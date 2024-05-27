@@ -21,7 +21,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
-    override fun getAllItemsStream(): Flow<List<AddTable>> = itemDao.getAllItems()
+    override fun getAllItemsStream(id: Int): Flow<List<AddTable>> = itemDao.getAllItems(id)
 
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()

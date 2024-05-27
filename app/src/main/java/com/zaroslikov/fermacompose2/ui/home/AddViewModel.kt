@@ -16,6 +16,7 @@
 
 package com.zaroslikov.fermacompose2.ui.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
@@ -28,21 +29,26 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * ViewModel to retrieve all items in the Room database.
  */
-class AddViewModel(val itemsRepository: ItemsRepository) : ViewModel() {
+class AddViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val itemsRepository: ItemsRepository) : ViewModel() {
+
+
+    private val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
     /**
      * Holds home ui state. The list of items are retrieved from [ItemsRepository] and mapped to
      * [HomeUiState]
      */
     val homeUiState: StateFlow<HomeUiState> =
-        itemsRepository.getAllItemsStream().map { HomeUiState(it) }
+        itemsRepository.getAllItemsStream(itemId).map { HomeUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = HomeUiState()
             )
     suspend fun saveItem() {
-        itemsRepository.insertItem(AddTable(0,"SAd",0.0, 36, mount = 6, year = 6, priceAll = "0.0", idPT = 5))
+        itemsRepository.insertItem(AddTable(0,"SAd",0.0, 36, mount = 6, year = 6, priceAll = "0.0", idPT = 1))
 
     }
     companion object {

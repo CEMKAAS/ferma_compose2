@@ -32,8 +32,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemDao {
 
-    @Query("SELECT * from MyFerma")
-    fun getAllItems(): Flow<List<AddTable>>
+    @Query("SELECT * from MyFerma Where idPT=:id ORDER BY id DESC")
+    fun getAllItems(id: Int): Flow<List<AddTable>>
 
     @Query("SELECT * from MyFerma WHERE id = :id")
     fun getItem(id: Int): Flow<AddTable>
