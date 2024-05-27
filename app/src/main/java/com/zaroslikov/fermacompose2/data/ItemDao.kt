@@ -32,14 +32,19 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemDao {
 
-    @Query("SELECT * from MyFerma Where idPT=:id ORDER BY id DESC")
-    fun getAllItems(id: Int): Flow<List<AddTable>>
+    @Query("SELECT * from Project")
+    fun getAllProject(): Flow<List<ProjectTable>>
 
     @Query("SELECT * from MyFerma WHERE id = :id")
     fun getItem(id: Int): Flow<AddTable>
 
-    @Query("SELECT * from Project")
-    fun getAllProject(): Flow<List<ProjectTable>>
+    @Query("SELECT * from MyFerma Where idPT=:id ORDER BY id DESC")
+    fun getAllItems(id: Int): Flow<List<AddTable>>
+
+    @Query("SELECT * from MyFerma Where id=:id")
+    fun getItemsAdd(id: Int): Flow<AddTable>
+
+
 
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.

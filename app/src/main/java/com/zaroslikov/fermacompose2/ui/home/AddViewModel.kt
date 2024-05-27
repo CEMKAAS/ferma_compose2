@@ -31,15 +31,11 @@ import kotlinx.coroutines.flow.stateIn
  */
 class AddViewModel(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository) : ViewModel() {
+    private val itemsRepository: ItemsRepository
+) : ViewModel() {
 
+    val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
-    private val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
-
-    /**
-     * Holds home ui state. The list of items are retrieved from [ItemsRepository] and mapped to
-     * [HomeUiState]
-     */
     val homeUiState: StateFlow<HomeUiState> =
         itemsRepository.getAllItemsStream(itemId).map { HomeUiState(it) }
             .stateIn(
@@ -47,13 +43,20 @@ class AddViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = HomeUiState()
             )
-    suspend fun saveItem() {
-        itemsRepository.insertItem(AddTable(0,"SAd",0.0, 36, mount = 6, year = 6, priceAll = "0.0", idPT = 1))
 
+    val itemAdd = itemsRepository.getItemsAdd()
+
+    suspend fun saveItem(addTable: AddTable) {
+//        if (validateInput()) { Todo Проверка
+        itemsRepository.insertItem(addTable)
+//        }
     }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
+
+
 }
 
 /**

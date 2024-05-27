@@ -48,9 +48,13 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -78,7 +82,9 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -101,6 +107,7 @@ fun AddScreen(
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -108,6 +115,9 @@ fun AddScreen(
     val showBottomDetails = remember { mutableStateOf(false) }
     val showBottomSheetFilter = remember { mutableStateOf(false) }
 
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -136,10 +146,7 @@ fun AddScreen(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-//                        showBottomSheet.value = true Todo Разблокировать
-                        coroutineScope.launch {
-                            viewModel.saveItem()
-                        }
+                        showBottomSheet.value = true //Todo Разблокировать
                     },
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
@@ -162,13 +169,31 @@ fun AddScreen(
                 contentPadding = innerPadding,
                 showBottom = showBottomSheet,
                 showBottomFilter = showBottomSheetFilter,
-                showBottomDetails = showBottomDetails
+                showBottomDetails = showBottomDetails,
+                sheetState = sheetState,
+                saveInRoomAdd = {
+                    coroutineScope.launch {
+                        viewModel.saveItem(
+                            AddTable(
+                                id = it.id,
+                                title = it.title,
+                                count = it.count,
+                                day = it.day,
+                                mount = it.mount,
+                                year = it.year,
+                                priceAll = it.priceAll,
+                                idPT = idProject
+                            )
+                        )
+                    }
+                }
             )
         }
     }
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddBody(
     itemList: List<AddTable>,
@@ -178,6 +203,8 @@ private fun AddBody(
     showBottom: MutableState<Boolean>,
     showBottomFilter: MutableState<Boolean>,
     showBottomDetails: MutableState<Boolean>,
+    sheetState: SheetState,
+    saveInRoomAdd: (AddTableInsert) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -208,19 +235,18 @@ private fun AddBody(
         if (showBottom.value) {
             AddProductSheet(
                 showBottom = showBottom,
-//                insertAddTable = insertAddTable,
-//                insertAddTable2 = insertAddTable2,
-//                view = view
+                saveInRoomAdd = saveInRoomAdd,
+                sheetState = sheetState
             )
         }
 
         if (showBottomDetails.value) {
-//            AddProductDetailsSheet(
-//                showBottom = showBottom,
-////                insertAddTable = insertAddTable,
-////                insertAddTable2 = insertAddTable2,
-////                view = view
-//            )
+            AddProductDetailsSheet(
+                showBottom = showBottom,
+//                insertAddTable = insertAddTable,
+//                insertAddTable2 = insertAddTable2,
+//                view = view
+            )
         }
     }
 }
@@ -296,15 +322,104 @@ fun AddProductCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun AddProductDetailsSheet(
+    showBottom: MutableState<Boolean>,
+    addTable: AddTable,
+    saveInRoomAdd: (AddTableInsert) -> Unit,
+    sheetState: SheetState
+) {
+
+    //Дата
+    var openDialog by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
+    ModalBottomSheet(
+        onDismissRequest = { showBottom.value = false },
+        sheetState = sheetState
+    ) {
+
+        var title by rememberSaveable { mutableStateOf(addTable.title) }
+        var count by rememberSaveable { mutableStateOf(addTable.count.toString()) }
+        var date by rememberSaveable { mutableStateOf("${addTable.day}.${addTable.mount}.${addTable.year}") }
+
+        //запоминает состояние для BottomShee
+        if (openDialog) {
+            DatePickerDialogSample(datePickerState, date) { date1 ->
+                date = date1
+                openDialog = false
+            }
+        }
+
+
+        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
+
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Товар") },
+                modifier = Modifier.fillMaxWidth(),
+                supportingText = {
+                    Text("Введите или выберите товар")
+                }
+            )
+
+            OutlinedTextField(
+                value = count,
+                onValueChange = { count = it },
+                label = { Text("Количество") },
+                modifier = Modifier.fillMaxWidth(),
+                supportingText = {
+                    Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                },
+                suffix = { Text(text = "Шт.") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//            isError = () TODO
+            )
+
+            OutlinedTextField(
+                value = date,
+                onValueChange = { date = it },
+                label = { Text("Дата") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { openDialog = true },
+                supportingText = {
+                    Text("Выберите дату")
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+
+//            isError = () TODO
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(onClick = {
+
+                }) {
+                    Text(text = "Добавить")
+                    //TODO Изображение
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun AddProductSheet(
     showBottom: MutableState<Boolean>,
-//    insertAddTable: (AddTableInsert) -> Unit,
-//    insertAddTable2: () -> Unit,
-//    view: AddDetails
+    saveInRoomAdd: (AddTableInsert) -> Unit,
+    sheetState: SheetState
 ) {
-    //запоминает состояние для BottomShee
 
-    ModalBottomSheet(onDismissRequest = { showBottom.value = false }) {
+    ModalBottomSheet(
+        onDismissRequest = { showBottom.value = false },
+        sheetState = sheetState
+    ) {
         var title by rememberSaveable { mutableStateOf("") }
         var count by rememberSaveable { mutableStateOf("") }
 
@@ -340,20 +455,18 @@ fun AddProductSheet(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(onClick = {
-//                    val calendar = Calendar.getInstance()
-//                    insertAddTable(
-//                        AddTableInsert(
-//                            id = 0,
-//                            title = title,
-//                            count = count.toDouble(),
-//                            calendar[Calendar.DAY_OF_MONTH],
-//                            (calendar[Calendar.MONTH] + 1),
-//                            calendar[Calendar.YEAR],
-//                            priceAll = "0"
-//                        )
-//                    )
-//                    view.sd
-//                    insertAddTable2()
+                    val calendar = Calendar.getInstance()
+                    saveInRoomAdd(
+                        AddTableInsert(
+                            id = 0,
+                            title = title,
+                            count = count.toDouble(),
+                            calendar[Calendar.DAY_OF_MONTH],
+                            (calendar[Calendar.MONTH] + 1),
+                            calendar[Calendar.YEAR],
+                            priceAll = "0"
+                        )
+                    )
                 }) {
                     Text(text = "Добавить")
                     //TODO Изображение
@@ -362,3 +475,14 @@ fun AddProductSheet(
         }
     }
 }
+
+
+data class AddTableInsert(
+    var id: Int,
+    var title: String,
+    var count: Double,
+    var day: Int,
+    var mount: Int,
+    var year: Int,
+    var priceAll: String
+)

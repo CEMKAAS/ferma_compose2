@@ -34,8 +34,10 @@ interface ItemsRepository {
      */
     fun getItemStream(id: Int): Flow<AddTable?>
 
-
     fun getAllProject(): Flow<List<ProjectTable>>
+
+
+    fun getItemsAdd(id: Int): Flow<AddTable>
 
 
     suspend fun insertProject(projectTable: ProjectTable)
