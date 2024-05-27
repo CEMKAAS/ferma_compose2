@@ -18,12 +18,21 @@ package com.zaroslikov.fermacompose2.data.ferma
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 /**
  * Entity data class represents a single row in the database.
  */
-@Entity(tableName = "MyFerma")
+@Entity(
+    tableName = "MyFerma",
+    foreignKeys = [ForeignKey(
+        entity = ProjectTable::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("idPT"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
 data class AddTable(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,

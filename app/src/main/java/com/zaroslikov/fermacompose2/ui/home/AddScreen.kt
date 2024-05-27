@@ -265,7 +265,7 @@ fun AddProductCard(
 
             Column {
                 Text(
-                    text = addProduct.title,
+                    text = addProduct.id.toString(),
                     modifier = Modifier
                         .fillMaxWidth(0.16f)
                         .padding(6.dp),
