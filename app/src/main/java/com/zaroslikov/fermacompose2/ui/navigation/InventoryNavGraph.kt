@@ -26,6 +26,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zaroslikov.fermacompose2.ui.home.AddScreen
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.ui.start.StartDestination
+import com.zaroslikov.fermacompose2.ui.start.StartScreen
+import com.zaroslikov.fermacompose2.ui.start.add.AddProject
+import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
 
 
 /**
@@ -39,19 +43,40 @@ fun InventoryNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = HomeDestination.route,
+        startDestination = StartDestination.route,
         modifier = modifier,
     ) {
 
-        composable(route = HomeDestination.route) {
+        composable(route = StartDestination.route) {
+            StartScreen(navController = navController,//TODO переделать на адд ADD
+                navigateToItemUpdate = {
+                    navController.navigate(
+//                    "${
+                  HomeDestination.route
+//                    }/${it}"
+                    )
+                })
+        }
+
+        composable(route = ProjectAddDestination.route) {
+            AddProject(navController = navController,//TODO переделать на старт
+                navigateBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = HomeDestination.route,
+//            arguments = listOf(navArgument(HomeDestination.itemIdArg) {
+//                type = NavType.IntType
+//            })
+        ) {
             AddScreen(
                 navigateToItemEntry = {
 //                    navController.navigate(ItemEntryDestination.route)
-                                      },
+                },
                 drawerState = drawerState,
                 navigateToItemUpdate = {
 //                    navController.navigate(
-//                        "${ItemDetailsDestination.route}/${it}"
+//                        "${HomeDestination.route}/${it}"
 //                    )
                 }
             )

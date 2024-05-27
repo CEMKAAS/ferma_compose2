@@ -17,6 +17,7 @@
 package com.zaroslikov.fermacompose2.data
 
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -33,10 +34,18 @@ interface ItemsRepository {
      */
     fun getItemStream(id: Int): Flow<AddTable?>
 
+
+    fun getAllProject(): Flow<List<ProjectTable>>
+
+
+    suspend fun insertProject(projectTable: ProjectTable)
+
     /**
      * Insert item in the data source
      */
     suspend fun insertItem(item: AddTable)
+
+
 
     /**
      * Delete item from the data source

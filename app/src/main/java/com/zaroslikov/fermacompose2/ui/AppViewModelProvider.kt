@@ -24,6 +24,9 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
+import com.zaroslikov.fermacompose2.ui.start.StartScreen
+import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
+import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Inventory app
@@ -31,10 +34,19 @@ import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 object AppViewModelProvider {
     val Factory = viewModelFactory {
 
+        initializer {
+            StartScreenViewModel(inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            ProjectAddViewModel(inventoryApplication().container.itemsRepository)
+        }
+
         // Initializer for HomeViewModel
         initializer {
             AddViewModel(inventoryApplication().container.itemsRepository)
         }
+
     }
 }
 

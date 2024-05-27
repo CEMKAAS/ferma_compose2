@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -37,10 +38,16 @@ interface ItemDao {
     @Query("SELECT * from MyFerma WHERE id = :id")
     fun getItem(id: Int): Flow<AddTable>
 
+    @Query("SELECT * from Project")
+    fun getAllProject(): Flow<List<ProjectTable>>
+
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: AddTable)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertProject(projectTable: ProjectTable)
 
     @Update
     suspend fun update(item: AddTable)

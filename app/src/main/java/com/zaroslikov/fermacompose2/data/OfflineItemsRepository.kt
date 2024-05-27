@@ -17,12 +17,16 @@
 package com.zaroslikov.fermacompose2.data
 
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAllItemsStream(): Flow<List<AddTable>> = itemDao.getAllItems()
 
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
+    override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
+
+    override suspend fun insertProject(projectTable: ProjectTable) = itemDao.insertProject(projectTable)
 
     override suspend fun insertItem(item: AddTable) = itemDao.insert(item)
 

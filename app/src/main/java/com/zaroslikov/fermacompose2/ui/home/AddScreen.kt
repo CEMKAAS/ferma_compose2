@@ -83,6 +83,8 @@ import kotlinx.coroutines.launch
 object HomeDestination : NavigationDestination {
     override val route = "home"
     override val titleRes = R.string.app_name
+    const val itemIdArg = "itemId"
+    val routeWithArgs = "$route/{$itemIdArg}"
 }
 
 /**
