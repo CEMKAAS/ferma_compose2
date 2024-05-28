@@ -54,6 +54,23 @@ class AddViewModel(
                 initialValue = HomeUiState()
             )
 
+    val titleUiState: StateFlow<TitleUiState> =
+        itemsRepository.getItemsTitleAddList(itemId).map { TitleUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = TitleUiState()
+            )
+
+
+    val categoryUiState: StateFlow<CategoryUiState> =
+        itemsRepository.getItemsCategoryAddList(itemId).map { CategoryUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = CategoryUiState()
+            )
+
     suspend fun itemAdd(id: Int) = itemsRepository.getItemsAdd(id)
 
     suspend fun saveItem(addTable: AddTable) {
@@ -73,3 +90,7 @@ class AddViewModel(
  * Ui State for HomeScreen
  */
 data class HomeUiState(val itemList: List<AddTable> = listOf())
+
+data class TitleUiState(val titleList: List<String> = listOf())
+
+data class CategoryUiState(val categoryList: List<String> = listOf())

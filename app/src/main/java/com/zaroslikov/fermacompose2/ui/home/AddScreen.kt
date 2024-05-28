@@ -41,12 +41,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,12 +54,8 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -81,7 +75,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -91,7 +84,6 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -115,6 +107,9 @@ fun AddScreen(
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    val titleUiState by viewModel.titleUiState.collectAsState()
+    val categoryUiState by viewModel.categoryUiState.collectAsState()
 
     val idProject = viewModel.itemId
 
@@ -180,6 +175,7 @@ fun AddScreen(
                 sheetState = sheetState,
                 saveInRoomAdd = {
                     coroutineScope.launch {
+                        showBottomSheet.value = false
                         viewModel.saveItem(
                             AddTable(
                                 id = it.id,
@@ -195,7 +191,9 @@ fun AddScreen(
                             )
                         )
                     }
-                }
+                },
+                titleList = titleUiState.titleList,
+                categoryList = categoryUiState.categoryList
             )
         }
     }
@@ -212,7 +210,9 @@ private fun AddBody(
     showBottom: MutableState<Boolean>,
     showBottomFilter: MutableState<Boolean>,
     sheetState: SheetState,
-    saveInRoomAdd: (AddTableInsert) -> Unit
+    saveInRoomAdd: (AddTableInsert) -> Unit,
+    titleList: List<String>,
+    categoryList: List<String>
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -244,7 +244,9 @@ private fun AddBody(
             AddProductSheet(
                 showBottom = showBottom,
                 saveInRoomAdd = saveInRoomAdd,
-                sheetState = sheetState
+                sheetState = sheetState,
+                titleList = titleList,
+                categoryList = categoryList
             )
         }
     }
@@ -292,7 +294,7 @@ fun AddProductCard(
 
             Column {
                 Text(
-                    text = addProduct.id.toString(),
+                    text = addProduct.title,
                     modifier = Modifier
                         .fillMaxWidth(0.16f)
                         .padding(6.dp),
@@ -333,6 +335,8 @@ fun AddProductCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProductSheet(
+    titleList: List<String>,
+    categoryList: List<String>,
     showBottom: MutableState<Boolean>,
     saveInRoomAdd: (AddTableInsert) -> Unit,
     sheetState: SheetState
@@ -344,14 +348,28 @@ fun AddProductSheet(
     ) {
         var title by remember { mutableStateOf("") }
         var count by rememberSaveable { mutableStateOf("") }
-        var category by rememberSaveable { mutableStateOf("") }
-
-        val coffeeDrinks = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
-        var expanded by remember { mutableStateOf(false) }
-
-
+        var category by remember { mutableStateOf("") }
         var suffix by remember { mutableStateOf("Ед.") }
+
+
+        var expanded by remember { mutableStateOf(false) }
         var expandedSuf by remember { mutableStateOf(false) }
+        var expandedCat by remember { mutableStateOf(false) }
+
+        var isErrorTitle by rememberSaveable { mutableStateOf(false) }
+        var isErrorCount by rememberSaveable { mutableStateOf(false) }
+
+        fun validateTitle(text: String) {
+            if (text == "") {
+                isErrorTitle = true
+            }
+        }
+
+        fun validateCount(text: String) {
+            if (text == "") {
+                isErrorCount = true
+            }
+        }
 
 
         Column(modifier = Modifier.padding(5.dp, 5.dp)) {
@@ -364,18 +382,22 @@ fun AddProductSheet(
                 ) {
                     OutlinedTextField(
                         value = title,
-                        onValueChange = { title = it },
+                        onValueChange = {
+                            title = it
+                            validateTitle(title)
+                        },
                         label = { Text(text = "Товар") },
                         supportingText = {
                             Text("Выберите или укажите товар")
                         },
                         modifier = Modifier
                             .menuAnchor()
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        isError = isErrorTitle
                     )
 
                     val filteredOptions =
-                        coffeeDrinks.filter { it.contains(title, ignoreCase = true) }
+                        titleList.filter { it.contains(title, ignoreCase = true) }
                     if (filteredOptions.isNotEmpty()) {
                         ExposedDropdownMenu(
                             expanded = expanded,
@@ -396,10 +418,14 @@ fun AddProductSheet(
                     }
                 }
             }
+
             Box {
                 OutlinedTextField(
                     value = count,
-                    onValueChange = { count = it },
+                    onValueChange = {
+                        count = it
+                        validateCount(count)
+                    },
                     label = { Text("Количество") },
                     modifier = Modifier.fillMaxWidth(),
                     supportingText = {
@@ -414,7 +440,7 @@ fun AddProductSheet(
                         Text(text = suffix)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//            isError = () TODO
+                    isError = isErrorCount
                 )
                 DropdownMenu(
                     expanded = expandedSuf,
@@ -437,17 +463,50 @@ fun AddProductSheet(
 
             }
 
+//            Box {
+//                ExposedDropdownMenuBox(
+//                    expanded = expandedCat,
+//                    onExpandedChange = {
+//                        expandedCat = !expandedCat
+//                    }
+//                ) {
             OutlinedTextField(
                 value = category,
                 onValueChange = { category = it },
                 label = { Text("Категория") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+//                            .menuAnchor()
+                ,
                 supportingText = {
-                    Text("Укажите категорию в которую хотите отнести товар")
+                    Text("Укажите или выберите категорию в которую хотите отнести товар")
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-//            isError = () TODO
+                isError = isErrorCount
             )
+
+//                    val filteredOptions =
+//                        categoryList.filter { it.contains(category, ignoreCase = true) }
+//                    if (filteredOptions.isNotEmpty()) {
+//                        ExposedDropdownMenu(
+//                            expanded = expandedCat,
+//                            onDismissRequest = {
+//                                // We shouldn't hide the menu when the user enters/removes any character
+//                            }
+//                        ) {
+//                            filteredOptions.forEach { item ->
+//                                DropdownMenuItem(
+//                                    text = { Text(text = item) },
+//                                    onClick = {
+//                                        category = item
+//                                        expandedCat = false
+//                                    }
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -455,20 +514,22 @@ fun AddProductSheet(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(onClick = {
-                    val calendar = Calendar.getInstance()
-                    saveInRoomAdd(
-                        AddTableInsert(
-                            id = 0,
-                            title = title,
-                            count = count.toDouble(),
-                            calendar[Calendar.DAY_OF_MONTH],
-                            (calendar[Calendar.MONTH] + 1),
-                            calendar[Calendar.YEAR],
-                            suffix = suffix,
-                            category = category,
-                            priceAll = "0"
+                    if (!isErrorTitle && !isErrorCount) {
+                        val calendar = Calendar.getInstance()
+                        saveInRoomAdd(
+                            AddTableInsert(
+                                id = 0,
+                                title = title,
+                                count = count.toDouble(),
+                                calendar[Calendar.DAY_OF_MONTH],
+                                (calendar[Calendar.MONTH] + 1),
+                                calendar[Calendar.YEAR],
+                                suffix = suffix,
+                                category = category,
+                                priceAll = "0"
+                            )
                         )
-                    )
+                    }
                 }) {
                     Text(text = "Добавить")
                     //TODO Изображение
