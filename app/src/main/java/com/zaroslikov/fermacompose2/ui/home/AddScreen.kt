@@ -18,6 +18,7 @@ package com.zaroslikov.fermacompose2.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -35,14 +36,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -51,6 +58,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
@@ -73,6 +81,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -99,7 +108,6 @@ object HomeDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
-    navigateToItemEntry: () -> Unit,
     navigateToItemUpdate: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
@@ -107,12 +115,12 @@ fun AddScreen(
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
 
     val showBottomSheet = remember { mutableStateOf(false) }
-    val showBottomDetails = remember { mutableStateOf(false) }
     val showBottomSheetFilter = remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(
@@ -169,7 +177,6 @@ fun AddScreen(
                 contentPadding = innerPadding,
                 showBottom = showBottomSheet,
                 showBottomFilter = showBottomSheetFilter,
-                showBottomDetails = showBottomDetails,
                 sheetState = sheetState,
                 saveInRoomAdd = {
                     coroutineScope.launch {
@@ -182,6 +189,8 @@ fun AddScreen(
                                 mount = it.mount,
                                 year = it.year,
                                 priceAll = it.priceAll,
+                                suffix = it.suffix,
+                                category = it.category,
                                 idPT = idProject
                             )
                         )
@@ -202,7 +211,6 @@ private fun AddBody(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     showBottom: MutableState<Boolean>,
     showBottomFilter: MutableState<Boolean>,
-    showBottomDetails: MutableState<Boolean>,
     sheetState: SheetState,
     saveInRoomAdd: (AddTableInsert) -> Unit
 ) {
@@ -226,26 +234,17 @@ private fun AddBody(
             )
         }
 
-//        if (showBottomFilter.value) {
+        if (showBottomFilter.value) {
 //            FilterProductSheet(
 //                showBottom = showBottomFilter
 //            )
-//        }
+        }
 
         if (showBottom.value) {
             AddProductSheet(
                 showBottom = showBottom,
                 saveInRoomAdd = saveInRoomAdd,
                 sheetState = sheetState
-            )
-        }
-
-        if (showBottomDetails.value) {
-            AddProductDetailsSheet(
-                showBottom = showBottom,
-//                insertAddTable = insertAddTable,
-//                insertAddTable2 = insertAddTable2,
-//                view = view
             )
         }
     }
@@ -267,6 +266,8 @@ private fun InventoryList(
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable { onItemClick(item) })
+
+
         }
     }
 }
@@ -297,7 +298,15 @@ fun AddProductCard(
                         .padding(6.dp),
                     fontWeight = FontWeight.SemiBold,
                 )
-
+                if (addProduct.category != "") {
+                    Text(
+                        text = "Категория: ${addProduct.category}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(6.dp)
+                    )
+                }
                 Text(
                     text = "${addProduct.day}.${addProduct.mount}.${addProduct.year}",
                     textAlign = TextAlign.Center,
@@ -308,7 +317,7 @@ fun AddProductCard(
             }
 
             Text(
-                text = "${addProduct.count} шт.",
+                text = "${addProduct.count} ${addProduct.suffix}",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth(0.3f)
@@ -320,93 +329,6 @@ fun AddProductCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddProductDetailsSheet(
-    showBottom: MutableState<Boolean>,
-    addTable: AddTable,
-    saveInRoomAdd: (AddTableInsert) -> Unit,
-    sheetState: SheetState
-) {
-
-    //Дата
-    var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-
-    ModalBottomSheet(
-        onDismissRequest = { showBottom.value = false },
-        sheetState = sheetState
-    ) {
-
-        var title by rememberSaveable { mutableStateOf(addTable.title) }
-        var count by rememberSaveable { mutableStateOf(addTable.count.toString()) }
-        var date by rememberSaveable { mutableStateOf("${addTable.day}.${addTable.mount}.${addTable.year}") }
-
-        //запоминает состояние для BottomShee
-        if (openDialog) {
-            DatePickerDialogSample(datePickerState, date) { date1 ->
-                date = date1
-                openDialog = false
-            }
-        }
-
-
-        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Товар") },
-                modifier = Modifier.fillMaxWidth(),
-                supportingText = {
-                    Text("Введите или выберите товар")
-                }
-            )
-
-            OutlinedTextField(
-                value = count,
-                onValueChange = { count = it },
-                label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth(),
-                supportingText = {
-                    Text("Укажите кол-во товара, которое хотите сохранить на склад")
-                },
-                suffix = { Text(text = "Шт.") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//            isError = () TODO
-            )
-
-            OutlinedTextField(
-                value = date,
-                onValueChange = { date = it },
-                label = { Text("Дата") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { openDialog = true },
-                supportingText = {
-                    Text("Выберите дату")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-
-//            isError = () TODO
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(onClick = {
-
-                }) {
-                    Text(text = "Добавить")
-                    //TODO Изображение
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -420,32 +342,110 @@ fun AddProductSheet(
         onDismissRequest = { showBottom.value = false },
         sheetState = sheetState
     ) {
-        var title by rememberSaveable { mutableStateOf("") }
+        var title by remember { mutableStateOf("") }
         var count by rememberSaveable { mutableStateOf("") }
+        var category by rememberSaveable { mutableStateOf("") }
+
+        val coffeeDrinks = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
+        var expanded by remember { mutableStateOf(false) }
+
+
+        var suffix by remember { mutableStateOf("Ед.") }
+        var expandedSuf by remember { mutableStateOf(false) }
+
 
         Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-            Text(text = "Cейчас на складе: ${"Яйца - 50 шт."}", fontSize = 20.sp)
+            Box {
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = {
+                        expanded = !expanded
+                    }
+                ) {
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text(text = "Товар") },
+                        supportingText = {
+                            Text("Выберите или укажите товар")
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
 
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Товар") },
-                modifier = Modifier.fillMaxWidth(),
-                supportingText = {
-                    Text("Введите или выберите товар")
+                    val filteredOptions =
+                        coffeeDrinks.filter { it.contains(title, ignoreCase = true) }
+                    if (filteredOptions.isNotEmpty()) {
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = {
+                                // We shouldn't hide the menu when the user enters/removes any character
+                            }
+                        ) {
+                            filteredOptions.forEach { item ->
+                                DropdownMenuItem(
+                                    text = { Text(text = item) },
+                                    onClick = {
+                                        title = item
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
-            )
+            }
+            Box {
+                OutlinedTextField(
+                    value = count,
+                    onValueChange = { count = it },
+                    label = { Text("Количество") },
+                    modifier = Modifier.fillMaxWidth(),
+                    supportingText = {
+                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { expandedSuf = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
+                        }
+                    },
+                    suffix = {
+                        Text(text = suffix)
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//            isError = () TODO
+                )
+                DropdownMenu(
+                    expanded = expandedSuf,
+                    onDismissRequest = { expandedSuf = false },
+                    //todo чтобы был слева
+                ) {
+                    DropdownMenuItem(
+                        onClick = { suffix = "Шт." },
+                        text = { Text("Шт.") }
+                    )
+                    DropdownMenuItem(
+                        onClick = { suffix = "Кг." },
+                        text = { Text("Кг.") }
+                    )
+                    DropdownMenuItem(
+                        onClick = { suffix = "Л." },
+                        text = { Text("Л.") }
+                    )
+                }
+
+            }
 
             OutlinedTextField(
-                value = count,
-                onValueChange = { count = it },
-                label = { Text("Количество") },
+                value = category,
+                onValueChange = { category = it },
+                label = { Text("Категория") },
                 modifier = Modifier.fillMaxWidth(),
                 supportingText = {
-                    Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                    Text("Укажите категорию в которую хотите отнести товар")
                 },
-                suffix = { Text(text = "Шт.") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
 //            isError = () TODO
             )
             Row(
@@ -464,6 +464,8 @@ fun AddProductSheet(
                             calendar[Calendar.DAY_OF_MONTH],
                             (calendar[Calendar.MONTH] + 1),
                             calendar[Calendar.YEAR],
+                            suffix = suffix,
+                            category = category,
                             priceAll = "0"
                         )
                     )
@@ -484,5 +486,226 @@ data class AddTableInsert(
     var day: Int,
     var mount: Int,
     var year: Int,
-    var priceAll: String
+    var priceAll: String,
+    var suffix: String,
+    var category: String,
 )
+//
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun AddProductSheetPP() {
+//
+//    var title by remember { mutableStateOf("") }
+//    var count by rememberSaveable { mutableStateOf("") }
+//    var category by rememberSaveable { mutableStateOf("") }
+//
+//    val coffeeDrinks = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
+//    var expanded by remember { mutableStateOf(false) }
+//
+//
+//    var suffix by remember { mutableStateOf("Ед.") }
+//    var expandedSuf by remember { mutableStateOf(false) }
+//
+//
+//    Column(modifier = Modifier.padding(5.dp, 5.dp)) {
+//        Box {
+//                ExposedDropdownMenuBox(
+//                    expanded = expanded,
+//                    onExpandedChange = {
+//                        expanded = !expanded
+//                    }
+//                ) {
+//                    OutlinedTextField(
+//                        value = title,
+//                        onValueChange = { title = it },
+//                        label = { Text(text = "Товар") },
+//                        supportingText = {
+//                            Text("Выберите или укажите товар")
+//                        },
+//                        modifier = Modifier
+//                            .menuAnchor()
+//                            .fillMaxWidth()
+//                    )
+//
+//                    val filteredOptions =
+//                        coffeeDrinks.filter { it.contains(title, ignoreCase = true) }
+//                    if (filteredOptions.isNotEmpty()) {
+//                        ExposedDropdownMenu(
+//                            expanded = expanded,
+//                            onDismissRequest = {
+//                                // We shouldn't hide the menu when the user enters/removes any character
+//                            }
+//                        ) {
+//                            filteredOptions.forEach { item ->
+//                                DropdownMenuItem(
+//                                    text = { Text(text = item) },
+//                                    onClick = {
+//                                        title = item
+//                                        expanded = false
+//                                    }
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//    Box {
+//        OutlinedTextField(
+//            value = count,
+//            onValueChange = { count = it },
+//            label = { Text("Количество") },
+//            modifier = Modifier.fillMaxWidth(),
+//            supportingText = {
+//                Text("Укажите кол-во товара, которое хотите сохранить на склад")
+//            },
+//            trailingIcon = {
+//                IconButton(onClick = { expandedSuf = true }) {
+//                    Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
+//                }
+//            },
+//            suffix = {
+//                Text(text = suffix)
+//            },
+//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+////            isError = () TODO
+//        )
+//        DropdownMenu(
+//            expanded = expandedSuf,
+//            onDismissRequest = { expandedSuf = false },
+//            //todo чтобы был слева
+//        ) {
+//            DropdownMenuItem(
+//                onClick = { suffix = "Шт." },
+//                text = { Text("Шт.") }
+//            )
+//            DropdownMenuItem(
+//                onClick = { suffix = "Кг." },
+//                text = { Text("Кг.") }
+//            )
+//            DropdownMenuItem(
+//                onClick = { suffix = "Л." },
+//                text = { Text("Л.") }
+//            )
+//        }
+//
+//    }
+//
+//        OutlinedTextField(
+//            value = category,
+//            onValueChange = { category = it },
+//            label = { Text("Категория") },
+//            modifier = Modifier.fillMaxWidth(),
+//            supportingText = {
+//                Text("Укажите категорию в которую хотите отнести товар")
+//            },
+//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+////            isError = () TODO
+//        )
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(vertical = 10.dp),
+//            horizontalArrangement = Arrangement.Center
+//        ) {
+//            Button(onClick = {
+//            }) {
+//                Text(text = "Добавить")
+//                //TODO Изображение
+//            }
+//        }
+//    }
+//}
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun AddProductSheetPPRewie() {
+//    AddProductSheetPP()
+//}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun AddProductDetailsSheet(
+//    showBottom: MutableState<Boolean>,
+//    addTable: AddTable,
+//    saveInRoomAdd: (AddTableInsert) -> Unit,
+//    sheetState: SheetState
+//) {
+//
+//    //Дата
+//    var openDialog by remember { mutableStateOf(false) }
+//    val datePickerState = rememberDatePickerState()
+//
+//    ModalBottomSheet(
+//        onDismissRequest = { showBottom.value = false },
+//        sheetState = sheetState
+//    ) {
+//
+//        var title by rememberSaveable { mutableStateOf(addTable.title) }
+//        var count by rememberSaveable { mutableStateOf(addTable.count.toString()) }
+//        var date by rememberSaveable { mutableStateOf("${addTable.day}.${addTable.mount}.${addTable.year}") }
+//
+//        //запоминает состояние для BottomShee
+//        if (openDialog) {
+//            DatePickerDialogSample(datePickerState, date) { date1 ->
+//                date = date1
+//                openDialog = false
+//            }
+//        }
+//
+//
+//        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
+//
+//            OutlinedTextField(
+//                value = title,
+//                onValueChange = { title = it },
+//                label = { Text("Товар") },
+//                modifier = Modifier.fillMaxWidth(),
+//                supportingText = {
+//                    Text("Введите или выберите товар")
+//                }
+//            )
+//
+//            OutlinedTextField(
+//                value = count,
+//                onValueChange = { count = it },
+//                label = { Text("Количество") },
+//                modifier = Modifier.fillMaxWidth(),
+//                supportingText = {
+//                    Text("Укажите кол-во товара, которое хотите сохранить на склад")
+//                },
+//                suffix = { Text(text = "Шт.") },
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+////            isError = () TODO
+//            )
+//
+//            OutlinedTextField(
+//                value = date,
+//                onValueChange = { date = it },
+//                label = { Text("Дата") },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .clickable { openDialog = true },
+//                supportingText = {
+//                    Text("Выберите дату")
+//                },
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+//
+////            isError = () TODO
+//            )
+//
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(vertical = 10.dp),
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                Button(onClick = {
+//
+//                }) {
+//                    Text(text = "Добавить")
+//                    //TODO Изображение
+//                }
+//            }
+//        }
+//    }
+//}

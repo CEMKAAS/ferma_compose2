@@ -16,6 +16,10 @@
 
 package com.zaroslikov.fermacompose2.ui.home
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,7 +38,13 @@ class AddViewModel(
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
+
+
     val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
+
+    var itemIdAdd by mutableIntStateOf(0)
+    private set
+
 
     val homeUiState: StateFlow<HomeUiState> =
         itemsRepository.getAllItemsStream(itemId).map { HomeUiState(it) }
@@ -44,7 +54,7 @@ class AddViewModel(
                 initialValue = HomeUiState()
             )
 
-    val itemAdd = itemsRepository.getItemsAdd()
+    suspend fun itemAdd(id: Int) = itemsRepository.getItemsAdd(id)
 
     suspend fun saveItem(addTable: AddTable) {
 //        if (validateInput()) { Todo Проверка

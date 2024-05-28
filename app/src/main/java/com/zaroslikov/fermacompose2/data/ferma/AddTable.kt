@@ -46,7 +46,8 @@ data class AddTable(
     val mount: Int, // месяц
     val year: Int, // время
     val priceAll: String,
-
     @ColumnInfo(name = "idPT")
-    val idPT: Int
+    val idPT: Int,
+    var suffix: String,
+    var category: String,
 )

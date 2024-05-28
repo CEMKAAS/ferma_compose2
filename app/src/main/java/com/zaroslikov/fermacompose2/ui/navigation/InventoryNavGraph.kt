@@ -66,9 +66,6 @@ fun InventoryNavHost(
             })
         ) {
             AddScreen(
-                navigateToItemEntry = {
-//                    navController.navigate(ItemEntryDestination.route)
-                },
                 drawerState = drawerState,
                 navigateToItemUpdate = {
 //                    navController.navigate(
