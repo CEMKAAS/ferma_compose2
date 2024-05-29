@@ -24,6 +24,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
+import com.zaroslikov.fermacompose2.ui.home.AddEditProduct
+import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
+import com.zaroslikov.fermacompose2.ui.home.AddEntryProduct
 import com.zaroslikov.fermacompose2.ui.home.AddScreen
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
@@ -67,11 +71,39 @@ fun InventoryNavHost(
         ) {
             AddScreen(
                 drawerState = drawerState,
+                navigateToItemAdd = {
+                    navController.navigate(
+                        "${AddEntryDestination.route}/${it}"
+                    )
+                },
                 navigateToItemUpdate = {
-//                    navController.navigate(
-//                        "${HomeDestination.route}/${it}"
-//                    )
+                    navController.navigate(
+                        "${AddEditDestination.route}/${it}"
+                    )
                 }
+            )
+        }
+        composable(
+            route = AddEntryDestination.routeWithArgs,
+            arguments = listOf(navArgument(AddEntryDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            AddEntryProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = AddEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(AddEditDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            AddEditProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
             )
         }
     }

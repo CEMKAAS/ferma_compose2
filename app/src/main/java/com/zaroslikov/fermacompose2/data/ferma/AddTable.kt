@@ -50,4 +50,5 @@ data class AddTable(
     val idPT: Int,
     var suffix: String,
     var category: String,
+    var animal: String,
 )

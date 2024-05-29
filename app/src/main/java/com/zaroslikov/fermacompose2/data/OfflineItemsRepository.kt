@@ -25,9 +25,10 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
-    override fun getItemsAdd(id: Int): Flow<AddTable> =itemDao.getItemsAdd(id)
+    override fun getItemAdd(id: Int): Flow<AddTable> =itemDao.getItemAdd(id)
     override fun getItemsTitleAddList(id: Int): Flow<List<String>>  = itemDao.getItemsTitleAddList(id)
     override fun getItemsCategoryAddList(id: Int): Flow<List<String>> = itemDao.getItemsCategoryAddList(id)
+    override fun getItemsAnimalAddList(id: Int): Flow<List<String>> = itemDao.getItemsAnimalAddList(id)
 
     override suspend fun insertProject(projectTable: ProjectTable) = itemDao.insertProject(projectTable)
 

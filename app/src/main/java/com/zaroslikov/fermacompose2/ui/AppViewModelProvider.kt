@@ -23,6 +23,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
+import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
+import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.start.StartScreen
 import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
@@ -44,8 +46,19 @@ object AppViewModelProvider {
 
         // Initializer for HomeViewModel
         initializer {
-
             AddViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            AddEntryViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            AddEditViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository)
         }

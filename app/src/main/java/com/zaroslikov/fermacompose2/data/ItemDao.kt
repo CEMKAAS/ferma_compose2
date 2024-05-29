@@ -42,13 +42,16 @@ interface ItemDao {
     fun getAllItems(id: Int): Flow<List<AddTable>>
 
     @Query("SELECT * from MyFerma Where id=:id")
-    fun getItemsAdd(id: Int): Flow<AddTable>
+    fun getItemAdd(id: Int): Flow<AddTable>
 
     @Query("SELECT MyFerma.Title from MyFerma Where idPT=:id group by MyFerma.Title ")
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
 
     @Query("SELECT MyFerma.category from MyFerma Where idPT=:id group by MyFerma.category ")
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
+
+    @Query("SELECT MyFerma.animal from MyFerma Where idPT=:id group by MyFerma.animal ")
+    fun getItemsAnimalAddList(id: Int): Flow<List<String>>
 
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.

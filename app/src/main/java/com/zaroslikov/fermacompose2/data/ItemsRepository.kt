@@ -32,15 +32,18 @@ interface ItemsRepository {
     /**
      * Retrieve an item from the given data source that matches with the [id].
      */
+
+
     fun getItemStream(id: Int): Flow<AddTable?>
 
     fun getAllProject(): Flow<List<ProjectTable>>
 
-    fun getItemsAdd(id: Int): Flow<AddTable>
+    fun getItemAdd(id: Int): Flow<AddTable>
 
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
 
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
+    fun getItemsAnimalAddList(id: Int): Flow<List<String>>
 
     suspend fun insertProject(projectTable: ProjectTable)
 

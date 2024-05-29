@@ -45,6 +45,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -101,6 +102,7 @@ object HomeDestination : NavigationDestination {
 @Composable
 fun AddScreen(
     navigateToItemUpdate: (Int) -> Unit,
+    navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -108,19 +110,11 @@ fun AddScreen(
     val homeUiState by viewModel.homeUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    val titleUiState by viewModel.titleUiState.collectAsState()
-    val categoryUiState by viewModel.categoryUiState.collectAsState()
-
     val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
 
-    val showBottomSheet = remember { mutableStateOf(false) }
     val showBottomSheetFilter = remember { mutableStateOf(false) }
-
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -141,16 +135,14 @@ fun AddScreen(
                     title = "Мои Товары",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheet, //todo на фильтр
+                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
                     filterSheet = true,
                     scrollBehavior = scrollBehavior
                 )
             },
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = {
-                        showBottomSheet.value = true //Todo Разблокировать
-                    },
+                    onClick = { navigateToItemAdd(idProject) },
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .padding(
@@ -170,30 +162,7 @@ fun AddScreen(
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                showBottom = showBottomSheet,
-                showBottomFilter = showBottomSheetFilter,
-                sheetState = sheetState,
-                saveInRoomAdd = {
-                    coroutineScope.launch {
-                        showBottomSheet.value = false
-                        viewModel.saveItem(
-                            AddTable(
-                                id = it.id,
-                                title = it.title,
-                                count = it.count,
-                                day = it.day,
-                                mount = it.mount,
-                                year = it.year,
-                                priceAll = it.priceAll,
-                                suffix = it.suffix,
-                                category = it.category,
-                                idPT = idProject
-                            )
-                        )
-                    }
-                },
-                titleList = titleUiState.titleList,
-                categoryList = categoryUiState.categoryList
+                showBottomFilter = showBottomSheetFilter
             )
         }
     }
@@ -207,12 +176,7 @@ private fun AddBody(
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottom: MutableState<Boolean>,
-    showBottomFilter: MutableState<Boolean>,
-    sheetState: SheetState,
-    saveInRoomAdd: (AddTableInsert) -> Unit,
-    titleList: List<String>,
-    categoryList: List<String>
+    showBottomFilter: MutableState<Boolean>
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -240,15 +204,6 @@ private fun AddBody(
 //            )
         }
 
-        if (showBottom.value) {
-            AddProductSheet(
-                showBottom = showBottom,
-                saveInRoomAdd = saveInRoomAdd,
-                sheetState = sheetState,
-                titleList = titleList,
-                categoryList = categoryList
-            )
-        }
     }
 }
 
@@ -309,6 +264,15 @@ fun AddProductCard(
                             .padding(6.dp)
                     )
                 }
+                if (addProduct.animal != "") {
+                    Text(
+                        text = "Животное: ${addProduct.animal}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(6.dp)
+                    )
+                }
                 Text(
                     text = "${addProduct.day}.${addProduct.mount}.${addProduct.year}",
                     textAlign = TextAlign.Center,
@@ -331,226 +295,6 @@ fun AddProductCard(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddProductSheet(
-    titleList: List<String>,
-    categoryList: List<String>,
-    showBottom: MutableState<Boolean>,
-    saveInRoomAdd: (AddTableInsert) -> Unit,
-    sheetState: SheetState
-) {
-
-    ModalBottomSheet(
-        onDismissRequest = { showBottom.value = false },
-        sheetState = sheetState
-    ) {
-        var title by remember { mutableStateOf("") }
-        var count by rememberSaveable { mutableStateOf("") }
-        var category by remember { mutableStateOf("") }
-        var suffix by remember { mutableStateOf("Ед.") }
-
-
-        var expanded by remember { mutableStateOf(false) }
-        var expandedSuf by remember { mutableStateOf(false) }
-        var expandedCat by remember { mutableStateOf(false) }
-
-        var isErrorTitle by rememberSaveable { mutableStateOf(false) }
-        var isErrorCount by rememberSaveable { mutableStateOf(false) }
-
-        fun validateTitle(text: String) {
-            if (text == "") {
-                isErrorTitle = true
-            }
-        }
-
-        fun validateCount(text: String) {
-            if (text == "") {
-                isErrorCount = true
-            }
-        }
-
-
-        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-            Box {
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = {
-                        expanded = !expanded
-                    }
-                ) {
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = {
-                            title = it
-                            validateTitle(title)
-                        },
-                        label = { Text(text = "Товар") },
-                        supportingText = {
-                            Text("Выберите или укажите товар")
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        isError = isErrorTitle
-                    )
-
-                    val filteredOptions =
-                        titleList.filter { it.contains(title, ignoreCase = true) }
-                    if (filteredOptions.isNotEmpty()) {
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = {
-                                // We shouldn't hide the menu when the user enters/removes any character
-                            }
-                        ) {
-                            filteredOptions.forEach { item ->
-                                DropdownMenuItem(
-                                    text = { Text(text = item) },
-                                    onClick = {
-                                        title = item
-                                        expanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            Box {
-                OutlinedTextField(
-                    value = count,
-                    onValueChange = {
-                        count = it
-                        validateCount(count)
-                    },
-                    label = { Text("Количество") },
-                    modifier = Modifier.fillMaxWidth(),
-                    supportingText = {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { expandedSuf = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
-                        }
-                    },
-                    suffix = {
-                        Text(text = suffix)
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = isErrorCount
-                )
-                DropdownMenu(
-                    expanded = expandedSuf,
-                    onDismissRequest = { expandedSuf = false },
-                    //todo чтобы был слева
-                ) {
-                    DropdownMenuItem(
-                        onClick = { suffix = "Шт." },
-                        text = { Text("Шт.") }
-                    )
-                    DropdownMenuItem(
-                        onClick = { suffix = "Кг." },
-                        text = { Text("Кг.") }
-                    )
-                    DropdownMenuItem(
-                        onClick = { suffix = "Л." },
-                        text = { Text("Л.") }
-                    )
-                }
-
-            }
-
-//            Box {
-//                ExposedDropdownMenuBox(
-//                    expanded = expandedCat,
-//                    onExpandedChange = {
-//                        expandedCat = !expandedCat
-//                    }
-//                ) {
-            OutlinedTextField(
-                value = category,
-                onValueChange = { category = it },
-                label = { Text("Категория") },
-                modifier = Modifier.fillMaxWidth()
-//                            .menuAnchor()
-                ,
-                supportingText = {
-                    Text("Укажите или выберите категорию в которую хотите отнести товар")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                isError = isErrorCount
-            )
-
-//                    val filteredOptions =
-//                        categoryList.filter { it.contains(category, ignoreCase = true) }
-//                    if (filteredOptions.isNotEmpty()) {
-//                        ExposedDropdownMenu(
-//                            expanded = expandedCat,
-//                            onDismissRequest = {
-//                                // We shouldn't hide the menu when the user enters/removes any character
-//                            }
-//                        ) {
-//                            filteredOptions.forEach { item ->
-//                                DropdownMenuItem(
-//                                    text = { Text(text = item) },
-//                                    onClick = {
-//                                        category = item
-//                                        expandedCat = false
-//                                    }
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(onClick = {
-                    if (!isErrorTitle && !isErrorCount) {
-                        val calendar = Calendar.getInstance()
-                        saveInRoomAdd(
-                            AddTableInsert(
-                                id = 0,
-                                title = title,
-                                count = count.toDouble(),
-                                calendar[Calendar.DAY_OF_MONTH],
-                                (calendar[Calendar.MONTH] + 1),
-                                calendar[Calendar.YEAR],
-                                suffix = suffix,
-                                category = category,
-                                priceAll = "0"
-                            )
-                        )
-                    }
-                }) {
-                    Text(text = "Добавить")
-                    //TODO Изображение
-                }
-            }
-        }
-    }
-}
-
-
-data class AddTableInsert(
-    var id: Int,
-    var title: String,
-    var count: Double,
-    var day: Int,
-    var mount: Int,
-    var year: Int,
-    var priceAll: String,
-    var suffix: String,
-    var category: String,
-)
 //
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
