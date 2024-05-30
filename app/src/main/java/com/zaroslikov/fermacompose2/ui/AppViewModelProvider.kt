@@ -26,7 +26,9 @@ import com.zaroslikov.fermacompose2.InventoryApplication
 import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
-import com.zaroslikov.fermacompose2.ui.start.StartScreen
+import com.zaroslikov.fermacompose2.ui.sale.SaleEditViewModel
+import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
+import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddViewModel
 
@@ -62,6 +64,26 @@ object AppViewModelProvider {
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository)
         }
+
+        //Sale
+        initializer {
+            SaleViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            SaleEntryViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            SaleEditViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
 
     }
 }

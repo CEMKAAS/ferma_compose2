@@ -30,6 +30,12 @@ import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEntryProduct
 import com.zaroslikov.fermacompose2.ui.home.AddScreen
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
+import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
+import com.zaroslikov.fermacompose2.ui.sale.SaleEditProduct
+import com.zaroslikov.fermacompose2.ui.sale.SaleEntryDestination
+import com.zaroslikov.fermacompose2.ui.sale.SaleEntryProduct
+import com.zaroslikov.fermacompose2.ui.sale.SaleScreen
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import com.zaroslikov.fermacompose2.ui.start.StartScreen
 import com.zaroslikov.fermacompose2.ui.start.add.AddProject
@@ -108,6 +114,57 @@ fun InventoryNavHost(
             )
         ) {
             AddEditProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        //Sale
+        composable(
+            route = SaleDestination.routeWithArgs,
+            arguments = listOf(navArgument(SaleDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            SaleScreen(
+                drawerState = drawerState,
+                navigateToItemAdd = {
+                    navController.navigate(
+                        "${SaleEntryDestination.route}/${it}"
+                    )
+                },
+                navigateToItemUpdate = {
+                    navController.navigate(
+                        "${SaleEditDestination.route}/${it.id}/${it.idPT}"
+                    )
+                }
+            )
+        }
+        composable(
+            route = SaleEntryDestination.routeWithArgs,
+            arguments = listOf(navArgument(SaleEntryDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            SaleEntryProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = SaleEditDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(SaleEditDestination.itemIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(SaleEditDestination.itemIdArgTwo) {
+                    type = NavType.IntType
+                }
+
+            )
+        ) {
+            SaleEditProduct(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }
             )

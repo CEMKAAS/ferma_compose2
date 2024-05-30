@@ -171,3 +171,24 @@ fun TopAppBarStart(title: String, canNavigateBack: Boolean, navigateUp: () -> Un
         }
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarEdit(title: String, navigateUp: () -> Unit = {}) {
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.largeTopAppBarColors(
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        title = {
+            Text(text = title)
+        },
+        navigationIcon = {
+            IconButton(onClick = navigateUp) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Назад"
+                )
+            }
+        }
+    )
+}

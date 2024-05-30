@@ -40,16 +40,11 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -57,8 +52,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -66,8 +59,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,9 +69,8 @@ import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
-import kotlinx.coroutines.launch
-import java.util.Calendar
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -211,12 +203,10 @@ private fun InventoryList(
         contentPadding = contentPadding
     ) {
         items(items = itemList, key = { it.id }) { item ->
-            AddProductCard(addProduct = item,
+           AddProductCard(addProduct = item,
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable { onItemClick(item) })
-
-
         }
     }
 }
@@ -239,57 +229,79 @@ fun AddProductCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Column {
+            Column(
+                modifier = Modifier.fillMaxWidth(0.7f)
+            ) {
                 Text(
                     text = addProduct.title,
                     modifier = Modifier
-                        .fillMaxWidth(0.16f)
+                        .wrapContentSize()
                         .padding(6.dp),
                     fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
                 )
                 if (addProduct.category != "") {
                     Text(
                         text = "Категория: ${addProduct.category}",
-                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .wrapContentSize()
-                            .padding(6.dp)
+                            .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
                 if (addProduct.animal != "") {
                     Text(
                         text = "Животное: ${addProduct.animal}",
-                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .wrapContentSize()
-                            .padding(6.dp)
+                            .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
                 Text(
-                    text = "${addProduct.day}.${addProduct.mount}.${addProduct.year}",
+                    text = "Дата: ${addProduct.day}.${addProduct.mount}.${addProduct.year}",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(6.dp)
+                        .padding(vertical = 3.dp, horizontal = 6.dp)
                 )
             }
-
             Text(
                 text = "${addProduct.count} ${addProduct.suffix}",
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.End,
                 modifier = Modifier
-                    .fillMaxWidth(0.3f)
-                    .padding(6.dp),
-                fontWeight = FontWeight.Black,
+                    .padding(6.dp)
+                    .fillMaxWidth(1f),
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
         }
     }
 }
 
+
+@Preview()
+@Composable
+fun Card() {
+    AddProductCard(
+        addProduct = AddTable(
+            0,
+            "Мясо Коровы",
+            150.50,
+            25,
+            12,
+            2025,
+            "0",
+            1,
+            "кг",
+            "Животноводство",
+            "Борька"
+        )
+    )
+}
+
+
 data class navigateId(
-    val id:Int,
-    val idPT:Int
+    val id: Int,
+    val idPT: Int
 
 )
 

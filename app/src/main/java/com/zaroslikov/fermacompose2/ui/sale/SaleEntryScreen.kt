@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.home
+package com.zaroslikov.fermacompose2.ui.sale
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -43,15 +43,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.sale.AddTableInsert
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
 
-object AddEntryDestination : NavigationDestination {
-    override val route = "AddEntry"
+object SaleEntryDestination : NavigationDestination {
+    override val route = "SaleEntry"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -59,10 +59,10 @@ object AddEntryDestination : NavigationDestination {
 
 
 @Composable
-fun AddEntryProduct(
+fun SaleEntryProduct(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: AddEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: SaleEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
     val titleUiState by viewModel.titleUiState.collectAsState()
@@ -75,21 +75,22 @@ fun AddEntryProduct(
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Мои Товары", navigateUp = navigateBack)
+            TopAppBarEdit(title = "Мои Продажи", navigateUp = navigateBack)
         }
     ) { innerPadding ->
 
-        AddEntryContainerProduct(
+        SaleEntryContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(5.dp),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             animalList = animalUiState.animalList,
-            saveInRoomAdd = {
+            buyerList = arrayListOf(),
+            saveInRoomSale = {
                 coroutineScope.launch {
                     viewModel.saveItem(
-                        AddTable(
+                        SaleTable(
                             id = it.id,
                             title = it.title,
                             count = it.count,
@@ -99,14 +100,15 @@ fun AddEntryProduct(
                             priceAll = it.priceAll,
                             suffix = it.suffix,
                             category = it.category,
-                            animal = it.anaimal,
-                            idPT = idProject
+                            animal = it.animal,
+                            idPT = idProject,
+                            buyer = it.buyer
                         )
 
                     )
                     Toast.makeText(
                         context,
-                        "Добавлено: ${it.title} ${it.count} ${it.suffix}",
+                        "Продано: ${it.title} ${it.count} ${it.suffix} за ${it.priceAll} ₽",
                         Toast.LENGTH_SHORT
                     ).show()
                     onNavigateUp()
@@ -118,26 +120,32 @@ fun AddEntryProduct(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEntryContainerProduct(
+fun SaleEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
     animalList: List<String>,
-    saveInRoomAdd: (AddTableInsert) -> Unit
+    buyerList: List<String>,
+    saveInRoomSale: (SaleTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
     var suffix by remember { mutableStateOf("Ед.") }
     var animal by remember { mutableStateOf("") }
+    var priceAll by remember { mutableStateOf("") }
+    var buyer by remember { mutableStateOf("") }
+
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
     var expandedCat by remember { mutableStateOf(false) }
     var expandedAni by remember { mutableStateOf(false) }
+    var expandedBuy by remember { mutableStateOf(false) }
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
+    var isErrorPrice by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
@@ -152,10 +160,15 @@ fun AddEntryContainerProduct(
         isErrorCount = text == ""
     }
 
+    fun validatePrice(text: String) {
+        isErrorPrice = text == ""
+    }
+
     fun errorBoolean(): Boolean {
         isErrorTitle = title == ""
         isErrorCount = count == ""
-        return !(isErrorTitle || isErrorCount)
+        isErrorPrice = priceAll == ""
+        return !(isErrorTitle || isErrorCount || isErrorPrice)
     }
 
 
@@ -270,6 +283,22 @@ fun AddEntryContainerProduct(
 
         }
 
+        OutlinedTextField(
+            value = priceAll,
+            onValueChange = {
+                priceAll = it
+                validatePrice(priceAll)
+            },
+            label = { Text("Цена") },
+            modifier = Modifier.fillMaxWidth(),
+            supportingText = {
+                Text("Укажите цену за купленный товар")
+            },
+            suffix = { Text(text = "₽") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = isErrorPrice
+        )
+
         Box {
             ExposedDropdownMenuBox(
                 expanded = expandedCat,
@@ -355,6 +384,59 @@ fun AddEntryContainerProduct(
             }
         }
 
+        Box {
+            ExposedDropdownMenuBox(
+                expanded = expandedBuy,
+                onExpandedChange = {
+                    expandedBuy = !expandedBuy
+                }
+            ) {
+                OutlinedTextField(
+                    value = buyer,
+                    onValueChange = {
+                        buyer = it
+                    },
+                    label = { Text(text = "Покупатель") },
+                    supportingText = {
+                        Text("Выберите или укажите имя покупателя")
+
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+//                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+//                    keyboardActions = KeyboardActions(onNext = {
+//                        focusManager.moveFocus(
+//                            FocusDirection.Down
+//                        )
+//                    }
+//                    )
+                )
+
+                val filteredOptions =
+                    buyerList.filter { it.contains(buyer, ignoreCase = true) }
+                if (filteredOptions.isNotEmpty()) {
+                    ExposedDropdownMenu(
+                        expanded = expandedBuy,
+                        onDismissRequest = {
+//                            expanded = false
+                        }
+                    ) {
+                        filteredOptions.forEach { item ->
+                            DropdownMenuItem(
+                                text = { Text(text = item) },
+                                onClick = {
+                                    buyer = item
+                                    expandedBuy = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -365,18 +447,19 @@ fun AddEntryContainerProduct(
                 onClick = {
                     if (errorBoolean()) {
                         val calendar = Calendar.getInstance()
-                        saveInRoomAdd(
-                            AddTableInsert(
+                        saveInRoomSale(
+                            SaleTableInsert(
                                 id = 0,
                                 title = title,
                                 count = count.toDouble(),
-                                calendar[Calendar.DAY_OF_MONTH],
-                                (calendar[Calendar.MONTH] + 1),
-                                calendar[Calendar.YEAR],
+                                day = calendar[Calendar.DAY_OF_MONTH],
+                                mount = (calendar[Calendar.MONTH] + 1),
+                                year = calendar[Calendar.YEAR],
                                 suffix = suffix,
                                 category = category,
-                                anaimal = animal,
-                                priceAll = "0"
+                                animal = animal,
+                                priceAll =  priceAll,
+                                buyer = buyer
                             )
                         )
                     }
@@ -392,7 +475,7 @@ fun AddEntryContainerProduct(
 }
 
 
-data class AddTableInsert(
+data class SaleTableInsert(
     var id: Int,
     var title: String,
     var count: Double,
@@ -402,6 +485,7 @@ data class AddTableInsert(
     var priceAll: String,
     var suffix: String,
     var category: String,
-    var anaimal: String
+    var animal: String,
+    var buyer: String
 )
 

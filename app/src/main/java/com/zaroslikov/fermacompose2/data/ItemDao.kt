@@ -24,6 +24,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -53,6 +54,7 @@ interface ItemDao {
     @Query("SELECT MyFerma.animal from MyFerma Where idPT=:id group by MyFerma.animal ")
     fun getItemsAnimalAddList(id: Int): Flow<List<String>>
 
+
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -66,4 +68,36 @@ interface ItemDao {
 
     @Delete
     suspend fun delete(item: AddTable)
+
+    //Sale
+
+    @Query("SELECT * from MyFermaSale Where idPT=:id ORDER BY id DESC")
+    fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
+
+    @Query("SELECT * from MyFermaSale Where id=:id")
+    fun getItemSale(id: Int): Flow<SaleTable>
+
+    @Query("SELECT MyFermaSale.Title from MyFermaSale Where idPT=:id group by MyFermaSale.Title")
+    fun getItemsTitleSaleList(id: Int): Flow<List<String>>
+
+    @Query("SELECT MyFermaSale.category from MyFermaSale Where idPT=:id group by MyFermaSale.category")
+    fun getItemsCategorySaleList(id: Int): Flow<List<String>>
+
+    @Query("SELECT MyFermaSale.animal from MyFermaSale Where idPT=:id group by MyFermaSale.animal")
+    fun getItemsAnimalSaleList(id: Int): Flow<List<String>>
+
+    @Query("SELECT MyFermaSale.buyer from MyFermaSale Where idPT=:id group by MyFermaSale.buyer")
+    fun getItemsBuyerSaleList(id: Int): Flow<List<String>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertSale(item: SaleTable)
+    @Update
+    suspend fun updateSale(item: SaleTable)
+
+    @Delete
+    suspend fun deleteSale(item: SaleTable)
+
+
+
+
 }

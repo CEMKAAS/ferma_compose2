@@ -16,8 +16,14 @@
 
 package com.zaroslikov.fermacompose2.data
 
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -51,16 +57,30 @@ interface ItemsRepository {
      * Insert item in the data source
      */
     suspend fun insertItem(item: AddTable)
-
-
-
     /**
      * Delete item from the data source
      */
     suspend fun deleteItem(item: AddTable)
-
     /**
      * Update item in the data source
      */
     suspend fun updateItem(item: AddTable)
+
+
+    fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
+    fun getItemSale(id: Int): Flow<SaleTable>
+    fun getItemsTitleSaleList(id: Int): Flow<List<String>>
+    fun getItemsCategorySaleList(id: Int): Flow<List<String>>
+    fun getItemsAnimalSaleList(id: Int): Flow<List<String>>
+    fun getItemsBuyerSaleList(id: Int): Flow<List<String>>
+    suspend fun insertSale(item: SaleTable)
+    suspend fun updateSale(item: SaleTable)
+    suspend fun deleteSale(item: SaleTable)
+
+
+
+
+
+
+
 }

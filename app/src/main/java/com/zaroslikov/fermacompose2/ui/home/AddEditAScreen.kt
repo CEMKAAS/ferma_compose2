@@ -4,10 +4,8 @@ package com.zaroslikov.fermacompose2.ui.home
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,6 +21,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,19 +38,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarStart
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 object AddEditDestination : NavigationDestination {
     override val route = "AddEdit"
@@ -74,13 +72,11 @@ fun AddEditProduct(
     val categoryUiState by viewModel.categoryUiState.collectAsState()
     val animalUiState by viewModel.animalUiState.collectAsState()
 
-    val idProject = viewModel.itemId
-
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
-            TopAppBarStart(title = "Мои Товары", canNavigateBack = true, navigateUp = navigateBack)
+            TopAppBarEdit(title = "Мои Товары", navigateUp = navigateBack)
         }
     ) { innerPadding ->
 
@@ -94,13 +90,21 @@ fun AddEditProduct(
             addTable = viewModel.itemUiState,
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {
+                if (it) {
+                    coroutineScope.launch {
+                        viewModel.saveItem()
+                        Toast.makeText(
+                            context,
+                            "Обновлено: ${viewModel.itemUiState.title} ${viewModel.itemUiState.count} ${viewModel.itemUiState.suffix}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onNavigateUp()
+                    }
+                }
+            },
+            deleteAdd = {
                 coroutineScope.launch {
-                    viewModel.saveItem()
-//                    Toast.makeText(
-//                        context,
-//                        "Обновлено: ${it.title} ${it.count} ${it.suffix}",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
+                    viewModel.deleteItem()
                     onNavigateUp()
                 }
             }
@@ -117,14 +121,9 @@ fun AddEditContainerProduct(
     categoryList: List<String>,
     animalList: List<String>,
     onValueChange: (AddTableUiState) -> Unit = {},
-    saveInRoomAdd: () -> Unit
+    saveInRoomAdd: (Boolean) -> Unit,
+    deleteAdd: () -> Unit
 ) {
-//    var title by remember { mutableStateOf("") }
-//    var count by rememberSaveable { mutableStateOf("") }
-//    var category by remember { mutableStateOf("") }
-//    var suffix by remember { mutableStateOf("Ед.") }
-//    var animal by remember { mutableStateOf("") }
-
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
     var expandedCat by remember { mutableStateOf(false) }
@@ -192,7 +191,8 @@ fun AddEditContainerProduct(
                             FocusDirection.Down
                         )
                     }
-                    ))
+                    )
+                )
 
                 val filteredOptions =
                     titleList.filter { it.contains(addTable.title, ignoreCase = true) }
@@ -243,9 +243,17 @@ fun AddEditContainerProduct(
                 },
                 suffix = {
                     Text(text = addTable.suffix)
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isErrorCount
+                }, isError = isErrorCount,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(onNext = {
+                    focusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                }
+                )
             )
             DropdownMenu(
                 expanded = expandedSuf,
@@ -291,7 +299,16 @@ fun AddEditContainerProduct(
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    }
+                    )
                 )
 
                 val filteredOptions =
@@ -333,7 +350,17 @@ fun AddEditContainerProduct(
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    }
+                    )
                 )
 
                 ExposedDropdownMenu(
@@ -359,8 +386,6 @@ fun AddEditContainerProduct(
             }
         }
 
-
-
         if (openDialog) {
             DatePickerDialogSample(datePickerState, formattedDate) { date ->
                 formattedDate = date
@@ -379,11 +404,19 @@ fun AddEditContainerProduct(
         OutlinedTextField(
             value = formattedDate,
             onValueChange = {},
-            label = { Text("Дата начала проекта") },
+            readOnly = true,
+            label = { Text("Дата") },
             supportingText = {
-                Text("Выберите дату начала проекта")
+                Text("Выберите дату ")
             },
-            suffix = { Text(text = "₽") },
+            trailingIcon = {
+                IconButton(onClick = { openDialog = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
@@ -391,23 +424,29 @@ fun AddEditContainerProduct(
                 },
         )
 
-
-        Row(
+        Button(
+            onClick = { saveInRoomAdd(errorBoolean()) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.Center
+                .padding(vertical = 15.dp)
         ) {
-            Button(
-                onClick =
-                if (errorBoolean()) {
-                    saveInRoomAdd
-                }
+            Icon(
+                painter = painterResource(R.drawable.baseline_create_24),
+                contentDescription = " Обновить "
+            )
+            Text(text = " Обновить ")
+        }
 
-            ) {
-                Text(text = "Обновить")
-                //TODO Изображение
-            }
+        OutlinedButton(
+            onClick = deleteAdd,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_delete_24),
+                contentDescription = "Удалить"
+            )
+            Text(text = " Удалить ")
         }
     }
 }

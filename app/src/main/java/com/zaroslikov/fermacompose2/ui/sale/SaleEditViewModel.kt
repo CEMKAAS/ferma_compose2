@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.home
+package com.zaroslikov.fermacompose2.ui.sale
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
+import com.zaroslikov.fermacompose2.ui.home.toAddTableUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -16,36 +19,36 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AddEditViewModel(
+class SaleEditViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArg])
-    private val itemIdPT: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArgTwo])
+    private val itemId: Int = checkNotNull(savedStateHandle[SaleEditDestination.itemIdArg])
+    private val itemIdPT: Int = checkNotNull(savedStateHandle[SaleEditDestination.itemIdArgTwo])
 
-    var itemUiState by mutableStateOf(AddTableUiState())
+    var itemUiState by mutableStateOf(SaleTableUiState())
         private set
 
     init {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getItemAdd(itemId)
+            itemUiState = itemsRepository.getItemSale(itemId)
                 .filterNotNull()
                 .first()
-                .toAddTableUiState()
+                .toSaleTableUiState()
         }
     }
 
-    fun updateUiState(itemDetails: AddTableUiState) {
+    fun updateUiState(itemDetails: SaleTableUiState) {
         itemUiState =
             itemDetails
     }
 
     val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleAddList(itemIdPT).map { TitleUiState(it) }
+        itemsRepository.getItemsTitleSaleList(itemIdPT).map { TitleUiState(it) }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(AddEditViewModel.TIMEOUT_MILLIS),
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = TitleUiState()
             )
 
@@ -67,11 +70,11 @@ class AddEditViewModel(
             )
 
     suspend fun saveItem() {
-        itemsRepository.updateItem(itemUiState.toAddTable())
+        itemsRepository.updateSale(itemUiState.toSaleTable())
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteItem(itemUiState.toAddTable())
+        itemsRepository.deleteSale(itemUiState.toSaleTable())
     }
 
     companion object {
@@ -80,7 +83,7 @@ class AddEditViewModel(
 
 }
 
-data class AddTableUiState(
+data class SaleTableUiState(
     val id: Int = 0,
     val title: String = "", // название
     val count: String = "", // Кол-во
@@ -92,12 +95,17 @@ data class AddTableUiState(
     var suffix: String = "",
     var category: String = "",
     var animal: String = "",
+    var buyer: String = ""
 )
 
-fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category, animal
+fun SaleTable.toSaleTableUiState(): SaleTableUiState = SaleTableUiState(
+    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category, animal, buyer
 )
 
-fun AddTableUiState.toAddTable(): AddTable = AddTable(
-    id, title, count.toDouble(), day, mount, year, priceAll, idPT, suffix, category, animal
+fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
+    id = id,
+    title = title,
+    count = count.toDouble(),
+    day = day,
+    mount, year, priceAll, suffix, category, animal, buyer, idPT
 )

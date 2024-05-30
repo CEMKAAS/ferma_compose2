@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.zaroslikov.fermacompose2.ui.home
+package com.zaroslikov.fermacompose2.ui.sale
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -32,33 +29,31 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * ViewModel to retrieve all items in the Room database.
  */
-class AddViewModel(
+class SaleViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
 
 
-    val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
+    val itemId: Int = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
 
 
-    val homeUiState: StateFlow<HomeUiState> =
-        itemsRepository.getAllItemsStream(itemId).map { HomeUiState(it) }
+    val saleUiState: StateFlow<SaleUiState> =
+        itemsRepository.getAllSaleItems(itemId).map { SaleUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = HomeUiState()
+                initialValue = SaleUiState()
             )
-
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
 
 }
 
 /**
  * Ui State for HomeScreen
  */
-data class HomeUiState(val itemList: List<AddTable> = listOf())
+data class SaleUiState(val itemList: List<SaleTable> = listOf())
