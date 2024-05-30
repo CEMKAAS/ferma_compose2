@@ -78,7 +78,7 @@ fun InventoryNavHost(
                 },
                 navigateToItemUpdate = {
                     navController.navigate(
-                        "${AddEditDestination.route}/${it}"
+                        "${AddEditDestination.route}/${it.id}/${it.idPT}"
                     )
                 }
             )
@@ -97,9 +97,15 @@ fun InventoryNavHost(
 
         composable(
             route = AddEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(AddEditDestination.itemIdArg) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(AddEditDestination.itemIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(AddEditDestination.itemIdArgTwo) {
+                    type = NavType.IntType
+                }
+
+            )
         ) {
             AddEditProduct(
                 navigateBack = { navController.popBackStack() },
