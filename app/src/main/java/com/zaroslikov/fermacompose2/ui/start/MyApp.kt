@@ -12,22 +12,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun DrawerSheet(
     scope: CoroutineScope,
-    navController: (String) -> Unit,
+    navigateToStart:()->Unit,
+    navigateToModalSheet: (DrawerNavigation) -> Unit,
     drawerState: DrawerState,
     x: Int,
-    y: String
+    idPTNavigation: String
 ) {
     val drawerItems = listOf(
 
         DrawerItems(
-            R.drawable.baseline_arrow_back_24, "Вернуться к проектам", "Start"
-        )
+            R.drawable.baseline_arrow_back_24, "Вернуться к проектам", StartDestination.route
+        ),
 
 //        DrawerItems(
 //            R.drawable.baseline_warehouse_24, "Мой Склад", ItemDetailsDestination.route
@@ -35,12 +38,12 @@ fun DrawerSheet(
 //        DrawerItems(
 //            R.drawable.baseline_currency_ruble_24, "Мой Финансы", "Finance"
 //        ),
-//        DrawerItems(
-//            R.drawable.baseline_add_circle_outline_24, "Мои Товары", AddProductDestination.route
-//        ),
-//        DrawerItems(
-//            R.drawable.baseline_add_card_24, "Мои Продажи", "Sale"
-//        ),
+        DrawerItems(
+            R.drawable.baseline_add_circle_outline_24, "Мои Товары", HomeDestination.route
+        ),
+        DrawerItems(
+            R.drawable.baseline_add_card_24, "Мои Продажи", SaleDestination.route
+        ),
 //        DrawerItems(
 //            R.drawable.baseline_add_shopping_cart_24, "Мои Покупки", "Expenses"
 //        ),
@@ -70,9 +73,18 @@ fun DrawerSheet(
                 },
                 onClick = {
                     selectedItem = it
+
                     scope.launch {
-                        navController("${it.route}/${y}")
-//                        navController.navigate(it.route)
+                        if (it.route == StartDestination.route) {
+                            navigateToStart()
+                        } else {
+                            navigateToModalSheet(
+                                DrawerNavigation(
+                                    it.route,
+                                    idPTNavigation
+                                )
+                            )
+                        }
                         drawerState.apply {
                             if (isClosed) open() else close()
                         }
@@ -87,4 +99,9 @@ data class DrawerItems(
     val icon: Int,
     val text: String,
     val route: String
+)
+
+data class DrawerNavigation(
+    val routeDrawer: String,
+    val idProjectDrawer: String
 )

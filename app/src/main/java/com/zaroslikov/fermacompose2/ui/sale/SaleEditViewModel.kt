@@ -10,6 +10,9 @@ import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
+import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
+import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
+import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.home.toAddTableUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -54,7 +57,7 @@ class SaleEditViewModel(
 
 
     val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategoryAddList(itemIdPT).map { CategoryUiState(it) }
+        itemsRepository.getItemsCategorySaleList(itemIdPT).map { CategoryUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -62,7 +65,7 @@ class SaleEditViewModel(
             )
 
     val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalAddList(itemIdPT).map { AnimalUiState(it) }
+        itemsRepository.getItemsAnimalSaleList(itemIdPT).map { AnimalUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

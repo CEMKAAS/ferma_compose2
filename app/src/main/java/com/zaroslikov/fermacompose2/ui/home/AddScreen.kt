@@ -70,6 +70,7 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
+import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
 object HomeDestination : NavigationDestination {
@@ -85,6 +86,8 @@ object HomeDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
+    navigateToStart:()-> Unit,
+    navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
@@ -105,10 +108,11 @@ fun AddScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navController = { },
+                navigateToStart =  navigateToStart,
+                navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                0,//ToDo 3
-                "1"
+                1,//ToDo 3
+                idProject.toString()
             )
         },
     ) {

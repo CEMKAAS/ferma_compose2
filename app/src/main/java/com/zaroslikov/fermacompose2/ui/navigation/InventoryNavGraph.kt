@@ -77,6 +77,12 @@ fun InventoryNavHost(
         ) {
             AddScreen(
                 drawerState = drawerState,
+                navigateToStart = {
+                    navController.navigate(StartDestination.route)
+                },
+                navigateToModalSheet = {
+                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                },
                 navigateToItemAdd = {
                     navController.navigate(
                         "${AddEntryDestination.route}/${it}"
@@ -128,6 +134,12 @@ fun InventoryNavHost(
         ) {
             SaleScreen(
                 drawerState = drawerState,
+                navigateToStart = {
+                    navController.navigate(StartDestination.route)
+                },
+                navigateToModalSheet = {
+                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                },
                 navigateToItemAdd = {
                     navController.navigate(
                         "${SaleEntryDestination.route}/${it}"

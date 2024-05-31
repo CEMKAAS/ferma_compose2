@@ -71,6 +71,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
+import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
 object SaleDestination : NavigationDestination {
@@ -86,6 +87,8 @@ object SaleDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaleScreen(
+    navigateToStart :()->Unit,
+    navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
@@ -106,10 +109,11 @@ fun SaleScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navController = { },
+                navigateToStart =  navigateToStart,
+                navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                0,//ToDo 3
-                "1"
+                2,//ToDo 3
+                idProject.toString()
             )
         },
     ) {
@@ -257,7 +261,7 @@ fun SaleProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
-                if (saleTable.buyer!= "") {
+                if (saleTable.buyer != "") {
                     Text(
                         text = "Покупатель: ${saleTable.buyer}",
                         modifier = Modifier
