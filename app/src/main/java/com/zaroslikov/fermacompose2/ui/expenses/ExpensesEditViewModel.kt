@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.home
+package com.zaroslikov.fermacompose2.ui.expenses
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,73 +7,66 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
+import com.zaroslikov.fermacompose2.ui.home.TitleUiState
+import com.zaroslikov.fermacompose2.ui.sale.toSaleTableUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AddEditViewModel(
+class ExpensesEditViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArg])
-    private val itemIdPT: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArgTwo])
+    private val itemId: Int = checkNotNull(savedStateHandle[ExpensesEditDestination.itemIdArg])
+    private val itemIdPT: Int = checkNotNull(savedStateHandle[ExpensesEditDestination.itemIdArgTwo])
 
-    var itemUiState by mutableStateOf(AddTableUiState())
+    var itemUiState by mutableStateOf(ExpensesTableUiState())
         private set
 
     init {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getItemAdd(itemId)
+            itemUiState = itemsRepository.getItemExpenses(itemId)
                 .filterNotNull()
                 .first()
-                .toAddTableUiState()
+                .toExpensesTableUiState()
         }
     }
 
-    fun updateUiState(itemDetails: AddTableUiState) {
+    fun updateUiState(itemDetails: ExpensesTableUiState) {
         itemUiState =
             itemDetails
     }
 
     val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleAddList(itemIdPT).map { TitleUiState(it) }
+        itemsRepository.getItemsTitleExpensesList(itemIdPT).map { TitleUiState(it) }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(AddEditViewModel.TIMEOUT_MILLIS),
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = TitleUiState()
             )
 
 
     val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategoryAddList(itemIdPT).map { CategoryUiState(it) }
-            .filterNotNull()
+        itemsRepository.getItemsCategoryExpensesList(itemIdPT).map { CategoryUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = CategoryUiState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalAddList(itemIdPT).map { AnimalUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
-            )
-
     suspend fun saveItem() {
-        itemsRepository.updateItem(itemUiState.toAddTable())
+        itemsRepository.updateExpenses(itemUiState.toExpensesTable())
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteItem(itemUiState.toAddTable())
+        itemsRepository.deleteExpenses(itemUiState.toExpensesTable())
     }
 
     companion object {
@@ -82,7 +75,7 @@ class AddEditViewModel(
 
 }
 
-data class AddTableUiState(
+data class ExpensesTableUiState(
     val id: Int = 0,
     val title: String = "", // название
     val count: String = "", // Кол-во
@@ -93,13 +86,22 @@ data class AddTableUiState(
     val idPT: Int = 0,
     var suffix: String = "",
     var category: String = "",
-    var animal: String = "",
 )
 
-fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category, animal
+fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTableUiState(
+    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category
 )
 
-fun AddTableUiState.toAddTable(): AddTable = AddTable(
-    id, title, count.toDouble(), day, mount, year, priceAll, idPT, suffix, category, animal
+fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
+    id = id,
+    title = title,
+    count = count.toDouble(),
+    day = day,
+    mount = mount,
+    year = year,
+    priceAll = priceAll,
+    suffix = suffix,
+    category = category,
+    idPT = idPT
 )
+

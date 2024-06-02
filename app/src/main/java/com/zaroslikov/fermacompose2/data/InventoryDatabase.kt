@@ -21,13 +21,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 
 /**
  * Database class with a singleton Instance object.
  */
-@Database(entities = [AddTable::class, SaleTable::class, ProjectTable::class], version = 1, exportSchema = false)
+@Database(entities = [AddTable::class, SaleTable::class, ExpensesTable::class, ProjectTable::class], version = 1, exportSchema = false)
 abstract class InventoryDatabase : RoomDatabase() {
 
     abstract fun itemDao(): ItemDao

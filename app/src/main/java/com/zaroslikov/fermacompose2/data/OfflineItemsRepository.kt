@@ -17,6 +17,7 @@
 package com.zaroslikov.fermacompose2.data
 
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import kotlinx.coroutines.flow.Flow
@@ -54,4 +55,15 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateSale(item: SaleTable)= itemDao.updateSale(item)
 
     override suspend fun deleteSale(item: SaleTable) = itemDao.deleteSale(item)
+    override fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>> = itemDao.getAllExpensesItems(id)
+
+    override fun getItemExpenses(id: Int): Flow<ExpensesTable> = itemDao.getItemExpenses(id)
+
+    override fun getItemsTitleExpensesList(id: Int): Flow<List<String>> = itemDao.getItemsTitleExpensesList(id)
+
+    override fun getItemsCategoryExpensesList(id: Int): Flow<List<String>> = itemDao.getItemsCategoryExpensesList(id)
+
+    override suspend fun insertExpenses(item: ExpensesTable) = itemDao.insertExpenses(item)
+    override suspend fun updateExpenses(item: ExpensesTable) = itemDao.updateExpenses(item)
+    override suspend fun deleteExpenses(item: ExpensesTable) = itemDao.deleteExpenses(item)
 }

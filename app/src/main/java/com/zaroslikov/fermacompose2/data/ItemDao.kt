@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import kotlinx.coroutines.flow.Flow
@@ -70,7 +71,6 @@ interface ItemDao {
     suspend fun delete(item: AddTable)
 
     //Sale
-
     @Query("SELECT * from MyFermaSale Where idPT=:id ORDER BY id DESC")
     fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
 
@@ -97,6 +97,26 @@ interface ItemDao {
     @Delete
     suspend fun deleteSale(item: SaleTable)
 
+    //Expenses
+    @Query("SELECT * from MyFermaEXPENSES Where idPT=:id ORDER BY id DESC")
+    fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>>
+
+    @Query("SELECT * from MyFermaEXPENSES Where id=:id")
+    fun getItemExpenses(id: Int): Flow<ExpensesTable>
+
+    @Query("SELECT MyFermaEXPENSES.Title from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.Title")
+    fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
+
+    @Query("SELECT MyFermaEXPENSES.category from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.category")
+    fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertExpenses(item: ExpensesTable)
+    @Update
+    suspend fun updateExpenses(item: ExpensesTable)
+
+    @Delete
+    suspend fun deleteExpenses(item: ExpensesTable)
 
 
 

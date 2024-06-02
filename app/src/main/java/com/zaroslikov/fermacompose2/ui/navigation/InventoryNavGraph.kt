@@ -24,6 +24,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditDestination
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditProduct
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryDestination
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryProduct
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesScreen
 import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEditProduct
 import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
@@ -140,7 +146,7 @@ fun InventoryNavHost(
                 navigateToModalSheet = {
                     navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
                 },
-                navigateToItemAdd = {
+                navigateToItem = {
                     navController.navigate(
                         "${SaleEntryDestination.route}/${it}"
                     )
@@ -177,6 +183,64 @@ fun InventoryNavHost(
             )
         ) {
             SaleEditProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+
+        //Expenses
+        composable(
+            route = ExpensesDestination.routeWithArgs,
+            arguments = listOf(navArgument(ExpensesDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            ExpensesScreen(
+                drawerState = drawerState,
+                navigateToStart = {
+                    navController.navigate(StartDestination.route)
+                },
+                navigateToModalSheet = {
+                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                },
+                navigateToItem = {
+                    navController.navigate(
+                        "${ExpensesEntryDestination.route}/${it}"
+                    )
+                },
+                navigateToItemUpdate = {
+                    navController.navigate(
+                        "${ExpensesEditDestination.route}/${it.id}/${it.idPT}"
+                    )
+                }
+            )
+        }
+        composable(
+            route = ExpensesEntryDestination.routeWithArgs,
+            arguments = listOf(navArgument(ExpensesEntryDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            ExpensesEntryProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = ExpensesEditDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(ExpensesEditDestination.itemIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(ExpensesEditDestination.itemIdArgTwo) {
+                    type = NavType.IntType
+                }
+
+            )
+        ) {
+            ExpensesEditProduct(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }
             )

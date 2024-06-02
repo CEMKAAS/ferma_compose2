@@ -68,6 +68,8 @@ fun SaleEntryProduct(
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
     val animalUiState by viewModel.animalUiState.collectAsState()
+    val buyerUiState by viewModel.buyerUiState.collectAsState()
+
 
     val idProject = viewModel.itemId
 
@@ -75,7 +77,7 @@ fun SaleEntryProduct(
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Мои Продажи", navigateUp = navigateBack)
+            TopAppBarEdit(title = "Добавить Продажу", navigateUp = navigateBack)
         }
     ) { innerPadding ->
 
@@ -86,7 +88,7 @@ fun SaleEntryProduct(
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             animalList = animalUiState.animalList,
-            buyerList = arrayListOf(),
+            buyerList = buyerUiState.buyerList,
             saveInRoomSale = {
                 coroutineScope.launch {
                     viewModel.saveItem(
@@ -201,13 +203,17 @@ fun SaleEntryContainerProduct(
                         .menuAnchor()
                         .fillMaxWidth(),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
                         )
                     }
-                    ))
+                    )
+                )
 
                 val filteredOptions =
                     titleList.filter { it.contains(title, ignoreCase = true) }
@@ -259,8 +265,17 @@ fun SaleEntryContainerProduct(
                 suffix = {
                     Text(text = suffix)
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isErrorCount
+                isError = isErrorCount,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(onNext = {
+                    focusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                }
+                )
             )
             DropdownMenu(
                 expanded = expandedSuf,
@@ -292,10 +307,26 @@ fun SaleEntryContainerProduct(
             label = { Text("Цена") },
             modifier = Modifier.fillMaxWidth(),
             supportingText = {
-                Text("Укажите цену за купленный товар")
+                if (isErrorPrice) {
+                    Text(
+                        text = "Не указана цена за товар!",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Text("Укажите цену за проданный товар")
+                }
             },
             suffix = { Text(text = "₽") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }
+            ),
             isError = isErrorPrice
         )
 
@@ -316,7 +347,16 @@ fun SaleEntryContainerProduct(
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    }
+                    )
                 )
 
                 val filteredOptions =
@@ -343,47 +383,6 @@ fun SaleEntryContainerProduct(
             }
         }
 
-        if (animalList.isNotEmpty()) {
-            ExposedDropdownMenuBox(
-                expanded = expandedAni,
-                onExpandedChange = { expandedAni = !expandedAni },
-            ) {
-                OutlinedTextField(
-                    value = animalList[selectedItemIndex],
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
-                    supportingText = {
-                        Text("Выберите животное, которое принесло товар")
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedAni,
-                    onDismissRequest = { expandedAni = false }
-                ) {
-                    animalList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                expandedAni = false
-                                animal = animalList[selectedItemIndex]
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
         Box {
             ExposedDropdownMenuBox(
                 expanded = expandedBuy,
@@ -397,20 +396,19 @@ fun SaleEntryContainerProduct(
                         buyer = it
                     },
                     label = { Text(text = "Покупатель") },
-                    supportingText = {
-                        Text("Выберите или укажите имя покупателя")
-
-                    },
+                    supportingText = { Text("Выберите или укажите имя покупателя") },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth(),
-//                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-//                    keyboardActions = KeyboardActions(onNext = {
-//                        focusManager.moveFocus(
-//                            FocusDirection.Down
-//                        )
-//                    }
-//                    )
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    })
                 )
 
                 val filteredOptions =
@@ -436,6 +434,44 @@ fun SaleEntryContainerProduct(
             }
         }
 
+        if (animalList.isNotEmpty()) {
+            ExposedDropdownMenuBox(
+                expanded = expandedAni,
+                onExpandedChange = { expandedAni = !expandedAni },
+            ) {
+                OutlinedTextField(
+                    value = animalList[selectedItemIndex],
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
+                    supportingText = { Text("Выберите животное, которое принесло товар") },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedAni,
+                    onDismissRequest = { expandedAni = false }
+                ) {
+                    animalList.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                )
+                            },
+                            onClick = {
+                                selectedItemIndex = index
+                                expandedAni = false
+                                animal = animalList[selectedItemIndex]
+                            }
+                        )
+                    }
+                }
+            }
+        }
 
         Row(
             modifier = Modifier
@@ -458,7 +494,7 @@ fun SaleEntryContainerProduct(
                                 suffix = suffix,
                                 category = category,
                                 animal = animal,
-                                priceAll =  priceAll,
+                                priceAll = priceAll,
                                 buyer = buyer
                             )
                         )
@@ -468,7 +504,7 @@ fun SaleEntryContainerProduct(
                     .fillMaxWidth()
                     .padding(vertical = 15.dp)
             ) {
-                Text(text = "Добавить")
+                Text(text = "Продать")
             }
         }
     }

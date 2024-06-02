@@ -23,6 +23,9 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditViewModel
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryViewModel
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
@@ -84,6 +87,24 @@ object AppViewModelProvider {
                 inventoryApplication().container.itemsRepository)
         }
 
+        //Expenses
+        initializer {
+            ExpensesViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+           ExpensesEntryViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            ExpensesEditViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
 
     }
 }

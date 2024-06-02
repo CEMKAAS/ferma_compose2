@@ -1,11 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
-package com.zaroslikov.fermacompose2.ui.sale
+package com.zaroslikov.fermacompose2.ui.expenses
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,11 +20,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,97 +42,94 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
-object SaleEditDestination : NavigationDestination {
-    override val route = "SaleEdit"
+object ExpensesEntryDestination : NavigationDestination {
+    override val route = "ExpensesEntry"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
-    const val itemIdArgTwo = "itemAddId"
-    val routeWithArgs = "$route/{$itemIdArg}/{$itemIdArgTwo}"
+    val routeWithArgs = "$route/{$itemIdArg}"
 }
 
 
 @Composable
-fun SaleEditProduct(
+fun ExpensesEntryProduct(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: SaleEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: ExpensesEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
-
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
-    val animalUiState by viewModel.animalUiState.collectAsState()
-    val buyerUiState by viewModel.buyerUiState.collectAsState()
+
+    val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Изменить Продажу", navigateUp = navigateBack)
+            TopAppBarEdit(title = "Добавить Покупку", navigateUp = navigateBack)
         }
     ) { innerPadding ->
 
-        SaleEditContainerProduct(
+        ExpensesEntryContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(5.dp),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
-            animalList = animalUiState.animalList,
-            buyerList = buyerUiState.buyerList,
-            saleTable = viewModel.itemUiState,
-            onValueChange = viewModel::updateUiState,
-            saveInRoomAdd = {
-                if (it) {
-                    coroutineScope.launch {
-                        viewModel.saveItem()
-                        Toast.makeText(
-                            context,
-                            "Обновлено: ${viewModel.itemUiState.title} ${viewModel.itemUiState.count} ${viewModel.itemUiState.suffix} за ${viewModel.itemUiState.priceAll} ₽",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        onNavigateUp()
-                    }
-                }
-            },
-            deleteAdd = {
+            saveInRoomSale = {
                 coroutineScope.launch {
-                    viewModel.deleteItem()
+                    viewModel.saveItem(
+                        ExpensesTable(
+                            id = it.id,
+                            title = it.title,
+                            count = it.count,
+                            day = it.day,
+                            mount = it.mount,
+                            year = it.year,
+                            priceAll = it.priceAll,
+                            suffix = it.suffix,
+                            category = it.category,
+                            idPT = idProject
+                        )
+
+                    )
+                    Toast.makeText(
+                        context,
+                        "Куплено: ${it.title} ${it.count} ${it.suffix} за ${it.priceAll} ₽",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     onNavigateUp()
                 }
-            }
+            },
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SaleEditContainerProduct(
+fun ExpensesEntryContainerProduct(
     modifier: Modifier,
-    saleTable: SaleTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<String>,
-    buyerList: List<String>,
-    onValueChange: (SaleTableUiState) -> Unit = {},
-    saveInRoomAdd: (Boolean) -> Unit,
-    deleteAdd: () -> Unit
+    saveInRoomSale: (ExpensesTableInsert) -> Unit
 ) {
+    var title by remember { mutableStateOf("") }
+    var count by rememberSaveable { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+    var suffix by remember { mutableStateOf("Ед.") }
+    var priceAll by remember { mutableStateOf("") }
+
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
     var expandedCat by remember { mutableStateOf(false) }
-    var expandedAni by remember { mutableStateOf(false) }
-    var expandedBuy by remember { mutableStateOf(false) }
-
-    var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    var formattedDate = "${saleTable.day}.${saleTable.mount}.${saleTable.year}"
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
@@ -156,13 +149,13 @@ fun SaleEditContainerProduct(
     }
 
     fun validatePrice(text: String) {
-        isErrorCount = text == ""
+        isErrorPrice = text == ""
     }
 
     fun errorBoolean(): Boolean {
-        isErrorTitle = saleTable.title == ""
-        isErrorCount = saleTable.count == ""
-        isErrorPrice = saleTable.priceAll == ""
+        isErrorTitle = title == ""
+        isErrorCount = count == ""
+        isErrorPrice = priceAll == ""
         return !(isErrorTitle || isErrorCount || isErrorPrice)
     }
 
@@ -176,10 +169,10 @@ fun SaleEditContainerProduct(
                 }
             ) {
                 OutlinedTextField(
-                    value = saleTable.title,
+                    value = title,
                     onValueChange = {
-                        onValueChange(saleTable.copy(title = it))
-                        validateTitle(it)
+                        title = it
+                        validateTitle(title)
                     },
                     label = { Text(text = "Товар") },
                     supportingText = {
@@ -209,7 +202,7 @@ fun SaleEditContainerProduct(
                 )
 
                 val filteredOptions =
-                    titleList.filter { it.contains(saleTable.title, ignoreCase = true) }
+                    titleList.filter { it.contains(title, ignoreCase = true) }
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -221,7 +214,7 @@ fun SaleEditContainerProduct(
                             DropdownMenuItem(
                                 text = { Text(text = item) },
                                 onClick = {
-                                    onValueChange(saleTable.copy(title = item))
+                                    title = item
                                     expanded = false
                                 }
                             )
@@ -233,10 +226,10 @@ fun SaleEditContainerProduct(
 
         Box {
             OutlinedTextField(
-                value = saleTable.count,
+                value = count,
                 onValueChange = {
-                    onValueChange(saleTable.copy(count = it))
-                    validateCount(it)
+                    count = it
+                    validateCount(count)
                 },
                 label = { Text("Количество") },
                 modifier = Modifier.fillMaxWidth(),
@@ -256,7 +249,7 @@ fun SaleEditContainerProduct(
                     }
                 },
                 suffix = {
-                    Text(text = saleTable.suffix)
+                    Text(text = suffix)
                 },
                 isError = isErrorCount,
                 keyboardOptions = KeyboardOptions(
@@ -276,21 +269,15 @@ fun SaleEditContainerProduct(
                 //todo чтобы был слева
             ) {
                 DropdownMenuItem(
-                    onClick = {
-                        onValueChange(saleTable.copy(suffix = "Шт."))
-                    },
+                    onClick = { suffix = "Шт." },
                     text = { Text("Шт.") }
                 )
                 DropdownMenuItem(
-                    onClick = {
-                        onValueChange(saleTable.copy(suffix = "Кг."))
-                    },
+                    onClick = { suffix = "Кг." },
                     text = { Text("Кг.") }
                 )
                 DropdownMenuItem(
-                    onClick = {
-                        onValueChange(saleTable.copy(suffix = "Л."))
-                    },
+                    onClick = { suffix = "Л." },
                     text = { Text("Л.") }
                 )
             }
@@ -298,10 +285,10 @@ fun SaleEditContainerProduct(
         }
 
         OutlinedTextField(
-            value = saleTable.priceAll,
+            value = priceAll,
             onValueChange = {
-                onValueChange(saleTable.copy(priceAll = it))
-                validatePrice(saleTable.priceAll)
+                priceAll = it
+                validatePrice(priceAll)
             },
             label = { Text("Цена") },
             modifier = Modifier.fillMaxWidth(),
@@ -312,7 +299,7 @@ fun SaleEditContainerProduct(
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите цену за проданный товар")
+                    Text("Укажите цену за купленный товар")
                 }
             },
             suffix = { Text(text = "₽") },
@@ -337,8 +324,8 @@ fun SaleEditContainerProduct(
                 }
             ) {
                 OutlinedTextField(
-                    value = saleTable.category,
-                    onValueChange = { onValueChange(saleTable.copy(category = it)) },
+                    value = category,
+                    onValueChange = { category = it },
                     label = { Text("Категория") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -359,7 +346,7 @@ fun SaleEditContainerProduct(
                 )
 
                 val filteredOptions =
-                    categoryList.filter { it.contains(saleTable.category, ignoreCase = true) }
+                    categoryList.filter { it.contains(category, ignoreCase = true) }
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expandedCat,
@@ -372,7 +359,7 @@ fun SaleEditContainerProduct(
                             DropdownMenuItem(
                                 text = { Text(text = item) },
                                 onClick = {
-                                    onValueChange(saleTable.copy(category = item))
+                                    category = item
                                     expandedCat = false
                                 }
                             )
@@ -382,171 +369,50 @@ fun SaleEditContainerProduct(
             }
         }
 
-        if (animalList.isNotEmpty()) {
-            ExposedDropdownMenuBox(
-                expanded = expandedAni,
-                onExpandedChange = { expandedAni = !expandedAni },
-            ) {
-                OutlinedTextField(
-                    value = saleTable.animal,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
-                    supportingText = {
-                        Text("Выберите животное, которое принесло товар")
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedAni,
-                    onDismissRequest = { expandedAni = false }
-                ) {
-                    animalList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                expandedAni = false
-                                onValueChange(saleTable.copy(animal = animalList[selectedItemIndex]))
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedBuy,
-                onExpandedChange = {
-                    expandedBuy = !expandedBuy
-                }
-            ) {
-                OutlinedTextField(
-                    value = saleTable.buyer,
-                    onValueChange = {
-                        onValueChange(saleTable.copy(buyer = it))
-                    },
-                    label = { Text(text = "Покупатель") },
-                    supportingText = { Text("Выберите или укажите имя покупателя") },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    })
-                )
-
-                val filteredOptions =
-                    buyerList.filter { it.contains(saleTable.buyer, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expandedBuy,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    saleTable.buyer = item
-                                    expandedBuy = false
-                                    onValueChange(saleTable.copy(buyer = item))
-                                }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                onClick = {
+                    if (errorBoolean()) {
+                        val calendar = Calendar.getInstance()
+                        saveInRoomSale(
+                            ExpensesTableInsert(
+                                id = 0,
+                                title = title,
+                                count = count.toDouble(),
+                                day = calendar[Calendar.DAY_OF_MONTH],
+                                mount = (calendar[Calendar.MONTH] + 1),
+                                year = calendar[Calendar.YEAR],
+                                suffix = suffix,
+                                category = category,
+                                priceAll = priceAll,
                             )
-                        }
+                        )
                     }
-                }
-            }
-        }
-
-
-        if (openDialog) {
-            DatePickerDialogSample(datePickerState, formattedDate) { date ->
-                formattedDate = date
-                openDialog = false
-                val formattedDateList = formattedDate.split(".")
-                onValueChange(
-                    saleTable.copy(
-                        day = formattedDateList[0].toInt(),
-                        mount = formattedDateList[1].toInt(),
-                        year = formattedDateList[2].toInt()
-                    )
-                )
-            }
-        }
-
-        OutlinedTextField(
-            value = formattedDate,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Дата") },
-            supportingText = {
-                Text("Выберите дату ")
-            },
-            trailingIcon = {
-                IconButton(onClick = { openDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    openDialog = true
                 },
-        )
-
-        Button(
-            onClick = { saveInRoomAdd(errorBoolean()) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_create_24),
-                contentDescription = " Обновить "
-            )
-            Text(text = " Обновить ")
-        }
-
-        OutlinedButton(
-            onClick = deleteAdd,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_delete_24),
-                contentDescription = "Удалить"
-            )
-            Text(text = " Удалить ")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp)
+            ) {
+                Text(text = "Купить")
+            }
         }
     }
 }
+
+
+data class ExpensesTableInsert(
+    var id: Int,
+    var title: String,
+    var count: Double,
+    var day: Int,
+    var mount: Int,
+    var year: Int,
+    var priceAll: String,
+    var suffix: String,
+    var category: String,
+)

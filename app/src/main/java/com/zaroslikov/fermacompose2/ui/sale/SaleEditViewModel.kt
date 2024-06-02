@@ -71,6 +71,13 @@ class SaleEditViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = AnimalUiState()
             )
+    val buyerUiState: StateFlow<BuyerUiState> =
+        itemsRepository.getItemsAnimalSaleList(itemIdPT).map {  BuyerUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue =  BuyerUiState()
+            )
 
     suspend fun saveItem() {
         itemsRepository.updateSale(itemUiState.toSaleTable())
@@ -112,3 +119,5 @@ fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
     day = day,
     mount, year, priceAll, suffix, category, animal, buyer, idPT
 )
+
+data class BuyerUiState(val buyerList: List<String> = listOf())

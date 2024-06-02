@@ -22,6 +22,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import kotlinx.coroutines.flow.Flow
@@ -77,7 +78,20 @@ interface ItemsRepository {
     suspend fun updateSale(item: SaleTable)
     suspend fun deleteSale(item: SaleTable)
 
+    //Expenses
+    fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>>
 
+    fun getItemExpenses(id: Int): Flow<ExpensesTable>
+
+    fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
+
+    fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
+
+    suspend fun insertExpenses(item: ExpensesTable)
+
+    suspend fun updateExpenses(item: ExpensesTable)
+
+    suspend fun deleteExpenses(item: ExpensesTable)
 
 
 

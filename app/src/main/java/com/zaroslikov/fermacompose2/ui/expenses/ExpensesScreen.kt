@@ -1,20 +1,4 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.zaroslikov.fermacompose2.ui.sale
+package com.zaroslikov.fermacompose2.ui.expenses
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,15 +50,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
-object SaleDestination : NavigationDestination {
-    override val route = "Sale"
+object ExpensesDestination : NavigationDestination {
+    override val route = "expenses"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -86,16 +70,16 @@ object SaleDestination : NavigationDestination {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SaleScreen(
-    navigateToStart: () -> Unit,
+fun ExpensesScreen(
+    navigateToStart:()-> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItem: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.saleUiState.collectAsState()
+    val homeUiState by viewModel.homeUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -109,10 +93,10 @@ fun SaleScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navigateToStart = navigateToStart,
+                navigateToStart =  navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                2,//ToDo 3
+                3,//ToDo 4
                 idProject.toString()
             )
         },
@@ -121,7 +105,7 @@ fun SaleScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarFerma(
-                    title = "Мои Продажи",
+                    title = "Мои Покупки",
                     scope = coroutineScope,
                     drawerState = drawerState,
                     showBottomFilter = showBottomSheetFilter, //todo на фильтр
@@ -146,7 +130,7 @@ fun SaleScreen(
                 }
             },
         ) { innerPadding ->
-            SaleBody(
+            ExpensesBody(
                 itemList = homeUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
@@ -160,8 +144,8 @@ fun SaleScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SaleBody(
-    itemList: List<SaleTable>,
+private fun ExpensesBody(
+    itemList: List<ExpensesTable>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -173,13 +157,13 @@ private fun SaleBody(
     ) {
         if (itemList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),//TODO
+                text = stringResource(R.string.no_item_description),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),
             )
         } else {
-            InventoryList(
+            ExpensesList(
                 itemList = itemList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
@@ -197,9 +181,9 @@ private fun SaleBody(
 }
 
 @Composable
-private fun InventoryList(
-    itemList: List<SaleTable>,
-    onItemClick: (SaleTable) -> Unit,
+private fun ExpensesList(
+    itemList: List<ExpensesTable>,
+    onItemClick: (ExpensesTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -208,7 +192,7 @@ private fun InventoryList(
         contentPadding = contentPadding
     ) {
         items(items = itemList, key = { it.id }) { item ->
-            SaleProductCard(saleTable = item,
+            ExpensesCard(expensesTable = item,
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable { onItemClick(item) })
@@ -217,11 +201,11 @@ private fun InventoryList(
 }
 
 @Composable
-fun SaleProductCard(
-    saleTable: SaleTable,
+fun ExpensesCard(
+    expensesTable: ExpensesTable,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    androidx.compose.material3.Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
@@ -238,49 +222,32 @@ fun SaleProductCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = saleTable.title,
+                    text = expensesTable.title,
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (saleTable.category != "") {
+                if (expensesTable.category != "") {
                     Text(
-                        text = "Категория: ${saleTable.category}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                if (saleTable.animal != "") {
-                    Text(
-                        text = "Животное: ${saleTable.animal}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                if (saleTable.buyer != "") {
-                    Text(
-                        text = "Покупатель: ${saleTable.buyer}",
+                        text = "Категория: ${expensesTable.category}",
                         modifier = Modifier
                             .wrapContentSize()
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
                 Text(
-                    text = "Дата: ${saleTable.day}.${saleTable.mount}.${saleTable.year}",
+                    text = "Дата: ${expensesTable.day}.${expensesTable.mount}.${expensesTable.year}",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(vertical = 3.dp, horizontal = 6.dp)
                 )
             }
-
             Text(
-                text = "${saleTable.count} ${saleTable.suffix}\n за \n${saleTable.priceAll} ₽",
-                textAlign = TextAlign.Center,
+                text = "${expensesTable.count} ${expensesTable.suffix}\n за \n${expensesTable.priceAll} ₽",
+                textAlign = TextAlign.End,
                 modifier = Modifier
                     .padding(6.dp)
                     .fillMaxWidth(1f),
@@ -295,8 +262,8 @@ fun SaleProductCard(
 //@Preview()
 //@Composable
 //fun Card() {
-//    SaleProductCard(
-//        saleTable = SaleTable(
+//    AddProductCard(
+//        addProduct = AddTable(
 //            0,
 //            "Мясо Коровы",
 //            150.50,
@@ -304,17 +271,17 @@ fun SaleProductCard(
 //            12,
 //            2025,
 //            "0",
+//            1,
 //            "кг",
 //            "Животноводство",
-//            "Борька",
-//            "Тетя Надя",
-//            1
+//            "Борька"
 //        )
 //    )
 //}
 
-
-data class navigateId(
-    val id: Int,
-    val idPT: Int
-)
+//
+//data class navigateId(
+//    val id: Int,
+//    val idPT: Int
+//
+//)
