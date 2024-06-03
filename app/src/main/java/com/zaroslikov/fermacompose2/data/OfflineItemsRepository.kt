@@ -20,6 +20,7 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
@@ -66,4 +67,17 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun insertExpenses(item: ExpensesTable) = itemDao.insertExpenses(item)
     override suspend fun updateExpenses(item: ExpensesTable) = itemDao.updateExpenses(item)
     override suspend fun deleteExpenses(item: ExpensesTable) = itemDao.deleteExpenses(item)
+    override fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>> =itemDao.getAllWriteOffItems(id)
+    override fun getItemWriteOff(id: Int): Flow<WriteOffTable> = itemDao.getItemWriteOff(id)
+
+    override fun getItemsTitleWriteOffList(id: Int): Flow<List<String>> = itemDao.getItemsTitleWriteOffList(id)
+
+    override fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>> = itemDao.getItemsCategoryWriteOffList(id)
+    override fun getItemsAnimalWriteOffList(id: Int): Flow<List<String>> = itemDao.getItemsAnimalyWriteOffList(id)
+
+    override suspend fun insertWriteOff(item: WriteOffTable) = itemDao.insertWriteOff(item)
+
+    override suspend fun updateWriteOff(item: WriteOffTable) = itemDao.updateWriteOff(item)
+
+    override suspend fun deleteWriteOff(item: WriteOffTable) = itemDao.deleteWriteOff(item)
 }

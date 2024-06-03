@@ -12,8 +12,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -45,11 +47,11 @@ fun DrawerSheet(
             R.drawable.baseline_add_card_24, "Мои Продажи", SaleDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_add_shopping_cart_24, "Мои Покупки", "Expenses"
+            R.drawable.baseline_add_shopping_cart_24, "Мои Покупки", ExpensesDestination.route
         ),
-//        DrawerItems(
-//            R.drawable.baseline_edit_note_24, "Мои Списания", "WriteOff"
-//        ),
+        DrawerItems(
+            R.drawable.baseline_edit_note_24, "Мои Списания", WriteOffDestination.route
+        )
 //        DrawerItems(
 //            R.drawable.baseline_bar_chart_24, "Мои Графики", "Chart"
 //        ),

@@ -26,6 +26,7 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -118,6 +119,29 @@ interface ItemDao {
     @Delete
     suspend fun deleteExpenses(item: ExpensesTable)
 
+    //WriteOff
+    @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id ORDER BY id DESC")
+    fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
+
+    @Query("SELECT * from MyFermaWRITEOFF Where id=:id")
+    fun getItemWriteOff(id: Int): Flow<WriteOffTable>
+
+    @Query("SELECT MyFermaWRITEOFF.Title from MyFermaWRITEOFF Where idPT=:id group by MyFermaWRITEOFF.Title")
+    fun getItemsTitleWriteOffList(id: Int): Flow<List<String>>
+
+    @Query("SELECT MyFermaWRITEOFF.category from MyFermaWRITEOFF Where idPT=:id group by MyFermaWRITEOFF.category")
+    fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>>
+
+    @Query("SELECT MyFermaWRITEOFF.animal from MyFermaWRITEOFF Where idPT=:id group by MyFermaWRITEOFF.animal")
+    fun getItemsAnimalyWriteOffList(id: Int): Flow<List<String>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertWriteOff(item: WriteOffTable)
+    @Update
+    suspend fun updateWriteOff(item: WriteOffTable)
+
+    @Delete
+    suspend fun deleteWriteOff(item: WriteOffTable)
 
 
 }

@@ -46,6 +46,12 @@ import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import com.zaroslikov.fermacompose2.ui.start.StartScreen
 import com.zaroslikov.fermacompose2.ui.start.add.AddProject
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditDestination
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditProduct
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryDestination
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryProduct
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffScreen
 
 
 /**
@@ -241,6 +247,63 @@ fun InventoryNavHost(
             )
         ) {
             ExpensesEditProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        //WriteOff
+        composable(
+            route = WriteOffDestination.routeWithArgs,
+            arguments = listOf(navArgument(WriteOffDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            WriteOffScreen(
+                drawerState = drawerState,
+                navigateToStart = {
+                    navController.navigate(StartDestination.route)
+                },
+                navigateToModalSheet = {
+                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                },
+                navigateToItem = {
+                    navController.navigate(
+                        "${WriteOffEntryDestination.route}/${it}"
+                    )
+                },
+                navigateToItemUpdate = {
+                    navController.navigate(
+                        "${WriteOffEditDestination.route}/${it.id}/${it.idPT}"
+                    )
+                }
+            )
+        }
+        composable(
+            route = WriteOffEntryDestination.routeWithArgs,
+            arguments = listOf(navArgument(WriteOffEntryDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            WriteOffEntryProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = WriteOffEditDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(WriteOffEditDestination.itemIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(WriteOffEditDestination.itemIdArgTwo) {
+                    type = NavType.IntType
+                }
+
+            )
+        ) {
+            WriteOffEditProduct(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() }
             )

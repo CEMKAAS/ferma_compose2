@@ -34,6 +34,9 @@ import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddViewModel
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditViewModel
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryViewModel
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Inventory app
@@ -102,6 +105,26 @@ object AppViewModelProvider {
 
         initializer {
             ExpensesEditViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+
+        // WriteOff
+        initializer {
+            WriteOffViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            WriteOffEntryViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            WriteOffEditViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository)
         }

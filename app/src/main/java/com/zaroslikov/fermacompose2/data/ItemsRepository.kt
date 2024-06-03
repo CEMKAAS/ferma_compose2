@@ -25,6 +25,7 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -93,7 +94,16 @@ interface ItemsRepository {
 
     suspend fun deleteExpenses(item: ExpensesTable)
 
+    //WriteOff
 
+    fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
+    fun getItemWriteOff(id: Int): Flow<WriteOffTable>
+    fun getItemsTitleWriteOffList(id: Int): Flow<List<String>>
+    fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>>
+    fun getItemsAnimalWriteOffList(id: Int): Flow<List<String>>
+    suspend fun insertWriteOff(item: WriteOffTable)
+    suspend fun updateWriteOff(item: WriteOffTable)
+    suspend fun deleteWriteOff(item: WriteOffTable)
 
 
 
