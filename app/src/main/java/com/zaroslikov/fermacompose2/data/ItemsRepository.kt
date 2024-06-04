@@ -95,7 +95,6 @@ interface ItemsRepository {
     suspend fun deleteExpenses(item: ExpensesTable)
 
     //WriteOff
-
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
     fun getItemsTitleWriteOffList(id: Int): Flow<List<String>>
@@ -104,6 +103,13 @@ interface ItemsRepository {
     suspend fun insertWriteOff(item: WriteOffTable)
     suspend fun updateWriteOff(item: WriteOffTable)
     suspend fun deleteWriteOff(item: WriteOffTable)
+
+    //Finance
+//    fun getCurrentBalance(id: Int): Flow<Int>
+//    fun getIncome(id: Int): Flow<Int>
+//    fun getExpenses(id: Int): Flow<Int>
+//    fun getCategoryIncomeCurrentMonth(id: Int): Flow<List<String>>
+//    fun getCategoryExpensesCurrentMonth(id: Int): Flow<List<String>>
 
 
 

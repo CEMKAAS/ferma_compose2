@@ -27,6 +27,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.ui.finance.Fin
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -139,9 +140,24 @@ interface ItemDao {
     suspend fun insertWriteOff(item: WriteOffTable)
     @Update
     suspend fun updateWriteOff(item: WriteOffTable)
-
     @Delete
     suspend fun deleteWriteOff(item: WriteOffTable)
+
+//    @Query("SELECT COALESCE(SUM(MyFermaSale.priceAll), 0) - COALESCE(SUM(MyFermaEXPENSES.priceAll), 0) AS ResultCount FROM MyFermaSale LEFT JOIN MyFermaEXPENSES ON MyFermaSale.idPT = MyFermaEXPENSES.idPT WHERE MyFermaSale.idPT =:id")
+//    fun getCurrentBalance(id: Int): Flow<Int>
+//
+//    @Query("SELECT COALESCE(SUM(MyFermaSale.priceAll), 0) AS ResultCount FROM MyFermaSale WHERE MyFermaSale.idPT =:id")
+//    fun getIncome(id: Int): Flow<Int>
+//
+//    @Query("SELECT COALESCE(SUM(MyFermaEXPENSES.priceAll), 0) AS ResultCount FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id")
+//    fun getExpenses(id: Int): Flow<Int>
+//
+//    @Query("SELECT MyFermaSale.category, COALESCE(SUM(MyFermaSale.priceAll), 0.0) FROM MyFermaSale Where idPT=:id group by MyFermaSale.category ORDER BY MyFermaSale.priceAll DESC")
+//    fun getCategoryIncomeCurrentMonth(id: Int): Flow<List<Fin>>
+//
+//    @Query("SELECT MyFermaEXPENSES.category, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) FROM MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.category ORDER BY MyFermaEXPENSES.priceAll DESC")
+//    fun getCategoryExpensesCurrentMonth(id: Int): Flow<List<Fin>>
+//
 
 
 }
