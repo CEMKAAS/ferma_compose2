@@ -21,6 +21,8 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.ui.finance.Fin
+import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
@@ -28,61 +30,114 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
-    override fun getItemAdd(id: Int): Flow<AddTable> =itemDao.getItemAdd(id)
-    override fun getItemsTitleAddList(id: Int): Flow<List<String>>  = itemDao.getItemsTitleAddList(id)
-    override fun getItemsCategoryAddList(id: Int): Flow<List<String>> = itemDao.getItemsCategoryAddList(id)
-    override fun getItemsAnimalAddList(id: Int): Flow<List<String>> = itemDao.getItemsAnimalAddList(id)
+    override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)
+    override fun getItemsTitleAddList(id: Int): Flow<List<String>> =
+        itemDao.getItemsTitleAddList(id)
 
-    override suspend fun insertProject(projectTable: ProjectTable) = itemDao.insertProject(projectTable)
+    override fun getItemsCategoryAddList(id: Int): Flow<List<String>> =
+        itemDao.getItemsCategoryAddList(id)
+
+    override fun getItemsAnimalAddList(id: Int): Flow<List<String>> =
+        itemDao.getItemsAnimalAddList(id)
+
+    override suspend fun insertProject(projectTable: ProjectTable) =
+        itemDao.insertProject(projectTable)
 
     override suspend fun insertItem(item: AddTable) = itemDao.insert(item)
 
     override suspend fun deleteItem(item: AddTable) = itemDao.delete(item)
 
     override suspend fun updateItem(item: AddTable) = itemDao.update(item)
-    override fun getAllSaleItems(id: Int): Flow<List<SaleTable>>  = itemDao.getAllSaleItems(id)
+
+    //Sale
+    override fun getAllSaleItems(id: Int): Flow<List<SaleTable>> = itemDao.getAllSaleItems(id)
 
     override fun getItemSale(id: Int): Flow<SaleTable> = itemDao.getItemSale(id)
 
-    override fun getItemsTitleSaleList(id: Int): Flow<List<String>> = itemDao.getItemsTitleSaleList(id)
+    override fun getItemsTitleSaleList(id: Int): Flow<List<String>> =
+        itemDao.getItemsTitleSaleList(id)
 
-    override fun getItemsCategorySaleList(id: Int): Flow<List<String>> = itemDao.getItemsCategorySaleList(id)
+    override fun getItemsCategorySaleList(id: Int): Flow<List<String>> =
+        itemDao.getItemsCategorySaleList(id)
 
-    override fun getItemsAnimalSaleList(id: Int): Flow<List<String>> = itemDao.getItemsAnimalSaleList(id)
+    override fun getItemsAnimalSaleList(id: Int): Flow<List<String>> =
+        itemDao.getItemsAnimalSaleList(id)
 
-    override fun getItemsBuyerSaleList(id: Int): Flow<List<String>> = itemDao.getItemsBuyerSaleList(id)
+    override fun getItemsBuyerSaleList(id: Int): Flow<List<String>> =
+        itemDao.getItemsBuyerSaleList(id)
+
     override suspend fun insertSale(item: SaleTable) = itemDao.insertSale(item)
 
-    override suspend fun updateSale(item: SaleTable)= itemDao.updateSale(item)
+    override suspend fun updateSale(item: SaleTable) = itemDao.updateSale(item)
 
     override suspend fun deleteSale(item: SaleTable) = itemDao.deleteSale(item)
-    override fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>> = itemDao.getAllExpensesItems(id)
+    //Expenses
+    override fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>> =
+        itemDao.getAllExpensesItems(id)
 
     override fun getItemExpenses(id: Int): Flow<ExpensesTable> = itemDao.getItemExpenses(id)
 
-    override fun getItemsTitleExpensesList(id: Int): Flow<List<String>> = itemDao.getItemsTitleExpensesList(id)
+    override fun getItemsTitleExpensesList(id: Int): Flow<List<String>> =
+        itemDao.getItemsTitleExpensesList(id)
 
-    override fun getItemsCategoryExpensesList(id: Int): Flow<List<String>> = itemDao.getItemsCategoryExpensesList(id)
+    override fun getItemsCategoryExpensesList(id: Int): Flow<List<String>> =
+        itemDao.getItemsCategoryExpensesList(id)
 
     override suspend fun insertExpenses(item: ExpensesTable) = itemDao.insertExpenses(item)
     override suspend fun updateExpenses(item: ExpensesTable) = itemDao.updateExpenses(item)
     override suspend fun deleteExpenses(item: ExpensesTable) = itemDao.deleteExpenses(item)
-    override fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>> =itemDao.getAllWriteOffItems(id)
+
+    //WriteOff
+    override fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>> =
+        itemDao.getAllWriteOffItems(id)
+
     override fun getItemWriteOff(id: Int): Flow<WriteOffTable> = itemDao.getItemWriteOff(id)
 
-    override fun getItemsTitleWriteOffList(id: Int): Flow<List<String>> = itemDao.getItemsTitleWriteOffList(id)
+    override fun getItemsTitleWriteOffList(id: Int): Flow<List<String>> =
+        itemDao.getItemsTitleWriteOffList(id)
 
-    override fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>> = itemDao.getItemsCategoryWriteOffList(id)
-    override fun getItemsAnimalWriteOffList(id: Int): Flow<List<String>> = itemDao.getItemsAnimalyWriteOffList(id)
+    override fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>> =
+        itemDao.getItemsCategoryWriteOffList(id)
+
+    override fun getItemsAnimalWriteOffList(id: Int): Flow<List<String>> =
+        itemDao.getItemsAnimalyWriteOffList(id)
+
     override suspend fun insertWriteOff(item: WriteOffTable) = itemDao.insertWriteOff(item)
     override suspend fun updateWriteOff(item: WriteOffTable) = itemDao.updateWriteOff(item)
     override suspend fun deleteWriteOff(item: WriteOffTable) = itemDao.deleteWriteOff(item)
 
-//    override fun getCurrentBalance(id: Int): Flow<Int>  =itemDao.getCurrentBalance(id)
-//    override fun getIncome(id: Int): Flow<Int>  = itemDao.getIncome(id)
-//    override fun getExpenses(id: Int): Flow<Int> =itemDao.getExpenses(id)
-//    override fun getCategoryIncomeCurrentMonth(id: Int): Flow<List<String>> = itemDao.getCategoryIncomeCurrentMonth(id)
-//    override fun getCategoryExpensesCurrentMonth(id: Int): Flow<List<String>> = itemDao.getCategoryExpensesCurrentMonth(id)
+    //Finance
+    override fun getCurrentBalance(id: Int): Flow<Double> = itemDao.getCurrentBalance(id)
+    override fun getIncome(id: Int): Flow<Double> = itemDao.getIncome(id)
+    override fun getExpenses(id: Int): Flow<Double> = itemDao.getExpenses(id)
+    override fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>> =
+        itemDao.getCategoryIncomeCurrentMonth(id, mount, year)
+    override fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>> =
+        itemDao.getCategoryExpensesCurrentMonth(id, mount, year)
+    override fun getIncomeExpensesCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int
+    ): Flow<List<IncomeExpensesDetails>> = itemDao.getIncomeExpensesCurrentMonth(id, mount, year)
+
+
+    //FinanceTap
+    override fun getIncomeAllList(id: Int): Flow<List<Fin>> = itemDao.getIncomeAllList(id)
+    override fun getExpensesAllList(id: Int): Flow<List<Fin>> = itemDao.getExpensesAllList(id)
+    override fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>> = itemDao.getIncomeCategoryAllList(id)
+    override fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>> = itemDao.getExpensesCategoryAllList(id)
+    override fun getProductListCategoryIncomeCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int,
+        category: String
+    ): Flow<List<Fin>> = itemDao.getProductListCategoryIncomeCurrentMonth(id,mount, year, category)
+    override fun getProductLisCategoryExpensesCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int,
+        category: String
+    ): Flow<List<Fin>> = itemDao.getProductLisCategoryExpensesCurrentMonth(id,mount, year, category)
 
 
 }

@@ -111,7 +111,7 @@ fun AddScreen(
                 navigateToStart =  navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                1,//ToDo 3
+                3,//ToDo 3
                 idProject.toString()
             )
         },
@@ -282,25 +282,25 @@ fun AddProductCard(
 }
 
 
-@Preview()
-@Composable
-fun Card() {
-    AddProductCard(
-        addProduct = AddTable(
-            0,
-            "Мясо Коровы",
-            150.50,
-            25,
-            12,
-            2025,
-            "0",
-            1,
-            "кг",
-            "Животноводство",
-            "Борька"
-        )
-    )
-}
+//@Preview()
+//@Composable
+//fun Card() {
+//    AddProductCard(
+//        addProduct = AddTable(
+//            0,
+//            "Мясо Коровы",
+//            150.50,
+//            25,
+//            12,
+//            2025,
+//            "0",
+//            1,
+//            "кг",
+//            "Животноводство",
+//            "Борька"
+//        )
+//    )
+//}
 
 
 data class navigateId(

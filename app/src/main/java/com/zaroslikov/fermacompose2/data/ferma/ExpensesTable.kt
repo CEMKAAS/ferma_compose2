@@ -26,7 +26,7 @@ data class ExpensesTable(
     val day: Int,  // день
     val mount: Int, // месяц
     val year: Int, // время
-    val priceAll: String,
+    val priceAll: Double,
     var suffix: String,
     var category: String,
 

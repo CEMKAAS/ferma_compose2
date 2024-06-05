@@ -26,6 +26,8 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.ui.finance.Fin
+import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -105,12 +107,19 @@ interface ItemsRepository {
     suspend fun deleteWriteOff(item: WriteOffTable)
 
     //Finance
-//    fun getCurrentBalance(id: Int): Flow<Int>
-//    fun getIncome(id: Int): Flow<Int>
-//    fun getExpenses(id: Int): Flow<Int>
-//    fun getCategoryIncomeCurrentMonth(id: Int): Flow<List<String>>
-//    fun getCategoryExpensesCurrentMonth(id: Int): Flow<List<String>>
+    fun getCurrentBalance(id: Int): Flow<Double>
+    fun getIncome(id: Int): Flow<Double>
+    fun getExpenses(id: Int): Flow<Double>
+    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
+    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
+    fun getIncomeExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<IncomeExpensesDetails>>
 
 
+    fun getIncomeAllList(id: Int): Flow<List<Fin>>
+    fun getExpensesAllList(id: Int): Flow<List<Fin>>
+    fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>>
+    fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
+    fun getProductListCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<Fin>>
+    fun getProductLisCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<Fin>>
 
 }

@@ -109,7 +109,7 @@ data class SaleTableUiState(
 )
 
 fun SaleTable.toSaleTableUiState(): SaleTableUiState = SaleTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category, animal, buyer
+    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category, animal, buyer
 )
 
 fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
@@ -117,7 +117,7 @@ fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
     title = title,
     count = count.toDouble(),
     day = day,
-    mount, year, priceAll, suffix, category, animal, buyer, idPT
+    mount, year, priceAll.toDouble(), suffix, category, animal, buyer, idPT
 )
 
 data class BuyerUiState(val buyerList: List<String> = listOf())

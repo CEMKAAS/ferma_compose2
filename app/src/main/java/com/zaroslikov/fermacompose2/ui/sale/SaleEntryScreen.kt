@@ -494,7 +494,7 @@ fun SaleEntryContainerProduct(
                                 suffix = suffix,
                                 category = category,
                                 animal = animal,
-                                priceAll = priceAll,
+                                priceAll = priceAll.toDouble(),
                                 buyer = buyer
                             )
                         )
@@ -518,7 +518,7 @@ data class SaleTableInsert(
     var day: Int,
     var mount: Int,
     var year: Int,
-    var priceAll: String,
+    var priceAll: Double,
     var suffix: String,
     var category: String,
     var animal: String,

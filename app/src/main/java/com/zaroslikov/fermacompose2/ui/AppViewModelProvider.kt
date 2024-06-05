@@ -26,6 +26,7 @@ import com.zaroslikov.fermacompose2.InventoryApplication
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesViewModel
+import com.zaroslikov.fermacompose2.ui.finance.FinanceViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
@@ -52,61 +53,78 @@ object AppViewModelProvider {
             ProjectAddViewModel(inventoryApplication().container.itemsRepository)
         }
 
+        // Finance
+        initializer {
+            FinanceViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
         // Initializer for HomeViewModel
         initializer {
             AddViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
             AddEntryViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
             AddEditViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         //Sale
         initializer {
             SaleViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
             SaleEntryViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
             SaleEditViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         //Expenses
         initializer {
             ExpensesViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
-           ExpensesEntryViewModel(
+            ExpensesEntryViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
             ExpensesEditViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
 
@@ -114,19 +132,22 @@ object AppViewModelProvider {
         initializer {
             WriteOffViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
             WriteOffEntryViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         initializer {
             WriteOffEditViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository)
+                inventoryApplication().container.itemsRepository
+            )
         }
 
     }

@@ -89,7 +89,7 @@ data class ExpensesTableUiState(
 )
 
 fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category
+    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category
 )
 
 fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
@@ -99,7 +99,7 @@ fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
     day = day,
     mount = mount,
     year = year,
-    priceAll = priceAll,
+    priceAll = priceAll.toDouble(),
     suffix = suffix,
     category = category,
     idPT = idPT

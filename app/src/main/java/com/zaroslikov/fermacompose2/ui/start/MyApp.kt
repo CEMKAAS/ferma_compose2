@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
+import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
@@ -37,9 +38,9 @@ fun DrawerSheet(
 //        DrawerItems(
 //            R.drawable.baseline_warehouse_24, "Мой Склад", ItemDetailsDestination.route
 //        ),
-//        DrawerItems(
-//            R.drawable.baseline_currency_ruble_24, "Мой Финансы", "Finance"
-//        ),
+        DrawerItems(
+            R.drawable.baseline_add_circle_outline_24, "Мой Финансы", FinanceDestination.route
+        ),
         DrawerItems(
             R.drawable.baseline_add_circle_outline_24, "Мои Товары", HomeDestination.route
         ),

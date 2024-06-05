@@ -389,7 +389,7 @@ fun ExpensesEntryContainerProduct(
                                 year = calendar[Calendar.YEAR],
                                 suffix = suffix,
                                 category = category,
-                                priceAll = priceAll,
+                                priceAll = priceAll.toDouble(),
                             )
                         )
                     }
@@ -412,7 +412,7 @@ data class ExpensesTableInsert(
     var day: Int,
     var mount: Int,
     var year: Int,
-    var priceAll: String,
+    var priceAll: Double,
     var suffix: String,
     var category: String,
 )

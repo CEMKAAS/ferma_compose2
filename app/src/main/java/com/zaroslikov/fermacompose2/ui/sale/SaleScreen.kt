@@ -112,7 +112,7 @@ fun SaleScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                2,//ToDo 3
+                4,//ToDo 3
                 idProject.toString()
             )
         },

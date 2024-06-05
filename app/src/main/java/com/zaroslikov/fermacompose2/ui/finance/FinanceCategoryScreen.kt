@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.writeOff
+package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,15 +49,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
-object WriteOffDestination : NavigationDestination {
-    override val route = "WriteOff"
+object FinanceCategoryDestination : NavigationDestination {
+    override val route = "FinanceCategory"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -68,16 +69,16 @@ object WriteOffDestination : NavigationDestination {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WriteOffScreen(
+fun FinanceCategoryScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItem: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    viewModel: WriteOffViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.writeOffUiState.collectAsState()
+    val homeUiState by viewModel.saleUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -94,7 +95,7 @@ fun WriteOffScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                5,//ToDo 6
+                4,//ToDo 3
                 idProject.toString()
             )
         },
@@ -103,7 +104,7 @@ fun WriteOffScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarFerma(
-                    title = "Мои Списания",
+                    title = "Мои Продажи",
                     scope = coroutineScope,
                     drawerState = drawerState,
                     showBottomFilter = showBottomSheetFilter, //todo на фильтр
@@ -128,7 +129,7 @@ fun WriteOffScreen(
                 }
             },
         ) { innerPadding ->
-            WriteOffBody(
+            FinanceCategoryBody(
                 itemList = homeUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
@@ -142,8 +143,8 @@ fun WriteOffScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun WriteOffBody(
-    itemList: List<WriteOffTable>,
+private fun FinanceCategoryBody(
+    itemList: List<SaleTable>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -161,7 +162,7 @@ private fun WriteOffBody(
                 modifier = Modifier.padding(contentPadding),
             )
         } else {
-            WriteOffInventoryList(
+            FinanceCategoryInventoryList(
                 itemList = itemList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
@@ -179,9 +180,9 @@ private fun WriteOffBody(
 }
 
 @Composable
-private fun WriteOffInventoryList(
-    itemList: List<WriteOffTable>,
-    onItemClick: (WriteOffTable) -> Unit,
+private fun FinanceCategoryInventoryList(
+    itemList: List<SaleTable>,
+    onItemClick: (SaleTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -190,7 +191,7 @@ private fun WriteOffInventoryList(
         contentPadding = contentPadding
     ) {
         items(items = itemList, key = { it.id }) { item ->
-            WriteOffProductCard(writeOffTable = item,
+            FinanceCategoryProductCard(saleTable = item,
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable { onItemClick(item) })
@@ -199,8 +200,8 @@ private fun WriteOffInventoryList(
 }
 
 @Composable
-fun WriteOffProductCard(
-    writeOffTable: WriteOffTable,
+fun FinanceCategoryProductCard(
+    saleTable: SaleTable,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -220,31 +221,39 @@ fun WriteOffProductCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = writeOffTable.title,
+                    text = saleTable.title,
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (writeOffTable.category != "") {
+                if (saleTable.category != "") {
                     Text(
-                        text = "Категория: ${writeOffTable.category}",
+                        text = "Категория: ${saleTable.category}",
                         modifier = Modifier
                             .wrapContentSize()
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
-                if (writeOffTable.animal != "") {
+                if (saleTable.animal != "") {
                     Text(
-                        text = "Животное: ${writeOffTable.animal}",
+                        text = "Животное: ${saleTable.animal}",
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(vertical = 3.dp, horizontal = 6.dp)
+                    )
+                }
+                if (saleTable.buyer != "") {
+                    Text(
+                        text = "Покупатель: ${saleTable.buyer}",
                         modifier = Modifier
                             .wrapContentSize()
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
                 Text(
-                    text = "Дата: ${writeOffTable.day}.${writeOffTable.mount}.${writeOffTable.year}",
+                    text = "Дата: ${saleTable.day}.${saleTable.mount}.${saleTable.year}",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .wrapContentSize()
@@ -253,7 +262,7 @@ fun WriteOffProductCard(
             }
 
             Text(
-                text = "${writeOffTable.count} ${writeOffTable.suffix}",
+                text = "${saleTable.count} ${saleTable.suffix}\n за \n${saleTable.priceAll} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
@@ -264,25 +273,3 @@ fun WriteOffProductCard(
         }
     }
 }
-
-
-//@Preview()
-//@Composable
-//fun Card() {
-//    SaleProductCard(
-//        saleTable = SaleTable(
-//            0,
-//            "Мясо Коровы",
-//            150.50,
-//            25,
-//            12,
-//            2025,
-//            "0",
-//            "кг",
-//            "Животноводство",
-//            "Борька",
-//            "Тетя Надя",
-//            1
-//        )
-//    )
-//}
