@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.finance
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -112,12 +113,11 @@ fun FinanceScreen(
                 incomeRow = incomeRow.itemList,
                 expensesRow = expensesRow.itemList,
                 incomeExpensesList = incomeExpensesList.itemList,
-                onItemClick = navigateToItemUpdate,
+                navigateToCategory = navigateToCategory,
+                navigateToIncomeExpenses = navigateToIncomeExpenses,
                 modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter,
-
-                )
+                contentPadding = innerPadding
+            )
         }
     }
 }
@@ -132,10 +132,10 @@ private fun FinanceBody(
     incomeRow: List<Fin>,
     expensesRow: List<Fin>,
     incomeExpensesList: List<IncomeExpensesDetails>,
-    onItemClick: (navigateId) -> Unit,
+    navigateToCategory: (navigateId) -> Unit,
+    navigateToIncomeExpenses: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -160,7 +160,7 @@ private fun FinanceBody(
         )
 
         Card(
-            onClick = { /*TODO*/ }, modifier = Modifier.padding(0.dp),
+            onClick = { navigateToIncomeExpenses() }, modifier = Modifier.padding(0.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -183,7 +183,7 @@ private fun FinanceBody(
         }
 
         Card(
-            onClick = { /*TODO*/ }, modifier = Modifier.padding(0.dp)
+            onClick = { navigateToIncomeExpenses() }, modifier = Modifier.padding(0.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -215,7 +215,9 @@ private fun FinanceBody(
         )
         LazyRow {
             items(items = incomeRow) {
-                CardRow(it)
+                CardRow(it, modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { navigateToCategory(it) })
             }
         }
 
@@ -230,7 +232,9 @@ private fun FinanceBody(
         )
         LazyRow {
             items(items = expensesRow) {
-                CardRow(it)
+                CardRow(it, modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { navigateToCategory(it) })
             }
         }
 
@@ -245,7 +249,7 @@ private fun FinanceBody(
         )
 
         LazyColumn {
-            items(items = incomeExpensesList) {
+            items(items = incomeExpensesList) { it ->
                 TransactionRow(it)
             }
         }
@@ -256,9 +260,10 @@ private fun FinanceBody(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardRow(
-    fin: Fin
+    fin: Fin,
+    modifier: Modifier = Modifier
 ) {
-    Card(onClick = { /*TODO*/ }, modifier = Modifier.padding(5.dp)) {
+    Card(modifier = Modifier.padding(5.dp)) {
         Text(
             text = fin.category, textAlign = TextAlign.Start,
             fontSize = 15.sp,

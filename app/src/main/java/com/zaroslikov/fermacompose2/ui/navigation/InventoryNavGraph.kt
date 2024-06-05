@@ -32,6 +32,7 @@ import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryProduct
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
+import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
 import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEditProduct
