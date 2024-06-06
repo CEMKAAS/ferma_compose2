@@ -27,6 +27,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.finance.Fin
+import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import kotlinx.coroutines.flow.Flow
 
@@ -115,11 +116,11 @@ interface ItemsRepository {
     fun getIncomeExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<IncomeExpensesDetails>>
 
 
-    fun getIncomeAllList(id: Int): Flow<List<Fin>>
-    fun getExpensesAllList(id: Int): Flow<List<Fin>>
+    fun getIncomeAllList(id: Int): Flow<List<FinTit>>
+    fun getExpensesAllList(id: Int): Flow<List<FinTit>>
     fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>>
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
-    fun getProductListCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<Fin>>
-    fun getProductLisCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<Fin>>
+    fun getProductListCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
+    fun getProductLisCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
 
 }

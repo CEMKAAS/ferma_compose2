@@ -61,8 +61,8 @@ object FinanceDestination : NavigationDestination {
 fun FinanceScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToCategory: (navigateId) -> Unit,
-    navigateToIncomeExpenses: (Int) -> Unit,
+    navigateToCategory: (FinanceCategoryData) -> Unit,
+    navigateToIncomeExpenses: (FinanceIncomeExpensesData) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: FinanceViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -77,7 +77,8 @@ fun FinanceScreen(
     val incomeRow by viewModel.incomeCategoryUiState.collectAsState()
     val expensesRow by viewModel.expensesCategoryUiState.collectAsState()
     val incomeExpensesList by viewModel.incomeExpensesUiState.collectAsState()
-    //val idProject = viewModel.itemId
+
+    val idProject = viewModel.itemId
     val showBottomSheetFilter = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
@@ -115,6 +116,7 @@ fun FinanceScreen(
                 incomeExpensesList = incomeExpensesList.itemList,
                 navigateToCategory = navigateToCategory,
                 navigateToIncomeExpenses = navigateToIncomeExpenses,
+                idPT = idProject,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding
             )
@@ -131,9 +133,11 @@ private fun FinanceBody(
     expenses: Double,
     incomeRow: List<Fin>,
     expensesRow: List<Fin>,
+
     incomeExpensesList: List<IncomeExpensesDetails>,
-    navigateToCategory: (navigateId) -> Unit,
-    navigateToIncomeExpenses: (Int) -> Unit,
+    navigateToCategory: (FinanceCategoryData) -> Unit,
+    navigateToIncomeExpenses: (FinanceIncomeExpensesData) -> Unit,
+    idPT: Int,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -160,7 +164,7 @@ private fun FinanceBody(
         )
 
         Card(
-            onClick = { navigateToIncomeExpenses() }, modifier = Modifier.padding(0.dp),
+            onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, true)) }, modifier = Modifier.padding(0.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -183,7 +187,7 @@ private fun FinanceBody(
         }
 
         Card(
-            onClick = { navigateToIncomeExpenses() }, modifier = Modifier.padding(0.dp)
+            onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, false)) }, modifier = Modifier.padding(0.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -217,7 +221,7 @@ private fun FinanceBody(
             items(items = incomeRow) {
                 CardRow(it, modifier = Modifier
                     .padding(8.dp)
-                    .clickable { navigateToCategory(it) })
+                    .clickable { navigateToCategory(FinanceCategoryData(idPT,it.category,true)) })
             }
         }
 
@@ -233,8 +237,8 @@ private fun FinanceBody(
         LazyRow {
             items(items = expensesRow) {
                 CardRow(it, modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { navigateToCategory(it) })
+                    .padding(5.dp)
+                    .clickable { navigateToCategory(FinanceCategoryData(idPT,it.category,false)) })
             }
         }
 
@@ -263,7 +267,7 @@ fun CardRow(
     fin: Fin,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = Modifier.padding(5.dp)) {
+    Card(modifier = modifier) {
         Text(
             text = fin.category, textAlign = TextAlign.Start,
             fontSize = 15.sp,
@@ -343,4 +347,20 @@ fun TransactionRow(
 data class Fin(
     val category: String,
     val priceAll: Double
+)
+
+data class FinTit(
+    val Title: String,
+    val priceAll: Double
+)
+
+data class FinanceCategoryData(
+    val idPT: Int,
+    val category: String,
+    val incomeBoolean: Boolean
+)
+
+data class FinanceIncomeExpensesData(
+    val idPT: Int,
+    val incomeBoolean: Boolean
 )

@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -61,7 +62,9 @@ object FinanceIncomeExpensesDestination : NavigationDestination {
     override val route = "FinanceIncomeExpenses"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+    const val itemIdArgTwo = "itemCategory"
+    val routeWithArgs =
+        "${FinanceIncomeExpensesDestination.route}/{$itemIdArg}/{$itemIdArgTwo}"
 }
 
 /**
@@ -69,74 +72,29 @@ object FinanceIncomeExpensesDestination : NavigationDestination {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FinanceIncomeExpensesyScreen(
-    navigateToStart: () -> Unit,
-    navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (navigateId) -> Unit,
-    navigateToItem: (Int) -> Unit,
-    drawerState: DrawerState,
+fun FinanceIncomeExpensesScreen(
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: FinanceIncomeExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.saleUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+//    val coroutineScope = rememberCoroutineScope()
 
-    val idProject = viewModel.itemId
+    val financeCategoryState by viewModel.financeCategoryIEState.collectAsState()
+    val financeProduuctState by viewModel.financeProductIEState.collectAsState()
 
-    val coroutineScope = rememberCoroutineScope()
-
-    val showBottomSheetFilter = remember { mutableStateOf(false) }
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerSheet(
-                scope = coroutineScope,
-                navigateToStart = navigateToStart,
-                navigateToModalSheet = navigateToModalSheet,
-                drawerState = drawerState,
-                4,//ToDo 3
-                idProject.toString()
-            )
-        },
-    ) {
-        Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBarFerma(
-                    title = "Мои Продажи",
-                    scope = coroutineScope,
-                    drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
-                    scrollBehavior = scrollBehavior
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigateToItem(idProject) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .padding(
-                            end = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateEndPadding(LocalLayoutDirection.current)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
-                    )
-                }
-            },
-        ) { innerPadding ->
-            FinanceIncomeExpensesBody(
-                itemList = homeUiState.itemList,
-                onItemClick = navigateToItemUpdate,
-                modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter
-            )
+    Scaffold(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBarEdit(title = "Добавить Продажу", navigateUp = navigateBack)
         }
+    ) { innerPadding ->
+        FinanceIncomeExpensesBody(
+            itemList = financeCategoryState.itemList,
+            productList = financeProduuctState.itemList,
+            modifier = modifier.fillMaxSize(),
+            contentPadding = innerPadding
+        )
     }
 }
 
@@ -144,45 +102,29 @@ fun FinanceIncomeExpensesyScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FinanceIncomeExpensesBody(
-    itemList: List<SaleTable>,
-    onItemClick: (navigateId) -> Unit,
+    itemList: List<Fin>,
+    productList: List<FinTit>,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        if (itemList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_item_description),//TODO
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
-        } else {
-            FinanceIncomeExpensesInventoryList(
-                itemList = itemList,
-                onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
-                contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-            )
-        }
-
-        if (showBottomFilter.value) {
-//            FilterProductSheet(
-//                showBottom = showBottomFilter
-//            )
-        }
-
+        FinanceIncomeExpensesInventoryList(
+            itemList = itemList,
+            productList = productList,
+            contentPadding = contentPadding,
+            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+        )
     }
+
 }
 
 @Composable
 private fun FinanceIncomeExpensesInventoryList(
-    itemList: List<SaleTable>,
-    onItemClick: (SaleTable) -> Unit,
+    itemList: List<Fin>,
+    productList: List<FinTit>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -190,18 +132,48 @@ private fun FinanceIncomeExpensesInventoryList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = itemList, key = { it.id }) { item ->
-            FinanceIncomeExpensesProductCard(saleTable = item,
+        item {
+            Text(
+                text = "Категории",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        items(items = itemList) { item ->
+            FinanceIncomProductCard(
+                fin = item,
                 modifier = Modifier
                     .padding(8.dp)
-                    .clickable { onItemClick(item) })
+            )
+        }
+        item {
+            Text(
+                text = "Товар",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        items(items = productList) { item ->
+            FinanceIncomeExpensesProductCard(
+                fin = item,
+                modifier = Modifier
+                    .padding(8.dp)
+            )
         }
     }
 }
 
 @Composable
-fun FinanceIncomeExpensesProductCard(
-    saleTable: SaleTable,
+fun FinanceIncomProductCard(
+    fin: Fin,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -221,48 +193,61 @@ fun FinanceIncomeExpensesProductCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = saleTable.title,
+                    text = fin.category,
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (saleTable.category != "") {
-                    Text(
-                        text = "Категория: ${saleTable.category}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                if (saleTable.animal != "") {
-                    Text(
-                        text = "Животное: ${saleTable.animal}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                if (saleTable.buyer != "") {
-                    Text(
-                        text = "Покупатель: ${saleTable.buyer}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
+            }
+
+            Text(
+                text = "${fin.priceAll} ₽",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(1f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun FinanceIncomeExpensesProductCard(
+    fin: FinTit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Column(
+                modifier = Modifier.fillMaxWidth(0.7f)
+            ) {
                 Text(
-                    text = "Дата: ${saleTable.day}.${saleTable.mount}.${saleTable.year}",
-                    textAlign = TextAlign.Center,
+                    text = fin.Title,
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(vertical = 3.dp, horizontal = 6.dp)
+                        .padding(6.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
                 )
             }
 
             Text(
-                text = "${saleTable.count} ${saleTable.suffix}\n за \n${saleTable.priceAll} ₽",
+                text = "${fin.priceAll} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
