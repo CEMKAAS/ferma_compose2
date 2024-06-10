@@ -125,8 +125,8 @@ fun WriteOffEntryContainerProduct(
     saveInRoomSale: (WriteOffTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
-    var count by rememberSaveable { mutableStateOf("Без категории") }
-    var category by remember { mutableStateOf("") }
+    var count by rememberSaveable { mutableStateOf("") }
+    var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Ед.") }
     var animal by remember { mutableStateOf("") }
     var priceAll by remember { mutableStateOf("") }

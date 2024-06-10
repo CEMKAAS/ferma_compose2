@@ -36,10 +36,10 @@ fun DrawerSheet(
             R.drawable.baseline_arrow_back_24, "Вернуться к проектам", StartDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_add_circle_outline_24, "Мой Склад", WarehouseDestination.route
+            R.drawable.baseline_warehouse_24, "Мой Склад", WarehouseDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_add_circle_outline_24, "Мой Финансы", FinanceDestination.route
+            R.drawable.baseline_currency_ruble_24, "Мой Финансы", FinanceDestination.route
         ),
         DrawerItems(
             R.drawable.baseline_add_circle_outline_24, "Мои Товары", HomeDestination.route
