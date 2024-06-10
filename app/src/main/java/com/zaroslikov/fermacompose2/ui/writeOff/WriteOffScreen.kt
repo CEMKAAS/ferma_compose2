@@ -94,7 +94,7 @@ fun WriteOffScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                5,//ToDo 6
+                6,
                 idProject.toString()
             )
         },

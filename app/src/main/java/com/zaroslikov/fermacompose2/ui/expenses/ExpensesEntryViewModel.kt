@@ -24,7 +24,7 @@ class ExpensesEntryViewModel(
     val itemId: Int = checkNotNull(savedStateHandle[ExpensesEntryDestination.itemIdArg])
 
     val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleSaleList(itemId).map { TitleUiState(it) }
+        itemsRepository.getItemsTitleExpensesList(itemId).map { TitleUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -33,7 +33,7 @@ class ExpensesEntryViewModel(
 
 
     val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategorySaleList(itemId).map { CategoryUiState(it) }
+        itemsRepository.getItemsCategoryExpensesList(itemId).map { CategoryUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

@@ -1,28 +1,20 @@
-package com.zaroslikov.fermacompose2.ui.expenses
+package com.zaroslikov.fermacompose2.ui.warehouse
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -38,46 +30,38 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
-object ExpensesDestination : NavigationDestination {
-    override val route = "expenses"
+object WarehouseDestination : NavigationDestination {
+    override val route = "warehouse"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpensesScreen(
-    navigateToStart:()-> Unit,
+fun WarehouseScreen(
+    navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
-    navigateToItem: (Int) -> Unit,
+    navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -93,10 +77,10 @@ fun ExpensesScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navigateToStart =  navigateToStart,
+                navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                5,
+                1,//ToDo 3
                 idProject.toString()
             )
         },
@@ -105,34 +89,18 @@ fun ExpensesScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarFerma(
-                    title = "Мои Покупки",
+                    title = "Мой Склад",
                     scope = coroutineScope,
                     drawerState = drawerState,
                     showBottomFilter = showBottomSheetFilter, //todo на фильтр
                     filterSheet = true,
                     scrollBehavior = scrollBehavior
                 )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigateToItem(idProject) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .padding(
-                            end = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateEndPadding(LocalLayoutDirection.current)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
-                    )
-                }
-            },
+            }
         ) { innerPadding ->
-            ExpensesBody(
+            WarehouseBody(
                 itemList = homeUiState.itemList,
-                onItemClick = navigateToItemUpdate,
+//                onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
                 showBottomFilter = showBottomSheetFilter
@@ -144,9 +112,9 @@ fun ExpensesScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExpensesBody(
-    itemList: List<ExpensesTable>,
-    onItemClick: (navigateId) -> Unit,
+private fun WarehouseBody(
+    itemList: List<WarehouseData>,
+//    onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     showBottomFilter: MutableState<Boolean>
@@ -163,9 +131,9 @@ private fun ExpensesBody(
                 modifier = Modifier.padding(contentPadding),
             )
         } else {
-            ExpensesList(
+            WarehouseInventoryList(
                 itemList = itemList,
-                onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
+//                onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
@@ -181,9 +149,9 @@ private fun ExpensesBody(
 }
 
 @Composable
-private fun ExpensesList(
-    itemList: List<ExpensesTable>,
-    onItemClick: (ExpensesTable) -> Unit,
+private fun WarehouseInventoryList(
+    itemList: List<WarehouseData>,
+//    onItemClick: (AddTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -191,21 +159,34 @@ private fun ExpensesList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = itemList, key = { it.id }) { item ->
-            ExpensesCard(expensesTable = item,
+        item {
+            Text(
+                text = "Сейчас на складе:",
+                textAlign = TextAlign.Center,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        items(items = itemList) { item ->
+            WarehouseProductCard(
+                warehouseProduct = item,
                 modifier = Modifier
                     .padding(8.dp)
-                    .clickable { onItemClick(item) })
+            )
+//                    .clickable { onItemClick(item) })
         }
     }
 }
 
 @Composable
-fun ExpensesCard(
-    expensesTable: ExpensesTable,
+fun WarehouseProductCard(
+    warehouseProduct: WarehouseData,
     modifier: Modifier = Modifier
 ) {
-    androidx.compose.material3.Card(
+    Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
@@ -222,31 +203,16 @@ fun ExpensesCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = expensesTable.title,
+                    text = warehouseProduct.Title,
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (expensesTable.category != "") {
-                    Text(
-                        text = "Категория: ${expensesTable.category}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                Text(
-                    text = "Дата: ${expensesTable.day}.${expensesTable.mount}.${expensesTable.year}",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(vertical = 3.dp, horizontal = 6.dp)
-                )
             }
             Text(
-                text = "${expensesTable.count} ${expensesTable.suffix}\n за \n${expensesTable.priceAll} ₽",
+                text = "${warehouseProduct.ResultCount} ${warehouseProduct.suffix}",
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .padding(6.dp)
@@ -279,9 +245,9 @@ fun ExpensesCard(
 //    )
 //}
 
-//
-//data class navigateId(
-//    val id: Int,
-//    val idPT: Int
-//
-//)
+
+data class WarehouseData(
+    val Title: String,
+    val ResultCount: Double,
+    val suffix: String
+)

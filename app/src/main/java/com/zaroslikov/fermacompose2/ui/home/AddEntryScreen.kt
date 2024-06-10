@@ -125,7 +125,7 @@ fun AddEntryContainerProduct(
     saveInRoomAdd: (AddTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
-    var count by rememberSaveable { mutableStateOf("") }
+    var count by rememberSaveable { mutableStateOf("Без категории") }
     var category by remember { mutableStateOf("") }
     var suffix by remember { mutableStateOf("Ед.") }
     var animal by remember { mutableStateOf("") }

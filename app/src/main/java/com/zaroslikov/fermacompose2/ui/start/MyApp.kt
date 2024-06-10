@@ -16,6 +16,7 @@ import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -34,10 +35,9 @@ fun DrawerSheet(
         DrawerItems(
             R.drawable.baseline_arrow_back_24, "Вернуться к проектам", StartDestination.route
         ),
-
-//        DrawerItems(
-//            R.drawable.baseline_warehouse_24, "Мой Склад", ItemDetailsDestination.route
-//        ),
+        DrawerItems(
+            R.drawable.baseline_add_circle_outline_24, "Мой Склад", WarehouseDestination.route
+        ),
         DrawerItems(
             R.drawable.baseline_add_circle_outline_24, "Мой Финансы", FinanceDestination.route
         ),

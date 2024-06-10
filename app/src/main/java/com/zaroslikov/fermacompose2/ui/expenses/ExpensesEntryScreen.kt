@@ -123,7 +123,7 @@ fun ExpensesEntryContainerProduct(
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Ед.") }
     var priceAll by remember { mutableStateOf("") }
 

@@ -29,6 +29,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -100,7 +101,6 @@ interface ItemsRepository {
     //WriteOff
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
-    fun getItemsTitleWriteOffList(id: Int): Flow<List<String>>
     fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>>
     fun getItemsAnimalWriteOffList(id: Int): Flow<List<String>>
     suspend fun insertWriteOff(item: WriteOffTable)
@@ -122,5 +122,8 @@ interface ItemsRepository {
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
     fun getProductListCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
     fun getProductLisCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
+
+    fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
+
 
 }

@@ -30,6 +30,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -133,9 +134,6 @@ interface ItemDao {
     @Query("SELECT * from MyFermaWRITEOFF Where id=:id")
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
 
-    @Query("SELECT MyFermaWRITEOFF.Title from MyFermaWRITEOFF Where idPT=:id group by MyFermaWRITEOFF.Title")
-    fun getItemsTitleWriteOffList(id: Int): Flow<List<String>>
-
     @Query("SELECT MyFermaWRITEOFF.category from MyFermaWRITEOFF Where idPT=:id group by MyFermaWRITEOFF.category")
     fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>>
 
@@ -149,6 +147,8 @@ interface ItemDao {
     @Delete
     suspend fun deleteWriteOff(item: WriteOffTable)
 
+
+    //Finance
     @Query("SELECT COALESCE(SUM(MyFermaSale.priceAll), 0.0) - COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS ResultCount FROM MyFermaSale LEFT JOIN MyFermaEXPENSES ON MyFermaSale.idPT = MyFermaEXPENSES.idPT WHERE MyFermaSale.idPT =:id")
     fun getCurrentBalance(id: Int): Flow<Double>
 
@@ -175,7 +175,6 @@ interface ItemDao {
     )
     fun getIncomeExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<IncomeExpensesDetails>>
 
-
     @Query("SELECT MyFermaSale.title, COALESCE(SUM(MyFermaSale.priceAll), 0.0) AS priceAll FROM MyFermaSale WHERE MyFermaSale.idPT =:id group by MyFermaSale.title")
     fun getIncomeAllList(id: Int): Flow<List<FinTit>>
     @Query("SELECT MyFermaEXPENSES.title, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS priceAll FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id group by MyFermaEXPENSES.title")
@@ -188,4 +187,26 @@ interface ItemDao {
     fun getProductListCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
     @Query("SELECT MyFermaEXPENSES.title, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS priceAll FROM MyFermaEXPENSES Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaEXPENSES.title ORDER BY MyFermaEXPENSES.priceAll DESC")
     fun getProductLisCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
+
+    @Query("SELECT Title, suffix, " +
+            "       SUM(AddCount) - COALESCE(SUM(SaleCount), 0) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
+            " FROM (" +
+            "    SELECT Title,suffix, SUM(Count) AS AddCount, 0 AS SaleCount, 0 AS WriteOffCount" +
+            "    FROM MyFerma" +
+            "    WHERE idPT = :id" +
+            "    GROUP BY Title" +
+            "    UNION ALL" +
+            "    SELECT Title, suffix, 0 AS AddCount, SUM(Count) AS SaleCount, 0 AS WriteOffCount" +
+            "    FROM MyFermaSale" +
+            "    WHERE idPT = :id" +
+            "    GROUP BY Title" +
+            "    UNION ALL" +
+            "    SELECT Title, suffix, 0 AS AddCount, 0 AS SaleCount, SUM(Count) AS WriteOffCount" +
+            "    FROM MyFermaWRITEOFF" +
+            "    WHERE idPT = :id" +
+            "    GROUP BY Title" +
+            ")" +
+            "GROUP BY Title ORDER BY ResultCount DESC")
+    fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
+
 }

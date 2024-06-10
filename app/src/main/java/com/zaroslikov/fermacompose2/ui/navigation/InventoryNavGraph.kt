@@ -52,6 +52,8 @@ import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import com.zaroslikov.fermacompose2.ui.start.StartScreen
 import com.zaroslikov.fermacompose2.ui.start.add.AddProject
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseScreen
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditProduct
@@ -80,6 +82,21 @@ fun InventoryNavHost(
                 navigateToItemUpdate = {
                     navController.navigate("${HomeDestination.route}/${it}")
                 })
+        }
+
+        composable(
+            route = WarehouseDestination.routeWithArgs,
+            arguments = listOf(navArgument(WarehouseDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            WarehouseScreen(
+                navigateToStart = { navController.navigate(StartDestination.route) },
+                navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")},
+                navigateToItemUpdate = {},
+                navigateToItemAdd = {},
+                drawerState = drawerState
+            )
         }
 
         composable(route = ProjectAddDestination.route) {

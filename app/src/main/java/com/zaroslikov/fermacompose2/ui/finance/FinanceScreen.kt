@@ -89,8 +89,8 @@ fun FinanceScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                2,//ToDo 3
-                "1"
+                2,
+                idProject.toString()
             )
         },
     ) {

@@ -49,7 +49,7 @@ class SaleEntryViewModel(
             )
 
     val buyerUiState: StateFlow<BuyerUiState> =
-        itemsRepository.getItemsAnimalSaleList(itemId).map {BuyerUiState(it)}
+        itemsRepository.getItemsBuyerSaleList(itemId).map {BuyerUiState(it)}
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -65,7 +65,3 @@ class SaleEntryViewModel(
     }
 
 }
-
-/**
- * Ui State for HomeScreen
- */

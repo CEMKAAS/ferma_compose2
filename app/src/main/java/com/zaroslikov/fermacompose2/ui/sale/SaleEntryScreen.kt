@@ -132,7 +132,7 @@ fun SaleEntryContainerProduct(
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Ед.") }
     var animal by remember { mutableStateOf("") }
     var priceAll by remember { mutableStateOf("") }

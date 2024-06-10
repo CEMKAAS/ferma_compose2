@@ -23,7 +23,7 @@ class WriteOffEntryViewModel (
     val itemId: Int = checkNotNull(savedStateHandle[WriteOffEntryDestination.itemIdArg])
 
     val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleWriteOffList(itemId).map { TitleUiState(it) }
+        itemsRepository.getItemsTitleAddList(itemId).map { TitleUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

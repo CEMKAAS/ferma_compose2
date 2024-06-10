@@ -24,6 +24,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
@@ -94,9 +95,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemWriteOff(id: Int): Flow<WriteOffTable> = itemDao.getItemWriteOff(id)
 
-    override fun getItemsTitleWriteOffList(id: Int): Flow<List<String>> =
-        itemDao.getItemsTitleWriteOffList(id)
-
     override fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>> =
         itemDao.getItemsCategoryWriteOffList(id)
 
@@ -140,5 +138,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         category: String
     ): Flow<List<FinTit>> = itemDao.getProductLisCategoryExpensesCurrentMonth(id,mount, year, category)
 
+    override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> = itemDao.getCurrentBalanceWarehouse(id)
 
 }
