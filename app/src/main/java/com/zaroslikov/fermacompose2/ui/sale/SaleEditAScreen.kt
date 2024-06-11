@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -87,7 +88,8 @@ fun SaleEditProduct(
         SaleEditContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(5.dp).verticalScroll(rememberScrollState()),
+                .padding(5.dp)
+                .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             animalList = animalUiState.animalList,
@@ -196,11 +198,13 @@ fun SaleEditContainerProduct(
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
                     isError = isErrorTitle,
                     keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                        capitalization = KeyboardCapitalization.Sentences
                     ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
@@ -241,7 +245,9 @@ fun SaleEditContainerProduct(
                     validateCount(it)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -306,7 +312,9 @@ fun SaleEditContainerProduct(
                 validatePrice(saleTable.priceAll)
             },
             label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -344,13 +352,15 @@ fun SaleEditContainerProduct(
                     label = { Text("Категория") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(),
+                        .menuAnchor()
+                        .padding(bottom = 2.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
                     keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                        capitalization = KeyboardCapitalization.Sentences
                     ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
@@ -399,7 +409,8 @@ fun SaleEditContainerProduct(
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
@@ -451,10 +462,12 @@ fun SaleEditContainerProduct(
                     supportingText = { Text("Выберите или укажите имя покупателя") },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
                     keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                        capitalization = KeyboardCapitalization.Sentences
                     ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
@@ -523,7 +536,8 @@ fun SaleEditContainerProduct(
                 .fillMaxWidth()
                 .clickable {
                     openDialog = true
-                },
+                }
+                .padding(bottom = 2.dp),
         )
 
         Button(

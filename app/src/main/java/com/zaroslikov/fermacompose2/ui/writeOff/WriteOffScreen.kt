@@ -227,7 +227,7 @@ fun WriteOffProductCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (writeOffTable.category != "") {
+                if (writeOffTable.category != "Без категории") {
                     Text(
                         text = "Категория: ${writeOffTable.category}",
                         modifier = Modifier

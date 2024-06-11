@@ -244,7 +244,7 @@ fun AddProductCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (addProduct.category != "") {
+                if (addProduct.category != "Без категории") {
                     Text(
                         text = "Категория: ${addProduct.category}",
                         modifier = Modifier

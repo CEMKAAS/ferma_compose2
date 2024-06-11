@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -37,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -81,7 +84,8 @@ fun AddEntryProduct(
         AddEntryContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(5.dp),
+                .padding(5.dp)
+                .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             animalList = animalUiState.animalList,
@@ -127,7 +131,7 @@ fun AddEntryContainerProduct(
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
     var category by remember { mutableStateOf("Без категории") }
-    var suffix by remember { mutableStateOf("Ед.") }
+    var suffix by remember { mutableStateOf("Шт.") }
     var animal by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
@@ -185,15 +189,15 @@ fun AddEntryContainerProduct(
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
                         )
-                    }
-                    ))
+                    }))
 
                 val filteredOptions =
                     titleList.filter { it.contains(title, ignoreCase = true) }
@@ -226,7 +230,8 @@ fun AddEntryContainerProduct(
                     validateCount(count)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 2.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -282,11 +287,12 @@ fun AddEntryContainerProduct(
                     label = { Text("Категория") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(),
+                        .menuAnchor()
+                        .padding(bottom = 2.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                 )
 
                 val filteredOptions =
@@ -326,9 +332,11 @@ fun AddEntryContainerProduct(
                     supportingText = {
                         Text("Выберите животное, которое принесло товар")
                     },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
+                        .padding(bottom = 2.dp)
                 )
 
                 ExposedDropdownMenu(
@@ -368,7 +376,7 @@ fun AddEntryContainerProduct(
                             AddTableInsert(
                                 id = 0,
                                 title = title,
-                                count = count.toDouble(),
+                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                                 calendar[Calendar.DAY_OF_MONTH],
                                 (calendar[Calendar.MONTH] + 1),
                                 calendar[Calendar.YEAR],

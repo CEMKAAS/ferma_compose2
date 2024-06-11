@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -37,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +65,7 @@ object WriteOffEntryDestination : NavigationDestination {
 fun WriteOffEntryProduct(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel:WriteOffEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: WriteOffEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
     val titleUiState by viewModel.titleUiState.collectAsState()
@@ -82,7 +85,8 @@ fun WriteOffEntryProduct(
         WriteOffEntryContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(5.dp),
+                .padding(5.dp)
+                .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             animalList = animalUiState.animalList,
@@ -121,14 +125,12 @@ fun WriteOffEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<String>,
     saveInRoomSale: (WriteOffTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
     var category by remember { mutableStateOf("Без категории") }
-    var suffix by remember { mutableStateOf("Ед.") }
-    var animal by remember { mutableStateOf("") }
+    var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("") }
 
 
@@ -137,7 +139,6 @@ fun WriteOffEntryContainerProduct(
     var expandedCat by remember { mutableStateOf(false) }
     var expandedAni by remember { mutableStateOf(false) }
 
-    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
@@ -145,18 +146,13 @@ fun WriteOffEntryContainerProduct(
     var selectedItemIndex by remember { mutableStateOf(0) }
 
 
-    fun validateTitle(text: String) {
-        isErrorTitle = text == ""
-    }
-
     fun validateCount(text: String) {
         isErrorCount = text == ""
     }
 
     fun errorBoolean(): Boolean {
-        isErrorTitle = title == ""
         isErrorCount = count == ""
-        return !(isErrorTitle || isErrorCount)
+        return !(isErrorCount)
     }
 
 
@@ -164,61 +160,41 @@ fun WriteOffEntryContainerProduct(
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                }
+                onExpandedChange = { expanded = !expanded },
             ) {
                 OutlinedTextField(
-                    value = title,
-                    onValueChange = {
-                        title = it
-                        validateTitle(title)
-                    },
+                    value = titleList[selectedItemIndex],
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     label = { Text(text = "Товар") },
                     supportingText = {
-                        if (isErrorTitle) {
-                            Text(
-                                text = "Не указано имя товара",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else {
-                            Text("Выберите или укажите товар")
-                        }
+                        Text("Выберите товар, который хотите списать")
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
-                    isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp)
                 )
 
-                val filteredOptions =
-                    titleList.filter { it.contains(title, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    title = item
-                                    expanded = false
-                                }
-                            )
-                        }
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    titleList.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                )
+                            },
+                            onClick = {
+                                selectedItemIndex = index
+                                expanded = false
+                                title = titleList[selectedItemIndex]
+                            }
+                        )
                     }
                 }
             }
@@ -232,7 +208,9 @@ fun WriteOffEntryContainerProduct(
                     validateCount(count)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -290,9 +268,11 @@ fun WriteOffEntryContainerProduct(
                 priceAll = it
             },
             label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp),
             supportingText = {
-                    Text("Укажите цену за списанный товар")
+                Text("Укажите цену за списанный товар")
             },
             suffix = { Text(text = "₽") },
             keyboardOptions = KeyboardOptions(
@@ -306,134 +286,42 @@ fun WriteOffEntryContainerProduct(
             }
             )
         )
+    }
 
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedCat,
-                onExpandedChange = {
-                    expandedCat = !expandedCat
-                }
-            ) {
-                OutlinedTextField(
-                    value = category,
-                    onValueChange = { category = it },
-                    label = { Text("Категория") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    supportingText = {
-                        Text("Укажите или выберите категорию в которую хотите отнести товар")
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Button(
+            onClick = {
+                if (errorBoolean()) {
+                    val calendar = Calendar.getInstance()
+                    saveInRoomSale(
+                        WriteOffTableInsert(
+                            id = 0,
+                            title = title,
+                            count = count.toDouble(),
+                            day = calendar[Calendar.DAY_OF_MONTH],
+                            mount = (calendar[Calendar.MONTH] + 1),
+                            year = calendar[Calendar.YEAR],
+                            suffix = suffix,
+                            category = category,
+                            priceAll = priceAll
                         )
-                    }
                     )
-                )
-
-                val filteredOptions =
-                    categoryList.filter { it.contains(category, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expandedCat,
-                        onDismissRequest = {
-//                            expandedCat = false
-                            // We shouldn't hide the menu when the user enters/removes any character
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    category = item
-                                    expandedCat = false
-                                }
-                            )
-                        }
-                    }
                 }
-            }
-        }
-
-        if (animalList.isNotEmpty()) {
-            ExposedDropdownMenuBox(
-                expanded = expandedAni,
-                onExpandedChange = { expandedAni = !expandedAni },
-            ) {
-                OutlinedTextField(
-                    value = animalList[selectedItemIndex],
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
-                    supportingText = { Text("Выберите животное, которое принесло товар") },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedAni,
-                    onDismissRequest = { expandedAni = false }
-                ) {
-                    animalList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                expandedAni = false
-                                animal = animalList[selectedItemIndex]
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        Row(
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.Center
+                .padding(vertical = 15.dp)
         ) {
-            Button(
-                onClick = {
-                    if (errorBoolean()) {
-                        val calendar = Calendar.getInstance()
-                        saveInRoomSale(
-                            WriteOffTableInsert(
-                                id = 0,
-                                title = title,
-                                count = count.toDouble(),
-                                day = calendar[Calendar.DAY_OF_MONTH],
-                                mount = (calendar[Calendar.MONTH] + 1),
-                                year = calendar[Calendar.YEAR],
-                                suffix = suffix,
-                                category = category,
-                                animal = animal,
-                                priceAll = priceAll
-                            )
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-            ) {
-                Text(text = "Продать")
-            }
+            Text(text = "Списать")
         }
     }
 }
+
 
 
 data class WriteOffTableInsert(

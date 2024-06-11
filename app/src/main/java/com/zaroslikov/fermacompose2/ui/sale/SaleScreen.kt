@@ -245,7 +245,7 @@ fun SaleProductCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (saleTable.category != "") {
+                if (saleTable.category != "Без категории") {
                     Text(
                         text = "Категория: ${saleTable.category}",
                         modifier = Modifier
@@ -261,7 +261,7 @@ fun SaleProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
-                if (saleTable.buyer != "") {
+                if (saleTable.buyer != "Неизвестный") {
                     Text(
                         text = "Покупатель: ${saleTable.buyer}",
                         modifier = Modifier

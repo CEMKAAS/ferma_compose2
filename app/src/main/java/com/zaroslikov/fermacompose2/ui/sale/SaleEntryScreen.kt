@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -37,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -84,7 +87,8 @@ fun SaleEntryProduct(
         SaleEntryContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(5.dp),
+                .padding(5.dp)
+                .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             animalList = animalUiState.animalList,
@@ -133,10 +137,10 @@ fun SaleEntryContainerProduct(
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
     var category by remember { mutableStateOf("Без категории") }
-    var suffix by remember { mutableStateOf("Ед.") }
+    var suffix by remember { mutableStateOf("Шт.") }
     var animal by remember { mutableStateOf("") }
     var priceAll by remember { mutableStateOf("") }
-    var buyer by remember { mutableStateOf("") }
+    var buyer by remember { mutableStateOf("Неизвестный") }
 
 
     var expanded by remember { mutableStateOf(false) }
@@ -201,12 +205,10 @@ fun SaleEntryContainerProduct(
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 5.dp),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -246,7 +248,8 @@ fun SaleEntryContainerProduct(
                     validateCount(count)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 2.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -305,7 +308,7 @@ fun SaleEntryContainerProduct(
                 validatePrice(priceAll)
             },
             label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -343,14 +346,11 @@ fun SaleEntryContainerProduct(
                     label = { Text("Категория") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(),
+                        .menuAnchor().padding(bottom = 2.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -399,11 +399,8 @@ fun SaleEntryContainerProduct(
                     supportingText = { Text("Выберите или укажите имя покупателя") },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
+                        .fillMaxWidth().padding(bottom = 2.dp),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -447,7 +444,7 @@ fun SaleEntryContainerProduct(
                     supportingText = { Text("Выберите животное, которое принесло товар") },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth().padding(bottom = 2.dp),
                 )
 
                 ExposedDropdownMenu(
@@ -487,14 +484,14 @@ fun SaleEntryContainerProduct(
                             SaleTableInsert(
                                 id = 0,
                                 title = title,
-                                count = count.toDouble(),
+                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                                 day = calendar[Calendar.DAY_OF_MONTH],
                                 mount = (calendar[Calendar.MONTH] + 1),
                                 year = calendar[Calendar.YEAR],
                                 suffix = suffix,
                                 category = category,
                                 animal = animal,
-                                priceAll = priceAll.toDouble(),
+                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                                 buyer = buyer
                             )
                         )

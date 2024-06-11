@@ -101,5 +101,5 @@ fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
 )
 
 fun AddTableUiState.toAddTable(): AddTable = AddTable(
-    id, title, count.toDouble(), day, mount, year, priceAll, idPT, suffix, category, animal
+    id, title, count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), day, mount, year, priceAll, idPT, suffix, category, animal
 )

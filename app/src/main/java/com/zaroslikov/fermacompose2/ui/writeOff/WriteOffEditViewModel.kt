@@ -107,7 +107,7 @@ fun WriteOffTable.toWriteOffTableUiState(): WriteOffTableUiState = WriteOffTable
 fun WriteOffTableUiState.toWriteOffTable(): WriteOffTable = WriteOffTable(
     id = id,
     title = title,
-    count = count.toDouble(),
+    count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     day = day,
     mount, year, priceAll, suffix, category, animal, idPT
 )

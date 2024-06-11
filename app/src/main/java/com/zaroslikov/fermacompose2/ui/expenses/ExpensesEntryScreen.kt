@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -37,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -81,7 +84,8 @@ fun ExpensesEntryProduct(
         ExpensesEntryContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(5.dp),
+                .padding(5.dp)
+                .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             saveInRoomSale = {
@@ -124,7 +128,7 @@ fun ExpensesEntryContainerProduct(
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
     var category by remember { mutableStateOf("Без категории") }
-    var suffix by remember { mutableStateOf("Ед.") }
+    var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
@@ -187,12 +191,10 @@ fun ExpensesEntryContainerProduct(
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -232,7 +234,8 @@ fun ExpensesEntryContainerProduct(
                     validateCount(count)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 2.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -280,6 +283,18 @@ fun ExpensesEntryContainerProduct(
                     onClick = { suffix = "Л." },
                     text = { Text("Л.") }
                 )
+                DropdownMenuItem(
+                    onClick = { suffix = "м3" },
+                    text = { Text("м3") }
+                )
+                DropdownMenuItem(
+                    onClick = { suffix = "Тн." },
+                    text = { Text("Тн.") }
+                )
+                DropdownMenuItem(
+                    onClick = { suffix = "М." },
+                    text = { Text("М.") }
+                )
             }
 
         }
@@ -291,7 +306,8 @@ fun ExpensesEntryContainerProduct(
                 validatePrice(priceAll)
             },
             label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(bottom = 2.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -329,14 +345,12 @@ fun ExpensesEntryContainerProduct(
                     label = { Text("Категория") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(),
+                        .menuAnchor()
+                        .padding(bottom = 2.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -383,13 +397,13 @@ fun ExpensesEntryContainerProduct(
                             ExpensesTableInsert(
                                 id = 0,
                                 title = title,
-                                count = count.toDouble(),
+                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                                 day = calendar[Calendar.DAY_OF_MONTH],
                                 mount = (calendar[Calendar.MONTH] + 1),
                                 year = calendar[Calendar.YEAR],
                                 suffix = suffix,
                                 category = category,
-                                priceAll = priceAll.toDouble(),
+                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                             )
                         )
                     }

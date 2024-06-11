@@ -229,7 +229,7 @@ fun ExpensesCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (expensesTable.category != "") {
+                if (expensesTable.category != "Без категории") {
                     Text(
                         text = "Категория: ${expensesTable.category}",
                         modifier = Modifier

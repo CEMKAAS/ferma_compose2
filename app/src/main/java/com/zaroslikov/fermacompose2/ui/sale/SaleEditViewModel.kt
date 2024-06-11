@@ -115,9 +115,9 @@ fun SaleTable.toSaleTableUiState(): SaleTableUiState = SaleTableUiState(
 fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
     id = id,
     title = title,
-    count = count.toDouble(),
+    count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     day = day,
-    mount, year, priceAll.toDouble(), suffix, category, animal, buyer, idPT
+    mount, year, priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), suffix, category, animal, buyer, idPT
 )
 
 data class BuyerUiState(val buyerList: List<String> = listOf())
