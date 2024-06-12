@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -23,20 +24,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -67,14 +73,11 @@ fun WriteOffEntryProduct(
     onNavigateUp: () -> Unit,
     viewModel: WriteOffEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val context = LocalContext.current
-    val titleUiState by viewModel.titleUiState.collectAsState()
-    val categoryUiState by viewModel.categoryUiState.collectAsState()
-    val animalUiState by viewModel.animalUiState.collectAsState()
 
     val idProject = viewModel.itemId
-
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val titleUiState by viewModel.titleUiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -88,8 +91,6 @@ fun WriteOffEntryProduct(
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
-            categoryList = categoryUiState.categoryList,
-            animalList = animalUiState.animalList,
             saveInRoomSale = {
                 coroutineScope.launch {
                     viewModel.saveItem(
@@ -102,8 +103,7 @@ fun WriteOffEntryProduct(
                             year = it.year,
                             priceAll = it.priceAll,
                             suffix = it.suffix,
-                            category = it.category,
-                            animal = it.animal,
+                            status = it.status,
                             idPT = idProject
                         )
                     )
@@ -124,37 +124,34 @@ fun WriteOffEntryProduct(
 fun WriteOffEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
-    categoryList: List<String>,
     saveInRoomSale: (WriteOffTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
-    var category by remember { mutableStateOf("Без категории") }
+    var state by remember { mutableStateOf(true) }
     var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("") }
 
-
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
-    var expandedCat by remember { mutableStateOf(false) }
-    var expandedAni by remember { mutableStateOf(false) }
 
+
+    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
-    var selectedItemIndex by remember { mutableStateOf(0) }
-
+    var selectedItemIndex by remember { mutableIntStateOf(0) }
 
     fun validateCount(text: String) {
         isErrorCount = text == ""
     }
 
     fun errorBoolean(): Boolean {
+        isErrorTitle = title == ""
         isErrorCount = count == ""
-        return !(isErrorCount)
+        return !(isErrorCount || isErrorTitle)
     }
-
 
     Column(modifier = modifier) {
         Box {
@@ -163,13 +160,20 @@ fun WriteOffEntryContainerProduct(
                 onExpandedChange = { expanded = !expanded },
             ) {
                 OutlinedTextField(
-                    value = titleList[selectedItemIndex],
+                    value = title,
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     label = { Text(text = "Товар") },
                     supportingText = {
-                        Text("Выберите товар, который хотите списать")
+                        if (isErrorTitle) {
+                            Text(
+                                text = "Не выбран товар для списания",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        } else {
+                            Text("Выберите товар, который хотите списать")
+                        }
                     },
                     modifier = Modifier
                         .menuAnchor()
@@ -286,42 +290,79 @@ fun WriteOffEntryContainerProduct(
             }
             )
         )
-    }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Button(
-            onClick = {
-                if (errorBoolean()) {
-                    val calendar = Calendar.getInstance()
-                    saveInRoomSale(
-                        WriteOffTableInsert(
-                            id = 0,
-                            title = title,
-                            count = count.toDouble(),
-                            day = calendar[Calendar.DAY_OF_MONTH],
-                            mount = (calendar[Calendar.MONTH] + 1),
-                            year = calendar[Calendar.YEAR],
-                            suffix = suffix,
-                            category = category,
-                            priceAll = priceAll
-                        )
-                    )
-                }
-            },
-            modifier = Modifier
+
+        Column(
+            Modifier
+                .selectableGroup()
                 .fillMaxWidth()
-                .padding(vertical = 15.dp)
+                .padding(vertical = 10.dp),
+//            horizontalArrangement = Arrangement.Start,
+//            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Списать")
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = state,
+                    onClick = { state = true },
+                    modifier = Modifier.semantics { contentDescription = "Localized Description" }
+                )
+                Text(text = "На собственные нужды")
+            }
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = !state,
+                    onClick = { state = false },
+                    modifier = Modifier.semantics { contentDescription = "Localized Description" },
+                )
+                Text(text = "На утилизацию")
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                onClick = {
+                    if (errorBoolean()) {
+                        val calendar = Calendar.getInstance()
+
+                        val status = if (state) R.drawable.baseline_cottage_24
+                        else R.drawable.baseline_delete_24
+
+                        saveInRoomSale(
+                            WriteOffTableInsert(
+                                id = 0,
+                                title = title,
+                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                    .toDouble(),
+                                day = calendar[Calendar.DAY_OF_MONTH],
+                                mount = (calendar[Calendar.MONTH] + 1),
+                                year = calendar[Calendar.YEAR],
+                                suffix = suffix,
+                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                    .toDouble(),
+                                status = status
+                            )
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp)
+            ) {
+                Text(text = "Списать")
+            }
         }
     }
 }
-
 
 
 data class WriteOffTableInsert(
@@ -331,9 +372,8 @@ data class WriteOffTableInsert(
     var day: Int,
     var mount: Int,
     var year: Int,
-    var priceAll: String,
-    var suffix: String,
-    var category: String,
-    var animal: String
+    var status: Int,
+    var priceAll: Double,
+    var suffix: String
 )
 

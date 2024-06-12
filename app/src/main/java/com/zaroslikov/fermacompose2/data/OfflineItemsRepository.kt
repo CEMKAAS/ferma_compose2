@@ -95,12 +95,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemWriteOff(id: Int): Flow<WriteOffTable> = itemDao.getItemWriteOff(id)
 
-    override fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>> =
-        itemDao.getItemsCategoryWriteOffList(id)
-
-    override fun getItemsAnimalWriteOffList(id: Int): Flow<List<String>> =
-        itemDao.getItemsAnimalyWriteOffList(id)
-
     override suspend fun insertWriteOff(item: WriteOffTable) = itemDao.insertWriteOff(item)
     override suspend fun updateWriteOff(item: WriteOffTable) = itemDao.updateWriteOff(item)
     override suspend fun deleteWriteOff(item: WriteOffTable) = itemDao.deleteWriteOff(item)

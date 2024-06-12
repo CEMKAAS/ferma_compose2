@@ -101,8 +101,7 @@ interface ItemsRepository {
     //WriteOff
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
-    fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>>
-    fun getItemsAnimalWriteOffList(id: Int): Flow<List<String>>
+
     suspend fun insertWriteOff(item: WriteOffTable)
     suspend fun updateWriteOff(item: WriteOffTable)
     suspend fun deleteWriteOff(item: WriteOffTable)

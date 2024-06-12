@@ -2,11 +2,14 @@ package com.zaroslikov.fermacompose2.ui.writeOff
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
@@ -34,11 +38,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -70,10 +77,7 @@ fun WriteOffEditProduct(
     viewModel: WriteOffEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val context = LocalContext.current
-
     val titleUiState by viewModel.titleUiState.collectAsState()
-    val categoryUiState by viewModel.categoryUiState.collectAsState()
-    val animalUiState by viewModel.animalUiState.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -89,8 +93,6 @@ fun WriteOffEditProduct(
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
-            categoryList = categoryUiState.categoryList,
-            animalList = animalUiState.animalList,
             writeOffTable = viewModel.itemUiState,
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {
@@ -122,105 +124,88 @@ fun WriteOffEditContainerProduct(
     modifier: Modifier,
     writeOffTable: WriteOffTableUiState,
     titleList: List<String>,
-    categoryList: List<String>,
-    animalList: List<String>,
     onValueChange: (WriteOffTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
     deleteAdd: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
-    var expandedCat by remember { mutableStateOf(false) }
-    var expandedAni by remember { mutableStateOf(false) }
 
     var openDialog by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     var formattedDate = "${writeOffTable.day}.${writeOffTable.mount}.${writeOffTable.year}"
 
-    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
     var selectedItemIndex by remember { mutableStateOf(0) }
 
-
-    fun validateTitle(text: String) {
-        isErrorTitle = text == ""
-    }
-
     fun validateCount(text: String) {
         isErrorCount = text == ""
     }
 
     fun errorBoolean(): Boolean {
-        isErrorTitle = writeOffTable.title == ""
         isErrorCount = writeOffTable.count == ""
-        return !(isErrorTitle || isErrorCount)
+        return !(isErrorCount)
+    }
+
+
+    var state by remember { mutableStateOf(true) }
+
+    if (R.drawable.baseline_cottage_24 == writeOffTable.status) {
+        state = true
+    } else if (R.drawable.baseline_delete_24 == writeOffTable.status) {
+        state = false
     }
 
 
     Column(modifier = modifier) {
+
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                }
+                onExpandedChange = { expanded = !expanded },
             ) {
                 OutlinedTextField(
                     value = writeOffTable.title,
-                    onValueChange = {
-                        onValueChange(writeOffTable.copy(title = it))
-                        validateTitle(it)
-                    },
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     label = { Text(text = "Товар") },
                     supportingText = {
-                        if (isErrorTitle) {
-                            Text(
-                                text = "Не указано имя товара",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else {
-                            Text("Выберите или укажите товар")
-                        }
+                        Text("Выберите товар, который хотите списать")
                     },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
-                    isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
+                        .padding(bottom = 2.dp)
                 )
 
-                val filteredOptions =
-                    titleList.filter { it.contains(writeOffTable.title, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    onValueChange(writeOffTable.copy(title = item))
-                                    expanded = false
-                                }
-                            )
-                        }
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    titleList.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                )
+                            },
+                            onClick = {
+                                selectedItemIndex = index
+                                expanded = false
+//                                title = titleList[selectedItemIndex]
+                                onValueChange(writeOffTable.copy(title = item))
+                            }
+                        )
                     }
                 }
             }
         }
+
 
         Box {
             OutlinedTextField(
@@ -230,7 +215,9 @@ fun WriteOffEditContainerProduct(
                     validateCount(it)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth() .padding(bottom = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -238,7 +225,7 @@ fun WriteOffEditContainerProduct(
                             color = MaterialTheme.colorScheme.error
                         )
                     } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                        Text("Укажите кол-во товара, которое хотите списать со склада")
                     }
                 },
                 trailingIcon = {
@@ -294,7 +281,9 @@ fun WriteOffEditContainerProduct(
                 onValueChange(writeOffTable.copy(priceAll = it))
             },
             label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth() .padding(bottom = 2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp),
             supportingText = {
                 Text("Укажите цену за списанный товар")
             },
@@ -311,104 +300,47 @@ fun WriteOffEditContainerProduct(
             )
         )
 
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedCat,
-                onExpandedChange = {
-                    expandedCat = !expandedCat
-                }
+        Column(
+            Modifier
+                .selectableGroup()
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = writeOffTable.category,
-                    onValueChange = { onValueChange(writeOffTable.copy(category = it)) },
-                    label = { Text("Категория") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor() .padding(bottom = 2.dp),
-                    supportingText = {
-                        Text("Укажите или выберите категорию в которую хотите отнести товар")
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
-                )
-
-                val filteredOptions =
-                    categoryList.filter { it.contains(writeOffTable.category, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expandedCat,
-                        onDismissRequest = {
-//                            expandedCat = false
-                            // We shouldn't hide the menu when the user enters/removes any character
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    onValueChange(writeOffTable.copy(category = item))
-                                    expandedCat = false
-                                }
+                RadioButton(
+                    selected = state,
+                    onClick = {
+                        state = true
+                        onValueChange(
+                            writeOffTable.copy(
+                                status = R.drawable.baseline_cottage_24
                             )
-                        }
-                    }
-                }
-            }
-        }
-
-        if (animalList.isNotEmpty()) {
-            ExposedDropdownMenuBox(
-                expanded = expandedAni,
-                onExpandedChange = { expandedAni = !expandedAni },
-            ) {
-                OutlinedTextField(
-                    value = writeOffTable.animal,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
-                    supportingText = {
-                        Text("Выберите животное, которое принесло товар")
+                        )
                     },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth() .padding(bottom = 2.dp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
+                    modifier = Modifier.semantics { contentDescription = "Localized Description" }
                 )
-
-                ExposedDropdownMenu(
-                    expanded = expandedAni,
-                    onDismissRequest = { expandedAni = false }
-                ) {
-                    animalList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                expandedAni = false
-                                onValueChange(writeOffTable.copy(animal = animalList[selectedItemIndex]))
-                            }
+                Text(text = "На собственные нужды")
+            }
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = !state,
+                    onClick = {
+                        state = false
+                        onValueChange(
+                            writeOffTable.copy(
+                                status = R.drawable.baseline_delete_24
+                            )
                         )
-                    }
-                }
+                    },
+                    modifier = Modifier.semantics { contentDescription = "Localized Description" },
+                )
+                Text(text = "На утилизацию")
             }
         }
 

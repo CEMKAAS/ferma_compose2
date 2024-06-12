@@ -133,13 +133,6 @@ interface ItemDao {
 
     @Query("SELECT * from MyFermaWRITEOFF Where id=:id")
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
-
-    @Query("SELECT MyFermaWRITEOFF.category from MyFermaWRITEOFF Where idPT=:id group by MyFermaWRITEOFF.category")
-    fun getItemsCategoryWriteOffList(id: Int): Flow<List<String>>
-
-    @Query("SELECT MyFermaWRITEOFF.animal from MyFermaWRITEOFF Where idPT=:id group by MyFermaWRITEOFF.animal")
-    fun getItemsAnimalyWriteOffList(id: Int): Flow<List<String>>
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWriteOff(item: WriteOffTable)
     @Update

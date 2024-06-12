@@ -13,14 +13,18 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -34,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -95,14 +100,16 @@ fun FinanceScreen(
         },
     ) {
         Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(
+                rememberScrollState()
+            ),
             topBar = {
                 TopAppBarFerma(
                     title = "Мои Финансы",
                     scope = coroutineScope,
                     drawerState = drawerState,
                     showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
+                    filterSheet = false,
                     scrollBehavior = scrollBehavior
                 )
             }
@@ -133,7 +140,6 @@ private fun FinanceBody(
     expenses: Double,
     incomeRow: List<Fin>,
     expensesRow: List<Fin>,
-
     incomeExpensesList: List<IncomeExpensesDetails>,
     navigateToCategory: (FinanceCategoryData) -> Unit,
     navigateToIncomeExpenses: (FinanceIncomeExpensesData) -> Unit,
@@ -143,7 +149,9 @@ private fun FinanceBody(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(contentPadding),
+        modifier = modifier
+            .padding(contentPadding)
+            .padding(8.dp),
     ) {
 
         Text(
@@ -152,95 +160,158 @@ private fun FinanceBody(
             fontSize = 25.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 5.dp),
+                .padding(bottom = 2.dp),
             fontWeight = FontWeight.SemiBold
         )
 
         Text(
             text = "Текущий баланс",
             textAlign = TextAlign.Start,
-            fontSize = 10.sp,
-            modifier = Modifier.fillMaxWidth()
+            fontSize = 8.sp,
+            color = Color.Gray,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
         )
 
-        Card(
-            onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, true)) }, modifier = Modifier.padding(0.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+        Row {
+            Card(
+                onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, true)) },
+                modifier = Modifier
+                    .padding(2.dp)
+                    .fillMaxWidth(0.5f),
             ) {
                 Text(
                     text = "Доход",
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.Center,
                     fontSize = 15.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
                     text = "$income ₽",
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.Center,
                     fontSize = 15.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
                     fontWeight = FontWeight.SemiBold
                 )
             }
-
-        }
-
-        Card(
-            onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, false)) }, modifier = Modifier.padding(0.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            Card(
+                onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, false)) },
+                modifier = Modifier
+                    .padding(2.dp)
+                    .fillMaxWidth(1f)
             ) {
                 Text(
                     text = "Расход",
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.Center,
                     fontSize = 15.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
                     text = "$expenses ₽",
-                    textAlign = TextAlign.Start,
+                    textAlign = TextAlign.Center,
                     fontSize = 15.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
                     fontWeight = FontWeight.SemiBold
                 )
+
             }
         }
 
-        Text(
-            text = "Доходы в текущем месяце",
-            textAlign = TextAlign.Start,
-            fontSize = 15.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 5.dp),
-            fontWeight = FontWeight.SemiBold
-        )
-        LazyRow {
-            items(items = incomeRow) {
-                CardRow(it, modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { navigateToCategory(FinanceCategoryData(idPT,it.category,true)) })
+        if (expensesRow.isNotEmpty() && incomeRow.isEmpty()) {
+            Text(
+                text = "А где же доходы в этом месяце?",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        } else if (incomeRow.isNotEmpty()) {
+            Text(
+                text = "Доходы в текущем месяце",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+            LazyRow {
+                items(items = incomeRow) {
+                    CardRow(it, modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            navigateToCategory(
+                                FinanceCategoryData(
+                                    idPT,
+                                    it.category,
+                                    true
+                                )
+                            )
+                        })
+                }
             }
+        } else {
+            Text(
+                text = "Доходов в этом месяце нет :(",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
-        Text(
-            text = "Расходы в текущем месяце",
-            textAlign = TextAlign.Start,
-            fontSize = 15.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 5.dp),
-            fontWeight = FontWeight.SemiBold
-        )
-        LazyRow {
-            items(items = expensesRow) {
-                CardRow(it, modifier = Modifier
-                    .padding(5.dp)
-                    .clickable { navigateToCategory(FinanceCategoryData(idPT,it.category,false)) })
+        if (expensesRow.isNotEmpty()) {
+            Text(
+                text = "Расходы в текущем месяце",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+            LazyRow {
+                items(items = expensesRow) {
+                    CardRow(it, modifier = Modifier
+                        .padding(5.dp)
+                        .clickable {
+                            navigateToCategory(
+                                FinanceCategoryData(
+                                    idPT,
+                                    it.category,
+                                    false
+                                )
+                            )
+                        })
+                }
             }
+        } else {
+            Text(
+                text = "Расходов в этом месяце нет (Это хорошо)",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
         }
+
 
         Text(
             text = "Транзакции в текущем месяце",
@@ -248,7 +319,7 @@ private fun FinanceBody(
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 5.dp),
+                .padding(vertical = 5.dp),
             fontWeight = FontWeight.SemiBold
         )
 
@@ -317,32 +388,59 @@ fun TransactionRow(
                     .padding(vertical = 3.dp, horizontal = 6.dp)
             )
         }
+        if (!incomeExpensesDetails.priceAll.toString().contains("-")) {
+            Text(
+                text = "${incomeExpensesDetails.priceAll} ₽",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(1f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                color = Color.Green
+            )
+        } else {
+            Text(
+                text = "${incomeExpensesDetails.priceAll} ₽",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(1f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                color = Color.Red
+            )
+        }
 
-        Text(
-            text = "${incomeExpensesDetails.priceAll} ₽",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(6.dp)
-                .fillMaxWidth(1f),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp,
-            color = Color.Green
-        )
-        Divider(color = Color.DarkGray, thickness = 2.dp, modifier = Modifier.padding(5.dp))
     }
+    Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(5.dp))
 }
 
-//@Preview
-//@Composable
-//fun FinancePrewie() {
-//    FinanceScreen(
-//        navigateToStart = { /*TODO*/ },
-//        navigateToModalSheet = {},
-//        navigateToItemUpdate = {},
-//        navigateToItem = {},
-//        drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-//    )
-//}
+@Preview(showBackground = true)
+@Composable
+fun FinancePrewie() {
+    FinanceBody(
+        currentBalance = 155.0,
+        income = 22.0,
+        expenses = 33.0,
+        incomeRow = arrayListOf(),
+        expensesRow = arrayListOf(),
+        incomeExpensesList = arrayListOf(
+            IncomeExpensesDetails(
+                "Govno",
+                55.0,
+                "ED",
+                88.0,
+                1,
+                2,
+                1996
+            ), IncomeExpensesDetails("Govno", 55.0, "ED", 88.0, 1, 2, 1996)
+        ),
+        navigateToCategory = {},
+        navigateToIncomeExpenses = {},
+        idPT = 1
+    )
+}
 
 data class Fin(
     val category: String,

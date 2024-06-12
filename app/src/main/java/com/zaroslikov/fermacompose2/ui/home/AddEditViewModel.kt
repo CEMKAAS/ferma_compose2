@@ -46,7 +46,7 @@ class AddEditViewModel(
         itemsRepository.getItemsTitleAddList(itemIdPT).map { TitleUiState(it) }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(AddEditViewModel.TIMEOUT_MILLIS),
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = TitleUiState()
             )
 

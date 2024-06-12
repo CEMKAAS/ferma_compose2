@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.writeOff
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -78,6 +80,7 @@ fun WriteOffScreen(
     viewModel: WriteOffViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.writeOffUiState.collectAsState()
+    val titleUiState by viewModel.titleUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -112,19 +115,21 @@ fun WriteOffScreen(
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigateToItem(idProject) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .padding(
-                            end = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateEndPadding(LocalLayoutDirection.current)
+                if (titleUiState.titleList.isNotEmpty()) {
+                    FloatingActionButton(
+                        onClick = { navigateToItem(idProject) },
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier
+                            .padding(
+                                end = WindowInsets.safeDrawing.asPaddingValues()
+                                    .calculateEndPadding(LocalLayoutDirection.current)
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
                         )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
-                    )
+                    }
                 }
             },
         ) { innerPadding ->
@@ -216,42 +221,36 @@ fun WriteOffProductCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Column(
-                modifier = Modifier.fillMaxWidth(0.7f)
-            ) {
-                Text(
-                    text = writeOffTable.title,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-                if (writeOffTable.category != "Без категории") {
-                    Text(
-                        text = "Категория: ${writeOffTable.category}",
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(id = writeOffTable.status),
+                        contentDescription = "delete",
                         modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
+                            .padding(6.dp)
                     )
-                }
-                if (writeOffTable.animal != "") {
-                    Text(
-                        text = "Животное: ${writeOffTable.animal}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                Text(
-                    text = "Дата: ${writeOffTable.day}.${writeOffTable.mount}.${writeOffTable.year}",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(vertical = 3.dp, horizontal = 6.dp)
-                )
-            }
 
+                    Column(
+                        modifier = Modifier.fillMaxWidth(0.7f)
+                    ) {
+                        Text(
+                            text = writeOffTable.title,
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(6.dp),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "Дата: ${writeOffTable.day}.${writeOffTable.mount}.${writeOffTable.year}",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(vertical = 3.dp, horizontal = 6.dp)
+                        )
+                    }
+                }
+            }
             Text(
                 text = "${writeOffTable.count} ${writeOffTable.suffix}",
                 textAlign = TextAlign.Center,

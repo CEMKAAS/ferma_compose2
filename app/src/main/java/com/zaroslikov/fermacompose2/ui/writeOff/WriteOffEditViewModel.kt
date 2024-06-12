@@ -55,22 +55,6 @@ class WriteOffEditViewModel(
             )
 
 
-    val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategoryWriteOffList(itemIdPT).map { CategoryUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = CategoryUiState()
-            )
-
-    val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalWriteOffList(itemIdPT).map { AnimalUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
-            )
-
     suspend fun saveItem() {
         itemsRepository.updateWriteOff(itemUiState.toWriteOffTable())
     }
@@ -95,13 +79,11 @@ data class WriteOffTableUiState(
     val priceAll: String = "",
     val idPT: Int = 0,
     var suffix: String = "",
-    var category: String = "",
-    var animal: String = "",
-    var buyer: String = ""
+    val status: Int = 0
 )
 
 fun WriteOffTable.toWriteOffTableUiState(): WriteOffTableUiState = WriteOffTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category, animal
+    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, status
 )
 
 fun WriteOffTableUiState.toWriteOffTable(): WriteOffTable = WriteOffTable(
@@ -109,6 +91,11 @@ fun WriteOffTableUiState.toWriteOffTable(): WriteOffTable = WriteOffTable(
     title = title,
     count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     day = day,
-    mount, year, priceAll, suffix, category, animal, idPT
+    mount = mount,
+    year = year,
+    priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+    suffix = suffix,
+    status = status,
+    idPT = idPT
 )
 

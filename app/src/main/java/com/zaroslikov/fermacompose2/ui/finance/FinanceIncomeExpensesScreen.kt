@@ -111,12 +111,21 @@ private fun FinanceIncomeExpensesBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        FinanceIncomeExpensesInventoryList(
-            itemList = itemList,
-            productList = productList,
-            contentPadding = contentPadding,
-            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-        )
+        if (productList.isEmpty()) {
+            Text(
+                text = stringResource(R.string.no_item_description),//TODO
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(contentPadding),
+            )
+        } else {
+            FinanceIncomeExpensesInventoryList(
+                itemList = itemList,
+                productList = productList,
+                contentPadding = contentPadding,
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+            )
+        }
     }
 
 }

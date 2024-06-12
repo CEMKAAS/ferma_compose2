@@ -84,6 +84,11 @@ fun InventoryNavHost(
                 })
         }
 
+        composable(route = ProjectAddDestination.route) {
+            AddProject(navController = navController,//TODO переделать на старт
+                navigateBack = { navController.popBackStack() })
+        }
+
         composable(
             route = WarehouseDestination.routeWithArgs,
             arguments = listOf(navArgument(WarehouseDestination.itemIdArg) {
@@ -98,12 +103,6 @@ fun InventoryNavHost(
                 drawerState = drawerState
             )
         }
-
-        composable(route = ProjectAddDestination.route) {
-            AddProject(navController = navController,//TODO переделать на старт
-                navigateBack = { navController.popBackStack() })
-        }
-
         composable(
             route = FinanceDestination.routeWithArgs,
             arguments = listOf(navArgument(FinanceDestination.itemIdArg) {
@@ -385,7 +384,6 @@ fun InventoryNavHost(
                 navArgument(WriteOffEditDestination.itemIdArgTwo) {
                     type = NavType.IntType
                 }
-
             )
         ) {
             WriteOffEditProduct(
