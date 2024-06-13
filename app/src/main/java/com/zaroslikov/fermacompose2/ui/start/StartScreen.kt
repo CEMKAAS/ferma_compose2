@@ -41,6 +41,7 @@ import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
 
 
@@ -63,7 +64,7 @@ fun StartScreen(
             TopAppBarStart(title = "Мое Хозяйство", canNavigateBack = false)
         }, floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate(ProjectAddDestination.route) },
+                onClick = { navController.navigate(ChoiseProjectDestination.route) },
                 icon = { Icon(Icons.Filled.Add, "Localized description") },
                 text = { Text(text = "Добавить") },
             )

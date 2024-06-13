@@ -77,7 +77,6 @@ interface ItemsRepository {
     fun getItemSale(id: Int): Flow<SaleTable>
     fun getItemsTitleSaleList(id: Int): Flow<List<String>>
     fun getItemsCategorySaleList(id: Int): Flow<List<String>>
-    fun getItemsAnimalSaleList(id: Int): Flow<List<String>>
     fun getItemsBuyerSaleList(id: Int): Flow<List<String>>
     suspend fun insertSale(item: SaleTable)
     suspend fun updateSale(item: SaleTable)

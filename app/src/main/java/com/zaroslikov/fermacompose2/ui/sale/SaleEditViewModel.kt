@@ -64,15 +64,8 @@ class SaleEditViewModel(
                 initialValue = CategoryUiState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalSaleList(itemIdPT).map { AnimalUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
-            )
     val buyerUiState: StateFlow<BuyerUiState> =
-        itemsRepository.getItemsAnimalSaleList(itemIdPT).map {  BuyerUiState(it) }
+        itemsRepository.getItemsBuyerSaleList(itemIdPT).map {  BuyerUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -104,12 +97,11 @@ data class SaleTableUiState(
     val idPT: Int = 0,
     var suffix: String = "",
     var category: String = "",
-    var animal: String = "",
     var buyer: String = ""
 )
 
 fun SaleTable.toSaleTableUiState(): SaleTableUiState = SaleTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category, animal, buyer
+    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category, buyer
 )
 
 fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
@@ -117,7 +109,7 @@ fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
     title = title,
     count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     day = day,
-    mount, year, priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), suffix, category, animal, buyer, idPT
+    mount, year, priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), suffix, category, buyer, idPT
 )
 
 data class BuyerUiState(val buyerList: List<String> = listOf())

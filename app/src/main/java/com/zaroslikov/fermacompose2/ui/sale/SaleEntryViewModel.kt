@@ -40,13 +40,6 @@ class SaleEntryViewModel(
                 initialValue = CategoryUiState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalSaleList(itemId).map {AnimalUiState(it)}
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
-            )
 
     val buyerUiState: StateFlow<BuyerUiState> =
         itemsRepository.getItemsBuyerSaleList(itemId).map {BuyerUiState(it)}

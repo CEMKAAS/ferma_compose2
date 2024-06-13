@@ -48,7 +48,6 @@ data class SaleTable(
     val priceAll: Double,
     var suffix: String,
     var category: String,
-    var animal: String,
     val buyer : String,
     @ColumnInfo(name = "idPT")
     val idPT: Int

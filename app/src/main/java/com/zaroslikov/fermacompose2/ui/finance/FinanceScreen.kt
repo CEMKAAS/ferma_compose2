@@ -416,31 +416,31 @@ fun TransactionRow(
     Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(5.dp))
 }
 
-@Preview(showBackground = true)
-@Composable
-fun FinancePrewie() {
-    FinanceBody(
-        currentBalance = 155.0,
-        income = 22.0,
-        expenses = 33.0,
-        incomeRow = arrayListOf(),
-        expensesRow = arrayListOf(),
-        incomeExpensesList = arrayListOf(
-            IncomeExpensesDetails(
-                "Govno",
-                55.0,
-                "ED",
-                88.0,
-                1,
-                2,
-                1996
-            ), IncomeExpensesDetails("Govno", 55.0, "ED", 88.0, 1, 2, 1996)
-        ),
-        navigateToCategory = {},
-        navigateToIncomeExpenses = {},
-        idPT = 1
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun FinancePrewie() {
+//    FinanceBody(
+//        currentBalance = 155.0,
+//        income = 22.0,
+//        expenses = 33.0,
+//        incomeRow = arrayListOf(),
+//        expensesRow = arrayListOf(),
+//        incomeExpensesList = arrayListOf(
+//            IncomeExpensesDetails(
+//                "Govno",
+//                55.0,
+//                "ED",
+//                88.0,
+//                1,
+//                2,
+//                1996
+//            ), IncomeExpensesDetails("Govno", 55.0, "ED", 88.0, 1, 2, 1996)
+//        ),
+//        navigateToCategory = {},
+//        navigateToIncomeExpenses = {},
+//        idPT = 1
+//    )
+//}
 
 data class Fin(
     val category: String,

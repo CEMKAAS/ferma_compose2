@@ -70,7 +70,6 @@ fun SaleEntryProduct(
     val context = LocalContext.current
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
-    val animalUiState by viewModel.animalUiState.collectAsState()
     val buyerUiState by viewModel.buyerUiState.collectAsState()
 
 
@@ -91,7 +90,6 @@ fun SaleEntryProduct(
                 .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
-            animalList = animalUiState.animalList,
             buyerList = buyerUiState.buyerList,
             saveInRoomSale = {
                 coroutineScope.launch {
@@ -106,7 +104,6 @@ fun SaleEntryProduct(
                             priceAll = it.priceAll,
                             suffix = it.suffix,
                             category = it.category,
-                            animal = it.animal,
                             idPT = idProject,
                             buyer = it.buyer
                         )
@@ -130,7 +127,6 @@ fun SaleEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<String>,
     buyerList: List<String>,
     saveInRoomSale: (SaleTableInsert) -> Unit
 ) {
@@ -138,7 +134,6 @@ fun SaleEntryContainerProduct(
     var count by rememberSaveable { mutableStateOf("") }
     var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Шт.") }
-    var animal by remember { mutableStateOf("") }
     var priceAll by remember { mutableStateOf("") }
     var buyer by remember { mutableStateOf("Неизвестный") }
 
@@ -146,7 +141,6 @@ fun SaleEntryContainerProduct(
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
     var expandedCat by remember { mutableStateOf(false) }
-    var expandedAni by remember { mutableStateOf(false) }
     var expandedBuy by remember { mutableStateOf(false) }
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
@@ -431,45 +425,6 @@ fun SaleEntryContainerProduct(
             }
         }
 
-        if (animalList.isNotEmpty()) {
-            ExposedDropdownMenuBox(
-                expanded = expandedAni,
-                onExpandedChange = { expandedAni = !expandedAni },
-            ) {
-                OutlinedTextField(
-                    value = animalList[selectedItemIndex],
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
-                    supportingText = { Text("Выберите животное, которое принесло товар") },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth().padding(bottom = 2.dp),
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedAni,
-                    onDismissRequest = { expandedAni = false }
-                ) {
-                    animalList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                expandedAni = false
-                                animal = animalList[selectedItemIndex]
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -490,7 +445,6 @@ fun SaleEntryContainerProduct(
                                 year = calendar[Calendar.YEAR],
                                 suffix = suffix,
                                 category = category,
-                                animal = animal,
                                 priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                                 buyer = buyer
                             )
@@ -518,7 +472,6 @@ data class SaleTableInsert(
     var priceAll: Double,
     var suffix: String,
     var category: String,
-    var animal: String,
     var buyer: String
 )
 

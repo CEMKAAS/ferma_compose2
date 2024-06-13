@@ -253,14 +253,6 @@ fun SaleProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
-                if (saleTable.animal != "") {
-                    Text(
-                        text = "Животное: ${saleTable.animal}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
                 if (saleTable.buyer != "Неизвестный") {
                     Text(
                         text = "Покупатель: ${saleTable.buyer}",

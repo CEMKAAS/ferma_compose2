@@ -74,9 +74,7 @@ fun SaleEditProduct(
 
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
-    val animalUiState by viewModel.animalUiState.collectAsState()
     val buyerUiState by viewModel.buyerUiState.collectAsState()
-
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -92,7 +90,6 @@ fun SaleEditProduct(
                 .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
-            animalList = animalUiState.animalList,
             buyerList = buyerUiState.buyerList,
             saleTable = viewModel.itemUiState,
             onValueChange = viewModel::updateUiState,
@@ -126,7 +123,6 @@ fun SaleEditContainerProduct(
     saleTable: SaleTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<String>,
     buyerList: List<String>,
     onValueChange: (SaleTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
@@ -135,7 +131,6 @@ fun SaleEditContainerProduct(
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
     var expandedCat by remember { mutableStateOf(false) }
-    var expandedAni by remember { mutableStateOf(false) }
     var expandedBuy by remember { mutableStateOf(false) }
 
     var openDialog by remember { mutableStateOf(false) }
@@ -389,58 +384,6 @@ fun SaleEditContainerProduct(
                                 }
                             )
                         }
-                    }
-                }
-            }
-        }
-
-        if (animalList.isNotEmpty()) {
-            ExposedDropdownMenuBox(
-                expanded = expandedAni,
-                onExpandedChange = { expandedAni = !expandedAni },
-            ) {
-                OutlinedTextField(
-                    value = saleTable.animal,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
-                    supportingText = {
-                        Text("Выберите животное, которое принесло товар")
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(bottom = 2.dp),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedAni,
-                    onDismissRequest = { expandedAni = false }
-                ) {
-                    animalList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                expandedAni = false
-                                onValueChange(saleTable.copy(animal = animalList[selectedItemIndex]))
-                            }
-                        )
                     }
                 }
             }

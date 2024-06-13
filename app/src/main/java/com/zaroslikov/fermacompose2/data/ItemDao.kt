@@ -92,9 +92,6 @@ interface ItemDao {
     @Query("SELECT MyFermaSale.category from MyFermaSale Where idPT=:id group by MyFermaSale.category")
     fun getItemsCategorySaleList(id: Int): Flow<List<String>>
 
-    @Query("SELECT MyFermaSale.animal from MyFermaSale Where idPT=:id group by MyFermaSale.animal")
-    fun getItemsAnimalSaleList(id: Int): Flow<List<String>>
-
     @Query("SELECT MyFermaSale.buyer from MyFermaSale Where idPT=:id group by MyFermaSale.buyer")
     fun getItemsBuyerSaleList(id: Int): Flow<List<String>>
 

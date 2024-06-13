@@ -62,9 +62,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getItemsCategorySaleList(id: Int): Flow<List<String>> =
         itemDao.getItemsCategorySaleList(id)
 
-    override fun getItemsAnimalSaleList(id: Int): Flow<List<String>> =
-        itemDao.getItemsAnimalSaleList(id)
-
     override fun getItemsBuyerSaleList(id: Int): Flow<List<String>> =
         itemDao.getItemsBuyerSaleList(id)
 
