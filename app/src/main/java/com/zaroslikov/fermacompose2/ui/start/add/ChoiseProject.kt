@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
 
 object ChoiseProjectDestination : NavigationDestination {
     override val route = "ChoiseProject"
@@ -62,7 +63,7 @@ fun ChooiseProjectContainer(
 
     val drawerItems = listOf(
         DrawerItems(
-            R.drawable.chicken, "Инкубатор", Screens.ScreenProjectRoute.route
+            R.drawable.chicken, "Инкубатор", AddIncubatorDestination.route
         ),
         DrawerItems(
             R.drawable.baseline_warehouse_24, "Хозяйство", ProjectAddDestination.route

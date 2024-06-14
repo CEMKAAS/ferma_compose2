@@ -49,12 +49,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
 
+object AddIncubatorDestination : NavigationDestination {
+    override val route = "AddIncubator"
+    override val titleRes = R.string.app_name
 
+}
 @Composable
 fun AddIncubator(
     navigateBack: () -> Unit,
@@ -313,7 +318,7 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
         OutlinedTextField(
             value = time1,
             onValueChange = {
-                time1 = "${timeState.hour} : ${timeState.minute}"
+
             },
             readOnly = true,
             label = { Text("Уведомление 1") },
@@ -321,7 +326,9 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
                 Text("Укажите время уведомления")
             },
             trailingIcon = {
-                IconButton(onClick = { showDialog = true }) {
+                IconButton(onClick = { showDialog = true
+                    time1 = "${timeState.hour}:${timeState.minute}"
+                }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_calendar_month_24),
                         contentDescription = "Показать меню"
@@ -345,7 +352,9 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
                 Text("Укажите время уведомления")
             },
             trailingIcon = {
-                IconButton(onClick = { showDialog = true }) {
+                IconButton(onClick = { showDialog = true
+                    time2 = "${timeState.hour}:${timeState.minute}"
+                }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_calendar_month_24),
                         contentDescription = "Показать меню"
@@ -369,7 +378,8 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
                 Text("Укажите время уведомления")
             },
             trailingIcon = {
-                IconButton(onClick = { showDialog = true }) {
+                IconButton(onClick = { showDialog = true
+                    time3 = "${timeState.hour}:${timeState.minute}"}) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_calendar_month_24),
                         contentDescription = "Показать меню"

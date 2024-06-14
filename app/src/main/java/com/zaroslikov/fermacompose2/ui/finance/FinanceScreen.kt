@@ -100,9 +100,7 @@ fun FinanceScreen(
         },
     ) {
         Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection).verticalScroll(
-                rememberScrollState()
-            ),
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarFerma(
                     title = "Мои Финансы",

@@ -54,6 +54,8 @@ import com.zaroslikov.fermacompose2.ui.start.add.AddProject
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProject
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubator
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseScreen
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
@@ -88,7 +90,7 @@ fun InventoryNavHost(
 
         composable(route = ChoiseProjectDestination.route) {
             ChoiseProject(navigateBack = { navController.popBackStack() },
-                navigateProject = { navController.navigate(it)})
+                navigateProject = { navController.navigate(it) })
         }
 
 
@@ -97,7 +99,11 @@ fun InventoryNavHost(
                 navigateBack = { navController.popBackStack() })
         }
 
-
+        composable(route = AddIncubatorDestination.route) {
+            AddIncubator(
+                navigateBack = { navController.popBackStack() },
+                navigateContinue = {})
+        }
 
         composable(
             route = WarehouseDestination.routeWithArgs,
