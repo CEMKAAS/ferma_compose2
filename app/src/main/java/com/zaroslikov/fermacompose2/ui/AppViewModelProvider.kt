@@ -37,6 +37,8 @@ import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddViewModel
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoContainer
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditViewModel
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryViewModel
@@ -54,6 +56,13 @@ object AppViewModelProvider {
 
         initializer {
             ProjectAddViewModel(inventoryApplication().container.itemsRepository)
+        }
+
+        initializer {
+            AddIncubatorTwoViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
         }
 
         //Warehouse

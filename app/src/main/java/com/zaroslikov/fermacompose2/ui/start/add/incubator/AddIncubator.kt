@@ -31,6 +31,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -58,12 +58,14 @@ import java.util.TimeZone
 object AddIncubatorDestination : NavigationDestination {
     override val route = "AddIncubator"
     override val titleRes = R.string.app_name
-
+    const val itemIdArg = "itemId"
+    val routeWithArgs = "$route/{$itemIdArg}"
 }
+
 @Composable
 fun AddIncubator(
     navigateBack: () -> Unit,
-    navigateContinue: () -> Unit
+    navigateContinue: (Array<String>) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -81,16 +83,22 @@ fun AddIncubator(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
+fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (Array<String>) -> Unit) {
 
     val typeBirdsList = arrayListOf("Курица", "Гуси", "Перепела", "Индюки", "Утки")
+
+    //Календарь
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val formattedDate: String = format.format(calendar.timeInMillis)
 
     var title by rememberSaveable { mutableStateOf("") }
     var typeBirds by rememberSaveable { mutableStateOf(typeBirdsList[0]) }
     var count by rememberSaveable { mutableStateOf("") }
-    var time1 by rememberSaveable { mutableStateOf("08:00") }
-    var time2 by rememberSaveable { mutableStateOf("12:00") }
-    var time3 by rememberSaveable { mutableStateOf("18:00") }
+    var date1 by remember { mutableStateOf(formattedDate) }
+    val time1 = rememberSaveable { mutableStateOf("08:00") }
+    val time2 = rememberSaveable { mutableStateOf("12:00") }
+    val time3 = rememberSaveable { mutableStateOf("18:00") }
 
     var expandedTypeBirds by remember { mutableStateOf(false) }
 
@@ -104,16 +112,9 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
 
     var selectedItemIndex by remember { mutableStateOf(0) }
 
-    //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val formattedDate: String = format.format(calendar.timeInMillis)
-
     //Дата
     var openDialog by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-
-    var date1 by remember { mutableStateOf(formattedDate) }
 
     if (openDialog) {
         DatePickerDialogSample(datePickerState, date1) { date ->
@@ -121,7 +122,6 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
             openDialog = false
         }
     }
-
 
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
@@ -137,43 +137,18 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
         return !(isErrorTitle || isErrorCount)
     }
 
-    var showDialog by remember { mutableStateOf(false) }
-    val timeState = rememberTimePickerState(
-        initialHour = 0,
-        initialMinute = 0
-    )
+    val showDialogTime1 = remember { mutableStateOf(false) }
+    val showDialogTime2 = remember { mutableStateOf(false) }
+    val showDialogTime3 = remember { mutableStateOf(false) }
 
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier
-                    .background(color = Color.LightGray.copy(alpha = .3f))
-                    .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                TimePicker(state = timeState)
-                Row(
-                    modifier = Modifier
-                        .padding(top = 12.dp)
-                        .fillMaxWidth(), horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text(text = "Принять")
-                    }
-                    TextButton(onClick = {
-                        showDialog = false
-                        timeState.hour
-                         timeState.minute
-                    }) {
-                        Text(text = "Назад")
-                    }
-                }
-            }
-        }
+    if (showDialogTime1.value) {
+        TimePicker(time = time1, showDialog = showDialogTime1)
+    }
+    if (showDialogTime2.value) {
+        TimePicker(time = time2, showDialog = showDialogTime2)
+    }
+    if (showDialogTime3.value) {
+        TimePicker(time = time3, showDialog = showDialogTime3)
     }
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
@@ -184,10 +159,17 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
                 title = it
                 validateTitle(title)
             },
-            label = { Text("Инкубатор №1") },
+            label = { Text("Инкубатор") },
             modifier = Modifier.fillMaxWidth(),
             supportingText = {
-                Text("Укажите название инкубатора")
+                if (isErrorTitle) {
+                    Text(
+                        text = "Не указано название",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Text("Укажите название инкубатора")
+                }
             },
             isError = isErrorTitle,
             keyboardOptions = KeyboardOptions(
@@ -214,14 +196,7 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTypeBirds) },
                     label = { Text(text = "Тип птицы") },
                     supportingText = {
-                        if (isErrorTitle) {
-                            Text(
-                                text = "Не выбран тип яйца",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else {
-                            Text("Выберите тип птицы")
-                        }
+                        Text("Выберите тип птицы")
                     },
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
@@ -316,9 +291,8 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
 
 
         OutlinedTextField(
-            value = time1,
+            value = time1.value,
             onValueChange = {
-
             },
             readOnly = true,
             label = { Text("Уведомление 1") },
@@ -326,8 +300,8 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
                 Text("Укажите время уведомления")
             },
             trailingIcon = {
-                IconButton(onClick = { showDialog = true
-                    time1 = "${timeState.hour}:${timeState.minute}"
+                IconButton(onClick = {
+                    showDialogTime1.value = true
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_calendar_month_24),
@@ -338,22 +312,22 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    showDialog = true
+                    showDialogTime1.value = true
                 }
                 .padding(bottom = 2.dp)
         )
 
         OutlinedTextField(
-            value = time2,
-            onValueChange = { time2 = "${timeState.hour} : ${timeState.minute}"},
+            value = time2.value,
+            onValueChange = {},
             readOnly = true,
             label = { Text("Уведомление 2") },
             supportingText = {
                 Text("Укажите время уведомления")
             },
             trailingIcon = {
-                IconButton(onClick = { showDialog = true
-                    time2 = "${timeState.hour}:${timeState.minute}"
+                IconButton(onClick = {
+                    showDialogTime2.value = true
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_calendar_month_24),
@@ -364,22 +338,23 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    showDialog = true
+                    showDialogTime2.value = true
                 }
                 .padding(bottom = 2.dp)
         )
 
         OutlinedTextField(
-            value = time3,
-            onValueChange = { time3 = "${timeState.hour} : ${timeState.minute}"},
+            value = time3.value,
+            onValueChange = { },
             readOnly = true,
             label = { Text("Уведомление 3") },
             supportingText = {
                 Text("Укажите время уведомления")
             },
             trailingIcon = {
-                IconButton(onClick = { showDialog = true
-                    time3 = "${timeState.hour}:${timeState.minute}"}) {
+                IconButton(onClick = {
+                    showDialogTime2.value = true
+                }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_calendar_month_24),
                         contentDescription = "Показать меню"
@@ -389,7 +364,7 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    showDialog = true
+                    showDialogTime2.value = true
                 }
                 .padding(bottom = 2.dp)
         )
@@ -424,11 +399,64 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: () -> Unit) {
 
             Button(onClick = {
                 if (errorBoolean()) {
-                    navigateContinue()
+                    navigateContinue(
+                        arrayOf(
+                            title,
+                            typeBirds,
+                            count,
+                            date1,
+                            time1.value,
+                            time2.value,
+                            time3.value,
+                            checkedStateAiring.value.toString(),
+                            checkedStateOver.value.toString()
+                        )
+                    )
                 }
             }) {
                 Text(text = "Далее")
-                //TODO Изображение
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePicker(time: MutableState<String>, showDialog: MutableState<Boolean>) {
+    val timeState = rememberTimePickerState(
+        initialHour = 0,
+        initialMinute = 0
+    )
+    AlertDialog(
+        onDismissRequest = { showDialog.value = false },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .background(color = Color.LightGray.copy(alpha = .3f))
+                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            TimePicker(state = timeState)
+            Row(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = {
+                    showDialog.value = false
+                    time.value = "${timeState.hour}:${timeState.minute}0"
+                }) {
+                    Text(text = "Принять")
+                }
+
+                TextButton(onClick = {
+                    showDialog.value = false
+                }) {
+                    Text(text = "Назад")
+                }
             }
         }
     }
