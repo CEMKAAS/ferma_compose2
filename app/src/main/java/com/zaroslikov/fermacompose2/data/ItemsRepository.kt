@@ -16,16 +16,18 @@
 
 package com.zaroslikov.fermacompose2.data
 
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -49,6 +51,14 @@ interface ItemsRepository {
     fun getItemStream(id: Int): Flow<AddTable?>
 
     fun getAllProject(): Flow<List<ProjectTable>>
+    fun getLastProject(): Flow<Int>
+    fun getIncubatorTemp(id: Int): Flow<IncubatorTemp>
+
+    fun getIncubatorDamp(id: Int): Flow<IncubatorDamp>
+
+    fun getIncubatorOver(id: Int): Flow<IncubatorOver>
+
+    fun getIncubatorAiring(id: Int): Flow<IncubatorAiring>
 
     fun getItemAdd(id: Int): Flow<AddTable>
 
@@ -123,5 +133,16 @@ interface ItemsRepository {
 
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorTemp(item: IncubatorTemp)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorDamp(item: IncubatorDamp)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorAiring(item: IncubatorAiring)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorOver(item: IncubatorOver)
 
 }

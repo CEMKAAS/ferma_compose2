@@ -27,6 +27,10 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -42,8 +46,25 @@ interface ItemDao {
     @Query("SELECT * from Project")
     fun getAllProject(): Flow<List<ProjectTable>>
 
+    @Query("SELECT id from Project ORDER BY id DESC Limit 1")
+    fun getLastProject(): Flow<Int>
+
+    @Query("SELECT * from МyINCUBATORTEMP2 Where id=:id")
+    fun getIncubatorTemp(id: Int): Flow<IncubatorTemp>
+
+    @Query("SELECT * from МyINCUBATORTEMPDAMP Where id=:id")
+    fun getIncubatorDamp(id: Int): Flow<IncubatorDamp>
+
+    @Query("SELECT * from МyINCUBATOROVER Where id=:id")
+    fun getIncubatorOver(id: Int): Flow<IncubatorOver>
+
+    @Query("SELECT * from МyINCUBATORAIRING Where id=:id")
+    fun getIncubatorAiring(id: Int): Flow<IncubatorAiring>
+
+
     @Query("SELECT * from MyFerma WHERE id = :id")
     fun getItem(id: Int): Flow<AddTable>
+
 
     @Query("SELECT * from MyFerma Where idPT=:id ORDER BY id DESC")
     fun getAllItems(id: Int): Flow<List<AddTable>>
@@ -97,6 +118,7 @@ interface ItemDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertSale(item: SaleTable)
+
     @Update
     suspend fun updateSale(item: SaleTable)
 
@@ -118,6 +140,7 @@ interface ItemDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertExpenses(item: ExpensesTable)
+
     @Update
     suspend fun updateExpenses(item: ExpensesTable)
 
@@ -130,10 +153,13 @@ interface ItemDao {
 
     @Query("SELECT * from MyFermaWRITEOFF Where id=:id")
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWriteOff(item: WriteOffTable)
+
     @Update
     suspend fun updateWriteOff(item: WriteOffTable)
+
     @Delete
     suspend fun deleteWriteOff(item: WriteOffTable)
 
@@ -149,10 +175,10 @@ interface ItemDao {
     fun getExpenses(id: Int): Flow<Double>
 
     @Query("SELECT MyFermaSale.category, COALESCE(SUM(MyFermaSale.priceAll), 0.0) AS priceAll FROM MyFermaSale Where idPT=:id and mount=:mount and year=:year group by MyFermaSale.category ORDER BY MyFermaSale.priceAll DESC")
-    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
+    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
 
     @Query("SELECT MyFermaEXPENSES.category, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS priceAll FROM MyFermaEXPENSES Where idPT=:id and mount=:mount and year=:year group by MyFermaEXPENSES.category ORDER BY MyFermaEXPENSES.priceAll DESC")
-    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
+    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
 
     @Query(
         "SELECT title, count, suffix, priceAll, day, mount, year " +
@@ -163,40 +189,73 @@ interface ItemDao {
                 " Where idPT=:id and mount=:mount and year=:year)" +
                 " combined_table"
     )
-    fun getIncomeExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<IncomeExpensesDetails>>
+    fun getIncomeExpensesCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int
+    ): Flow<List<IncomeExpensesDetails>>
 
     @Query("SELECT MyFermaSale.title, COALESCE(SUM(MyFermaSale.priceAll), 0.0) AS priceAll FROM MyFermaSale WHERE MyFermaSale.idPT =:id group by MyFermaSale.title")
     fun getIncomeAllList(id: Int): Flow<List<FinTit>>
+
     @Query("SELECT MyFermaEXPENSES.title, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS priceAll FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id group by MyFermaEXPENSES.title")
     fun getExpensesAllList(id: Int): Flow<List<FinTit>>
+
     @Query("SELECT MyFermaSale.category, COALESCE(SUM(MyFermaSale.priceAll), 0.0) AS priceAll FROM MyFermaSale WHERE MyFermaSale.idPT =:id group by MyFermaSale.category")
     fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>>
+
     @Query("SELECT MyFermaEXPENSES.category, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS priceAll FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id group by MyFermaEXPENSES.category")
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
-    @Query("SELECT MyFermaSale.title, COALESCE(SUM(MyFermaSale.priceAll), 0.0) AS priceAll FROM MyFermaSale Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaSale.title ORDER BY MyFermaSale.priceAll DESC")
-    fun getProductListCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
-    @Query("SELECT MyFermaEXPENSES.title, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS priceAll FROM MyFermaEXPENSES Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaEXPENSES.title ORDER BY MyFermaEXPENSES.priceAll DESC")
-    fun getProductLisCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
 
-    @Query("SELECT Title, suffix, " +
-            "       SUM(AddCount) - COALESCE(SUM(SaleCount), 0) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
-            " FROM (" +
-            "    SELECT Title,suffix, SUM(Count) AS AddCount, 0 AS SaleCount, 0 AS WriteOffCount" +
-            "    FROM MyFerma" +
-            "    WHERE idPT = :id" +
-            "    GROUP BY Title" +
-            "    UNION ALL" +
-            "    SELECT Title, suffix, 0 AS AddCount, SUM(Count) AS SaleCount, 0 AS WriteOffCount" +
-            "    FROM MyFermaSale" +
-            "    WHERE idPT = :id" +
-            "    GROUP BY Title" +
-            "    UNION ALL" +
-            "    SELECT Title, suffix, 0 AS AddCount, 0 AS SaleCount, SUM(Count) AS WriteOffCount" +
-            "    FROM MyFermaWRITEOFF" +
-            "    WHERE idPT = :id" +
-            "    GROUP BY Title" +
-            ")" +
-            "GROUP BY Title ORDER BY ResultCount DESC")
+    @Query("SELECT MyFermaSale.title, COALESCE(SUM(MyFermaSale.priceAll), 0.0) AS priceAll FROM MyFermaSale Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaSale.title ORDER BY MyFermaSale.priceAll DESC")
+    fun getProductListCategoryIncomeCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int,
+        category: String
+    ): Flow<List<FinTit>>
+
+    @Query("SELECT MyFermaEXPENSES.title, COALESCE(SUM(MyFermaEXPENSES.priceAll), 0.0) AS priceAll FROM MyFermaEXPENSES Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaEXPENSES.title ORDER BY MyFermaEXPENSES.priceAll DESC")
+    fun getProductLisCategoryExpensesCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int,
+        category: String
+    ): Flow<List<FinTit>>
+
+    @Query(
+        "SELECT Title, suffix, " +
+                "       SUM(AddCount) - COALESCE(SUM(SaleCount), 0) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
+                " FROM (" +
+                "    SELECT Title,suffix, SUM(Count) AS AddCount, 0 AS SaleCount, 0 AS WriteOffCount" +
+                "    FROM MyFerma" +
+                "    WHERE idPT = :id" +
+                "    GROUP BY Title" +
+                "    UNION ALL" +
+                "    SELECT Title, suffix, 0 AS AddCount, SUM(Count) AS SaleCount, 0 AS WriteOffCount" +
+                "    FROM MyFermaSale" +
+                "    WHERE idPT = :id" +
+                "    GROUP BY Title" +
+                "    UNION ALL" +
+                "    SELECT Title, suffix, 0 AS AddCount, 0 AS SaleCount, SUM(Count) AS WriteOffCount" +
+                "    FROM MyFermaWRITEOFF" +
+                "    WHERE idPT = :id" +
+                "    GROUP BY Title" +
+                ")" +
+                "GROUP BY Title ORDER BY ResultCount DESC"
+    )
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorTemp(item: IncubatorTemp)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorDamp(item: IncubatorDamp)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorAiring(item: IncubatorAiring)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIncubatorOver(item: IncubatorOver)
 
 }

@@ -55,7 +55,6 @@ import java.util.Calendar
 import java.util.TimeZone
 
 
-
 object ProjectAddDestination : NavigationDestination {
     override val route = "ProjectAdd"
     override val titleRes = R.string.app_name
@@ -199,10 +198,17 @@ fun AddProjectContainer(
                         ProjectTable(
                             id = 0,
                             titleProject = name,
-                            dateBegin = date1,
-                            dateFinal = date1,
-//                            picture = picture,
-                            status = 0,
+                            type = "",
+                            data = date1,
+                            eggAll = "",
+                            eggAllEND = "",
+                            airing = "",
+                            over = "",
+                            arhive = "0",
+                            dateEnd = date1,
+                            time1 = "",
+                            time2 = "",
+                            time3 = "",
                             mode = 1
                         )
                     )

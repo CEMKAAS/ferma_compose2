@@ -53,7 +53,8 @@ object StartDestination : NavigationDestination {
 @Composable
 fun StartScreen(
     navController: NavController,
-    navigateToItemUpdate: (Int) -> Unit,
+    navigateToItemProject: (Int) -> Unit,
+    navigateToItemIncubator: (Int) -> Unit,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
@@ -72,8 +73,9 @@ fun StartScreen(
     ) { innerPadding ->
         StartScreenContainer(
             modifier = Modifier.padding(innerPadding),
-            onItemClick = navigateToItemUpdate,
-            projectList = projectList.projectList
+            onItemClick = navigateToItemProject,
+            projectList = projectList.projectList,
+            navigateToItemIncubator = navigateToItemIncubator
         )
     }
 }
@@ -84,6 +86,7 @@ fun StartScreen(
 fun StartScreenContainer(
     modifier: Modifier,
     onItemClick: (Int) -> Unit,
+    navigateToItemIncubator: (Int) -> Unit,
     projectList: List<ProjectTable>
 ) {
     var state by remember { mutableStateOf(0) }
@@ -128,13 +131,23 @@ fun StartScreenContainer(
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     items(items = projectList, key = { it.id }) {
-                        CardFerma(
-                            projectTable = it, modifier = Modifier
-                                .padding(8.dp)
-                                .clickable {
-                                    onItemClick(it.id)
-                                }
-                        )
+                        if (it.mode == 0) {
+                            CardIncubator(
+                                projectTable = it, modifier = Modifier
+                                    .padding(8.dp)
+                                    .clickable {
+                                        navigateToItemIncubator(it.id)
+                                    }
+                            )
+                        } else {
+                            CardFerma(
+                                projectTable = it, modifier = Modifier
+                                    .padding(8.dp)
+                                    .clickable {
+                                        onItemClick(it.id)
+                                    }
+                            )
+                        }
                     }
                 }
             }
@@ -142,6 +155,43 @@ fun StartScreenContainer(
     }
 }
 
+@Composable
+fun CardIncubator(
+    projectTable: ProjectTable, modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable {
+//                navController.navigate(Screens.FermaRoute.route)
+            },
+        elevation = CardDefaults.cardElevation(10.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+
+//        Image(
+//            painter = painterResource(id = R.drawable.chicken),
+//            contentDescription = null,
+//            contentScale = ContentScale.Fit,
+//            modifier = Modifier.size(194.dp)
+//        )
+        Text(
+            text = projectTable.titleProject,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp, horizontal = 5.dp)
+        )
+        Text(
+            text = projectTable.data, fontSize = 15.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp)
+                .padding(bottom = 10.dp)
+        )
+    }
+}
 
 @Composable
 fun CardFerma(projectTable: ProjectTable, modifier: Modifier = Modifier) {
@@ -167,7 +217,7 @@ fun CardFerma(projectTable: ProjectTable, modifier: Modifier = Modifier) {
                 .padding(vertical = 5.dp, horizontal = 5.dp)
         )
         Text(
-            text = projectTable.dateBegin, fontSize = 15.sp,
+            text = projectTable.data, fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 5.dp)
@@ -206,40 +256,3 @@ fun CardFerma(projectTable: ProjectTable, modifier: Modifier = Modifier) {
 //    StartScreen(navController)
 //}
 
-@Composable
-fun CardIncubator(
-    navController: NavController
-) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable {
-//                navController.navigate(Screens.FermaRoute.route)
-            },
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-
-//        Image(
-//            painter = painterResource(id = R.drawable.chicken),
-//            contentDescription = null,
-//            contentScale = ContentScale.Fit,
-//            modifier = Modifier.size(194.dp)
-//        )
-        Text(
-            text = "Инкубатор №1",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp, horizontal = 5.dp)
-        )
-        Text(
-            text = "Идет 33 день", fontSize = 15.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 5.dp)
-                .padding(bottom = 10.dp)
-        )
-    }
-}

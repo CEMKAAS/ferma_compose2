@@ -16,6 +16,7 @@
 
 package com.zaroslikov.fermacompose2.ui.navigation
 
+import android.app.Person
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -42,6 +43,8 @@ import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEntryProduct
 import com.zaroslikov.fermacompose2.ui.home.AddScreen
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreen
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreenDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleEditProduct
@@ -56,6 +59,7 @@ import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubator
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorList
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwo
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
@@ -84,10 +88,16 @@ fun InventoryNavHost(
     ) {
 
         composable(route = StartDestination.route) {
-            StartScreen(navController = navController,//TODO переделать на адд ADD
-                navigateToItemUpdate = {
+            StartScreen(
+                navController = navController,//TODO переделать на адд ADD
+                navigateToItemProject = {
                     navController.navigate("${HomeDestination.route}/${it}")
-                })
+                },
+                navigateToItemIncubator = {
+                    navController.navigate("${IncubatorScreenDestination.route}/${it}")
+                }
+            )
+
         }
 
         composable(route = ChoiseProjectDestination.route) {
@@ -104,24 +114,34 @@ fun InventoryNavHost(
         composable(route = AddIncubatorDestination.route) {
             AddIncubator(
                 navigateBack = { navController.popBackStack() },
-                navigateContinue = { navController.navigate(
-                    "${AddIncubatorTwoDestination.route}/${it}}"
-                )})
+                navigateContinue = {
+                    navController.currentBackStackEntry?.savedStateHandle?.set("incubator", it)
+                    navController.navigate(AddIncubatorTwoDestination.route)
+                })
         }
 
         composable(
-            route = AddIncubatorTwoDestination.routeWithArgs,
-            arguments = listOf(navArgument(AddIncubatorTwoDestination.itemIdArg) {
-                type = NavType.StringArrayType
-            })
+            route = AddIncubatorTwoDestination.route
         ) {
-            AddIncubatorTwo(
-                navigateBack = { navController.popBackStack() },
-                navigateContinue = { navController.navigate(
-                    StartDestination.route
-                )})
+            navController.previousBackStackEntry?.savedStateHandle?.get<AddIncubatorList>("incubator")
+                ?.let {
+                    AddIncubatorTwo(
+                        navigateBack = { navController.popBackStack() },
+                        navController,
+                        projectIncubatorList = it
+                    )
+                }
         }
 
+        composable(
+            route = IncubatorScreenDestination.routeWithArgs,
+            arguments = listOf(navArgument(IncubatorScreenDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            IncubatorScreen(
+                navigateBack = { navController.popBackStack() })
+        }
 
         composable(
             route = WarehouseDestination.routeWithArgs,

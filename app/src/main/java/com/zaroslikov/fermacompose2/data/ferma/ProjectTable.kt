@@ -28,10 +28,36 @@ data class ProjectTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Int = 0,
+    @ColumnInfo(name = "NAME")
     val titleProject: String, // название
-    val dateBegin: String, // Начало проекта
-    val dateFinal: String,  // Конец проекта
+    @ColumnInfo(name = "TYPE")
+    val type: String, // Кол-во
+    @ColumnInfo(name = "DATA")
+    val data: String,  // Дата начала проекта
+    @ColumnInfo(name = "EGGALL")
+    val eggAll: String, // месяц
+    @ColumnInfo(name = "EGGALLEND")
+    val eggAllEND: String, // время
+    @ColumnInfo(name = "AIRING")
+    val airing: String,
+    @ColumnInfo(name = "OVERTURN")
+    val over: String,
+    @ColumnInfo(name = "ARHIVE")
+    var arhive: String,
+    @ColumnInfo(name = "DATAEND")
+    val dateEnd: String,  // Конец проекта
 //    val picture: ByteArray, // Изображение
-    val status: Int, // Статус
+    @ColumnInfo(name = "TIMEPUSH1")
+    var time1: String,
+    @ColumnInfo(name = "TIMEPUSH2")
+    var time2: String,
+    @ColumnInfo(name = "TIMEPUSH3")
+    var time3: String,
+
     val mode: Int //Инкубатор = 0, Хозяйство = 1
 )
+
+
+
+
+

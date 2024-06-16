@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
+import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -39,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -51,6 +54,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
@@ -65,7 +69,7 @@ object AddIncubatorDestination : NavigationDestination {
 @Composable
 fun AddIncubator(
     navigateBack: () -> Unit,
-    navigateContinue: (Array<String>) -> Unit
+    navigateContinue: (AddIncubatorList) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -83,9 +87,9 @@ fun AddIncubator(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (Array<String>) -> Unit) {
+fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (AddIncubatorList) -> Unit) {
 
-    val typeBirdsList = arrayListOf("Курица", "Гуси", "Перепела", "Индюки", "Утки")
+    val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
     //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
@@ -304,7 +308,7 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (Array<String>) 
                     showDialogTime1.value = true
                 }) {
                     Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        painter = painterResource(R.drawable.baseline_access_time_24),
                         contentDescription = "Показать меню"
                     )
                 }
@@ -330,7 +334,7 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (Array<String>) 
                     showDialogTime2.value = true
                 }) {
                     Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        painter = painterResource(R.drawable.baseline_access_time_24),
                         contentDescription = "Показать меню"
                     )
                 }
@@ -356,7 +360,7 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (Array<String>) 
                     showDialogTime2.value = true
                 }) {
                     Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        painter = painterResource(R.drawable.baseline_access_time_24),
                         contentDescription = "Показать меню"
                     )
                 }
@@ -398,18 +402,19 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (Array<String>) 
         ) {
 
             Button(onClick = {
+
                 if (errorBoolean()) {
                     navigateContinue(
-                        arrayOf(
-                            title,
-                            typeBirds,
-                            count,
-                            date1,
-                            time1.value,
-                            time2.value,
-                            time3.value,
-                            checkedStateAiring.value.toString(),
-                            checkedStateOver.value.toString()
+                        AddIncubatorList(
+                            title = title,
+                            typeBirds = typeBirds,
+                            count = count,
+                            date1 = date1,
+                            time1 = time1.value,
+                            time2 = time2.value,
+                            time3 = time3.value,
+                            checkedStateAiring = checkedStateAiring.value,
+                            checkedStateOver = checkedStateOver.value
                         )
                     )
                 }
@@ -419,6 +424,19 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (Array<String>) 
         }
     }
 }
+
+@Parcelize
+data class AddIncubatorList(
+    val title: String,
+    val typeBirds: String,
+    val count: String,
+    val date1: String,
+    val time1: String,
+    val time2: String,
+    val time3: String,
+    val checkedStateAiring: Boolean,
+    val checkedStateOver: Boolean
+) : Parcelable
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -430,11 +448,11 @@ fun TimePicker(time: MutableState<String>, showDialog: MutableState<Boolean>) {
     )
     AlertDialog(
         onDismissRequest = { showDialog.value = false },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().clip(shape = RoundedCornerShape(20.dp))
     ) {
         Column(
             modifier = Modifier
-                .background(color = Color.LightGray.copy(alpha = .3f))
+                .background(color = Color.LightGray)
                 .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

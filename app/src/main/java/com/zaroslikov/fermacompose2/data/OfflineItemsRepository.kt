@@ -21,6 +21,10 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
+import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -32,6 +36,14 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
+    override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
+
+    override fun getIncubatorTemp(id: Int): Flow<IncubatorTemp> = itemDao.getIncubatorTemp(id)
+    override fun getIncubatorDamp(id: Int): Flow<IncubatorDamp> = itemDao.getIncubatorDamp(id)
+    override fun getIncubatorOver(id: Int): Flow<IncubatorOver> = itemDao.getIncubatorOver(id)
+    override fun getIncubatorAiring(id: Int): Flow<IncubatorAiring> = itemDao.getIncubatorAiring(id)
+
+
     override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)
     override fun getItemsTitleAddList(id: Int): Flow<List<String>> =
         itemDao.getItemsTitleAddList(id)
@@ -70,6 +82,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateSale(item: SaleTable) = itemDao.updateSale(item)
 
     override suspend fun deleteSale(item: SaleTable) = itemDao.deleteSale(item)
+
     //Expenses
     override fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>> =
         itemDao.getAllExpensesItems(id)
@@ -102,8 +115,10 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getExpenses(id: Int): Flow<Double> = itemDao.getExpenses(id)
     override fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>> =
         itemDao.getCategoryIncomeCurrentMonth(id, mount, year)
+
     override fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>> =
         itemDao.getCategoryExpensesCurrentMonth(id, mount, year)
+
     override fun getIncomeExpensesCurrentMonth(
         id: Int,
         mount: Int,
@@ -114,21 +129,40 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     //FinanceTap
     override fun getIncomeAllList(id: Int): Flow<List<FinTit>> = itemDao.getIncomeAllList(id)
     override fun getExpensesAllList(id: Int): Flow<List<FinTit>> = itemDao.getExpensesAllList(id)
-    override fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>> = itemDao.getIncomeCategoryAllList(id)
-    override fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>> = itemDao.getExpensesCategoryAllList(id)
+    override fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>> =
+        itemDao.getIncomeCategoryAllList(id)
+
+    override fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>> =
+        itemDao.getExpensesCategoryAllList(id)
+
     override fun getProductListCategoryIncomeCurrentMonth(
         id: Int,
         mount: Int,
         year: Int,
         category: String
-    ): Flow<List<FinTit>> = itemDao.getProductListCategoryIncomeCurrentMonth(id,mount, year, category)
+    ): Flow<List<FinTit>> =
+        itemDao.getProductListCategoryIncomeCurrentMonth(id, mount, year, category)
+
     override fun getProductLisCategoryExpensesCurrentMonth(
         id: Int,
         mount: Int,
         year: Int,
         category: String
-    ): Flow<List<FinTit>> = itemDao.getProductLisCategoryExpensesCurrentMonth(id,mount, year, category)
+    ): Flow<List<FinTit>> =
+        itemDao.getProductLisCategoryExpensesCurrentMonth(id, mount, year, category)
 
-    override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> = itemDao.getCurrentBalanceWarehouse(id)
+    override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> =
+        itemDao.getCurrentBalanceWarehouse(id)
 
+    override suspend fun insertIncubatorTemp(item: IncubatorTemp) =
+        itemDao.insertIncubatorTemp(item)
+
+    override suspend fun insertIncubatorDamp(item: IncubatorDamp) =
+        itemDao.insertIncubatorDamp(item)
+
+    override suspend fun insertIncubatorAiring(item: IncubatorAiring) =
+        itemDao.insertIncubatorAiring(item)
+
+    override suspend fun insertIncubatorOver(item: IncubatorOver) =
+        itemDao.insertIncubatorOver(item)
 }
