@@ -160,11 +160,7 @@ fun CardIncubator(
     projectTable: ProjectTable, modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable {
-//                navController.navigate(Screens.FermaRoute.route)
-            },
+        modifier = modifier,
         elevation = CardDefaults.cardElevation(10.dp),
         colors = CardDefaults.cardColors()
     ) {

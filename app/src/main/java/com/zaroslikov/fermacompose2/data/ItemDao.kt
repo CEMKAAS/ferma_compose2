@@ -49,16 +49,16 @@ interface ItemDao {
     @Query("SELECT id from Project ORDER BY id DESC Limit 1")
     fun getLastProject(): Flow<Int>
 
-    @Query("SELECT * from МyINCUBATORTEMP2 Where id=:id")
+    @Query("SELECT * from МyINCUBATORTEMP2 Where idPT=:id")
     fun getIncubatorTemp(id: Int): Flow<IncubatorTemp>
 
-    @Query("SELECT * from МyINCUBATORTEMPDAMP Where id=:id")
+    @Query("SELECT * from МyINCUBATORTEMPDAMP Where idPT=:id")
     fun getIncubatorDamp(id: Int): Flow<IncubatorDamp>
 
-    @Query("SELECT * from МyINCUBATOROVER Where id=:id")
+    @Query("SELECT * from МyINCUBATOROVER Where idPT=:id")
     fun getIncubatorOver(id: Int): Flow<IncubatorOver>
 
-    @Query("SELECT * from МyINCUBATORAIRING Where id=:id")
+    @Query("SELECT * from МyINCUBATORAIRING Where idPT=:id")
     fun getIncubatorAiring(id: Int): Flow<IncubatorAiring>
 
 

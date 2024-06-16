@@ -13,8 +13,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -26,7 +24,6 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 
 
@@ -44,6 +41,9 @@ fun IncubatorScreen(
 ) {
     val temp = viewModel.tempState.collectAsState()
 
+   val tempList =  massd(temp.value.titleList)
+
+
     Scaffold(
         topBar = {
             TopAppBarStart(
@@ -55,25 +55,61 @@ fun IncubatorScreen(
 
         IncubatorContainer(
             modifier = Modifier.padding(innerPadding),
-            incubatorTemp = temp.value.itemList
+            incubatorTemp = tempList
         )
+    }
+}
+
+fun massd(temp: IncubatorTemp): MutableList<String> {
+    val mass = mutableListOf<String>()
+    mass.add(temp.day1)
+    mass.add(temp.day2)
+    mass.add(temp.day3)
+    mass.add(temp.day4)
+    mass.add(temp.day5)
+    mass.add(temp.day6)
+    mass.add(temp.day7)
+    mass.add(temp.day8)
+    mass.add(temp.day9)
+    mass.add(temp.day10)
+    mass.add(temp.day11)
+    mass.add(temp.day12)
+    mass.add(temp.day13)
+    mass.add(temp.day14)
+    mass.add(temp.day15)
+    mass.add(temp.day16)
+    mass.add(temp.day17)
+    if (temp.day18 == "0") return mass
+    else {
+        mass.add(temp.day18)
+        mass.add(temp.day19)
+        mass.add(temp.day20)
+        mass.add(temp.day21)
+        return if (temp.day22 == "0") mass else {
+            mass.add(temp.day22)
+            mass.add(temp.day23)
+            mass.add(temp.day24)
+            mass.add(temp.day25)
+            mass.add(temp.day26)
+            mass.add(temp.day27)
+            mass.add(temp.day28)
+            if (temp.day29 == "0") mass else {
+                mass.add(temp.day29)
+                mass.add(temp.day30)
+                mass
+            }
+        }
     }
 }
 
 @Composable
 fun IncubatorContainer(
     modifier: Modifier,
-    incubatorTemp: List<IncubatorTemp>
+    incubatorTemp: MutableList<String>
 ) {
 
-    val mass = mutableListOf<String>()
-    for (i in 0..20) {
-        mass.add(incubatorTemp[0].day1)
-    }
-
-
     LazyColumn(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        items(incubatorTemp[0].id) {
+        items(incubatorTemp.size) {
             MyRowIncubatorSettting(
                 it,
                 incubatorTemp[it]
@@ -82,21 +118,10 @@ fun IncubatorContainer(
     }
 }
 
-private fun setCursor(cursor: Cursor, sizeBegin: Int, size: Int): MutableList<String> {
-    cursor.moveToNext()
-    val mass = mutableListOf<String>()
-    for (i in sizeBegin..size) {
-        mass.add(cursor.getString(i).toString())
-    }
-    cursor.close()
-    return mass
-}
-
-
 @Composable
 fun MyRowIncubatorSettting(
     n: Int,
-    temp: IncubatorTemp
+    temp: String
 //    ovos: Boolean,
 //    ovosShowBottom: MutableState<Boolean>
 ) {
