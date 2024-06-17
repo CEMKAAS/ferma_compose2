@@ -43,6 +43,8 @@ import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEntryProduct
 import com.zaroslikov.fermacompose2.ui.home.AddScreen
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreen
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreenDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreenDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
@@ -140,6 +142,18 @@ fun InventoryNavHost(
             })
         ) {
             IncubatorScreen(
+                navigateBack = { navController.popBackStack() },
+                navigateDayEdit = { navController.navigate(IncubatorEditDayScreenDestination.route) }
+            )
+        }
+
+        composable(
+            route = IncubatorEditDayScreenDestination.route,
+//            arguments = listOf(navArgument(IncubatorEditDayScreenDestination.itemIdArg) {
+//                type = NavType.IntType
+//            })
+        ) {
+            IncubatorEditDayScreen(
                 navigateBack = { navController.popBackStack() })
         }
 

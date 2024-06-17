@@ -22,6 +22,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 class IncubatorViewModel(
     savedStateHandle: SavedStateHandle,
@@ -31,76 +36,114 @@ class IncubatorViewModel(
     val itemId: Int = checkNotNull(savedStateHandle[IncubatorScreenDestination.itemIdArg])
 
 
-    val projectIncubatorUIList: StateFlow<IncubatorProjectState> =
-        itemsRepository.getProject(itemId).map { IncubatorProjectState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncubatorProjectState()
-            )
+//    val projectIncubatorUIList: StateFlow<IncubatorProjectState> =
+//        itemsRepository.getProject(itemId).map { IncubatorProjectState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = IncubatorProjectState()
+//            )
 
 
-    val tempState: StateFlow<IncubatorState> =
-        itemsRepository.getIncubatorTemp(itemId).map { IncubatorState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncubatorState()
-            )
-
-    val dampState: StateFlow<IncubatorState> =
-        itemsRepository.getIncubatorDamp(itemId).map { IncubatorState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncubatorState()
-            )
-
-    //
-    val overState: StateFlow<IncubatorState> =
-        itemsRepository.getIncubatorOver(itemId).map { IncubatorState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncubatorState()
-            )
-
-    val airingState: StateFlow<IncubatorState> =
-        itemsRepository.getIncubatorAiring(itemId).map { IncubatorState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncubatorState()
-            )
-
-
-//    var tempStateList by mutableStateOf(IncubatorUIList())
-//        private set
-
-//    init {
-//        viewModelScope.launch {
+//    val tempState: StateFlow<IncubatorState> =
+//        itemsRepository.getIncubatorTemp(itemId).map { IncubatorState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = IncubatorState()
+//            )
 //
-//            tempStateList = itemsRepository.getIncubatorTemp(itemId)
-//                .filterNotNull()
-//                .first()
-//                .toIncubatorTemp()
+//    val dampState: StateFlow<IncubatorState> =
+//        itemsRepository.getIncubatorDamp(itemId).map { IncubatorState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = IncubatorState()
+//            )
 //
-//            tempStateList = itemsRepository.getIncubatorDamp(itemId)
-//                .filterNotNull()
-//                .first()
-//                .toIncubatorDamp()
+//    //
+//    val overState: StateFlow<IncubatorState> =
+//        itemsRepository.getIncubatorOver(itemId).map { IncubatorState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = IncubatorState()
+//            )
 //
-//            tempStateList = itemsRepository.getIncubatorOver(itemId)
-//                .filterNotNull()
-//                .first()
-//                .toIncubatorOver()
+//    val airingState: StateFlow<IncubatorState> =
+//        itemsRepository.getIncubatorAiring(itemId).map { IncubatorState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = IncubatorState()
+//            )
+
+    var projectState by mutableStateOf(IncubatorProjectState())
+        private set
+
+    var tempStateList by mutableStateOf(IncubatorState())
+        private set
+
+    var dampStateList by mutableStateOf(IncubatorState())
+        private set
+
+    var overStateList by mutableStateOf(IncubatorState())
+        private set
+    var airingStateList by mutableStateOf(IncubatorState())
+        private set
+
+    var day by mutableIntStateOf(0)
+        private set
+
+    init {
+        viewModelScope.launch {
+
+            projectState = itemsRepository.getProject(itemId)
+                .filterNotNull()
+                .first()
+                .toIncubatorProjectState()
+
+            tempStateList = itemsRepository.getIncubatorTemp(itemId)
+                .filterNotNull()
+                .first()
+                .toIncubatorState()
+
+            dampStateList = itemsRepository.getIncubatorDamp(itemId)
+                .filterNotNull()
+                .first()
+                .toIncubatorState()
+
+            overStateList = itemsRepository.getIncubatorOver(itemId)
+                .filterNotNull()
+                .first()
+                .toIncubatorState()
+
+            airingStateList = itemsRepository.getIncubatorAiring(itemId)
+                .filterNotNull()
+                .first()
+                .toIncubatorState()
+        }
+    }
+
+
+//   fun dateNoww() :Int {
+//        var diff: Long = 0
+//        val calendar: Calendar = Calendar.getInstance()
+//        val dateBefore22: String = projectState.data
+//        val dateBefore222: String =
+//            (calendar.get(Calendar.DAY_OF_MONTH) + 1).toString() + "." + (calendar.get(
+//                Calendar.MONTH
+//            ) + 1) + "." + calendar.get(Calendar.YEAR)
+//        val myFormat: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
 //
-//            tempStateList = itemsRepository.getIncubatorAiring(itemId)
-//                .filterNotNull()
-//                .first()
-//                .toIncubatorAiring()
-//
+//        try {
+//            val date1: Date = myFormat.parse(dateBefore22)
+//            val date2: Date = myFormat.parse(dateBefore222)
+//            diff = date2.time - date1.time
+//        } catch (e: ParseException) {
+//            throw RuntimeException(e)
 //        }
+//        return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt()
 //    }
 
 
@@ -143,62 +186,110 @@ class IncubatorViewModel(
 
 }
 
+fun ProjectTable.toIncubatorProjectState(): IncubatorProjectState = IncubatorProjectState(
+    id,
+    titleProject,
+    type,
+    data,
+    eggAll,
+    eggAllEND,
+    airing,
+    over,
+    arhive,
+    dateEnd,
+    time1,
+    time2,
+    time3,
+    mode
+)
+
 
 data class IncubatorProjectState(
-    val projectTable: ProjectTable = ProjectTable(
-        id = 0,
-        titleProject = "",
-        type = "",
-        data = "",
-        eggAll = "",
-        eggAllEND = "",
-        airing = "",
-        over = "",
-        arhive = "0",
-        dateEnd = "",
-        time1 = "",
-        time2 = "",
-        time3 = "",
-        mode = 0
-    )
+    val id: Int = 0,
+    val titleProject: String = "",
+    val type: String = "",
+    val data: String = "",
+    val eggAll: String = "",
+    val eggAllEND: String = "",
+    val airing: String = "",
+    val over: String = "",
+    val arhive: String = "0",
+    val dateEnd: String = "",
+    val time1: String = "",
+    val time2: String = "",
+    val time3: String = "",
+    val mode: Int = 0
+)
+
+fun IncubatorUIList.toIncubatorState(): IncubatorState = IncubatorState(
+    id,
+    day1,
+    day2,
+    day3,
+    day4,
+    day5,
+    day6,
+    day7,
+    day8,
+    day9,
+    day10,
+    day11,
+    day12,
+    day13,
+    day14,
+    day15,
+    day16,
+    day17,
+    day18,
+    day19,
+    day20,
+    day21,
+    day22,
+    day23,
+    day24,
+    day25,
+    day26,
+    day27,
+    day28,
+    day29,
+    day30,
+    idPT
 )
 
 
 data class IncubatorState(
-    val titleList: IncubatorUIList = IncubatorUIList(
-        0,
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        0
-    )
+    val id: Int = 0,
+    val day1: String = "",
+    val day2: String = "",
+    val day3: String = "",
+    val day4: String = "",
+    val day5: String = "",
+    val day6: String = "",
+    val day7: String = "",
+    val day8: String = "",
+    val day9: String = "",
+    val day10: String = "",
+    val day11: String = "",
+    val day12: String = "",
+    val day13: String = "",
+    val day14: String = "",
+    val day15: String = "",
+    val day16: String = "",
+    val day17: String = "",
+    val day18: String = "",
+    val day19: String = "",
+    val day20: String = "",
+    val day21: String = "",
+    val day22: String = "",
+    val day23: String = "",
+    val day24: String = "",
+    val day25: String = "",
+    val day26: String = "",
+    val day27: String = "",
+    val day28: String = "",
+    val day29: String = "",
+    val day30: String = "",
+    val idPT: Int = 0
 )
 
 data class IncubatorUIList(
@@ -235,6 +326,44 @@ data class IncubatorUIList(
     val day30: String,
     val idPT: Int
 )
+
+
+//data class IncubatorState(
+//    val titleList: IncubatorUIList = IncubatorUIList(
+//        0,
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        "",
+//        0
+//    )
+//)
 
 
 //1

@@ -1,6 +1,10 @@
 package com.zaroslikov.fermacompose2.ui.incubator
 
-import android.database.Cursor
+import android.annotation.SuppressLint
+import android.view.View
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -12,11 +16,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,12 +30,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -47,18 +50,20 @@ object IncubatorScreenDestination : NavigationDestination {
 @Composable
 fun IncubatorScreen(
     navigateBack: () -> Unit,
+    navigateDayEdit: () -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val temp = viewModel.tempState.collectAsState()
-    val damp = viewModel.dampState.collectAsState()
-    val over = viewModel.overState.collectAsState()
-    val airng = viewModel.airingState.collectAsState()
-    val project = viewModel.projectIncubatorUIList.collectAsState()
+    val temp = viewModel.tempStateList
+    val damp = viewModel.dampStateList
+    val over = viewModel.overStateList
+    val airng = viewModel.airingStateList
+    val project = viewModel.projectState
 
-    val tempList = massList(temp.value.titleList)
-    val dampList = massList(damp.value.titleList)
-    val overList = massList(over.value.titleList)
-    val airingList = massList(airng.value.titleList)
+
+    val tempList = massList(temp)
+    val dampList = massList(damp)
+    val overList = massList(over)
+    val airingList = massList(airng)
 
     Scaffold(
         topBar = {
@@ -70,17 +75,21 @@ fun IncubatorScreen(
         }) { innerPadding ->
 
         IncubatorContainer(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(8.dp),
             incubatorTemp = tempList,
             incubatorDamp = dampList,
             incubatorOver = overList,
             incubatorAiring = airingList,
-            projectTable = project.value.projectTable
+            projectTable = project,
+            navigateDayEdit = navigateDayEdit
         )
     }
 }
 
 
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun IncubatorContainer(
     modifier: Modifier,
@@ -88,32 +97,46 @@ fun IncubatorContainer(
     incubatorDamp: MutableList<String>,
     incubatorOver: MutableList<String>,
     incubatorAiring: MutableList<String>,
-    projectTable: ProjectTable
+    projectTable: IncubatorProjectState,
+    navigateDayEdit: () -> Unit
 ) {
-    var diff: Long = 0
-    val calendar: Calendar = Calendar.getInstance()
-    val dateBefore22: String = projectTable.data
-    val dateBefore222: String =
-        (calendar.get(Calendar.DAY_OF_MONTH) + 1).toString() + "." + (calendar.get(
-            Calendar.MONTH
-        ) + 1) + "." + calendar.get(Calendar.YEAR)
-    val myFormat: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
 
-    try {
-        val date1: Date = myFormat.parse(dateBefore22)
-        val date2: Date = myFormat.parse(dateBefore222)
-        diff = date2.time - date1.time
-    } catch (e: ParseException) {
-        throw RuntimeException(e)
-    }
-    val dateNow = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt()
+//    var diff: Long = 0
+//    val calendar: Calendar = Calendar.getInstance()
+//    val dateBefore22: String = projectTable.data
+//    val dateBefore222: String =
+//        (calendar.get(Calendar.DAY_OF_MONTH) + 1).toString() + "." + (calendar.get(
+//            Calendar.MONTH
+//        ) + 1) + "." + calendar.get(Calendar.YEAR)
+//    val myFormat = SimpleDateFormat("dd.MM.yyyy")
+//    val date1: Date? = myFormat.parse(dateBefore22)
+//    val date2: Date? = myFormat.parse(dateBefore222)
+//    diff = date2!!.time - date1!!.time
+//    val dateNow = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt()
 //    dateIncubator =  "Идет " + TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toString() + " день "
 
     val scrollState = rememberLazyListState()
 
-    LaunchedEffect(Unit) {
-        val middleIndex = dateNow
-        scrollState.scrollToItem(middleIndex)
+    var day = 0
+    var ovoscop = false
+
+    if (projectTable.data != "") {
+        LaunchedEffect(Unit) {
+            var diff: Long = 0
+            val calendar: Calendar = Calendar.getInstance()
+            val dateBefore22: String = projectTable.data
+            val dateBefore222: String =
+                (calendar.get(Calendar.DAY_OF_MONTH)).toString() + "." + (calendar.get(
+                    Calendar.MONTH
+                ) + 1) + "." + calendar.get(Calendar.YEAR)
+            val myFormat: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
+            val date1: Date = myFormat.parse(dateBefore22)
+            val date2: Date = myFormat.parse(dateBefore222)
+            diff = date2.time - date1.time
+            day = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt()
+            scrollState.scrollToItem(day)
+            ovoscop = setOvoskop(projectTable.type, day)
+        }
     }
 
 
@@ -121,6 +144,9 @@ fun IncubatorContainer(
         state = scrollState, modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(incubatorTemp.size) {
+
+            val borderStroke = if (day == it) BorderStroke(2.dp, Color.Black) else null
+
             MyRowIncubatorSettting(
                 it,
                 incubatorTemp[it],
@@ -130,7 +156,10 @@ fun IncubatorContainer(
                 modifier = Modifier
                     .padding(6.dp)
                     .clickable {
+                        navigateDayEdit()
                     },
+                borderStroke = borderStroke,
+                ovoscop
             )
         }
     }
@@ -143,16 +172,17 @@ fun MyRowIncubatorSettting(
     damp: String,
     over: String,
     airing: String,
-    modifier: Modifier = Modifier
-//    ovos: Boolean,
+    modifier: Modifier = Modifier,
+    borderStroke: BorderStroke?,
+    ovos: Boolean,
 //    ovosShowBottom: MutableState<Boolean>
 ) {
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors()
+        colors = CardDefaults.cardColors(),
+        border = borderStroke
     ) {
-
         Text(
             text = "День ${n + 1}",
             textAlign = TextAlign.Center,
@@ -199,21 +229,76 @@ fun MyRowIncubatorSettting(
                     .padding(6.dp)
             )
         }
-//        if (ovos) {
-//            TextButton(
-//                onClick = { ovosShowBottom.value = true },
-//                modifier = Modifier.fillMaxWidth()) {
-//                Text(
-//                    text = "Овоскопирование",
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier
-//                )
-//            }
-//        }
+        if (ovos) {
+            TextButton(
+                onClick = { },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Овоскопирование",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                )
+            }
+        }
     }
 }
 
-fun massList(temp: IncubatorUIList): MutableList<String> {
+fun setOvoskop(typeBird: String, day: Int): Boolean {
+    //todo доделать овоскоп
+    when (typeBird) {
+        "Курицы" -> {
+            return when (day) {
+                7 -> true
+                11 -> true
+                16 -> true
+                else -> {
+                    false
+                }
+            }
+        }
+
+        "Индюки", "Утки" -> {
+            return when (day) {
+                8 -> true
+                14 -> true
+                25 -> true
+                else -> {
+                    false
+                }
+            }
+        }
+
+        "Гуси" -> {
+            return when (day) {
+                9 -> true
+                15 -> true
+                21 -> true
+                else -> {
+                    false
+                }
+            }
+        }
+
+        "Перепела" -> {
+            return when (day) {
+                6 -> true
+                13 -> true
+                else -> {
+                    false
+                }
+            }
+        }
+
+        else -> {
+            return false
+        }
+    }
+
+}
+
+
+fun massList(temp: IncubatorState): MutableList<String> {
     val mass = mutableListOf<String>()
     mass.add(temp.day1)
     mass.add(temp.day2)

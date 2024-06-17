@@ -32,6 +32,7 @@ import com.zaroslikov.fermacompose2.ui.finance.FinanceViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleEditViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
@@ -68,6 +69,13 @@ object AppViewModelProvider {
 
         initializer {
             IncubatorViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
+        initializer {
+            IncubatorEditDayViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )
