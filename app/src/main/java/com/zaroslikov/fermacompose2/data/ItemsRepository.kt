@@ -31,6 +31,7 @@ import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorUIList
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
@@ -51,14 +52,15 @@ interface ItemsRepository {
     fun getItemStream(id: Int): Flow<AddTable?>
 
     fun getAllProject(): Flow<List<ProjectTable>>
+    fun getProject(id: Int): Flow<ProjectTable>
     fun getLastProject(): Flow<Int>
-    fun getIncubatorTemp(id: Int): Flow<IncubatorTemp>
+    fun getIncubatorTemp(id: Int): Flow<IncubatorUIList>
 
-    fun getIncubatorDamp(id: Int): Flow<IncubatorDamp>
+    fun getIncubatorDamp(id: Int): Flow<IncubatorUIList>
 
-    fun getIncubatorOver(id: Int): Flow<IncubatorOver>
+    fun getIncubatorOver(id: Int): Flow<IncubatorUIList>
 
-    fun getIncubatorAiring(id: Int): Flow<IncubatorAiring>
+    fun getIncubatorAiring(id: Int): Flow<IncubatorUIList>
 
     fun getItemAdd(id: Int): Flow<AddTable>
 

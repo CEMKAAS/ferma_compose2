@@ -28,6 +28,7 @@ import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorUIList
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
@@ -36,12 +37,13 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
+    override fun getProject(id: Int): Flow<ProjectTable> = itemDao.getProject(id)
     override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
 
-    override fun getIncubatorTemp(id: Int): Flow<IncubatorTemp> = itemDao.getIncubatorTemp(id)
-    override fun getIncubatorDamp(id: Int): Flow<IncubatorDamp> = itemDao.getIncubatorDamp(id)
-    override fun getIncubatorOver(id: Int): Flow<IncubatorOver> = itemDao.getIncubatorOver(id)
-    override fun getIncubatorAiring(id: Int): Flow<IncubatorAiring> = itemDao.getIncubatorAiring(id)
+    override fun getIncubatorTemp(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorTemp(id)
+    override fun getIncubatorDamp(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorDamp(id)
+    override fun getIncubatorOver(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorOver(id)
+    override fun getIncubatorAiring(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorAiring(id)
 
 
     override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)

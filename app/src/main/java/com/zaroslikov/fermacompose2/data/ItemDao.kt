@@ -34,6 +34,7 @@ import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorUIList
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
@@ -46,20 +47,24 @@ interface ItemDao {
     @Query("SELECT * from Project")
     fun getAllProject(): Flow<List<ProjectTable>>
 
+    @Query("SELECT * from Project Where id=:id")
+    fun getProject(id: Int): Flow<ProjectTable>
+
     @Query("SELECT id from Project ORDER BY id DESC Limit 1")
     fun getLastProject(): Flow<Int>
 
+
     @Query("SELECT * from МyINCUBATORTEMP2 Where idPT=:id")
-    fun getIncubatorTemp(id: Int): Flow<IncubatorTemp>
+    fun getIncubatorTemp(id: Int): Flow<IncubatorUIList>
 
     @Query("SELECT * from МyINCUBATORTEMPDAMP Where idPT=:id")
-    fun getIncubatorDamp(id: Int): Flow<IncubatorDamp>
+    fun getIncubatorDamp(id: Int): Flow<IncubatorUIList>
 
     @Query("SELECT * from МyINCUBATOROVER Where idPT=:id")
-    fun getIncubatorOver(id: Int): Flow<IncubatorOver>
+    fun getIncubatorOver(id: Int): Flow<IncubatorUIList>
 
     @Query("SELECT * from МyINCUBATORAIRING Where idPT=:id")
-    fun getIncubatorAiring(id: Int): Flow<IncubatorAiring>
+    fun getIncubatorAiring(id: Int): Flow<IncubatorUIList>
 
 
     @Query("SELECT * from MyFerma WHERE id = :id")
