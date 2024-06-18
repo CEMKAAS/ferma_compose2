@@ -45,6 +45,8 @@ import com.zaroslikov.fermacompose2.ui.home.AddScreen
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreenDestination
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditDestination
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreenDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
@@ -146,12 +148,25 @@ fun InventoryNavHost(
                 navigateDayEdit = {
                     navController.navigate(
                         "${IncubatorEditDayScreenDestination.route}/${it.idPT}/${it.day}"
-                    )
-//                    navController.currentBackStackEntry?.savedStateHandle?.set("ListIncubator", it)
-//                    navController.navigate(AddIncubatorTwoDestination.route)
-                }
+                    )},
+                navigateProjectEdit = {navController.navigate("${IncubatorProjectEditDestination.route}/${it}"
+                )}
             )
         }
+
+        composable(
+            route = IncubatorProjectEditDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(IncubatorProjectEditDestination.itemIdArg) {
+                    type = NavType.IntType
+                }
+            )) {
+            IncubatorProjectEditScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() })
+
+        }
+
 
         composable(
             route = IncubatorEditDayScreenDestination.routeWithArgs,

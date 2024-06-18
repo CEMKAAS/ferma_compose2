@@ -54,6 +54,7 @@ interface ItemsRepository {
 
     fun getAllProject(): Flow<List<ProjectTable>>
     fun getProject(id: Int): Flow<ProjectTable>
+    suspend fun updateProject(item: ProjectTable)
     fun getLastProject(): Flow<Int>
     fun getIncubatorTemp(id: Int): Flow<IncubatorUIList>
 

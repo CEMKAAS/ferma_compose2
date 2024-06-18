@@ -143,7 +143,7 @@ fun TopAppBarFerma(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarStart(title: String, canNavigateBack: Boolean, navigateUp: () -> Unit = {}) {
+fun TopAppBarStart(title: String, settingBoolean: Boolean, navigateUp: () -> Unit = {}, settingUp: () -> Unit = {}) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             titleContentColor = MaterialTheme.colorScheme.primary,
@@ -152,21 +152,21 @@ fun TopAppBarStart(title: String, canNavigateBack: Boolean, navigateUp: () -> Un
             Text(text = title)
         },
         navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Назад"
-                    )
-                }
+            IconButton(onClick = navigateUp) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Назад"
+                )
             }
         },
         actions = {
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "Настройка"
-                )
+            if (settingBoolean) {
+                IconButton(onClick = settingUp) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Настройка"
+                    )
+                }
             }
         }
     )

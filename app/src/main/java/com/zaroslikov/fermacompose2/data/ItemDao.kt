@@ -50,6 +50,9 @@ interface ItemDao {
     @Query("SELECT * from Project Where id=:id")
     fun getProject(id: Int): Flow<ProjectTable>
 
+    @Update
+    suspend fun updateProject(item: ProjectTable)
+
     @Query("SELECT id from Project ORDER BY id DESC Limit 1")
     fun getLastProject(): Flow<Int>
 

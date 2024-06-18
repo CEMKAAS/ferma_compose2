@@ -60,6 +60,7 @@ object IncubatorScreenDestination : NavigationDestination {
 fun IncubatorScreen(
     navigateBack: () -> Unit,
     navigateDayEdit: (IncubatorEditNav) -> Unit,
+    navigateProjectEdit: (Int) -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val temp = viewModel.tempStateList
@@ -80,6 +81,7 @@ fun IncubatorScreen(
                 title = "Инкубатор",
                 true,
                 navigateUp = navigateBack,
+                settingUp = { navigateProjectEdit(project.id) }
             )
         }) { innerPadding ->
 

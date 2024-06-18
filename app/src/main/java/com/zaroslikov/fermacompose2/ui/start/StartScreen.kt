@@ -62,7 +62,7 @@ fun StartScreen(
 
     Scaffold(
         topBar = {
-            TopAppBarStart(title = "Мое Хозяйство", canNavigateBack = false)
+            TopAppBarStart(title = "Мое Хозяйство", false)
         }, floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate(ChoiseProjectDestination.route) },
