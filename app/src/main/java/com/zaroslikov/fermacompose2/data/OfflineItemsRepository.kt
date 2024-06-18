@@ -167,4 +167,11 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override suspend fun insertIncubatorOver(item: IncubatorOver) =
         itemDao.insertIncubatorOver(item)
+
+    override suspend fun updateIncubatorTemp(item: IncubatorTemp) = itemDao.updateIncubatorTemp(item)
+
+    override suspend fun updateIncubatorDamp(item: IncubatorDamp) = itemDao.updateIncubatorDamp(item)
+
+    override suspend fun updateIncubatorAiring(item: IncubatorAiring) = itemDao.updateIncubatorAiring(item)
+    override suspend fun updateIncubatorOver(item: IncubatorOver) = itemDao.updateIncubatorOver(item)
 }

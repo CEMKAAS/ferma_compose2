@@ -143,18 +143,32 @@ fun InventoryNavHost(
         ) {
             IncubatorScreen(
                 navigateBack = { navController.popBackStack() },
-                navigateDayEdit = { navController.navigate(IncubatorEditDayScreenDestination.route) }
+                navigateDayEdit = {
+                    navController.navigate(
+                        "${IncubatorEditDayScreenDestination.route}/${it.idPT}/${it.day}"
+                    )
+//                    navController.currentBackStackEntry?.savedStateHandle?.set("ListIncubator", it)
+//                    navController.navigate(AddIncubatorTwoDestination.route)
+                }
             )
         }
 
         composable(
-            route = IncubatorEditDayScreenDestination.route,
-//            arguments = listOf(navArgument(IncubatorEditDayScreenDestination.itemIdArg) {
-//                type = NavType.IntType
-//            })
-        ) {
+            route = IncubatorEditDayScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(IncubatorEditDayScreenDestination.itemIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(IncubatorEditDayScreenDestination.itemIdArgTwo) {
+                    type = NavType.IntType
+                }
+            )) {
             IncubatorEditDayScreen(
-                navigateBack = { navController.popBackStack() })
+                navigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
 
         composable(

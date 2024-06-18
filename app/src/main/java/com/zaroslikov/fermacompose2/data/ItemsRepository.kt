@@ -19,6 +19,7 @@ package com.zaroslikov.fermacompose2.data
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -135,16 +136,21 @@ interface ItemsRepository {
 
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+
     suspend fun insertIncubatorTemp(item: IncubatorTemp)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+
     suspend fun insertIncubatorDamp(item: IncubatorDamp)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+
     suspend fun insertIncubatorAiring(item: IncubatorAiring)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+
+
     suspend fun insertIncubatorOver(item: IncubatorOver)
+    suspend fun updateIncubatorTemp(item: IncubatorTemp)
+    suspend fun updateIncubatorDamp(item: IncubatorDamp)
+    suspend fun updateIncubatorAiring(item: IncubatorAiring)
+    suspend fun updateIncubatorOver(item: IncubatorOver)
 
 }
