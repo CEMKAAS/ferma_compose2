@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
+import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.IncubatorList
@@ -63,16 +65,11 @@ fun IncubatorScreen(
     navigateProjectEdit: (Int) -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val temp = viewModel.tempStateList
-    val damp = viewModel.dampStateList
-    val over = viewModel.overStateList
-    val airng = viewModel.airingStateList
-    val project = viewModel.projectState
-
-    val tempList = massList(temp)
-    val dampList = massList(damp)
-    val overList = massList(over)
-    val airingList = massList(airng)
+    val temp by viewModel.tempState.collectAsState()
+    val damp by viewModel.dampState.collectAsState()
+    val over by viewModel.overState.collectAsState()
+    val airng by viewModel.airingState.collectAsState()
+    val project by viewModel.projectIncubatorUIList.collectAsState()
 
 
     Scaffold(
@@ -81,7 +78,7 @@ fun IncubatorScreen(
                 title = "Инкубатор",
                 true,
                 navigateUp = navigateBack,
-                settingUp = { navigateProjectEdit(project.id) }
+                settingUp = { navigateProjectEdit(project.project.id) }
             )
         }) { innerPadding ->
 
@@ -89,11 +86,11 @@ fun IncubatorScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(8.dp),
-            incubatorTemp = tempList,
-            incubatorDamp = dampList,
-            incubatorOver = overList,
-            incubatorAiring = airingList,
-            projectTable = project,
+            incubatorTemp = temp.list,
+            incubatorDamp = damp.list,
+            incubatorOver = over.list,
+            incubatorAiring = airng.list,
+            projectTable = project.project,
             navigateDayEdit = navigateDayEdit
         )
     }
@@ -104,17 +101,22 @@ fun IncubatorScreen(
 @Composable
 fun IncubatorContainer(
     modifier: Modifier,
-    incubatorTemp: MutableList<String>,
-    incubatorDamp: MutableList<String>,
-    incubatorOver: MutableList<String>,
-    incubatorAiring: MutableList<String>,
-    projectTable: IncubatorProjectState,
+    incubatorTemp: IncubatorUIList,
+    incubatorDamp: IncubatorUIList,
+    incubatorOver: IncubatorUIList,
+    incubatorAiring: IncubatorUIList,
+    projectTable: ProjectTable,
     navigateDayEdit: (IncubatorEditNav) -> Unit
 ) {
 
     val scrollState = rememberLazyListState()
 
     var day by rememberSaveable { mutableIntStateOf(0) }
+
+    val tempList = massList(incubatorTemp)
+    val dampList = massList(incubatorDamp)
+    val overList = massList(incubatorOver)
+    val airingList = massList(incubatorAiring)
 
     var ovoscop = false
 
@@ -141,16 +143,16 @@ fun IncubatorContainer(
     LazyColumn(
         state = scrollState, modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(incubatorTemp.size) {
+        items(tempList.size) {
 
             val borderStroke = if (day == it) BorderStroke(2.dp, Color.Black) else null
 
             MyRowIncubatorSettting(
                 it,
-                incubatorTemp[it],
-                incubatorDamp[it],
-                incubatorOver[it],
-                incubatorAiring[it],
+                tempList[it],
+                dampList[it],
+                overList[it],
+                airingList[it],
                 modifier = Modifier
                     .padding(6.dp)
                     .clickable {
@@ -180,6 +182,7 @@ fun MyRowIncubatorSettting(
     ovos: Boolean,
 //    ovosShowBottom: MutableState<Boolean>
 ) {
+
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(10.dp),
@@ -305,7 +308,7 @@ data class IncubatorEditNav(
     var day: Int,
 )
 
-fun massList(temp: IncubatorState): MutableList<String> {
+fun massList(temp: IncubatorUIList): MutableList<String> {
     val mass = mutableListOf<String>()
     mass.add(temp.day1)
     mass.add(temp.day2)

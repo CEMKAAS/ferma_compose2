@@ -114,9 +114,9 @@ fun IncubatorProjectEditScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncubatorEditDayContainer(
-    project: IncubatorProjectState,
+    project: IncubatorProjectEditState,
     modifier: Modifier = Modifier,
-    onValueChange: (IncubatorProjectState) -> Unit = {},
+    onValueChange: (IncubatorProjectEditState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")

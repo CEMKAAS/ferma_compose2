@@ -266,7 +266,6 @@ interface ItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIncubatorOver(item: IncubatorOver)
 
-
     @Update
     suspend fun updateIncubatorTemp(item: IncubatorTemp)
 
