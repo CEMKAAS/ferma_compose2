@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +54,7 @@ fun IncubatorScreen(
     navigateBack: () -> Unit,
     navigateDayEdit: (IncubatorEditNav) -> Unit,
     navigateProjectEdit: (Int) -> Unit,
+    navigateOvos: (IncubatorOvosNav) -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val temp by viewModel.tempState.collectAsState()
@@ -81,7 +83,8 @@ fun IncubatorScreen(
             incubatorOver = over.list,
             incubatorAiring = airng.list,
             projectTable = project.project,
-            navigateDayEdit = navigateDayEdit
+            navigateDayEdit = navigateDayEdit,
+            navigateOvos = navigateOvos
         )
     }
 }
@@ -96,7 +99,8 @@ fun IncubatorContainer(
     incubatorOver: IncubatorUIList,
     incubatorAiring: IncubatorUIList,
     projectTable: ProjectTable,
-    navigateDayEdit: (IncubatorEditNav) -> Unit
+    navigateDayEdit: (IncubatorEditNav) -> Unit,
+    navigateOvos: (IncubatorOvosNav) -> Unit
 ) {
 
     val scrollState = rememberLazyListState()
@@ -107,8 +111,6 @@ fun IncubatorContainer(
     val dampList = massList(incubatorDamp)
     val overList = massList(incubatorOver)
     val airingList = massList(incubatorAiring)
-
-    var ovoscop = false
 
     if (projectTable.data != "") {
         LaunchedEffect(Unit) {
@@ -125,7 +127,6 @@ fun IncubatorContainer(
             diff = date2.time - date1.time
             day = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt()
             scrollState.scrollToItem(day)
-            ovoscop = setOvoskop(projectTable.type, day)
         }
     }
 
@@ -154,7 +155,8 @@ fun IncubatorContainer(
                         )
                     },
                 borderStroke = borderStroke,
-                ovoscop
+                typeBird = projectTable.type,
+                navigateOvos = { navigateOvos(IncubatorOvosNav(day= it +1, typeBirds = projectTable.type)) }
             )
         }
     }
@@ -169,9 +171,12 @@ fun MyRowIncubatorSettting(
     airing: String,
     modifier: Modifier = Modifier,
     borderStroke: BorderStroke?,
-    ovos: Boolean,
-//    ovosShowBottom: MutableState<Boolean>
+    typeBird: String,
+    navigateOvos: () -> Unit
 ) {
+
+    var ovoscop by rememberSaveable { mutableStateOf(false) }
+    ovoscop = setOvoskop(typeBird, n+1)
 
     Card(
         modifier = modifier,
@@ -225,9 +230,9 @@ fun MyRowIncubatorSettting(
                     .padding(6.dp)
             )
         }
-        if (ovos) {
+        if (ovoscop) {
             TextButton(
-                onClick = { },
+                onClick = navigateOvos,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -296,6 +301,11 @@ fun setOvoskop(typeBird: String, day: Int): Boolean {
 data class IncubatorEditNav(
     val idPT: Int,
     var day: Int,
+)
+
+data class IncubatorOvosNav(
+    val day: Int,
+    val typeBirds : String
 )
 
 fun massList(temp: IncubatorUIList): MutableList<String> {

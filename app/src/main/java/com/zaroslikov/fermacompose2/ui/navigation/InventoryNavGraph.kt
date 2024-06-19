@@ -45,6 +45,8 @@ import com.zaroslikov.fermacompose2.ui.home.AddScreen
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreenDestination
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopDestination
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreen
@@ -148,11 +150,39 @@ fun InventoryNavHost(
                 navigateDayEdit = {
                     navController.navigate(
                         "${IncubatorEditDayScreenDestination.route}/${it.idPT}/${it.day}"
-                    )},
-                navigateProjectEdit = {navController.navigate("${IncubatorProjectEditDestination.route}/${it}"
-                )}
+                    )
+                },
+                navigateProjectEdit = {
+                    navController.navigate(
+                        "${IncubatorProjectEditDestination.route}/${it}"
+                    )
+                },
+                navigateOvos = {
+                    navController.navigate(
+                        "${IncubatorOvoscopDestination.route}/${it.day}/${it.typeBirds}"
+                    )
+                }
             )
         }
+
+        composable(
+            route = IncubatorOvoscopDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(IncubatorOvoscopDestination.itemIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(IncubatorOvoscopDestination.itemIdArgTwo) {
+                    type = NavType.StringType
+                }
+            )) {
+            IncubatorOvoscopScreen(
+                navigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
 
         composable(
             route = IncubatorProjectEditDestination.routeWithArgs,
