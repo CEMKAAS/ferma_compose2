@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.data.incubator
+package com.zaroslikov.fermacompose2.data.ferma
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -8,7 +8,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 
 
 @Entity(
-    tableName = "МyINCUBATORTEMP2",
+    tableName = "МyINCUBATORAIRING",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
         parentColumns = arrayOf("id"),
@@ -16,7 +16,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class IncubatorTemp(
+data class IncubatorAiring(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val day1: String, // название
@@ -51,4 +51,4 @@ data class IncubatorTemp(
     val day30: String, // название
     @ColumnInfo(name = "idPT")
     val idPT : Int
-)
+    )

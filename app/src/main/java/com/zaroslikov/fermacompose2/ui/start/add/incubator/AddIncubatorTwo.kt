@@ -38,10 +38,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.StartDestination

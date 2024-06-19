@@ -19,12 +19,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.IncubatorList
 import kotlinx.coroutines.launch
 
 

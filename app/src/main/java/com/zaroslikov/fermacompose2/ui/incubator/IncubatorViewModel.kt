@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -17,7 +18,7 @@ class IncubatorViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[IncubatorScreenDestination.itemIdArg])
 
-    val projectIncubatorUIList: StateFlow<IncubatorProjectState> =
+    val homeUiState: StateFlow<IncubatorProjectState> =
         itemsRepository.getProject(itemId).map { IncubatorProjectState(it) }
             .stateIn(
                 scope = viewModelScope,
@@ -26,12 +27,21 @@ class IncubatorViewModel(
             )
 
 
-    val tempState: StateFlow<IncubatorListState> =
-        itemsRepository.getIncubatorTemp(itemId).map { IncubatorListState(it) }
+//    val projectIncubatorUIList: StateFlow<IncubatorProjectState> =
+//        itemsRepository.getProject(itemId).map { IncubatorProjectState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = IncubatorProjectState()
+//            )
+
+
+    val tempState: StateFlow<IncubatorListState2> =
+        itemsRepository.getIncubatorTemp2(itemId).map { IncubatorListState2(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncubatorListState()
+                initialValue = IncubatorListState2()
             )
 
     val dampState: StateFlow<IncubatorListState> =
@@ -150,10 +160,13 @@ data class IncubatorProjectState(
     val project: ProjectTable = ProjectTable(0, "", "", "","","","","","","","","","",0)
 )
 
-data class IncubatorListState(
-  val list: IncubatorUIList = IncubatorUIList(0, "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",0)
+data class IncubatorListState2(
+    val list: IncubatorTemp = IncubatorTemp(0, "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",0)
 )
 
+data class IncubatorListState(
+    val list: IncubatorUIList = IncubatorUIList(0, "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",0)
+)
 
 //data class IncubatorTempUiState(val list: IncubatorTemp = IncubatorTemp(0, "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",0))
 //

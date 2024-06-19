@@ -21,10 +21,10 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -41,11 +41,20 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateProject(item: ProjectTable) = itemDao.updateProject(item)
 
     override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
+    override fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp> = itemDao.getIncubatorTemp2(id)
+
+    override fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp> = itemDao.getIncubatorDamp2(id)
+
+    override fun getIncubatorOver2(id: Int): Flow<IncubatorOver> = itemDao.getIncubatorOver2(id)
+
+    override fun getIncubatorAiring2(id: Int): Flow<IncubatorAiring> = itemDao.getIncubatorAiring2(id)
 
     override fun getIncubatorTemp(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorTemp(id)
     override fun getIncubatorDamp(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorDamp(id)
     override fun getIncubatorOver(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorOver(id)
     override fun getIncubatorAiring(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorAiring(id)
+
+
 
 
     override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)

@@ -2,23 +2,17 @@ package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
-import com.zaroslikov.fermacompose2.ui.sale.SaleTableUiState
-import com.zaroslikov.fermacompose2.ui.sale.toSaleTableUiState
-import kotlinx.coroutines.flow.Flow
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class AddIncubatorTwoViewModel(
     savedStateHandle: SavedStateHandle,

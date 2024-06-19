@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.data.incubator
+package com.zaroslikov.fermacompose2.data.ferma
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

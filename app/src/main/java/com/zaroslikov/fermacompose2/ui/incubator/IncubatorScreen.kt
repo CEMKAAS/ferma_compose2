@@ -1,11 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import android.annotation.SuppressLint
-import android.os.Parcelable
-import android.view.View
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -23,9 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,12 +32,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.IncubatorList
-import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -69,13 +59,13 @@ fun IncubatorScreen(
     val damp by viewModel.dampState.collectAsState()
     val over by viewModel.overState.collectAsState()
     val airng by viewModel.airingState.collectAsState()
-    val project by viewModel.projectIncubatorUIList.collectAsState()
+    val project by viewModel.homeUiState.collectAsState()
 
 
     Scaffold(
         topBar = {
             TopAppBarStart(
-                title = "Инкубатор",
+                title = temp.list.day1,
                 true,
                 navigateUp = navigateBack,
                 settingUp = { navigateProjectEdit(project.project.id) }
@@ -101,7 +91,7 @@ fun IncubatorScreen(
 @Composable
 fun IncubatorContainer(
     modifier: Modifier,
-    incubatorTemp: IncubatorUIList,
+    incubatorTemp: IncubatorTemp,
     incubatorDamp: IncubatorUIList,
     incubatorOver: IncubatorUIList,
     incubatorAiring: IncubatorUIList,
@@ -113,7 +103,7 @@ fun IncubatorContainer(
 
     var day by rememberSaveable { mutableIntStateOf(0) }
 
-    val tempList = massList(incubatorTemp)
+    val tempList = massList2(incubatorTemp)
     val dampList = massList(incubatorDamp)
     val overList = massList(incubatorOver)
     val airingList = massList(incubatorAiring)
@@ -309,6 +299,48 @@ data class IncubatorEditNav(
 )
 
 fun massList(temp: IncubatorUIList): MutableList<String> {
+    val mass = mutableListOf<String>()
+    mass.add(temp.day1)
+    mass.add(temp.day2)
+    mass.add(temp.day3)
+    mass.add(temp.day4)
+    mass.add(temp.day5)
+    mass.add(temp.day6)
+    mass.add(temp.day7)
+    mass.add(temp.day8)
+    mass.add(temp.day9)
+    mass.add(temp.day10)
+    mass.add(temp.day11)
+    mass.add(temp.day12)
+    mass.add(temp.day13)
+    mass.add(temp.day14)
+    mass.add(temp.day15)
+    mass.add(temp.day16)
+    mass.add(temp.day17)
+    if (temp.day18 == "0") return mass
+    else {
+        mass.add(temp.day18)
+        mass.add(temp.day19)
+        mass.add(temp.day20)
+        mass.add(temp.day21)
+        return if (temp.day22 == "0") mass else {
+            mass.add(temp.day22)
+            mass.add(temp.day23)
+            mass.add(temp.day24)
+            mass.add(temp.day25)
+            mass.add(temp.day26)
+            mass.add(temp.day27)
+            mass.add(temp.day28)
+            if (temp.day29 == "0") mass else {
+                mass.add(temp.day29)
+                mass.add(temp.day30)
+                mass
+            }
+        }
+    }
+}
+
+fun massList2(temp: IncubatorTemp): MutableList<String> {
     val mass = mutableListOf<String>()
     mass.add(temp.day1)
     mass.add(temp.day2)

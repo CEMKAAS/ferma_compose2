@@ -16,19 +16,15 @@
 
 package com.zaroslikov.fermacompose2.data
 
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -56,6 +52,17 @@ interface ItemsRepository {
     fun getProject(id: Int): Flow<ProjectTable>
     suspend fun updateProject(item: ProjectTable)
     fun getLastProject(): Flow<Int>
+
+
+    fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp>
+
+    fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp>
+
+    fun getIncubatorOver2(id: Int): Flow<IncubatorOver>
+
+    fun getIncubatorAiring2(id: Int): Flow<IncubatorAiring>
+
+
     fun getIncubatorTemp(id: Int): Flow<IncubatorUIList>
 
     fun getIncubatorDamp(id: Int): Flow<IncubatorUIList>

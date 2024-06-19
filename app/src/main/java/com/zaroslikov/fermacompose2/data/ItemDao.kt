@@ -27,10 +27,10 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -55,6 +55,18 @@ interface ItemDao {
 
     @Query("SELECT id from Project ORDER BY id DESC Limit 1")
     fun getLastProject(): Flow<Int>
+
+    @Query("SELECT * from МyINCUBATORTEMP2 Where idPT=:id")
+    fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp>
+
+    @Query("SELECT * from МyINCUBATORTEMPDAMP Where idPT=:id")
+    fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp>
+
+    @Query("SELECT * from МyINCUBATOROVER Where idPT=:id")
+    fun getIncubatorOver2(id: Int): Flow<IncubatorOver>
+
+    @Query("SELECT * from МyINCUBATORAIRING Where idPT=:id")
+    fun getIncubatorAiring2(id: Int): Flow<IncubatorAiring>
 
 
     @Query("SELECT * from МyINCUBATORTEMP2 Where idPT=:id")

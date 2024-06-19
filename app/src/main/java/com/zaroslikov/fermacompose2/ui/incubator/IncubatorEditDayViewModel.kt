@@ -1,18 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorOver
-import com.zaroslikov.fermacompose2.data.incubator.IncubatorTemp
-import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryDestination
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
+import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -105,18 +103,18 @@ class IncubatorEditDayViewModel(
 
 }
 
-fun  IncubatorState.toIncubatorTemp():IncubatorTemp = IncubatorTemp(
+fun  IncubatorState.toIncubatorTemp(): IncubatorTemp = IncubatorTemp(
     id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
 )
 
-fun  IncubatorState.toIncubatorDamp():IncubatorDamp = IncubatorDamp(
+fun  IncubatorState.toIncubatorDamp(): IncubatorDamp = IncubatorDamp(
     id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
 )
 
-fun  IncubatorState.toIncubatorOver():IncubatorOver = IncubatorOver(
+fun  IncubatorState.toIncubatorOver(): IncubatorOver = IncubatorOver(
     id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
 )
 
-fun  IncubatorState.toIncubatorAiring():IncubatorAiring = IncubatorAiring(
+fun  IncubatorState.toIncubatorAiring(): IncubatorAiring = IncubatorAiring(
     id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
 )
