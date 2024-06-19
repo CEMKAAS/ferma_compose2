@@ -2,28 +2,43 @@ package com.zaroslikov.fermacompose2.ui.incubator
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -62,7 +77,6 @@ fun IncubatorScreen(
     val over by viewModel.overState.collectAsState()
     val airng by viewModel.airingState.collectAsState()
     val project by viewModel.homeUiState.collectAsState()
-
 
     Scaffold(
         topBar = {
@@ -104,6 +118,13 @@ fun IncubatorContainer(
 ) {
 
     val scrollState = rememberLazyListState()
+
+    val openEndDialog = remember { mutableStateOf(false) }
+
+    if (openEndDialog.value) {
+        EndIncubator(openEndDialog)
+    }
+
 
     var day by rememberSaveable { mutableIntStateOf(0) }
 
@@ -156,11 +177,22 @@ fun IncubatorContainer(
                     },
                 borderStroke = borderStroke,
                 typeBird = projectTable.type,
-                navigateOvos = { navigateOvos(IncubatorOvosNav(day= it +1, typeBirds = projectTable.type)) }
+                navigateOvos = {
+                    navigateOvos(
+                        IncubatorOvosNav(
+                            day = it + 1,
+                            typeBirds = projectTable.type
+                        )
+                    )
+                }
             )
         }
     }
+    Button(onClick = { openEndDialog.value = true }) {
+        Text(text = "Завершить")
+    }
 }
+
 
 @Composable
 fun MyRowIncubatorSettting(
@@ -176,7 +208,7 @@ fun MyRowIncubatorSettting(
 ) {
 
     var ovoscop by rememberSaveable { mutableStateOf(false) }
-    ovoscop = setOvoskop(typeBird, n+1)
+    ovoscop = setOvoskop(typeBird, n + 1)
 
     Card(
         modifier = modifier,
@@ -245,6 +277,170 @@ fun MyRowIncubatorSettting(
     }
 }
 
+fun endInc(typeBird: String, day: Int): Boolean {
+    return if ((typeBird == "Курицы") && day < 21) {
+        false
+    } else if ((typeBird == "Индюки") && day < 28) {
+        false
+    } else if ((typeBird == "Гуси") && day < 30) {
+        false
+    } else if ((typeBird == "Утки") && day < 28) {
+        false
+    } else if ((typeBird == "Перепела") && day < 17) {
+        false
+    } else {
+        true//todo
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EndIncubator(
+    openEndDialog: MutableState<Boolean>,
+    endAdvance: Boolean,
+    projectBoolean: Boolean,
+    projectList: List<ProjectTable>,
+    projectTable: ProjectTable
+) {
+
+    AlertDialog(
+        onDismissRequest = { openEndDialog.value = false },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(20.dp))
+    ) {
+        Column(
+            modifier = Modifier
+                .background(color = Color.LightGray)
+                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "Поздравлем с появлением птенцов!",
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                fontSize = 19.sp
+            )
+
+            if (endAdvance) {
+                Text(
+                    "Мы сохранили Ваши данные в архив, чтобы вы не забыли параметры! Также Вы можете добавить птенцов в существующий проект или создать новый для дальнейшей работы"
+                            + "Вы заложили ${projectTable.eggAll} яиц Сколько птенцов у Вас вылупилось?",
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                )
+                Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+                OutlinedTextField(
+                    value = projectTable.eggAll,
+                    onValueChange = {
+                        //TODO Хз что лучше
+                    },
+                    label = { Text("Кол-во птенцов") }
+                )
+
+                if (projectBoolean) {
+                    val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
+// Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
+                    Column(Modifier.selectableGroup()) {
+                        projectList.forEach { text ->
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(56.dp)
+                                    .selectable(
+                                        selected = (text == selectedOption),
+                                        onClick = { onOptionSelected(text) },
+//                                        role = Role.RadioButton
+                                    )
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = (text == selectedOption),
+                                    onClick = null // null recommended for accessibility with screenreaders
+                                )
+                                Text(text.toString())
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+
+                    TextButton(
+                        onClick = { openEndDialog.value = false },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Завершить")
+                    }
+
+                    if (projectBoolean) {
+                        TextButton(
+                            onClick = { openEndDialog.value = false },
+                            modifier = Modifier.padding(8.dp),
+                        ) {
+                            Text("В проект")
+                        }
+                    }
+
+                    TextButton(
+                        onClick = {
+                            openEndDialog.value = false
+                            val calendar = Calendar.getInstance()
+                            val timeIn =
+                                calendar[Calendar.DAY_OF_MONTH].toString() + "." + (calendar[Calendar.MONTH] + 1) + "." + calendar[Calendar.YEAR]
+                        },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Новый проект")
+                    }
+                }
+            } else {
+                Text(
+                    "Вы уверены, что хотите завершить ${projectTable.titleProject}? Еще слишком рано завершать, удалим или добавим в архив?",
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                )
+                Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+
+                    TextButton(
+                        onClick = { openEndDialog.value = false },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Отмена")
+                    }
+
+                    TextButton(
+                        onClick = {
+                            openEndDialog.value = false
+                            val calendar = Calendar.getInstance()
+                            val timeIn =
+                                calendar[Calendar.DAY_OF_MONTH].toString() + "." + (calendar[Calendar.MONTH] + 1) + "." + calendar[Calendar.YEAR]
+                        },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("В архив")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 fun setOvoskop(typeBird: String, day: Int): Boolean {
     //todo доделать овоскоп
     when (typeBird) {
@@ -305,7 +501,7 @@ data class IncubatorEditNav(
 
 data class IncubatorOvosNav(
     val day: Int,
-    val typeBirds : String
+    val typeBirds: String
 )
 
 fun massList(temp: IncubatorUIList): MutableList<String> {
