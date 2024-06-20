@@ -15,8 +15,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -54,7 +61,7 @@ fun IncubatorEditDayScreen(
     Scaffold(
         topBar = {
             TopAppBarEdit(
-                title = "Инкубатор",
+                title = "День ${day}",
                 navigateUp = navigateBack,
             )
         }) { innerPadding ->
@@ -74,7 +81,7 @@ fun IncubatorEditDayScreen(
                     onNavigateUp()
                 }
             },
-            onValueTempChange = viewModel ::updateTempUiState,
+            onValueTempChange = viewModel::updateTempUiState,
             onValueDampChange = viewModel::updateDampUiState,
             onValueOverChange = viewModel::updateOverUiState,
             onValueAiringChange = viewModel::updateAiringUiState
@@ -98,21 +105,19 @@ fun IncubatorEditDayContainer(
     onValueAiringChange: (IncubatorState) -> Unit = {},
 ) {
 
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = modifier.padding(5.dp, 5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "День ${day}",
-            fontSize = 25.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth()
-        )
-
         OutlinedTextField(
             value = temp[day],
             onValueChange = {
                 temp[day] = it
-                onValueTempChange(IncubatorEditDayList(massTemp = temp).toEditIncubatorState().copy())
+                onValueTempChange(
+                    IncubatorEditDayList(massTemp = temp).toEditIncubatorState()
+                )
             },
             label = { Text("Температура") },
             modifier = Modifier.fillMaxWidth(),
@@ -120,14 +125,27 @@ fun IncubatorEditDayContainer(
                 Text("Укажите температуру")
             },
             suffix = { Text(text = "°C") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            //            isError = () TODO
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Number,
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                }
+                //            isError = () TODO
+            )
         )
         OutlinedTextField(
             value = damp[day],
             onValueChange = {
                 damp[day] = it
-                onValueDampChange(IncubatorEditDayList(massTemp = damp).toEditIncubatorState().copy())
+                onValueDampChange(
+                    IncubatorEditDayList(massTemp = damp).toEditIncubatorState()
+                )
             },
             label = { Text("Влажность") },
             modifier = Modifier.fillMaxWidth(),
@@ -135,43 +153,84 @@ fun IncubatorEditDayContainer(
                 Text("Укажите влажность")
             },
             suffix = { Text(text = "%") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Number,
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                },
 //            isError = () TODO
+            )
         )
         OutlinedTextField(
             value = over[day],
             onValueChange = {
                 over[day] = it
-                onValueOverChange(IncubatorEditDayList(massTemp = over).toEditIncubatorState().copy())
+                onValueOverChange(
+                    IncubatorEditDayList(massTemp = over).toEditIncubatorState()
+                )
             },
             label = { Text("Переворот") },
             modifier = Modifier.fillMaxWidth(),
             supportingText = {
                 Text("Укажите кол-во переворачиваний")
             },
-            suffix = { },
-//            isError = () TODO
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                }
+            )
         )
         OutlinedTextField(
             value = airing[day],
             onValueChange = {
                 airing[day] = it
-                onValueAiringChange(IncubatorEditDayList(massTemp = airing).toEditIncubatorState().copy())
+                onValueAiringChange(
+                    IncubatorEditDayList(massTemp = airing).toEditIncubatorState()
+                )
             },
             label = { Text("Проветривание") },
             modifier = Modifier.fillMaxWidth(),
             supportingText = {
                 Text("Укажите кол-во проветриваний")
             },
-//            isError = () TODO
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                }
+            )
         )
 
         Button(
             onClick = { saveDay() },
-            modifier = Modifier.padding(vertical = 10.dp)
-        ) {
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+            ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_create_24),
+                contentDescription = " Обновить "
+            )
             Text(text = "Обновить")
-            //TODO Изображение
         }
     }
 }
@@ -252,5 +311,5 @@ fun IncubatorEditDayList.toEditIncubatorState(): IncubatorState = IncubatorState
     day28 = massTemp[28],
     day29 = massTemp[29],
     day30 = massTemp[30],
-    idPT =  massTemp[31].toInt(),
+    idPT = massTemp[31].toInt(),
 )

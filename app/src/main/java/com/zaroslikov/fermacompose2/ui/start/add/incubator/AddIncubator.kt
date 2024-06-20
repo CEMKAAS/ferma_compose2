@@ -50,8 +50,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.TopAppBarStart
+import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import kotlinx.parcelize.Parcelize
@@ -70,24 +73,30 @@ object AddIncubatorDestination : NavigationDestination {
 fun AddIncubator(
     navigateBack: () -> Unit,
     navigateContinue: (AddIncubatorList) -> Unit,
+    viewModel: AddIncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     Scaffold(
         topBar = {
-            TopAppBarStart(title = "Мое Хозяйство", true, navigateUp = navigateBack)
+            TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
         },
     ) { innerPadding ->
         AddIncubatorContainer(
             modifier = Modifier
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
-            navigateContinue = navigateContinue
+            navigateContinue = navigateContinue,
+            number = viewModel.countIncubator
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (AddIncubatorList) -> Unit) {
+fun AddIncubatorContainer(
+    modifier: Modifier,
+    navigateContinue: (AddIncubatorList) -> Unit,
+    number: Int
+) {
 
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
@@ -96,9 +105,9 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (AddIncubatorLis
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
 
-    var title by rememberSaveable { mutableStateOf("") }
+    var title by rememberSaveable { mutableStateOf("Инкубатор") }
     var typeBirds by rememberSaveable { mutableStateOf(typeBirdsList[0]) }
-    var count by rememberSaveable { mutableStateOf("") }
+    var count by rememberSaveable { mutableStateOf("0") }
     var date1 by remember { mutableStateOf(formattedDate) }
     val time1 = rememberSaveable { mutableStateOf("08:00") }
     val time2 = rememberSaveable { mutableStateOf("12:00") }
@@ -158,10 +167,10 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (AddIncubatorLis
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 
         OutlinedTextField(
-            value = title,
+            value = "$title №${number+1}",
             onValueChange = {
                 title = it
-                validateTitle(title)
+                validateTitle(it)
             },
             label = { Text("Инкубатор") },
             modifier = Modifier.fillMaxWidth(),
@@ -240,7 +249,7 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (AddIncubatorLis
             value = count,
             onValueChange = {
                 count = it
-                validateCount(count)
+                validateCount(it)
             },
             label = { Text("Количество") },
             modifier = Modifier.fillMaxWidth(),
@@ -418,7 +427,10 @@ fun AddIncubatorContainer(modifier: Modifier, navigateContinue: (AddIncubatorLis
                         )
                     )
                 }
-            }) {
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
+            ) {
                 Text(text = "Далее")
             }
         }
@@ -442,13 +454,16 @@ data class AddIncubatorList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePicker(time: MutableState<String>, showDialog: MutableState<Boolean>) {
+    val timsa = time.value.split(":").toTypedArray()
     val timeState = rememberTimePickerState(
-        initialHour = 0,
-        initialMinute = 0
+        initialHour = timsa[0].toInt(),
+        initialMinute = timsa[1].toInt()
     )
     AlertDialog(
         onDismissRequest = { showDialog.value = false },
-        modifier = Modifier.fillMaxWidth().clip(shape = RoundedCornerShape(20.dp))
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(20.dp))
     ) {
         Column(
             modifier = Modifier

@@ -1,11 +1,19 @@
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -14,6 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,7 +56,7 @@ fun IncubatorOvoscopScreen(
     Scaffold(
         topBar = {
             TopAppBarEdit(
-                title = "Инкубатор",
+                title = "Овоскопирование",
                 navigateUp = navigateBack,
             )
         }) { innerPadding ->
@@ -55,8 +66,9 @@ fun IncubatorOvoscopScreen(
             typeBird = viewModel.typeBirds,
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(8.dp),
-            onNavigateUp =  onNavigateUp
+                .padding(8.dp)
+                .verticalScroll(rememberScrollState()),
+            onNavigateUp = onNavigateUp
         )
     }
 
@@ -65,85 +77,103 @@ fun IncubatorOvoscopScreen(
 @Composable
 fun IncubatorEditDayContainer(
     day: Int,
-    typeBird :String,
+    typeBird: String,
     modifier: Modifier = Modifier,
     onNavigateUp: () -> Unit
 ) {
 
-    val image = setOvoskopImage(day,typeBird)
+    val image = setOvoskopImage(day, typeBird)
 
     Column(
-        modifier = modifier.padding(5.dp, 5.dp),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "День ${day}",
-            fontSize = 25.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth()
+            text = "День $day",
+            fontSize = 25.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
         )
 
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxSize()
-        )
+        Box(
+            modifier = Modifier
+                .height(400.dp)
+                .clip(shape = RoundedCornerShape(20.dp))
+                .background(color = Color.White)
+
+
+        ) {
+            Image(
+                painter = painterResource(id = image),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
         Text(
-            text = "тут кaкой-то текст",
-            fontSize = 25.sp, textAlign = TextAlign.Start, modifier = Modifier.fillMaxWidth()
+            text = " На $day день яйцо должно выглядеть так, если нет, его нужно убрать из инкубатора",
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
         )
 
         Button(
-            onClick = onNavigateUp ,
-            modifier = Modifier.padding(vertical = 10.dp)
+            onClick = onNavigateUp,
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .fillMaxWidth()
         ) {
-            Text(text = "Обновить")
-            //TODO Изображение
+            Text(text = "Понятно")
         }
     }
 }
 
-fun setOvoskopImage( day: Int, typeBird: String,): Int{
-    //todo доделать овоскоп
+fun setOvoskopImage(day: Int, typeBird: String): Int {
     when (typeBird) {
         "Курицы" -> {
             return when (day) {
-                7 -> R.drawable.chicken
-                11 -> R.drawable.chicken
-                16 -> R.drawable.chicken
+                7 -> R.drawable.chiken1
+                11 -> R.drawable.chiken2
+                16 -> R.drawable.chiken3
                 else -> {
-                    R.drawable.chicken
+                    R.drawable.chiken1
                 }
             }
         }
 
         "Индюки", "Утки" -> {
             return when (day) {
-                8 -> R.drawable.chicken
-                14 -> R.drawable.chicken
-                25 -> R.drawable.chicken
+                8 -> R.drawable.turkeys1
+                14 -> R.drawable.turkeys2
+                25 -> R.drawable.turkeys3
                 else -> {
-                    R.drawable.chicken
+                    R.drawable.turkeys1
                 }
             }
         }
 
         "Гуси" -> {
             return when (day) {
-                9 -> R.drawable.chicken
-                15 -> R.drawable.chicken
-                21 -> R.drawable.chicken
+                9 -> R.drawable.goose1
+                15 -> R.drawable.goose2
+                21 -> R.drawable.goose3
                 else -> {
-                    R.drawable.chicken
+                    R.drawable.goose1
                 }
             }
         }
 
         "Перепела" -> {
             return when (day) {
-                6 -> R.drawable.chicken
-                13 -> R.drawable.chicken
+                6 -> R.drawable.quail2
+                13 -> R.drawable.quail2
                 else -> {
-                    R.drawable.chicken
+                    R.drawable.quail1
                 }
             }
         }

@@ -79,15 +79,18 @@ fun IncubatorScreen(
     val damp by viewModel.dampState.collectAsState()
     val over by viewModel.overState.collectAsState()
     val airng by viewModel.airingState.collectAsState()
+    val projectState by viewModel.homeUiState.collectAsState()
     val project = viewModel.itemUiState
     val projectList by viewModel.projectListAct.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
+    // В приниципе все только доделать переход
+
     Scaffold(
         topBar = {
             TopAppBarStart(
-                title = project.titleProject,
+                title = projectState.project.titleProject,
                 true,
                 navigateUp = navigateBack,
                 settingUp = { navigateProjectEdit(project.id) }
@@ -200,7 +203,7 @@ fun IncubatorContainer(
             diff = date2.time - date1.time
             day = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt()
             scrollState.scrollToItem(day)
-            endBoolean = endInc(projectTable.type, day)
+            endBoolean = endInc(projectTable.type, day, openEndDialog)
         }
     }
 
@@ -241,7 +244,10 @@ fun IncubatorContainer(
             )
         }
         item {
-            Button(onClick = { openEndDialog.value = true }) {
+            Button(onClick = { openEndDialog.value = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)) {
                 Text(text = "Завершить")
             }
         }
@@ -333,7 +339,7 @@ fun MyRowIncubatorSettting(
     }
 }
 
-fun endInc(typeBird: String, day: Int): Boolean {
+fun endInc(typeBird: String, day: Int, openEndDialog: MutableState<Boolean>): Boolean {
     return if ((typeBird == "Курицы") && day < 21) {
         false
     } else if ((typeBird == "Индюки") && day < 28) {
@@ -345,7 +351,8 @@ fun endInc(typeBird: String, day: Int): Boolean {
     } else if ((typeBird == "Перепела") && day < 17) {
         false
     } else {
-        true//todo
+        openEndDialog.value = true
+        true
     }
 }
 
@@ -475,6 +482,11 @@ fun EndIncubator(
 
             } else {
                 Text(
+                    "Завершить ${projectTable.titleProject}?",
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                    fontSize = 19.sp
+                )
+                Text(
                     "Вы уверены, что хотите завершить ${projectTable.titleProject}? Еще слишком рано завершать, удалим или добавим в архив?",
                     modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
                 )
@@ -515,7 +527,6 @@ fun EndIncubator(
 
 
 fun setOvoskop(typeBird: String, day: Int): Boolean {
-    //todo доделать овоскоп
     when (typeBird) {
         "Курицы" -> {
             return when (day) {

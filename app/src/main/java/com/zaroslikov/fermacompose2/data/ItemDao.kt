@@ -53,10 +53,16 @@ interface ItemDao {
     @Query("SELECT * from Project Where mode = 1 and ARHIVE = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>
 
+    @Query("SELECT COUNT(*) AS row_count from Project Where mode = 0")
+    fun getCountRowProject(): Flow<Int>
+
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertProject(projectTable: ProjectTable)
+
     @Update
     suspend fun updateProject(item: ProjectTable)
+
     @Delete
     suspend fun deleteProject(item: ProjectTable)
 
@@ -293,14 +299,5 @@ interface ItemDao {
 
     @Update
     suspend fun updateIncubatorOver(item: IncubatorOver)
-
-    @Delete
-    suspend fun deleteIncubatorTemp(item: IncubatorTemp)
-    @Delete
-    suspend fun deleteIncubatorDamp(item: IncubatorDamp)
-    @Delete
-    suspend fun deleteIncubatorAiring(item: IncubatorAiring)
-    @Delete
-    suspend fun deleteIncubatorOver(item: IncubatorOver)
 
 }

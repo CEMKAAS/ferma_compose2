@@ -55,6 +55,8 @@ interface ItemsRepository {
     suspend fun deleteProject(item: ProjectTable)
 
     fun getLastProject(): Flow<Int>
+
+    fun getCountRowProject(): Flow<Int>
     fun getProjectListAct(): Flow<List<ProjectTable>>
     fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp>
 
@@ -164,10 +166,7 @@ interface ItemsRepository {
     suspend fun updateIncubatorOver(item: IncubatorOver)
 
 
-    suspend fun deleteIncubatorTemp(item: IncubatorTemp)
-    suspend fun deleteIncubatorDamp(item: IncubatorDamp)
-    suspend fun deleteIncubatorAiring(item: IncubatorAiring)
-    suspend fun deleteIncubatorOver(item: IncubatorOver)
+
 
 
 }

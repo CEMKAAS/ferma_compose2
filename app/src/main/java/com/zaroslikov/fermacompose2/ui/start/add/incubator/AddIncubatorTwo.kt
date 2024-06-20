@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
@@ -65,7 +66,7 @@ fun AddIncubatorTwo(
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
-            TopAppBarStart(title = "Мое Хозяйство", true, navigateUp = navigateBack)
+            TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
         },
     ) { innerPadding ->
         AddIncubatorTwoContainer(
@@ -194,7 +195,9 @@ fun AddIncubatorTwoContainer(
                     )
                     navigateContinue(list)
                 },
-                modifier = Modifier.padding(vertical = 5.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp, horizontal = 8.dp)
             ) {
                 Text(text = "Запустить")
             }
@@ -227,13 +230,12 @@ fun MyRowIncubatorAdd(
             .height(35.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BasicTextField(
-            value = text, onValueChange = { },
-            textStyle = TextStyle(textAlign = TextAlign.Center),
+        Text(
+            text = text,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth(0.16f)
                 .padding(6.dp),
-
             )
         Divider(
             color = Color.DarkGray,

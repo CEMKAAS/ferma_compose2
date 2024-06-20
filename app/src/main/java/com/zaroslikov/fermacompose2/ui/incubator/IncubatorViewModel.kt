@@ -100,10 +100,6 @@ class IncubatorViewModel(
 
     suspend fun deleteItem() {
         itemsRepository.deleteProject(itemUiState.toProjectTable())
-        itemsRepository.deleteIncubatorTemp()
-        itemsRepository.deleteIncubatorDamp()
-        itemsRepository.deleteIncubatorOver()
-        itemsRepository.deleteIncubatorAiring()
     }
 
 

@@ -42,6 +42,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun deleteProject(item: ProjectTable) = itemDao.deleteProject(item)
 
     override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
+    override fun getCountRowProject(): Flow<Int>  = itemDao.getCountRowProject()
+
     override fun getProjectListAct(): Flow<List<ProjectTable>> = itemDao.getProjectListAct()
 
     override fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp> = itemDao.getIncubatorTemp2(id)
@@ -188,11 +190,4 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override suspend fun updateIncubatorAiring(item: IncubatorAiring) = itemDao.updateIncubatorAiring(item)
     override suspend fun updateIncubatorOver(item: IncubatorOver) = itemDao.updateIncubatorOver(item)
-    override suspend fun deleteIncubatorTemp(item: IncubatorTemp) = itemDao.deleteIncubatorTemp(item)
-
-    override suspend fun deleteIncubatorDamp(item: IncubatorDamp) = itemDao.deleteIncubatorDamp(item)
-
-    override suspend fun deleteIncubatorAiring(item: IncubatorAiring) = itemDao.deleteIncubatorAiring(item)
-
-    override suspend fun deleteIncubatorOver(item: IncubatorOver) = itemDao.deleteIncubatorOver(item)
 }

@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
+import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -62,7 +63,7 @@ fun StartScreen(
 
     Scaffold(
         topBar = {
-            TopAppBarStart(title = "Мое Хозяйство", false)
+            TopAppBarStart2(title = "Мое Хозяйство")
         }, floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate(ChoiseProjectDestination.route) },

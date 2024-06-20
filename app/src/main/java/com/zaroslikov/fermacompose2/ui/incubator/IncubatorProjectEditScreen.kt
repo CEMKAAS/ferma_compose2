@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -94,7 +96,8 @@ fun IncubatorProjectEditScreen(
             project = viewModel.projectState,
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(8.dp),
+                .padding(8.dp)
+                .verticalScroll(rememberScrollState()),
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {
                 if (it) {
@@ -112,6 +115,7 @@ fun IncubatorProjectEditScreen(
             deleteRoom = {
                 coroutineScope.launch {
                     viewModel.deleteItem()
+                    navigateStart()
                 }
             }
         )
@@ -127,25 +131,15 @@ fun IncubatorEditDayContainer(
     saveInRoomAdd: (Boolean) -> Unit,
     deleteRoom: () -> Unit,
 ) {
-    val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
-
     //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
 
-
-    var expandedTypeBirds by remember { mutableStateOf(false) }
-
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
-    val checkedStateAiring = remember { mutableStateOf(false) }
-    val checkedStateOver = remember { mutableStateOf(false) }
-
     val focusManager = LocalFocusManager.current
-
-    var selectedItemIndex by remember { mutableStateOf(0) }
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
@@ -239,54 +233,6 @@ fun IncubatorEditDayContainer(
             }
             )
         )
-
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedTypeBirds,
-                onExpandedChange = { expandedTypeBirds = !expandedTypeBirds },
-            ) {
-                OutlinedTextField(
-                    value = project.type,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTypeBirds) },
-                    label = { Text(text = "Тип птицы") },
-                    supportingText = {
-                        Text("Выберите тип птицы")
-                    },
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }),
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(bottom = 2.dp)
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedTypeBirds,
-                    onDismissRequest = { expandedTypeBirds = false }
-                ) {
-                    typeBirdsList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                onValueChange(project.copy(type = typeBirdsList[selectedItemIndex]))
-                                expandedTypeBirds = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
 
         OutlinedTextField(
             value = project.eggAll,
@@ -423,27 +369,6 @@ fun IncubatorEditDayContainer(
                 }
                 .padding(bottom = 2.dp)
         )
-
-
-        Row(
-            Modifier
-                .selectableGroup()
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = checkedStateAiring.value,
-                onCheckedChange = { checkedStateAiring.value = it }
-            )
-            Text(text = "Авто охлаждение")
-            Checkbox(
-                checked = checkedStateOver.value,
-                onCheckedChange = { checkedStateOver.value = it }
-            )
-            Text(text = "Авто переворот")
-        }
 
         Button(
             onClick = { saveInRoomAdd(errorBoolean()) },
