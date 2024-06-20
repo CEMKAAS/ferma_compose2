@@ -16,6 +16,7 @@
 
 package com.zaroslikov.fermacompose2.data
 
+import androidx.room.Delete
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -51,9 +52,10 @@ interface ItemsRepository {
     fun getAllProject(): Flow<List<ProjectTable>>
     fun getProject(id: Int): Flow<ProjectTable>
     suspend fun updateProject(item: ProjectTable)
+    suspend fun deleteProject(item: ProjectTable)
+
     fun getLastProject(): Flow<Int>
-
-
+    fun getProjectListAct(): Flow<List<ProjectTable>>
     fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp>
 
     fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp>
@@ -160,5 +162,12 @@ interface ItemsRepository {
     suspend fun updateIncubatorDamp(item: IncubatorDamp)
     suspend fun updateIncubatorAiring(item: IncubatorAiring)
     suspend fun updateIncubatorOver(item: IncubatorOver)
+
+
+    suspend fun deleteIncubatorTemp(item: IncubatorTemp)
+    suspend fun deleteIncubatorDamp(item: IncubatorDamp)
+    suspend fun deleteIncubatorAiring(item: IncubatorAiring)
+    suspend fun deleteIncubatorOver(item: IncubatorOver)
+
 
 }

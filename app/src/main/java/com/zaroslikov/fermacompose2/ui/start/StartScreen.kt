@@ -119,6 +119,7 @@ fun StartScreenContainer(
                     )
                 }
             }
+
             HorizontalPager(
                 state = pagerState,
                 verticalAlignment = Alignment.Top,
@@ -126,27 +127,55 @@ fun StartScreenContainer(
                     .fillMaxWidth()
                     .weight(1f)
             ) {
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    items(items = projectList, key = { it.id }) {
-                        if (it.mode == 0) {
-                            CardIncubator(
-                                projectTable = it, modifier = Modifier
-                                    .padding(8.dp)
-                                    .clickable {
-                                        navigateToItemIncubator(it.id)
-                                    }
-                            )
-                        } else {
-                            CardFerma(
-                                projectTable = it, modifier = Modifier
-                                    .padding(8.dp)
-                                    .clickable {
-                                        onItemClick(it.id)
-                                    }
-                            )
+
+                    if (state == 0) {
+                        items(items = projectList, key = { it.id }) {
+                            if (it.arhive == "0") {
+                                if (it.mode == 0) {
+                                    CardIncubator(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                navigateToItemIncubator(it.id)
+                                            }
+                                    )
+                                } else if (it.mode == 1) {
+                                    CardFerma(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                onItemClick(it.id)
+                                            }
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        items(items = projectList, key = { it.id }) {
+                            if (it.arhive == "1") {
+                                if (it.mode == 0) {
+                                    CardIncubator(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                navigateToItemIncubator(it.id)
+                                            }
+                                    )
+                                } else if (it.mode == 1) {
+                                    CardFerma(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                onItemClick(it.id)
+                                            }
+                                    )
+                                }
+                            }
                         }
                     }
                 }

@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,6 +52,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -70,21 +72,25 @@ fun IncubatorScreen(
     navigateDayEdit: (IncubatorEditNav) -> Unit,
     navigateProjectEdit: (Int) -> Unit,
     navigateOvos: (IncubatorOvosNav) -> Unit,
+    navigateStart: () -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val temp by viewModel.tempState.collectAsState()
     val damp by viewModel.dampState.collectAsState()
     val over by viewModel.overState.collectAsState()
     val airng by viewModel.airingState.collectAsState()
-    val project by viewModel.homeUiState.collectAsState()
+    val project = viewModel.itemUiState
+    val projectList by viewModel.projectListAct.collectAsState()
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
             TopAppBarStart(
-                title = temp.list.day1,
+                title = project.titleProject,
                 true,
                 navigateUp = navigateBack,
-                settingUp = { navigateProjectEdit(project.project.id) }
+                settingUp = { navigateProjectEdit(project.id) }
             )
         }) { innerPadding ->
 
@@ -92,13 +98,40 @@ fun IncubatorScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(8.dp),
+//                .verticalScroll(rememberScrollState()),
             incubatorTemp = temp.list,
             incubatorDamp = damp.list,
             incubatorOver = over.list,
             incubatorAiring = airng.list,
-            projectTable = project.project,
+            projectTable = project,
             navigateDayEdit = navigateDayEdit,
-            navigateOvos = navigateOvos
+            navigateOvos = navigateOvos,
+            projectList = projectList.itemList,
+            onValueChange = viewModel::updateUiState,
+            saveInArh = {
+                coroutineScope.launch {
+                    viewModel.saveItem()
+                    navigateStart()
+                }
+            },
+            deleteInc = {
+                coroutineScope.launch {
+                    viewModel.deleteItem()
+                    navigateStart()
+                }
+            },
+            saveInProject = {
+                coroutineScope.launch {
+                    viewModel.saveItem()
+                    navigateStart()
+                }
+            },
+            saveInNewProject = {
+                coroutineScope.launch {
+                    viewModel.saveItem()
+                    navigateStart()
+                }
+            },
         )
     }
 }
@@ -112,17 +145,36 @@ fun IncubatorContainer(
     incubatorDamp: IncubatorUIList,
     incubatorOver: IncubatorUIList,
     incubatorAiring: IncubatorUIList,
-    projectTable: ProjectTable,
+    projectTable: IncubatorProjectEditState,
     navigateDayEdit: (IncubatorEditNav) -> Unit,
-    navigateOvos: (IncubatorOvosNav) -> Unit
+    navigateOvos: (IncubatorOvosNav) -> Unit,
+    projectList: List<ProjectTable>,
+    onValueChange: (IncubatorProjectEditState) -> Unit = {},
+    saveInArh: () -> Unit,
+    deleteInc: () -> Unit,
+    saveInProject: () -> Unit,
+    saveInNewProject: () -> Unit
+
 ) {
 
     val scrollState = rememberLazyListState()
 
     val openEndDialog = remember { mutableStateOf(false) }
+    var endBoolean by remember { mutableStateOf(false) }
 
     if (openEndDialog.value) {
-        EndIncubator(openEndDialog)
+        EndIncubator(
+            openEndDialog = openEndDialog,
+            endAdvance = endBoolean,
+            projectBoolean = projectList.isNotEmpty(),
+            projectList = projectList,
+            projectTable = projectTable,
+            onValueChange = onValueChange,
+            saveInArh = saveInArh,
+            deleteInc = deleteInc,
+            saveInProject = saveInProject,
+            saveInNewProject = saveInNewProject
+        )
     }
 
 
@@ -148,6 +200,7 @@ fun IncubatorContainer(
             diff = date2.time - date1.time
             day = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt()
             scrollState.scrollToItem(day)
+            endBoolean = endInc(projectTable.type, day)
         }
     }
 
@@ -187,10 +240,13 @@ fun IncubatorContainer(
                 }
             )
         }
+        item {
+            Button(onClick = { openEndDialog.value = true }) {
+                Text(text = "Завершить")
+            }
+        }
     }
-    Button(onClick = { openEndDialog.value = true }) {
-        Text(text = "Завершить")
-    }
+
 }
 
 
@@ -204,7 +260,7 @@ fun MyRowIncubatorSettting(
     modifier: Modifier = Modifier,
     borderStroke: BorderStroke?,
     typeBird: String,
-    navigateOvos: () -> Unit
+    navigateOvos: () -> Unit,
 ) {
 
     var ovoscop by rememberSaveable { mutableStateOf(false) }
@@ -301,8 +357,16 @@ fun EndIncubator(
     endAdvance: Boolean,
     projectBoolean: Boolean,
     projectList: List<ProjectTable>,
-    projectTable: ProjectTable
+    projectTable: IncubatorProjectEditState,
+    onValueChange: (IncubatorProjectEditState) -> Unit = {},
+    saveInArh: () -> Unit,
+    deleteInc: () -> Unit,
+    saveInProject: () -> Unit,
+    saveInNewProject: () -> Unit
 ) {
+    val calendar = Calendar.getInstance()
+    val dateEnd =
+        calendar[Calendar.DAY_OF_MONTH].toString() + "." + (calendar[Calendar.MONTH] + 1) + "." + calendar[Calendar.YEAR]
 
     AlertDialog(
         onDismissRequest = { openEndDialog.value = false },
@@ -310,6 +374,7 @@ fun EndIncubator(
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(20.dp))
     ) {
+
         Column(
             modifier = Modifier
                 .background(color = Color.LightGray)
@@ -317,13 +382,13 @@ fun EndIncubator(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                "Поздравлем с появлением птенцов!",
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-                fontSize = 19.sp
-            )
 
             if (endAdvance) {
+                Text(
+                    "Поздравлем с появлением птенцов!",
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                    fontSize = 19.sp
+                )
                 Text(
                     "Мы сохранили Ваши данные в архив, чтобы вы не забыли параметры! Также Вы можете добавить птенцов в существующий проект или создать новый для дальнейшей работы"
                             + "Вы заложили ${projectTable.eggAll} яиц Сколько птенцов у Вас вылупилось?",
@@ -334,14 +399,14 @@ fun EndIncubator(
                 OutlinedTextField(
                     value = projectTable.eggAll,
                     onValueChange = {
-                        //TODO Хз что лучше
+                        onValueChange(projectTable.copy(eggAllEND = it))
                     },
                     label = { Text("Кол-во птенцов") }
                 )
 
                 if (projectBoolean) {
                     val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
-// Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
+
                     Column(Modifier.selectableGroup()) {
                         projectList.forEach { text ->
                             Row(
@@ -360,14 +425,11 @@ fun EndIncubator(
                                     selected = (text == selectedOption),
                                     onClick = null // null recommended for accessibility with screenreaders
                                 )
-                                Text(text.toString())
+                                Text(text.titleProject)
                             }
                         }
                     }
                 }
-
-
-
 
                 Row(
                     modifier = Modifier
@@ -376,16 +438,24 @@ fun EndIncubator(
                 ) {
 
                     TextButton(
-                        onClick = { openEndDialog.value = false },
-                        modifier = Modifier.padding(8.dp),
+                        onClick = {
+                            openEndDialog.value = false
+                            onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
+                            saveInArh()
+                        },
+                        modifier = Modifier.padding(4.dp),
                     ) {
                         Text("Завершить")
                     }
 
                     if (projectBoolean) {
                         TextButton(
-                            onClick = { openEndDialog.value = false },
-                            modifier = Modifier.padding(8.dp),
+                            onClick = {
+                                openEndDialog.value = false
+                                onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
+                                saveInProject()
+                            },
+                            modifier = Modifier.padding(4.dp),
                         ) {
                             Text("В проект")
                         }
@@ -394,15 +464,15 @@ fun EndIncubator(
                     TextButton(
                         onClick = {
                             openEndDialog.value = false
-                            val calendar = Calendar.getInstance()
-                            val timeIn =
-                                calendar[Calendar.DAY_OF_MONTH].toString() + "." + (calendar[Calendar.MONTH] + 1) + "." + calendar[Calendar.YEAR]
+                            onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
+                            saveInNewProject()
                         },
-                        modifier = Modifier.padding(8.dp),
+                        modifier = Modifier.padding(4.dp),
                     ) {
                         Text("Новый проект")
                     }
                 }
+
             } else {
                 Text(
                     "Вы уверены, что хотите завершить ${projectTable.titleProject}? Еще слишком рано завершать, удалим или добавим в архив?",
@@ -417,18 +487,21 @@ fun EndIncubator(
                 ) {
 
                     TextButton(
-                        onClick = { openEndDialog.value = false },
+                        onClick = {
+                            openEndDialog.value = false
+                            deleteInc()
+                        },
                         modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text("Отмена")
+
+                        ) {
+                        Text("Удалить")
                     }
 
                     TextButton(
                         onClick = {
                             openEndDialog.value = false
-                            val calendar = Calendar.getInstance()
-                            val timeIn =
-                                calendar[Calendar.DAY_OF_MONTH].toString() + "." + (calendar[Calendar.MONTH] + 1) + "." + calendar[Calendar.YEAR]
+                            onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
+                            saveInArh()
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {

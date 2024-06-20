@@ -1,15 +1,24 @@
 package com.zaroslikov.fermacompose2.ui.incubator
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesTableUiState
+import com.zaroslikov.fermacompose2.ui.expenses.toExpensesTableUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class IncubatorViewModel(
     savedStateHandle: SavedStateHandle,
@@ -18,7 +27,7 @@ class IncubatorViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[IncubatorScreenDestination.itemIdArg])
 
-    val homeUiState: StateFlow<IncubatorProjectState> =
+    var homeUiState: StateFlow<IncubatorProjectState> =
         itemsRepository.getProject(itemId).map { IncubatorProjectState(it) }
             .stateIn(
                 scope = viewModelScope,
@@ -26,15 +35,13 @@ class IncubatorViewModel(
                 initialValue = IncubatorProjectState()
             )
 
-
-//    val projectIncubatorUIList: StateFlow<IncubatorProjectState> =
-//        itemsRepository.getProject(itemId).map { IncubatorProjectState(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = IncubatorProjectState()
-//            )
-
+    val projectListAct: StateFlow<IncubatorProjectListUiState> =
+        itemsRepository.getProjectListAct().map { IncubatorProjectListUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = IncubatorProjectListUiState()
+            )
 
     val tempState: StateFlow<IncubatorListState2> =
         itemsRepository.getIncubatorTemp2(itemId).map { IncubatorListState2(it) }
@@ -52,7 +59,6 @@ class IncubatorViewModel(
                 initialValue = IncubatorListState()
             )
 
-    //
     val overState: StateFlow<IncubatorListState> =
         itemsRepository.getIncubatorOver(itemId).map { IncubatorListState(it) }
             .stateIn(
@@ -68,6 +74,39 @@ class IncubatorViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = IncubatorListState()
             )
+
+
+
+    var itemUiState by mutableStateOf(IncubatorProjectEditState())
+        private set
+
+    init {
+        viewModelScope.launch {
+            itemUiState = itemsRepository.getProject(itemId)
+                .filterNotNull()
+                .first()
+                .toIncubatorProjectState()
+        }
+    }
+
+    fun updateUiState(itemDetails: IncubatorProjectEditState) {
+        itemUiState =
+            itemDetails
+    }
+
+    suspend fun saveItem() {
+        itemsRepository.updateProject(itemUiState.toProjectTable())
+    }
+
+    suspend fun deleteItem() {
+        itemsRepository.deleteProject(itemUiState.toProjectTable())
+        itemsRepository.deleteIncubatorTemp()
+        itemsRepository.deleteIncubatorDamp()
+        itemsRepository.deleteIncubatorOver()
+        itemsRepository.deleteIncubatorAiring()
+    }
+
+
 
 //    var projectState by mutableStateOf(IncubatorProjectState())
 //        private set
@@ -155,6 +194,9 @@ class IncubatorViewModel(
 
 
 }
+
+
+data class IncubatorProjectListUiState(val itemList: List<ProjectTable> = listOf())
 
 data class IncubatorProjectState(
     val project: ProjectTable = ProjectTable(0, "", "", "","","","","","","","","","",0)

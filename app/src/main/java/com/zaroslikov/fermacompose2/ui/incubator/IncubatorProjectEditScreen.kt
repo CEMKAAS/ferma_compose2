@@ -23,6 +23,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -74,6 +75,7 @@ object IncubatorProjectEditDestination : NavigationDestination {
 fun IncubatorProjectEditScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
+    navigateStart: () -> Unit,
     viewModel: IncubatorProjectEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
@@ -106,6 +108,11 @@ fun IncubatorProjectEditScreen(
                         onNavigateUp()
                     }
                 }
+            },
+            deleteRoom = {
+                coroutineScope.launch {
+                    viewModel.deleteItem()
+                }
             }
         )
     }
@@ -118,6 +125,7 @@ fun IncubatorEditDayContainer(
     modifier: Modifier = Modifier,
     onValueChange: (IncubatorProjectEditState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
+    deleteRoom: () -> Unit,
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
@@ -437,19 +445,32 @@ fun IncubatorEditDayContainer(
             Text(text = "Авто переворот")
         }
 
-        Row(
+        Button(
+            onClick = { saveInRoomAdd(errorBoolean()) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+                .padding(vertical = 10.dp)
         ) {
-
-            Button(onClick = {
-                saveInRoomAdd(errorBoolean())
-            }) {
-                Text(text = "Далее")
-            }
+            Icon(
+                painter = painterResource(R.drawable.baseline_create_24),
+                contentDescription = " Обновить "
+            )
+            Text(text = " Обновить ")
         }
+
+        OutlinedButton(
+            onClick = deleteRoom,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_delete_24),
+                contentDescription = "Удалить"
+            )
+            Text(text = " Удалить ")
+        }
+
+
     }
 }
 

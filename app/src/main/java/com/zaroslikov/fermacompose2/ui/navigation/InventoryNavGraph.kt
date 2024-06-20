@@ -161,6 +161,9 @@ fun InventoryNavHost(
                     navController.navigate(
                         "${IncubatorOvoscopDestination.route}/${it.day}/${it.typeBirds}"
                     )
+                },
+                navigateStart = {
+                    navController.navigate(StartDestination.route)
                 }
             )
         }
@@ -193,10 +196,10 @@ fun InventoryNavHost(
             )) {
             IncubatorProjectEditScreen(
                 navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
-
+                onNavigateUp = { navController.navigateUp() },
+                navigateStart = { navController.navigate(StartDestination.route) }
+            )
         }
-
 
         composable(
             route = IncubatorEditDayScreenDestination.routeWithArgs,

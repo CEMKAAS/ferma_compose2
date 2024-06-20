@@ -50,8 +50,15 @@ interface ItemDao {
     @Query("SELECT * from Project Where id=:id")
     fun getProject(id: Int): Flow<ProjectTable>
 
+    @Query("SELECT * from Project Where mode = 1 and ARHIVE = 0")
+    fun getProjectListAct(): Flow<List<ProjectTable>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertProject(projectTable: ProjectTable)
     @Update
     suspend fun updateProject(item: ProjectTable)
+    @Delete
+    suspend fun deleteProject(item: ProjectTable)
 
     @Query("SELECT id from Project ORDER BY id DESC Limit 1")
     fun getLastProject(): Flow<Int>
@@ -106,9 +113,6 @@ interface ItemDao {
     // existing Item into the database Room ignores the conflict.
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: AddTable)
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertProject(projectTable: ProjectTable)
 
     @Update
     suspend fun update(item: AddTable)
@@ -289,5 +293,14 @@ interface ItemDao {
 
     @Update
     suspend fun updateIncubatorOver(item: IncubatorOver)
+
+    @Delete
+    suspend fun deleteIncubatorTemp(item: IncubatorTemp)
+    @Delete
+    suspend fun deleteIncubatorDamp(item: IncubatorDamp)
+    @Delete
+    suspend fun deleteIncubatorAiring(item: IncubatorAiring)
+    @Delete
+    suspend fun deleteIncubatorOver(item: IncubatorOver)
 
 }

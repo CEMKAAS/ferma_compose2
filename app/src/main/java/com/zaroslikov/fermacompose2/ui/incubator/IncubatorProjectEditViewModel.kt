@@ -39,6 +39,13 @@ class IncubatorProjectEditViewModel(
     suspend fun saveItem() {
         itemsRepository.updateProject(projectState.toProjectTable())
     }
+
+    suspend fun deleteItem() {
+        itemsRepository.deleteProject(projectState.toProjectTable())
+    }
+
+
+
 }
 
 fun IncubatorProjectEditState.toProjectTable(): ProjectTable = ProjectTable(

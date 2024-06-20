@@ -39,8 +39,11 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
     override fun getProject(id: Int): Flow<ProjectTable> = itemDao.getProject(id)
     override suspend fun updateProject(item: ProjectTable) = itemDao.updateProject(item)
+    override suspend fun deleteProject(item: ProjectTable) = itemDao.deleteProject(item)
 
     override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
+    override fun getProjectListAct(): Flow<List<ProjectTable>> = itemDao.getProjectListAct()
+
     override fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp> = itemDao.getIncubatorTemp2(id)
 
     override fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp> = itemDao.getIncubatorDamp2(id)
@@ -185,4 +188,11 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override suspend fun updateIncubatorAiring(item: IncubatorAiring) = itemDao.updateIncubatorAiring(item)
     override suspend fun updateIncubatorOver(item: IncubatorOver) = itemDao.updateIncubatorOver(item)
+    override suspend fun deleteIncubatorTemp(item: IncubatorTemp) = itemDao.deleteIncubatorTemp(item)
+
+    override suspend fun deleteIncubatorDamp(item: IncubatorDamp) = itemDao.deleteIncubatorDamp(item)
+
+    override suspend fun deleteIncubatorAiring(item: IncubatorAiring) = itemDao.deleteIncubatorAiring(item)
+
+    override suspend fun deleteIncubatorOver(item: IncubatorOver) = itemDao.deleteIncubatorOver(item)
 }
