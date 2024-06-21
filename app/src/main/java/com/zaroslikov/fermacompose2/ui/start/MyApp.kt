@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
@@ -52,13 +53,10 @@ fun DrawerSheet(
         ),
         DrawerItems(
             R.drawable.baseline_edit_note_24, "Мои Списания", WriteOffDestination.route
+        ),
+        DrawerItems(
+            R.drawable.baseline_edit_note_24, "Мои Животные", AnimalDestination.route
         )
-//        DrawerItems(
-//            R.drawable.baseline_bar_chart_24, "Мои Графики", "Chart"
-//        ),
-//        DrawerItems(
-//            R.drawable.baseline_cruelty_free_24, "Мои Животные", "Animal"
-//        )
 
     )
 

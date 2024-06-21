@@ -43,7 +43,7 @@ data class ProjectTable(
     @ColumnInfo(name = "OVERTURN")
     val over: String,
     @ColumnInfo(name = "ARHIVE")
-    var arhive: String,
+    var arhive: String,  //не архив = 0, Архив = 1
     @ColumnInfo(name = "DATAEND")
     val dateEnd: String,  // Конец проекта
 //    val picture: ByteArray, // Изображение

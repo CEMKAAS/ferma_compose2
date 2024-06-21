@@ -59,7 +59,8 @@ fun StartScreen(
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
-    val projectList by viewModel.getAllProject.collectAsState()
+    val projectListArh by viewModel.getAllProjectArh.collectAsState()
+    val projectListAct by viewModel.getAllProjectAct.collectAsState()
 
     Scaffold(
         topBar = {
@@ -75,7 +76,8 @@ fun StartScreen(
         StartScreenContainer(
             modifier = Modifier.padding(innerPadding),
             onItemClick = navigateToItemProject,
-            projectList = projectList.projectList,
+            projectListArh = projectListArh.projectList,
+            projectListAct = projectListAct.projectList,
             navigateToItemIncubator = navigateToItemIncubator
         )
     }
@@ -88,7 +90,8 @@ fun StartScreenContainer(
     modifier: Modifier,
     onItemClick: (Int) -> Unit,
     navigateToItemIncubator: (Int) -> Unit,
-    projectList: List<ProjectTable>
+    projectListArh: List<ProjectTable>,
+    projectListAct: List<ProjectTable>
 ) {
     var state by remember { mutableStateOf(0) }
     val titles = listOf("Действующие", "Архив")
@@ -129,56 +132,56 @@ fun StartScreenContainer(
                     .weight(1f)
             ) {
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp)
+            ) {
 
-                    if (state == 0) {
-                        items(items = projectList, key = { it.id }) {
-                            if (it.arhive == "0") {
-                                if (it.mode == 0) {
-                                    CardIncubator(
-                                        projectTable = it, modifier = Modifier
-                                            .padding(8.dp)
-                                            .clickable {
-                                                navigateToItemIncubator(it.id)
-                                            }
-                                    )
-                                } else if (it.mode == 1) {
-                                    CardFerma(
-                                        projectTable = it, modifier = Modifier
-                                            .padding(8.dp)
-                                            .clickable {
-                                                onItemClick(it.id)
-                                            }
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        items(items = projectList, key = { it.id }) {
-                            if (it.arhive == "1") {
-                                if (it.mode == 0) {
-                                    CardIncubator(
-                                        projectTable = it, modifier = Modifier
-                                            .padding(8.dp)
-                                            .clickable {
-                                                navigateToItemIncubator(it.id)
-                                            }
-                                    )
-                                } else if (it.mode == 1) {
-                                    CardFerma(
-                                        projectTable = it, modifier = Modifier
-                                            .padding(8.dp)
-                                            .clickable {
-                                                onItemClick(it.id)
-                                            }
-                                    )
-                                }
+                when (state) {
+                    0 -> {
+                        items(items = projectListArh, key = { it.id }) {
+                            if (it.mode == 0) {
+                                CardIncubator(
+                                    projectTable = it, modifier = Modifier
+                                        .padding(8.dp)
+                                        .clickable {
+                                            navigateToItemIncubator(it.id)
+                                        }
+                                )
+                            } else {
+                                CardFerma(
+                                    projectTable = it, modifier = Modifier
+                                        .padding(8.dp)
+                                        .clickable {
+                                            onItemClick(it.id)
+                                        }
+                                )
                             }
                         }
                     }
+
+                    1 -> {
+                        items(items = projectListAct, key = { it.id }) {
+                            if (it.mode == 0) {
+                                CardIncubator(
+                                    projectTable = it, modifier = Modifier
+                                        .padding(8.dp)
+                                        .clickable {
+                                            navigateToItemIncubator(it.id)
+                                        }
+                                )
+                            } else {
+                                CardFerma(
+                                    projectTable = it, modifier = Modifier
+                                        .padding(8.dp)
+                                        .clickable {
+                                            onItemClick(it.id)
+                                        }
+                                )
+                            }
+                        }
+                    }
+                }
                 }
             }
         }

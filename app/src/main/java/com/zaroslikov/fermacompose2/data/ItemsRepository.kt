@@ -17,6 +17,8 @@
 package com.zaroslikov.fermacompose2.data
 
 import androidx.room.Delete
+import androidx.room.Query
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -45,11 +47,11 @@ interface ItemsRepository {
     /**
      * Retrieve an item from the given data source that matches with the [id].
      */
-
-
     fun getItemStream(id: Int): Flow<AddTable?>
 
     fun getAllProject(): Flow<List<ProjectTable>>
+    fun getAllProjectArh(): Flow<List<ProjectTable>>
+    fun getAllProjectAct(): Flow<List<ProjectTable>>
     fun getProject(id: Int): Flow<ProjectTable>
     suspend fun updateProject(item: ProjectTable)
     suspend fun deleteProject(item: ProjectTable)
@@ -164,8 +166,7 @@ interface ItemsRepository {
     suspend fun updateIncubatorDamp(item: IncubatorDamp)
     suspend fun updateIncubatorAiring(item: IncubatorAiring)
     suspend fun updateIncubatorOver(item: IncubatorOver)
-
-
+    fun getAllAnimal(id:Int): Flow<List<AnimalTable>>
 
 
 

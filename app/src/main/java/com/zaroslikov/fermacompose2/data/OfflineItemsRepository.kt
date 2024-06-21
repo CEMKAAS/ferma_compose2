@@ -16,6 +16,7 @@
 
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -37,29 +38,24 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
+    override fun getAllProjectArh(): Flow<List<ProjectTable>> = itemDao.getAllProjectArh()
+    override fun getAllProjectAct(): Flow<List<ProjectTable>> = itemDao.getAllProjectAct()
     override fun getProject(id: Int): Flow<ProjectTable> = itemDao.getProject(id)
     override suspend fun updateProject(item: ProjectTable) = itemDao.updateProject(item)
     override suspend fun deleteProject(item: ProjectTable) = itemDao.deleteProject(item)
-
     override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
-    override fun getCountRowProject(): Flow<Int>  = itemDao.getCountRowProject()
-
+    override fun getCountRowProject(): Flow<Int> = itemDao.getCountRowProject()
     override fun getProjectListAct(): Flow<List<ProjectTable>> = itemDao.getProjectListAct()
-
     override fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp> = itemDao.getIncubatorTemp2(id)
-
     override fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp> = itemDao.getIncubatorDamp2(id)
-
     override fun getIncubatorOver2(id: Int): Flow<IncubatorOver> = itemDao.getIncubatorOver2(id)
-
-    override fun getIncubatorAiring2(id: Int): Flow<IncubatorAiring> = itemDao.getIncubatorAiring2(id)
+    override fun getIncubatorAiring2(id: Int): Flow<IncubatorAiring> =
+        itemDao.getIncubatorAiring2(id)
 
     override fun getIncubatorTemp(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorTemp(id)
     override fun getIncubatorDamp(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorDamp(id)
     override fun getIncubatorOver(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorOver(id)
     override fun getIncubatorAiring(id: Int): Flow<IncubatorUIList> = itemDao.getIncubatorAiring(id)
-
-
 
 
     override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)
@@ -184,10 +180,18 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun insertIncubatorOver(item: IncubatorOver) =
         itemDao.insertIncubatorOver(item)
 
-    override suspend fun updateIncubatorTemp(item: IncubatorTemp) = itemDao.updateIncubatorTemp(item)
+    override suspend fun updateIncubatorTemp(item: IncubatorTemp) =
+        itemDao.updateIncubatorTemp(item)
 
-    override suspend fun updateIncubatorDamp(item: IncubatorDamp) = itemDao.updateIncubatorDamp(item)
+    override suspend fun updateIncubatorDamp(item: IncubatorDamp) =
+        itemDao.updateIncubatorDamp(item)
 
-    override suspend fun updateIncubatorAiring(item: IncubatorAiring) = itemDao.updateIncubatorAiring(item)
-    override suspend fun updateIncubatorOver(item: IncubatorOver) = itemDao.updateIncubatorOver(item)
+    override suspend fun updateIncubatorAiring(item: IncubatorAiring) =
+        itemDao.updateIncubatorAiring(item)
+
+    override suspend fun updateIncubatorOver(item: IncubatorOver) =
+        itemDao.updateIncubatorOver(item)
+
+    override fun getAllAnimal(id: Int): Flow<List<AnimalTable>> = itemDao.getAllAnimal(id)
+
 }

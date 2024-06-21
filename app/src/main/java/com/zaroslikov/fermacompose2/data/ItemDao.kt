@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -46,6 +47,12 @@ interface ItemDao {
 
     @Query("SELECT * from Project")
     fun getAllProject(): Flow<List<ProjectTable>>
+
+    @Query("SELECT * from Project Where ARHIVE = 1")
+    fun getAllProjectArh(): Flow<List<ProjectTable>>
+
+    @Query("SELECT * from Project Where ARHIVE = 0")
+    fun getAllProjectAct(): Flow<List<ProjectTable>>
 
     @Query("SELECT * from Project Where id=:id")
     fun getProject(id: Int): Flow<ProjectTable>
@@ -299,5 +306,8 @@ interface ItemDao {
 
     @Update
     suspend fun updateIncubatorOver(item: IncubatorOver)
+
+    @Query("SELECT * from AnimalTable Where idPT=:id")
+    fun getAllAnimal(id:Int): Flow<List<AnimalTable>>
 
 }

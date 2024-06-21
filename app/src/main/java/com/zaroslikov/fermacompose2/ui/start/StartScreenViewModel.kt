@@ -11,14 +11,21 @@ import kotlinx.coroutines.flow.stateIn
 
 class StartScreenViewModel(private val fermaRepository: ItemsRepository) : ViewModel() {
 
-    val getAllProject: StateFlow<StartUiState> =
-        fermaRepository.getAllProject().map { StartUiState(it) }
+    val getAllProjectArh: StateFlow<StartUiState> =
+        fermaRepository.getAllProjectArh().map { StartUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = StartUiState()
             )
 
+    val getAllProjectAct: StateFlow<StartUiState> =
+        fermaRepository.getAllProjectAct().map { StartUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = StartUiState()
+            )
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

@@ -25,6 +25,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
+import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryDestination
+import com.zaroslikov.fermacompose2.ui.animal.AnimalScreen
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditProduct
@@ -521,5 +524,35 @@ fun InventoryNavHost(
                 onNavigateUp = { navController.navigateUp() }
             )
         }
+
+        composable(
+            route = AnimalDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(AnimalDestination.itemIdArg) {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            AnimalScreen(
+                drawerState = drawerState,
+                navigateToStart = {
+                    navController.navigate(StartDestination.route)
+                },
+                navigateToModalSheet = {
+                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                },
+                navigateToItem = {
+                    navController.navigate(
+                        "${AnimalEntryDestination.route}/${it}"
+                    )
+                },
+                navigateToItemUpdate = {
+                    navController.navigate(
+                        "${ExpensesEditDestination.route}/${it.id}/${it.idPT}"
+                    )
+                }
+            )
+        }
+
     }
 }
