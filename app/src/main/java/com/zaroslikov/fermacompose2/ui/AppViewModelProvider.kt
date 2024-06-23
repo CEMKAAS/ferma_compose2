@@ -23,6 +23,9 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
+import com.zaroslikov.fermacompose2.ui.animal.AnimalCardViewModel
+import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
+import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesViewModel
@@ -217,6 +220,27 @@ object AppViewModelProvider {
 
         initializer {
             WriteOffEditViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
+        initializer {
+            AnimalViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
+        initializer {
+            AnimalEntryViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
+        initializer {
+            AnimalCardViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )

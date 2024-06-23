@@ -25,8 +25,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.zaroslikov.fermacompose2.ui.animal.AnimalCard
+import com.zaroslikov.fermacompose2.ui.animal.AnimalCardDestination
+import com.zaroslikov.fermacompose2.ui.animal.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryDestination
+import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryProduct
+import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalScreen
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditDestination
@@ -541,18 +546,44 @@ fun InventoryNavHost(
                 navigateToModalSheet = {
                     navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
                 },
-                navigateToItem = {
+                navigateToItemAdd = {
                     navController.navigate(
                         "${AnimalEntryDestination.route}/${it}"
                     )
                 },
-                navigateToItemUpdate = {
+                navigateToItemCard = {
                     navController.navigate(
-                        "${ExpensesEditDestination.route}/${it.id}/${it.idPT}"
+                        "${AnimalCardDestination.route}/${it}"
                     )
                 }
             )
         }
+
+        composable(
+            route = AnimalEntryDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalEntryDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            AnimalEntryProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = AnimalCardDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalCardDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            AnimalCardProduct(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+                onNavigateIndicators = {navController.navigate("${AnimalIndicatorsDestination.route}/${it}")}
+            )
+        }
+
 
     }
 }

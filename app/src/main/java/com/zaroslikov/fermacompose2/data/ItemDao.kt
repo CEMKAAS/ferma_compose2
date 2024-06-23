@@ -22,7 +22,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -308,6 +312,53 @@ interface ItemDao {
     suspend fun updateIncubatorOver(item: IncubatorOver)
 
     @Query("SELECT * from AnimalTable Where idPT=:id")
-    fun getAllAnimal(id:Int): Flow<List<AnimalTable>>
+    fun getAllAnimal(id: Int): Flow<List<AnimalTable>>
+
+    @Query("SELECT * from AnimalTable Where id=:id")
+    fun getAnimal(id: Int): Flow<AnimalTable>
+
+    @Query("SELECT type from AnimalTable Where idPT=:id")
+    fun getTypeAnimal(id: Int): Flow<List<String>>
+
+
+    @Insert
+    suspend fun insertAnimalTable(animalTable: AnimalTable): Long
+
+    @Insert
+    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable)
+
+    @Insert
+    suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+
+    @Insert
+    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+
+    @Insert
+    suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+
+    @Query("SELECT * from AnimalCountTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+    fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>>
+
+    @Query("SELECT * from AnimalSizeTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+    fun getSizeAnimalLimit(id: Int): Flow<List<AnimalSizeTable>>
+
+    @Query("SELECT * from AnimalVaccinationTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+    fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>>
+
+    @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+    fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>>
+
+
+//    @Query("SELECT * from AnimalCountTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+//    fun getCountAnimalLimit(id: Int, table: String): Flow<List<AnimalCountTable>>
+//
+//    @Query("SELECT * from AnimalSizeTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+//    fun getSizeAnimalLimit(id: Int): Flow<List<AnimalSizeTable>>
+//
+//    @Query("SELECT * from AnimalVaccinationTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+//    fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>>
+//
+//    @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
+//    fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>>
 
 }

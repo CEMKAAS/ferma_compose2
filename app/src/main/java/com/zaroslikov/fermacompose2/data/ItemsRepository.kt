@@ -17,8 +17,13 @@
 package com.zaroslikov.fermacompose2.data
 
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
+import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -167,7 +172,23 @@ interface ItemsRepository {
     suspend fun updateIncubatorAiring(item: IncubatorAiring)
     suspend fun updateIncubatorOver(item: IncubatorOver)
     fun getAllAnimal(id:Int): Flow<List<AnimalTable>>
+    fun getAnimal(id: Int): Flow<AnimalTable>
+    fun getTypeAnimal(id:Int): Flow<List<String>>
 
 
+    suspend fun insertAnimalTable(animalTable: AnimalTable): Long
+
+    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable)
+
+    suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+
+    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+
+    suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+
+    fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>>
+    fun getSizeAnimalLimit(id: Int): Flow<List<AnimalSizeTable>>
+    fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>>
+    fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>>
 
 }

@@ -4,6 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryDestination
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
@@ -18,10 +22,10 @@ class AnimalEntryViewModel (
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    val itemId: Int = checkNotNull(savedStateHandle[ExpensesEntryDestination.itemIdArg])
+    val itemId: Int = checkNotNull(savedStateHandle[AnimalEntryDestination.itemIdArg])
 
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleExpensesList(itemId).map { TitleUiState(it) }
+    val typeUiState: StateFlow<TitleUiState> =
+        itemsRepository.getTypeAnimal(itemId).map {TitleUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -29,16 +33,14 @@ class AnimalEntryViewModel (
             )
 
 
-    val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategoryExpensesList(itemId).map { CategoryUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = CategoryUiState()
-            )
 
-    suspend fun saveItem(expensesTable: ExpensesTable) {
-        itemsRepository.insertExpenses(expensesTable)
+    suspend fun saveItem(animalTable: AnimalTable, animalCountTable: AnimalCountTable, animalWeightTable: AnimalWeightTable, animalSizeTable: AnimalSizeTable) {
+        val id = itemsRepository.insertAnimalTable(animalTable)
+
+        itemsRepository.insertAnimalCountTable(animalCountTable.copy(idAnimal = 22))
+        itemsRepository.insertAnimalWeightTable(animalWeightTable.copy(idAnimal = id.toInt()))
+        itemsRepository.insertAnimalSizeTable(animalSizeTable.copy(idAnimal = id.toInt()))
+
     }
 
     companion object {
@@ -46,3 +48,4 @@ class AnimalEntryViewModel (
     }
 
 }
+

@@ -23,7 +23,7 @@ data class AnimalTable(
     val type: String,
     val data: String,
     val groop: Boolean,
-    val count: String,
+    val count: String, //groop = true, one = false
     val sex: String,
     val note : String,
     val image:String,

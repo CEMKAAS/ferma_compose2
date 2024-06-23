@@ -69,8 +69,8 @@ object AnimalDestination : NavigationDestination {
 fun AnimalScreen(
     navigateToStart:()-> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (navigateId) -> Unit,
-    navigateToItem: (Int) -> Unit,
+    navigateToItemCard: (Int) -> Unit,
+    navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: AnimalViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -111,7 +111,7 @@ fun AnimalScreen(
             },
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { navigateToItem(idProject) },
+                    onClick = { navigateToItemAdd(idProject) },
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .padding(
@@ -128,7 +128,7 @@ fun AnimalScreen(
         ) { innerPadding ->
             AnimalBody(
                 itemList = animalUiState.itemList,
-                onItemClick = navigateToItemUpdate,
+                onItemClick = navigateToItemCard,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding
             )
@@ -141,7 +141,7 @@ fun AnimalScreen(
 @Composable
 private fun AnimalBody(
     itemList: List<AnimalTable>,
-    onItemClick: (navigateId) -> Unit,
+    onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -159,7 +159,7 @@ private fun AnimalBody(
         } else {
             AnimalList(
                 itemList = itemList,
-                onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
+                onItemClick = onItemClick,
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
@@ -170,7 +170,7 @@ private fun AnimalBody(
 @Composable
 private fun AnimalList(
     itemList: List<AnimalTable>,
-    onItemClick: (AnimalTable) -> Unit,
+    onItemClick: (Int) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -182,7 +182,7 @@ private fun AnimalList(
             AnimalCard(animalTable = item,
                 modifier = Modifier
                     .padding(8.dp)
-                    .clickable { onItemClick(item) })
+                    .clickable { onItemClick(item.id) })
         }
     }
 }
