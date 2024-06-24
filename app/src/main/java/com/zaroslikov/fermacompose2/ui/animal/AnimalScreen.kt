@@ -137,7 +137,6 @@ fun AnimalScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AnimalBody(
     itemList: List<AnimalTable>,

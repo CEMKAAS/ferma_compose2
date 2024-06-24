@@ -37,7 +37,7 @@ class AnimalEntryViewModel (
     suspend fun saveItem(animalTable: AnimalTable, animalCountTable: AnimalCountTable, animalWeightTable: AnimalWeightTable, animalSizeTable: AnimalSizeTable) {
         val id = itemsRepository.insertAnimalTable(animalTable)
 
-        itemsRepository.insertAnimalCountTable(animalCountTable.copy(idAnimal = 22))
+        itemsRepository.insertAnimalCountTable(animalCountTable.copy(idAnimal = id.toInt()))
         itemsRepository.insertAnimalWeightTable(animalWeightTable.copy(idAnimal = id.toInt()))
         itemsRepository.insertAnimalSizeTable(animalSizeTable.copy(idAnimal = id.toInt()))
 

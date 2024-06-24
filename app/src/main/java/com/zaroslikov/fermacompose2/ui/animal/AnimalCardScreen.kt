@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -75,8 +76,8 @@ object AnimalCardDestination : NavigationDestination {
 @Composable
 fun AnimalCardProduct(
     navigateBack: () -> Unit,
-    onNavigateUp: () -> Unit,
-    onNavigateIndicators: () -> Unit,
+    onNavigateSetting: () -> Unit,
+    onNavigateIndicators: (AnimalIndicators) -> Unit,
     viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val animalTable = viewModel.animalState.collectAsState()
@@ -89,7 +90,12 @@ fun AnimalCardProduct(
         .padding(8.dp)
 
     Scaffold(topBar = {
-        TopAppBarEdit(title = animalTable.value.animalTable.name, navigateUp = navigateBack)
+        TopAppBarStart(
+            title = animalTable.value.animalTable.name,
+            true,
+            navigateUp = navigateBack,
+            settingUp = {  onNavigateSetting() }
+        )
     }) { innerPadding ->
         AnimalCardContainer(
             modifier = Modifier
@@ -101,8 +107,7 @@ fun AnimalCardProduct(
             animalSizeTable = size.value.itemList,
             animalCountTable = count.value.itemList,
             animalVaccinationTable = vaccination.value.itemList,
-            modifierClicableCard = modifierCardClicable
-                .clickable { }
+            onNavigateIndicators = onNavigateIndicators
         )
     }
 }
@@ -115,7 +120,7 @@ fun AnimalCardContainer(
     animalSizeTable: List<AnimalSizeTable>,
     animalCountTable: List<AnimalCountTable>,
     animalVaccinationTable: List<AnimalVaccinationTable>,
-    modifierClicableCard: Modifier = Modifier,
+    onNavigateIndicators: (AnimalIndicators) -> Unit,
     ) {
 
     val modifierCard = Modifier
@@ -144,7 +149,7 @@ fun AnimalCardContainer(
 
         if (!animalTable.groop) {
             Card(
-                modifier =  modifierClicableCard
+                modifier =  modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "weight"))}
             ) {
                 var i = 1
                 Text(
@@ -158,7 +163,7 @@ fun AnimalCardContainer(
             }
 
             Card(
-                modifier = modifierClicableCardSize
+                modifier = modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "size"))}
             ) {
                 var i = 1
                 Text(
@@ -173,7 +178,7 @@ fun AnimalCardContainer(
         } else {
 
             Card(
-                modifier = modifierClicableCardCount
+                modifier = modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "count"))}
             ) {
                 var i = 1
                 Text(
@@ -188,7 +193,7 @@ fun AnimalCardContainer(
         }
 
         Card(
-            modifier = modifierClicableCardVaccination
+            modifier = modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "vaccination"))}
         ) {
             var i = 1
             Text(

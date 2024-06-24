@@ -30,6 +30,7 @@ import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
+import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -214,6 +215,18 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
         itemDao.insertAnimalWeightTable(animalWeightTable)
 
+    override suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable) =
+        itemDao.updateAnimalCountTable(animalCountTable)
+
+    override suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
+        itemDao.updateAnimalSizeTable(animalSizeTable)
+
+    override suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
+        itemDao.updateAnimalVaccinationTable(animalVaccinationTable)
+    override suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
+        itemDao.updateAnimalWeightTable(animalWeightTable)
+
+
     override fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>> =
         itemDao.getCountAnimalLimit(id)
 
@@ -225,6 +238,17 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>> =
         itemDao.getWeightAnimalLimit(id)
+
+    override fun getCountAnimal(id: Int): Flow<List<AnimalIndicatorsVM>> =
+        itemDao.getCountAnimal(id)
+
+    override fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>> = itemDao.getSizeAnimal(id)
+
+    override fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>> =
+        itemDao.getVaccinationtAnimal(id)
+
+    override fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>> =
+        itemDao.getWeightAnimal(id)
 
 
 }
