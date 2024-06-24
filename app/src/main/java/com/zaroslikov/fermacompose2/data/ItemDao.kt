@@ -336,17 +336,31 @@ interface ItemDao {
 
     @Insert
     suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+
+    @Update
+    suspend fun updateAnimalTable(animalTable: AnimalTable)
+
+    @Delete
+    suspend fun deleteAnimalTable(animalTable: AnimalTable)
+
     @Update
     suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
-
     @Update
     suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable)
-
     @Update
     suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
-
     @Update
     suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+
+    @Delete
+    suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)
+    @Delete
+    suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+    @Delete
+    suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+    @Delete
+    suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+
 
     @Query("SELECT * from AnimalCountTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
     fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>>

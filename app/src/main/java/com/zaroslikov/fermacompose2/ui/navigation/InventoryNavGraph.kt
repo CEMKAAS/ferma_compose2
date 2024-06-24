@@ -29,6 +29,8 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalCard
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
+import com.zaroslikov.fermacompose2.ui.animal.AnimalEditDestination
+import com.zaroslikov.fermacompose2.ui.animal.AnimalEditProduct
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryProduct
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsDestination
@@ -469,7 +471,7 @@ fun InventoryNavHost(
             })
         ) {
             AnimalCardProduct(navigateBack = { navController.popBackStack() },
-                onNavigateSetting = { navController.navigateUp() },
+                onNavigateSetting = { navController.navigate("${AnimalEditDestination.route}/${it}") },
                 onNavigateIndicators = { navController.navigate("${AnimalIndicatorsDestination.route}/${it.id}/${it.table}") })
         }
 
@@ -484,6 +486,16 @@ fun InventoryNavHost(
 
             )) {
             AnimalIndicatorsScreen(
+                navigateBack = { navController.popBackStack() })
+        }
+
+        composable(route = AnimalEditDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(AnimalEditDestination.itemIdArg) {
+                    type = NavType.IntType
+                }
+            )) {
+            AnimalEditProduct(
                 navigateBack = { navController.popBackStack() })
         }
 

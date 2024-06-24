@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -60,6 +61,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesTableUiState
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
@@ -91,6 +93,9 @@ fun AnimalIndicatorsScreen(
     val indicatorsList = viewModel.indicatorsUiState.collectAsState()
     val vaccinationList = viewModel.vaccinationtUiState.collectAsState()
 
+    val editUiState = viewModel.animalUiState
+    val vacUiTable = viewModel.vaccinationState
+
     val coroutineScope = rememberCoroutineScope()
     val addBottomSheet = remember { mutableStateOf(false) }
     val editBottomSheet = remember { mutableStateOf(false) }
@@ -112,7 +117,8 @@ fun AnimalIndicatorsScreen(
             )
         }
     }) { innerPadding ->
-        AnimalIndicatorsBody(id = viewModel.itemId,
+        AnimalIndicatorsBody(
+            id = viewModel.itemId,
             indicators = viewModel.indicators,
             itemList = indicatorsList.value.itemList,
             itemVaccinationList = vaccinationList.value.itemList,
@@ -125,6 +131,7 @@ fun AnimalIndicatorsScreen(
                     viewModel.saveItem(it)
                 }
             },
+            editUiState = editUiState,
             saveVaccinationt = {
                 coroutineScope.launch {
                     viewModel.saveVaccinationt(it)
@@ -135,10 +142,22 @@ fun AnimalIndicatorsScreen(
                     viewModel.updateItem(it)
                 }
             },
-            onItemClick = {
-
-            }
-
+            onValueChange = viewModel::updateUiState,
+            deleteInTable = {
+                coroutineScope.launch {
+                    viewModel.deleteItem()
+                }
+            },
+            updateVaccinationt = {
+                coroutineScope.launch {
+                    viewModel.updateVaccinationt(it)
+                }
+            },
+            deleteVaccinationt = { coroutineScope.launch {
+                viewModel.deleteVaccinationt()
+            }},
+            editVaccinationtUiState = vacUiTable,
+            onValueChangeVaccinationt =  viewModel::updatevaccinationUiState
         )
 
 
@@ -153,12 +172,24 @@ private fun AnimalIndicatorsBody(
     itemVaccinationList: List<AnimalVaccinationTable>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+
     addBottomSheet: MutableState<Boolean>,
     editBottomSheet: MutableState<Boolean>,
+
     saveInTable: (AnimalIndicatorsVM) -> Unit,
-    saveVaccinationt: (AnimalVaccinationTable) -> Unit,
     updateInTable: (AnimalIndicatorsVM) -> Unit,
-    onItemClick: (AnimalIndicatorsVM) -> Unit
+    deleteInTable: () -> Unit,
+
+    saveVaccinationt: (AnimalVaccinationTable) -> Unit,
+    updateVaccinationt: (AnimalVaccinationTable) -> Unit,
+    deleteVaccinationt: () -> Unit,
+
+    editUiState: AnimalIndicatorsVM,
+    onValueChange: (AnimalIndicatorsVM) -> Unit = {},
+
+    editVaccinationtUiState: AnimalVaccinationTable,
+    onValueChangeVaccinationt: (AnimalVaccinationTable) -> Unit = {},
+
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -174,7 +205,8 @@ private fun AnimalIndicatorsBody(
                         modifier = Modifier
                             .padding(8.dp)
                             .clickable {
-
+                                onValueChangeVaccinationt(item)
+                                editBottomSheet.value = true
                             }
                     )
                 }
@@ -184,6 +216,7 @@ private fun AnimalIndicatorsBody(
                         indicators = item, modifier = Modifier
                             .padding(8.dp)
                             .clickable {
+                                onValueChange(item)
                                 editBottomSheet.value = true
                             }
                     )
@@ -193,11 +226,21 @@ private fun AnimalIndicatorsBody(
         }
 
         if (editBottomSheet.value) {
-            EditdIndicatorsBottomSheet(
-                animalIndicatorsVM = edit,
-                editBottomSheet = editBottomSheet,
-                updateInTable = updateInTable,
-            )
+            if (indicators == "vaccination") {
+                EditVacIndicatorsBottomSheet(
+                    animalVaccinationTable = editVaccinationtUiState,
+                    editBottomSheet = editBottomSheet,
+                    updateInTable = updateVaccinationt,
+                    deleteInTable = deleteVaccinationt
+                )
+            }else{
+                EditdIndicatorsBottomSheet(
+                    animalIndicatorsVM = editUiState,
+                    editBottomSheet = editBottomSheet,
+                    updateInTable = updateInTable,
+                    deleteInTable = deleteInTable
+                )
+            }
         }
 
         if (addBottomSheet.value) {
@@ -212,6 +255,162 @@ private fun AnimalIndicatorsBody(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditVacIndicatorsBottomSheet(
+    animalVaccinationTable: AnimalVaccinationTable,
+    editBottomSheet: MutableState<Boolean>,
+    updateInTable: (AnimalVaccinationTable) -> Unit,
+    deleteInTable: () -> Unit
+) {
+
+    ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
+        var count by rememberSaveable { mutableStateOf(animalVaccinationTable.vaccination) }
+        var date1 by rememberSaveable { mutableStateOf(animalVaccinationTable.date) }
+        var date2 by rememberSaveable { mutableStateOf(animalVaccinationTable.nextVaccination) }
+
+
+        //Дата
+        var openDialog by remember { mutableStateOf(false) }
+        var openDialog2 by remember { mutableStateOf(false) }
+        val datePickerState = rememberDatePickerState()
+
+        if (openDialog) {
+            DatePickerDialogSample(datePickerState, date1) { date ->
+                date1 = date
+                openDialog = false
+            }
+        }
+
+        if (openDialog2) {
+            DatePickerDialogSample(datePickerState, date2) { date ->
+                date2 = date
+                openDialog2 = false
+            }
+        }
+
+        var isErrorCount by rememberSaveable { mutableStateOf(false) }
+
+        fun validateCount(text: String) {
+            isErrorCount = text == ""
+        }
+
+        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
+
+            OutlinedTextField(
+                value = count,
+                onValueChange = {
+                    count = it
+                    validateCount(count)
+                },
+                label = { Text("Товар") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 2.dp),
+                supportingText = {
+                    if (isErrorCount) {
+                        Text(
+                            text = "Не указано кол-во товара",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    } else {
+                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                    }
+                },
+                suffix = {
+                    Text(text = "Кг")
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = isErrorCount
+            )
+
+            OutlinedTextField(
+                value = date1,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Дата") },
+                supportingText = {
+                    Text("Выберите дату ")
+                },
+                trailingIcon = {
+                    IconButton(onClick = { openDialog = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_calendar_month_24),
+                            contentDescription = "Показать меню"
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        openDialog = true
+                    }
+                    .padding(bottom = 2.dp),
+            )
+
+            OutlinedTextField(
+                value = date2,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Дата") },
+                supportingText = {
+                    Text("Выберите дату ")
+                },
+                trailingIcon = {
+                    IconButton(onClick = { openDialog2 = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_calendar_month_24),
+                            contentDescription = "Показать меню"
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        openDialog2 = true
+                    }
+                    .padding(bottom = 2.dp),
+            )
+
+            Button(
+                onClick = {
+                    updateInTable(
+                        AnimalVaccinationTable(
+                            id =  animalVaccinationTable.id,
+                            vaccination = count,
+                            date = date1,
+                            nextVaccination = date2,
+                            idAnimal =  animalVaccinationTable.idAnimal
+                        )
+                    )
+                    editBottomSheet.value = false
+                }, modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_create_24),
+                    contentDescription = " Обновить "
+                )
+                Text(text = " Обновить ")
+            }
+
+            OutlinedButton(
+                onClick = {
+                    deleteInTable()
+                    editBottomSheet.value = false
+                },     modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_delete_24),
+                    contentDescription = "Удалить"
+                )
+                Text(text = " Удалить ")
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -219,6 +418,7 @@ fun EditdIndicatorsBottomSheet(
     animalIndicatorsVM: AnimalIndicatorsVM,
     editBottomSheet: MutableState<Boolean>,
     updateInTable: (AnimalIndicatorsVM) -> Unit,
+    deleteInTable: () -> Unit
 ) {
 
     ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
@@ -295,13 +495,9 @@ fun EditdIndicatorsBottomSheet(
                     .padding(bottom = 2.dp),
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(onClick = {
+
+            Button(
+                onClick = {
                     updateInTable(
                         AnimalIndicatorsVM(
                             id = animalIndicatorsVM.id,
@@ -311,9 +507,29 @@ fun EditdIndicatorsBottomSheet(
                         )
                     )
                     editBottomSheet.value = false
-                }) {
-                    Text(text = "Добавить")
-                }
+                }, modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_create_24),
+                    contentDescription = " Обновить "
+                )
+                Text(text = " Обновить ")
+            }
+
+            OutlinedButton(
+                onClick = {
+                    deleteInTable()
+                    editBottomSheet.value = false
+                },     modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_delete_24),
+                    contentDescription = "Удалить"
+                )
+                Text(text = " Удалить ")
             }
         }
     }

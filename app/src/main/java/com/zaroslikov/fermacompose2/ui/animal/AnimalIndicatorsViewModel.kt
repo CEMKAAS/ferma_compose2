@@ -1,5 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +14,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesTableUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +30,23 @@ class AnimalIndicatorsViewModel(
     val indicators: String =
         checkNotNull(savedStateHandle[AnimalIndicatorsDestination.itemIdArgTwo])
 
+
+    var animalUiState by mutableStateOf(AnimalIndicatorsVM(0, "", "", 0))
+        private set
+
+    var vaccinationState by mutableStateOf(AnimalVaccinationTable(0, "", "", "", 0))
+        private set
+
+
+    fun updateUiState(animalIndicatorsVM: AnimalIndicatorsVM) {
+        animalUiState =
+            animalIndicatorsVM
+    }
+
+    fun updatevaccinationUiState(animalVaccinationTable: AnimalVaccinationTable) {
+        vaccinationState =
+            animalVaccinationTable
+    }
 
     val indicatorsUiState: StateFlow<AnimalIndicatorsUiState> = when (indicators) {
         "count" -> {
@@ -88,6 +109,7 @@ class AnimalIndicatorsViewModel(
             "weight" -> {
                 itemsRepository.insertAnimalWeightTable(animalIndicatorsVM.toWeight())
             }
+
             else -> {}
         }
     }
@@ -97,12 +119,33 @@ class AnimalIndicatorsViewModel(
             "count" -> {
                 itemsRepository.updateAnimalCountTable(animalIndicatorsVM.toCount())
             }
+
             "size" -> {
                 itemsRepository.updateAnimalSizeTable(animalIndicatorsVM.toSize())
             }
+
             "weight" -> {
                 itemsRepository.updateAnimalWeightTable(animalIndicatorsVM.toWeight())
             }
+
+            else -> {}
+        }
+    }
+
+    suspend fun deleteItem() {
+        when (indicators) {
+            "count" -> {
+                itemsRepository.deleteAnimalCountTable(animalUiState.toCount())
+            }
+
+            "size" -> {
+                itemsRepository.deleteAnimalSizeTable(animalUiState.toSize())
+            }
+
+            "weight" -> {
+                itemsRepository.deleteAnimalWeightTable(animalUiState.toWeight())
+            }
+
             else -> {}
         }
     }
@@ -114,6 +157,10 @@ class AnimalIndicatorsViewModel(
 
     suspend fun updateVaccinationt(animalVaccinationTable: AnimalVaccinationTable) {
         itemsRepository.updateAnimalVaccinationTable(animalVaccinationTable)
+    }
+
+    suspend fun deleteVaccinationt() {
+        itemsRepository.deleteAnimalVaccinationTable(vaccinationState)
     }
 
 

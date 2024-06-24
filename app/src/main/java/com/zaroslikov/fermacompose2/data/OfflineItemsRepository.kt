@@ -226,6 +226,14 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
         itemDao.updateAnimalWeightTable(animalWeightTable)
 
+    override suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)  = itemDao.deleteAnimalCountTable(animalCountTable)
+    override suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable) = itemDao.deleteAnimalSizeTable(animalSizeTable)
+    override suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) = itemDao.insertAnimalVaccinationTable(animalVaccinationTable)
+    override suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable) = itemDao.deleteAnimalWeightTable(animalWeightTable)
+
+    override suspend fun updateAnimalTable(animalTable: AnimalTable) = itemDao.updateAnimalTable(animalTable)
+    override suspend fun deleteAnimalTable(animalTable: AnimalTable) = itemDao.deleteAnimalTable(animalTable)
+
 
     override fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>> =
         itemDao.getCountAnimalLimit(id)

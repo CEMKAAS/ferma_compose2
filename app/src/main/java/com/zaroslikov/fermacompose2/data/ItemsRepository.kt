@@ -194,6 +194,14 @@ interface ItemsRepository {
     suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable)
 
 
+    suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)
+    suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+    suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+    suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+
+    suspend fun updateAnimalTable(animalTable: AnimalTable)
+    suspend fun deleteAnimalTable(animalTable: AnimalTable)
+
     fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>>
     fun getSizeAnimalLimit(id: Int): Flow<List<AnimalSizeTable>>
     fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>>

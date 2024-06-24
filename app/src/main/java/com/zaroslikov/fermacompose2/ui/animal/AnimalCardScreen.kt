@@ -76,7 +76,7 @@ object AnimalCardDestination : NavigationDestination {
 @Composable
 fun AnimalCardProduct(
     navigateBack: () -> Unit,
-    onNavigateSetting: () -> Unit,
+    onNavigateSetting: (Int) -> Unit,
     onNavigateIndicators: (AnimalIndicators) -> Unit,
     viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -94,7 +94,7 @@ fun AnimalCardProduct(
             title = animalTable.value.animalTable.name,
             true,
             navigateUp = navigateBack,
-            settingUp = {  onNavigateSetting() }
+            settingUp = {  onNavigateSetting(animalTable.value.animalTable.id) }
         )
     }) { innerPadding ->
         AnimalCardContainer(
