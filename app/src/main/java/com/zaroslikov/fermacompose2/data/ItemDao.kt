@@ -37,6 +37,7 @@ import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
+import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -384,7 +385,7 @@ interface ItemDao {
     @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC")
     fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
 
-
-
+    @Query("SELECT Title,COALESCE(SUM(Count), 0.0) AS priceAll, suffix from MyFerma Where animal=:name GROUP BY Title ORDER BY priceAll DESC")
+    fun getProductAnimal(name:String):Flow<List<AnimalTitSuff>>
 
 }

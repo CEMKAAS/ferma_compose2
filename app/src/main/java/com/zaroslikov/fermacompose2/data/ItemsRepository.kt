@@ -35,6 +35,7 @@ import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
+import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -212,9 +213,7 @@ interface ItemsRepository {
     fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
     fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
     fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
-
-
-
+    fun getProductAnimal(name:String):Flow<List<AnimalTitSuff>>
 
 
 }

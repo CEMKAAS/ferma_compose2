@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardViewModel
+import com.zaroslikov.fermacompose2.ui.animal.AnimalEditViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsCard
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
@@ -106,7 +107,6 @@ object AppViewModelProvider {
                 inventoryApplication().container.itemsRepository
             )
         }
-
 
         //Warehouse
         initializer {
@@ -254,7 +254,12 @@ object AppViewModelProvider {
                 inventoryApplication().container.itemsRepository
             )
         }
-
+        initializer {
+            AnimalEditViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
     }
 }
 

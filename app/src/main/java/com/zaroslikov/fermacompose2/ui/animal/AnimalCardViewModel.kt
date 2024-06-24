@@ -69,6 +69,15 @@ class AnimalCardViewModel(
                 initialValue = AnimalVaccinationCardUiStateLimit()
             )
 
+    val productState: StateFlow<AnimalProductCardUiStateLimit> =
+        itemsRepository.getProductAnimal(animalState.value.animalTable.name)
+            .map { AnimalProductCardUiStateLimit(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = AnimalProductCardUiStateLimit()
+            )
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
@@ -100,3 +109,11 @@ data class AnimalSizeCardUiStateLimit(val itemList: List<AnimalSizeTable> = list
 data class AnimalWeightUiStateLimit(val itemList: List<AnimalWeightTable> = listOf())
 
 data class AnimalVaccinationCardUiStateLimit(val itemList: List<AnimalVaccinationTable> = listOf())
+
+data class AnimalProductCardUiStateLimit(val itemList: List<AnimalTitSuff> = listOf())
+
+data class AnimalTitSuff(
+    val Title: String,
+    val priceAll: Double,
+    val suffix: String
+)

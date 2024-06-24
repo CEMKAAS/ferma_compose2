@@ -31,6 +31,7 @@ import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
+import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -258,5 +259,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>> =
         itemDao.getWeightAnimal(id)
 
+    override fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>> = itemDao.getProductAnimal(name)
 
 }

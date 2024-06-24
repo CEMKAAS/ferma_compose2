@@ -20,6 +20,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -53,6 +54,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.expenses.ExpensesTableUiState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import kotlinx.coroutines.launch
@@ -70,37 +72,41 @@ object AnimalEditDestination : NavigationDestination {
 @Composable
 fun AnimalEditProduct(
     navigateBack: () -> Unit,
+    navigateEdit: () -> Unit,
+    navigateDelete: () -> Unit,
     viewModel: AnimalEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
     val coroutineScope = rememberCoroutineScope()
+
     val animalEditUiState = viewModel.animaEditUiState
-
-
+    val typeEditUiState = viewModel.typeUiState.collectAsState()
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Добавить Животного", navigateUp = navigateBack)
+            TopAppBarEdit(title = "Редактировать данные", navigateUp = navigateBack)
         }
     ) { innerPadding ->
         AnimalEditContainer(
-            idPT = viewModel.itemId,
+            animalEditUiState = animalEditUiState,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            typeList = typeList.titleList,
+            typeList = typeEditUiState.value.titleList,
+            onValueChange = viewModel::updateUiState,
             saveInRoomSale = {
                 coroutineScope.launch {
-                    viewModel.saveItem(
-                        animalTable = it.animalTable,
-                        animalCountTable = it.animalCountTable,
-                        animalWeightTable = it.animalWeightTable,
-                        animalSizeTable = it.animalSizeTable
-                    )
-                    onNavigateUp()
+                    viewModel.saveItem()
+                    navigateEdit()
                 }
             },
+            deleteInRoom = {
+                coroutineScope.launch {
+                    viewModel.deleteItem()
+                }
+                navigateDelete()
+            }
         )
     }
 }
@@ -108,22 +114,14 @@ fun AnimalEditProduct(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalEditContainer(
-    idPT: Int,
+    animalEditUiState: AnimalEditUiState,
     modifier: Modifier,
     typeList: List<String>,
-    saveInRoomSale: (AnimalEntryRoom) -> Unit
+    onValueChange: (AnimalEditUiState) -> Unit = {},
+    saveInRoomSale: () -> Unit,
+    deleteInRoom: () -> Unit
 ) {
     val sexList = arrayListOf("Мужской", "Женский")
-
-    var title by remember { mutableStateOf("") }
-    var type by rememberSaveable { mutableStateOf("") }
-    var sex by rememberSaveable { mutableStateOf(sexList[0]) }
-    var state by remember { mutableStateOf(true) }//выбор группы
-    var weight by remember { mutableStateOf("10") }
-    var size by remember { mutableStateOf("0") }
-    var count by remember { mutableStateOf("1") }
-    var note by remember { mutableStateOf("") }
-
 
     var expandedSex by remember { mutableStateOf(false) }
     var expandedType by remember { mutableStateOf(false) }
@@ -132,8 +130,10 @@ fun AnimalEditContainer(
     var isErrorType by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
-
     var selectedItemIndex by remember { mutableStateOf(0) }
+
+    var openDialog by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
 
 
     fun validateTitle(text: String) {
@@ -145,37 +145,19 @@ fun AnimalEditContainer(
     }
 
     fun errorBoolean(): Boolean {
-        isErrorTitle = title == ""
-        isErrorType = count == ""
+        isErrorTitle = animalEditUiState.name == ""
+        isErrorType = animalEditUiState.type == ""
         return !(isErrorTitle || isErrorType)
-    }
-
-    //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val formattedDate: String = format.format(calendar.timeInMillis)
-
-    var date1 by remember { mutableStateOf(formattedDate) }
-
-    //Дата
-    var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-
-    if (openDialog) {
-        DatePickerDialogSample(datePickerState, date1) { date ->
-            date1 = date
-            openDialog = false
-        }
     }
 
 
     Column(modifier = modifier) {
 
         OutlinedTextField(
-            value = title,
+            value = animalEditUiState.name,
             onValueChange = {
-                title = it
-                validateTitle(title)
+                onValueChange(animalEditUiState.copy(name = it))
+                validateTitle(it)
             },
             label = { Text(text = "Название") },
             supportingText = {
@@ -214,10 +196,10 @@ fun AnimalEditContainer(
             ) {
 
                 OutlinedTextField(
-                    value = type,
+                    value = animalEditUiState.type,
                     onValueChange = {
-                        type = it
-                        validateType(type)
+                        onValueChange(animalEditUiState.copy(type = it))
+                        validateType(it)
                     },
                     label = { Text(text = "Тип") },
                     supportingText = {
@@ -248,7 +230,7 @@ fun AnimalEditContainer(
                     )
                 )
                 val filteredOptions =
-                    typeList.filter { it.contains(type, ignoreCase = true) }
+                    typeList.filter { it.contains(animalEditUiState.type, ignoreCase = true) }
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expandedType,
@@ -261,7 +243,7 @@ fun AnimalEditContainer(
                             DropdownMenuItem(
                                 text = { Text(text = item) },
                                 onClick = {
-                                    type = item
+                                    onValueChange(animalEditUiState.copy(type = item))
                                     expandedType = false
                                 }
                             )
@@ -271,8 +253,19 @@ fun AnimalEditContainer(
             }
         }
 
+        if (openDialog) {
+            DatePickerDialogSample(datePickerState, animalEditUiState.data) { date ->
+                openDialog = false
+                onValueChange(
+                    animalEditUiState.copy(
+                        data = date
+                    )
+                )
+            }
+        }
+
         OutlinedTextField(
-            value = date1,
+            value = animalEditUiState.data,
             onValueChange = {},
             label = { Text("Дата рождения или завода") },
             supportingText = {
@@ -304,8 +297,14 @@ fun AnimalEditContainer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = state,
-                    onClick = { state = true },
+                    selected = animalEditUiState.groop,
+                    onClick = {
+                        onValueChange(
+                            animalEditUiState.copy(
+                                groop = true
+                            )
+                        )
+                    },
                     modifier = Modifier.semantics { contentDescription = "Localized Description" }
                 )
                 Text(text = "Группа")
@@ -315,22 +314,28 @@ fun AnimalEditContainer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = !state,
-                    onClick = { state = false },
+                    selected = !animalEditUiState.groop,
+                    onClick = {
+                        onValueChange(
+                            animalEditUiState.copy(
+                                groop = false
+                            )
+                        )
+                    },
                     modifier = Modifier.semantics { contentDescription = "Localized Description" },
                 )
                 Text(text = "Один")
             }
         }
 
-        if (!state) {
+        if (!animalEditUiState.groop) {
             Box {
                 ExposedDropdownMenuBox(
                     expanded = expandedSex,
                     onExpandedChange = { expandedSex = !expandedSex },
                 ) {
                     OutlinedTextField(
-                        value = sex,
+                        value = animalEditUiState.sex,
                         onValueChange = {},
                         readOnly = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSex) },
@@ -363,98 +368,24 @@ fun AnimalEditContainer(
                                 },
                                 onClick = {
                                     selectedItemIndex = index
+                                    onValueChange(
+                                        animalEditUiState.copy(
+                                            sex = sexList[selectedItemIndex]
+                                        )
+                                    )
                                     expandedSex = false
-                                    sex = sexList[selectedItemIndex]
                                 }
                             )
                         }
                     }
                 }
             }
-
-            OutlinedTextField(
-                value = weight,
-                onValueChange = {
-                    weight = it
-                },
-                label = { Text(text = "Вес") },
-                supportingText = {
-                    Text("Укажите вес животного")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Number,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                suffix = { Text(text = "кг.") },
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
-                    )
-                }
-                )
-            )
-
-            OutlinedTextField(
-                value = size,
-                onValueChange = {
-                    size = it
-                },
-                label = { Text(text = "Размер") },
-                supportingText = {
-                    Text("Укажите размер Вашего животного")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Number,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
-                    )
-                }
-                )
-            )
-        } else {
-
-            OutlinedTextField(
-                value = count,
-                onValueChange = {
-                    count = it
-                },
-                label = { Text(text = "Колличество") },
-                supportingText = {
-                    Text("Укажите кол-во Вашей группы")
-                },
-                suffix = { Text(text = "кг.") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Number,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
-                    )
-                }
-                )
-            )
         }
 
         OutlinedTextField(
-            value = note,
+            value = animalEditUiState.note,
             onValueChange = {
-                note = it
+                onValueChange(animalEditUiState.copy(note = it))
             },
             label = { Text(text = "Примечание") },
             supportingText = {
@@ -476,58 +407,34 @@ fun AnimalEditContainer(
             )
         )
 
-        Row(
+        Button(
+            onClick = {
+                if (errorBoolean()) {
+                    saveInRoomSale(
+                    )
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.Center
+                .padding(vertical = 15.dp)
         ) {
-            Button(
-                onClick = {
-                    if (errorBoolean()) {
-                        saveInRoomSale(
-                            AnimalEntryRoom(
-                                AnimalTable(
-                                    id = 0,
-                                    name = title,
-                                    type = type,
-                                    data = date1,
-                                    groop = state,
-                                    count = count,
-                                    sex = sex,
-                                    note = note,
-                                    image = "0",
-                                    arhiv = false,
-                                    idPT = idPT
-                                ),
-                                AnimalCountTable(
-                                    id = 0,
-                                    count = count,
-                                    date = date1,
-                                    idAnimal = idPT
-                                ),
-                                AnimalWeightTable(
-                                    id = 0,
-                                    weight = weight,
-                                    date = date1,
-                                    idAnimal = idPT
-                                ),
-                                AnimalSizeTable(
-                                    id = 0,
-                                    size = size,
-                                    date = date1,
-                                    idAnimal = idPT
-                                )
-                            )
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-            ) {
-                Text(text = "Добавить")
-            }
+            Icon(
+                painter = painterResource(R.drawable.baseline_create_24),
+                contentDescription = " Обновить "
+            )
+            Text(text = " Обновить ")
+        }
+
+        OutlinedButton(
+            onClick = { deleteInRoom() },
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_delete_24),
+                contentDescription = "Удалить"
+            )
+            Text(text = " Удалить ")
         }
     }
 }

@@ -85,16 +85,14 @@ fun AnimalCardProduct(
     val count = viewModel.countState.collectAsState()
     val weight = viewModel.weightState.collectAsState()
     val vaccination = viewModel.vaccinationState.collectAsState()
-    val modifierCardClicable = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
+    val product = viewModel.productState.collectAsState()
 
     Scaffold(topBar = {
         TopAppBarStart(
             title = animalTable.value.animalTable.name,
             true,
             navigateUp = navigateBack,
-            settingUp = {  onNavigateSetting(animalTable.value.animalTable.id) }
+            settingUp = { onNavigateSetting(animalTable.value.animalTable.id) }
         )
     }) { innerPadding ->
         AnimalCardContainer(
@@ -107,6 +105,7 @@ fun AnimalCardProduct(
             animalSizeTable = size.value.itemList,
             animalCountTable = count.value.itemList,
             animalVaccinationTable = vaccination.value.itemList,
+            animalProductTable = product.value.itemList,
             onNavigateIndicators = onNavigateIndicators
         )
     }
@@ -120,8 +119,9 @@ fun AnimalCardContainer(
     animalSizeTable: List<AnimalSizeTable>,
     animalCountTable: List<AnimalCountTable>,
     animalVaccinationTable: List<AnimalVaccinationTable>,
+    animalProductTable: List<AnimalTitSuff>,
     onNavigateIndicators: (AnimalIndicators) -> Unit,
-    ) {
+) {
 
     val modifierCard = Modifier
         .fillMaxWidth()
@@ -149,7 +149,14 @@ fun AnimalCardContainer(
 
         if (!animalTable.groop) {
             Card(
-                modifier =  modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "weight"))}
+                modifier = modifierCard.clickable {
+                    onNavigateIndicators(
+                        AnimalIndicators(
+                            id = animalTable.id,
+                            table = "weight"
+                        )
+                    )
+                }
             ) {
                 var i = 1
                 Text(
@@ -163,7 +170,14 @@ fun AnimalCardContainer(
             }
 
             Card(
-                modifier = modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "size"))}
+                modifier = modifierCard.clickable {
+                    onNavigateIndicators(
+                        AnimalIndicators(
+                            id = animalTable.id,
+                            table = "size"
+                        )
+                    )
+                }
             ) {
                 var i = 1
                 Text(
@@ -178,7 +192,14 @@ fun AnimalCardContainer(
         } else {
 
             Card(
-                modifier = modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "count"))}
+                modifier = modifierCard.clickable {
+                    onNavigateIndicators(
+                        AnimalIndicators(
+                            id = animalTable.id,
+                            table = "count"
+                        )
+                    )
+                }
             ) {
                 var i = 1
                 Text(
@@ -193,7 +214,14 @@ fun AnimalCardContainer(
         }
 
         Card(
-            modifier = modifierCard.clickable {  onNavigateIndicators(AnimalIndicators(id = animalTable.id, table = "vaccination"))}
+            modifier = modifierCard.clickable {
+                onNavigateIndicators(
+                    AnimalIndicators(
+                        id = animalTable.id,
+                        table = "vaccination"
+                    )
+                )
+            }
         ) {
             var i = 1
             Text(
@@ -210,6 +238,7 @@ fun AnimalCardContainer(
             }
         }
 
+
         Card(
             modifier = modifierCard
         ) {
@@ -218,20 +247,15 @@ fun AnimalCardContainer(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
-            Text(text = "600 кг тврога", modifier = modifierText)
-            Text(text = "200 л молока", modifier = modifierText)
+            if (animalProductTable.isNotEmpty()) {
+                animalProductTable.forEach{
+                    Text(text = "${it.Title} ${it.priceAll} ${it.suffix}", modifier = modifierText)
+                }
+            }else{
+                Text(text = "Пока ничего нет :(", modifier = modifierText)
+            }
         }
 
-        Card(
-            modifier = modifierCard
-        ) {
-            Text(
-                text = "Выручки получено:", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(text = "220  рубля за 800 кг тврога", modifier = modifierText)
-        }
 
         Card(
             modifier = modifierCard
@@ -253,8 +277,3 @@ data class AnimalIndicators(
     val table: String
 )
 
-//@Preview(showBackground = true)
-//@Composable
-//fun AnimalCardPrewie() {
-//    AnimalCardContainer(modifier = Modifier.padding(5.dp))
-//}

@@ -168,7 +168,8 @@ fun InventoryNavHost(
             })
         }
 
-        composable(route = IncubatorOvoscopDestination.routeWithArgs,
+        composable(
+            route = IncubatorOvoscopDestination.routeWithArgs,
             arguments = listOf(navArgument(IncubatorOvoscopDestination.itemIdArg) {
                 type = NavType.IntType
             }, navArgument(IncubatorOvoscopDestination.itemIdArgTwo) {
@@ -181,7 +182,8 @@ fun InventoryNavHost(
         }
 
 
-        composable(route = IncubatorProjectEditDestination.routeWithArgs,
+        composable(
+            route = IncubatorProjectEditDestination.routeWithArgs,
             arguments = listOf(navArgument(IncubatorProjectEditDestination.itemIdArg) {
                 type = NavType.IntType
             })
@@ -191,7 +193,8 @@ fun InventoryNavHost(
                 navigateStart = { navController.navigate(StartDestination.route) })
         }
 
-        composable(route = IncubatorEditDayScreenDestination.routeWithArgs,
+        composable(
+            route = IncubatorEditDayScreenDestination.routeWithArgs,
             arguments = listOf(navArgument(IncubatorEditDayScreenDestination.itemIdArg) {
                 type = NavType.IntType
             }, navArgument(IncubatorEditDayScreenDestination.itemIdArgTwo) {
@@ -251,7 +254,8 @@ fun InventoryNavHost(
             FinanceCategoryScreen(navigateBack = { navController.popBackStack() })
         }
 
-        composable(route = FinanceIncomeExpensesDestination.routeWithArgs,
+        composable(
+            route = FinanceIncomeExpensesDestination.routeWithArgs,
             arguments = listOf(navArgument(FinanceIncomeExpensesDestination.itemIdArg) {
                 type = NavType.IntType
             }, navArgument(FinanceIncomeExpensesDestination.itemIdArgTwo) {
@@ -423,7 +427,8 @@ fun InventoryNavHost(
                 onNavigateUp = { navController.navigateUp() })
         }
 
-        composable(route = WriteOffEditDestination.routeWithArgs,
+        composable(
+            route = WriteOffEditDestination.routeWithArgs,
             arguments = listOf(navArgument(WriteOffEditDestination.itemIdArg) {
                 type = NavType.IntType
             }, navArgument(WriteOffEditDestination.itemIdArgTwo) {
@@ -434,7 +439,8 @@ fun InventoryNavHost(
                 onNavigateUp = { navController.navigateUp() })
         }
 
-        composable(route = AnimalDestination.routeWithArgs,
+        composable(
+            route = AnimalDestination.routeWithArgs,
             arguments = listOf(navArgument(AnimalDestination.itemIdArg) {
                 type = NavType.IntType
             })
@@ -496,7 +502,12 @@ fun InventoryNavHost(
                 }
             )) {
             AnimalEditProduct(
-                navigateBack = { navController.popBackStack() })
+                navigateBack = { navController.popBackStack() },
+                navigateEdit = { navController.navigateUp() },
+                navigateDelete = {
+                    navController.navigate(StartDestination.route)
+                }
+            )
         }
 
 
