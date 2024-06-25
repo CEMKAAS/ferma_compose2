@@ -101,7 +101,7 @@ fun AnimalIndicatorsScreen(
     val editBottomSheet = remember { mutableStateOf(false) }
 
     Scaffold(modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
-        TopAppBarEdit(title = "Добавить Продажу", navigateUp = navigateBack)
+        TopAppBarEdit(title = viewModel.indicators, navigateUp = navigateBack)
     }, floatingActionButton = {
         FloatingActionButton(
             onClick = { addBottomSheet.value = true },
@@ -195,38 +195,48 @@ private fun AnimalIndicatorsBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        LazyColumn(
-            modifier = modifier, contentPadding = contentPadding
-        ) {
-            if (indicators == "vaccination") {
-                items(items = itemVaccinationList) { item ->
-                    AnimalVaccinatioCard(
-                        animalVaccinationTable = item,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                onValueChangeVaccinationt(item)
-                                editBottomSheet.value = true
-                            }
-                    )
-                }
-            } else {
-                items(items = itemList) { item ->
-                    AnimalIndicatorsCard(
-                        indicators = item, modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                onValueChange(item)
-                                editBottomSheet.value = true
-                            }
-                    )
+        if (itemVaccinationList.isNotEmpty()||itemList.isNotEmpty()) {
+            LazyColumn(
+                modifier = modifier, contentPadding = contentPadding
+            ) {
+                if (indicators == "Прививки") {
+                    items(items = itemVaccinationList) { item ->
+                        AnimalVaccinatioCard(
+                            animalVaccinationTable = item,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    onValueChangeVaccinationt(item)
+                                    editBottomSheet.value = true
+                                }
+                        )
+                    }
+                } else {
+                    items(items = itemList) { item ->
+                        AnimalIndicatorsCard(
+                            indicators = item, modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    onValueChange(item)
+                                    editBottomSheet.value = true
+                                }
+                        )
 
+                    }
                 }
             }
+        }else{
+            Text(
+                text = ("Нет данных по $indicators"),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(contentPadding),
+            )
+
         }
 
         if (editBottomSheet.value) {
-            if (indicators == "vaccination") {
+            if (indicators == "Прививки") {
                 EditVacIndicatorsBottomSheet(
                     animalVaccinationTable = editVaccinationtUiState,
                     editBottomSheet = editBottomSheet,
@@ -268,7 +278,6 @@ fun EditVacIndicatorsBottomSheet(
         var count by rememberSaveable { mutableStateOf(animalVaccinationTable.vaccination) }
         var date1 by rememberSaveable { mutableStateOf(animalVaccinationTable.date) }
         var date2 by rememberSaveable { mutableStateOf(animalVaccinationTable.nextVaccination) }
-
 
         //Дата
         var openDialog by remember { mutableStateOf(false) }
@@ -582,7 +591,7 @@ fun AddIndicatorsBottomSheet(
         }
 
 
-        val keyboardOptions = if (indicators == "vaccination") {
+        val keyboardOptions = if (indicators == "Прививки") {
             KeyboardOptions(keyboardType = KeyboardType.Text)
         } else {
             KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -641,7 +650,7 @@ fun AddIndicatorsBottomSheet(
                     .padding(bottom = 2.dp),
             )
 
-            if (indicators == "vaccination") {
+            if (indicators == "Прививки") {
                 OutlinedTextField(
                     value = date2,
                     onValueChange = {},
@@ -674,7 +683,7 @@ fun AddIndicatorsBottomSheet(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(onClick = {
-                    if (indicators == "vaccination") {
+                    if (indicators == "Прививки") {
                         saveVaccinationt(
                             AnimalVaccinationTable(
                                 id = 0,

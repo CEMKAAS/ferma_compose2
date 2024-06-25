@@ -15,11 +15,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,14 +39,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -58,26 +67,30 @@ import java.util.TimeZone
 object ProjectAddDestination : NavigationDestination {
     override val route = "ProjectAdd"
     override val titleRes = R.string.app_name
-
 }
 
 
 @Composable
 fun AddProject(
-    navController: NavController, navigateBack: () -> Unit,
+    navigateBack: () -> Unit,
+    navigateToStart: () -> Unit,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
-            TopAppBarStart(title = "Мое Хозяйство", true, navigateUp = navigateBack)
+            TopAppBarEdit(title = "Проект", navigateUp = navigateBack)
         },
     ) { innerPadding ->
         AddProjectContainer(
+            number = viewModel.countProject,
             modifier = Modifier.padding(innerPadding),
-            navController,
-            scope = scope,
-            viewModel = viewModel
+            navigateToStart = {
+                coroutineScope.launch {
+                    viewModel.insertTable(it)
+                    navigateToStart()
+                }
+            }
         )
     }
 }
@@ -85,10 +98,9 @@ fun AddProject(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProjectContainer(
+    number: Int,
     modifier: Modifier,
-    navController: NavController,
-    scope: CoroutineScope,
-    viewModel: ProjectAddViewModel
+    navigateToStart: (ProjectTable) -> Unit,
 ) {
 
     //Календарь
@@ -96,22 +108,17 @@ fun AddProjectContainer(
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
 
-    //Картинка
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            imageUri = uri
-        }
-
-    val context = LocalContext.current
-    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
-
     //Дата
     var openDialog by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
+    datePickerState.setSelection(calendar.timeInMillis) //todo хмм
+    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
 
+    fun validateTitle(text: String) {
+        isErrorTitle = text == ""
+    }
     //Текст
-    var name by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("Мое Хозяйство №${number}") }
     var date1 by remember { mutableStateOf(formattedDate) }
 
     if (openDialog) {
@@ -124,99 +131,126 @@ fun AddProjectContainer(
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            imageUri?.let {
-                if (Build.VERSION.SDK_INT < 28) {
-                    bitmap.value = MediaStore.Images
-                        .Media.getBitmap(context.contentResolver, it)
-                } else {
-                    val source = ImageDecoder.createSource(context.contentResolver, it)
-                    bitmap.value = ImageDecoder.decodeBitmap(source)
-                }
-            }
+        //Картинка
+//    var imageUri by remember { mutableStateOf<Uri?>(null) }
+//    val launcher =
+//        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+//            imageUri = uri
+//        }
+//
+//    val context = LocalContext.current
+//    val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+//        Row(verticalAlignment = Alignment.CenterVertically) {
+//            imageUri?.let {
+//                if (Build.VERSION.SDK_INT < 28) {
+//                    bitmap.value = MediaStore.Images
+//                        .Media.getBitmap(context.contentResolver, it)
+//                } else {
+//                    val source = ImageDecoder.createSource(context.contentResolver, it)
+//                    bitmap.value = ImageDecoder.decodeBitmap(source)
+//                }
+//            }
+//
+//            if (imageUri == null) {
+//                Image(
+//                    painter = painterResource(R.drawable.baseline_add_photo_alternate_24),
+//                    contentDescription = null,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .size(125.dp)
+//                        .clickable { launcher.launch("image/*") }
+//                )
+//            } else {
+//                bitmap.value?.let { btm ->
+//                    Image(
+//                        bitmap = btm.asImageBitmap(),
+//                        contentDescription = null,
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .size(125.dp)
+//                            .clickable { launcher.launch("image/*") }
+//                    )
+//                }
+//            }
 
-            if (imageUri == null) {
-                Image(
-                    painter = painterResource(R.drawable.baseline_add_photo_alternate_24),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(125.dp)
-                        .clickable { launcher.launch("image/*") }
-                )
-            } else {
-                bitmap.value?.let { btm ->
-                    Image(
-                        bitmap = btm.asImageBitmap(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(125.dp)
-                            .clickable { launcher.launch("image/*") }
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = {
+                name = it
+                validateTitle(it)
+            },
+            label = { Text("Название") },
+            supportingText = {
+                if (isErrorTitle) {
+                    Text(
+                        text = "Не указано название проекта",
+                        color = MaterialTheme.colorScheme.error
                     )
-                }
-            }
-
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Название") },
-                modifier = Modifier.fillMaxWidth(),
-                supportingText = {
+                } else {
                     Text("Укажите название проекта")
                 }
-                //            isError = () TODO
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp),
+            isError = isErrorTitle,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                capitalization = KeyboardCapitalization.Sentences
             )
-        }
+        )
 
         OutlinedTextField(
             value = date1,
             onValueChange = {},
-            label = { Text("Дата начала проекта") },
+            label = { Text("Дата") },
             supportingText = {
                 Text("Выберите дату начала проекта")
             },
-            suffix = { Text(text = "₽") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    openDialog = true
-                },
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(onClick = {
-
-                scope.launch {
-                    viewModel.insertTable(
-                        ProjectTable(
-                            id = 0,
-                            titleProject = name,
-                            type = "",
-                            data = date1,
-                            eggAll = "",
-                            eggAllEND = "",
-                            airing = "",
-                            over = "",
-                            arhive = "0",
-                            dateEnd = date1,
-                            time1 = "",
-                            time2 = "",
-                            time3 = "",
-                            mode = 1
-                        )
+            trailingIcon = {
+                IconButton(onClick = { openDialog = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        contentDescription = "Показать меню"
                     )
                 }
-                navController.navigate(StartDestination.route)
-            }) {
-                Text(text = "Начать")
-            }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp)
+                .clickable {
+                    openDialog = true
+                }
+        )
+
+        Button(
+            onClick = {
+                navigateToStart(
+                    ProjectTable(
+                        id = 0,
+                        titleProject = name,
+                        type = "",
+                        data = date1,
+                        eggAll = "",
+                        eggAllEND = "",
+                        airing = "",
+                        over = "",
+                        arhive = "0",
+                        dateEnd = date1,
+                        time1 = "",
+                        time2 = "",
+                        time3 = "",
+                        mode = 1
+                    )
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 15.dp)
+        )
+        {
+            Text(text = "Начать")
         }
     }
 }
@@ -236,7 +270,8 @@ fun DatePickerDialogSample(
             TextButton(
                 onClick = {
                     val format = SimpleDateFormat("dd.MM.yyyy")
-                    val formattedDate: String = format.format(datePickerState.selectedDateMillis)
+                    val formattedDate: String =
+                        format.format(datePickerState.selectedDateMillis)
                     onDateSelected(formattedDate)
                 },
             ) { Text("Выбрать") }

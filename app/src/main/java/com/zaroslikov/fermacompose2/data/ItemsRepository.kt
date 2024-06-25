@@ -66,7 +66,9 @@ interface ItemsRepository {
 
     fun getLastProject(): Flow<Int>
 
+    fun getCountRowIncubator(): Flow<Int>
     fun getCountRowProject(): Flow<Int>
+
     fun getProjectListAct(): Flow<List<ProjectTable>>
     fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp>
 

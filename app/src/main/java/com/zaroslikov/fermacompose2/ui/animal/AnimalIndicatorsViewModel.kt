@@ -49,7 +49,7 @@ class AnimalIndicatorsViewModel(
     }
 
     val indicatorsUiState: StateFlow<AnimalIndicatorsUiState> = when (indicators) {
-        "count" -> {
+        "Количество" -> {
             itemsRepository.getCountAnimal(itemId).map { AnimalIndicatorsUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
@@ -58,7 +58,7 @@ class AnimalIndicatorsViewModel(
                 )
         }
 
-        "size" -> {
+        "Размер" -> {
             itemsRepository.getSizeAnimal(itemId).map { AnimalIndicatorsUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
@@ -67,7 +67,7 @@ class AnimalIndicatorsViewModel(
                 )
         }
 
-        "weight" -> {
+        "Вес" -> {
             itemsRepository.getWeightAnimal(itemId).map { AnimalIndicatorsUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
@@ -98,15 +98,15 @@ class AnimalIndicatorsViewModel(
 
     suspend fun saveItem(animalIndicatorsVM: AnimalIndicatorsVM) {
         when (indicators) {
-            "count" -> {
+            "Количество" -> {
                 itemsRepository.insertAnimalCountTable(animalIndicatorsVM.toCount())
             }
 
-            "size" -> {
+            "Размер" -> {
                 itemsRepository.insertAnimalSizeTable(animalIndicatorsVM.toSize())
             }
 
-            "weight" -> {
+            "Вес" -> {
                 itemsRepository.insertAnimalWeightTable(animalIndicatorsVM.toWeight())
             }
 
@@ -116,15 +116,15 @@ class AnimalIndicatorsViewModel(
 
     suspend fun updateItem(animalIndicatorsVM: AnimalIndicatorsVM) {
         when (indicators) {
-            "count" -> {
+            "Количество" -> {
                 itemsRepository.updateAnimalCountTable(animalIndicatorsVM.toCount())
             }
 
-            "size" -> {
+            "Размер" -> {
                 itemsRepository.updateAnimalSizeTable(animalIndicatorsVM.toSize())
             }
 
-            "weight" -> {
+            "Вес" -> {
                 itemsRepository.updateAnimalWeightTable(animalIndicatorsVM.toWeight())
             }
 
@@ -134,15 +134,15 @@ class AnimalIndicatorsViewModel(
 
     suspend fun deleteItem() {
         when (indicators) {
-            "count" -> {
+            "Количество" -> {
                 itemsRepository.deleteAnimalCountTable(animalUiState.toCount())
             }
 
-            "size" -> {
+            "Размер" -> {
                 itemsRepository.deleteAnimalSizeTable(animalUiState.toSize())
             }
 
-            "weight" -> {
+            "Вес" -> {
                 itemsRepository.deleteAnimalWeightTable(animalUiState.toWeight())
             }
 

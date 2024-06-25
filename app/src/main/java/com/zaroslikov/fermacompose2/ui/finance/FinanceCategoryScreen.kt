@@ -80,14 +80,12 @@ fun FinanceCategoryScreen(
     viewModel: FinanceCategoryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-//    val coroutineScope = rememberCoroutineScope()
-
     val financeCategoryState by viewModel.financeCategoryUiState.collectAsState()
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBarEdit(title = "Добавить Продажу", navigateUp = navigateBack)
+            TopAppBarEdit(title = viewModel.itemCategory, navigateUp = navigateBack)
         }
     ) { innerPadding ->
         FinanceCategoryBody(
@@ -134,7 +132,6 @@ private fun FinanceCategoryInventoryList(
                 modifier = Modifier
                     .padding(8.dp)
             )
-//                    .clickable { onItemClick(item) })
         }
     }
 }

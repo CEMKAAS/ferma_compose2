@@ -500,7 +500,6 @@ fun AnimalEntryContainer(
                                     type = type,
                                     data = date1,
                                     groop = state,
-                                    count = count,
                                     sex = sex,
                                     note = note,
                                     image = "0",

@@ -5,6 +5,15 @@
         <string name="back_button">Back</string>
         <string name="delete">Delete</string>
         <string name="delete_question">Are you sure you want to delete?</string>
+        <string name="no_item_add">Упсс!\nНет товара:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_warehouse">Склад пустой:(\nДобавьте товар в разделе "Мои Товар".</string>
+        <string name="no_item_sale">Нет продаж:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_expenses">Нет покупок:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_write_off">Нет списаний:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_write_off_no_product">Нечего списывать\nДобавьте товар в разделе "Мои Товар" для списания.</string>
+        <string name="no_item_animal">Нет животных:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_finance">В этом месяце нет транкзаций</string>
+        <string name="no_item_finance_edit">Нет транкзаций</string>
         <string name="no_item_description">Упсс!\nНет товара:(\nНажмите + чтобы добавить.</string>
         <string name="edit_item_title">Edit Item</string>
         <string name="item">Item</string>

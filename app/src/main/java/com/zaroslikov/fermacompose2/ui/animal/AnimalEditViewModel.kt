@@ -73,7 +73,6 @@ data class AnimalEditUiState(
     val type: String = "",
     val data: String = "",
     val groop: Boolean = true,
-    val count: String = "",
     val sex: String = "",
     val note: String = "",
     val image: String = "",
@@ -83,10 +82,10 @@ data class AnimalEditUiState(
 
 fun AnimalTable.toAnimaEditUiState(
 ): AnimalEditUiState = AnimalEditUiState(
-    id, name, type, data, groop, count, sex, note, image, arhiv, idPT
+    id, name, type, data, groop, sex, note, image, arhiv, idPT
 )
 
 fun AnimalEditUiState.toAnimalTable(): AnimalTable = AnimalTable(
-    id, name, type, data, groop, count, sex, note, image, arhiv, idPT
+    id, name, type, data, groop, sex, note, image, arhiv, idPT
 )
 

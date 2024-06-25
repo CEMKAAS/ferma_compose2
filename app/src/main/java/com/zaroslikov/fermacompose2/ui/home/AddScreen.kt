@@ -96,9 +96,7 @@ fun AddScreen(
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
     val idProject = viewModel.itemId
-
     val coroutineScope = rememberCoroutineScope()
 
     val showBottomSheetFilter = remember { mutableStateOf(false) }
@@ -123,8 +121,6 @@ fun AddScreen(
                     title = "Мои Товары",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
                     scrollBehavior = scrollBehavior
                 )
             },
@@ -172,7 +168,7 @@ private fun AddBody(
     ) {
         if (itemList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),
+                text = stringResource(R.string.no_item_add),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),

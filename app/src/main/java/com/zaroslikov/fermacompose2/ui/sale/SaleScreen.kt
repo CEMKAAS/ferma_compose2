@@ -124,8 +124,6 @@ fun SaleScreen(
                     title = "Мои Продажи",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
                     scrollBehavior = scrollBehavior
                 )
             },
@@ -173,7 +171,7 @@ private fun SaleBody(
     ) {
         if (itemList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),//TODO
+                text = stringResource(R.string.no_item_sale),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),

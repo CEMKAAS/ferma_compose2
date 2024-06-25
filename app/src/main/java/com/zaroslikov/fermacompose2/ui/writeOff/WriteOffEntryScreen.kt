@@ -127,30 +127,33 @@ fun WriteOffEntryContainerProduct(
     saveInRoomSale: (WriteOffTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
-    var count by rememberSaveable { mutableStateOf("") }
+    var count by rememberSaveable { mutableStateOf("0") }
     var state by remember { mutableStateOf(true) }
     var suffix by remember { mutableStateOf("Шт.") }
-    var priceAll by remember { mutableStateOf("") }
+    var priceAll by remember { mutableStateOf("0") }
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
 
-
-    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
+    var isErrorPrice by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
     var selectedItemIndex by remember { mutableIntStateOf(0) }
 
+    fun validatePrice(text: String) {
+        isErrorCount = text == ""
+    }
+
     fun validateCount(text: String) {
         isErrorCount = text == ""
     }
 
     fun errorBoolean(): Boolean {
-        isErrorTitle = title == ""
+        isErrorPrice = title == ""
         isErrorCount = count == ""
-        return !(isErrorCount || isErrorTitle)
+        return !(isErrorCount || isErrorPrice)
     }
 
     Column(modifier = modifier) {
@@ -166,14 +169,7 @@ fun WriteOffEntryContainerProduct(
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     label = { Text(text = "Товар") },
                     supportingText = {
-                        if (isErrorTitle) {
-                            Text(
-                                text = "Не выбран товар для списания",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else {
-                            Text("Выберите товар, который хотите списать")
-                        }
+                        Text("Выберите товар, который хотите списать")
                     },
                     modifier = Modifier
                         .menuAnchor()
@@ -270,14 +266,23 @@ fun WriteOffEntryContainerProduct(
             value = priceAll,
             onValueChange = {
                 priceAll = it
+                validatePrice(it)
             },
             label = { Text("Цена") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 2.dp),
             supportingText = {
-                Text("Укажите цену за списанный товар")
+                if (isErrorCount) {
+                    Text(
+                        text = "Не указана цена за списанный товар",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Text("Укажите цену за списанный товар")
+                }
             },
+            isError = isErrorPrice,
             suffix = { Text(text = "₽") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,

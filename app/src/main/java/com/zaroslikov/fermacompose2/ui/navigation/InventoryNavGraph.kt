@@ -107,7 +107,7 @@ fun InventoryNavHost(
         composable(route = StartDestination.route) {
             StartScreen(navController = navController,//TODO переделать на адд ADD
                 navigateToItemProject = {
-                    navController.navigate("${HomeDestination.route}/${it}")
+                    navController.navigate("${WarehouseDestination.route}/${it}")
                 }, navigateToItemIncubator = {
                     navController.navigate("${IncubatorScreenDestination.route}/${it}")
                 })
@@ -121,8 +121,10 @@ fun InventoryNavHost(
 
 
         composable(route = ProjectAddDestination.route) {
-            AddProject(navController = navController,//TODO переделать на старт
-                navigateBack = { navController.popBackStack() })
+            AddProject(
+                navigateBack = { navController.popBackStack() },
+                navigateToStart = { navController.navigate(StartDestination.route) }
+            )
         }
 
         composable(route = AddIncubatorDestination.route) {
@@ -215,8 +217,6 @@ fun InventoryNavHost(
             WarehouseScreen(
                 navigateToStart = { navController.navigate(StartDestination.route) },
                 navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
-                navigateToItemUpdate = {},
-                navigateToItemAdd = {},
                 drawerState = drawerState
             )
         }
@@ -505,7 +505,7 @@ fun InventoryNavHost(
                 navigateBack = { navController.popBackStack() },
                 navigateEdit = { navController.navigateUp() },
                 navigateDelete = {
-                    navController.navigate(StartDestination.route)
+                    navController.navigate("${AnimalDestination.route}/${it}")
                 }
             )
         }

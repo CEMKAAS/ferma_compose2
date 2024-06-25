@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
 
@@ -43,7 +44,7 @@ fun ChoiseProject(
 ) {
     Scaffold(
         topBar = {
-            TopAppBarStart(title = "Выбор проекта", true, navigateUp = navigateBack)
+            TopAppBarEdit(title = "Выбор проекта", navigateUp = navigateBack)
         }) { innerPadding ->
         ChooiseProjectContainer(
             modifier = Modifier

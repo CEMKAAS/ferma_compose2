@@ -139,7 +139,12 @@ fun AnimalCardContainer(
         Card(
             modifier = modifierCard
         ) {
-            Text(text = "Имя: ${animalTable.name}", modifier = modifierText)
+            Text(
+                //TODO Подумать как правильно
+                text = "Данные", modifier = modifierHeading,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
             Text(text = "Тип: ${animalTable.type}", modifier = modifierText)
             if (!animalTable.groop) {
                 Text(text = "Пол: ${animalTable.sex}", modifier = modifierText)
@@ -153,7 +158,7 @@ fun AnimalCardContainer(
                     onNavigateIndicators(
                         AnimalIndicators(
                             id = animalTable.id,
-                            table = "weight"
+                            table = "Вес"
                         )
                     )
                 }
@@ -174,14 +179,14 @@ fun AnimalCardContainer(
                     onNavigateIndicators(
                         AnimalIndicators(
                             id = animalTable.id,
-                            table = "size"
+                            table = "Размер"
                         )
                     )
                 }
             ) {
                 var i = 1
                 Text(
-                    text = "Рост", modifier = modifierHeading,
+                    text = "Размер", modifier = modifierHeading,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
@@ -196,7 +201,7 @@ fun AnimalCardContainer(
                     onNavigateIndicators(
                         AnimalIndicators(
                             id = animalTable.id,
-                            table = "count"
+                            table = "Количество"
                         )
                     )
                 }
@@ -218,7 +223,7 @@ fun AnimalCardContainer(
                 onNavigateIndicators(
                     AnimalIndicators(
                         id = animalTable.id,
-                        table = "vaccination"
+                        table = "Прививки"
                     )
                 )
             }

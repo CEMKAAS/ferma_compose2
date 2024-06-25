@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
+import com.zaroslikov.fermacompose2.TopAppBarFermaFilter
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
@@ -57,8 +58,6 @@ object WarehouseDestination : NavigationDestination {
 fun WarehouseScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (navigateId) -> Unit,
-    navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -88,19 +87,18 @@ fun WarehouseScreen(
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBarFerma(
+                TopAppBarFermaFilter(
                     title = "Мой Склад",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
+                    showBottomFilter = showBottomSheetFilter,
+                    filterSheet = false,
                     scrollBehavior = scrollBehavior
                 )
             }
         ) { innerPadding ->
             WarehouseBody(
                 itemList = homeUiState.itemList,
-//                onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
                 showBottomFilter = showBottomSheetFilter
@@ -114,7 +112,6 @@ fun WarehouseScreen(
 @Composable
 private fun WarehouseBody(
     itemList: List<WarehouseData>,
-//    onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     showBottomFilter: MutableState<Boolean>
@@ -125,7 +122,7 @@ private fun WarehouseBody(
     ) {
         if (itemList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),
+                text = stringResource(R.string.no_item_warehouse),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),
@@ -133,7 +130,6 @@ private fun WarehouseBody(
         } else {
             WarehouseInventoryList(
                 itemList = itemList,
-//                onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
@@ -151,7 +147,6 @@ private fun WarehouseBody(
 @Composable
 private fun WarehouseInventoryList(
     itemList: List<WarehouseData>,
-//    onItemClick: (AddTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
@@ -176,7 +171,6 @@ private fun WarehouseInventoryList(
                 modifier = Modifier
                     .padding(8.dp)
             )
-//                    .clickable { onItemClick(item) })
         }
     }
 }

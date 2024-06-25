@@ -423,7 +423,7 @@ fun AddEditContainerProduct(
                 .padding(bottom = 2.dp)
                 .clickable {
                     openDialog = true
-                },
+                }
         )
 
         Button(

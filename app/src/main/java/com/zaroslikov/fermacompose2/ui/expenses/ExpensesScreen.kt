@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -108,8 +109,6 @@ fun ExpensesScreen(
                     title = "Мои Покупки",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
                     scrollBehavior = scrollBehavior
                 )
             },
@@ -157,7 +156,7 @@ private fun ExpensesBody(
     ) {
         if (itemList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),
+                text = stringResource(R.string.no_item_expenses),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),
@@ -205,7 +204,7 @@ fun ExpensesCard(
     expensesTable: ExpensesTable,
     modifier: Modifier = Modifier
 ) {
-    androidx.compose.material3.Card(
+    Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()

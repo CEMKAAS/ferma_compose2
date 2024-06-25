@@ -83,6 +83,7 @@ fun WriteOffScreen(
     val titleUiState by viewModel.titleUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    val writeOffBoolean = titleUiState.titleList.isNotEmpty()
     val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
@@ -109,13 +110,11 @@ fun WriteOffScreen(
                     title = "Мои Списания",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
                     scrollBehavior = scrollBehavior
                 )
             },
             floatingActionButton = {
-                if (titleUiState.titleList.isNotEmpty()) {
+                if (writeOffBoolean) {
                     FloatingActionButton(
                         onClick = { navigateToItem(idProject) },
                         shape = MaterialTheme.shapes.medium,
@@ -134,6 +133,7 @@ fun WriteOffScreen(
             },
         ) { innerPadding ->
             WriteOffBody(
+                writeOffBoolean = writeOffBoolean,
                 itemList = homeUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
@@ -148,6 +148,7 @@ fun WriteOffScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WriteOffBody(
+    writeOffBoolean: Boolean,
     itemList: List<WriteOffTable>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
@@ -158,14 +159,26 @@ private fun WriteOffBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
+
         if (itemList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_item_description),//TODO
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
-        } else {
+            if(writeOffBoolean) {
+                Text(
+                    text = stringResource(R.string.no_item_write_off_no_product),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(contentPadding),
+                )
+            }else{
+                Text(
+                    text = stringResource(R.string.no_item_write_off),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(contentPadding),
+                )
+            }
+
+
+        }  else {
             WriteOffInventoryList(
                 itemList = itemList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },

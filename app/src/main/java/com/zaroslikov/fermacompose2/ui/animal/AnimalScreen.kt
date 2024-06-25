@@ -104,8 +104,6 @@ fun AnimalScreen(
                     title = "Мои Животные",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter, //todo на фильтр
-                    filterSheet = true,
                     scrollBehavior = scrollBehavior
                 )
             },
@@ -150,7 +148,7 @@ private fun AnimalBody(
     ) {
         if (itemList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),
+                text = stringResource(R.string.no_item_animal),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),

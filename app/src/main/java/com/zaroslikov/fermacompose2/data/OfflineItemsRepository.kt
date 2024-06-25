@@ -50,6 +50,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateProject(item: ProjectTable) = itemDao.updateProject(item)
     override suspend fun deleteProject(item: ProjectTable) = itemDao.deleteProject(item)
     override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
+    override fun getCountRowIncubator(): Flow<Int> = itemDao.getCountRowIncubator()
     override fun getCountRowProject(): Flow<Int> = itemDao.getCountRowProject()
     override fun getProjectListAct(): Flow<List<ProjectTable>> = itemDao.getProjectListAct()
     override fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp> = itemDao.getIncubatorTemp2(id)

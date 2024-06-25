@@ -67,6 +67,9 @@ interface ItemDao {
     fun getProjectListAct(): Flow<List<ProjectTable>>
 
     @Query("SELECT COUNT(*) AS row_count from Project Where mode = 0")
+    fun getCountRowIncubator(): Flow<Int>
+
+    @Query("SELECT COUNT(*) AS row_count from Project Where mode = 1")
     fun getCountRowProject(): Flow<Int>
 
 
@@ -124,7 +127,7 @@ interface ItemDao {
     @Query("SELECT MyFerma.category from MyFerma Where idPT=:id group by MyFerma.category ")
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
 
-    @Query("SELECT MyFerma.animal from MyFerma Where idPT=:id group by MyFerma.animal ")
+    @Query("SELECT name from AnimalTable Where idPT=:id")
     fun getItemsAnimalAddList(id: Int): Flow<List<String>>
 
 

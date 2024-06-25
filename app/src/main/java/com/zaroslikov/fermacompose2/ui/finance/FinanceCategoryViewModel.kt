@@ -29,7 +29,7 @@ class FinanceCategoryViewModel(
 ) : ViewModel() {
 
     private val itemId: Int = checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArg])
-    private val itemCategory: String =
+    val itemCategory: String =
         checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArgTwo])
     val itemBoolean: Boolean =
         checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArgThree])

@@ -96,7 +96,6 @@ data class AnimalCardUiState(
         "",
         "",
         "",
-        "",
         false,
         1
     )

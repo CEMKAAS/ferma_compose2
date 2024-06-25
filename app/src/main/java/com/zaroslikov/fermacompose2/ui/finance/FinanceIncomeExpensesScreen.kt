@@ -79,6 +79,7 @@ fun FinanceIncomeExpensesScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 //    val coroutineScope = rememberCoroutineScope()
+    val titleTopBar = if(viewModel.itemBoolean) "Мои Доходы" else "Мои Расходы"
 
     val financeCategoryState by viewModel.financeCategoryIEState.collectAsState()
     val financeProduuctState by viewModel.financeProductIEState.collectAsState()
@@ -86,7 +87,7 @@ fun FinanceIncomeExpensesScreen(
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBarEdit(title = "Добавить Продажу", navigateUp = navigateBack)
+            TopAppBarEdit(title = titleTopBar, navigateUp = navigateBack)
         }
     ) { innerPadding ->
         FinanceIncomeExpensesBody(
@@ -113,7 +114,7 @@ private fun FinanceIncomeExpensesBody(
     ) {
         if (productList.isEmpty()) {
             Text(
-                text = stringResource(R.string.no_item_description),//TODO
+                text = stringResource(R.string.no_item_finance_edit),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),
