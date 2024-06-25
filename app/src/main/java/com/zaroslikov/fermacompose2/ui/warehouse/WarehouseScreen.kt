@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.TopAppBarFermaFilter
+import com.zaroslikov.fermacompose2.TopAppBarFermaWarehouse
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
@@ -58,6 +59,7 @@ object WarehouseDestination : NavigationDestination {
 fun WarehouseScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
+    navigateToEdit:(Int) ->Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -87,12 +89,11 @@ fun WarehouseScreen(
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBarFermaFilter(
+                TopAppBarFermaWarehouse(
                     title = "Мой Склад",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    showBottomFilter = showBottomSheetFilter,
-                    filterSheet = false,
+                    navigateToEdit = {navigateToEdit(idProject)},
                     scrollBehavior = scrollBehavior
                 )
             }

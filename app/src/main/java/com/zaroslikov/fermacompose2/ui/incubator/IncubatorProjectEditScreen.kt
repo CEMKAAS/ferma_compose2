@@ -81,7 +81,6 @@ fun IncubatorProjectEditScreen(
     viewModel: IncubatorProjectEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(

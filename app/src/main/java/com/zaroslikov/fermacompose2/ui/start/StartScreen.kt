@@ -1,11 +1,13 @@
 package com.zaroslikov.fermacompose2.ui.start
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -30,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -41,9 +45,14 @@ import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.incubator.endInc
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 
 object StartDestination : NavigationDestination {
@@ -56,6 +65,8 @@ fun StartScreen(
     navController: NavController,
     navigateToItemProject: (Int) -> Unit,
     navigateToItemIncubator: (Int) -> Unit,
+    navigateToItemProjectArh: (Int) -> Unit,
+    navigateToItemIncubatorArh: (Int) -> Unit,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
@@ -78,7 +89,9 @@ fun StartScreen(
             onItemClick = navigateToItemProject,
             projectListArh = projectListArh.projectList,
             projectListAct = projectListAct.projectList,
-            navigateToItemIncubator = navigateToItemIncubator
+            navigateToItemIncubator = navigateToItemIncubator,
+            navigateToItemProjectArh = navigateToItemProjectArh,
+            navigateToItemIncubatorArh = navigateToItemIncubatorArh
         )
     }
 }
@@ -90,6 +103,8 @@ fun StartScreenContainer(
     modifier: Modifier,
     onItemClick: (Int) -> Unit,
     navigateToItemIncubator: (Int) -> Unit,
+    navigateToItemProjectArh: (Int) -> Unit,
+    navigateToItemIncubatorArh: (Int) -> Unit,
     projectListArh: List<ProjectTable>,
     projectListAct: List<ProjectTable>
 ) {
@@ -132,56 +147,56 @@ fun StartScreenContainer(
                     .weight(1f)
             ) {
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(16.dp)
-            ) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
 
-                when (state) {
-                    0 -> {
-                        items(items = projectListArh, key = { it.id }) {
-                            if (it.mode == 0) {
-                                CardIncubator(
-                                    projectTable = it, modifier = Modifier
-                                        .padding(8.dp)
-                                        .clickable {
-                                            navigateToItemIncubator(it.id)
-                                        }
-                                )
-                            } else {
-                                CardFerma(
-                                    projectTable = it, modifier = Modifier
-                                        .padding(8.dp)
-                                        .clickable {
-                                            onItemClick(it.id)
-                                        }
-                                )
+                    when (state) {
+                        0 -> {
+                            items(items = projectListAct, key = { it.id }) {
+                                if (it.mode == 0) {
+                                    CardIncubator(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                navigateToItemIncubator(it.id)
+                                            }
+                                    )
+                                } else {
+                                    CardFerma(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                onItemClick(it.id)
+                                            }
+                                    )
+                                }
+                            }
+                        }
+
+                        1 -> {
+                            items(items = projectListArh, key = { it.id }) {
+                                if (it.mode == 0) {
+                                    CardIncubator(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                navigateToItemIncubatorArh(it.id)
+                                            }
+                                    )
+                                } else {
+                                    CardFerma(
+                                        projectTable = it, modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                navigateToItemProjectArh(it.id)
+                                            }
+                                    )
+                                }
                             }
                         }
                     }
-
-                    1 -> {
-                        items(items = projectListAct, key = { it.id }) {
-                            if (it.mode == 0) {
-                                CardIncubator(
-                                    projectTable = it, modifier = Modifier
-                                        .padding(8.dp)
-                                        .clickable {
-                                            navigateToItemIncubator(it.id)
-                                        }
-                                )
-                            } else {
-                                CardFerma(
-                                    projectTable = it, modifier = Modifier
-                                        .padding(8.dp)
-                                        .clickable {
-                                            onItemClick(it.id)
-                                        }
-                                )
-                            }
-                        }
-                    }
-                }
                 }
             }
         }
@@ -197,13 +212,14 @@ fun CardIncubator(
         elevation = CardDefaults.cardElevation(10.dp),
         colors = CardDefaults.cardColors()
     ) {
+        val imcubCard = setImageIncubatorCard(projectTable)
 
-//        Image(
-//            painter = painterResource(id = R.drawable.chicken),
-//            contentDescription = null,
-//            contentScale = ContentScale.Fit,
-//            modifier = Modifier.size(194.dp)
-//        )
+        Image(
+            painter = painterResource(id = imcubCard.image),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(194.dp)
+        )
         Text(
             text = projectTable.titleProject,
             fontSize = 16.sp,
@@ -213,7 +229,7 @@ fun CardIncubator(
                 .padding(vertical = 5.dp, horizontal = 5.dp)
         )
         Text(
-            text = projectTable.data, fontSize = 15.sp,
+            text = imcubCard.day, fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 5.dp)
@@ -222,6 +238,56 @@ fun CardIncubator(
     }
 }
 
+fun setImageIncubatorCard(projectTable: ProjectTable): IncubatorCardImage {
+    var day = "Идет 0 день "
+    var image = R.drawable.chicken
+    when (projectTable.type) {
+        "Курицы" -> {
+            image = R.drawable.chicken
+        }
+
+        "Гуси" -> {
+            image = R.drawable.external_goose_birds_icongeek26_outline_icongeek26
+        }
+
+        "Перепела" -> {
+            image = R.drawable.quail
+        }
+
+        "Утки" -> {
+            image = R.drawable.duck
+        }
+
+        "Индюки" -> {
+            image = R.drawable.turkeycock
+        }
+    }
+    if (projectTable.arhive == "0") {
+        var diff: Long = 0
+        val calendar: Calendar = Calendar.getInstance()
+        val dateBefore22: String = projectTable.data
+        val dateBefore222: String =
+            (calendar.get(Calendar.DAY_OF_MONTH)).toString() + "." + (calendar.get(
+                Calendar.MONTH
+            ) + 1) + "." + calendar.get(Calendar.YEAR)
+        val myFormat: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
+        val date1: Date = myFormat.parse(dateBefore22)
+        val date2: Date = myFormat.parse(dateBefore222)
+        diff = date2.time - date1.time
+        day = "Идет ${TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)} день"
+
+    }else {
+        day = "Завершён"
+    }
+    return IncubatorCardImage(image, day)
+}
+
+data class IncubatorCardImage(
+    val image: Int,
+    val day: String
+)
+
+
 @Composable
 fun CardFerma(projectTable: ProjectTable, modifier: Modifier = Modifier) {
     Card(
@@ -229,14 +295,12 @@ fun CardFerma(projectTable: ProjectTable, modifier: Modifier = Modifier) {
         elevation = CardDefaults.cardElevation(10.dp),
         colors = CardDefaults.cardColors()
     ) {
-
-
-//        Image(
-//            bitmap = byteArrayToBitmap(picture).asImageBitmap(),
-//            contentDescription = null,
-//            contentScale = ContentScale.Fit,
-//            modifier = Modifier.size(194.dp)
-//        )
+        Image(
+            painter = painterResource(id = R.drawable.baseline_warehouse_24),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(194.dp)
+        )
         Text(
             text = projectTable.titleProject,
             fontSize = 16.sp,

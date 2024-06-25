@@ -158,12 +158,12 @@ fun IncubatorContainer(
         }
         item {
             Button(
-                onClick = { },
+                onClick = { deleteInc()},
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
             ) {
-                Text(text = "Завершить")
+                Text(text = "Удалить")
             }
         }
     }

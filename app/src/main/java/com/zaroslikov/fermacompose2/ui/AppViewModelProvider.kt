@@ -29,6 +29,7 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsCard
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
+import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesViewModel
@@ -50,6 +51,7 @@ import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddViewModel
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoContainer
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoViewModel
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorViewModel
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditViewModel
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryViewModel
@@ -111,6 +113,13 @@ object AppViewModelProvider {
         //Warehouse
         initializer {
             WarehouseViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
+        initializer {
+            WarehouseEditViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )
@@ -256,6 +265,12 @@ object AppViewModelProvider {
         }
         initializer {
             AnimalEditViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+        initializer {
+            FinanceArhivViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )

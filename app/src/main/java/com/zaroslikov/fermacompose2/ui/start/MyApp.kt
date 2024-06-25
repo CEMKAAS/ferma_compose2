@@ -55,7 +55,7 @@ fun DrawerSheet(
             R.drawable.baseline_edit_note_24, "Мои Списания", WriteOffDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_edit_note_24, "Мои Животные", AnimalDestination.route
+            R.drawable.baseline_cruelty_free_24, "Мои Животные", AnimalDestination.route
         )
 
     )

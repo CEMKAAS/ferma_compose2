@@ -167,6 +167,7 @@ fun AnimalEntryContainer(
     //Дата
     var openDialog by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
+    datePickerState.setSelection(calendar.timeInMillis)
 
     if (openDialog) {
         DatePickerDialogSample(datePickerState, date1) { date ->

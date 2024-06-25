@@ -174,7 +174,48 @@ fun TopAppBarFerma(
     )
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarFermaWarehouse(
+    title: String,
+    scope: CoroutineScope,
+    drawerState: DrawerState,
+    navigateToEdit: () -> Unit = {},
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.largeTopAppBarColors(
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        title = {
+            Text(text = title)
+        },
+        scrollBehavior = scrollBehavior,
+        navigationIcon = {
+            IconButton(onClick = {
+                scope.launch {
+                    drawerState.apply {
+                        if (isClosed) open() else close()
+                    }
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Меню"
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = navigateToEdit
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Настройка"
+                )
+            }
+        }
+    )
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -118,7 +118,7 @@ fun AddProjectContainer(
         isErrorTitle = text == ""
     }
     //Текст
-    var name by rememberSaveable { mutableStateOf("Мое Хозяйство №${number}") }
+    var name by rememberSaveable { mutableStateOf("") }
     var date1 by remember { mutableStateOf(formattedDate) }
 
     if (openDialog) {
@@ -128,6 +128,8 @@ fun AddProjectContainer(
         }
     }
 
+    name = "Мое Хозяйство №${
+        number + 1}"
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 
@@ -226,24 +228,26 @@ fun AddProjectContainer(
 
         Button(
             onClick = {
-                navigateToStart(
-                    ProjectTable(
-                        id = 0,
-                        titleProject = name,
-                        type = "",
-                        data = date1,
-                        eggAll = "",
-                        eggAllEND = "",
-                        airing = "",
-                        over = "",
-                        arhive = "0",
-                        dateEnd = date1,
-                        time1 = "",
-                        time2 = "",
-                        time3 = "",
-                        mode = 1
+               if (!isErrorTitle) {
+                    navigateToStart(
+                        ProjectTable(
+                            id = 0,
+                            titleProject = name,
+                            type = "",
+                            data = date1,
+                            eggAll = "",
+                            eggAllEND = "",
+                            airing = "",
+                            over = "",
+                            arhive = "0",
+                            dateEnd = date1,
+                            time1 = "",
+                            time2 = "",
+                            time3 = "",
+                            mode = 1
+                        )
                     )
-                )
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

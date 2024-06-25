@@ -17,11 +17,11 @@ import kotlinx.coroutines.launch
 class AddIncubatorViewModel(
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
-    var countIncubator by mutableIntStateOf(1)
+    var countIncubator by mutableStateOf(0)
         private set
     init {
         viewModelScope.launch {
-            countIncubator = itemsRepository.getCountRowProject()
+            countIncubator = itemsRepository.getCountRowIncubator()
                 .filterNotNull()
                 .first()
                 .toInt()

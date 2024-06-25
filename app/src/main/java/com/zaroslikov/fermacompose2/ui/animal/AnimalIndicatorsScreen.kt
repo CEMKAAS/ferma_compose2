@@ -195,7 +195,7 @@ private fun AnimalIndicatorsBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        if (itemVaccinationList.isNotEmpty()||itemList.isNotEmpty()) {
+        if (itemVaccinationList.isNotEmpty()&&itemList.isNotEmpty()) {
             LazyColumn(
                 modifier = modifier, contentPadding = contentPadding
             ) {
@@ -227,7 +227,7 @@ private fun AnimalIndicatorsBody(
             }
         }else{
             Text(
-                text = ("Нет данных по $indicators"),
+                text = ("Нет данных в категории $indicators\nНажмите + чтобы добавить."),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(contentPadding),

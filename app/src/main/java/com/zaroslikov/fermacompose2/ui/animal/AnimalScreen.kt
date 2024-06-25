@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,7 +68,7 @@ object AnimalDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalScreen(
-    navigateToStart:()-> Unit,
+    navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemCard: (Int) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
@@ -89,7 +90,7 @@ fun AnimalScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navigateToStart =  navigateToStart,
+                navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
                 7,
@@ -189,7 +190,7 @@ fun AnimalCard(
     animalTable: AnimalTable,
     modifier: Modifier = Modifier
 ) {
-    androidx.compose.material3.Card(
+    Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
@@ -214,9 +215,19 @@ fun AnimalCard(
                     fontSize = 16.sp
                 )
                 Text(
-                    text = "Дата: ${animalTable.data}",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
+                    text = "Тип: ${animalTable.type}", modifier = Modifier
+                        .wrapContentSize()
+                        .padding(vertical = 3.dp, horizontal = 6.dp)
+                )
+                if (!animalTable.groop) {
+                    Text(
+                        text = "Пол: ${animalTable.sex}", modifier = Modifier
+                            .wrapContentSize()
+                            .padding(vertical = 3.dp, horizontal = 6.dp)
+                    )
+                }
+                Text(
+                    text = "Дата: ${animalTable.data}", modifier = Modifier
                         .wrapContentSize()
                         .padding(vertical = 3.dp, horizontal = 6.dp)
                 )

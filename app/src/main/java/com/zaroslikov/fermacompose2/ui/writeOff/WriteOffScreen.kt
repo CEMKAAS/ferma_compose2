@@ -161,7 +161,7 @@ private fun WriteOffBody(
     ) {
 
         if (itemList.isEmpty()) {
-            if(writeOffBoolean) {
+            if(!writeOffBoolean) {
                 Text(
                     text = stringResource(R.string.no_item_write_off_no_product),
                     textAlign = TextAlign.Center,
