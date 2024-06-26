@@ -23,10 +23,10 @@ import androidx.room.PrimaryKey
 /**
  * Entity data class represents a single row in the database.
  */
-@Entity(tableName = "Project")
+@Entity(tableName = "МyINCUBATOR")
 data class ProjectTable(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
+    @ColumnInfo(name = "_id")
     val id: Int = 0,
     @ColumnInfo(name = "NAME")
     val titleProject: String, // название

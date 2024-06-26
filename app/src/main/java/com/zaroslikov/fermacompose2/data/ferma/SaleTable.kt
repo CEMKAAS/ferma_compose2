@@ -35,17 +35,21 @@ import androidx.room.PrimaryKey
 )
 data class SaleTable(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "_id")
     val id: Int = 0,
-
-    @ColumnInfo(name = "Title")
+    @ColumnInfo(name = "titleSale")
     val title: String, // название
-
-    @ColumnInfo(name = "Count")
+    @ColumnInfo(name = "discSale")
     val count: Double, // Кол-во
+    @ColumnInfo(name = "DAY")
     val day: Int,  // день
+    @ColumnInfo(name = "MOUNT")
     val mount: Int, // месяц
+    @ColumnInfo(name = "YEAR")
     val year: Int, // время
+    @ColumnInfo(name = "PRICE")
     val priceAll: Double,
+
     var suffix: String,
     var category: String,
     val buyer : String,

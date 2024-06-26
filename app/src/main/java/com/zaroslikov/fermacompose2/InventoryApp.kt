@@ -20,6 +20,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -52,6 +53,7 @@ fun InventoryApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 ) {
+
     InventoryNavHost(
         navController = navController,
         drawerState = drawerState
@@ -258,7 +260,7 @@ fun TopAppBarStart(
 @Composable
 fun TopAppBarStart2(
     title: String,
-    settingUp: () -> Unit = {}
+    infoBottomSheet: MutableState<Boolean>
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -268,10 +270,10 @@ fun TopAppBarStart2(
             Text(text = title)
         },
         actions = {
-            IconButton(onClick = settingUp) {
+            IconButton(onClick = { infoBottomSheet.value = true }) {
                 Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "Настройка"
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = "Информация"
                 )
             }
         }

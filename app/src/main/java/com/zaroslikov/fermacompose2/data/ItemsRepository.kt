@@ -95,6 +95,7 @@ interface ItemsRepository {
     fun getItemsAnimalAddList(id: Int): Flow<List<String>>
 
     suspend fun insertProject(projectTable: ProjectTable)
+    suspend fun insertProjectLong(projectTable: ProjectTable):Long
 
     /**
      * Insert item in the data source

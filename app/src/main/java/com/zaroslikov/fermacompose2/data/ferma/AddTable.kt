@@ -35,20 +35,24 @@ import androidx.room.PrimaryKey
 )
 data class AddTable(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "_id")
     val id: Int = 0,
-
-    @ColumnInfo(name = "Title")
+    @ColumnInfo(name = "title")
     val title: String, // название
-
-    @ColumnInfo(name = "Count")
+    @ColumnInfo(name = "disc")
     val count: Double, // Кол-во
+    @ColumnInfo(name = "DAY")
     val day: Int,  // день
+    @ColumnInfo(name = "MOUNT")
     val mount: Int, // месяц
+    @ColumnInfo(name = "YEAR")
     val year: Int, // время
-    val priceAll: String,
-    @ColumnInfo(name = "idPT")
-    val idPT: Int,
+    @ColumnInfo(name = "PRICE")
+    val priceAll: Double,
+
     var suffix: String,
     var category: String,
     var animal: String,
+    @ColumnInfo(name = "idPT")
+    val idPT: Int
 )

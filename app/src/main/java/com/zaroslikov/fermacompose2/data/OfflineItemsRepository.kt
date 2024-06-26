@@ -78,6 +78,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun insertProject(projectTable: ProjectTable) =
         itemDao.insertProject(projectTable)
 
+    override suspend fun insertProjectLong(projectTable: ProjectTable): Long = itemDao.insertProjectLong(projectTable)
+
     override suspend fun insertItem(item: AddTable) = itemDao.insert(item)
 
     override suspend fun deleteItem(item: AddTable) = itemDao.delete(item)

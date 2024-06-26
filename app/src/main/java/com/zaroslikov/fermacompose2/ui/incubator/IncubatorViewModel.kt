@@ -7,6 +7,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
@@ -76,7 +80,6 @@ class IncubatorViewModel(
             )
 
 
-
     var itemUiState by mutableStateOf(IncubatorProjectEditState())
         private set
 
@@ -98,10 +101,39 @@ class IncubatorViewModel(
         itemsRepository.updateProject(itemUiState.toProjectTable())
     }
 
+    suspend fun saveProject(animalTable: AnimalTable, count: String) {
+
+        itemsRepository.updateProject(itemUiState.toProjectTable())
+        itemsRepository.insertAnimalTable(animalTable)
+
+//        itemsRepository.insertAnimalCountTable(
+//            AnimalCountTable(
+//                count = count,
+//                date = animalTable.data,
+//                idAnimal = id.toInt()
+//            )
+//        )
+    }
+
+    suspend fun saveNewProject(animalTable: AnimalTable, count: String) {
+
+        val idPT = itemsRepository.insertProjectLong(itemUiState.toProjectTable())
+
+        itemsRepository.insertAnimalTable(animalTable.copy(idPT = idPT.toInt()))
+
+//        itemsRepository.insertAnimalCountTable(
+//            AnimalCountTable(
+//                count = count,
+//                date = animalTable.data,
+//                idAnimal = 1
+//            )
+//        )
+    }
+
+
     suspend fun deleteItem() {
         itemsRepository.deleteProject(itemUiState.toProjectTable())
     }
-
 
 
 //    var projectState by mutableStateOf(IncubatorProjectState())
@@ -195,15 +227,81 @@ class IncubatorViewModel(
 data class IncubatorProjectListUiState(val itemList: List<ProjectTable> = listOf())
 
 data class IncubatorProjectState(
-    val project: ProjectTable = ProjectTable(0, "", "", "","","","","","","","","","",0)
+    val project: ProjectTable = ProjectTable(0, "", "", "", "", "", "", "", "", "", "", "", "", 0)
 )
 
 data class IncubatorListState2(
-    val list: IncubatorTemp = IncubatorTemp(0, "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",0)
+    val list: IncubatorTemp = IncubatorTemp(
+        0,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        0
+    )
 )
 
 data class IncubatorListState(
-    val list: IncubatorUIList = IncubatorUIList(0, "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",0)
+    val list: IncubatorUIList = IncubatorUIList(
+        0,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        0
+    )
 )
 
 //data class IncubatorTempUiState(val list: IncubatorTemp = IncubatorTemp(0, "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",0))
