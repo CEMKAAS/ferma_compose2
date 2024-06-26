@@ -383,7 +383,7 @@ fun AddEntryContainerProduct(
                                 suffix = suffix,
                                 category = category,
                                 anaimal = animal,
-                                priceAll = "0"
+                                priceAll = 0.0
                             )
                         )
                     }
@@ -406,7 +406,7 @@ data class AddTableInsert(
     var day: Int,
     var mount: Int,
     var year: Int,
-    var priceAll: String,
+    var priceAll: Double,
     var suffix: String,
     var category: String,
     var anaimal: String

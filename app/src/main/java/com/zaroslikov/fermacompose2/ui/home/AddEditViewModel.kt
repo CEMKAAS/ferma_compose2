@@ -89,17 +89,17 @@ data class AddTableUiState(
     val day: Int = 0,  // день
     val mount: Int = 0, // месяц
     val year: Int = 0, // время
-    val priceAll: String = "",
-    val idPT: Int = 0,
+    val priceAll: Double = 0.0,
     var suffix: String = "",
     var category: String = "",
     var animal: String = "",
+    val idPT: Int = 0,
 )
 
 fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll, idPT, suffix, category, animal
+    id, title, count.toString(), day, mount, year, priceAll, suffix, category, animal, idPT
 )
 
 fun AddTableUiState.toAddTable(): AddTable = AddTable(
-    id, title, count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), day, mount, year, priceAll, idPT, suffix, category, animal
+    id, title, count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), day, mount, year, priceAll, suffix, category, animal, idPT
 )

@@ -118,7 +118,8 @@ fun AddProjectContainer(
         isErrorTitle = text == ""
     }
     //Текст
-    var name by rememberSaveable { mutableStateOf("") }
+    var name by remember { mutableStateOf("Мое Хозяйство №${
+        number + 1}") }
     var date1 by remember { mutableStateOf(formattedDate) }
 
     if (openDialog) {
@@ -127,9 +128,6 @@ fun AddProjectContainer(
             openDialog = false
         }
     }
-
-    name = "Мое Хозяйство №${
-        number + 1}"
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 

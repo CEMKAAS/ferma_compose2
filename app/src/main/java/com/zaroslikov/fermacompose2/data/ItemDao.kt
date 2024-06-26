@@ -51,7 +51,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemDao {
 
-    @Query("SELECT * from МyINCUBATOROVER")
+    @Query("SELECT * from МyINCUBATOR")
     fun getAllProject(): Flow<List<ProjectTable>>
 
     @Query("SELECT * from МyINCUBATOR Where ARHIVE = 1")
@@ -230,7 +230,7 @@ interface ItemDao {
     fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
 
     @Query(
-        "SELECT titleSale, discSale, suffix, PRICE, day, mount, year " +
+        "SELECT titleSale as title, discSale as count, suffix, PRICE as priceAll, day, mount, year " +
                 "from (SELECT MyFermaSale.titleSale, MyFermaSale.discSale, MyFermaSale.suffix, MyFermaSale.PRICE, MyFermaSale.day, MyFermaSale.mount, MyFermaSale.year From MyFermaSale" +
                 " Where idPT=:id and mount=:mount and year=:year " +
                 "UNION All " +
@@ -244,19 +244,19 @@ interface ItemDao {
         year: Int
     ): Flow<List<IncomeExpensesDetails>>
 
-    @Query("SELECT MyFermaSale.titleSale, COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS priceAll FROM MyFermaSale WHERE MyFermaSale.idPT =:id group by MyFermaSale.titleSale")
+    @Query("SELECT MyFermaSale.titleSale as Title, COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS priceAll FROM MyFermaSale WHERE MyFermaSale.idPT =:id group by MyFermaSale.titleSale")
     fun getIncomeAllList(id: Int): Flow<List<FinTit>>
 
-    @Query("SELECT MyFermaEXPENSES.titleEXPENSES, COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS priceAll FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id group by MyFermaEXPENSES.titleEXPENSES")
+    @Query("SELECT MyFermaEXPENSES.titleEXPENSES as Title, COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS priceAll FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id group by MyFermaEXPENSES.titleEXPENSES")
     fun getExpensesAllList(id: Int): Flow<List<FinTit>>
 
-    @Query("SELECT MyFermaSale.category, COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS priceAll FROM MyFermaSale WHERE MyFermaSale.idPT =:id group by MyFermaSale.category")
+    @Query("SELECT MyFermaSale.category as category, COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS priceAll FROM MyFermaSale WHERE MyFermaSale.idPT =:id group by MyFermaSale.category")
     fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>>
 
-    @Query("SELECT MyFermaEXPENSES.category, COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS priceAll FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id group by MyFermaEXPENSES.category")
+    @Query("SELECT MyFermaEXPENSES.category as category, COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS priceAll FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id group by MyFermaEXPENSES.category")
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
 
-    @Query("SELECT MyFermaSale.titleSale, COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS priceAll FROM MyFermaSale Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaSale.titleSale ORDER BY MyFermaSale.PRICE DESC")
+    @Query("SELECT MyFermaSale.titleSale as Title, COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS priceAll FROM MyFermaSale Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaSale.titleSale ORDER BY MyFermaSale.PRICE DESC")
     fun getProductListCategoryIncomeCurrentMonth(
         id: Int,
         mount: Int,
@@ -264,7 +264,7 @@ interface ItemDao {
         category: String
     ): Flow<List<FinTit>>
 
-    @Query("SELECT MyFermaEXPENSES.titleEXPENSES, COALESCE(SUM(MyFermaEXPENSES.discEXPENSES), 0.0) AS priceAll FROM MyFermaEXPENSES Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaEXPENSES.titleEXPENSES ORDER BY MyFermaEXPENSES.countEXPENSES DESC")
+    @Query("SELECT MyFermaEXPENSES.titleEXPENSES as Title, COALESCE(SUM(MyFermaEXPENSES.discEXPENSES), 0.0) AS priceAll FROM MyFermaEXPENSES Where idPT=:id and mount=:mount and year=:year and category=:category group by MyFermaEXPENSES.titleEXPENSES ORDER BY MyFermaEXPENSES.countEXPENSES DESC")
     fun getProductLisCategoryExpensesCurrentMonth(
         id: Int,
         mount: Int,
@@ -391,7 +391,7 @@ interface ItemDao {
     @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC")
     fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
 
-    @Query("SELECT Title,COALESCE(SUM(disc), 0.0) AS priceAll, suffix from MyFerma Where animal=:name GROUP BY Title ORDER BY priceAll DESC")
+    @Query("SELECT title as Title,COALESCE(SUM(disc), 0.0) AS priceAll, suffix from MyFerma Where animal=:name GROUP BY Title ORDER BY priceAll DESC")
     fun getProductAnimal(name:String):Flow<List<AnimalTitSuff>>
 
 }

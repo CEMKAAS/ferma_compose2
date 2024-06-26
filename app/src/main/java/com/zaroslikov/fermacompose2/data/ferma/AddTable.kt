@@ -28,7 +28,7 @@ import androidx.room.PrimaryKey
     tableName = "MyFerma",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
-        parentColumns = arrayOf("id"),
+        parentColumns = arrayOf("_id"),
         childColumns = arrayOf("idPT"),
         onDelete = ForeignKey.CASCADE
     )]

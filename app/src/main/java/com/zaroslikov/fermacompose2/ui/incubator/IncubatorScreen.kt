@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,6 +58,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 
@@ -126,16 +128,22 @@ fun IncubatorScreen(
             },
             saveInProject = {
                 coroutineScope.launch {
+                    viewModel.saveItem()
                     viewModel.saveProject(it.animalTable, it.count)
                     navigateStart()
                 }
             },
             saveInNewProject = {
                 coroutineScope.launch {
-                    viewModel.saveNewProject(it.animalTable,it.count)
+                    viewModel.saveNewProject(it.animalTable, it.count)
                     navigateStart()
                 }
             },
+            save ={
+                coroutineScope.launch {
+                    viewModel.saveNewProjectArh(it)
+                }
+            }
         )
     }
 }
@@ -157,8 +165,8 @@ fun IncubatorContainer(
     saveInArh: () -> Unit,
     deleteInc: () -> Unit,
     saveInProject: (IncubatorAnimalInProject) -> Unit,
-    saveInNewProject: (IncubatorAnimalInProject) -> Unit
-
+    saveInNewProject: (IncubatorAnimalInProject) -> Unit,
+    save:(project: ProjectTable)-> Unit
 ) {
 
     val scrollState = rememberLazyListState()
@@ -177,7 +185,8 @@ fun IncubatorContainer(
             saveInArh = saveInArh,
             deleteInc = deleteInc,
             saveInProject = saveInProject,
-            saveInNewProject = saveInNewProject
+            saveInNewProject = saveInNewProject,
+            save = save
         )
     }
 
@@ -245,10 +254,12 @@ fun IncubatorContainer(
             )
         }
         item {
-            Button(onClick = { openEndDialog.value = true },
+            Button(
+                onClick = { openEndDialog.value = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp)) {
+                    .padding(vertical = 10.dp)
+            ) {
                 Text(text = "Завершить")
             }
         }
@@ -370,11 +381,14 @@ fun EndIncubator(
     saveInArh: () -> Unit,
     deleteInc: () -> Unit,
     saveInProject: (IncubatorAnimalInProject) -> Unit,
-    saveInNewProject: (IncubatorAnimalInProject) -> Unit
+    saveInNewProject: (IncubatorAnimalInProject) -> Unit,
+    save: (project: ProjectTable) -> Unit
 ) {
-    val calendar = Calendar.getInstance()
-    val dateEnd =
-        calendar[Calendar.DAY_OF_MONTH].toString() + "." + (calendar[Calendar.MONTH] + 1) + "." + calendar[Calendar.YEAR]
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val dateEnd: String = format.format(calendar.timeInMillis)
+
+    var idProject by remember { mutableIntStateOf(1) }
 
     AlertDialog(
         onDismissRequest = { openEndDialog.value = false },
@@ -412,34 +426,35 @@ fun EndIncubator(
                     label = { Text("Кол-во птенцов") }
                 )
 
-                var idProject = 0
                 if (projectBoolean) {
+
                     val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
+                    idProject = selectedOption.id
 
                     Column(Modifier.selectableGroup()) {
                         projectList.forEach { text ->
                             Row(
                                 Modifier
                                     .fillMaxWidth()
-                                    .height(56.dp)
                                     .selectable(
-                                        selected = (text == selectedOption),
-                                        onClick = { onOptionSelected(text)
-                                                  idProject = text.id},
-//                                        role = Role.RadioButton
+                                        selected = (text == selectedOption
+                                                ),
+                                        onClick = { onOptionSelected(text) },
+                                        role = Role.RadioButton
                                     )
                                     .padding(horizontal = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
                                     selected = (text == selectedOption),
-                                    onClick = null // null recommended for accessibility with screenreaders
+                                    onClick = null
                                 )
                                 Text(text.titleProject)
                             }
                         }
                     }
                 }
+
 
                 Row(
                     modifier = Modifier
@@ -461,12 +476,23 @@ fun EndIncubator(
                     if (projectBoolean) {
                         TextButton(
                             onClick = {
-                                onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
-                                saveInProject(IncubatorAnimalInProject(
-                                    AnimalTable(name = projectTable.titleProject, type = projectTable.type, data = dateEnd, groop = true, sex = "Мужской", note = "", image = "", arhiv = false, idPT = idProject),
-                                    projectTable.eggAllEND
-                                ))
                                 openEndDialog.value = false
+                                onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
+                                saveInProject(
+                                    IncubatorAnimalInProject(
+                                        AnimalTable(
+                                            name = projectTable.titleProject,
+                                            type = projectTable.type,
+                                            data = dateEnd,
+                                            groop = true,
+                                            sex = "Мужской",
+                                            note = "",
+                                            image = "",
+                                            arhiv = false,
+                                            idPT = idProject
+                                        ), count = projectTable.eggAllEND
+                                    )
+                                )
                             },
                             modifier = Modifier.padding(4.dp),
                         ) {
@@ -476,23 +502,39 @@ fun EndIncubator(
 
                     TextButton(
                         onClick = {
-//                            onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
-//                            saveInArh()
-
-                            onValueChange(projectTable.copy(arhive = "0", dateEnd = dateEnd, mode = 1))
-                            saveInNewProject(IncubatorAnimalInProject(
-                                    AnimalTable(name = projectTable.titleProject, type = projectTable.type, data = dateEnd, groop = true, sex = "Мужской", note = "", image = "", arhiv = false, idPT = idProject),
-                            projectTable.eggAllEND
-                            ))
-
                             openEndDialog.value = false
+                            save(projectTable.toProjectTable())
+
+                            onValueChange(
+                                projectTable.copy(
+                                    id = 0,
+                                    arhive = "0",
+                                    dateEnd = dateEnd,
+                                    mode = 1
+                                )
+                            )
+                            saveInNewProject(
+                                IncubatorAnimalInProject(
+                                    AnimalTable(
+                                        name = projectTable.titleProject,
+                                        type = projectTable.type,
+                                        data = dateEnd,
+                                        groop = true,
+                                        sex = "Мужской",
+                                        note = "",
+                                        image = "",
+                                        arhiv = false,
+                                        idPT = idProject
+                                    ),
+                                    projectTable.eggAllEND
+                                )
+                            )
 
                         },
                         modifier = Modifier.padding(4.dp),
                     ) {
                         Text("Новый проект")
                     }
-
 
 
                 }
@@ -691,5 +733,5 @@ fun massList2(temp: IncubatorTemp): MutableList<String> {
 
 data class IncubatorAnimalInProject(
     val animalTable: AnimalTable,
-    val count:String
+    val count: String
 )

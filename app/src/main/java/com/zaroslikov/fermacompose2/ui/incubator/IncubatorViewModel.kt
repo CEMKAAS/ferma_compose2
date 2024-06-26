@@ -23,6 +23,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.TimeZone
 
 class IncubatorViewModel(
     savedStateHandle: SavedStateHandle,
@@ -102,32 +105,37 @@ class IncubatorViewModel(
     }
 
     suspend fun saveProject(animalTable: AnimalTable, count: String) {
-
-        itemsRepository.updateProject(itemUiState.toProjectTable())
-        itemsRepository.insertAnimalTable(animalTable)
-
-//        itemsRepository.insertAnimalCountTable(
-//            AnimalCountTable(
-//                count = count,
-//                date = animalTable.data,
-//                idAnimal = id.toInt()
-//            )
-//        )
+        val id = itemsRepository.insertAnimalTable(animalTable)
+        itemsRepository.insertAnimalCountTable(
+            AnimalCountTable(
+                count = count,
+                date = animalTable.data,
+                idAnimal = id.toInt()
+            )
+        )
     }
+
+    suspend fun saveNewProjectArh(project: ProjectTable) {
+        val format = SimpleDateFormat("dd.MM.yyyy")
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        val dateEnd: String = format.format(calendar.timeInMillis)
+        itemsRepository.updateProject(project.copy(arhive = "1", dateEnd = dateEnd))
+    }
+
 
     suspend fun saveNewProject(animalTable: AnimalTable, count: String) {
 
         val idPT = itemsRepository.insertProjectLong(itemUiState.toProjectTable())
 
-        itemsRepository.insertAnimalTable(animalTable.copy(idPT = idPT.toInt()))
+        val id = itemsRepository.insertAnimalTable(animalTable.copy(idPT = idPT.toInt()))
 
-//        itemsRepository.insertAnimalCountTable(
-//            AnimalCountTable(
-//                count = count,
-//                date = animalTable.data,
-//                idAnimal = 1
-//            )
-//        )
+        itemsRepository.insertAnimalCountTable(
+            AnimalCountTable(
+                count = count,
+                date = animalTable.data,
+                idAnimal = id.toInt()
+            )
+        )
     }
 
 

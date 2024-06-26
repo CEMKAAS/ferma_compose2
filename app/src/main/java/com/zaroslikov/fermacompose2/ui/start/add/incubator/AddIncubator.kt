@@ -105,7 +105,8 @@ fun AddIncubatorContainer(
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
 
-    var title by rememberSaveable { mutableStateOf("") }
+    var title by remember { mutableStateOf("Инкубатор №${
+        number + 1}") }
     var typeBirds by rememberSaveable { mutableStateOf(typeBirdsList[0]) }
     var count by rememberSaveable { mutableStateOf("0") }
     var date1 by remember { mutableStateOf(formattedDate) }
@@ -163,9 +164,6 @@ fun AddIncubatorContainer(
     if (showDialogTime3.value) {
         TimePicker(time = time3, showDialog = showDialogTime3)
     }
-
-    title = "Инкубатор №${
-        number + 1}"
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 

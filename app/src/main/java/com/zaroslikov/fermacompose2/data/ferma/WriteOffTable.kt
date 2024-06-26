@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
     tableName = "MyFermaWRITEOFF",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
-        parentColumns = arrayOf("id"),
+        parentColumns = arrayOf("_id"),
         childColumns = arrayOf("idPT"),
         onDelete = ForeignKey.CASCADE
     )]

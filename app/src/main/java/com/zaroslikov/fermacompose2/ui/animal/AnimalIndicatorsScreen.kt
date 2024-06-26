@@ -153,11 +153,13 @@ fun AnimalIndicatorsScreen(
                     viewModel.updateVaccinationt(it)
                 }
             },
-            deleteVaccinationt = { coroutineScope.launch {
-                viewModel.deleteVaccinationt()
-            }},
+            deleteVaccinationt = {
+                coroutineScope.launch {
+                    viewModel.deleteVaccinationt()
+                }
+            },
             editVaccinationtUiState = vacUiTable,
-            onValueChangeVaccinationt =  viewModel::updatevaccinationUiState
+            onValueChangeVaccinationt = viewModel::updatevaccinationUiState
         )
 
 
@@ -190,472 +192,175 @@ private fun AnimalIndicatorsBody(
     editVaccinationtUiState: AnimalVaccinationTable,
     onValueChangeVaccinationt: (AnimalVaccinationTable) -> Unit = {},
 
-) {
+    ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        if (itemVaccinationList.isNotEmpty()&&itemList.isNotEmpty()) {
-            LazyColumn(
-                modifier = modifier, contentPadding = contentPadding
-            ) {
-                if (indicators == "Прививки") {
-                    items(items = itemVaccinationList) { item ->
-                        AnimalVaccinatioCard(
-                            animalVaccinationTable = item,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clickable {
-                                    onValueChangeVaccinationt(item)
-                                    editBottomSheet.value = true
-                                }
-                        )
-                    }
-                } else {
-                    items(items = itemList) { item ->
-                        AnimalIndicatorsCard(
-                            indicators = item, modifier = Modifier
-                                .padding(8.dp)
-                                .clickable {
-                                    onValueChange(item)
-                                    editBottomSheet.value = true
-                                }
-                        )
 
-                    }
+//        Text(
+//                text = ("Нет данных в категории $indicators\nНажмите + чтобы добавить."),
+//        textAlign = TextAlign.Center,
+//        style = MaterialTheme.typography.titleLarge,
+//        modifier = Modifier.padding(contentPadding),
+//        )
+
+        LazyColumn(
+            modifier = modifier, contentPadding = contentPadding
+        ) {
+            if (indicators == "Прививки") {
+                items(items = itemVaccinationList) { item ->
+                    AnimalVaccinatioCard(
+                        animalVaccinationTable = item,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable {
+                                onValueChangeVaccinationt(item)
+                                editBottomSheet.value = true
+                            }
+                    )
+                }
+            } else {
+                items(items = itemList) { item ->
+                    AnimalIndicatorsCard(
+                        indicators = item, modifier = Modifier
+                            .padding(8.dp)
+                            .clickable {
+                                onValueChange(item)
+                                editBottomSheet.value = true
+                            }
+                    )
                 }
             }
-        }else{
-            Text(
-                text = ("Нет данных в категории $indicators\nНажмите + чтобы добавить."),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
-
         }
 
-        if (editBottomSheet.value) {
-            if (indicators == "Прививки") {
-                EditVacIndicatorsBottomSheet(
-                    animalVaccinationTable = editVaccinationtUiState,
-                    editBottomSheet = editBottomSheet,
-                    updateInTable = updateVaccinationt,
-                    deleteInTable = deleteVaccinationt
-                )
-            }else{
-                EditdIndicatorsBottomSheet(
-                    animalIndicatorsVM = editUiState,
-                    editBottomSheet = editBottomSheet,
-                    updateInTable = updateInTable,
-                    deleteInTable = deleteInTable
-                )
-            }
-        }
-
-        if (addBottomSheet.value) {
-            AddIndicatorsBottomSheet(
-                id = id,
-                indicators = indicators,
-                addBottomSheet = addBottomSheet,
-                saveInTable = saveInTable,
-                saveVaccinationt = saveVaccinationt
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditVacIndicatorsBottomSheet(
-    animalVaccinationTable: AnimalVaccinationTable,
-    editBottomSheet: MutableState<Boolean>,
-    updateInTable: (AnimalVaccinationTable) -> Unit,
-    deleteInTable: () -> Unit
-) {
-
-    ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
-        var count by rememberSaveable { mutableStateOf(animalVaccinationTable.vaccination) }
-        var date1 by rememberSaveable { mutableStateOf(animalVaccinationTable.date) }
-        var date2 by rememberSaveable { mutableStateOf(animalVaccinationTable.nextVaccination) }
-
-        //Дата
-        var openDialog by remember { mutableStateOf(false) }
-        var openDialog2 by remember { mutableStateOf(false) }
-        val datePickerState = rememberDatePickerState()
-
-        if (openDialog) {
-            DatePickerDialogSample(datePickerState, date1) { date ->
-                date1 = date
-                openDialog = false
-            }
-        }
-
-        if (openDialog2) {
-            DatePickerDialogSample(datePickerState, date2) { date ->
-                date2 = date
-                openDialog2 = false
-            }
-        }
-
-        var isErrorCount by rememberSaveable { mutableStateOf(false) }
-
-        fun validateCount(text: String) {
-            isErrorCount = text == ""
-        }
-
-        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-
-            OutlinedTextField(
-                value = count,
-                onValueChange = {
-                    count = it
-                    validateCount(count)
-                },
-                label = { Text("Товар") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp),
-                supportingText = {
-                    if (isErrorCount) {
-                        Text(
-                            text = "Не указано кол-во товара",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
-                    }
-                },
-                suffix = {
-                    Text(text = "Кг")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isErrorCount
-            )
-
-            OutlinedTextField(
-                value = date1,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Дата") },
-                supportingText = {
-                    Text("Выберите дату ")
-                },
-                trailingIcon = {
-                    IconButton(onClick = { openDialog = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_calendar_month_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        openDialog = true
-                    }
-                    .padding(bottom = 2.dp),
-            )
-
-            OutlinedTextField(
-                value = date2,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Дата") },
-                supportingText = {
-                    Text("Выберите дату ")
-                },
-                trailingIcon = {
-                    IconButton(onClick = { openDialog2 = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_calendar_month_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        openDialog2 = true
-                    }
-                    .padding(bottom = 2.dp),
-            )
-
-            Button(
-                onClick = {
-                    updateInTable(
-                        AnimalVaccinationTable(
-                            id =  animalVaccinationTable.id,
-                            vaccination = count,
-                            date = date1,
-                            nextVaccination = date2,
-                            idAnimal =  animalVaccinationTable.idAnimal
-                        )
+            if (editBottomSheet.value) {
+                if (indicators == "Прививки") {
+                    EditVacIndicatorsBottomSheet(
+                        animalVaccinationTable = editVaccinationtUiState,
+                        editBottomSheet = editBottomSheet,
+                        updateInTable = updateVaccinationt,
+                        deleteInTable = deleteVaccinationt
                     )
-                    editBottomSheet.value = false
-                }, modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_create_24),
-                    contentDescription = " Обновить "
-                )
-                Text(text = " Обновить ")
-            }
-
-            OutlinedButton(
-                onClick = {
-                    deleteInTable()
-                    editBottomSheet.value = false
-                },     modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_delete_24),
-                    contentDescription = "Удалить"
-                )
-                Text(text = " Удалить ")
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditdIndicatorsBottomSheet(
-    animalIndicatorsVM: AnimalIndicatorsVM,
-    editBottomSheet: MutableState<Boolean>,
-    updateInTable: (AnimalIndicatorsVM) -> Unit,
-    deleteInTable: () -> Unit
-) {
-
-    ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
-        var count by rememberSaveable { mutableStateOf(animalIndicatorsVM.weight) }
-        var date1 by rememberSaveable { mutableStateOf(animalIndicatorsVM.date) }
-
-        //Дата
-        var openDialog by remember { mutableStateOf(false) }
-        val datePickerState = rememberDatePickerState()
-
-        if (openDialog) {
-            DatePickerDialogSample(datePickerState, date1) { date ->
-                date1 = date
-                openDialog = false
-            }
-        }
-
-        var isErrorCount by rememberSaveable { mutableStateOf(false) }
-
-        fun validateCount(text: String) {
-            isErrorCount = text == ""
-        }
-
-        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-
-            OutlinedTextField(
-                value = count,
-                onValueChange = {
-                    count = it
-                    validateCount(count)
-                },
-                label = { Text("Товар") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp),
-                supportingText = {
-                    if (isErrorCount) {
-                        Text(
-                            text = "Не указано кол-во товара",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
-                    }
-                },
-                suffix = {
-                    Text(text = "Кг")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isErrorCount
-            )
-
-            OutlinedTextField(
-                value = date1,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Дата") },
-                supportingText = {
-                    Text("Выберите дату ")
-                },
-                trailingIcon = {
-                    IconButton(onClick = { openDialog = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_calendar_month_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        openDialog = true
-                    }
-                    .padding(bottom = 2.dp),
-            )
-
-
-            Button(
-                onClick = {
-                    updateInTable(
-                        AnimalIndicatorsVM(
-                            id = animalIndicatorsVM.id,
-                            weight = count,
-                            date = date1,
-                            idAnimal = animalIndicatorsVM.idAnimal
-                        )
+                } else {
+                    EditdIndicatorsBottomSheet(
+                        animalIndicatorsVM = editUiState,
+                        editBottomSheet = editBottomSheet,
+                        updateInTable = updateInTable,
+                        deleteInTable = deleteInTable
                     )
-                    editBottomSheet.value = false
-                }, modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_create_24),
-                    contentDescription = " Обновить "
-                )
-                Text(text = " Обновить ")
+                }
             }
 
-            OutlinedButton(
-                onClick = {
-                    deleteInTable()
-                    editBottomSheet.value = false
-                },     modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_delete_24),
-                    contentDescription = "Удалить"
+            if (addBottomSheet.value) {
+                AddIndicatorsBottomSheet(
+                    id = id,
+                    indicators = indicators,
+                    addBottomSheet = addBottomSheet,
+                    saveInTable = saveInTable,
+                    saveVaccinationt = saveVaccinationt
                 )
-                Text(text = " Удалить ")
             }
         }
     }
-}
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun EditVacIndicatorsBottomSheet(
+        animalVaccinationTable: AnimalVaccinationTable,
+        editBottomSheet: MutableState<Boolean>,
+        updateInTable: (AnimalVaccinationTable) -> Unit,
+        deleteInTable: () -> Unit
+    ) {
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddIndicatorsBottomSheet(
-    id: Int,
-    indicators: String,
-    addBottomSheet: MutableState<Boolean>,
-    saveInTable: (AnimalIndicatorsVM) -> Unit,
-    saveVaccinationt: (AnimalVaccinationTable) -> Unit,
-) {
+        ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
+            var count by rememberSaveable { mutableStateOf(animalVaccinationTable.vaccination) }
+            var date1 by rememberSaveable { mutableStateOf(animalVaccinationTable.date) }
+            var date2 by rememberSaveable { mutableStateOf(animalVaccinationTable.nextVaccination) }
 
-    ModalBottomSheet(onDismissRequest = { addBottomSheet.value = false }) {
-        val format = SimpleDateFormat("dd.MM.yyyy")
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        val formattedDate: String = format.format(calendar.timeInMillis)
+            //Дата
+            var openDialog by remember { mutableStateOf(false) }
+            var openDialog2 by remember { mutableStateOf(false) }
+            val datePickerState = rememberDatePickerState()
 
-        var count by rememberSaveable { mutableStateOf("") }
-        var date1 by rememberSaveable { mutableStateOf(formattedDate) }
-        var date2 by rememberSaveable { mutableStateOf(formattedDate) }
-
-        //Дата
-        var openDialog by remember { mutableStateOf(false) }
-        var openDialog2 by remember { mutableStateOf(false) }
-        val datePickerState = rememberDatePickerState()
-
-        if (openDialog) {
-            DatePickerDialogSample(datePickerState, date1) { date ->
-                date1 = date
-                openDialog = false
+            if (openDialog) {
+                DatePickerDialogSample(datePickerState, date1) { date ->
+                    date1 = date
+                    openDialog = false
+                }
             }
-        }
 
-        if (openDialog2) {
-            DatePickerDialogSample(datePickerState, date2) { date ->
-                date2 = date
-                openDialog = false
+            if (openDialog2) {
+                DatePickerDialogSample(datePickerState, date2) { date ->
+                    date2 = date
+                    openDialog2 = false
+                }
             }
-        }
 
+            var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
-        var isErrorCount by rememberSaveable { mutableStateOf(false) }
+            fun validateCount(text: String) {
+                isErrorCount = text == ""
+            }
 
-        fun validateCount(text: String) {
-            isErrorCount = text == ""
-        }
+            Column(modifier = Modifier.padding(5.dp, 5.dp)) {
 
+                OutlinedTextField(
+                    value = count,
+                    onValueChange = {
+                        count = it
+                        validateCount(count)
+                    },
+                    label = { Text("Товар") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
+                    supportingText = {
+                        if (isErrorCount) {
+                            Text(
+                                text = "Не указано кол-во товара",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        } else {
+                            Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                        }
+                    },
+                    suffix = {
+                        Text(text = "Кг")
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = isErrorCount
+                )
 
-        val keyboardOptions = if (indicators == "Прививки") {
-            KeyboardOptions(keyboardType = KeyboardType.Text)
-        } else {
-            KeyboardOptions(keyboardType = KeyboardType.Number)
-        }
+                OutlinedTextField(
+                    value = date1,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Дата") },
+                    supportingText = {
+                        Text("Выберите дату ")
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { openDialog = true }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_calendar_month_24),
+                                contentDescription = "Показать меню"
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            openDialog = true
+                        }
+                        .padding(bottom = 2.dp),
+                )
 
-        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-
-            OutlinedTextField(
-                value = count,
-                onValueChange = {
-                    count = it
-                    validateCount(count)
-                },
-                label = { Text("Товар") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 2.dp),
-                supportingText = {
-                    if (isErrorCount) {
-                        Text(
-                            text = "Не указано кол-во товара",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
-                    }
-                },
-                suffix = {
-                    Text(text = "Кг")
-                },
-                keyboardOptions = keyboardOptions,
-                isError = isErrorCount
-            )
-
-            OutlinedTextField(
-                value = date1,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Дата") },
-                supportingText = {
-                    Text("Выберите дату ")
-                },
-                trailingIcon = {
-                    IconButton(onClick = { openDialog = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_calendar_month_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        openDialog = true
-                    }
-                    .padding(bottom = 2.dp),
-            )
-
-            if (indicators == "Прививки") {
                 OutlinedTextField(
                     value = date2,
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Следующая прививка") },
+                    label = { Text("Дата") },
                     supportingText = {
                         Text("Выберите дату ")
                     },
@@ -675,118 +380,417 @@ fun AddIndicatorsBottomSheet(
                         .padding(bottom = 2.dp),
                 )
 
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(onClick = {
-                    if (indicators == "Прививки") {
-                        saveVaccinationt(
+                Button(
+                    onClick = {
+                        updateInTable(
                             AnimalVaccinationTable(
-                                id = 0,
+                                id = animalVaccinationTable.id,
                                 vaccination = count,
                                 date = date1,
                                 nextVaccination = date2,
-                                idAnimal = id
+                                idAnimal = animalVaccinationTable.idAnimal
                             )
                         )
-                    } else {
-                        saveInTable(
-                            AnimalIndicatorsVM(id = 0, weight = count, date = date1, idAnimal = id)
-                        )
-                    }
-                    addBottomSheet.value = false
-                }) {
-                    Text(text = "Добавить")
+                        editBottomSheet.value = false
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_create_24),
+                        contentDescription = " Обновить "
+                    )
+                    Text(text = " Обновить ")
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        deleteInTable()
+                        editBottomSheet.value = false
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_delete_24),
+                        contentDescription = "Удалить"
+                    )
+                    Text(text = " Удалить ")
                 }
             }
         }
     }
-}
 
-
-@Composable
-fun AnimalIndicatorsCard(
-    indicators: AnimalIndicatorsVM, modifier: Modifier = Modifier
-
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun EditdIndicatorsBottomSheet(
+        animalIndicatorsVM: AnimalIndicatorsVM,
+        editBottomSheet: MutableState<Boolean>,
+        updateInTable: (AnimalIndicatorsVM) -> Unit,
+        deleteInTable: () -> Unit
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = indicators.weight,
-                modifier = Modifier.padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = indicators.date,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
+
+        ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
+            var count by rememberSaveable { mutableStateOf(animalIndicatorsVM.weight) }
+            var date1 by rememberSaveable { mutableStateOf(animalIndicatorsVM.date) }
+
+            //Дата
+            var openDialog by remember { mutableStateOf(false) }
+            val datePickerState = rememberDatePickerState()
+
+            if (openDialog) {
+                DatePickerDialogSample(datePickerState, date1) { date ->
+                    date1 = date
+                    openDialog = false
+                }
+            }
+
+            var isErrorCount by rememberSaveable { mutableStateOf(false) }
+
+            fun validateCount(text: String) {
+                isErrorCount = text == ""
+            }
+
+            Column(modifier = Modifier.padding(5.dp, 5.dp)) {
+
+                OutlinedTextField(
+                    value = count,
+                    onValueChange = {
+                        count = it
+                        validateCount(count)
+                    },
+                    label = { Text("Товар") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
+                    supportingText = {
+                        if (isErrorCount) {
+                            Text(
+                                text = "Не указано кол-во товара",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        } else {
+                            Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                        }
+                    },
+                    suffix = {
+                        Text(text = "Кг")
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = isErrorCount
+                )
+
+                OutlinedTextField(
+                    value = date1,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Дата") },
+                    supportingText = {
+                        Text("Выберите дату ")
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { openDialog = true }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_calendar_month_24),
+                                contentDescription = "Показать меню"
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            openDialog = true
+                        }
+                        .padding(bottom = 2.dp),
+                )
+
+
+                Button(
+                    onClick = {
+                        updateInTable(
+                            AnimalIndicatorsVM(
+                                id = animalIndicatorsVM.id,
+                                weight = count,
+                                date = date1,
+                                idAnimal = animalIndicatorsVM.idAnimal
+                            )
+                        )
+                        editBottomSheet.value = false
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_create_24),
+                        contentDescription = " Обновить "
+                    )
+                    Text(text = " Обновить ")
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        deleteInTable()
+                        editBottomSheet.value = false
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_delete_24),
+                        contentDescription = "Удалить"
+                    )
+                    Text(text = " Удалить ")
+                }
+            }
         }
     }
-}
 
-@Composable
-fun AnimalVaccinatioCard(
-    animalVaccinationTable: AnimalVaccinationTable, modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun AddIndicatorsBottomSheet(
+        id: Int,
+        indicators: String,
+        addBottomSheet: MutableState<Boolean>,
+        saveInTable: (AnimalIndicatorsVM) -> Unit,
+        saveVaccinationt: (AnimalVaccinationTable) -> Unit,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = animalVaccinationTable.vaccination,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
 
-            Text(
-                text = animalVaccinationTable.date,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .wrapContentSize(),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
+        ModalBottomSheet(onDismissRequest = { addBottomSheet.value = false }) {
+            val format = SimpleDateFormat("dd.MM.yyyy")
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+            val formattedDate: String = format.format(calendar.timeInMillis)
 
-            Text(
-                text = animalVaccinationTable.nextVaccination,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .wrapContentSize(),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
+            var count by rememberSaveable { mutableStateOf("") }
+            var date1 by rememberSaveable { mutableStateOf(formattedDate) }
+            var date2 by rememberSaveable { mutableStateOf(formattedDate) }
+
+            //Дата
+            var openDialog by remember { mutableStateOf(false) }
+            var openDialog2 by remember { mutableStateOf(false) }
+            val datePickerState = rememberDatePickerState()
+
+            if (openDialog) {
+                DatePickerDialogSample(datePickerState, date1) { date ->
+                    date1 = date
+                    openDialog = false
+                }
+            }
+
+            if (openDialog2) {
+                DatePickerDialogSample(datePickerState, date2) { date ->
+                    date2 = date
+                    openDialog = false
+                }
+            }
+
+
+            var isErrorCount by rememberSaveable { mutableStateOf(false) }
+
+            fun validateCount(text: String) {
+                isErrorCount = text == ""
+            }
+
+
+            val keyboardOptions = if (indicators == "Прививки") {
+                KeyboardOptions(keyboardType = KeyboardType.Text)
+            } else {
+                KeyboardOptions(keyboardType = KeyboardType.Number)
+            }
+
+            Column(modifier = Modifier.padding(5.dp, 5.dp)) {
+
+                OutlinedTextField(
+                    value = count,
+                    onValueChange = {
+                        count = it
+                        validateCount(count)
+                    },
+                    label = { Text("Товар") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 2.dp),
+                    supportingText = {
+                        if (isErrorCount) {
+                            Text(
+                                text = "Не указано кол-во товара",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        } else {
+                            Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                        }
+                    },
+                    suffix = {
+                        Text(text = "Кг")
+                    },
+                    keyboardOptions = keyboardOptions,
+                    isError = isErrorCount
+                )
+
+                OutlinedTextField(
+                    value = date1,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Дата") },
+                    supportingText = {
+                        Text("Выберите дату ")
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { openDialog = true }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_calendar_month_24),
+                                contentDescription = "Показать меню"
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            openDialog = true
+                        }
+                        .padding(bottom = 2.dp),
+                )
+
+                if (indicators == "Прививки") {
+                    OutlinedTextField(
+                        value = date2,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Следующая прививка") },
+                        supportingText = {
+                            Text("Выберите дату ")
+                        },
+                        trailingIcon = {
+                            IconButton(onClick = { openDialog2 = true }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_calendar_month_24),
+                                    contentDescription = "Показать меню"
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                openDialog2 = true
+                            }
+                            .padding(bottom = 2.dp),
+                    )
+
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(onClick = {
+                        if (indicators == "Прививки") {
+                            saveVaccinationt(
+                                AnimalVaccinationTable(
+                                    id = 0,
+                                    vaccination = count,
+                                    date = date1,
+                                    nextVaccination = date2,
+                                    idAnimal = id
+                                )
+                            )
+                        } else {
+                            saveInTable(
+                                AnimalIndicatorsVM(
+                                    id = 0,
+                                    weight = count,
+                                    date = date1,
+                                    idAnimal = id
+                                )
+                            )
+                        }
+                        addBottomSheet.value = false
+                    }) {
+                        Text(text = "Добавить")
+                    }
+                }
+            }
         }
     }
-}
+
+
+    @Composable
+    fun AnimalIndicatorsCard(
+        indicators: AnimalIndicatorsVM, modifier: Modifier = Modifier
+
+    ) {
+        Card(
+            modifier = modifier,
+            elevation = CardDefaults.cardElevation(2.dp),
+            colors = CardDefaults.cardColors()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = indicators.weight,
+                    modifier = Modifier.padding(6.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = indicators.date,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(6.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun AnimalVaccinatioCard(
+        animalVaccinationTable: AnimalVaccinationTable, modifier: Modifier = Modifier,
+    ) {
+        Card(
+            modifier = modifier,
+            elevation = CardDefaults.cardElevation(2.dp),
+            colors = CardDefaults.cardColors()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = animalVaccinationTable.vaccination,
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(6.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
+                )
+
+                Text(
+                    text = animalVaccinationTable.date,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .wrapContentSize(),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    text = animalVaccinationTable.nextVaccination,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .wrapContentSize(),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
+                )
+            }
+        }
+    }
 

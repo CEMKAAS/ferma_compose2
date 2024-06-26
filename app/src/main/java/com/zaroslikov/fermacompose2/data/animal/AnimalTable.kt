@@ -11,7 +11,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
     tableName = "AnimalTable",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
-        parentColumns = arrayOf("id"),
+        parentColumns = arrayOf("_id"),
         childColumns = arrayOf("idPT"),
         onDelete = ForeignKey.CASCADE
     )]

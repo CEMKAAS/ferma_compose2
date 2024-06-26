@@ -374,7 +374,7 @@ fun setImageIncubatorCard(projectTable: ProjectTable): IncubatorCardImage {
         val date1: Date = myFormat.parse(dateBefore22)
         val date2: Date = myFormat.parse(dateBefore222)
         diff = date2.time - date1.time
-        day = "Идет ${TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)} день"
+        day = "Идет ${TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)+1} день"
 
     } else {
         day = "Завершён"
