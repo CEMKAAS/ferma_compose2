@@ -1,23 +1,38 @@
 package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
+import android.annotation.SuppressLint
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,28 +40,40 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
 import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivScreen
+import com.zaroslikov.fermacompose2.ui.incubator.EndIncubator
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorAnimalInProject
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
+import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.TimeZone
 
 object AddIncubatorTwoDestination : NavigationDestination {
     override val route = "AddIncubatorTwo"
@@ -55,6 +82,7 @@ object AddIncubatorTwoDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
+
 @Composable
 fun AddIncubatorTwo(
     navigateBack: () -> Unit,
@@ -62,6 +90,12 @@ fun AddIncubatorTwo(
     projectIncubatorList: AddIncubatorList,
     viewModel: AddIncubatorTwoViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val openEndDialog = remember { mutableStateOf(false) }
+    val project = viewModel.incubatorFromArchive(projectIncubatorList.typeBirds).collectAsState()
+    val projectCopy = project.value.itemList.toList()
+
+    openEndDialog.value = projectCopy.isNotEmpty()
+
 //    val projectIncubatorList = viewModel.itemId
     val scope = rememberCoroutineScope()
     Scaffold(
@@ -75,7 +109,7 @@ fun AddIncubatorTwo(
             navigateContinue = {
                 scope.launch {
 
-                     val idPT =  viewModel.savaProject(projectIncubatorList.toIncubatorData())
+                    val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
 
                     viewModel.saveIncubator(
                         it.toIncubatorTemp(idPT),
@@ -89,16 +123,111 @@ fun AddIncubatorTwo(
             typeBird = projectIncubatorList.typeBirds,
             airing = projectIncubatorList.checkedStateAiring,
             over = projectIncubatorList.checkedStateOver,
+            projectList = projectCopy,
+            openEndDialog = openEndDialog
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArhivIncubatorChoice(
+    openDialog: MutableState<Boolean>,
+    projectList: List<ProjectTable>,
+) {
+    var idProject by remember { mutableIntStateOf(1) }
+
+    AlertDialog(
+        onDismissRequest = { openDialog.value = false },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(20.dp))
+    ) {
+
+        Column(
+            modifier = Modifier
+                .background(color = Color.LightGray)
+                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "Выбрать данные из архива?",
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                fontSize = 19.sp
+            )
+            Text(
+                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+            )
+            Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+            val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
+            idProject = selectedOption.id
+            Column(Modifier.selectableGroup()) {
+                projectList.forEach { text ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (text == selectedOption),
+                                onClick = { onOptionSelected(text) },
+                                role = Role.RadioButton
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (text == selectedOption),
+                            onClick = null
+                        )
+                        Text(text.titleProject)
+                    }
+                }
+            }
+
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                TextButton(
+                    onClick = { openDialog.value = false }, modifier = Modifier.padding(8.dp)
+                ) {
+                    Text("Отмена")
+                }
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+
+
+                    }, modifier = Modifier.padding(8.dp)
+                )
+                { Text("Выбрать") }
+            }
+
+        }
+    }
+}
+
+
 @Composable
 fun AddIncubatorTwoContainer(
     modifier: Modifier, navigateContinue: (IncubatorList) -> Unit,
-    typeBird: String, airing: Boolean, over: Boolean
-
+    typeBird: String, airing: Boolean, over: Boolean,
+    projectList: List<ProjectTable>,
+    openEndDialog: MutableState<Boolean>,
 ) {
+
+
+    if (openEndDialog.value) {
+        ArhivIncubatorChoice(
+            openDialog = openEndDialog,
+            projectList = projectList
+        )
+    }
+
 
     val list = setAutoIncubator(setIncubator(typeBird), airing, over)
 
@@ -236,7 +365,7 @@ fun MyRowIncubatorAdd(
             modifier = Modifier
                 .fillMaxWidth(0.16f)
                 .padding(6.dp),
-            )
+        )
         Divider(
             color = Color.DarkGray,
             modifier = Modifier
@@ -555,7 +684,11 @@ private fun endMass(day: Int, mass: MutableList<String>) {
     }
 }
 
-private fun setAutoIncubator(list: IncubatorList, airing: Boolean, over: Boolean): IncubatorList {
+private fun setAutoIncubator(
+    list: IncubatorList,
+    airing: Boolean,
+    over: Boolean
+): IncubatorList {
 
     val airingAuto = mutableListOf<String>()
     val overAuto = mutableListOf<String>()

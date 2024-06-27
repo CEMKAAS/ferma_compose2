@@ -63,6 +63,9 @@ interface ItemDao {
     @Query("SELECT * from МyINCUBATOR Where _id=:id")
     fun getProject(id: Int): Flow<ProjectTable>
 
+    @Query("SELECT * from МyINCUBATOR Where TYPE =:type and mode = 0 and ARHIVE = 1")
+    fun getIncubatorListArh(type: String): Flow<List<ProjectTable>>
+
     @Query("SELECT * from МyINCUBATOR Where mode = 1 and ARHIVE = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>
 
@@ -352,19 +355,25 @@ interface ItemDao {
 
     @Update
     suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
+
     @Update
     suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+
     @Update
     suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+
     @Update
     suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable)
 
     @Delete
     suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)
+
     @Delete
     suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+
     @Delete
     suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+
     @Delete
     suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
 
@@ -384,14 +393,17 @@ interface ItemDao {
 
     @Query("SELECT id, count as weight, date, idAnimal from AnimalCountTable Where idAnimal=:id ORDER BY id DESC")
     fun getCountAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
+
     @Query("SELECT id, size as weight, date, idAnimal from AnimalSizeTable Where idAnimal=:id ORDER BY id DESC")
     fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
+
     @Query("SELECT * from AnimalVaccinationTable Where idAnimal=:id ORDER BY id DESC")
     fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
+
     @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC")
     fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
 
     @Query("SELECT title as Title,COALESCE(SUM(disc), 0.0) AS priceAll, suffix from MyFerma Where animal=:name GROUP BY Title ORDER BY priceAll DESC")
-    fun getProductAnimal(name:String):Flow<List<AnimalTitSuff>>
+    fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>>
 
 }
