@@ -30,5 +30,6 @@
         <string name="sell">Sell</string>
         <string name="yes">Yes</string>
         <string name="required_fields">*required fields</string>
+        <string name="banner_1"></string>
     </resources>
 

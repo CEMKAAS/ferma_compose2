@@ -66,6 +66,7 @@ import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.animal.AddIndicatorsBottomSheet
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.incubator.endInc
@@ -98,7 +99,6 @@ fun StartScreen(
     val projectListArh by viewModel.getAllProjectArh.collectAsState()
     val projectListAct by viewModel.getAllProjectAct.collectAsState()
     val infoBottomSheet = remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBarStart2(title = "Мое Хозяйство",
@@ -230,6 +230,7 @@ fun StartScreenContainer(
                 }
             }
         }
+
     }
 
     if (infoBottomSheet.value) {

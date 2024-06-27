@@ -17,6 +17,7 @@
 package com.zaroslikov.fermacompose2
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.ArrowBack
@@ -41,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -54,10 +56,11 @@ fun InventoryApp(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 ) {
 
-    InventoryNavHost(
-        navController = navController,
-        drawerState = drawerState
-    )
+        InventoryNavHost(
+            navController = navController,
+            drawerState = drawerState
+        )
+
 }
 
 /**
@@ -208,7 +211,8 @@ fun TopAppBarFermaWarehouse(
             }
         },
         actions = {
-            IconButton(onClick = navigateToEdit
+            IconButton(
+                onClick = navigateToEdit
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
