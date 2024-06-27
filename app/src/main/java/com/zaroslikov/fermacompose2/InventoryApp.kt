@@ -53,12 +53,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    modifier: Modifier = Modifier
 ) {
 
         InventoryNavHost(
             navController = navController,
-            drawerState = drawerState
+            drawerState = drawerState,
+            modifier = modifier
         )
 
 }

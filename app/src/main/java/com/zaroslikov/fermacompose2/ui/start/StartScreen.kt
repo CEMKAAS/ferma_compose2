@@ -93,6 +93,7 @@ fun StartScreen(
     navigateToItemIncubator: (Int) -> Unit,
     navigateToItemProjectArh: (Int) -> Unit,
     navigateToItemIncubatorArh: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
@@ -110,7 +111,8 @@ fun StartScreen(
                 icon = { Icon(Icons.Filled.Add, "Localized description") },
                 text = { Text(text = "Добавить") },
             )
-        }
+        },
+        modifier = modifier
     ) { innerPadding ->
         StartScreenContainer(
             modifier = Modifier.padding(innerPadding),

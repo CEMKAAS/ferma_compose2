@@ -107,7 +107,7 @@ fun InventoryNavHost(
     NavHost(
         navController = navController,
         startDestination = StartDestination.route,
-        modifier = modifier,
+        modifier = modifier
     ) {
 
         composable(route = StartDestination.route) {
@@ -123,7 +123,8 @@ fun InventoryNavHost(
                 },
                 navigateToItemProjectArh = {
                     navController.navigate("${FinanceArhivDestination.route}/${it}")
-                }
+                },
+                modifier = modifier
             )
 
         }
