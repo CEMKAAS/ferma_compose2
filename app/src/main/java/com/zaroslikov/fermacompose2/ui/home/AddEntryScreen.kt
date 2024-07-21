@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.home
 
+import android.graphics.drawable.Icon
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,11 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -47,6 +50,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -78,7 +82,14 @@ fun AddEntryProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Мои Товары", navigateUp = navigateBack)
-        }
+        },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        }
     ) { innerPadding ->
 
         AddEntryContainerProduct(
@@ -192,12 +203,16 @@ fun AddEntryContainerProduct(
                         .fillMaxWidth()
                         .padding(bottom = 2.dp),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
                         )
-                    }))
+                    })
+                )
 
                 val filteredOptions =
                     titleList.filter { it.contains(title, ignoreCase = true) }
@@ -230,7 +245,8 @@ fun AddEntryContainerProduct(
                     validateCount(count)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 2.dp),
                 supportingText = {
                     if (isErrorCount) {
@@ -292,7 +308,16 @@ fun AddEntryContainerProduct(
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    })
                 )
 
                 val filteredOptions =
@@ -320,19 +345,28 @@ fun AddEntryContainerProduct(
         }
 
         if (animalList.isNotEmpty()) {
+            animal = animalList[selectedItemIndex]
             ExposedDropdownMenuBox(
                 expanded = expandedAni,
                 onExpandedChange = { expandedAni = !expandedAni },
             ) {
                 OutlinedTextField(
-                    value = animalList[selectedItemIndex],
+                    value = animal,
                     onValueChange = {},
                     readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
+                    leadingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
+                    trailingIcon = {
+                        IconButton(onClick = { animal = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
+                        }
+                    },
                     supportingText = {
                         Text("Выберите животное, которое принесло товар")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
@@ -376,7 +410,8 @@ fun AddEntryContainerProduct(
                             AddTableInsert(
                                 id = 0,
                                 title = title,
-                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                    .toDouble(),
                                 calendar[Calendar.DAY_OF_MONTH],
                                 (calendar[Calendar.MONTH] + 1),
                                 calendar[Calendar.YEAR],

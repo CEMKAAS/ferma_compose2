@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.start.add
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,16 +14,19 @@ import kotlinx.coroutines.launch
 
 class ProjectAddViewModel(val itemsRepository: ItemsRepository) : ViewModel() {
 
-    var countProject by mutableIntStateOf(1)
-        private set
-    init {
+   private var countProject by mutableIntStateOf(0)
+
+    fun countProject(): Int {
         viewModelScope.launch {
             countProject = itemsRepository.getCountRowProject()
                 .filterNotNull()
                 .first()
                 .toInt()
         }
+        return countProject
     }
+
+
     suspend fun insertTable(item: ProjectTable) {
         itemsRepository.insertProject(item)
     }

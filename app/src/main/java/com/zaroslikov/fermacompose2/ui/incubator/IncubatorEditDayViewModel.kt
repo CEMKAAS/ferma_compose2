@@ -7,10 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -22,99 +20,45 @@ class IncubatorEditDayViewModel(
 ) : ViewModel() {
 
     val itemId: Int = checkNotNull(savedStateHandle[IncubatorEditDayScreenDestination.itemIdArg])
-
-
     val day: Int = checkNotNull(savedStateHandle[IncubatorEditDayScreenDestination.itemIdArgTwo])
 
-    var tempStateList by mutableStateOf(IncubatorState())
+    var incubatorState by mutableStateOf(IncubatorUiState())
         private set
 
-    var dampStateList by mutableStateOf(IncubatorState())
-        private set
-
-    var overStateList by mutableStateOf(IncubatorState())
-        private set
-    var airingStateList by mutableStateOf(IncubatorState())
-        private set
-
-    fun updateTempUiState(itemDetails: IncubatorState) {
-        tempStateList =
+    fun updateUiState(itemDetails: IncubatorUiState) {
+        incubatorState =
             itemDetails
     }
 
-    fun updateDampUiState(itemDetails: IncubatorState) {
-        dampStateList =
-            itemDetails
-    }
-
-    fun updateOverUiState(itemDetails: IncubatorState) {
-        overStateList =
-            itemDetails
-    }
-
-    fun updateAiringUiState(itemDetails: IncubatorState) {
-        airingStateList =
-            itemDetails
-    }
 
     init {
         viewModelScope.launch {
-
-            tempStateList = itemsRepository.getIncubatorTemp(itemId)
+            incubatorState = itemsRepository.getIncubator(itemId)
                 .filterNotNull()
                 .first()
-                .toIncubatorState()
-
-            dampStateList = itemsRepository.getIncubatorDamp(itemId)
-                .filterNotNull()
-                .first()
-                .toIncubatorState()
-
-            overStateList = itemsRepository.getIncubatorOver(itemId)
-                .filterNotNull()
-                .first()
-                .toIncubatorState()
-
-            airingStateList = itemsRepository.getIncubatorAiring(itemId)
-                .filterNotNull()
-                .first()
-                .toIncubatorState()
+                .toIncubatorUiState()
         }
     }
 
     suspend fun saveItem() {
-        itemsRepository.updateIncubatorTemp(tempStateList.toIncubatorTemp())
-        itemsRepository.updateIncubatorDamp(dampStateList.toIncubatorDamp())
-        itemsRepository.updateIncubatorOver(overStateList.toIncubatorOver())
-        itemsRepository.updateIncubatorAiring(airingStateList.toIncubatorAiring())
+        itemsRepository.updateIncubator(incubatorState.toIncubator())
     }
-
-//    suspend fun saveIncubator(
-//        incubatorTemp: IncubatorTemp,
-//        incubatorDamp: IncubatorDamp,
-//        incubatorOver: IncubatorOver,
-//        incubatorAiring: IncubatorAiring
-//    ) {
-//        itemsRepository.updateIncubatorTemp(incubatorTemp)
-//        itemsRepository.updateIncubatorDamp(incubatorDamp)
-//        itemsRepository.updateIncubatorOver(incubatorOver)
-//        itemsRepository.updateIncubatorAiring(incubatorAiring)
-//    }
-
 }
 
-fun  IncubatorState.toIncubatorTemp(): IncubatorTemp = IncubatorTemp(
-    id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
+data class IncubatorUiState(
+    val id: Int = 0,
+    val day: Int = 0,
+    val temp: String = "",
+    val damp: String = "",
+    var over: String = "",
+    var airing: String = "",
+    var idPT: Int = 0
 )
 
-fun  IncubatorState.toIncubatorDamp(): IncubatorDamp = IncubatorDamp(
-    id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
+fun Incubator.toIncubatorUiState(): IncubatorUiState =  IncubatorUiState(
+    id, day, temp, damp, over, airing, idPT
 )
 
-fun  IncubatorState.toIncubatorOver(): IncubatorOver = IncubatorOver(
-    id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
-)
-
-fun  IncubatorState.toIncubatorAiring(): IncubatorAiring = IncubatorAiring(
-    id, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21, day22, day23, day24, day25, day26, day27, day28, day29, day30, idPT
+fun IncubatorUiState.toIncubator(): Incubator = Incubator(
+    id, day, temp, damp, over, airing, idPT
 )

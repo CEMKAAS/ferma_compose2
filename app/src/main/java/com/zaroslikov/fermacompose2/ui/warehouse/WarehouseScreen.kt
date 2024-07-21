@@ -38,12 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarFerma
-import com.zaroslikov.fermacompose2.TopAppBarFermaFilter
 import com.zaroslikov.fermacompose2.TopAppBarFermaWarehouse
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
@@ -96,7 +94,14 @@ fun WarehouseScreen(
                     navigateToEdit = {navigateToEdit(idProject)},
                     scrollBehavior = scrollBehavior
                 )
-            }
+            },
+//            bottomBar = {
+//                Banner(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentHeight()
+//                )
+//            }
         ) { innerPadding ->
             WarehouseBody(
                 itemList = homeUiState.itemList,
@@ -167,11 +172,13 @@ private fun WarehouseInventoryList(
             )
         }
         items(items = itemList) { item ->
-            WarehouseProductCard(
-                warehouseProduct = item,
-                modifier = Modifier
-                    .padding(8.dp)
-            )
+            if (!item.ResultCount.toString().contains("-")) {
+                WarehouseProductCard(
+                    warehouseProduct = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                )
+            }
         }
     }
 }

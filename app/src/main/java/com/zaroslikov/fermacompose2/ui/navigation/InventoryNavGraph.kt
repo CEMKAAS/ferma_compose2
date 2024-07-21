@@ -111,7 +111,8 @@ fun InventoryNavHost(
     ) {
 
         composable(route = StartDestination.route) {
-            StartScreen(navController = navController,//TODO переделать на адд ADD
+            StartScreen(
+                navController = navController,//TODO переделать на адд ADD
                 navigateToItemProject = {
                     navController.navigate("${WarehouseDestination.route}/${it}")
                 },
@@ -550,7 +551,7 @@ fun InventoryNavHost(
             )) {
             FinanceArhivScreen(
                 navigateToBack = { navController.popBackStack() },
-                navigateToStart = { navController.navigateUp() },
+                navigateToStart = { navController.navigate(StartDestination.route) },
                 navigateToIncomeExpenses = {
                     navController.navigate(
                         "${FinanceIncomeExpensesDestination.route}/${it.idPT}/${it.incomeBoolean}"

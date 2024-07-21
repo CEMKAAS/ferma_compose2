@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,8 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import kotlinx.parcelize.Parcelize
@@ -79,13 +80,20 @@ fun AddIncubator(
         topBar = {
             TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
         },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        }
     ) { innerPadding ->
         AddIncubatorContainer(
             modifier = Modifier
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
             navigateContinue = navigateContinue,
-            number = viewModel.countIncubator
+            number = viewModel.countProject()
         )
     }
 }
@@ -105,8 +113,7 @@ fun AddIncubatorContainer(
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
 
-    var title by remember { mutableStateOf("Инкубатор №${
-        number + 1}") }
+    var title by remember { mutableStateOf("Мой Инкубатор") }
     var typeBirds by rememberSaveable { mutableStateOf(typeBirdsList[0]) }
     var count by rememberSaveable { mutableStateOf("0") }
     var date1 by remember { mutableStateOf(formattedDate) }
@@ -129,7 +136,8 @@ fun AddIncubatorContainer(
     //Дата
     var openDialog by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-    datePickerState.setSelection(calendar.timeInMillis)
+
+
     if (openDialog) {
         DatePickerDialogSample(datePickerState, date1) { date ->
             date1 = date
@@ -173,7 +181,7 @@ fun AddIncubatorContainer(
                 title = it
                 validateTitle(it)
             },
-            label = { Text("Инкубатор") },
+            label = { Text("Название") },
             modifier = Modifier.fillMaxWidth(),
             supportingText = {
                 if (isErrorTitle) {
@@ -302,86 +310,86 @@ fun AddIncubatorContainer(
                 }
                 .padding(bottom = 2.dp),
         )
-
-
-        OutlinedTextField(
-            value = time1.value,
-            onValueChange = {
-            },
-            readOnly = true,
-            label = { Text("Уведомление 1") },
-            supportingText = {
-                Text("Укажите время уведомления")
-            },
-            trailingIcon = {
-                IconButton(onClick = {
-                    showDialogTime1.value = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_access_time_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    showDialogTime1.value = true
-                }
-                .padding(bottom = 2.dp)
-        )
-
-        OutlinedTextField(
-            value = time2.value,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Уведомление 2") },
-            supportingText = {
-                Text("Укажите время уведомления")
-            },
-            trailingIcon = {
-                IconButton(onClick = {
-                    showDialogTime2.value = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_access_time_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    showDialogTime2.value = true
-                }
-                .padding(bottom = 2.dp)
-        )
-
-        OutlinedTextField(
-            value = time3.value,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text("Уведомление 3") },
-            supportingText = {
-                Text("Укажите время уведомления")
-            },
-            trailingIcon = {
-                IconButton(onClick = {
-                    showDialogTime2.value = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_access_time_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    showDialogTime2.value = true
-                }
-                .padding(bottom = 2.dp)
-        )
+//
+//
+//        OutlinedTextField(
+//            value = time1.value,
+//            onValueChange = {
+//            },
+//            readOnly = true,
+//            label = { Text("Уведомление 1") },
+//            supportingText = {
+//                Text("Укажите время уведомления")
+//            },
+//            trailingIcon = {
+//                IconButton(onClick = {
+//                    showDialogTime1.value = true
+//                }) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.baseline_access_time_24),
+//                        contentDescription = "Показать меню"
+//                    )
+//                }
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable {
+//                    showDialogTime1.value = true
+//                }
+//                .padding(bottom = 2.dp)
+//        )
+//
+//        OutlinedTextField(
+//            value = time2.value,
+//            onValueChange = {},
+//            readOnly = true,
+//            label = { Text("Уведомление 2") },
+//            supportingText = {
+//                Text("Укажите время уведомления")
+//            },
+//            trailingIcon = {
+//                IconButton(onClick = {
+//                    showDialogTime2.value = true
+//                }) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.baseline_access_time_24),
+//                        contentDescription = "Показать меню"
+//                    )
+//                }
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable {
+//                    showDialogTime2.value = true
+//                }
+//                .padding(bottom = 2.dp)
+//        )
+//
+//        OutlinedTextField(
+//            value = time3.value,
+//            onValueChange = { },
+//            readOnly = true,
+//            label = { Text("Уведомление 3") },
+//            supportingText = {
+//                Text("Укажите время уведомления")
+//            },
+//            trailingIcon = {
+//                IconButton(onClick = {
+//                    showDialogTime2.value = true
+//                }) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.baseline_access_time_24),
+//                        contentDescription = "Показать меню"
+//                    )
+//                }
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable {
+//                    showDialogTime2.value = true
+//                }
+//                .padding(bottom = 2.dp)
+//        )
 
 
         Row(

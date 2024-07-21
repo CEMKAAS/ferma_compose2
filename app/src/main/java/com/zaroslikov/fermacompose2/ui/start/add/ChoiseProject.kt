@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import com.zaroslikov.fermacompose2.TopAppBarStart
 import androidx.compose.ui.Modifier
-import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.start.DrawerItems
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Card
@@ -28,7 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
 
@@ -45,7 +47,15 @@ fun ChoiseProject(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Выбор проекта", navigateUp = navigateBack)
-        }) { innerPadding ->
+        },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        }
+    ) { innerPadding ->
         ChooiseProjectContainer(
             modifier = Modifier
                 .padding(innerPadding)

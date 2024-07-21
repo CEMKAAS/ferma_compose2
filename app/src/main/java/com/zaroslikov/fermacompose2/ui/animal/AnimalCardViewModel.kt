@@ -9,12 +9,6 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorListState
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorListState2
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectListUiState
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectState
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -69,14 +63,15 @@ class AnimalCardViewModel(
                 initialValue = AnimalVaccinationCardUiStateLimit()
             )
 
-    val productState: StateFlow<AnimalProductCardUiStateLimit> =
-        itemsRepository.getProductAnimal(animalState.value.animalTable.name)
+    fun productState(name:String): StateFlow<AnimalProductCardUiStateLimit> {
+        return itemsRepository.getProductAnimal(name)
             .map { AnimalProductCardUiStateLimit(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = AnimalProductCardUiStateLimit()
             )
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

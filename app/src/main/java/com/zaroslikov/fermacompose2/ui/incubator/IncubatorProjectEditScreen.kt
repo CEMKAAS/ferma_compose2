@@ -4,24 +4,19 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,21 +40,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -89,7 +81,15 @@ fun IncubatorProjectEditScreen(
                 title = "Инкубатор",
                 navigateUp = navigateBack,
             )
-        }) { innerPadding ->
+        },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        }
+    ) { innerPadding ->
 
         IncubatorEditDayContainer(
             project = viewModel.projectState,
@@ -289,85 +289,84 @@ fun IncubatorEditDayContainer(
                 .padding(bottom = 2.dp),
         )
 
-
-        OutlinedTextField(
-            value = project.time1,
-            onValueChange = {
-            },
-            readOnly = true,
-            label = { Text("Уведомление 1") },
-            supportingText = {
-                Text("Укажите время уведомления")
-            },
-            trailingIcon = {
-                IconButton(onClick = {
-                    showDialogTime1.value = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_access_time_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    showDialogTime1.value = true
-                }
-                .padding(bottom = 2.dp)
-        )
-
-        OutlinedTextField(
-            value = project.time2,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Уведомление 2") },
-            supportingText = {
-                Text("Укажите время уведомления")
-            },
-            trailingIcon = {
-                IconButton(onClick = {
-                    showDialogTime2.value = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_access_time_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    showDialogTime2.value = true
-                }
-                .padding(bottom = 2.dp)
-        )
-
-        OutlinedTextField(
-            value = project.time3,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text("Уведомление 3") },
-            supportingText = {
-                Text("Укажите время уведомления")
-            },
-            trailingIcon = {
-                IconButton(onClick = {
-                    showDialogTime3.value = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_access_time_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    showDialogTime3.value = true
-                }
-                .padding(bottom = 2.dp)
-        )
+//        OutlinedTextField(
+//            value = project.time1,
+//            onValueChange = {
+//            },
+//            readOnly = true,
+//            label = { Text("Уведомление 1") },
+//            supportingText = {
+//                Text("Укажите время уведомления")
+//            },
+//            trailingIcon = {
+//                IconButton(onClick = {
+//                    showDialogTime1.value = true
+//                }) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.baseline_access_time_24),
+//                        contentDescription = "Показать меню"
+//                    )
+//                }
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable {
+//                    showDialogTime1.value = true
+//                }
+//                .padding(bottom = 2.dp)
+//        )
+//
+//        OutlinedTextField(
+//            value = project.time2,
+//            onValueChange = {},
+//            readOnly = true,
+//            label = { Text("Уведомление 2") },
+//            supportingText = {
+//                Text("Укажите время уведомления")
+//            },
+//            trailingIcon = {
+//                IconButton(onClick = {
+//                    showDialogTime2.value = true
+//                }) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.baseline_access_time_24),
+//                        contentDescription = "Показать меню"
+//                    )
+//                }
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable {
+//                    showDialogTime2.value = true
+//                }
+//                .padding(bottom = 2.dp)
+//        )
+//
+//        OutlinedTextField(
+//            value = project.time3,
+//            onValueChange = { },
+//            readOnly = true,
+//            label = { Text("Уведомление 3") },
+//            supportingText = {
+//                Text("Укажите время уведомления")
+//            },
+//            trailingIcon = {
+//                IconButton(onClick = {
+//                    showDialogTime3.value = true
+//                }) {
+//                    Icon(
+//                        painter = painterResource(R.drawable.baseline_access_time_24),
+//                        contentDescription = "Показать меню"
+//                    )
+//                }
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable {
+//                    showDialogTime3.value = true
+//                }
+//                .padding(bottom = 2.dp)
+//        )
 
         Button(
             onClick = { saveInRoomAdd(errorBoolean()) },

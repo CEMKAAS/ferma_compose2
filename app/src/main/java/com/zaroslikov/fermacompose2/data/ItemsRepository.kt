@@ -16,10 +16,6 @@
 
 package com.zaroslikov.fermacompose2.data
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -27,19 +23,15 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorUIList
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
@@ -59,8 +51,11 @@ interface ItemsRepository {
 
     fun getIncubatorListArh(type: String): Flow<List<ProjectTable>>
 
+    fun getIncubatorListArh2(type: String): Flow<Int>
+
     fun getAllProject(): Flow<List<ProjectTable>>
     fun getAllProjectArh(): Flow<List<ProjectTable>>
+
     fun getAllProjectAct(): Flow<List<ProjectTable>>
     fun getProject(id: Int): Flow<ProjectTable>
     suspend fun updateProject(item: ProjectTable)
@@ -72,23 +67,10 @@ interface ItemsRepository {
     fun getCountRowProject(): Flow<Int>
 
     fun getProjectListAct(): Flow<List<ProjectTable>>
-    fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp>
+    fun getIncubatorList(id: Int): Flow<List<Incubator>>
 
-    fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp>
-
-    fun getIncubatorOver2(id: Int): Flow<IncubatorOver>
-
-    fun getIncubatorAiring2(id: Int): Flow<IncubatorAiring>
-
-
-    fun getIncubatorTemp(id: Int): Flow<IncubatorUIList>
-
-    fun getIncubatorDamp(id: Int): Flow<IncubatorUIList>
-
-    fun getIncubatorOver(id: Int): Flow<IncubatorUIList>
-
-    fun getIncubatorAiring(id: Int): Flow<IncubatorUIList>
-
+    suspend fun getIncubatorList2(id: Int): List<Incubator>
+    fun getIncubator(id: Int): Flow<Incubator>
     fun getItemAdd(id: Int): Flow<AddTable>
 
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
@@ -164,21 +146,8 @@ interface ItemsRepository {
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
 
-    suspend fun insertIncubatorTemp(item: IncubatorTemp)
-
-
-    suspend fun insertIncubatorDamp(item: IncubatorDamp)
-
-
-    suspend fun insertIncubatorAiring(item: IncubatorAiring)
-
-
-
-    suspend fun insertIncubatorOver(item: IncubatorOver)
-    suspend fun updateIncubatorTemp(item: IncubatorTemp)
-    suspend fun updateIncubatorDamp(item: IncubatorDamp)
-    suspend fun updateIncubatorAiring(item: IncubatorAiring)
-    suspend fun updateIncubatorOver(item: IncubatorOver)
+    suspend fun insertIncubator(item: Incubator)
+    suspend fun updateIncubator(item: Incubator)
     fun getAllAnimal(id:Int): Flow<List<AnimalTable>>
     fun getAnimal(id: Int): Flow<AnimalTable>
     fun getTypeAnimal(id:Int): Flow<List<String>>

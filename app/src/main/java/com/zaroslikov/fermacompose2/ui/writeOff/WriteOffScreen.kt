@@ -53,6 +53,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
@@ -131,6 +132,13 @@ fun WriteOffScreen(
                     }
                 }
             },
+//            bottomBar = {
+//                Banner(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentHeight()
+//                )
+//            }
         ) { innerPadding ->
             WriteOffBody(
                 writeOffBoolean = writeOffBoolean,

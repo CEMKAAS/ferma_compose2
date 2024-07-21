@@ -1,9 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
-import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import com.zaroslikov.fermacompose2.TopAppBarStart
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -25,7 +25,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -54,26 +54,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivScreen
-import com.zaroslikov.fermacompose2.ui.incubator.EndIncubator
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorAnimalInProject
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
-import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.TimeZone
+
 
 object AddIncubatorTwoDestination : NavigationDestination {
     override val route = "AddIncubatorTwo"
@@ -82,7 +73,6 @@ object AddIncubatorTwoDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-
 @Composable
 fun AddIncubatorTwo(
     navigateBack: () -> Unit,
@@ -90,18 +80,36 @@ fun AddIncubatorTwo(
     projectIncubatorList: AddIncubatorList,
     viewModel: AddIncubatorTwoViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val openEndDialog = remember { mutableStateOf(false) }
-    val project = viewModel.incubatorFromArchive(projectIncubatorList.typeBirds).collectAsState()
-    val projectCopy = project.value.itemList.toList()
 
-    openEndDialog.value = projectCopy.isNotEmpty()
+    val list = setAutoIncubator(setIncubator( projectIncubatorList.typeBirds), projectIncubatorList.checkedStateAiring, projectIncubatorList.checkedStateOver)
+    // Доставка из ахива
+//    val project = viewModel.incubatorFromArchive(projectIncubatorList.typeBirds).collectAsState()
+//
+//    val projectCopy = project.value.itemList
+//
+//    val countProject = viewModel.incubatorFromArchive2(projectIncubatorList.typeBirds)
+//    val openEndDialog = remember { mutableStateOf(false) }
+//
+//
+//    if (countProject == 0) {
+//        openEndDialog.value = false
+//    } else {
+//        openEndDialog.value = true
+//    }
 
-//    val projectIncubatorList = viewModel.itemId
+    val activity = LocalContext.current as Activity
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
         },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        }
     ) { innerPadding ->
         AddIncubatorTwoContainer(
             modifier = Modifier
@@ -112,124 +120,123 @@ fun AddIncubatorTwo(
                     val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
 
                     viewModel.saveIncubator(
-                        it.toIncubatorTemp(idPT),
-                        it.toIncubatorDamp(idPT),
-                        it.toIncubatorOver(idPT),
-                        it.toIncubatorAiring(idPT)
+                        setIdPT(it, idPT)
                     )
+
                     navController.navigate(StartDestination.route)
+                    (activity as MainActivity)?.showAd()
+
                 }
             },
-            typeBird = projectIncubatorList.typeBirds,
-            airing = projectIncubatorList.checkedStateAiring,
-            over = projectIncubatorList.checkedStateOver,
-            projectList = projectCopy,
-            openEndDialog = openEndDialog
+            list= list,
+//            projectList = projectCopy,
+//            openEndDialog = openEndDialog
+//            incubatorArh= {
+//                    scope.launch {
+//                       // val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
+//                        list = viewModel.saveIncubator3(it).toMutableList()
+////                        viewModel.saveIncubator2(it, idPT)
+//                        openEndDialog.value = false
+////                        (activity as MainActivity)?.showAd()
+//
+////                        navController.navigate(StartDestination.route)
+//                    }
+//            },
+
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ArhivIncubatorChoice(
-    openDialog: MutableState<Boolean>,
-    projectList: List<ProjectTable>,
-) {
-    var idProject by remember { mutableIntStateOf(1) }
-
-    AlertDialog(
-        onDismissRequest = { openDialog.value = false },
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(20.dp))
-    ) {
-
-        Column(
-            modifier = Modifier
-                .background(color = Color.LightGray)
-                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                "Выбрать данные из архива?",
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-                fontSize = 19.sp
-            )
-            Text(
-                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
-            )
-            Spacer(modifier = Modifier.padding(vertical = 10.dp))
-
-            val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
-            idProject = selectedOption.id
-            Column(Modifier.selectableGroup()) {
-                projectList.forEach { text ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = (text == selectedOption),
-                                onClick = { onOptionSelected(text) },
-                                role = Role.RadioButton
-                            )
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (text == selectedOption),
-                            onClick = null
-                        )
-                        Text(text.titleProject)
-                    }
-                }
-            }
-
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                TextButton(
-                    onClick = { openDialog.value = false }, modifier = Modifier.padding(8.dp)
-                ) {
-                    Text("Отмена")
-                }
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-
-
-                    }, modifier = Modifier.padding(8.dp)
-                )
-                { Text("Выбрать") }
-            }
-
-        }
-    }
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun ArhivIncubatorChoice(
+//    openDialog: MutableState<Boolean>,
+//    projectList: List<ProjectTable>,
+////    incubatorArh: (Int) -> Unit,
+//
+//) {
+//    var idProject by remember { mutableIntStateOf(1) }
+//
+//    AlertDialog(
+//        onDismissRequest = { openDialog.value = false },
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clip(shape = RoundedCornerShape(20.dp))
+//    ) {
+//
+//        Column(
+//            modifier = Modifier
+//                .background(color = Color.LightGray)
+//                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Text(
+//                "Выбрать данные из архива?",
+//                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+//                fontSize = 19.sp
+//            )
+//            Text(
+//                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
+//                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+//            )
+//            Spacer(modifier = Modifier.padding(vertical = 10.dp))
+//
+//            val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
+//            idProject = selectedOption.id
+//            Column(Modifier.selectableGroup()) {
+//                projectList.forEach { text ->
+//                    Row(
+//                        Modifier
+//                            .fillMaxWidth()
+//                            .selectable(
+//                                selected = (text == selectedOption),
+//                                onClick = { onOptionSelected(text) },
+//                                role = Role.RadioButton
+//                            )
+//                            .padding(horizontal = 16.dp),
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        RadioButton(
+//                            selected = (text == selectedOption),
+//                            onClick = null
+//                        )
+//                        Text(text.titleProject)
+//                    }
+//                }
+//            }
+//
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.Center,
+//            ) {
+//                TextButton(
+//                    onClick = { openDialog.value = false }, modifier = Modifier.padding(8.dp)
+//                ) {
+//                    Text("Отмена")
+//                }
+//                if (projectList[0].titleProject != "Ищем инкубаторы... Подождите пожалуйста") {
+//                    TextButton(
+//                        onClick = {
+//                            incubatorArh(idProject)
+//                        }, modifier = Modifier.padding(8.dp)
+//                    )
+//                    { Text("Выбрать") }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 @Composable
 fun AddIncubatorTwoContainer(
-    modifier: Modifier, navigateContinue: (IncubatorList) -> Unit,
-    typeBird: String, airing: Boolean, over: Boolean,
-    projectList: List<ProjectTable>,
-    openEndDialog: MutableState<Boolean>,
+    modifier: Modifier, navigateContinue: (MutableList<Incubator>) -> Unit,
+//    incubatorArh: (Int) -> Unit,
+    list:MutableList<Incubator>,
+//    projectList: List<ProjectTable>,
+//    openEndDialog: MutableState<Boolean>,
 ) {
-
-
-    if (openEndDialog.value) {
-        ArhivIncubatorChoice(
-            openDialog = openEndDialog,
-            projectList = projectList
-        )
-    }
-
-
-    val list = setAutoIncubator(setIncubator(typeBird), airing, over)
 
     LazyColumn(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         item {
@@ -303,25 +310,13 @@ fun AddIncubatorTwoContainer(
         }
         item { Divider(color = Color.DarkGray, thickness = 1.dp) }
         item { Divider(color = Color.DarkGray, thickness = 1.dp) }
-        items(list.massTemp.size) {
-            MyRowIncubatorAdd(
-                it,
-                list.massTemp,
-                list.massDamp,
-                list.massOver,
-                list.massAiring
-            )
+        items(list.size) {
+            MyRowIncubatorAdd(list[it])
         }
+
         item {
             Button(
                 onClick = {
-                    setMassToSql(
-                        typeBird,
-                        list.massTemp,
-                        list.massDamp,
-                        list.massOver,
-                        list.massAiring
-                    )
                     navigateContinue(list)
                 },
                 modifier = Modifier
@@ -332,27 +327,25 @@ fun AddIncubatorTwoContainer(
             }
         }
     }
+
+//    if (openEndDialog.value) {
+//        ArhivIncubatorChoice(
+//            openDialog = openEndDialog,
+//            projectList = projectList
+//            incubatorArh = incubatorArh
+//        )
+//    }
 }
 
 
 @Composable
-fun MyRowIncubatorAdd(
-    day: Int,
-    temp: MutableList<String>,
-    damp: MutableList<String>,
-    over: MutableList<String>,
-    airing: MutableList<String>
-
-) {
-
-    val text by rememberSaveable { mutableStateOf("${day + 1}") }
-    var tempDay by remember { mutableStateOf(temp[day]) }
-    var dampDay by remember { mutableStateOf(damp[day]) }
-    var overDay by remember { mutableStateOf(over[day]) }
-    var airingDay by remember { mutableStateOf(airing[day]) }
+fun MyRowIncubatorAdd(incubator: Incubator) {
+    var tempDay by remember { mutableStateOf(incubator.temp) }
+    var dampDay by remember { mutableStateOf(incubator.damp) }
+    var overDay by remember { mutableStateOf(incubator.over) }
+    var airingDay by remember { mutableStateOf(incubator.airing) }
 
     val focusManager = LocalFocusManager.current
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -360,7 +353,7 @@ fun MyRowIncubatorAdd(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = text,
+            text = incubator.day.toString(),
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth(0.16f)
@@ -376,7 +369,7 @@ fun MyRowIncubatorAdd(
             value = tempDay,
             onValueChange = {
                 tempDay = it
-                temp[day] = it
+                incubator.temp = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
             modifier = Modifier
@@ -404,7 +397,7 @@ fun MyRowIncubatorAdd(
             value = dampDay,
             onValueChange = {
                 dampDay = it
-                damp[day] = it
+                incubator.damp = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
             modifier = Modifier
@@ -432,7 +425,7 @@ fun MyRowIncubatorAdd(
             value = overDay,
             onValueChange = {
                 overDay = it
-                over[day] = it
+                incubator.over = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
             modifier = Modifier
@@ -460,7 +453,7 @@ fun MyRowIncubatorAdd(
             value = airingDay,
             onValueChange = {
                 airingDay = it
-                airing[day] = it
+                incubator.airing = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
             modifier = Modifier
@@ -483,6 +476,1487 @@ fun MyRowIncubatorAdd(
     Divider(color = Color.DarkGray, thickness = 1.dp)
 }
 
+
+private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
+    val incubator: MutableList<Incubator> = mutableListOf()
+    when (typeIncubator) {
+        "Курицы" -> {
+            incubator.add(
+                Incubator(
+                    day = 1,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 2,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 3,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 4,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 5,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 6,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 7,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 8,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 9,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 10,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 11,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 12,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 13,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 14,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 15,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 16,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 17,
+                    temp = "37.3",
+                    damp = "47",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 18,
+                    temp = "37.3",
+                    damp = "47",
+                    over = "2-3",
+                    airing = "2 раза по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 19,
+                    temp = "37.0",
+                    damp = "70",
+                    over = "2-3",
+                    airing = "2 раза по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 20,
+                    temp = "37.0",
+                    damp = "70",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 21,
+                    temp = "37.0",
+                    damp = "70",
+                    over = "0",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            return incubator
+        }
+
+        "Гуси" -> {
+            incubator.add(
+                Incubator(
+                    day = 1,
+                    temp = "38.0",
+                    damp = "65",
+                    over = "3-4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 2,
+                    temp = "37.8",
+                    damp = "65",
+                    over = "6",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 3,
+                    temp = "37.8",
+                    damp = "65",
+                    over = "6",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 4,
+                    temp = "37.6",
+                    damp = "70",
+                    over = "6",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 5,
+                    temp = "37.6",
+                    damp = "70",
+                    over = "6",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 6,
+                    temp = "37.6",
+                    damp = "70",
+                    over = "6",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 7,
+                    temp = "37.6",
+                    damp = "70",
+                    over = "6",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 8,
+                    temp = "37.6",
+                    damp = "70",
+                    over = "6",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 9,
+                    temp = "37.6",
+                    damp = "70",
+                    over = "10",
+                    airing = "1 раз по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 10,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 11,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 12,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 13,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 14,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 15,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 16,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 17,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 18,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 19,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 20,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 21,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 22,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 23,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 24,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 25,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 26,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 27,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "10",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 28,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "0",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 29,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "0",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 30,
+                    temp = "37.3",
+                    damp = "75",
+                    over = "0",
+                    airing = "3 раза по 45 мин",
+                    idPT = 0
+                )
+            )
+            return incubator
+        }
+
+
+        "Перепела" -> {
+            incubator.add(
+                Incubator(
+                    day = 1,
+                    temp = "38.0",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 2,
+                    temp = "38.0",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 3,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 4,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 5,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 6,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 7,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 8,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 9,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 10,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 11,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 12,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 13,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 14,
+                    temp = "37.7",
+                    damp = "55",
+                    over = "3-6",
+                    airing = "1 раз по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 15,
+                    temp = "37.5",
+                    damp = "37,5",
+                    over = "3-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 16,
+                    temp = "37.5",
+                    damp = "37,5",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 17,
+                    temp = "37.5",
+                    damp = "37,5",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            return incubator
+        }
+
+        "Индюки" -> {
+            incubator.add(
+                Incubator(
+                    day = 1,
+                    temp = "38.0",
+                    damp = "60",
+                    over = "6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 2,
+                    temp = "38.0",
+                    damp = "60",
+                    over = "6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 3,
+                    temp = "38.0",
+                    damp = "60",
+                    over = "6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 4,
+                    temp = "38.0",
+                    damp = "60",
+                    over = "6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 5,
+                    temp = "38.0",
+                    damp = "60",
+                    over = "6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 6,
+                    temp = "38.0",
+                    damp = "60",
+                    over = "6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 7,
+                    temp = "38.0",
+                    damp = "60",
+                    over = "6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 8,
+                    temp = "37.7",
+                    damp = "45",
+                    over = "6",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 9,
+                    temp = "37.7",
+                    damp = "45",
+                    over = "6",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 10,
+                    temp = "37.7",
+                    damp = "45",
+                    over = "6",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 11,
+                    temp = "37.7",
+                    damp = "45",
+                    over = "6",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 12,
+                    temp = "37.7",
+                    damp = "45",
+                    over = "6",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 13,
+                    temp = "37.7",
+                    damp = "45",
+                    over = "6",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 14,
+                    temp = "37.7",
+                    damp = "65",
+                    over = "6",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 15,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 16,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 17,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 18,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 19,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 20,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 21,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 22,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 23,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 24,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 25,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "4",
+                    airing = "4 раза по 10 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 26,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 27,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 28,
+                    temp = "37.5",
+                    damp = "65",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            return incubator
+        }
+
+        "Утки" -> {
+            incubator.add(
+                Incubator(
+                    day = 1,
+                    temp = "38.0",
+                    damp = "75",
+                    over = "4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 2,
+                    temp = "38.0",
+                    damp = "75",
+                    over = "4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 3,
+                    temp = "38.0",
+                    damp = "75",
+                    over = "4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 4,
+                    temp = "38.0",
+                    damp = "75",
+                    over = "4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 5,
+                    temp = "38.0",
+                    damp = "75",
+                    over = "4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 6,
+                    temp = "38.0",
+                    damp = "75",
+                    over = "4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 7,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 8,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 9,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 10,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 11,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 12,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 13,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 14,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "4-6",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 15,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 16,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 17,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 18,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 19,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 20,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 21,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 22,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 23,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 24,
+                    temp = "37.8",
+                    damp = "60",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 25,
+                    temp = "37.5",
+                    damp = "90",
+                    over = "6",
+                    airing = "2 раза по 15 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 26,
+                    temp = "37.5",
+                    damp = "90",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 27,
+                    temp = "37.5",
+                    damp = "90",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 28,
+                    temp = "37.5",
+                    damp = "90",
+                    over = "нет",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            return incubator
+        }
+
+        else -> {
+            incubator.add(
+                Incubator(
+                    day = 1,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 2,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 3,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 4,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 5,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 6,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 7,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 8,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 9,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 10,
+                    temp = "37.9",
+                    damp = "66",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 11,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "нет",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 12,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 13,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 14,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 15,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 16,
+                    temp = "37.5",
+                    damp = "60",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 17,
+                    temp = "37.3",
+                    damp = "47",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 18,
+                    temp = "37.3",
+                    damp = "47",
+                    over = "2-3",
+                    airing = "2 раза по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 19,
+                    temp = "37.0",
+                    damp = "70",
+                    over = "2-3",
+                    airing = "2 раза по 20 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 20,
+                    temp = "37.0",
+                    damp = "70",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            incubator.add(
+                Incubator(
+                    day = 21,
+                    temp = "37.0",
+                    damp = "70",
+                    over = "2-3",
+                    airing = "2 раза по 5 мин",
+                    idPT = 0
+                )
+            )
+            return incubator
+        }
+    }
+}
+
 fun AddIncubatorList.toIncubatorData(): ProjectTable = ProjectTable(
     id = 0,
     titleProject = title,
@@ -500,882 +1974,692 @@ fun AddIncubatorList.toIncubatorData(): ProjectTable = ProjectTable(
     mode = 0
 )
 
-
-fun IncubatorList.toIncubatorTemp(idPT: Int): IncubatorTemp = IncubatorTemp(
-    day1 = massTemp[0],
-    day2 = massTemp[1],
-    day3 = massTemp[2],
-    day4 = massTemp[3],
-    day5 = massTemp[4],
-    day6 = massTemp[5],
-    day7 = massTemp[6],
-    day8 = massTemp[7],
-    day9 = massTemp[8],
-    day10 = massTemp[9],
-    day11 = massTemp[10],
-    day12 = massTemp[11],
-    day13 = massTemp[12],
-    day14 = massTemp[13],
-    day15 = massTemp[14],
-    day16 = massTemp[15],
-    day17 = massTemp[16],
-    day18 = massTemp[17],
-    day19 = massTemp[18],
-    day20 = massTemp[19],
-    day21 = massTemp[20],
-    day22 = massTemp[21],
-    day23 = massTemp[22],
-    day24 = massTemp[23],
-    day25 = massTemp[24],
-    day26 = massTemp[25],
-    day27 = massTemp[26],
-    day28 = massTemp[27],
-    day29 = massTemp[28],
-    day30 = massTemp[29],
-    idPT = idPT
-)
-
-fun IncubatorList.toIncubatorDamp(idPT: Int): IncubatorDamp = IncubatorDamp(
-    day1 = massDamp[0],
-    day2 = massDamp[1],
-    day3 = massDamp[2],
-    day4 = massDamp[3],
-    day5 = massDamp[4],
-    day6 = massDamp[5],
-    day7 = massDamp[6],
-    day8 = massDamp[7],
-    day9 = massDamp[8],
-    day10 = massDamp[9],
-    day11 = massDamp[10],
-    day12 = massDamp[11],
-    day13 = massDamp[12],
-    day14 = massDamp[13],
-    day15 = massDamp[14],
-    day16 = massDamp[15],
-    day17 = massDamp[16],
-    day18 = massDamp[17],
-    day19 = massDamp[18],
-    day20 = massDamp[19],
-    day21 = massDamp[20],
-    day22 = massDamp[21],
-    day23 = massDamp[22],
-    day24 = massDamp[23],
-    day25 = massDamp[24],
-    day26 = massDamp[25],
-    day27 = massDamp[26],
-    day28 = massDamp[27],
-    day29 = massDamp[28],
-    day30 = massDamp[29],
-    idPT = idPT
-)
-
-fun IncubatorList.toIncubatorOver(idPT: Int): IncubatorOver = IncubatorOver(
-    day1 = massOver[0],
-    day2 = massOver[1],
-    day3 = massOver[2],
-    day4 = massOver[3],
-    day5 = massOver[4],
-    day6 = massOver[5],
-    day7 = massOver[6],
-    day8 = massOver[7],
-    day9 = massOver[8],
-    day10 = massOver[9],
-    day11 = massOver[10],
-    day12 = massOver[11],
-    day13 = massOver[12],
-    day14 = massOver[13],
-    day15 = massOver[14],
-    day16 = massOver[15],
-    day17 = massOver[16],
-    day18 = massOver[17],
-    day19 = massOver[18],
-    day20 = massOver[19],
-    day21 = massOver[20],
-    day22 = massOver[21],
-    day23 = massOver[22],
-    day24 = massOver[23],
-    day25 = massOver[24],
-    day26 = massOver[25],
-    day27 = massOver[26],
-    day28 = massOver[27],
-    day29 = massOver[28],
-    day30 = massOver[29],
-    idPT = idPT
-
-)
-
-fun IncubatorList.toIncubatorAiring(idPT: Int): IncubatorAiring = IncubatorAiring(
-    day1 = massAiring[0],
-    day2 = massAiring[1],
-    day3 = massAiring[2],
-    day4 = massAiring[3],
-    day5 = massAiring[4],
-    day6 = massAiring[5],
-    day7 = massAiring[6],
-    day8 = massAiring[7],
-    day9 = massAiring[8],
-    day10 = massAiring[9],
-    day11 = massAiring[10],
-    day12 = massAiring[11],
-    day13 = massAiring[12],
-    day14 = massAiring[13],
-    day15 = massAiring[14],
-    day16 = massAiring[15],
-    day17 = massAiring[16],
-    day18 = massAiring[17],
-    day19 = massAiring[18],
-    day20 = massAiring[19],
-    day21 = massAiring[20],
-    day22 = massAiring[21],
-    day23 = massAiring[22],
-    day24 = massAiring[23],
-    day25 = massAiring[24],
-    day26 = massAiring[25],
-    day27 = massAiring[26],
-    day28 = massAiring[27],
-    day29 = massAiring[28],
-    day30 = massAiring[29],
-    idPT = idPT
-)
-
-
-data class IncubatorList(
-    var massTemp: MutableList<String>,
-    var massDamp: MutableList<String>,
-    var massAiring: MutableList<String>,
-    var massOver: MutableList<String>
-)
-
-private fun setMassToSql(
-    typeIncubator: String,
-    massTemp: MutableList<String>,
-    massDamp: MutableList<String>,
-    massOver: MutableList<String>,
-    massAiring: MutableList<String>
-) {
-    when (typeIncubator) {
-        "Курицы" -> {
-            endMass(9, massTemp)
-            endMass(9, massDamp)
-            endMass(9, massOver)
-            endMass(9, massAiring)
-        }
-
-        "Индюки", "Утки" -> {
-            endMass(2, massTemp)
-            endMass(2, massDamp)
-            endMass(2, massOver)
-            endMass(2, massAiring)
-        }
-
-        "Перепела" -> {
-            endMass(13, massTemp)
-            endMass(13, massDamp)
-            endMass(13, massOver)
-            endMass(13, massAiring)
-        }
+private fun setIdPT(list: MutableList<Incubator>, idPT: Int): MutableList<Incubator> {
+    list.forEach {
+        it.idPT = idPT
     }
-
-}
-
-private fun endMass(day: Int, mass: MutableList<String>) {
-    for (i in 1..day) {
-        mass.add("0")
-    }
+    return list
 }
 
 private fun setAutoIncubator(
-    list: IncubatorList,
+    list: MutableList<Incubator>,
     airing: Boolean,
     over: Boolean
-): IncubatorList {
-
-    val airingAuto = mutableListOf<String>()
-    val overAuto = mutableListOf<String>()
+): MutableList<Incubator> {
 
     if (airing) {
-        for (i in 0..list.massTemp.size) {
-            airingAuto.add("Авто")
+        list.forEach {
+            it.airing = "Авто"
         }
     }
-
     if (over) {
-        for (i in 0..list.massTemp.size) {
-            overAuto.add("Авто")
+        list.forEach {
+            it.over = "Авто"
         }
     }
-
-    return if (airing && over) {
-        list.copy(massAiring = airingAuto, massOver = overAuto)
-    } else if (airing) {
-        list.copy(massAiring = airingAuto)
-    } else if (over) {
-        list.copy(
-            massOver = overAuto
-        )
-    } else list
+    return list
 }
 
 
-private fun setIncubator(typeIncubator: String): IncubatorList {
-    when (typeIncubator) {
-        "Курицы" -> {
-            return IncubatorList(
-                massTemp = mutableListOf(
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.3",
-                    "37.3",
-                    "37.0",
-                    "37.0",
-                    "37.0",
-
-                    ),
-                massDamp = mutableListOf(
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "47",
-                    "47",
-                    "70",
-                    "70",
-                    "70"
-                ),
-                massAiring = mutableListOf(
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 20 мин",
-                    "2 раза по 20 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин"
-                ),
-                massOver = mutableListOf(
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "0"
-                )
-            )
-        }
-
-        "Гуси" -> {
-            return IncubatorList(
-                massTemp = mutableListOf(
-                    "38.0",
-                    "37.8",
-                    "37.8",
-                    "37.6",
-                    "37.6",
-                    "37.6",
-                    "37.6",
-                    "37.6",
-                    "37.6",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3",
-                    "37.3"
-                ),
-                massDamp = mutableListOf(
-                    "65",
-                    "65",
-                    "65",
-                    "70",
-                    "70",
-                    "70",
-                    "70",
-                    "70",
-                    "70",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75"
-                ),
-                massAiring = mutableListOf(
-                    "нет",
-                    "1 раз по 20 мин",
-                    "1 раз по 20 мин",
-                    "1 раз по 20 мин",
-                    "1 раз по 20 мин",
-                    "2 раз по 20 мин",
-                    "2 раз по 20 мин",
-                    "2 раз по 20 мин",
-                    "2 раз по 20 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин",
-                    "3 раза по 45 мин"
-                ),
-                massOver = mutableListOf(
-                    "3-4",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "10",
-                    "0",
-                    "0",
-                    "0"
-                )
-            )
-        }
-
-        "Перепела" -> {
-            return IncubatorList(
-                massTemp = mutableListOf(
-                    "38.0",
-                    "38.0",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.5",
-                    "37.5",
-                    "37.5"
-                ),
-                massDamp = mutableListOf(
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "55",
-                    "37.5",
-                    "37.5",
-                    "37.5"
-                ),
-                massAiring = mutableListOf(
-                    "нет",
-                    "нет",
-                    "нет",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "1 раз по 5 мин",
-                    "нет",
-                    "нет",
-                    "нет"
-                ),
-                massOver = mutableListOf(
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "3-6",
-                    "нет",
-                    "нет"
-                )
-            )
-        }
-
-        "Индюки" -> {
-            return IncubatorList(
-                massTemp = mutableListOf(
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.7",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5"
-                ),
-                massDamp = mutableListOf(
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "45",
-                    "45",
-                    "45",
-                    "45",
-                    "45",
-                    "45",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65",
-                    "65"
-                ),
-                massAiring = mutableListOf(
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "4 раза по 10 мин",
-                    "нет",
-                    "нет",
-                    "нет"
-                ),
-                massOver = mutableListOf(
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "нет",
-                    "нет",
-                    "нет"
-                )
-            )
-        }
-
-        "Утки" -> {
-            return IncubatorList(
-                massTemp = mutableListOf(
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "38.0",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.8",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5"
-                ),
-                massDamp = mutableListOf(
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "75",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "90",
-                    "90",
-                    "90",
-                    "90"
-                ),
-                massAiring = mutableListOf(
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "2 раза по 15 мин",
-                    "2 раза по 15 мин",
-                    "2 раза по 15 мин",
-                    "2 раза по 20 мин",
-                    "2 раза по 20 мин",
-                    "2 раза по 15 мин",
-                    "2 раза по 15 мин",
-                    "2 раза по 15 мин",
-                    "2 раза по 15 мин",
-                    "2 раза по 15 мин",
-                    "2 раза по 15 мин",
-                    "нет",
-                    "нет",
-                    "нет"
-                ),
-                massOver = mutableListOf(
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4",
-                    "4-6",
-                    "4-6",
-                    "4-6",
-                    "4-6",
-                    "4-6",
-                    "4-6",
-                    "4-6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "6",
-                    "нет",
-                    "нет",
-                    "нет"
-                )
-            )
-        }
-
-        else -> {
-            return IncubatorList(
-                massTemp = mutableListOf(
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.9",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.5",
-                    "37.3",
-                    "37.3",
-                    "37.0",
-                    "37.0",
-                    "37.0"
-                ),
-                massDamp = mutableListOf(
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "66",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "60",
-                    "47",
-                    "47",
-                    "70",
-                    "70",
-                    "70"
-                ),
-                massAiring = mutableListOf(
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "нет",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 20 мин",
-                    "2 раза по 20 мин",
-                    "2 раза по 5 мин",
-                    "2 раза по 5 мин"
-                ),
-                massOver = mutableListOf(
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "2-3",
-                    "0"
-                )
-            )
-        }
-    }
-}
+//
+//private fun setIncubator1(typeIncubator: String): IncubatorTemp{
+//    when (typeIncubator) {
+//        "Курицы" -> {
+//            return IncubatorList(
+//                massTemp = mutableListOf(
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.3",
+//                    "37.3",
+//                    "37.0",
+//                    "37.0",
+//                    "37.0",
+//                    ),
+//                massDamp = mutableListOf(
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "47",
+//                    "47",
+//                    "70",
+//                    "70",
+//                    "70"
+//                ),
+//                massAiring = mutableListOf(
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 20 мин",
+//                    "2 раза по 20 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин"
+//                ),
+//                massOver = mutableListOf(
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "0"
+//                )
+//            )
+//        }
+//
+//        "Гуси" -> {
+//            return IncubatorList(
+//                massTemp = mutableListOf(
+//                    "38.0",
+//                    "37.8",
+//                    "37.8",
+//                    "37.6",
+//                    "37.6",
+//                    "37.6",
+//                    "37.6",
+//                    "37.6",
+//                    "37.6",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3",
+//                    "37.3"
+//                ),
+//                massDamp = mutableListOf(
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "70",
+//                    "70",
+//                    "70",
+//                    "70",
+//                    "70",
+//                    "70",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75"
+//                ),
+//                massAiring = mutableListOf(
+//                    "нет",
+//                    "1 раз по 20 мин",
+//                    "1 раз по 20 мин",
+//                    "1 раз по 20 мин",
+//                    "1 раз по 20 мин",
+//                    "2 раз по 20 мин",
+//                    "2 раз по 20 мин",
+//                    "2 раз по 20 мин",
+//                    "2 раз по 20 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин",
+//                    "3 раза по 45 мин"
+//                ),
+//                massOver = mutableListOf(
+//                    "3-4",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "10",
+//                    "0",
+//                    "0",
+//                    "0"
+//                )
+//            )
+//        }
+//
+//        "Перепела" -> {
+//            return IncubatorList(
+//                massTemp = mutableListOf(
+//                    "38.0",
+//                    "38.0",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5"
+//                ),
+//                massDamp = mutableListOf(
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "55",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5"
+//                ),
+//                massAiring = mutableListOf(
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "1 раз по 5 мин",
+//                    "нет",
+//                    "нет",
+//                    "нет"
+//                ),
+//                massOver = mutableListOf(
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "3-6",
+//                    "нет",
+//                    "нет"
+//                )
+//            )
+//        }
+//
+//        "Индюки" -> {
+//            return IncubatorList(
+//                massTemp = mutableListOf(
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.7",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5"
+//                ),
+//                massDamp = mutableListOf(
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "45",
+//                    "45",
+//                    "45",
+//                    "45",
+//                    "45",
+//                    "45",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65",
+//                    "65"
+//                ),
+//                massAiring = mutableListOf(
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "4 раза по 10 мин",
+//                    "нет",
+//                    "нет",
+//                    "нет"
+//                ),
+//                massOver = mutableListOf(
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "нет",
+//                    "нет",
+//                    "нет"
+//                )
+//            )
+//        }
+//
+//        "Утки" -> {
+//            return IncubatorList(
+//                massTemp = mutableListOf(
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "38.0",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.8",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5"
+//                ),
+//                massDamp = mutableListOf(
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "75",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "90",
+//                    "90",
+//                    "90",
+//                    "90"
+//                ),
+//                massAiring = mutableListOf(
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 20 мин",
+//                    "2 раза по 20 мин",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 15 мин",
+//                    "2 раза по 15 мин",
+//                    "нет",
+//                    "нет",
+//                    "нет"
+//                ),
+//                massOver = mutableListOf(
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4",
+//                    "4-6",
+//                    "4-6",
+//                    "4-6",
+//                    "4-6",
+//                    "4-6",
+//                    "4-6",
+//                    "4-6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "6",
+//                    "нет",
+//                    "нет",
+//                    "нет"
+//                )
+//            )
+//        }
+//
+//        else -> {
+//            return IncubatorList(
+//                massTemp = mutableListOf(
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.9",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.5",
+//                    "37.3",
+//                    "37.3",
+//                    "37.0",
+//                    "37.0",
+//                    "37.0"
+//                ),
+//                massDamp = mutableListOf(
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "66",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "60",
+//                    "47",
+//                    "47",
+//                    "70",
+//                    "70",
+//                    "70"
+//                ),
+//                massAiring = mutableListOf(
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "нет",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 20 мин",
+//                    "2 раза по 20 мин",
+//                    "2 раза по 5 мин",
+//                    "2 раза по 5 мин"
+//                ),
+//                massOver = mutableListOf(
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "2-3",
+//                    "0"
+//                )
+//            )
+//        }
+//    }
+//}

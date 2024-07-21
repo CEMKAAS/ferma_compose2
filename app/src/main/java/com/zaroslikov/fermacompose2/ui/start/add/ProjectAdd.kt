@@ -1,21 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.start.add
 
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import android.app.Activity
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
@@ -27,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -37,29 +28,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.StartDestination
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -69,26 +54,35 @@ object ProjectAddDestination : NavigationDestination {
     override val titleRes = R.string.app_name
 }
 
-
 @Composable
 fun AddProject(
     navigateBack: () -> Unit,
     navigateToStart: () -> Unit,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val activity = LocalContext.current as Activity
+
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Проект", navigateUp = navigateBack)
         },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        },
     ) { innerPadding ->
         AddProjectContainer(
-            number = viewModel.countProject,
+            number = viewModel.countProject(),
             modifier = Modifier.padding(innerPadding),
             navigateToStart = {
                 coroutineScope.launch {
                     viewModel.insertTable(it)
                     navigateToStart()
+                    (activity as MainActivity)?.showAd()
                 }
             }
         )
@@ -111,15 +105,19 @@ fun AddProjectContainer(
     //Дата
     var openDialog by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-    datePickerState.setSelection(calendar.timeInMillis) //todo хмм
+
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
 
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
     }
+
     //Текст
-    var name by remember { mutableStateOf("Мое Хозяйство №${
-        number + 1}") }
+    var name by remember {
+        mutableStateOf(
+            "Мое Хозяйство"
+        )
+    }
     var date1 by remember { mutableStateOf(formattedDate) }
 
     if (openDialog) {
@@ -204,6 +202,7 @@ fun AddProjectContainer(
         OutlinedTextField(
             value = date1,
             onValueChange = {},
+            readOnly = true,
             label = { Text("Дата") },
             supportingText = {
                 Text("Выберите дату начала проекта")
@@ -226,7 +225,8 @@ fun AddProjectContainer(
 
         Button(
             onClick = {
-               if (!isErrorTitle) {
+                if (!isErrorTitle) {
+
                     navigateToStart(
                         ProjectTable(
                             id = 0,
@@ -245,6 +245,7 @@ fun AddProjectContainer(
                             mode = 1
                         )
                     )
+
                 }
             },
             modifier = Modifier
@@ -260,6 +261,43 @@ fun AddProjectContainer(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialogSample(
+    datePickerState: DatePickerState,
+    dateToday: String,
+    onDateSelected: (String) -> Unit
+) {
+    val state = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates
+    )
+
+    DatePickerDialog(
+        onDismissRequest = {
+            onDateSelected(dateToday)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val format = SimpleDateFormat("dd.MM.yyyy")
+                    val formattedDate: String =
+                        format.format(state.selectedDateMillis)
+                    onDateSelected(formattedDate)
+                },
+            ) { Text("Выбрать") }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDateSelected(dateToday)
+                }
+            ) { Text("Назад") }
+        }
+    ) {
+        DatePicker(state = state)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerDialogSampleNoLimit(
     datePickerState: DatePickerState,
     dateToday: String,
     onDateSelected: (String) -> Unit
@@ -291,6 +329,7 @@ fun DatePickerDialogSample(
 }
 
 
+
 //@Preview(showBackground = true)
 //@Composable
 //fun AddProjectPrewie() {
@@ -300,3 +339,14 @@ fun DatePickerDialogSample(
 //        scope = rememberCoroutineScope()
 //    )
 //}
+
+@OptIn(ExperimentalMaterial3Api::class)
+object PastOrPresentSelectableDates: SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+        return utcTimeMillis <= System.currentTimeMillis()
+    }
+
+    override fun isSelectableYear(year: Int): Boolean {
+        return year <= LocalDate.now().year
+    }
+}

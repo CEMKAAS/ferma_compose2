@@ -29,19 +29,15 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorAiring
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorDamp
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorOver
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorUIList
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
@@ -65,6 +61,8 @@ interface ItemDao {
 
     @Query("SELECT * from МyINCUBATOR Where TYPE =:type and mode = 0 and ARHIVE = 1")
     fun getIncubatorListArh(type: String): Flow<List<ProjectTable>>
+    @Query("SELECT COUNT(*) AS row_count from МyINCUBATOR Where TYPE =:type and mode = 0 and ARHIVE = 1")
+    fun getIncubatorListArh2(type: String): Flow<Int>
 
     @Query("SELECT * from МyINCUBATOR Where mode = 1 and ARHIVE = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>
@@ -91,35 +89,17 @@ interface ItemDao {
     @Query("SELECT _id from МyINCUBATOR ORDER BY _id DESC Limit 1")
     fun getLastProject(): Flow<Int>
 
-    @Query("SELECT * from МyINCUBATORTEMP2 Where idPT=:id")
-    fun getIncubatorTemp2(id: Int): Flow<IncubatorTemp>
+    @Query("SELECT * from MyIncubator Where idPT=:id")
+    fun getIncubatorList(id: Int): Flow<List<Incubator>>
 
-    @Query("SELECT * from МyINCUBATORTEMPDAMP Where idPT=:id")
-    fun getIncubatorDamp2(id: Int): Flow<IncubatorDamp>
+    @Query("SELECT * from MyIncubator Where idPT=:id")
+    suspend fun getIncubatorList2(id: Int): List<Incubator>
 
-    @Query("SELECT * from МyINCUBATOROVER Where idPT=:id")
-    fun getIncubatorOver2(id: Int): Flow<IncubatorOver>
-
-    @Query("SELECT * from МyINCUBATORAIRING Where idPT=:id")
-    fun getIncubatorAiring2(id: Int): Flow<IncubatorAiring>
-
-
-    @Query("SELECT * from МyINCUBATORTEMP2 Where idPT=:id")
-    fun getIncubatorTemp(id: Int): Flow<IncubatorUIList>
-
-    @Query("SELECT * from МyINCUBATORTEMPDAMP Where idPT=:id")
-    fun getIncubatorDamp(id: Int): Flow<IncubatorUIList>
-
-    @Query("SELECT * from МyINCUBATOROVER Where idPT=:id")
-    fun getIncubatorOver(id: Int): Flow<IncubatorUIList>
-
-    @Query("SELECT * from МyINCUBATORAIRING Where idPT=:id")
-    fun getIncubatorAiring(id: Int): Flow<IncubatorUIList>
-
+    @Query("SELECT * from MyIncubator Where idPT=:id")
+    fun getIncubator(id: Int): Flow<Incubator>
 
     @Query("SELECT * from MyFerma WHERE _id = :id")
     fun getItem(id: Int): Flow<AddTable>
-
 
     @Query("SELECT * from MyFerma Where idPT=:id ORDER BY _id DESC")
     fun getAllItems(id: Int): Flow<List<AddTable>>
@@ -136,9 +116,6 @@ interface ItemDao {
     @Query("SELECT name from AnimalTable Where idPT=:id")
     fun getItemsAnimalAddList(id: Int): Flow<List<String>>
 
-
-    // Specify the conflict strategy as IGNORE, when the user tries to add an
-    // existing Item into the database Room ignores the conflict.
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: AddTable)
 
@@ -294,33 +271,15 @@ interface ItemDao {
                 "    WHERE idPT = :id" +
                 "    GROUP BY titleWRITEOFF" +
                 ")" +
-                "GROUP BY Title ORDER BY ResultCount DESC"
+                " GROUP BY Title ORDER BY ResultCount DESC"
     )
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertIncubatorTemp(item: IncubatorTemp)
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertIncubatorDamp(item: IncubatorDamp)
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertIncubatorAiring(item: IncubatorAiring)
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertIncubatorOver(item: IncubatorOver)
+    suspend fun insertIncubator(item: Incubator)
 
     @Update
-    suspend fun updateIncubatorTemp(item: IncubatorTemp)
-
-    @Update
-    suspend fun updateIncubatorDamp(item: IncubatorDamp)
-
-    @Update
-    suspend fun updateIncubatorAiring(item: IncubatorAiring)
-
-    @Update
-    suspend fun updateIncubatorOver(item: IncubatorOver)
+    suspend fun updateIncubator(item: Incubator)
 
     @Query("SELECT * from AnimalTable Where idPT=:id")
     fun getAllAnimal(id: Int): Flow<List<AnimalTable>>

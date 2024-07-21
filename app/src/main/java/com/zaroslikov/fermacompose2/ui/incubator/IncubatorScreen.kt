@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
@@ -50,9 +50,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.ferma.IncubatorTemp
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -78,10 +79,7 @@ fun IncubatorScreen(
     navigateStart: () -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val temp by viewModel.tempState.collectAsState()
-    val damp by viewModel.dampState.collectAsState()
-    val over by viewModel.overState.collectAsState()
-    val airng by viewModel.airingState.collectAsState()
+    val incubator by viewModel.incubatorUiState.collectAsState()
     val projectState by viewModel.homeUiState.collectAsState()
     val project = viewModel.itemUiState
     val projectList by viewModel.projectListAct.collectAsState()
@@ -89,7 +87,6 @@ fun IncubatorScreen(
     val coroutineScope = rememberCoroutineScope()
 
     // В приниципе все только доделать переход
-
     Scaffold(
         topBar = {
             TopAppBarStart(
@@ -98,17 +95,22 @@ fun IncubatorScreen(
                 navigateUp = navigateBack,
                 settingUp = { navigateProjectEdit(project.id) }
             )
-        }) { innerPadding ->
+        },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        }
+    ) { innerPadding ->
 
         IncubatorContainer(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(8.dp),
 //                .verticalScroll(rememberScrollState()),
-            incubatorTemp = temp.list,
-            incubatorDamp = damp.list,
-            incubatorOver = over.list,
-            incubatorAiring = airng.list,
+            incubator = incubator.itemList,
             projectTable = project,
             navigateDayEdit = navigateDayEdit,
             navigateOvos = navigateOvos,
@@ -139,7 +141,7 @@ fun IncubatorScreen(
                     navigateStart()
                 }
             },
-            save ={
+            save = {
                 coroutineScope.launch {
                     viewModel.saveNewProjectArh(it)
                 }
@@ -153,10 +155,7 @@ fun IncubatorScreen(
 @Composable
 fun IncubatorContainer(
     modifier: Modifier,
-    incubatorTemp: IncubatorTemp,
-    incubatorDamp: IncubatorUIList,
-    incubatorOver: IncubatorUIList,
-    incubatorAiring: IncubatorUIList,
+    incubator: List<Incubator>,
     projectTable: IncubatorProjectEditState,
     navigateDayEdit: (IncubatorEditNav) -> Unit,
     navigateOvos: (IncubatorOvosNav) -> Unit,
@@ -166,7 +165,7 @@ fun IncubatorContainer(
     deleteInc: () -> Unit,
     saveInProject: (IncubatorAnimalInProject) -> Unit,
     saveInNewProject: (IncubatorAnimalInProject) -> Unit,
-    save:(project: ProjectTable)-> Unit
+    save: (project: ProjectTable) -> Unit
 ) {
 
     val scrollState = rememberLazyListState()
@@ -190,13 +189,7 @@ fun IncubatorContainer(
         )
     }
 
-
     var day by rememberSaveable { mutableIntStateOf(0) }
-
-    val tempList = massList2(incubatorTemp)
-    val dampList = massList(incubatorDamp)
-    val overList = massList(incubatorOver)
-    val airingList = massList(incubatorAiring)
 
     if (projectTable.data != "") {
         LaunchedEffect(Unit) {
@@ -221,16 +214,12 @@ fun IncubatorContainer(
     LazyColumn(
         state = scrollState, modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(tempList.size) {
+        items(incubator.size) {
 
             val borderStroke = if (day == it) BorderStroke(2.dp, Color.Black) else null
 
             MyRowIncubatorSettting(
-                it,
-                tempList[it],
-                dampList[it],
-                overList[it],
-                airingList[it],
+                incubator[it],
                 modifier = Modifier
                     .padding(6.dp)
                     .clickable {
@@ -270,11 +259,7 @@ fun IncubatorContainer(
 
 @Composable
 fun MyRowIncubatorSettting(
-    n: Int,
-    temp: String,
-    damp: String,
-    over: String,
-    airing: String,
+    incubator: Incubator,
     modifier: Modifier = Modifier,
     borderStroke: BorderStroke?,
     typeBird: String,
@@ -282,7 +267,7 @@ fun MyRowIncubatorSettting(
 ) {
 
     var ovoscop by rememberSaveable { mutableStateOf(false) }
-    ovoscop = setOvoskop(typeBird, n + 1)
+    ovoscop = setOvoskop(typeBird, incubator.day)
 
     Card(
         modifier = modifier,
@@ -291,7 +276,7 @@ fun MyRowIncubatorSettting(
         border = borderStroke
     ) {
         Text(
-            text = "День ${n + 1}",
+            text = "День ${incubator.day}",
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(6.dp)
@@ -306,13 +291,13 @@ fun MyRowIncubatorSettting(
         ) {
 
             Text(
-                text = "Температура ${temp}°C",
+                text = "Температура ${incubator.temp}°C",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
             )
             Text(
-                text = "Влажность ${damp}%",
+                text = "Влажность ${incubator.damp}%",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
@@ -324,13 +309,13 @@ fun MyRowIncubatorSettting(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Переворачивать ${over}",
+                text = "Переворачивать ${incubator.over}",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
             )
             Text(
-                text = "Проветривать ${airing}",
+                text = "Проветривать ${incubator.airing}",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
@@ -646,90 +631,6 @@ data class IncubatorOvosNav(
     val day: Int,
     val typeBirds: String
 )
-
-fun massList(temp: IncubatorUIList): MutableList<String> {
-    val mass = mutableListOf<String>()
-    mass.add(temp.day1)
-    mass.add(temp.day2)
-    mass.add(temp.day3)
-    mass.add(temp.day4)
-    mass.add(temp.day5)
-    mass.add(temp.day6)
-    mass.add(temp.day7)
-    mass.add(temp.day8)
-    mass.add(temp.day9)
-    mass.add(temp.day10)
-    mass.add(temp.day11)
-    mass.add(temp.day12)
-    mass.add(temp.day13)
-    mass.add(temp.day14)
-    mass.add(temp.day15)
-    mass.add(temp.day16)
-    mass.add(temp.day17)
-    if (temp.day18 == "0") return mass
-    else {
-        mass.add(temp.day18)
-        mass.add(temp.day19)
-        mass.add(temp.day20)
-        mass.add(temp.day21)
-        return if (temp.day22 == "0") mass else {
-            mass.add(temp.day22)
-            mass.add(temp.day23)
-            mass.add(temp.day24)
-            mass.add(temp.day25)
-            mass.add(temp.day26)
-            mass.add(temp.day27)
-            mass.add(temp.day28)
-            if (temp.day29 == "0") mass else {
-                mass.add(temp.day29)
-                mass.add(temp.day30)
-                mass
-            }
-        }
-    }
-}
-
-fun massList2(temp: IncubatorTemp): MutableList<String> {
-    val mass = mutableListOf<String>()
-    mass.add(temp.day1)
-    mass.add(temp.day2)
-    mass.add(temp.day3)
-    mass.add(temp.day4)
-    mass.add(temp.day5)
-    mass.add(temp.day6)
-    mass.add(temp.day7)
-    mass.add(temp.day8)
-    mass.add(temp.day9)
-    mass.add(temp.day10)
-    mass.add(temp.day11)
-    mass.add(temp.day12)
-    mass.add(temp.day13)
-    mass.add(temp.day14)
-    mass.add(temp.day15)
-    mass.add(temp.day16)
-    mass.add(temp.day17)
-    if (temp.day18 == "0") return mass
-    else {
-        mass.add(temp.day18)
-        mass.add(temp.day19)
-        mass.add(temp.day20)
-        mass.add(temp.day21)
-        return if (temp.day22 == "0") mass else {
-            mass.add(temp.day22)
-            mass.add(temp.day23)
-            mass.add(temp.day24)
-            mass.add(temp.day25)
-            mass.add(temp.day26)
-            mass.add(temp.day27)
-            mass.add(temp.day28)
-            if (temp.day29 == "0") mass else {
-                mass.add(temp.day29)
-                mass.add(temp.day30)
-                mass
-            }
-        }
-    }
-}
 
 data class IncubatorAnimalInProject(
     val animalTable: AnimalTable,

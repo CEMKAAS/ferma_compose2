@@ -16,6 +16,7 @@
 
 package com.zaroslikov.fermacompose2
 
+
 import android.app.Application
 import com.yandex.mobile.ads.common.MobileAds
 import com.zaroslikov.fermacompose2.data.AppContainer
@@ -30,7 +31,8 @@ class InventoryApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        MobileAds.initialize(this) {  }
         container = AppDataContainer(this)
-        MobileAds.initialize(this){ }
+
     }
 }

@@ -57,7 +57,7 @@ dependencies {
     // Import the Compose BOM
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.activity:activity-compose:1.8.1")
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material3:material3:1.2.0-beta01")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -68,6 +68,7 @@ dependencies {
     //Room
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
     implementation("androidx.core:core-ktx:1.12.0")
+    implementation(libs.androidx.lifecycle.process)
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
 
@@ -75,6 +76,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
-    implementation ("com.yandex.android:mobileads:7.1.0")
+    implementation ("com.yandex.android:mobileads:7.2.0")
 
 }
+
+//

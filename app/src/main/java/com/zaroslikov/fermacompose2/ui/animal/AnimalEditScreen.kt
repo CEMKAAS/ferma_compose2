@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
@@ -49,18 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesTableUiState
+import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.TimeZone
+
 
 object AnimalEditDestination : NavigationDestination {
     override val route = "animalEdit"
@@ -85,7 +80,14 @@ fun AnimalEditProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Редактировать данные", navigateUp = navigateBack)
-        }
+        },
+//        bottomBar = {
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
+//        }
     ) { innerPadding ->
         AnimalEditContainer(
             animalEditUiState = animalEditUiState,
@@ -266,6 +268,7 @@ fun AnimalEditContainer(
 
         OutlinedTextField(
             value = animalEditUiState.data,
+            readOnly = true,
             onValueChange = {},
             label = { Text("Дата рождения или завода") },
             supportingText = {
