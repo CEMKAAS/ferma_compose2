@@ -44,6 +44,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object WarehouseDestination : NavigationDestination {
     override val route = "warehouse"
@@ -94,14 +95,7 @@ fun WarehouseScreen(
                     navigateToEdit = {navigateToEdit(idProject)},
                     scrollBehavior = scrollBehavior
                 )
-            },
-//            bottomBar = {
-//                Banner(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                )
-//            }
+            }
         ) { innerPadding ->
             WarehouseBody(
                 itemList = homeUiState.itemList,
@@ -127,12 +121,29 @@ private fun WarehouseBody(
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_item_warehouse),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
+            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                Text(
+                    text = "Добро пожаловать на Склад!",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "В этом раздели указано сколько Вашего товара сейчас на складе (учитываются данные при добавлении, продажи и списании), если колличество Вашего Товара ушло в минус, оно отображаться в этом Разделе не будет!",
+                    textAlign = TextAlign.Justify,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "Сейчас склад пустой:(\nДобавьте товар в разделе \"Мои Товары\"",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 20.sp,
+                )
+            }
         } else {
             WarehouseInventoryList(
                 itemList = itemList,
@@ -214,7 +225,7 @@ fun WarehouseProductCard(
                 )
             }
             Text(
-                text = "${warehouseProduct.ResultCount} ${warehouseProduct.suffix}",
+                text = "${formatter(warehouseProduct.ResultCount)} ${warehouseProduct.suffix}",
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .padding(6.dp)

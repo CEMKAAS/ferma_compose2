@@ -32,9 +32,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -64,13 +66,19 @@ import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.incubator.endInc
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSampleNoLimit
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
+import com.zaroslikov.fermacompose2.ui.start.formatter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 object AnimalIndicatorsDestination : NavigationDestination {
     override val route = "FinanceCategory"
@@ -101,6 +109,10 @@ fun AnimalIndicatorsScreen(
     val coroutineScope = rememberCoroutineScope()
     val addBottomSheet = remember { mutableStateOf(false) }
     val editBottomSheet = remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -121,22 +133,14 @@ fun AnimalIndicatorsScreen(
                     contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
                 )
             }
-        },
-//        bottomBar = {
-//        Banner(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .wrapContentHeight()
-//        )
-//    }
+        }
     ) { innerPadding ->
         AnimalIndicatorsBody(
             id = viewModel.itemId,
             indicators = viewModel.indicators,
             itemList = indicatorsList.value.itemList,
             itemVaccinationList = vaccinationList.value.itemList,
-            modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding,
+            modifier = modifier.padding(innerPadding),
             addBottomSheet = addBottomSheet,
             editBottomSheet = editBottomSheet,
             saveInTable = {
@@ -172,13 +176,15 @@ fun AnimalIndicatorsScreen(
                 }
             },
             editVaccinationtUiState = vacUiTable,
-            onValueChangeVaccinationt = viewModel::updatevaccinationUiState
+            onValueChangeVaccinationt = viewModel::updatevaccinationUiState,
+            sheetState = sheetState
         )
 
 
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AnimalIndicatorsBody(
     id: Int,
@@ -186,7 +192,6 @@ private fun AnimalIndicatorsBody(
     itemList: List<AnimalIndicatorsVM>,
     itemVaccinationList: List<AnimalVaccinationTable>,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
 
     addBottomSheet: MutableState<Boolean>,
     editBottomSheet: MutableState<Boolean>,
@@ -205,23 +210,27 @@ private fun AnimalIndicatorsBody(
     editVaccinationtUiState: AnimalVaccinationTable,
     onValueChangeVaccinationt: (AnimalVaccinationTable) -> Unit = {},
 
-    ) {
+    sheetState:SheetState
+
+) {
 
     val suff = when (indicators) {
         "Количество" -> {
             "шт."
         }
+
         "Вес" -> {
             "кг."
         }
+
         "Размер" -> {
             "м."
         }
+
         else -> {
             ""
         }
     }
-
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -229,38 +238,60 @@ private fun AnimalIndicatorsBody(
     ) {
 
 //        Text(
-//                text = ("Нет данных в категории $indicators\nНажмите + чтобы добавить."),
-//        textAlign = TextAlign.Center,
-//        style = MaterialTheme.typography.titleLarge,
-//        modifier = Modifier.padding(contentPadding),
+//            text = ("Нет данных в категории $indicators\nНажмите + чтобы добавить."),
+//            textAlign = TextAlign.Center,
+//            style = MaterialTheme.typography.titleLarge,
+//            modifier = Modifier.padding(contentPadding),
 //        )
 
-        LazyColumn(
-            modifier = modifier, contentPadding = contentPadding
-        ) {
+        LazyColumn {
             if (indicators == "Прививки") {
-                items(items = itemVaccinationList) { item ->
-                    AnimalVaccinatioCard(
-                        animalVaccinationTable = item,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                onValueChangeVaccinationt(item)
-                                editBottomSheet.value = true
-                            }
-                    )
+                if (itemVaccinationList.isNotEmpty()) {
+                    item { HeadingIndicators(indicators = indicators) }
+                    items(items = itemVaccinationList) { item ->
+                        AnimalVaccinatioCard(
+                            animalVaccinationTable = item,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    onValueChangeVaccinationt(item)
+                                    editBottomSheet.value = true
+                                }
+                        )
+                    }
+                } else {
+                    item {
+                        Text(
+                            text = "Здесь Вы можете ввести информацию о прививках вашего животного\nНажмите на кнопку «+», чтобы добавить данные.",
+                            modifier = Modifier.fillMaxWidth().padding(1.dp),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             } else {
-                items(items = itemList) { item ->
-                    AnimalIndicatorsCard(
-                        indicators = suff,
-                        indicatorsData = item, modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                onValueChange(item)
-                                editBottomSheet.value = true
-                            }
-                    )
+                if (itemList.isNotEmpty()) {
+                    item { HeadingIndicators(indicators = indicators) }
+                    items(items = itemList) { item ->
+                        AnimalIndicatorsCard(
+                            indicators = suff,
+                            indicatorsData = item, modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    onValueChange(item)
+                                    editBottomSheet.value = true
+                                }
+                        )
+                    }
+                } else {
+                    item {
+                        Text(
+                            text = "Введите информацию о вашем животном.\nНажмите на кнопку «+», чтобы добавить данные.",
+                            modifier = Modifier.fillMaxWidth().padding(1.dp),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -271,16 +302,18 @@ private fun AnimalIndicatorsBody(
                     animalVaccinationTable = editVaccinationtUiState,
                     editBottomSheet = editBottomSheet,
                     updateInTable = updateVaccinationt,
-                    deleteInTable = deleteVaccinationt
+                    deleteInTable = deleteVaccinationt,
+                    sheetState = sheetState
                 )
             } else {
                 EditIndicatorsBottomSheet(
-                    suff= suff,
+                    suff = suff,
                     indicators = indicators,
                     animalIndicatorsVM = editUiState,
                     editBottomSheet = editBottomSheet,
                     updateInTable = updateInTable,
-                    deleteInTable = deleteInTable
+                    deleteInTable = deleteInTable,
+                    sheetState = sheetState
                 )
             }
         }
@@ -292,7 +325,8 @@ private fun AnimalIndicatorsBody(
                 indicators = indicators,
                 addBottomSheet = addBottomSheet,
                 saveInTable = saveInTable,
-                saveVaccinationt = saveVaccinationt
+                saveVaccinationt = saveVaccinationt,
+                sheetState = sheetState
             )
         }
     }
@@ -304,10 +338,12 @@ fun EditVacIndicatorsBottomSheet(
     animalVaccinationTable: AnimalVaccinationTable,
     editBottomSheet: MutableState<Boolean>,
     updateInTable: (AnimalVaccinationTable) -> Unit,
-    deleteInTable: () -> Unit
+    deleteInTable: () -> Unit,
+    sheetState: SheetState
 ) {
 
-    ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
+    ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false },
+        sheetState = sheetState ) {
         var count by rememberSaveable { mutableStateOf(animalVaccinationTable.vaccination) }
         var date1 by rememberSaveable { mutableStateOf(animalVaccinationTable.date) }
         var date2 by rememberSaveable { mutableStateOf(animalVaccinationTable.nextVaccination) }
@@ -315,17 +351,24 @@ fun EditVacIndicatorsBottomSheet(
         //Дата
         var openDialog by remember { mutableStateOf(false) }
         var openDialog2 by remember { mutableStateOf(false) }
-        val datePickerState = rememberDatePickerState()
+
+        val datePickerStateLimit = rememberDatePickerState(
+            selectableDates = PastOrPresentSelectableDates,
+            initialSelectedDateMillis = dateLong(date1)
+        )
+        val datePickerStateNoLimit = rememberDatePickerState(
+            initialSelectedDateMillis = dateLong(date2)
+        )
 
         if (openDialog) {
-            DatePickerDialogSample(datePickerState, date1) { date ->
+            DatePickerDialogSample(datePickerStateLimit, date1) { date ->
                 date1 = date
                 openDialog = false
             }
         }
 
         if (openDialog2) {
-            DatePickerDialogSampleNoLimit(datePickerState, date2) { date ->
+            DatePickerDialogSampleNoLimit(datePickerStateNoLimit, date2) { date ->
                 date2 = date
                 openDialog2 = false
             }
@@ -348,7 +391,7 @@ fun EditVacIndicatorsBottomSheet(
                 label = { Text("Название прививки") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -388,7 +431,7 @@ fun EditVacIndicatorsBottomSheet(
                     .clickable {
                         openDialog = true
                     }
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
             )
 
             OutlinedTextField(
@@ -412,7 +455,7 @@ fun EditVacIndicatorsBottomSheet(
                     .clickable {
                         openDialog2 = true
                     }
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
             )
 
             Button(
@@ -443,7 +486,7 @@ fun EditVacIndicatorsBottomSheet(
                     editBottomSheet.value = false
                 }, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 15.dp)
+                    .padding(top = 15.dp, bottom = 35.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.baseline_delete_24),
@@ -463,19 +506,25 @@ fun EditIndicatorsBottomSheet(
     animalIndicatorsVM: AnimalIndicatorsVM,
     editBottomSheet: MutableState<Boolean>,
     updateInTable: (AnimalIndicatorsVM) -> Unit,
-    deleteInTable: () -> Unit
+    deleteInTable: () -> Unit,
+    sheetState: SheetState
 ) {
 
-    ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false }) {
+    ModalBottomSheet(onDismissRequest = { editBottomSheet.value = false },
+        sheetState = sheetState ) {
         var count by rememberSaveable { mutableStateOf(animalIndicatorsVM.weight) }
         var date1 by rememberSaveable { mutableStateOf(animalIndicatorsVM.date) }
 
         //Дата
         var openDialog by remember { mutableStateOf(false) }
-        val datePickerState = rememberDatePickerState()
+
+        val datePickerStateLimit = rememberDatePickerState(
+            selectableDates = PastOrPresentSelectableDates,
+            initialSelectedDateMillis = dateLong(date1)
+        )
 
         if (openDialog) {
-            DatePickerDialogSample(datePickerState, date1) { date ->
+            DatePickerDialogSample(datePickerStateLimit, date1) { date ->
                 date1 = date
                 openDialog = false
             }
@@ -498,7 +547,7 @@ fun EditIndicatorsBottomSheet(
                 label = { Text(indicators) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -539,7 +588,7 @@ fun EditIndicatorsBottomSheet(
                     .clickable {
                         openDialog = true
                     }
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
             )
 
 
@@ -570,7 +619,7 @@ fun EditIndicatorsBottomSheet(
                     editBottomSheet.value = false
                 }, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 15.dp)
+                    .padding(top = 15.dp, bottom = 35.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.baseline_delete_24),
@@ -587,14 +636,15 @@ fun EditIndicatorsBottomSheet(
 @Composable
 fun AddIndicatorsBottomSheet(
     id: Int,
-    suff:String,
+    suff: String,
     indicators: String,
     addBottomSheet: MutableState<Boolean>,
     saveInTable: (AnimalIndicatorsVM) -> Unit,
     saveVaccinationt: (AnimalVaccinationTable) -> Unit,
+    sheetState: SheetState
 ) {
 
-    ModalBottomSheet(onDismissRequest = { addBottomSheet.value = false }) {
+    ModalBottomSheet(onDismissRequest = { addBottomSheet.value = false },sheetState = sheetState) {
         val format = SimpleDateFormat("dd.MM.yyyy")
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         val formattedDate: String = format.format(calendar.timeInMillis)
@@ -606,29 +656,32 @@ fun AddIndicatorsBottomSheet(
         //Дата
         var openDialog by remember { mutableStateOf(false) }
         var openDialog2 by remember { mutableStateOf(false) }
-        val datePickerState = rememberDatePickerState()
+        val datePickerStateLimit = rememberDatePickerState(
+            selectableDates = PastOrPresentSelectableDates,
+            initialSelectedDateMillis = calendar.timeInMillis
+        )
+        val datePickerStateNoLimit =
+            rememberDatePickerState(initialSelectedDateMillis = calendar.timeInMillis)
 
         if (openDialog) {
-            DatePickerDialogSample(datePickerState, date1) { date ->
+            DatePickerDialogSample(datePickerStateLimit, date1) { date ->
                 date1 = date
                 openDialog = false
             }
         }
 
         if (openDialog2) {
-            DatePickerDialogSampleNoLimit(datePickerState, date2) { date ->
+            DatePickerDialogSampleNoLimit(datePickerStateNoLimit, date2) { date ->
                 date2 = date
                 openDialog2 = false
             }
         }
-
 
         var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
         fun validateCount(text: String) {
             isErrorCount = text == ""
         }
-
 
         val keyboardOptions = if (indicators == "Прививки") {
             KeyboardOptions(
@@ -655,7 +708,7 @@ fun AddIndicatorsBottomSheet(
                 label = { Text(indicators) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -671,11 +724,6 @@ fun AddIndicatorsBottomSheet(
                 },
                 keyboardOptions = keyboardOptions,
                 isError = isErrorCount,
-//                keyboardActions = KeyboardActions(onNext = {
-//                    focusManager.moveFocus(
-//                        FocusDirection.Down
-//                    )
-//                }
             )
 
             OutlinedTextField(
@@ -699,7 +747,7 @@ fun AddIndicatorsBottomSheet(
                     .clickable {
                         openDialog = true
                     }
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
             )
 
             if (indicators == "Прививки") {
@@ -724,7 +772,7 @@ fun AddIndicatorsBottomSheet(
                         .clickable {
                             openDialog2 = true
                         }
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                 )
 
             }
@@ -734,29 +782,33 @@ fun AddIndicatorsBottomSheet(
                     .padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Button(onClick = {
-                    if (indicators == "Прививки") {
-                        saveVaccinationt(
-                            AnimalVaccinationTable(
-                                id = 0,
-                                vaccination = count,
-                                date = date1,
-                                nextVaccination = date2,
-                                idAnimal = id
+                Button(
+                    onClick = {
+                        if (indicators == "Прививки") {
+                            saveVaccinationt(
+                                AnimalVaccinationTable(
+                                    id = 0,
+                                    vaccination = count,
+                                    date = date1,
+                                    nextVaccination = date2,
+                                    idAnimal = id
+                                )
                             )
-                        )
-                    } else {
-                        saveInTable(
-                            AnimalIndicatorsVM(
-                                id = 0,
-                                weight = count,
-                                date = date1,
-                                idAnimal = id
+                        } else {
+                            saveInTable(
+                                AnimalIndicatorsVM(
+                                    id = 0,
+                                    weight = count,
+                                    date = date1,
+                                    idAnimal = id
+                                )
                             )
-                        )
-                    }
-                    addBottomSheet.value = false
-                }) {
+                        }
+                        addBottomSheet.value = false
+                    }, modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 35.dp)
+                ) {
                     Text(text = "Добавить")
                 }
             }
@@ -779,20 +831,19 @@ fun AnimalIndicatorsCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .padding(6.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${indicatorsData.weight} $indicators",
-                modifier = Modifier.padding(6.dp),
+                text = "${formatter(indicatorsData.weight.toDouble())} $indicators",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
             Text(
                 text = indicatorsData.date,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(6.dp),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
@@ -812,25 +863,21 @@ fun AnimalVaccinatioCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .padding(6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = animalVaccinationTable.vaccination,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(6.dp),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                modifier = Modifier.fillMaxWidth(0.2f)
             )
 
             Text(
                 text = animalVaccinationTable.date,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .wrapContentSize(),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
@@ -838,9 +885,6 @@ fun AnimalVaccinatioCard(
             Text(
                 text = animalVaccinationTable.nextVaccination,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .wrapContentSize(),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
@@ -848,3 +892,31 @@ fun AnimalVaccinatioCard(
     }
 }
 
+@Composable
+fun HeadingIndicators(indicators: String) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = indicators,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp
+        )
+        Text(
+            text = "Дата",
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp
+        )
+        if (indicators == "Прививки") {
+            Text(
+                text = "Дата\nследующей",
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+        }
+    }
+}

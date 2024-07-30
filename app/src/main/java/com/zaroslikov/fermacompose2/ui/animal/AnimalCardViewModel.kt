@@ -22,12 +22,12 @@ class AnimalCardViewModel(
     val itemId: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
 
 
-    val animalState: StateFlow<AnimalCardUiState> =
-        itemsRepository.getAnimal(itemId).map { AnimalCardUiState(it) }
+   val animalState2: StateFlow<AnimalCardUiState23> =
+        itemsRepository.getAnimal(itemId).map { AnimalCardUiState23(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalCardUiState()
+                initialValue = AnimalCardUiState23()
             )
 
     val countState: StateFlow<AnimalCoutUiStateLimit> =
@@ -81,8 +81,23 @@ class AnimalCardViewModel(
 }
 
 
-data class AnimalCardUiState(
-    val animalTable: AnimalTable = AnimalTable(
+//data class AnimalCardUiState(
+//    val animalTable2: AnimalTable = AnimalTable(
+//        0,
+//        "",
+//        "",
+//        "",
+//        true,
+//        "",
+//        "",
+//        "",
+//        false,
+//        0
+//    )
+//)
+
+data class AnimalCardUiState23(
+    val animalTable2: AnimalTable = AnimalTable(
         0,
         "",
         "",
@@ -92,7 +107,7 @@ data class AnimalCardUiState(
         "",
         "",
         false,
-        1
+        0
     )
 )
 

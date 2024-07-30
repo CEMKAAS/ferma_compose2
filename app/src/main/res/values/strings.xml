@@ -1,20 +1,21 @@
 
     <resources>
-        <string name="app_name">Inventory</string>
+        <string name="app_name">Мое Хозяйство 2</string>
         <string name="attention">Attention</string>
         <string name="back_button">Back</string>
         <string name="delete">Delete</string>
         <string name="delete_question">Are you sure you want to delete?</string>
-        <string name="no_item_add">Упсс!\nНет товара:(\nНажмите + чтобы добавить.</string>
-        <string name="no_item_warehouse">Склад пустой:(\nДобавьте товар в разделе "Мои Товар".</string>
-        <string name="no_item_sale">Нет продаж:(\nНажмите + чтобы добавить.</string>
-        <string name="no_item_expenses">Нет покупок:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_add">В этом разделе Вы можете добавлять товар, который получили со своей фермы!\nСейчас нет товара:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_warehouse">В это раздели указано сколько товара на складе(учитываются данные при добавлении, продажи и списании), если кол-во ушло в минус, он отображаться не будет\n Сейчас склад пустой:(\nДобавьте товар в разделе "Мои Товар".</string>
+        <string name="no_item_sale">В этот раздел можно заносить данные по Вашим продажам, сколько товара Вы продали, засколько и кому\nСейчас нет продаж:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_expenses">В этот раздел можно заносить данные по Вашим покупкам, сколько товара Вы купили и засколько\nСейчас Нет покупок:(\nНажмите + чтобы добавить.</string>
         <string name="no_item_write_off">Нет списаний:(\nНажмите + чтобы добавить.</string>
-        <string name="no_item_write_off_no_product">Нечего списывать\nДобавьте товар в разделе "Мои Товар" для списания.</string>
-        <string name="no_item_animal">Нет животных:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_write_off_no_product">В этот раздел заносятся данные, если вам нужно списать продукцию со склада\nСейчас нечего списывать\nДобавьте товар в разделе "Мои Товар" для списания.</string>
+        <string name="no_item_animal">В этот раздел заносятся данные по Вашим животным\nНажмите + чтобы добавить.</string>
         <string name="no_item_finance">В этом месяце нет транкзаций</string>
         <string name="no_item_finance_edit">Нет транкзаций</string>
         <string name="no_item_description">Упсс!\nНет товара:(\nНажмите + чтобы добавить.</string>
+        <string name="no_item_start_screen"></string>
         <string name="edit_item_title">Edit Item</string>
         <string name="item">Item</string>
         <string name="item_detail_title">Item Details</string>

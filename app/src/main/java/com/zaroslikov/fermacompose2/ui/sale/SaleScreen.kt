@@ -71,6 +71,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object SaleDestination : NavigationDestination {
     override val route = "Sale"
@@ -175,12 +176,29 @@ private fun SaleBody(
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_item_sale),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
+            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                Text(
+                    text = "Добро пожаловать в раздел \"Мои Продажи!\"",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "В этом разделе Вы можете добавлять товары, которые продаете с Вашей фермы! Каждому товару можно назначить цену, кол-во, категорию и покупателя.",
+                    textAlign = TextAlign.Justify,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "Сейчас нет продаж:(\nНажмите + чтобы добавить.",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 20.sp,
+                )
+            }
         } else {
             InventoryList(
                 itemList = itemList,
@@ -248,7 +266,9 @@ fun SaleProductCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (saleTable.category != "Без категории") {
+                if (saleTable.category == "Без категории" || saleTable.category == "" ) {
+
+                }else{
                     Text(
                         text = "Категория: ${saleTable.category}",
                         modifier = Modifier
@@ -256,7 +276,10 @@ fun SaleProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
-                if (saleTable.buyer != "Неизвестный") {
+
+                if (saleTable.buyer == "Неизвестный" || saleTable.buyer == "") {
+
+                }else{
                     Text(
                         text = "Покупатель: ${saleTable.buyer}",
                         modifier = Modifier
@@ -264,8 +287,16 @@ fun SaleProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
+
                 Text(
-                    text = "Дата: ${saleTable.day}.${saleTable.mount}.${saleTable.year}",
+                    text = "Дата: ${
+                        String.format(
+                            "%02d.%02d.%d",
+                            saleTable.day,
+                            saleTable.mount,
+                            saleTable.year
+                        )
+                    }",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .wrapContentSize()
@@ -274,7 +305,7 @@ fun SaleProductCard(
             }
 
             Text(
-                text = "${saleTable.count} ${saleTable.suffix}\n за \n${saleTable.priceAll} ₽",
+                text = "${formatter(saleTable.count)} ${saleTable.suffix}\n за \n${formatter(saleTable.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)

@@ -76,16 +76,8 @@ fun ExpensesEntryProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Добавить Покупку", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
-
         ExpensesEntryContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
@@ -191,15 +183,19 @@ fun ExpensesEntryContainerProduct(
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else {
-                            Text("Выберите или укажите товар")
+                            Text("Введите или выберите товар")
                         }
                     },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -235,12 +231,13 @@ fun ExpensesEntryContainerProduct(
             OutlinedTextField(
                 value = count,
                 onValueChange = {
-                    count = it
+                    count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                     validateCount(count)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -307,12 +304,13 @@ fun ExpensesEntryContainerProduct(
         OutlinedTextField(
             value = priceAll,
             onValueChange = {
-                priceAll = it
+                priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 validatePrice(priceAll)
             },
             label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth()
-                .padding(bottom = 2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -351,11 +349,15 @@ fun ExpensesEntryContainerProduct(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -402,13 +404,15 @@ fun ExpensesEntryContainerProduct(
                             ExpensesTableInsert(
                                 id = 0,
                                 title = title,
-                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                    .toDouble(),
                                 day = calendar[Calendar.DAY_OF_MONTH],
                                 mount = (calendar[Calendar.MONTH] + 1),
                                 year = calendar[Calendar.YEAR],
                                 suffix = suffix,
                                 category = category,
-                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                    .toDouble(),
                             )
                         )
                     }

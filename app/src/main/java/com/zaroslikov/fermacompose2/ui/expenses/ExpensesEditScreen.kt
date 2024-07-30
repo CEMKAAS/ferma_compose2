@@ -50,6 +50,8 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
 
 object ExpensesEditDestination : NavigationDestination {
@@ -77,14 +79,7 @@ fun ExpensesEditProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Изменить Покупку", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         ExpensesEditContainerProduct(
@@ -135,8 +130,6 @@ fun ExpensesEditContainerProduct(
     var expandedCat by remember { mutableStateOf(false) }
 
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    var formattedDate = "${expensesTable.day}.${expensesTable.mount}.${expensesTable.year}"
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
@@ -186,13 +179,13 @@ fun ExpensesEditContainerProduct(
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else {
-                            Text("Выберите или укажите товар")
+                            Text("Введите или выберите товар")
                         }
                     },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorTitle,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
@@ -234,13 +227,13 @@ fun ExpensesEditContainerProduct(
             OutlinedTextField(
                 value = expensesTable.count,
                 onValueChange = {
-                    onValueChange(expensesTable.copy(count = it))
+                    onValueChange(expensesTable.copy(count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                     validateCount(it)
                 },
                 label = { Text("Количество") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -319,13 +312,13 @@ fun ExpensesEditContainerProduct(
         OutlinedTextField(
             value = expensesTable.priceAll,
             onValueChange = {
-                onValueChange(expensesTable.copy(priceAll = it))
+                onValueChange(expensesTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                 validatePrice(expensesTable.priceAll)
             },
             label = { Text("Цена") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -364,7 +357,7 @@ fun ExpensesEditContainerProduct(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
@@ -405,7 +398,13 @@ fun ExpensesEditContainerProduct(
             }
         }
 
+        var formattedDate = String.format("%02d.%02d.%d", expensesTable.day, expensesTable.mount, expensesTable.year)
+
         if (openDialog) {
+            val datePickerState = rememberDatePickerState(
+                selectableDates = PastOrPresentSelectableDates,
+                initialSelectedDateMillis = dateLong(formattedDate)
+            )
             DatePickerDialogSample(datePickerState, formattedDate) { date ->
                 formattedDate = date
                 openDialog = false
@@ -441,7 +440,7 @@ fun ExpensesEditContainerProduct(
                 .clickable {
                     openDialog = true
                 }
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
         )
 
         Button(

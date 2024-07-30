@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.start
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ModalDrawerSheet
@@ -21,11 +22,17 @@ import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun DrawerSheet(
     scope: CoroutineScope,
-    navigateToStart:()->Unit,
+    navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     drawerState: DrawerState,
     x: Int,
@@ -95,6 +102,29 @@ fun DrawerSheet(
         }
     }
 }
+
+fun formatter(number: Double): String {
+    val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
+    numberFormat.minimumFractionDigits = 0
+    numberFormat.maximumFractionDigits = 2
+    return numberFormat.format(number).toString()
+}
+
+
+fun dateLong(data: String): Long {
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+
+    return if (data == "") {
+        calendar.timeInMillis
+    } else {
+        val dateLong: Date? = format.parse(data)
+        dateLong?.time ?: calendar.timeInMillis
+    }
+}
+
+
+
 
 data class DrawerItems(
     val icon: Int,

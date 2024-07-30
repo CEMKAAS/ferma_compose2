@@ -104,7 +104,11 @@ fun AddProjectContainer(
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+
+    val state = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = calendar.timeInMillis
+    )
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
 
@@ -121,7 +125,7 @@ fun AddProjectContainer(
     var date1 by remember { mutableStateOf(formattedDate) }
 
     if (openDialog) {
-        DatePickerDialogSample(datePickerState, date1) { date ->
+        DatePickerDialogSample(state, date1) { date ->
             date1 = date
             openDialog = false
         }
@@ -265,10 +269,6 @@ fun DatePickerDialogSample(
     dateToday: String,
     onDateSelected: (String) -> Unit
 ) {
-    val state = rememberDatePickerState(
-        selectableDates = PastOrPresentSelectableDates
-    )
-
     DatePickerDialog(
         onDismissRequest = {
             onDateSelected(dateToday)
@@ -278,7 +278,7 @@ fun DatePickerDialogSample(
                 onClick = {
                     val format = SimpleDateFormat("dd.MM.yyyy")
                     val formattedDate: String =
-                        format.format(state.selectedDateMillis)
+                        format.format(datePickerState.selectedDateMillis)
                     onDateSelected(formattedDate)
                 },
             ) { Text("Выбрать") }
@@ -291,7 +291,7 @@ fun DatePickerDialogSample(
             ) { Text("Назад") }
         }
     ) {
-        DatePicker(state = state)
+        DatePicker(state = datePickerState)
     }
 }
 

@@ -54,7 +54,12 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 
 object AnimalEditDestination : NavigationDestination {
@@ -71,7 +76,6 @@ fun AnimalEditProduct(
     navigateDelete: () -> Unit,
     viewModel: AnimalEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-
     val coroutineScope = rememberCoroutineScope()
 
     val animalEditUiState = viewModel.animaEditUiState
@@ -80,14 +84,7 @@ fun AnimalEditProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Редактировать данные", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         AnimalEditContainer(
             animalEditUiState = animalEditUiState,
@@ -106,8 +103,8 @@ fun AnimalEditProduct(
             deleteInRoom = {
                 coroutineScope.launch {
                     viewModel.deleteItem()
+                    navigateDelete()
                 }
-                navigateDelete()
             }
         )
     }
@@ -135,8 +132,11 @@ fun AnimalEditContainer(
     var selectedItemIndex by remember { mutableStateOf(0) }
 
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
 
+    val datePickerState = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = dateLong(animalEditUiState.data)
+    )
 
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
@@ -174,7 +174,7 @@ fun AnimalEditContainer(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
             isError = isErrorTitle,
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
@@ -196,7 +196,6 @@ fun AnimalEditContainer(
                     expandedType = !expandedType
                 }
             ) {
-
                 OutlinedTextField(
                     value = animalEditUiState.type,
                     onValueChange = {
@@ -217,7 +216,7 @@ fun AnimalEditContainer(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorType,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
@@ -286,7 +285,12 @@ fun AnimalEditContainer(
                 .fillMaxWidth()
                 .clickable {
                     openDialog = true
-                },
+                }.padding(vertical = 10.dp)
+        )
+
+        Text(
+            text = "Вносим данные по группе или одному животному?",
+            modifier = Modifier.padding(start = 6.dp)
         )
 
         Row(
@@ -354,7 +358,7 @@ fun AnimalEditContainer(
                         modifier = Modifier
                             .menuAnchor()
                             .fillMaxWidth()
-                            .padding(bottom = 2.dp)
+                            .padding(bottom = 10.dp)
                     )
 
                     ExposedDropdownMenu(
@@ -396,7 +400,7 @@ fun AnimalEditContainer(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
                 keyboardType = KeyboardType.Text,
@@ -429,7 +433,7 @@ fun AnimalEditContainer(
         }
 
         OutlinedButton(
-            onClick = { deleteInRoom() },
+            onClick = deleteInRoom,
             modifier = Modifier
                 .fillMaxWidth()
         ) {

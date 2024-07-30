@@ -34,6 +34,7 @@ import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object FinanceCategoryDestination : NavigationDestination {
     override val route = "FinanceCategory"
@@ -151,7 +152,7 @@ fun FinanceCategoryProductCard(
             }
 
             Text(
-                text = "${fin.priceAll} ₽",
+                text = "${formatter(fin.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)

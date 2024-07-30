@@ -58,9 +58,11 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.TimeZone
 
 object AnimalEntryDestination : NavigationDestination {
@@ -83,14 +85,7 @@ fun AnimalEntryProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Добавить Животного", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         AnimalEntryContainer(
             idPT = viewModel.itemId,
@@ -155,7 +150,7 @@ fun AnimalEntryContainer(
 
     fun errorBoolean(): Boolean {
         isErrorTitle = title == ""
-        isErrorType = count == ""
+        isErrorType = type == ""
         return !(isErrorTitle || isErrorType)
     }
 
@@ -168,8 +163,11 @@ fun AnimalEntryContainer(
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
 
+    val datePickerState = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = calendar.timeInMillis
+    )
 
     if (openDialog) {
         DatePickerDialogSample(datePickerState, date1) { date ->
@@ -177,7 +175,6 @@ fun AnimalEntryContainer(
             openDialog = false
         }
     }
-
 
     Column(modifier = modifier) {
 
@@ -200,7 +197,7 @@ fun AnimalEntryContainer(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
             isError = isErrorTitle,
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
@@ -243,7 +240,7 @@ fun AnimalEntryContainer(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorType,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
@@ -301,7 +298,13 @@ fun AnimalEntryContainer(
                 .fillMaxWidth()
                 .clickable {
                     openDialog = true
-                },
+                }
+                .padding(vertical = 10.dp),
+        )
+
+        Text(
+            text = "Вносим данные по группе или одному животному?",
+            modifier = Modifier.padding(start = 6.dp)
         )
 
         Row(
@@ -357,7 +360,7 @@ fun AnimalEntryContainer(
                         modifier = Modifier
                             .menuAnchor()
                             .fillMaxWidth()
-                            .padding(bottom = 2.dp)
+                            .padding(bottom = 10.dp)
                     )
 
                     ExposedDropdownMenu(
@@ -394,7 +397,7 @@ fun AnimalEntryContainer(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Number,
@@ -420,7 +423,7 @@ fun AnimalEntryContainer(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Number,
@@ -447,7 +450,7 @@ fun AnimalEntryContainer(
                 suffix = { Text(text = "шт.") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Number,
@@ -473,7 +476,7 @@ fun AnimalEntryContainer(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences

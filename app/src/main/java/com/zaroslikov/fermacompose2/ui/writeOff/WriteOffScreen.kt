@@ -58,6 +58,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object WriteOffDestination : NavigationDestination {
     override val route = "WriteOff"
@@ -131,14 +132,7 @@ fun WriteOffScreen(
                         )
                     }
                 }
-            },
-//            bottomBar = {
-//                Banner(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                )
-//            }
+            }
         ) { innerPadding ->
             WriteOffBody(
                 writeOffBoolean = writeOffBoolean,
@@ -170,19 +164,53 @@ private fun WriteOffBody(
 
         if (itemList.isEmpty()) {
             if(!writeOffBoolean) {
-                Text(
-                    text = stringResource(R.string.no_item_write_off_no_product),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(contentPadding),
-                )
+                Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                    Text(
+                        text = "Добро пожаловать в раздел \"Мои Списания!\"",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        fontSize = 20.sp,
+                    )
+                    Text(
+                        text = "В этом разделе вы можете оформить списание товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
+                        textAlign = TextAlign.Justify,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        fontSize = 20.sp,
+                    )
+                    Text(
+                        text = "Добавьте товар в разделе \"Мои Товар\" для списания",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 20.sp,
+                    )
+                }
             }else{
-                Text(
-                    text = stringResource(R.string.no_item_write_off),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(contentPadding),
-                )
+                Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                    Text(
+                        text = "Добро пожаловать в раздел \"Мои Списания!\"",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        fontSize = 20.sp,
+                    )
+                    Text(
+                        text = "В этом разделе вы можете оформить списание товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
+                        textAlign = TextAlign.Justify,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        fontSize = 20.sp,
+                    )
+                    Text(
+                        text = "Нет списаний:(\nНажмите + чтобы добавить.",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontSize = 20.sp,
+                    )
+                }
             }
 
 
@@ -263,7 +291,14 @@ fun WriteOffProductCard(
                             fontSize = 16.sp
                         )
                         Text(
-                            text = "Дата: ${writeOffTable.day}.${writeOffTable.mount}.${writeOffTable.year}",
+                            text = "Дата: ${
+                                String.format(
+                                    "%02d.%02d.%d",
+                                    writeOffTable.day,
+                                    writeOffTable.mount,
+                                    writeOffTable.year
+                                )
+                            }",
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .wrapContentSize()
@@ -273,7 +308,7 @@ fun WriteOffProductCard(
                 }
             }
             Text(
-                text = "${writeOffTable.count} ${writeOffTable.suffix}",
+                text = "${formatter(writeOffTable.count)} ${writeOffTable.suffix}",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)

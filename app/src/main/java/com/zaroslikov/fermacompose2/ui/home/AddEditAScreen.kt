@@ -54,7 +54,10 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 object AddEditDestination : NavigationDestination {
     override val route = "AddEdit"
@@ -82,20 +85,14 @@ fun AddEditProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Мои Товары", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         AddEditContainerProduct(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(5.dp).verticalScroll(rememberScrollState()),
+                .padding(5.dp)
+                .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
             animalList = animalUiState.animalList,
@@ -142,8 +139,7 @@ fun AddEditContainerProduct(
     var expandedAni by remember { mutableStateOf(false) }
 
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    var formattedDate = "${addTable.day}.${addTable.mount}.${addTable.year}"
+
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
@@ -190,15 +186,19 @@ fun AddEditContainerProduct(
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else {
-                            Text("Выберите или укажите товар")
+                            Text("Введите или выберите товар")
                         }
                     },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -234,11 +234,17 @@ fun AddEditContainerProduct(
             OutlinedTextField(
                 value = addTable.count,
                 onValueChange = {
-                    onValueChange(addTable.copy(count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                    onValueChange(
+                        addTable.copy(
+                            count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                        )
+                    )
                     validateCount(it)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -308,11 +314,16 @@ fun AddEditContainerProduct(
                     label = { Text("Категория") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor().padding(bottom = 2.dp),
+                        .menuAnchor()
+                        .padding(bottom = 10.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -354,13 +365,15 @@ fun AddEditContainerProduct(
                     value = addTable.animal,
                     onValueChange = {},
                     readOnly = true,
+                    label = {Text(text = "Животное") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
                     supportingText = {
                         Text("Выберите животное, которое принесло товар")
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth().padding(bottom = 2.dp),
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Next
@@ -395,11 +408,18 @@ fun AddEditContainerProduct(
                 }
             }
         }
+        var formattedDate =
+            String.format("%02d.%02d.%d", addTable.day, addTable.mount, addTable.year)
 
         if (openDialog) {
+            val datePickerState = rememberDatePickerState(
+                selectableDates = PastOrPresentSelectableDates,
+                initialSelectedDateMillis = dateLong(formattedDate)
+            )
             DatePickerDialogSample(datePickerState, formattedDate) { date ->
                 formattedDate = date
                 openDialog = false
+
                 val formattedDateList = formattedDate.split(".")
                 onValueChange(
                     addTable.copy(
@@ -429,7 +449,7 @@ fun AddEditContainerProduct(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp)
+                .padding(bottom = 10.dp)
                 .clickable {
                     openDialog = true
                 }

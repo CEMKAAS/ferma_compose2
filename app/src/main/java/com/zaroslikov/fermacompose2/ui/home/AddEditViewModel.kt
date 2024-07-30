@@ -86,9 +86,9 @@ data class AddTableUiState(
     val id: Int = 0,
     val title: String = "", // название
     val count: String = "", // Кол-во
-    val day: Int = 0,  // день
-    val mount: Int = 0, // месяц
-    val year: Int = 0, // время
+    val day: Int = 27,  // день
+    val mount: Int = 6, // месяц
+    val year: Int = 2024, // время
     val priceAll: Double = 0.0,
     var suffix: String = "",
     var category: String = "",

@@ -56,6 +56,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object ExpensesDestination : NavigationDestination {
     override val route = "expenses"
@@ -70,7 +71,7 @@ object ExpensesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreen(
-    navigateToStart:()-> Unit,
+    navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItem: (Int) -> Unit,
@@ -92,7 +93,7 @@ fun ExpensesScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navigateToStart =  navigateToStart,
+                navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
                 5,
@@ -125,14 +126,7 @@ fun ExpensesScreen(
                         contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
                     )
                 }
-            },
-//            bottomBar = {
-//                Banner(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                )
-//            }
+            }
         ) { innerPadding ->
             ExpensesBody(
                 itemList = homeUiState.itemList,
@@ -160,12 +154,29 @@ private fun ExpensesBody(
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_item_expenses),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
+            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                Text(
+                    text = "Добро пожаловать в раздел \"Мои Покупки!\"",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "В этом разделе Вы можете добавлять покупки, которые покупаете для Вашей фермы и не только! Каждой покупки можно назначить кол-во, цену и категорию.",
+                    textAlign = TextAlign.Justify,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "Сейчас нет покупок:(\nНажмите + чтобы добавить.",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 20.sp,
+                )
+            }
         } else {
             ExpensesList(
                 itemList = itemList,
@@ -233,7 +244,9 @@ fun ExpensesCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (expensesTable.category != "Без категории") {
+                if (expensesTable.category == "Без категории" || expensesTable.category == "") {
+
+                } else{
                     Text(
                         text = "Категория: ${expensesTable.category}",
                         modifier = Modifier
@@ -242,7 +255,14 @@ fun ExpensesCard(
                     )
                 }
                 Text(
-                    text = "Дата: ${expensesTable.day}.${expensesTable.mount}.${expensesTable.year}",
+                    text = "Дата: ${
+                        String.format(
+                            "%02d.%02d.%d",
+                            expensesTable.day,
+                            expensesTable.mount,
+                            expensesTable.year
+                        )
+                    }",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .wrapContentSize()
@@ -250,8 +270,8 @@ fun ExpensesCard(
                 )
             }
             Text(
-                text = "${expensesTable.count} ${expensesTable.suffix}\n за \n${expensesTable.priceAll} ₽",
-                textAlign = TextAlign.End,
+                text = "${formatter(expensesTable.count)} ${expensesTable.suffix}\n за\n${formatter(expensesTable.priceAll)} ₽",
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
                     .fillMaxWidth(1f),

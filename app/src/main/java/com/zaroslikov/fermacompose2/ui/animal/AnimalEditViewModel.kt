@@ -6,15 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditViewModel
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesTableUiState
-import com.zaroslikov.fermacompose2.ui.expenses.toExpensesTable
-import com.zaroslikov.fermacompose2.ui.expenses.toExpensesTableUiState
-import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -59,7 +52,7 @@ class AnimalEditViewModel(
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteAnimalTable(animaEditUiState.toAnimalTable())
+        itemsRepository.deleteAnimalTable(animaEditUiState.id)
     }
 
     companion object {

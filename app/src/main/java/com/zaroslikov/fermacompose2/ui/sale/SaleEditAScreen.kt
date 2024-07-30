@@ -52,6 +52,8 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
 
 object SaleEditDestination : NavigationDestination {
@@ -79,14 +81,7 @@ fun SaleEditProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Изменить Продажу", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         SaleEditContainerProduct(
@@ -140,8 +135,6 @@ fun SaleEditContainerProduct(
     var expandedBuy by remember { mutableStateOf(false) }
 
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    var formattedDate = "${saleTable.day}.${saleTable.mount}.${saleTable.year}"
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
@@ -194,13 +187,13 @@ fun SaleEditContainerProduct(
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else {
-                            Text("Выберите или укажите товар")
+                            Text("Введите или выберите товар")
                         }
                     },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorTitle,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
@@ -242,13 +235,13 @@ fun SaleEditContainerProduct(
             OutlinedTextField(
                 value = saleTable.count,
                 onValueChange = {
-                    onValueChange(saleTable.copy(count = it))
+                    onValueChange(saleTable.copy(count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                     validateCount(it)
                 },
                 label = { Text("Количество") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -309,13 +302,13 @@ fun SaleEditContainerProduct(
         OutlinedTextField(
             value = saleTable.priceAll,
             onValueChange = {
-                onValueChange(saleTable.copy(priceAll = it))
+                onValueChange(saleTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                 validatePrice(saleTable.priceAll)
             },
             label = { Text("Цена") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -354,7 +347,7 @@ fun SaleEditContainerProduct(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
@@ -412,7 +405,7 @@ fun SaleEditContainerProduct(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Text,
@@ -449,8 +442,13 @@ fun SaleEditContainerProduct(
             }
         }
 
+        var formattedDate = String.format("%02d.%02d.%d", saleTable.day, saleTable.mount, saleTable.year)
 
         if (openDialog) {
+            val datePickerState = rememberDatePickerState(
+                selectableDates = PastOrPresentSelectableDates,
+                initialSelectedDateMillis = dateLong(formattedDate)
+            )
             DatePickerDialogSample(datePickerState, formattedDate) { date ->
                 formattedDate = date
                 openDialog = false
@@ -483,11 +481,10 @@ fun SaleEditContainerProduct(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
-                    openDialog = true
-                }
-                .padding(bottom = 2.dp),
+                .clickable { openDialog = true }
+                .padding(bottom = 10.dp),
         )
+
 
         Button(
             onClick = { saveInRoomAdd(errorBoolean()) },

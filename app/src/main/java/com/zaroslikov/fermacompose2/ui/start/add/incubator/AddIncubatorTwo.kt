@@ -21,10 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
@@ -81,7 +85,11 @@ fun AddIncubatorTwo(
     viewModel: AddIncubatorTwoViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
-    val list = setAutoIncubator(setIncubator( projectIncubatorList.typeBirds), projectIncubatorList.checkedStateAiring, projectIncubatorList.checkedStateOver)
+    val list = setAutoIncubator(
+        setIncubator(projectIncubatorList.typeBirds),
+        projectIncubatorList.checkedStateAiring,
+        projectIncubatorList.checkedStateOver
+    )
     // Доставка из ахива
 //    val project = viewModel.incubatorFromArchive(projectIncubatorList.typeBirds).collectAsState()
 //
@@ -102,14 +110,7 @@ fun AddIncubatorTwo(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         AddIncubatorTwoContainer(
             modifier = Modifier
@@ -128,7 +129,7 @@ fun AddIncubatorTwo(
 
                 }
             },
-            list= list,
+            list = list,
 //            projectList = projectCopy,
 //            openEndDialog = openEndDialog
 //            incubatorArh= {
@@ -144,8 +145,62 @@ fun AddIncubatorTwo(
 //            },
 
         )
+        DialogExamples()
     }
 }
+
+@Composable
+fun DialogExamples() {
+    val openAlertDialog = remember { mutableStateOf(true) }
+    when {
+        openAlertDialog.value -> {
+            AlertDialogExample(
+                onDismissRequest = { openAlertDialog.value = false },
+                onConfirmation = {
+                    openAlertDialog.value = false
+                },
+                dialogTitle = "Справка",
+                dialogText = "Если ваш инкубатор имеет погрешность, вы можете установить необходимую температуру здесь или воспользоваться рекомендованными значениями, которые можно изменять в процессе. \nРекомендуем вести ежедневный журнал и тщательно записывать данные, чтобы в будущем иметь возможность обратиться к этой информации из архива.",
+                icon = Icons.Default.Info
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertDialogExample(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText, textAlign = TextAlign.Justify)
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Отлично!")
+            }
+        }
+    )
+}
+
 
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
@@ -233,7 +288,7 @@ fun AddIncubatorTwo(
 fun AddIncubatorTwoContainer(
     modifier: Modifier, navigateContinue: (MutableList<Incubator>) -> Unit,
 //    incubatorArh: (Int) -> Unit,
-    list:MutableList<Incubator>,
+    list: MutableList<Incubator>,
 //    projectList: List<ProjectTable>,
 //    openEndDialog: MutableState<Boolean>,
 ) {
@@ -332,7 +387,7 @@ fun AddIncubatorTwoContainer(
 //        ArhivIncubatorChoice(
 //            openDialog = openEndDialog,
 //            projectList = projectList
-//            incubatorArh = incubatorArh
+//                    incubatorArh = incubatorArh
 //        )
 //    }
 }
@@ -368,7 +423,7 @@ fun MyRowIncubatorAdd(incubator: Incubator) {
         BasicTextField(
             value = tempDay,
             onValueChange = {
-                tempDay = it
+                tempDay = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 incubator.temp = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -396,7 +451,7 @@ fun MyRowIncubatorAdd(incubator: Incubator) {
         BasicTextField(
             value = dampDay,
             onValueChange = {
-                dampDay = it
+                dampDay = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 incubator.damp = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -484,50 +539,50 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
             incubator.add(
                 Incubator(
                     day = 1,
-                    temp = "37.9",
-                    damp = "66",
+                    temp = "37.5",
+                    damp = "60",
                     over = "2-3",
-                    airing = "нет",
+                    airing = "2 раза по 5 минут",
                     idPT = 0
                 )
             )
             incubator.add(
                 Incubator(
                     day = 2,
-                    temp = "37.9",
-                    damp = "66",
+                    temp = "37.5",
+                    damp = "60",
                     over = "2-3",
-                    airing = "нет",
+                    airing = "2 раза по 5 минут",
                     idPT = 0
                 )
             )
             incubator.add(
                 Incubator(
                     day = 3,
-                    temp = "37.9",
-                    damp = "66",
+                    temp = "37.0",
+                    damp = "70",
                     over = "2-3",
-                    airing = "нет",
+                    airing = "2 раза по 5 минут",
                     idPT = 0
                 )
             )
             incubator.add(
                 Incubator(
                     day = 4,
-                    temp = "37.9",
-                    damp = "66",
+                    temp = "37.0",
+                    damp = "70",
                     over = "2-3",
-                    airing = "нет",
+                    airing = "2 раза по 5 минут",
                     idPT = 0
                 )
             )
             incubator.add(
                 Incubator(
                     day = 5,
-                    temp = "37.9",
-                    damp = "66",
+                    temp = "37.0",
+                    damp = "70",
                     over = "2-3",
-                    airing = "нет",
+                    airing = "2 раза по 5 минут",
                     idPT = 0
                 )
             )
@@ -645,7 +700,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                 Incubator(
                     day = 17,
                     temp = "37.3",
-                    damp = "47",
+                    damp = "60",
                     over = "2-3",
                     airing = "2 раза по 5 мин",
                     idPT = 0
@@ -655,7 +710,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                 Incubator(
                     day = 18,
                     temp = "37.3",
-                    damp = "47",
+                    damp = "60",
                     over = "2-3",
                     airing = "2 раза по 20 мин",
                     idPT = 0
@@ -666,7 +721,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     day = 19,
                     temp = "37.0",
                     damp = "70",
-                    over = "2-3",
+                    over = "нет",
                     airing = "2 раза по 20 мин",
                     idPT = 0
                 )
@@ -676,7 +731,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     day = 20,
                     temp = "37.0",
                     damp = "70",
-                    over = "2-3",
+                    over = "нет",
                     airing = "2 раза по 5 мин",
                     idPT = 0
                 )
@@ -686,7 +741,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     day = 21,
                     temp = "37.0",
                     damp = "70",
-                    over = "0",
+                    over = "нет",
                     airing = "2 раза по 5 мин",
                     idPT = 0
                 )
@@ -751,7 +806,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     temp = "37.6",
                     damp = "70",
                     over = "6",
-                    airing = "1 раз по 20 мин",
+                    airing = "2 раза по 20 мин",
                     idPT = 0
                 )
             )
@@ -761,7 +816,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     temp = "37.6",
                     damp = "70",
                     over = "6",
-                    airing = "1 раз по 20 мин",
+                    airing = "2 раза по 20 мин",
                     idPT = 0
                 )
             )
@@ -771,7 +826,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     temp = "37.6",
                     damp = "70",
                     over = "6",
-                    airing = "1 раз по 20 мин",
+                    airing = "2 раза по 20 мин",
                     idPT = 0
                 )
             )
@@ -781,7 +836,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     temp = "37.6",
                     damp = "70",
                     over = "10",
-                    airing = "1 раз по 20 мин",
+                    airing = "2 раз по 20 мин",
                     idPT = 0
                 )
             )
@@ -970,7 +1025,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     day = 28,
                     temp = "37.3",
                     damp = "75",
-                    over = "0",
+                    over = "нет",
                     airing = "3 раза по 45 мин",
                     idPT = 0
                 )
@@ -980,7 +1035,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     day = 29,
                     temp = "37.3",
                     damp = "75",
-                    over = "0",
+                    over = "нет",
                     airing = "3 раза по 45 мин",
                     idPT = 0
                 )
@@ -990,7 +1045,7 @@ private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
                     day = 30,
                     temp = "37.3",
                     damp = "75",
-                    over = "0",
+                    over = "нет",
                     airing = "3 раза по 45 мин",
                     idPT = 0
                 )

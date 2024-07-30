@@ -54,18 +54,11 @@ fun IncubatorEditDayScreen(
     Scaffold(
         topBar = {
             TopAppBarEdit(
-                title = "День ${day}",
+                title = "День $day",
                 navigateUp = navigateBack,
             )
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
-        ) { innerPadding ->
+        }
+    ) { innerPadding ->
 
         IncubatorEditDayContainer(
             incubator,
@@ -102,11 +95,13 @@ fun IncubatorEditDayContainer(
             value = incubator.temp,
             onValueChange = {
                 onValueChange(
-                   incubator.copy(temp = it)
+                    incubator.copy(temp = it.replace(Regex("[^\\d.]"), "").replace(",", "."))
                 )
             },
             label = { Text("Температура") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
             supportingText = {
                 Text("Укажите температуру")
             },
@@ -122,18 +117,19 @@ fun IncubatorEditDayContainer(
                         FocusDirection.Down
                     )
                 }
-                //            isError = () TODO
             )
         )
         OutlinedTextField(
-            value = incubator.damp,
+            value = incubator.damp.replace(Regex("[^\\d.]"), "").replace(",", "."),
             onValueChange = {
                 onValueChange(
                     incubator.copy(damp = it)
                 )
             },
             label = { Text("Влажность") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
             supportingText = {
                 Text("Укажите влажность")
             },
@@ -160,7 +156,9 @@ fun IncubatorEditDayContainer(
                 )
             },
             label = { Text("Переворот") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
             supportingText = {
                 Text("Укажите кол-во переворачиваний")
             },
@@ -185,7 +183,9 @@ fun IncubatorEditDayContainer(
                 )
             },
             label = { Text("Проветривание") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
             supportingText = {
                 Text("Укажите кол-во проветриваний")
             },

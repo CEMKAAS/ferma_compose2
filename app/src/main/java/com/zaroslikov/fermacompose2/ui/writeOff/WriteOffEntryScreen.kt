@@ -180,7 +180,7 @@ fun WriteOffEntryContainerProduct(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp)
+                        .padding(bottom = 10.dp)
                 )
 
                 ExposedDropdownMenu(
@@ -210,13 +210,13 @@ fun WriteOffEntryContainerProduct(
             OutlinedTextField(
                 value = count,
                 onValueChange = {
-                    count = it
+                    count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                     validateCount(count)
                 },
                 label = { Text("Количество") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -271,7 +271,7 @@ fun WriteOffEntryContainerProduct(
         OutlinedTextField(
             value = priceAll,
             onValueChange = {
-                priceAll = it
+                priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 validatePrice(it)
             },
             label = { Text("Цена") },

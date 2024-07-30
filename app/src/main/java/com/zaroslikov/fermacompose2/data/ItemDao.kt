@@ -287,7 +287,7 @@ interface ItemDao {
     @Query("SELECT * from AnimalTable Where id=:id")
     fun getAnimal(id: Int): Flow<AnimalTable>
 
-    @Query("SELECT type from AnimalTable Where idPT=:id")
+    @Query("SELECT type from AnimalTable Where idPT=:id GROUP BY type")
     fun getTypeAnimal(id: Int): Flow<List<String>>
 
 

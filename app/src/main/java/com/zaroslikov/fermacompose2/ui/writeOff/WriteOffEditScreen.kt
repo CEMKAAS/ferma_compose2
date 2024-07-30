@@ -59,6 +59,8 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
 
 object WriteOffEditDestination : NavigationDestination {
@@ -84,14 +86,7 @@ fun WriteOffEditProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Изменить Списание", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         WriteOffEditContainerProduct(
@@ -139,8 +134,6 @@ fun WriteOffEditContainerProduct(
     var expandedSuf by remember { mutableStateOf(false) }
 
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    var formattedDate = "${writeOffTable.day}.${writeOffTable.mount}.${writeOffTable.year}"
 
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
@@ -186,7 +179,7 @@ fun WriteOffEditContainerProduct(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp)
+                        .padding(bottom = 10.dp)
                 )
 
                 ExposedDropdownMenu(
@@ -218,13 +211,13 @@ fun WriteOffEditContainerProduct(
             OutlinedTextField(
                 value = writeOffTable.count,
                 onValueChange = {
-                    onValueChange(writeOffTable.copy(count = it))
+                    onValueChange(writeOffTable.copy(count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                     validateCount(it)
                 },
                 label = { Text("Количество") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -285,12 +278,12 @@ fun WriteOffEditContainerProduct(
         OutlinedTextField(
             value = writeOffTable.priceAll,
             onValueChange = {
-                onValueChange(writeOffTable.copy(priceAll = it))
+                onValueChange(writeOffTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
             },
             label = { Text("Цена") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
             supportingText = {
                 Text("Укажите цену за списанный товар")
             },
@@ -351,8 +344,13 @@ fun WriteOffEditContainerProduct(
             }
         }
 
+        var formattedDate = String.format("%02d.%02d.%d", writeOffTable.day, writeOffTable.mount, writeOffTable.year)
 
         if (openDialog) {
+            val datePickerState = rememberDatePickerState(
+                selectableDates = PastOrPresentSelectableDates,
+                initialSelectedDateMillis = dateLong(formattedDate)
+            )
             DatePickerDialogSample(datePickerState, formattedDate) { date ->
                 formattedDate = date
                 openDialog = false
@@ -385,7 +383,7 @@ fun WriteOffEditContainerProduct(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 2.dp)
+                .padding(bottom = 10.dp)
                 .clickable {
                     openDialog = true
                 },

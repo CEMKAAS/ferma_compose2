@@ -16,11 +16,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,12 +43,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
@@ -95,14 +102,7 @@ fun IncubatorScreen(
                 navigateUp = navigateBack,
                 settingUp = { navigateProjectEdit(project.id) }
             )
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         IncubatorContainer(
@@ -372,203 +372,255 @@ fun EndIncubator(
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val dateEnd: String = format.format(calendar.timeInMillis)
-
+    var isErrorCount by rememberSaveable { mutableStateOf(false) }
     var idProject by remember { mutableIntStateOf(1) }
+    fun validateCount(text: String) {
+        isErrorCount = text == ""
+    }
+    fun errorBoolean(): Boolean {
+        isErrorCount = projectTable.eggAllEND == ""
+        return !isErrorCount
+    }
 
-    AlertDialog(
+    Dialog(
         onDismissRequest = { openEndDialog.value = false },
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(20.dp))
     ) {
-
-        Column(
+        Card(
             modifier = Modifier
-                .background(color = Color.LightGray)
-                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(20.dp))
         ) {
 
-            if (endAdvance) {
-                Text(
-                    "Поздравлем с появлением птенцов!",
-                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-                    fontSize = 19.sp
-                )
-                Text(
-                    "Мы сохранили Ваши данные в архив, чтобы вы не забыли параметры! Также Вы можете добавить птенцов в существующий проект или создать новый для дальнейшей работы"
-                            + "Вы заложили ${projectTable.eggAll} яиц Сколько птенцов у Вас вылупилось?",
-                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
-                )
-                Spacer(modifier = Modifier.padding(vertical = 10.dp))
 
-                OutlinedTextField(
-                    value = projectTable.eggAllEND,
-                    onValueChange = {
-                        onValueChange(projectTable.copy(eggAllEND = it))
-                    },
-                    label = { Text("Кол-во птенцов") }
-                )
+            Column(
+                modifier = Modifier
+                    .background(color = Color.LightGray)
+                    .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-                if (projectBoolean) {
+                if (endAdvance) {
+                    Text(
+                        "Поздравлем с появлением птенцов!",
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                        fontSize = 19.sp, fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "Мы сохранили инкубатор в архив, чтобы вы не забыли параметры!\nТакже Вы можете добавить птенцов в существующий проект или создать новый для дальнейшей работы.\n"
+                                + "Вы заложили ${projectTable.eggAll} яиц.\nСколько птенцов у Вас вылупилось?",
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp),
+                        fontSize = 15.sp,
 
-                    val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
-                    idProject = selectedOption.id
-
-                    Column(Modifier.selectableGroup()) {
-                        projectList.forEach { text ->
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .selectable(
-                                        selected = (text == selectedOption
-                                                ),
-                                        onClick = { onOptionSelected(text) },
-                                        role = Role.RadioButton
-                                    )
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = (text == selectedOption),
-                                    onClick = null
+                        )
+                    OutlinedTextField(
+                        value = projectTable.eggAllEND,
+                        onValueChange = {
+                            onValueChange(
+                                projectTable.copy(
+                                    eggAllEND = it.replace(
+                                        Regex("[^\\d.]"),
+                                        ""
+                                    ).replace(",", ".")
                                 )
-                                Text(text.titleProject)
+                            )
+                            validateCount(projectTable.eggAllEND)
+                        },
+                        label = { Text("Кол-во птенцов") },
+                        modifier = Modifier.padding(top = 5.dp, bottom = 10.dp),
+                        suffix = { Text(text = "Шт.") },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        ),
+                        supportingText = {
+                            if (isErrorCount) {
+                                Text(
+                                    text = "Не указано кол-во яиц",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            } else {
+                                Text("Укажите кол-во яиц, которых заложили в инкубатор")
+                            }
+                        },
+                        isError = isErrorCount,
+                    )
+
+                    if (projectBoolean) {
+
+                        val (selectedOption, onOptionSelected) = remember {
+                            mutableStateOf(
+                                projectList[0]
+                            )
+                        }
+                        idProject = selectedOption.id
+
+                        Column(Modifier.selectableGroup()) {
+                            projectList.forEach { text ->
+                                Row(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .selectable(
+                                            selected = (text == selectedOption
+                                                    ),
+                                            onClick = { onOptionSelected(text) },
+                                            role = Role.RadioButton
+                                        )
+                                        .padding(horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    RadioButton(
+                                        selected = (text == selectedOption),
+                                        onClick = null
+                                    )
+                                    Text(
+                                        text.titleProject,
+                                        modifier = Modifier.padding(start = 4.dp)
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-
-                    TextButton(
-                        onClick = {
-                            openEndDialog.value = false
-                            onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
-                            saveInArh()
-                        },
-                        modifier = Modifier.padding(4.dp),
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
                     ) {
-                        Text("Завершить")
-                    }
 
-                    if (projectBoolean) {
                         TextButton(
                             onClick = {
                                 openEndDialog.value = false
                                 onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
-                                saveInProject(
-                                    IncubatorAnimalInProject(
-                                        AnimalTable(
-                                            name = projectTable.titleProject,
-                                            type = projectTable.type,
-                                            data = dateEnd,
-                                            groop = true,
-                                            sex = "Мужской",
-                                            note = "",
-                                            image = "",
-                                            arhiv = false,
-                                            idPT = idProject
-                                        ), count = projectTable.eggAllEND
-                                    )
-                                )
+                                saveInArh()
                             },
                             modifier = Modifier.padding(4.dp),
                         ) {
-                            Text("В проект")
+                            Text("Завершить")
                         }
-                    }
 
-                    TextButton(
-                        onClick = {
-                            openEndDialog.value = false
-                            save(projectTable.toProjectTable())
+                        if (projectBoolean) {
+                            TextButton(
+                                onClick = {
+                                    if (errorBoolean()) {
+                                        openEndDialog.value = false
+                                        onValueChange(
+                                            projectTable.copy(
+                                                arhive = "1",
+                                                dateEnd = dateEnd
+                                            )
+                                        )
+                                        saveInProject(
+                                            IncubatorAnimalInProject(
+                                                AnimalTable(
+                                                    name = projectTable.titleProject,
+                                                    type = projectTable.type,
+                                                    data = dateEnd,
+                                                    groop = true,
+                                                    sex = "Мужской",
+                                                    note = "",
+                                                    image = "",
+                                                    arhiv = false,
+                                                    idPT = idProject
+                                                ), count = projectTable.eggAllEND
+                                            )
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.padding(4.dp),
+                            ) {
+                                Text("В проект")
+                            }
+                        }
 
-                            onValueChange(
-                                projectTable.copy(
-                                    id = 0,
-                                    arhive = "0",
-                                    dateEnd = dateEnd,
-                                    mode = 1
-                                )
-                            )
-                            saveInNewProject(
-                                IncubatorAnimalInProject(
-                                    AnimalTable(
-                                        name = projectTable.titleProject,
-                                        type = projectTable.type,
-                                        data = dateEnd,
-                                        groop = true,
-                                        sex = "Мужской",
-                                        note = "",
-                                        image = "",
-                                        arhiv = false,
-                                        idPT = idProject
-                                    ),
-                                    projectTable.eggAllEND
-                                )
-                            )
+                        TextButton(
+                            onClick = {
+                                if (errorBoolean()) {
+                                    openEndDialog.value = false
+                                    save(projectTable.toProjectTable())
 
-                        },
-                        modifier = Modifier.padding(4.dp),
-                    ) {
-                        Text("Новый проект")
-                    }
-
-
-                }
-
-            } else {
-                Text(
-                    "Завершить ${projectTable.titleProject}?",
-                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-                    fontSize = 19.sp
-                )
-                Text(
-                    "Вы уверены, что хотите завершить ${projectTable.titleProject}? Еще слишком рано завершать, удалим или добавим в архив?",
-                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
-                )
-                Spacer(modifier = Modifier.padding(vertical = 10.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-
-                    TextButton(
-                        onClick = {
-                            openEndDialog.value = false
-                            deleteInc()
-                        },
-                        modifier = Modifier.padding(8.dp),
-
+                                    onValueChange(
+                                        projectTable.copy(
+                                            id = 0,
+                                            arhive = "0",
+                                            dateEnd = dateEnd,
+                                            mode = 1
+                                        )
+                                    )
+                                    saveInNewProject(
+                                        IncubatorAnimalInProject(
+                                            AnimalTable(
+                                                name = projectTable.titleProject,
+                                                type = projectTable.type,
+                                                data = dateEnd,
+                                                groop = true,
+                                                sex = "Мужской",
+                                                note = "",
+                                                image = "",
+                                                arhiv = false,
+                                                idPT = idProject
+                                            ),
+                                            projectTable.eggAllEND
+                                        )
+                                    )
+                                }
+                            },
+                            modifier = Modifier.padding(4.dp),
                         ) {
-                        Text("Удалить")
+                            Text("Новый проект")
+                        }
+
+
                     }
 
-                    TextButton(
-                        onClick = {
-                            openEndDialog.value = false
-                            onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
-                            saveInArh()
-                        },
-                        modifier = Modifier.padding(8.dp),
+                } else {
+                    Text(
+                        "Завершить ${projectTable.titleProject}?",
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "Сейчас еще рано,чтобы завершать инкубатор.\nВы можете удалить или добавить в архив, если Вам в будующем нужны будут эти данные",
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp),
+                        fontSize = 15.sp,
+                    )
+                    Spacer(modifier = Modifier.padding(vertical = 10.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
                     ) {
-                        Text("В архив")
+
+                        TextButton(
+                            onClick = {
+                                openEndDialog.value = false
+                                deleteInc()
+                            },
+                            modifier = Modifier.padding(8.dp),
+
+                            ) {
+                            Text("Удалить")
+                        }
+
+                        TextButton(
+                            onClick = {
+                                openEndDialog.value = false
+                                onValueChange(projectTable.copy(arhive = "1", dateEnd = dateEnd))
+                                saveInArh()
+                            },
+                            modifier = Modifier.padding(8.dp),
+                        ) {
+                            Text("В архив")
+                        }
                     }
                 }
             }
         }
     }
 }
-
 
 fun setOvoskop(typeBird: String, day: Int): Boolean {
     when (typeBird) {

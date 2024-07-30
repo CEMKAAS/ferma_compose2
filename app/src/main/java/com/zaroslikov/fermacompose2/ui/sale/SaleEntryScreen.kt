@@ -200,13 +200,13 @@ fun SaleEntryContainerProduct(
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else {
-                            Text("Выберите или укажите товар")
+                            Text("Введите или выберите товар")
                         }
                     },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 5.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorTitle,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
@@ -244,12 +244,12 @@ fun SaleEntryContainerProduct(
             OutlinedTextField(
                 value = count,
                 onValueChange = {
-                    count = it
+                    count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                     validateCount(count)
                 },
                 label = { Text("Количество") },
                 modifier = Modifier.fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -304,11 +304,11 @@ fun SaleEntryContainerProduct(
         OutlinedTextField(
             value = priceAll,
             onValueChange = {
-                priceAll = it
+                priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 validatePrice(priceAll)
             },
             label = { Text("Цена") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -346,7 +346,7 @@ fun SaleEntryContainerProduct(
                     label = { Text("Категория") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor().padding(bottom = 2.dp),
+                        .menuAnchor().padding(bottom = 10.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
@@ -399,7 +399,7 @@ fun SaleEntryContainerProduct(
                     supportingText = { Text("Выберите или укажите имя покупателя") },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth().padding(bottom = 2.dp),
+                        .fillMaxWidth().padding(bottom = 10.dp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(

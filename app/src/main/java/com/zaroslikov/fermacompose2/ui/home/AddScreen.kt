@@ -72,6 +72,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -167,12 +168,29 @@ private fun AddBody(
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_item_add),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
+            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                Text(
+                    text = "Добро пожаловать в раздел \"Мои Товары!\"",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "В этом разделе Вы можете добавлять товары, которые поступают с вашей фермы! Каждому товару можно назначить кол-во, категорию и животное, если оно занесено в разделе \"Мои Животные\"",
+                    textAlign = TextAlign.Justify,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "Сейчас нет товаров:(\nНажмите + чтобы добавить.",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 20.sp,
+                )
+            }
         } else {
             InventoryList(
                 itemList = itemList,
@@ -240,7 +258,10 @@ fun AddProductCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (addProduct.category != "Без категории") {
+
+                if (addProduct.category == "Без категории" || addProduct.category == "") {
+
+                }else{
                     Text(
                         text = "Категория: ${addProduct.category}",
                         modifier = Modifier
@@ -248,6 +269,7 @@ fun AddProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
+
                 if (addProduct.animal != "") {
                     Text(
                         text = "Животное: ${addProduct.animal}",
@@ -257,7 +279,7 @@ fun AddProductCard(
                     )
                 }
                 Text(
-                    text = "Дата: ${addProduct.day}.${addProduct.mount}.${addProduct.year}",
+                    text = "Дата: ${String.format("%02d.%02d.%d", addProduct.day, addProduct.mount,addProduct.year)}",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .wrapContentSize()
@@ -265,7 +287,7 @@ fun AddProductCard(
                 )
             }
             Text(
-                text = "${addProduct.count} ${addProduct.suffix}",
+                text = "${formatter(addProduct.count)} ${addProduct.suffix}",
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .padding(6.dp)

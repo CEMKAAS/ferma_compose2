@@ -40,6 +40,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCard
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.formatter
 import kotlinx.coroutines.launch
 
 object FinanceArhivDestination : NavigationDestination {
@@ -143,7 +144,7 @@ private fun FinanceBody(
     ) {
 
         Text(
-            text = "$currentBalance ₽",
+            text = "${formatter(currentBalance)} ₽",
             textAlign = TextAlign.Start,
             fontSize = 25.sp,
             modifier = Modifier
@@ -183,7 +184,7 @@ private fun FinanceBody(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "$income ₽",
+                    text = "${formatter(income)} ₽",
                     textAlign = TextAlign.Center,
                     fontSize = 15.sp,
                     modifier = Modifier
@@ -208,7 +209,7 @@ private fun FinanceBody(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "$expenses ₽",
+                    text = "${formatter(expenses)} ₽",
                     textAlign = TextAlign.Center,
                     fontSize = 15.sp,
                     modifier = Modifier

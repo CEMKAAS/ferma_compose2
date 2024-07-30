@@ -45,6 +45,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object FinanceDestination : NavigationDestination {
     override val route = "Finance"
@@ -151,7 +152,7 @@ private fun FinanceBody(
             .padding(8.dp),
     ) {
         Text(
-            text = "$currentBalance ₽",
+            text = "${formatter(currentBalance)} ₽",
             textAlign = TextAlign.Start,
             fontSize = 25.sp,
             modifier = Modifier
@@ -185,7 +186,7 @@ private fun FinanceBody(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "$income ₽",
+                    text = "${formatter(income)} ₽",
                     textAlign = TextAlign.Center,
                     fontSize = 15.sp,
                     modifier = Modifier
@@ -210,7 +211,7 @@ private fun FinanceBody(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "$expenses ₽",
+                    text = "${formatter(expenses)} ₽",
                     textAlign = TextAlign.Center,
                     fontSize = 15.sp,
                     modifier = Modifier
@@ -306,24 +307,23 @@ private fun FinanceBody(
             )
         }
 
-
-        Text(
-            text = "Транзакции в текущем месяце",
-            textAlign = TextAlign.Start,
-            fontSize = 15.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp),
-            fontWeight = FontWeight.SemiBold
-        )
-
         if (incomeExpensesList.isNotEmpty()) {
+            Text(
+                text = "Транзакции в текущем месяце:",
+                textAlign = TextAlign.Start,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+
             LazyColumn {
                 items(items = incomeExpensesList) { it ->
                     TransactionRow(it)
                 }
             }
-        }else{
+        } else {
             Text(
                 text = stringResource(R.string.no_item_finance),
                 textAlign = TextAlign.Center,
@@ -350,7 +350,7 @@ fun CardRow(
                 .padding(5.dp),
         )
         Text(
-            text = "${fin.priceAll} ₽", textAlign = TextAlign.Start,
+            text = "${formatter(fin.priceAll)} ₽", textAlign = TextAlign.Start,
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -383,7 +383,7 @@ fun TransactionRow(
                 fontSize = 12.sp
             )
             Text(
-                text = "${incomeExpensesDetails.day}. ${incomeExpensesDetails.mount}.${incomeExpensesDetails.year}",
+                text = String.format("%02d.%02d.%d", incomeExpensesDetails.day, incomeExpensesDetails.mount,incomeExpensesDetails.year),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
                 modifier = Modifier
@@ -393,7 +393,7 @@ fun TransactionRow(
         }
         if (!incomeExpensesDetails.priceAll.toString().contains("-")) {
             Text(
-                text = "${incomeExpensesDetails.priceAll} ₽",
+                text = "${formatter(incomeExpensesDetails.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
@@ -404,7 +404,7 @@ fun TransactionRow(
             )
         } else {
             Text(
-                text = "${incomeExpensesDetails.priceAll} ₽",
+                text = "${formatter(incomeExpensesDetails.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)

@@ -1,7 +1,10 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -12,8 +15,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,6 +31,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 
 object AnimalCardDestination : NavigationDestination {
@@ -42,19 +48,19 @@ fun AnimalCardProduct(
     onNavigateIndicators: (AnimalIndicators) -> Unit,
     viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val animalTable = viewModel.animalState.collectAsState()
+    val animalTable = viewModel.animalState2.collectAsState()
     val size = viewModel.sizeState.collectAsState()
     val count = viewModel.countState.collectAsState()
     val weight = viewModel.weightState.collectAsState()
     val vaccination = viewModel.vaccinationState.collectAsState()
-    val product = viewModel.productState(animalTable.value.animalTable.name).collectAsState()
+    val product = viewModel.productState(animalTable.value.animalTable2.name).collectAsState()
 
     Scaffold(topBar = {
         TopAppBarStart(
-            title = animalTable.value.animalTable.name,
+            title = animalTable.value.animalTable2.name,
             true,
             navigateUp = navigateBack,
-            settingUp = { onNavigateSetting(animalTable.value.animalTable.id) }
+            settingUp = { onNavigateSetting(animalTable.value.animalTable2.id) }
         )
     }) { innerPadding ->
         AnimalCardContainer(
@@ -62,7 +68,7 @@ fun AnimalCardProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            animalTable = animalTable.value.animalTable,
+            animalTable = animalTable.value.animalTable2,
             animalWeightTable = weight.value.itemList,
             animalSizeTable = size.value.itemList,
             animalCountTable = count.value.itemList,
@@ -102,7 +108,6 @@ fun AnimalCardContainer(
             modifier = modifierCard
         ) {
             Text(
-                //TODO Подумать как правильно
                 text = "Данные", modifier = modifierHeading,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
@@ -131,8 +136,15 @@ fun AnimalCardContainer(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                animalWeightTable.forEach {
-                    Text(text = "${i++})  ${it.weight} кг. на ${it.date}", modifier = modifierText)
+                if (animalWeightTable.isNotEmpty()) {
+                    animalWeightTable.forEach {
+                        Text(
+                            text = "${i++}) ${it.weight} кг. на ${it.date}",
+                            modifier = modifierText
+                        )
+                    }
+                } else {
+                    Text(text = "Данных нет! Нажмите, чтобы добавить", modifier = modifierText)
                 }
             }
 
@@ -152,8 +164,12 @@ fun AnimalCardContainer(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                animalSizeTable.forEach {
-                    Text(text = "${i++}) ${it.size} м. на ${it.date}", modifier = modifierText)
+                if (animalSizeTable.isNotEmpty()) {
+                    animalSizeTable.forEach {
+                        Text(text = "${i++}) ${it.size} м. на ${it.date}", modifier = modifierText)
+                    }
+                } else {
+                    Text(text = "Данных нет! Нажмите, чтобы добавить", modifier = modifierText)
                 }
             }
         } else {
@@ -174,8 +190,15 @@ fun AnimalCardContainer(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                animalCountTable.forEach {
-                    Text(text = "${i++}) ${it.count} шт. на ${it.date}", modifier = modifierText)
+                if (animalCountTable.isNotEmpty()) {
+                    animalCountTable.forEach {
+                        Text(
+                            text = "${i++}) ${formatter(it.count.toDouble())} шт. на ${it.date}",
+                            modifier = modifierText
+                        )
+                    }
+                } else {
+                    Text(text = "Данных нет! Нажмите, чтобы добавить", modifier = modifierText)
                 }
             }
         }
@@ -198,7 +221,22 @@ fun AnimalCardContainer(
             )
             if (animalVaccinationTable.isNotEmpty()) {
                 animalVaccinationTable.forEach {
-                    Text(text = "${i++}) ${it.vaccination} ${it.date}", modifier = modifierText)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "${i++}) ${it.vaccination}",
+                            modifier = modifierText.fillMaxWidth(0.6f)
+                        )
+                        Text(
+                            text = it.date,
+                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 8.dp),
+                            textAlign = TextAlign.End
+                        )
+                    }
                 }
             } else {
                 Text(text = "Нет добавленных прививок", modifier = modifierText)
@@ -214,11 +252,27 @@ fun AnimalCardContainer(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
+            var i = 1
             if (animalProductTable.isNotEmpty()) {
-                animalProductTable.forEach{
-                    Text(text = "${it.Title} ${it.priceAll} ${it.suffix}", modifier = modifierText)
+                animalProductTable.forEach {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "${i++}) ${it.Title}",
+                            modifier = modifierText.fillMaxWidth(0.6f)
+                        )
+                        Text(
+                            text = "${formatter(it.priceAll)} ${it.suffix}",
+                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 8.dp),
+                            textAlign = TextAlign.End
+                        )
+                    }
                 }
-            }else{
+            } else {
                 Text(text = "Пока ничего нет :(", modifier = modifierText)
             }
         }
@@ -232,7 +286,12 @@ fun AnimalCardContainer(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
-            Text(text = animalTable.note, modifier = modifierText)
+            if (animalTable.note == "") {
+                Text(text = "Здесь пока пусто:(", modifier = modifierText)
+            } else {
+                Text(text = animalTable.note, modifier = modifierText)
+            }
+
         }
 
     }

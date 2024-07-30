@@ -224,7 +224,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun deleteAnimalTable(animalTable: AnimalTable) =
         itemDao.deleteAnimalTable(animalTable)
 
-
     override fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>> =
         itemDao.getCountAnimalLimit(id)
 

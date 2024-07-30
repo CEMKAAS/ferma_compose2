@@ -537,9 +537,7 @@ fun InventoryNavHost(
             AnimalEditProduct(
                 navigateBack = { navController.popBackStack() },
                 navigateEdit = { navController.navigateUp() },
-                navigateDelete = {
-                    navController.navigate("${AnimalDestination.route}/${it}")
-                }
+                navigateDelete = { navController.navigate(StartDestination.route) }
             )
         }
 

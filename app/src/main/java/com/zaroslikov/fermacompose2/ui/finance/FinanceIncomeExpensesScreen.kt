@@ -37,6 +37,7 @@ import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.formatter
 
 object FinanceIncomeExpensesDestination : NavigationDestination {
     override val route = "FinanceIncomeExpenses"
@@ -68,14 +69,7 @@ fun FinanceIncomeExpensesScreen(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarEdit(title = titleTopBar, navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         FinanceIncomeExpensesBody(
             itemList = financeCategoryState.itemList,
@@ -200,7 +194,7 @@ fun FinanceIncomProductCard(
             }
 
             Text(
-                text = "${fin.priceAll} ₽",
+                text = "${formatter(fin.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
@@ -244,7 +238,7 @@ fun FinanceIncomeExpensesProductCard(
             }
 
             Text(
-                text = "${fin.priceAll} ₽",
+                text = "${formatter(fin.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)

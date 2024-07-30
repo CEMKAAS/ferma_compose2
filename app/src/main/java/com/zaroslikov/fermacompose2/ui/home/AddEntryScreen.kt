@@ -82,14 +82,7 @@ fun AddEntryProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Мои Товары", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         AddEntryContainerProduct(
@@ -195,13 +188,13 @@ fun AddEntryContainerProduct(
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else {
-                            Text("Выберите или укажите товар")
+                            Text("Введите или выберите товар")
                         }
                     },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     isError = isErrorTitle,
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
@@ -241,13 +234,13 @@ fun AddEntryContainerProduct(
             OutlinedTextField(
                 value = count,
                 onValueChange = {
-                    count = it
+                    count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                     validateCount(count)
                 },
                 label = { Text("Количество") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
                         Text(
@@ -304,13 +297,13 @@ fun AddEntryContainerProduct(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor()
-                        .padding(bottom = 2.dp),
+                        .padding(bottom = 10.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Text,
+                        keyboardType = KeyboardType.Number,
                         capitalization = KeyboardCapitalization.Sentences
                     ),
                     keyboardActions = KeyboardActions(onNext = {
@@ -353,6 +346,7 @@ fun AddEntryContainerProduct(
                 OutlinedTextField(
                     value = animal,
                     onValueChange = {},
+                    label = { Text("Животное") },
                     readOnly = true,
                     leadingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
                     trailingIcon = {
@@ -370,7 +364,7 @@ fun AddEntryContainerProduct(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp)
+                        .padding(bottom = 10.dp)
                 )
 
                 ExposedDropdownMenu(

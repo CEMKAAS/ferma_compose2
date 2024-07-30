@@ -52,6 +52,8 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -81,14 +83,7 @@ fun IncubatorProjectEditScreen(
                 title = "Инкубатор",
                 navigateUp = navigateBack,
             )
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         IncubatorEditDayContainer(
@@ -130,11 +125,6 @@ fun IncubatorEditDayContainer(
     saveInRoomAdd: (Boolean) -> Unit,
     deleteRoom: () -> Unit,
 ) {
-    //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val formattedDate: String = format.format(calendar.timeInMillis)
-
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
@@ -142,7 +132,10 @@ fun IncubatorEditDayContainer(
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = dateLong(project.data)
+    )
 
     if (openDialog) {
         DatePickerDialogSample(datePickerState, project.data) { date ->
@@ -209,7 +202,9 @@ fun IncubatorEditDayContainer(
                 validateTitle(it)
             },
             label = { Text("Инкубатор") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
             supportingText = {
                 if (isErrorTitle) {
                     Text(
@@ -236,11 +231,13 @@ fun IncubatorEditDayContainer(
         OutlinedTextField(
             value = project.eggAll,
             onValueChange = {
-                onValueChange(project.copy(eggAll = it))
+                onValueChange(project.copy(eggAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                 validateCount(project.eggAll)
             },
             label = { Text("Количество") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
             supportingText = {
                 if (isErrorCount) {
                     Text(
@@ -248,7 +245,7 @@ fun IncubatorEditDayContainer(
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите кол-во яий, которых заложили в инкубатор")
+                    Text("Укажите кол-во яиц, которых заложили в инкубатор")
                 }
             },
             suffix = { Text(text = "Шт.") },
@@ -286,7 +283,7 @@ fun IncubatorEditDayContainer(
                 .clickable {
                     openDialog = true
                 }
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
         )
 
 //        OutlinedTextField(

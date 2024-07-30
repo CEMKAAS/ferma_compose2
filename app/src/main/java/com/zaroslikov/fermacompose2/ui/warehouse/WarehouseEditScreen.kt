@@ -36,7 +36,10 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 
 object WarehouseEditDestination : NavigationDestination {
@@ -58,14 +61,7 @@ fun WarehouseEditScreen(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Редактировать Проект", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         WarehouseEditContainer(project = viewModel.projectState,
             modifier = Modifier.padding(innerPadding),
@@ -107,9 +103,14 @@ fun WarehouseEditContainer(
     onValueChange: (IncubatorProjectEditState) -> Unit = {},
 ) {
 
+
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+
+    val datePickerState = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = dateLong(project.data)
+    )
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
 
@@ -126,7 +127,8 @@ fun WarehouseEditContainer(
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 
-        OutlinedTextField(value = project.titleProject,
+        OutlinedTextField(
+            value = project.titleProject,
             onValueChange = {
                 onValueChange(project.copy(titleProject = it))
                 validateTitle(it)
@@ -193,7 +195,7 @@ fun WarehouseEditContainer(
             onClick = {
                 onValueChange(project.copy(arhive = "1"))
                 arhivInRoom(isErrorTitle)
-                      }, modifier = Modifier.fillMaxWidth()
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_archive_24),
@@ -203,7 +205,7 @@ fun WarehouseEditContainer(
         }
 
         OutlinedButton(
-            onClick = {deleteInRoom()}, modifier = Modifier.fillMaxWidth()
+            onClick = { deleteInRoom() }, modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_delete_24),

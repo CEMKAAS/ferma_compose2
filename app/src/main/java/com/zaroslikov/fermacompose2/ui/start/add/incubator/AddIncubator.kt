@@ -58,6 +58,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -79,14 +80,7 @@ fun AddIncubator(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         AddIncubatorContainer(
             modifier = Modifier
@@ -135,7 +129,10 @@ fun AddIncubatorContainer(
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = calendar.timeInMillis
+    )
 
 
     if (openDialog) {
@@ -182,7 +179,7 @@ fun AddIncubatorContainer(
                 validateTitle(it)
             },
             label = { Text("Название") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorTitle) {
                     Text(
@@ -228,7 +225,7 @@ fun AddIncubatorContainer(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .padding(bottom = 2.dp)
+                        .padding(bottom = 10.dp)
                 )
 
                 ExposedDropdownMenu(
@@ -257,11 +254,11 @@ fun AddIncubatorContainer(
         OutlinedTextField(
             value = count,
             onValueChange = {
-                count = it
+                count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 validateCount(it)
             },
             label = { Text("Количество") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorCount) {
                     Text(
@@ -269,7 +266,7 @@ fun AddIncubatorContainer(
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите кол-во яий, которых заложили в инкубатор")
+                    Text("Укажите кол-во яиц, которых заложили в инкубатор")
                 }
             },
             suffix = { Text(text = "Шт.") },
@@ -308,7 +305,7 @@ fun AddIncubatorContainer(
                 .clickable {
                     openDialog = true
                 }
-                .padding(bottom = 2.dp),
+                .padding(bottom = 10.dp),
         )
 //
 //

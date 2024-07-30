@@ -121,14 +121,7 @@ fun AnimalScreen(
                         contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
                     )
                 }
-            },
-//            bottomBar = {
-//                Banner(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                )
-//            }
+            }
         ) { innerPadding ->
             AnimalBody(
                 itemList = animalUiState.itemList,
@@ -153,12 +146,29 @@ private fun AnimalBody(
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_item_animal),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
+            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                Text(
+                    text = "Добро пожаловать в раздел \"Мои Животные!\"",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "В этом разделе вы можете регистрировать животных, находящихся на вашей ферме! Каждое животное можно добавить как по отдельности, так и в группе. Для группового добавления укажите количество, а для отдельных животных — их вес и размер. Для всех животных необходимо указать имя, вид, информацию о прививках и дополнительные примечания. При добавлении товара в разделе \"Мои Товары\" внутри карточки животного, если указать конкретное животное, Вы сможете отслеживать объем произведенного им товара.",
+                    textAlign = TextAlign.Justify,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "Сейчас нет животных:(\nНажмите + чтобы добавить.",
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 20.sp,
+                )
+            }
         } else {
             AnimalList(
                 itemList = itemList,
