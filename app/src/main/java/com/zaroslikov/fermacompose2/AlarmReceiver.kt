@@ -69,7 +69,8 @@ class AlarmReceiver : BroadcastReceiver() {
             builder = NotificationCompat.Builder(context)
             intent = Intent(context, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+            pendingIntent = PendingIntent.getActivity(context, 0, intent,
+                PendingIntent.FLAG_IMMUTABLE)
             builder.setContentTitle("Время пришло!") // required
                 .setSmallIcon(R.drawable.ic_launcher_foreground) // required
                 .setContentText("Пора внести товар и расходы за сегодня!") // required

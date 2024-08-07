@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -48,6 +49,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -79,14 +81,7 @@ fun SaleEntryProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Добавить Продажу", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         SaleEntryContainerProduct(
@@ -111,7 +106,8 @@ fun SaleEntryProduct(
                             suffix = it.suffix,
                             category = it.category,
                             idPT = idProject,
-                            buyer = it.buyer
+                            buyer = it.buyer,
+                            note = it.note
                         )
 
                     )
@@ -142,7 +138,7 @@ fun SaleEntryContainerProduct(
     var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("") }
     var buyer by remember { mutableStateOf("Неизвестный") }
-
+    var note by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
@@ -344,6 +340,11 @@ fun SaleEntryContainerProduct(
                     value = category,
                     onValueChange = { category = it },
                     label = { Text("Категория") },
+                    trailingIcon = {
+                        IconButton(onClick = { category = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor().padding(bottom = 10.dp),
@@ -397,6 +398,11 @@ fun SaleEntryContainerProduct(
                     },
                     label = { Text(text = "Покупатель") },
                     supportingText = { Text("Выберите или укажите имя покупателя") },
+                    trailingIcon = {
+                        IconButton(onClick = { category = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
+                        }
+                    },
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth().padding(bottom = 10.dp),
@@ -431,6 +437,24 @@ fun SaleEntryContainerProduct(
             }
         }
 
+        OutlinedTextField(
+            value = note,
+            onValueChange = {
+                note = it
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -452,9 +476,17 @@ fun SaleEntryContainerProduct(
                                 suffix = suffix,
                                 category = category,
                                 priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-                                buyer = buyer
+                                buyer = buyer,
+                                note = note
                             )
                         )
+                        val eventParameters: MutableMap<String, Any> = HashMap()
+                        eventParameters["Имя"] = title
+                        eventParameters["Кол-во"] = "$title $count $suffix $priceAll₽"
+                        eventParameters["Категория"] = category
+                        eventParameters["Покупатель"] = buyer
+                        eventParameters["Примечание"] = note
+                        AppMetrica.reportEvent("Sale Products", eventParameters);
                     }
                 },
                 modifier = Modifier
@@ -478,6 +510,7 @@ data class SaleTableInsert(
     var priceAll: Double,
     var suffix: String,
     var category: String,
-    var buyer: String
+    var buyer: String,
+    var note: String
 )
 

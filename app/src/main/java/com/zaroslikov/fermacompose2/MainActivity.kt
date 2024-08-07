@@ -32,6 +32,7 @@ import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
 import java.util.Calendar
 import java.util.Date
 
@@ -47,32 +48,36 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-            MobileAds.initialize(this) {
+            FermaCompose2Theme {
+                MobileAds.initialize(this) {
 
-                loadAppOpenAd()
-                val processLifecycleObserver = DefaultProcessLifecycleObserver(
-                    onProcessCaneForeground = ::showAppOpenAd
-                )
-                ProcessLifecycleOwner.get().lifecycle.addObserver(processLifecycleObserver)
+                    loadAppOpenAd()
+                    val processLifecycleObserver = DefaultProcessLifecycleObserver(
+                        onProcessCaneForeground = ::showAppOpenAd
+                    )
+                    ProcessLifecycleOwner.get().lifecycle.addObserver(processLifecycleObserver)
 
 
-                //Межстра
-                interstitialAdLoader = InterstitialAdLoader(this).apply {
-                    setAdLoadListener(object : InterstitialAdLoadListener {
-                        override fun onAdLoaded(ad: InterstitialAd) {
-                            interstitialAd = ad
-                            // The ad was loaded successfully. Now you can show loaded ad.
-                        }
+                    //Межстра
+                    interstitialAdLoader = InterstitialAdLoader(this).apply {
+                        setAdLoadListener(object : InterstitialAdLoadListener {
+                            override fun onAdLoaded(ad: InterstitialAd) {
+                                interstitialAd = ad
+                                // The ad was loaded successfully. Now you can show loaded ad.
+                            }
 
-                        override fun onAdFailedToLoad(adRequestError: AdRequestError) {
-                            // Ad failed to load with AdRequestError.
-                            // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
-                        }
-                    })
+                            override fun onAdFailedToLoad(adRequestError: AdRequestError) {
+                                // Ad failed to load with AdRequestError.
+                                // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+                            }
+                        })
+                    }
+                    loadInterstitialAd()
                 }
-                loadInterstitialAd()
+                InventoryApp(modifier = Modifier)
+
             }
-            InventoryApp(modifier = Modifier)
+
         }
     }
 
@@ -80,7 +85,7 @@ class MainActivity : ComponentActivity() {
 
     private fun loadInterstitialAd() {
         val adRequestConfiguration =
-            AdRequestConfiguration.Builder("demo-interstitial-yandex").build()
+            AdRequestConfiguration.Builder("R-M-10848417-2").build()
         interstitialAdLoader?.loadAd(adRequestConfiguration)
     }
 
@@ -195,7 +200,7 @@ class MainActivity : ComponentActivity() {
         }
         appOpenAdLoader.setAdLoadListener(appOpenAdLoadListener)
 
-        val AD_UNIT_ID = "demo-appopenad-yandex"
+        val AD_UNIT_ID = "R-M-10848417-3"
         val adRequestConfiguration = AdRequestConfiguration.Builder(AD_UNIT_ID).build()
         appOpenAdLoader.loadAd(adRequestConfiguration)
         appOpenAdLoader.loadAd(adRequestConfiguration)

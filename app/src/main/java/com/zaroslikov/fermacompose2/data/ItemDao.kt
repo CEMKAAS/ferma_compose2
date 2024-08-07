@@ -194,7 +194,8 @@ interface ItemDao {
 
 
     //Finance
-    @Query("SELECT COALESCE(SUM(MyFermaSale.PRICE), 0.0) - COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS ResultCount FROM MyFermaSale LEFT JOIN MyFermaEXPENSES ON MyFermaSale.idPT = MyFermaEXPENSES.idPT WHERE MyFermaSale.idPT =:id")
+    @Query("SELECT COALESCE(" +
+            "(SELECT SUM(PRICE) FROM MyFermaSale WHERE idPT =:id), 0) - COALESCE((SELECT SUM(countEXPENSES) FROM MyFermaEXPENSES WHERE idPT=:id), 0) AS PriceDifference;")
     fun getCurrentBalance(id: Int): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS ResultCount FROM MyFermaSale WHERE MyFermaSale.idPT =:id")
@@ -216,7 +217,7 @@ interface ItemDao {
                 "UNION All " +
                 "SELECT MyFermaEXPENSES.titleEXPENSES, MyFermaEXPENSES.discEXPENSES, MyFermaEXPENSES.suffix, -MyFermaEXPENSES.countEXPENSES AS minusPriceAll, MyFermaEXPENSES.day, MyFermaEXPENSES.mount, MyFermaEXPENSES.year from MyFermaEXPENSES" +
                 " Where idPT=:id and mount=:mount and year=:year)" +
-                " combined_table"
+                " combined_table ORDER BY day DESC"
     )
     fun getIncomeExpensesCurrentMonth(
         id: Int,

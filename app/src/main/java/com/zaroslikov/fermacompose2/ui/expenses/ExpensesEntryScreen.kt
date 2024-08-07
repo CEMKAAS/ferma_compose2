@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -48,6 +49,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -98,7 +100,8 @@ fun ExpensesEntryProduct(
                             priceAll = it.priceAll,
                             suffix = it.suffix,
                             category = it.category,
-                            idPT = idProject
+                            idPT = idProject,
+                            note = it.note
                         )
 
                     )
@@ -127,6 +130,7 @@ fun ExpensesEntryContainerProduct(
     var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
@@ -350,6 +354,11 @@ fun ExpensesEntryContainerProduct(
                         .fillMaxWidth()
                         .menuAnchor()
                         .padding(bottom = 10.dp),
+                    trailingIcon = {
+                        IconButton(onClick = { category = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
+                        }
+                    },
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
@@ -390,6 +399,24 @@ fun ExpensesEntryContainerProduct(
             }
         }
 
+        OutlinedTextField(
+            value = note,
+            onValueChange = {
+                note = it
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -413,8 +440,15 @@ fun ExpensesEntryContainerProduct(
                                 category = category,
                                 priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
                                     .toDouble(),
+                                note = note
                             )
                         )
+                        val eventParameters: MutableMap<String, Any> = HashMap()
+                        eventParameters["Имя"] = title
+                        eventParameters["Кол-во"] = "$title $count $suffix $priceAll₽"
+                        eventParameters["Категория"] = category
+                        eventParameters["Примечание"] = note
+                        AppMetrica.reportEvent("Expenses Products", eventParameters);
                     }
                 },
                 modifier = Modifier
@@ -438,4 +472,5 @@ data class ExpensesTableInsert(
     var priceAll: Double,
     var suffix: String,
     var category: String,
+    var note:String
 )

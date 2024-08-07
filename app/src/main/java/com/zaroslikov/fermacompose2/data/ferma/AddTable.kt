@@ -53,6 +53,7 @@ data class AddTable(
     var suffix: String,
     var category: String,
     var animal: String,
+    val note : String,
     @ColumnInfo(name = "idPT")
     val idPT: Int
 )

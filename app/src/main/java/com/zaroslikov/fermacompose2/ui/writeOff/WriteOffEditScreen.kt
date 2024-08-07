@@ -153,9 +153,9 @@ fun WriteOffEditContainerProduct(
 
     var state by remember { mutableStateOf(true) }
 
-    if (R.drawable.baseline_cottage_24 == writeOffTable.status) {
+    if (0 == writeOffTable.status) {
         state = true
-    } else if (R.drawable.baseline_delete_24 == writeOffTable.status) {
+    } else if (1 == writeOffTable.status) {
         state = false
     }
 
@@ -290,6 +290,35 @@ fun WriteOffEditContainerProduct(
             suffix = { Text(text = "₽") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }
+            )
+        )
+
+        OutlinedTextField(
+            value = writeOffTable.note,
+            onValueChange = {
+                onValueChange(
+                    writeOffTable.copy(
+                        note = it
+                    )
+                )
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(onNext = {

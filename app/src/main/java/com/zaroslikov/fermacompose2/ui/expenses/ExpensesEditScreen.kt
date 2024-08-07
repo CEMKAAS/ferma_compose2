@@ -398,6 +398,35 @@ fun ExpensesEditContainerProduct(
             }
         }
 
+        OutlinedTextField(
+            value = expensesTable.note,
+            onValueChange = {
+                onValueChange(
+                    expensesTable.copy(
+                        note = it
+                    )
+                )
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }
+            )
+        )
+
         var formattedDate = String.format("%02d.%02d.%d", expensesTable.day, expensesTable.mount, expensesTable.year)
 
         if (openDialog) {

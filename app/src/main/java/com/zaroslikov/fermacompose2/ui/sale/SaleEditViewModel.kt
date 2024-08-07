@@ -65,11 +65,11 @@ class SaleEditViewModel(
             )
 
     val buyerUiState: StateFlow<BuyerUiState> =
-        itemsRepository.getItemsBuyerSaleList(itemIdPT).map {  BuyerUiState(it) }
+        itemsRepository.getItemsBuyerSaleList(itemIdPT).map { BuyerUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =  BuyerUiState()
+                initialValue = BuyerUiState()
             )
 
     suspend fun saveItem() {
@@ -97,11 +97,23 @@ data class SaleTableUiState(
     val idPT: Int = 0,
     var suffix: String = "",
     var category: String = "",
-    var buyer: String = ""
+    var buyer: String = "",
+    var note: String = ""
 )
 
 fun SaleTable.toSaleTableUiState(): SaleTableUiState = SaleTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category, buyer
+    id,
+    title,
+    count.toString(),
+    day,
+    mount,
+    year,
+    priceAll.toString(),
+    idPT,
+    suffix,
+    category,
+    buyer,
+    note
 )
 
 fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
@@ -109,7 +121,14 @@ fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
     title = title,
     count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     day = day,
-    mount, year, priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), suffix, category, buyer, idPT
+    mount = mount,
+    year = year,
+    priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+    suffix = suffix,
+    category = category,
+    buyer = buyer,
+    note = note,
+    idPT = idPT
 )
 
 data class BuyerUiState(val buyerList: List<String> = listOf())

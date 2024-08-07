@@ -270,10 +270,16 @@ fun WriteOffProductCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            val  image = if(writeOffTable.status == 0) {
+                R.drawable.baseline_cottage_24
+            }else {
+                R.drawable.baseline_delete_24
+            }
+
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
-                        painter = painterResource(id = writeOffTable.status),
+                        painter = painterResource(id = image),
                         contentDescription = "delete",
                         modifier = Modifier
                             .padding(6.dp)
@@ -290,6 +296,14 @@ fun WriteOffProductCard(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp
                         )
+                        if (writeOffTable.note != "") {
+                            Text(
+                                text = "Примечание: ${writeOffTable.note}",
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .padding(vertical = 3.dp, horizontal = 6.dp)
+                            )
+                        }
                         Text(
                             text = "Дата: ${
                                 String.format(

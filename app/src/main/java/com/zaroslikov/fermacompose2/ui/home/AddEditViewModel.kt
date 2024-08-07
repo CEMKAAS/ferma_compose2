@@ -93,13 +93,14 @@ data class AddTableUiState(
     var suffix: String = "",
     var category: String = "",
     var animal: String = "",
-    val idPT: Int = 0,
+    val note:String = "",
+    val idPT: Int = 0
 )
 
 fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll, suffix, category, animal, idPT
+    id, title, count.toString(), day, mount, year, priceAll, suffix, category, animal,note, idPT
 )
 
 fun AddTableUiState.toAddTable(): AddTable = AddTable(
-    id, title, count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), day, mount, year, priceAll, suffix, category, animal, idPT
+    id, title, count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), day, mount, year, priceAll, suffix, category, animal,note, idPT,
 )

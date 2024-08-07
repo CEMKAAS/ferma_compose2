@@ -67,6 +67,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 
 
@@ -123,6 +124,13 @@ fun AddIncubatorTwo(
                     viewModel.saveIncubator(
                         setIdPT(it, idPT)
                     )
+                    val eventParameters: MutableMap<String, Any> = HashMap()
+                    eventParameters["Имя"] = projectIncubatorList.title
+                    eventParameters["Тип"] = projectIncubatorList.typeBirds
+                    eventParameters["Кол-во"] = projectIncubatorList.count
+                    eventParameters["АвтоОхл"] = projectIncubatorList.checkedStateAiring
+                    eventParameters["АвтоПрев"] = projectIncubatorList.checkedStateAiring
+                    AppMetrica.reportEvent("Incubator", eventParameters);
 
                     navController.navigate(StartDestination.route)
                     (activity as MainActivity)?.showAd()
@@ -298,7 +306,6 @@ fun AddIncubatorTwoContainer(
             Row(
                 modifier = Modifier
                     .height(40.dp)
-                    .background(color = Color(red = 238, green = 243, blue = 220))
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {

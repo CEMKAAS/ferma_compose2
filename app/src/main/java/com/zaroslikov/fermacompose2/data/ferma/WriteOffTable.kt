@@ -33,6 +33,7 @@ data class WriteOffTable (
 
     val priceAll: Double,
     var suffix: String,
+    val note : String,
     @ColumnInfo(name = "idPT")
     val idPT: Int,
 )

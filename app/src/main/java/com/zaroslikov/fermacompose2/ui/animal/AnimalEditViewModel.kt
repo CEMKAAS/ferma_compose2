@@ -52,7 +52,7 @@ class AnimalEditViewModel(
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteAnimalTable(animaEditUiState.id)
+        itemsRepository.deleteAnimalTable(animaEditUiState.toAnimalTable())
     }
 
     companion object {

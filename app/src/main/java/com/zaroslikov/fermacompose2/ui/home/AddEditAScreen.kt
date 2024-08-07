@@ -365,7 +365,7 @@ fun AddEditContainerProduct(
                     value = addTable.animal,
                     onValueChange = {},
                     readOnly = true,
-                    label = {Text(text = "Животное") },
+                    label = { Text(text = "Животное") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
                     supportingText = {
                         Text("Выберите животное, которое принесло товар")
@@ -430,6 +430,35 @@ fun AddEditContainerProduct(
                 )
             }
         }
+
+        OutlinedTextField(
+            value = addTable.note,
+            onValueChange = {
+                onValueChange(
+                    addTable.copy(
+                        note = it
+                    )
+                )
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }
+            )
+        )
 
         OutlinedTextField(
             value = formattedDate,

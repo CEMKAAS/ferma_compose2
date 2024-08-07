@@ -53,6 +53,7 @@ data class SaleTable(
     var suffix: String,
     var category: String,
     val buyer : String,
+    val note : String,
     @ColumnInfo(name = "idPT")
     val idPT: Int
 )

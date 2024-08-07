@@ -278,6 +278,14 @@ fun AddProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
+                if (addProduct.note != "") {
+                    Text(
+                        text = "Примечание: ${addProduct.note}",
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(vertical = 3.dp, horizontal = 6.dp)
+                    )
+                }
                 Text(
                     text = "Дата: ${String.format("%02d.%02d.%d", addProduct.day, addProduct.mount,addProduct.year)}",
                     textAlign = TextAlign.Center,

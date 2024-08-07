@@ -73,7 +73,7 @@ object AnimalEditDestination : NavigationDestination {
 fun AnimalEditProduct(
     navigateBack: () -> Unit,
     navigateEdit: () -> Unit,
-    navigateDelete: () -> Unit,
+    navigateDelete: (String) -> Unit,
     viewModel: AnimalEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -95,15 +95,17 @@ fun AnimalEditProduct(
             typeList = typeEditUiState.value.titleList,
             onValueChange = viewModel::updateUiState,
             saveInRoomSale = {
-                coroutineScope.launch {
-                    viewModel.saveItem()
-                    navigateEdit()
+                if (it) {
+                    coroutineScope.launch {
+                        viewModel.saveItem()
+                        navigateEdit()
+                    }
                 }
             },
             deleteInRoom = {
                 coroutineScope.launch {
                     viewModel.deleteItem()
-                    navigateDelete()
+                    navigateDelete(it)
                 }
             }
         )
@@ -117,8 +119,8 @@ fun AnimalEditContainer(
     modifier: Modifier,
     typeList: List<String>,
     onValueChange: (AnimalEditUiState) -> Unit = {},
-    saveInRoomSale: () -> Unit,
-    deleteInRoom: () -> Unit
+    saveInRoomSale: (Boolean) -> Unit,
+    deleteInRoom: (String) -> Unit
 ) {
     val sexList = arrayListOf("Мужской", "Женский")
 
@@ -285,7 +287,8 @@ fun AnimalEditContainer(
                 .fillMaxWidth()
                 .clickable {
                     openDialog = true
-                }.padding(vertical = 10.dp)
+                }
+                .padding(vertical = 10.dp)
         )
 
         Text(
@@ -415,12 +418,7 @@ fun AnimalEditContainer(
         )
 
         Button(
-            onClick = {
-                if (errorBoolean()) {
-                    saveInRoomSale(
-                    )
-                }
-            },
+            onClick = { saveInRoomSale(errorBoolean())},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 15.dp)
@@ -433,7 +431,7 @@ fun AnimalEditContainer(
         }
 
         OutlinedButton(
-            onClick = deleteInRoom,
+            onClick = { deleteInRoom(animalEditUiState.idPT.toString()) },
             modifier = Modifier
                 .fillMaxWidth()
         ) {

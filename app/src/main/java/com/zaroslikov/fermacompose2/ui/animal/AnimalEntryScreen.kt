@@ -59,6 +59,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -424,6 +425,7 @@ fun AnimalEntryContainer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 10.dp),
+                suffix = { Text(text = "м.") },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Number,
@@ -526,6 +528,10 @@ fun AnimalEntryContainer(
                                 )
                             )
                         )
+                        val eventParameters: MutableMap<String, Any> = HashMap()
+                        eventParameters["Имя"] = title
+                        eventParameters["Тип"] = type
+                        AppMetrica.reportEvent("Animal", eventParameters);
                     }
                 },
                 modifier = Modifier

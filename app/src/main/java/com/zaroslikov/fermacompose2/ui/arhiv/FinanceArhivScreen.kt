@@ -81,14 +81,7 @@ fun FinanceArhivScreen(
                 title = project.titleProject,
                 navigateUp = navigateToBack
             )
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         FinanceBody(
             currentBalance = currentBalance,
@@ -160,18 +153,20 @@ private fun FinanceBody(
             color = Color.Gray,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 10.dp)
+                .padding(bottom = 6.dp)
         )
         FinanceCard(
             projectTable = projectState, modifier = Modifier
-                .padding(5.dp)
+                .padding(horizontal = 4.dp, vertical = 8.dp)
         )
 
-        Row {
+        Row(modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
             Card(
+                elevation = CardDefaults.cardElevation(10.dp),
+                colors = CardDefaults.cardColors(),
                 onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, true)) },
                 modifier = Modifier
-                    .padding(2.dp)
+                    .padding(end = 2.dp)
                     .fillMaxWidth(0.5f),
             ) {
                 Text(
@@ -196,8 +191,10 @@ private fun FinanceBody(
             Card(
                 onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, false)) },
                 modifier = Modifier
-                    .padding(2.dp)
-                    .fillMaxWidth(1f)
+                    .padding(start = 2.dp)
+                    .fillMaxWidth(1f),
+                elevation = CardDefaults.cardElevation(10.dp),
+                colors = CardDefaults.cardColors(),
             ) {
                 Text(
                     text = "Расход",
@@ -223,7 +220,7 @@ private fun FinanceBody(
         animalList.forEach {
             AnimalCard(
                 animalTable = it, modifier = Modifier
-                    .padding(8.dp)
+                    .padding(4.dp)
             )
         }
 
@@ -232,7 +229,7 @@ private fun FinanceBody(
                 onValueChange(projectState.copy(arhive = "0"))
                 unarchive()
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(top = 15.dp)
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_unarchive_24),

@@ -254,6 +254,14 @@ fun ExpensesCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
+                if (expensesTable.note != "") {
+                    Text(
+                        text = "Примечание: ${expensesTable.note}",
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(vertical = 3.dp, horizontal = 6.dp)
+                    )
+                }
                 Text(
                     text = "Дата: ${
                         String.format(

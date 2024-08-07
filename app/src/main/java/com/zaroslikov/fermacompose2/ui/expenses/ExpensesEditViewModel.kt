@@ -86,10 +86,11 @@ data class ExpensesTableUiState(
     val idPT: Int = 0,
     var suffix: String = "",
     var category: String = "",
+    val note:String = ""
 )
 
 fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category
+    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category, note
 )
 
 fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
@@ -102,6 +103,7 @@ fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
     priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     suffix = suffix,
     category = category,
+    note = note,
     idPT = idPT
 )
 

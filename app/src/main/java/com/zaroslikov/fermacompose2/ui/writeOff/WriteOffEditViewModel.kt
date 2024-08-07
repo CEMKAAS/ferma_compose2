@@ -79,11 +79,12 @@ data class WriteOffTableUiState(
     val priceAll: String = "",
     val idPT: Int = 0,
     var suffix: String = "",
-    val status: Int = 0
+    val status: Int = 0,
+    val note:String = ""
 )
 
 fun WriteOffTable.toWriteOffTableUiState(): WriteOffTableUiState = WriteOffTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, status
+    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, status, note
 )
 
 fun WriteOffTableUiState.toWriteOffTable(): WriteOffTable = WriteOffTable(
@@ -96,6 +97,7 @@ fun WriteOffTableUiState.toWriteOffTable(): WriteOffTable = WriteOffTable(
     priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     suffix = suffix,
     status = status,
-    idPT = idPT
+    idPT = idPT,
+    note= note
 )
 

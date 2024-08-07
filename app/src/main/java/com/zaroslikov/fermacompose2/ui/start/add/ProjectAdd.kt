@@ -42,6 +42,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -66,14 +67,7 @@ fun AddProject(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Проект", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        },
+        }
     ) { innerPadding ->
         AddProjectContainer(
             number = viewModel.countProject(),
@@ -116,11 +110,10 @@ fun AddProjectContainer(
         isErrorTitle = text == ""
     }
 
+
     //Текст
     var name by remember {
-        mutableStateOf(
-            "Мое Хозяйство"
-        )
+        mutableStateOf("")
     }
     var date1 by remember { mutableStateOf(formattedDate) }
 
@@ -130,6 +123,12 @@ fun AddProjectContainer(
             openDialog = false
         }
     }
+    fun errorBoolean(): Boolean {
+        isErrorTitle = name == ""
+        return !(isErrorTitle)
+    }
+
+
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 
@@ -229,7 +228,7 @@ fun AddProjectContainer(
 
         Button(
             onClick = {
-                if (!isErrorTitle) {
+                if (errorBoolean()) {
 
                     navigateToStart(
                         ProjectTable(
@@ -249,7 +248,9 @@ fun AddProjectContainer(
                             mode = 1
                         )
                     )
-
+                    val eventParameters: MutableMap<String, Any> = HashMap()
+                    eventParameters["Имя"] = name
+                    AppMetrica.reportEvent("Project", eventParameters);
                 }
             },
             modifier = Modifier

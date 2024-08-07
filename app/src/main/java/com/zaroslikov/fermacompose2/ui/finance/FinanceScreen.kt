@@ -104,14 +104,7 @@ fun FinanceScreen(
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
-            },
-//            bottomBar = {
-//                Banner(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                )
-//            }
+            }
         ) { innerPadding ->
             FinanceBody(
                 currentBalance = currentBalance,
@@ -154,7 +147,7 @@ private fun FinanceBody(
         Text(
             text = "${formatter(currentBalance)} ₽",
             textAlign = TextAlign.Start,
-            fontSize = 25.sp,
+            fontSize = 28.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 2.dp),
@@ -163,7 +156,7 @@ private fun FinanceBody(
         Text(
             text = "Текущий баланс",
             textAlign = TextAlign.Start,
-            fontSize = 8.sp,
+            fontSize = 10.sp,
             color = Color.Gray,
             modifier = Modifier
                 .fillMaxWidth()
@@ -345,6 +338,7 @@ fun CardRow(
         Text(
             text = fin.category, textAlign = TextAlign.Start,
             fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(5.dp),
@@ -354,7 +348,7 @@ fun CardRow(
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(5.dp),
         )
     }
 }
@@ -380,7 +374,7 @@ fun TransactionRow(
                     .wrapContentSize()
                     .padding(6.dp),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 12.sp
+                fontSize = 14.sp
             )
             Text(
                 text = String.format("%02d.%02d.%d", incomeExpensesDetails.day, incomeExpensesDetails.mount,incomeExpensesDetails.year),
@@ -388,7 +382,7 @@ fun TransactionRow(
                 fontSize = 12.sp,
                 modifier = Modifier
                     .wrapContentSize()
-                    .padding(vertical = 3.dp, horizontal = 6.dp)
+                    .padding(vertical = 1.dp, horizontal = 6.dp)
             )
         }
         if (!incomeExpensesDetails.priceAll.toString().contains("-")) {
@@ -396,7 +390,7 @@ fun TransactionRow(
                 text = "${formatter(incomeExpensesDetails.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(6.dp)
+                    .padding(3.dp)
                     .fillMaxWidth(1f),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp,
@@ -407,7 +401,7 @@ fun TransactionRow(
                 text = "${formatter(incomeExpensesDetails.priceAll)} ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(6.dp)
+                    .padding(3.dp)
                     .fillMaxWidth(1f),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp,

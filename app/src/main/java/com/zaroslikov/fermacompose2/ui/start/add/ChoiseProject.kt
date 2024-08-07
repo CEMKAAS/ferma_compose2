@@ -47,14 +47,7 @@ fun ChoiseProject(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Выбор проекта", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         ChooiseProjectContainer(
             modifier = Modifier
@@ -77,7 +70,7 @@ fun ChooiseProjectContainer(
             R.drawable.chicken, "Инкубатор", AddIncubatorDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_warehouse_24, "Хозяйство", ProjectAddDestination.route
+            R.drawable.livestock, "Хозяйство", ProjectAddDestination.route
         ),
     )
 

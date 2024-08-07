@@ -46,6 +46,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,6 +56,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -81,14 +83,7 @@ fun WriteOffEntryProduct(
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Добавить Списания", navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
 
         WriteOffEntryContainerProduct(
@@ -110,7 +105,8 @@ fun WriteOffEntryProduct(
                             priceAll = it.priceAll,
                             suffix = it.suffix,
                             status = it.status,
-                            idPT = idProject
+                            idPT = idProject,
+                            note = it.note
                         )
                     )
                     Toast.makeText(
@@ -137,6 +133,7 @@ fun WriteOffEntryContainerProduct(
     var state by remember { mutableStateOf(true) }
     var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("0") }
+    var note by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
@@ -302,14 +299,30 @@ fun WriteOffEntryContainerProduct(
             )
         )
 
+        OutlinedTextField(
+            value = note,
+            onValueChange = {
+                note = it
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+
 
         Column(
             Modifier
                 .selectableGroup()
                 .fillMaxWidth()
                 .padding(vertical = 10.dp),
-//            horizontalArrangement = Arrangement.Start,
-//            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -345,8 +358,8 @@ fun WriteOffEntryContainerProduct(
                     if (errorBoolean()) {
                         val calendar = Calendar.getInstance()
 
-                        val status = if (state) R.drawable.baseline_cottage_24
-                        else R.drawable.baseline_delete_24
+                        val status = if (state) 0
+                        else 1
 
                         saveInRoomSale(
                             WriteOffTableInsert(
@@ -360,9 +373,16 @@ fun WriteOffEntryContainerProduct(
                                 suffix = suffix,
                                 priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
                                     .toDouble(),
-                                status = status
-                            )
+                                status = status,
+                                note = note
+                                )
                         )
+                        val eventParameters: MutableMap<String, Any> = HashMap()
+                        eventParameters["Имя"] = title
+                        eventParameters["Кол-во"] = "$title $count $suffix $priceAll₽"
+                        eventParameters["Статус"] = status
+                        eventParameters["Примечание"] = note
+                        AppMetrica.reportEvent("WriteOff Products", eventParameters);
                     }
                 },
                 modifier = Modifier
@@ -385,6 +405,7 @@ data class WriteOffTableInsert(
     var year: Int,
     var status: Int,
     var priceAll: Double,
-    var suffix: String
+    var suffix: String,
+    var note:String
 )
 

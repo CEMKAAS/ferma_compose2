@@ -358,7 +358,7 @@ fun InfoBottomSheet(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
             Text(
-                text = "Это отличный способ быть в курсе всех новостей, делиться своими впечатлениями и предлагать идеи для улучшения нашего приложения. Давайте вместе сделаем Ваше хозяйство ещё лучше!",
+                text = "Это отличный способ быть в курсе всех новостей, делиться своими впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство ещё лучше!",
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 20.sp,
                 textAlign = TextAlign.Justify
@@ -484,7 +484,7 @@ fun CardFerma(
         colors = CardDefaults.cardColors()
     ) {
         Image(
-            painter = painterResource(id = R.drawable.baseline_warehouse_24),
+            painter = painterResource(id = R.drawable.livestock),
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier.size(194.dp),

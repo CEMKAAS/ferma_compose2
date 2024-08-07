@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -54,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -62,6 +65,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -90,7 +94,7 @@ fun IncubatorScreen(
     val projectState by viewModel.homeUiState.collectAsState()
     val project = viewModel.itemUiState
     val projectList by viewModel.projectListAct.collectAsState()
-
+    val activity = LocalContext.current as Activity
     val coroutineScope = rememberCoroutineScope()
 
     // В приниципе все только доделать переход
@@ -133,12 +137,14 @@ fun IncubatorScreen(
                     viewModel.saveItem()
                     viewModel.saveProject(it.animalTable, it.count)
                     navigateStart()
+                    (activity as MainActivity)?.showAd()
                 }
             },
             saveInNewProject = {
                 coroutineScope.launch {
                     viewModel.saveNewProject(it.animalTable, it.count)
                     navigateStart()
+                    (activity as MainActivity)?.showAd()
                 }
             },
             save = {
@@ -526,6 +532,12 @@ fun EndIncubator(
                                                 ), count = projectTable.eggAllEND
                                             )
                                         )
+                                        val eventParameters: MutableMap<String, Any> = HashMap()
+                                        eventParameters["Тип"] = projectTable.type
+                                        eventParameters["Кол-во"] = "${projectTable.eggAll} ${projectTable.eggAllEND}"
+                                        eventParameters["В Проект"] = "Да"
+                                        AppMetrica.reportEvent("End Incubator", eventParameters);
+
                                     }
                                 },
                                 modifier = Modifier.padding(4.dp),
@@ -564,6 +576,12 @@ fun EndIncubator(
                                             projectTable.eggAllEND
                                         )
                                     )
+                                    val eventParameters: MutableMap<String, Any> = HashMap()
+                                    eventParameters["Тип"] = projectTable.type
+                                    eventParameters["Кол-во"] = "${projectTable.eggAll} ${projectTable.eggAllEND}"
+                                    eventParameters["В Проект"] = "Новый"
+                                    AppMetrica.reportEvent("End Incubator", eventParameters);
+
                                 }
                             },
                             modifier = Modifier.padding(4.dp),

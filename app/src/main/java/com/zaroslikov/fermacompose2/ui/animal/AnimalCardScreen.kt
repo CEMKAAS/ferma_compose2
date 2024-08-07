@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
-import android.graphics.Paint.Align
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +25,6 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -48,19 +46,19 @@ fun AnimalCardProduct(
     onNavigateIndicators: (AnimalIndicators) -> Unit,
     viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val animalTable = viewModel.animalState2.collectAsState()
+    val animalTable = viewModel.itemUiState
     val size = viewModel.sizeState.collectAsState()
     val count = viewModel.countState.collectAsState()
     val weight = viewModel.weightState.collectAsState()
     val vaccination = viewModel.vaccinationState.collectAsState()
-    val product = viewModel.productState(animalTable.value.animalTable2.name).collectAsState()
+    val product = viewModel.productState(animalTable.name).collectAsState()
 
     Scaffold(topBar = {
         TopAppBarStart(
-            title = animalTable.value.animalTable2.name,
+            title = animalTable.name,
             true,
             navigateUp = navigateBack,
-            settingUp = { onNavigateSetting(animalTable.value.animalTable2.id) }
+            settingUp = { onNavigateSetting(animalTable.id) }
         )
     }) { innerPadding ->
         AnimalCardContainer(
@@ -68,7 +66,7 @@ fun AnimalCardProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            animalTable = animalTable.value.animalTable2,
+            animalTable = animalTable,
             animalWeightTable = weight.value.itemList,
             animalSizeTable = size.value.itemList,
             animalCountTable = count.value.itemList,
@@ -82,7 +80,7 @@ fun AnimalCardProduct(
 @Composable
 fun AnimalCardContainer(
     modifier: Modifier,
-    animalTable: AnimalTable,
+    animalTable: AnimalEditUiState,
     animalWeightTable: List<AnimalWeightTable>,
     animalSizeTable: List<AnimalSizeTable>,
     animalCountTable: List<AnimalCountTable>,
@@ -233,7 +231,7 @@ fun AnimalCardContainer(
                         )
                         Text(
                             text = it.date,
-                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 8.dp),
+                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 15.dp),
                             textAlign = TextAlign.End
                         )
                     }
@@ -267,7 +265,7 @@ fun AnimalCardContainer(
                         )
                         Text(
                             text = "${formatter(it.priceAll)} ${it.suffix}",
-                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 8.dp),
+                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 15.dp),
                             textAlign = TextAlign.End
                         )
                     }

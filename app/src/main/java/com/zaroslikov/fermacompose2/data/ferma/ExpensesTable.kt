@@ -33,6 +33,7 @@ data class ExpensesTable(
 
     var suffix: String,
     var category: String,
+    val note : String,
     @ColumnInfo(name = "idPT")
     val idPT: Int,
 )

@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.home
 
-import android.graphics.drawable.Icon
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -50,8 +48,8 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -107,7 +105,8 @@ fun AddEntryProduct(
                             suffix = it.suffix,
                             category = it.category,
                             animal = it.anaimal,
-                            idPT = idProject
+                            idPT = idProject,
+                            note = it.note
                         )
 
                     )
@@ -137,6 +136,7 @@ fun AddEntryContainerProduct(
     var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Шт.") }
     var animal by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
@@ -301,9 +301,14 @@ fun AddEntryContainerProduct(
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
+                    trailingIcon = {
+                        IconButton(onClick = { category = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Text,
                         capitalization = KeyboardCapitalization.Sentences
                     ),
                     keyboardActions = KeyboardActions(onNext = {
@@ -358,9 +363,15 @@ fun AddEntryContainerProduct(
                         Text("Выберите животное, которое принесло товар")
                     },
                     keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Text,
                         capitalization = KeyboardCapitalization.Sentences
                     ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    }),
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
@@ -390,6 +401,24 @@ fun AddEntryContainerProduct(
             }
         }
 
+        OutlinedTextField(
+            value = note,
+            onValueChange = {
+                note = it
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -412,9 +441,17 @@ fun AddEntryContainerProduct(
                                 suffix = suffix,
                                 category = category,
                                 anaimal = animal,
-                                priceAll = 0.0
+                                priceAll = 0.0,
+                                note = note
                             )
                         )
+                        val eventParameters: MutableMap<String, Any> = HashMap()
+                        eventParameters["Имя"] = title
+                        eventParameters["Кол-во"] = "$title $count"
+                        eventParameters["Категория"] = category
+                        eventParameters["Животное"] = animal
+                        eventParameters["Примечание"] = note
+                        AppMetrica.reportEvent("Add Products", eventParameters);
                     }
                 },
                 modifier = Modifier
@@ -438,6 +475,7 @@ data class AddTableInsert(
     var priceAll: Double,
     var suffix: String,
     var category: String,
-    var anaimal: String
+    var anaimal: String,
+    var note: String
 )
 

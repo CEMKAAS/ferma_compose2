@@ -21,6 +21,8 @@ import android.app.Application
 import com.yandex.mobile.ads.common.MobileAds
 import com.zaroslikov.fermacompose2.data.AppContainer
 import com.zaroslikov.fermacompose2.data.AppDataContainer
+import io.appmetrica.analytics.AppMetrica
+import io.appmetrica.analytics.AppMetricaConfig
 
 class InventoryApplication : Application() {
 
@@ -31,6 +33,9 @@ class InventoryApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        val config =
+            AppMetricaConfig.newConfigBuilder("7bc20e66-fc56-4002-ac33-4cc15dd28213").build()
+        AppMetrica.activate(this, config)
         MobileAds.initialize(this) {  }
         container = AppDataContainer(this)
 

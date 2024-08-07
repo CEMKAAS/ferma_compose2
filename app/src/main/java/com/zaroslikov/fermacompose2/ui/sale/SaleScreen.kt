@@ -287,7 +287,14 @@ fun SaleProductCard(
                             .padding(vertical = 3.dp, horizontal = 6.dp)
                     )
                 }
-
+                if (saleTable.note != "") {
+                    Text(
+                        text = "Примечание: ${saleTable.note}",
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(vertical = 3.dp, horizontal = 6.dp)
+                    )
+                }
                 Text(
                     text = "Дата: ${
                         String.format(

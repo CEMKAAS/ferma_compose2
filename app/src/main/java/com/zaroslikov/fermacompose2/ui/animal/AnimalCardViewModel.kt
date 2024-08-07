@@ -1,5 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,10 +12,16 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
+import com.zaroslikov.fermacompose2.ui.incubator.toIncubatorProjectState
+import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class AnimalCardViewModel(
     savedStateHandle: SavedStateHandle,
@@ -22,13 +31,13 @@ class AnimalCardViewModel(
     val itemId: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
 
 
-   val animalState2: StateFlow<AnimalCardUiState23> =
-        itemsRepository.getAnimal(itemId).map { AnimalCardUiState23(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalCardUiState23()
-            )
+//   val animalState2: StateFlow<AnimalCardUiState23> =
+//        itemsRepository.getAnimal(itemId).map { AnimalCardUiState23(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = AnimalCardUiState23()
+//            )
 
     val countState: StateFlow<AnimalCoutUiStateLimit> =
         itemsRepository.getCountAnimalLimit(itemId).map { AnimalCoutUiStateLimit(it) }
@@ -72,6 +81,22 @@ class AnimalCardViewModel(
                 initialValue = AnimalProductCardUiStateLimit()
             )
     }
+
+    var itemUiState by mutableStateOf(AnimalEditUiState())
+        private set
+
+    init {
+        viewModelScope.launch {
+            itemUiState = itemsRepository.getAnimal(itemId)
+                .filterNotNull()
+                .first()
+                .toAnimaEditUiState()
+        }
+    }
+
+
+
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
