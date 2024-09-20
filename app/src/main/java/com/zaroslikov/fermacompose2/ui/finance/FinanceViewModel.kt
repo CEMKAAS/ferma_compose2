@@ -24,6 +24,11 @@ class FinanceViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[FinanceDestination.itemIdArg])
 
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val month = calendar[Calendar.MONTH] + 1
+    val year = calendar[Calendar.YEAR]
+
+
     var currentBalanceUiState by mutableDoubleStateOf(0.00)
         private set
 
@@ -32,6 +37,12 @@ class FinanceViewModel(
 
     var expensesUiState by mutableDoubleStateOf(0.00)
         private set
+
+    var incomeMountUiState by mutableDoubleStateOf(0.00)
+        private set
+    var expensesMountUiState by mutableDoubleStateOf(0.00)
+        private set
+
 
     init {
         viewModelScope.launch {
@@ -49,27 +60,19 @@ class FinanceViewModel(
                 .filterNotNull()
                 .first().toDouble()
         }
+
+        viewModelScope.launch {
+            incomeMountUiState = itemsRepository.getIncomeMount(itemId, month, year)
+                .filterNotNull()
+                .first().toDouble()
+        }
+        viewModelScope.launch {
+            expensesMountUiState = itemsRepository.getExpensesMount(itemId, month, year)
+                .filterNotNull()
+                .first().toDouble()
+        }
+
     }
-
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val month = calendar[Calendar.MONTH] + 1
-    val year = calendar[Calendar.YEAR]
-
-    val incomeCategoryUiState: StateFlow<IncomeCategoryUiState> =
-        itemsRepository.getCategoryIncomeCurrentMonth(itemId,month,year).map {IncomeCategoryUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncomeCategoryUiState()
-            )
-
-    val expensesCategoryUiState: StateFlow<IncomeCategoryUiState> =
-        itemsRepository.getCategoryExpensesCurrentMonth(itemId,month,year).map { IncomeCategoryUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = IncomeCategoryUiState()
-            )
 
     val incomeExpensesUiState: StateFlow<IncomeExpensesCategoryUiState> =
         itemsRepository.getIncomeExpensesCurrentMonth(itemId,month,year).map { IncomeExpensesCategoryUiState(it) }

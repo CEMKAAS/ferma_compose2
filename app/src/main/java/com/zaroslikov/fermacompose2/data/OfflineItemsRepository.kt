@@ -129,6 +129,9 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentBalance(id: Int): Flow<Double> = itemDao.getCurrentBalance(id)
     override fun getIncome(id: Int): Flow<Double> = itemDao.getIncome(id)
     override fun getExpenses(id: Int): Flow<Double> = itemDao.getExpenses(id)
+    override fun getIncomeMount(id: Int, mount: Int, year: Int): Flow<Double> = itemDao.getIncomeMount(id, mount,year)
+    override fun getExpensesMount(id: Int, mount: Int, year: Int): Flow<Double> = itemDao.getExpensesMount(id, mount,year)
+
     override fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>> =
         itemDao.getCategoryIncomeCurrentMonth(id, mount, year)
 

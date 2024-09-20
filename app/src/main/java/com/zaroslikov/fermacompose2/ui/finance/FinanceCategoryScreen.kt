@@ -63,14 +63,7 @@ fun FinanceCategoryScreen(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarEdit(title = viewModel.itemCategory, navigateUp = navigateBack)
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
+        }
     ) { innerPadding ->
         FinanceCategoryBody(
             itemList = financeCategoryState.itemList,

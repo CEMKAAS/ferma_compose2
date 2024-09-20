@@ -131,6 +131,10 @@ interface ItemsRepository {
     fun getCurrentBalance(id: Int): Flow<Double>
     fun getIncome(id: Int): Flow<Double>
     fun getExpenses(id: Int): Flow<Double>
+
+    fun getIncomeMount(id: Int, mount: Int, year:Int): Flow<Double>
+    fun getExpensesMount(id: Int, mount: Int, year:Int): Flow<Double>
+
     fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
     fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
     fun getIncomeExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<IncomeExpensesDetails>>

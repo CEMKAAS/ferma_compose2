@@ -62,7 +62,7 @@ object FinanceDestination : NavigationDestination {
 fun FinanceScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToCategory: (FinanceCategoryData) -> Unit,
+    navigateToFinaceMount: (Int) -> Unit,
     navigateToIncomeExpenses: (FinanceIncomeExpensesData) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
@@ -74,13 +74,12 @@ fun FinanceScreen(
     val currentBalance = viewModel.currentBalanceUiState
     val income = viewModel.incomeUiState
     val expenses = viewModel.expensesUiState
+    val incomeMount = viewModel.incomeMountUiState
+    val expensesMount = viewModel.expensesMountUiState
 
-    val incomeRow by viewModel.incomeCategoryUiState.collectAsState()
-    val expensesRow by viewModel.expensesCategoryUiState.collectAsState()
     val incomeExpensesList by viewModel.incomeExpensesUiState.collectAsState()
 
     val idProject = viewModel.itemId
-    val showBottomSheetFilter = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -110,10 +109,10 @@ fun FinanceScreen(
                 currentBalance = currentBalance,
                 income = income,
                 expenses = expenses,
-                incomeRow = incomeRow.itemList,
-                expensesRow = expensesRow.itemList,
+                incomeMount = incomeMount,
+                expensesMount = expensesMount,
                 incomeExpensesList = incomeExpensesList.itemList,
-                navigateToCategory = navigateToCategory,
+                navigateToFinaceMount = navigateToFinaceMount,
                 navigateToIncomeExpenses = navigateToIncomeExpenses,
                 idPT = idProject,
                 modifier = modifier.fillMaxSize(),
@@ -129,10 +128,10 @@ private fun FinanceBody(
     currentBalance: Double,
     income: Double,
     expenses: Double,
-    incomeRow: List<Fin>,
-    expensesRow: List<Fin>,
+    incomeMount: Double,
+    expensesMount: Double,
     incomeExpensesList: List<IncomeExpensesDetails>,
-    navigateToCategory: (FinanceCategoryData) -> Unit,
+    navigateToFinaceMount: (Int) -> Unit,
     navigateToIncomeExpenses: (FinanceIncomeExpensesData) -> Unit,
     idPT: Int,
     modifier: Modifier = Modifier,
@@ -216,88 +215,42 @@ private fun FinanceBody(
             }
         }
 
-        if (expensesRow.isNotEmpty() && incomeRow.isEmpty()) {
+        Card(
+            onClick = { navigateToFinaceMount(idPT) },
+            modifier = Modifier
+                .padding(2.dp)
+                .fillMaxWidth(),
+        ) {
             Text(
-                text = "А где же доходы в этом месяце?",
-                textAlign = TextAlign.Start,
+                text = "Текущий месяц",
+                textAlign = TextAlign.Center,
                 fontSize = 15.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 5.dp),
+                    .padding(2.dp),
                 fontWeight = FontWeight.SemiBold
             )
-        } else if (incomeRow.isNotEmpty()) {
-            Text(
-                text = "Доходы в текущем месяце",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-            LazyRow {
-                items(items = incomeRow) {
-                    CardRow(it, modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            navigateToCategory(
-                                FinanceCategoryData(
-                                    idPT,
-                                    it.category,
-                                    true
-                                )
-                            )
-                        })
-                }
+            Row {
+                Text(
+                    text = "${formatter(incomeMount)} ₽",
+                    textAlign = TextAlign.Center,
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "${formatter(expensesMount)} ₽",
+                    textAlign = TextAlign.Center,
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    fontWeight = FontWeight.SemiBold
+                )
             }
-        } else {
-            Text(
-                text = "Доходов в этом месяце нет :(",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-        }
 
-        if (expensesRow.isNotEmpty()) {
-            Text(
-                text = "Расходы в текущем месяце",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-            LazyRow {
-                items(items = expensesRow) {
-                    CardRow(it, modifier = Modifier
-                        .padding(5.dp)
-                        .clickable {
-                            navigateToCategory(
-                                FinanceCategoryData(
-                                    idPT,
-                                    it.category,
-                                    false
-                                )
-                            )
-                        })
-                }
-            }
-        } else {
-            Text(
-                text = "Расходов в этом месяце нет (Это хорошо)",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
         }
 
         if (incomeExpensesList.isNotEmpty()) {
@@ -377,7 +330,12 @@ fun TransactionRow(
                 fontSize = 14.sp
             )
             Text(
-                text = String.format("%02d.%02d.%d", incomeExpensesDetails.day, incomeExpensesDetails.mount,incomeExpensesDetails.year),
+                text = String.format(
+                    "%02d.%02d.%d",
+                    incomeExpensesDetails.day,
+                    incomeExpensesDetails.mount,
+                    incomeExpensesDetails.year
+                ),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
                 modifier = Modifier

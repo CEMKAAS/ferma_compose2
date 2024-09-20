@@ -35,6 +35,7 @@ import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesViewModel
+import com.zaroslikov.fermacompose2.ui.finance.FinanceMountViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
@@ -132,6 +133,14 @@ object AppViewModelProvider {
                 inventoryApplication().container.itemsRepository
             )
         }
+
+        initializer {
+            FinanceMountViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
 
         initializer {
             FinanceCategoryViewModel(

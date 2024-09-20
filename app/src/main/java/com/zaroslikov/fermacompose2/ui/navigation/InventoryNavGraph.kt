@@ -51,6 +51,8 @@ import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesScreen
+import com.zaroslikov.fermacompose2.ui.finance.FinanceMountDestination
+import com.zaroslikov.fermacompose2.ui.finance.FinanceMountScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
 import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEditProduct
@@ -263,13 +265,27 @@ fun InventoryNavHost(
                 navController.navigate(StartDestination.route)
             }, navigateToModalSheet = {
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-            }, navigateToCategory = {
-                navController.navigate(
-                    "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}"
-                )
             }, navigateToIncomeExpenses = {
                 navController.navigate(
                     "${FinanceIncomeExpensesDestination.route}/${it.idPT}/${it.incomeBoolean}"
+                )
+            }, navigateToFinaceMount = {
+                navController.navigate(
+                    "${FinanceMountDestination.route}/${it}"
+                )
+            })
+        }
+
+        composable(
+            route = FinanceMountDestination.routeWithArgs,
+            arguments = listOf(navArgument(FinanceMountDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            FinanceMountScreen( navigateBack = { navController.popBackStack() },
+                navigateToCategory = {
+                navController.navigate(
+                    "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}"
                 )
             })
         }
