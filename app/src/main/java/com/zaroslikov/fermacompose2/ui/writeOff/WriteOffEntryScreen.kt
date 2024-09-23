@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.writeOff
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -56,9 +59,13 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.TimeZone
 
 object WriteOffEntryDestination : NavigationDestination {
     override val route = "WriteOffEntry"
@@ -157,6 +164,28 @@ fun WriteOffEntryContainerProduct(
         isErrorPrice = title == ""
         isErrorCount = count == ""
         return !(isErrorCount || isErrorPrice)
+    }
+
+    //Календарь
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val formattedDate: String = format.format(calendar.timeInMillis)
+
+    //Дата
+    var openDialog by remember { mutableStateOf(false) }
+
+    val stateDate = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = calendar.timeInMillis
+    )
+
+    var date1 by remember { mutableStateOf(formattedDate) }
+
+    if (openDialog) {
+        DatePickerDialogSample(stateDate, date1) { date ->
+            date1 = date
+            openDialog = false
+        }
     }
 
     Column(modifier = modifier) {
@@ -300,6 +329,30 @@ fun WriteOffEntryContainerProduct(
         )
 
         OutlinedTextField(
+            value = date1,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Дата") },
+            supportingText = {
+                Text("Выберите дату")
+            },
+            trailingIcon = {
+                IconButton(onClick = { openDialog = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp)
+                .clickable {
+                    openDialog = true
+                }
+        )
+
+        OutlinedTextField(
             value = note,
             onValueChange = {
                 note = it
@@ -356,7 +409,7 @@ fun WriteOffEntryContainerProduct(
             Button(
                 onClick = {
                     if (errorBoolean()) {
-                        val calendar = Calendar.getInstance()
+                        val formattedDateList = date1.split(".")
 
                         val status = if (state) 0
                         else 1
@@ -367,9 +420,9 @@ fun WriteOffEntryContainerProduct(
                                 title = title,
                                 count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
                                     .toDouble(),
-                                day = calendar[Calendar.DAY_OF_MONTH],
-                                mount = (calendar[Calendar.MONTH] + 1),
-                                year = calendar[Calendar.YEAR],
+                                formattedDateList[0].toInt(),
+                                formattedDateList[1].toInt(),
+                                formattedDateList[2].toInt(),
                                 suffix = suffix,
                                 priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
                                     .toDouble(),
