@@ -432,6 +432,30 @@ fun AddEditContainerProduct(
         }
 
         OutlinedTextField(
+            value = formattedDate,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Дата") },
+            supportingText = {
+                Text("Выберите дату ")
+            },
+            trailingIcon = {
+                IconButton(onClick = { openDialog = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+                .clickable {
+                    openDialog = true
+                }
+        )
+
+        OutlinedTextField(
             value = addTable.note,
             onValueChange = {
                 onValueChange(
@@ -458,30 +482,6 @@ fun AddEditContainerProduct(
                 )
             }
             )
-        )
-
-        OutlinedTextField(
-            value = formattedDate,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Дата") },
-            supportingText = {
-                Text("Выберите дату ")
-            },
-            trailingIcon = {
-                IconButton(onClick = { openDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-                .clickable {
-                    openDialog = true
-                }
         )
 
         Button(

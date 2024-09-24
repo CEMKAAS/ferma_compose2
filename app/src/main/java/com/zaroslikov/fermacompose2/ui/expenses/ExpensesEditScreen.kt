@@ -315,18 +315,18 @@ fun ExpensesEditContainerProduct(
                 onValueChange(expensesTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                 validatePrice(expensesTable.priceAll)
             },
-            label = { Text("Цена") },
+            label = { Text("Стоимость") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
-                        text = "Не указана цена за товар!",
+                        text = "Не указана стоимость за товар!",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите цену за купленный товар")
+                    Text("Укажите стоимость за купленный товар")
                 }
             },
             suffix = { Text(text = "₽") },
@@ -373,7 +373,6 @@ fun ExpensesEditContainerProduct(
                     }
                     )
                 )
-
                 val filteredOptions =
                     categoryList.filter { it.contains(expensesTable.category, ignoreCase = true) }
                 if (filteredOptions.isNotEmpty()) {
@@ -397,35 +396,6 @@ fun ExpensesEditContainerProduct(
                 }
             }
         }
-
-        OutlinedTextField(
-            value = expensesTable.note,
-            onValueChange = {
-                onValueChange(
-                    expensesTable.copy(
-                        note = it
-                    )
-                )
-            },
-            label = { Text("Примечание") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            supportingText = {
-                Text("Здесь может быть важная информация")
-
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
-                )
-            }
-            )
-        )
 
         var formattedDate = String.format("%02d.%02d.%d", expensesTable.day, expensesTable.mount, expensesTable.year)
 
@@ -471,6 +441,36 @@ fun ExpensesEditContainerProduct(
                 }
                 .padding(bottom = 10.dp),
         )
+
+        OutlinedTextField(
+            value = expensesTable.note,
+            onValueChange = {
+                onValueChange(
+                    expensesTable.copy(
+                        note = it
+                    )
+                )
+            },
+            label = { Text("Примечание") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                Text("Здесь может быть важная информация")
+
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }
+            )
+        )
+
 
         Button(
             onClick = { saveInRoomAdd(errorBoolean()) },

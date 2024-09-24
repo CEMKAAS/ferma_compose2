@@ -280,12 +280,12 @@ fun WriteOffEditContainerProduct(
             onValueChange = {
                 onValueChange(writeOffTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
             },
-            label = { Text("Цена") },
+            label = { Text("Стоимость") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp),
             supportingText = {
-                Text("Укажите цену за списанный товар")
+                Text("Укажите стоимость за списанный товар")
             },
             suffix = { Text(text = "₽") },
             keyboardOptions = KeyboardOptions(
@@ -298,6 +298,51 @@ fun WriteOffEditContainerProduct(
                 )
             }
             )
+        )
+
+        var formattedDate = String.format("%02d.%02d.%d", writeOffTable.day, writeOffTable.mount, writeOffTable.year)
+
+        if (openDialog) {
+            val datePickerState = rememberDatePickerState(
+                selectableDates = PastOrPresentSelectableDates,
+                initialSelectedDateMillis = dateLong(formattedDate)
+            )
+            DatePickerDialogSample(datePickerState, formattedDate) { date ->
+                formattedDate = date
+                openDialog = false
+                val formattedDateList = formattedDate.split(".")
+                onValueChange(
+                    writeOffTable.copy(
+                        day = formattedDateList[0].toInt(),
+                        mount = formattedDateList[1].toInt(),
+                        year = formattedDateList[2].toInt()
+                    )
+                )
+            }
+        }
+
+        OutlinedTextField(
+            value = formattedDate,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Дата") },
+            supportingText = {
+                Text("Выберите дату ")
+            },
+            trailingIcon = {
+                IconButton(onClick = { openDialog = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+                .clickable {
+                    openDialog = true
+                },
         )
 
         OutlinedTextField(
@@ -372,51 +417,6 @@ fun WriteOffEditContainerProduct(
                 Text(text = "На утилизацию")
             }
         }
-
-        var formattedDate = String.format("%02d.%02d.%d", writeOffTable.day, writeOffTable.mount, writeOffTable.year)
-
-        if (openDialog) {
-            val datePickerState = rememberDatePickerState(
-                selectableDates = PastOrPresentSelectableDates,
-                initialSelectedDateMillis = dateLong(formattedDate)
-            )
-            DatePickerDialogSample(datePickerState, formattedDate) { date ->
-                formattedDate = date
-                openDialog = false
-                val formattedDateList = formattedDate.split(".")
-                onValueChange(
-                    writeOffTable.copy(
-                        day = formattedDateList[0].toInt(),
-                        mount = formattedDateList[1].toInt(),
-                        year = formattedDateList[2].toInt()
-                    )
-                )
-            }
-        }
-
-        OutlinedTextField(
-            value = formattedDate,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Дата") },
-            supportingText = {
-                Text("Выберите дату ")
-            },
-            trailingIcon = {
-                IconButton(onClick = { openDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-                .clickable {
-                    openDialog = true
-                },
-        )
 
         Button(
             onClick = { saveInRoomAdd(errorBoolean()) },

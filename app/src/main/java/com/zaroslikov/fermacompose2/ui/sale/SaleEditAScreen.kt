@@ -249,7 +249,7 @@ fun SaleEditContainerProduct(
                             color = MaterialTheme.colorScheme.error
                         )
                     } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                        Text("Укажите кол-во товара, которое хотите продать со склада")
                     }
                 },
                 trailingIcon = {
@@ -305,18 +305,18 @@ fun SaleEditContainerProduct(
                 onValueChange(saleTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                 validatePrice(saleTable.priceAll)
             },
-            label = { Text("Цена") },
+            label = { Text("Стоимость") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
-                        text = "Не указана цена за товар!",
+                        text = "Не указана стоимость за товар!",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите цену за проданный товар")
+                    Text("Укажите стоимость за проданный товар")
                 }
             },
             suffix = { Text(text = "₽") },
@@ -387,6 +387,49 @@ fun SaleEditContainerProduct(
                 }
             }
         }
+
+        var formattedDate = String.format("%02d.%02d.%d", saleTable.day, saleTable.mount, saleTable.year)
+
+        if (openDialog) {
+            val datePickerState = rememberDatePickerState(
+                selectableDates = PastOrPresentSelectableDates,
+                initialSelectedDateMillis = dateLong(formattedDate)
+            )
+            DatePickerDialogSample(datePickerState, formattedDate) { date ->
+                formattedDate = date
+                openDialog = false
+                val formattedDateList = formattedDate.split(".")
+                onValueChange(
+                    saleTable.copy(
+                        day = formattedDateList[0].toInt(),
+                        mount = formattedDateList[1].toInt(),
+                        year = formattedDateList[2].toInt()
+                    )
+                )
+            }
+        }
+
+        OutlinedTextField(
+            value = formattedDate,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Дата") },
+            supportingText = {
+                Text("Выберите дату ")
+            },
+            trailingIcon = {
+                IconButton(onClick = { openDialog = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { openDialog = true }
+                .padding(bottom = 10.dp),
+        )
 
         Box {
             ExposedDropdownMenuBox(
@@ -470,50 +513,6 @@ fun SaleEditContainerProduct(
             }
             )
         )
-
-        var formattedDate = String.format("%02d.%02d.%d", saleTable.day, saleTable.mount, saleTable.year)
-
-        if (openDialog) {
-            val datePickerState = rememberDatePickerState(
-                selectableDates = PastOrPresentSelectableDates,
-                initialSelectedDateMillis = dateLong(formattedDate)
-            )
-            DatePickerDialogSample(datePickerState, formattedDate) { date ->
-                formattedDate = date
-                openDialog = false
-                val formattedDateList = formattedDate.split(".")
-                onValueChange(
-                    saleTable.copy(
-                        day = formattedDateList[0].toInt(),
-                        mount = formattedDateList[1].toInt(),
-                        year = formattedDateList[2].toInt()
-                    )
-                )
-            }
-        }
-
-        OutlinedTextField(
-            value = formattedDate,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Дата") },
-            supportingText = {
-                Text("Выберите дату ")
-            },
-            trailingIcon = {
-                IconButton(onClick = { openDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { openDialog = true }
-                .padding(bottom = 10.dp),
-        )
-
 
         Button(
             onClick = { saveInRoomAdd(errorBoolean()) },

@@ -283,7 +283,7 @@ fun SaleEntryContainerProduct(
                             color = MaterialTheme.colorScheme.error
                         )
                     } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                        Text("Укажите кол-во товара, которое хотите продать со склада")
                     }
                 },
                 trailingIcon = {
@@ -333,16 +333,16 @@ fun SaleEntryContainerProduct(
                 priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 validatePrice(priceAll)
             },
-            label = { Text("Цена") },
+            label = { Text("Стоимость") },
             modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
-                        text = "Не указана цена за товар!",
+                        text = "Не указана стоимость за товар!",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите цену за проданный товар")
+                    Text("Укажите стоимость за проданный товар")
                 }
             },
             suffix = { Text(text = "₽") },

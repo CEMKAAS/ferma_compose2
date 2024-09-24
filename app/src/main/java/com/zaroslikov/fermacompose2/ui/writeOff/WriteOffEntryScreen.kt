@@ -250,7 +250,7 @@ fun WriteOffEntryContainerProduct(
                             color = MaterialTheme.colorScheme.error
                         )
                     } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
+                        Text("Укажите кол-во товара, которое хотите списать со склада")
                     }
                 },
                 trailingIcon = {
@@ -300,18 +300,18 @@ fun WriteOffEntryContainerProduct(
                 priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 validatePrice(it)
             },
-            label = { Text("Цена") },
+            label = { Text("Стоимость") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 2.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
-                        text = "Не указана цена за списанный товар",
+                        text = "Не указана стоимость за списанный товар",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите цену за списанный товар")
+                    Text("Укажите стоимость за списанный товар")
                 }
             },
             isError = isErrorPrice,

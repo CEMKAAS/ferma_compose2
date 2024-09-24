@@ -104,7 +104,7 @@ interface ItemDao {
 //    @Query("SELECT * from MyFerma Where idPT=:id ORDER BY _id DESC")
 //    fun getAllItems(id: Int): Flow<List<AddTable>>
 
-    @Query("SELECT * from MyFerma Where idPT=:id ORDER BY YEAR ASC, MOUNT ASC, day ASC")
+    @Query("SELECT * from MyFerma Where idPT=:id ORDER BY day DESC, MOUNT DESC, YEAR DESC")
     fun getAllItems(id: Int): Flow<List<AddTable>>
 
     @Query("SELECT * from MyFerma Where _id=:id")
@@ -129,7 +129,7 @@ interface ItemDao {
     suspend fun delete(item: AddTable)
 
     //Sale
-    @Query("SELECT * from MyFermaSale Where idPT=:id ORDER BY _id DESC")
+    @Query("SELECT * from MyFermaSale Where idPT=:id ORDER BY day DESC, MOUNT DESC, YEAR DESC")
     fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
 
     @Query("SELECT * from MyFermaSale Where _id=:id")
@@ -158,7 +158,7 @@ interface ItemDao {
     suspend fun deleteSale(item: SaleTable)
 
     //Expenses
-    @Query("SELECT * from MyFermaEXPENSES Where idPT=:id ORDER BY _id DESC")
+    @Query("SELECT * from MyFermaEXPENSES Where idPT=:id ORDER BY day DESC, MOUNT DESC, YEAR DESC")
     fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>>
 
     @Query("SELECT * from MyFermaEXPENSES Where _id=:id")
@@ -180,7 +180,7 @@ interface ItemDao {
     suspend fun deleteExpenses(item: ExpensesTable)
 
     //WriteOff
-    @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id ORDER BY _id DESC")
+    @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id ORDER BY day DESC, MOUNT DESC, YEAR DESC")
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
 
     @Query("SELECT * from MyFermaWRITEOFF Where _id=:id")

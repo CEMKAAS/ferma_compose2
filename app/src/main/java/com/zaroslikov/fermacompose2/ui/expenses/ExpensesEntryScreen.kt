@@ -340,18 +340,18 @@ fun ExpensesEntryContainerProduct(
                 priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                 validatePrice(priceAll)
             },
-            label = { Text("Цена") },
+            label = { Text("Стоимость") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
-                        text = "Не указана цена за товар!",
+                        text = "Не указана стоимость за товар!",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите цену за купленный товар")
+                    Text("Укажите стоимость за купленный товар")
                 }
             },
             suffix = { Text(text = "₽") },

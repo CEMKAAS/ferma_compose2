@@ -67,14 +67,14 @@ class FinanceMountViewModel(
             )
 
 
-    suspend fun saveItem() {
-        itemsRepository.updateSale(itemUiState.toSaleTable())
-    }
-
-    suspend fun deleteItem() {
-        itemsRepository.deleteSale(itemUiState.toSaleTable())
-    }
-
+//    suspend fun saveItem() {
+//        itemsRepository.updateSale(itemUiState.toSaleTable())
+//    }
+//
+//    suspend fun deleteItem() {
+//        itemsRepository.deleteSale(itemUiState.toSaleTable())
+//    }
+//
 
 
 
