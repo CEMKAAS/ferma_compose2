@@ -35,6 +35,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -285,11 +286,47 @@ interface ItemDao {
     )
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
+    // Analysis
+    @Query("SELECT COALESCE(SUM(disc), 0) AS ResultCount from MyFerma Where idPT=:id and title=:name")
+    fun getAnalysisAddAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(discSale), 0) AS ResultCount from MyFermaSale Where idPT=:id and titleSale=:name")
+    fun getAnalysisSaleAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(discWRITEOFF), 0) AS ResultCount from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name")
+    fun getAnalysisWriteOffAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(discWRITEOFF), 0) AS ResultCount from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0")
+    fun getAnalysisWriteOffOwnNeedsAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(discWRITEOFF), 0) AS ResultCount from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1")
+    fun getAnalysisWriteOffScrapAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(price), 0) AS ResultCount from MyFermaSale Where idPT=:id and titleSale=:name")
+    fun getAnalysisSaleSoldAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(priceAll), 0) AS ResultCount from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0")
+    fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(priceAll), 0) AS ResultCount from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1")
+    fun getAnalysisWriteOffScrapMoneyAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT CASE WHEN COALESCE(SUM(disc), 0) = 0 THEN 0 ELSE COALESCE(SUM(disc), 0) / 365 END AS ResultCount from MyFerma Where idPT=:id and title=:name")
+    fun getAnalysisAddAverageValueAllTime(id: Int,name:String): Flow<Double>
+
+    @Query("SELECT Title, COALESCE(SUM(disc)) AS ResultCount, suffix from MyFerma Where idPT=:id GROUP BY Title ORDER BY ResultCount DESC")
+    fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
+
+    @Query("SELECT Buyer As buyer, COALESCE(SUM(PRICE)) AS resultPrice, COALESCE(SUM(discSale)) AS resultCount from MyFermaSale Where idPT=:id GROUP BY buyer ORDER BY ResultPrice DESC")
+    fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIncubator(item: Incubator)
 
     @Update
     suspend fun updateIncubator(item: Incubator)
+
+    //Animal
 
     @Query("SELECT * from AnimalTable Where idPT=:id")
     fun getAllAnimal(id: Int): Flow<List<AnimalTable>>

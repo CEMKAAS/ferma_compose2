@@ -29,7 +29,7 @@ data class WriteOffTable (
     @ColumnInfo(name = "YEAR")
     val year: Int, // время
     @ColumnInfo(name = "statusWRITEOFF")
-    var status: Int,
+    var status: Int, //0-на собственные 1-утиль
 
     val priceAll: Double,
     var suffix: String,

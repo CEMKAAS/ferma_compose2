@@ -16,6 +16,7 @@
 
 package com.zaroslikov.fermacompose2.data
 
+import androidx.room.Query
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -29,6 +30,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -79,16 +81,18 @@ interface ItemsRepository {
     fun getItemsAnimalAddList(id: Int): Flow<List<String>>
 
     suspend fun insertProject(projectTable: ProjectTable)
-    suspend fun insertProjectLong(projectTable: ProjectTable):Long
+    suspend fun insertProjectLong(projectTable: ProjectTable): Long
 
     /**
      * Insert item in the data source
      */
     suspend fun insertItem(item: AddTable)
+
     /**
      * Delete item from the data source
      */
     suspend fun deleteItem(item: AddTable)
+
     /**
      * Update item in the data source
      */
@@ -132,29 +136,58 @@ interface ItemsRepository {
     fun getIncome(id: Int): Flow<Double>
     fun getExpenses(id: Int): Flow<Double>
 
-    fun getIncomeMount(id: Int, mount: Int, year:Int): Flow<Double>
-    fun getExpensesMount(id: Int, mount: Int, year:Int): Flow<Double>
+    fun getIncomeMount(id: Int, mount: Int, year: Int): Flow<Double>
+    fun getExpensesMount(id: Int, mount: Int, year: Int): Flow<Double>
 
-    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
-    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<Fin>>
-    fun getIncomeExpensesCurrentMonth(id: Int, mount: Int, year:Int): Flow<List<IncomeExpensesDetails>>
+    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
+    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
+    fun getIncomeExpensesCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int
+    ): Flow<List<IncomeExpensesDetails>>
 
 
     fun getIncomeAllList(id: Int): Flow<List<FinTit>>
     fun getExpensesAllList(id: Int): Flow<List<FinTit>>
     fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>>
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
-    fun getProductListCategoryIncomeCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
-    fun getProductLisCategoryExpensesCurrentMonth(id: Int, mount: Int, year:Int, category: String): Flow<List<FinTit>>
+    fun getProductListCategoryIncomeCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int,
+        category: String
+    ): Flow<List<FinTit>>
+
+    fun getProductLisCategoryExpensesCurrentMonth(
+        id: Int,
+        mount: Int,
+        year: Int,
+        category: String
+    ): Flow<List<FinTit>>
 
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
 
+    // Analysis
+    fun getAnalysisAddAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisSaleSoldAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisWriteOffScrapMoneyAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
+    fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
+
+
     suspend fun insertIncubator(item: Incubator)
     suspend fun updateIncubator(item: Incubator)
-    fun getAllAnimal(id:Int): Flow<List<AnimalTable>>
+    fun getAllAnimal(id: Int): Flow<List<AnimalTable>>
     fun getAnimal(id: Int): Flow<AnimalTable>
-    fun getTypeAnimal(id:Int): Flow<List<String>>
+    fun getTypeAnimal(id: Int): Flow<List<String>>
 
 
     suspend fun insertAnimalTable(animalTable: AnimalTable): Long
@@ -191,7 +224,7 @@ interface ItemsRepository {
     fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
     fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
     fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
-    fun getProductAnimal(name:String):Flow<List<AnimalTitSuff>>
+    fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>>
 
 
 }

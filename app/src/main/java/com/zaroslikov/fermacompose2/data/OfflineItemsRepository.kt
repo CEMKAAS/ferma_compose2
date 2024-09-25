@@ -173,6 +173,18 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> =
         itemDao.getCurrentBalanceWarehouse(id)
 
+    override fun getAnalysisAddAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisAddAllTime(id, name)
+    override fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisSaleAllTime(id, name)
+    override fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffAllTime(id, name)
+    override fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTime(id, name)
+    override fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Double>  = itemDao.getAnalysisWriteOffScrapMoneyAllTime(id,name)
+    override fun getAnalysisSaleSoldAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisSaleSoldAllTime(id, name)
+    override fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTime(id, name)
+    override fun getAnalysisWriteOffScrapMoneyAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffScrapMoneyAllTime(id, name)
+    override fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisAddAverageValueAllTime(id, name)
+    override fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<Double>> = itemDao.getAnalysisAddAnimalAllTime(id, name)
+    override fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<Double>> = itemDao.getAnalysisSaleBuyerAllTime(id,name)
+
     override suspend fun insertIncubator(item: Incubator) =
         itemDao.insertIncubator(item)
 
