@@ -46,6 +46,8 @@ import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditProduct
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryProduct
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesScreen
+import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisDestination
+import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisProduct
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
@@ -312,6 +314,17 @@ fun InventoryNavHost(
             })
         ) {
             FinanceIncomeExpensesScreen(navigateBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = FinanceAnalysisDestination.routeWithArgs,
+            arguments = listOf(navArgument(FinanceIncomeExpensesDestination.itemIdArg) {
+                type = NavType.IntType
+            }, navArgument(FinanceIncomeExpensesDestination.itemIdArgTwo) {
+                type = NavType.StringType
+            })
+        ) {
+            FinanceAnalysisProduct(navigateBack = { navController.popBackStack() })
         }
 
 

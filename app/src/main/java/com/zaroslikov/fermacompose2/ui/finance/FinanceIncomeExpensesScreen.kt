@@ -184,7 +184,7 @@ fun FinanceIncomProductCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = fin.category,
+                    text = fin.title,
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),

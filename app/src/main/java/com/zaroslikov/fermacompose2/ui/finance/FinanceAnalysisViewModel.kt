@@ -2,12 +2,15 @@ package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCoutUiStateLimit
+import com.zaroslikov.fermacompose2.ui.animal.AnimalEditUiState
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,75 +25,57 @@ class FinanceAnalysisViewModel(
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    val itemId: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
-    val name: String = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
-    val suffix: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
+    val itemId: Int = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArg])
+    val name: String = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArgTwo])
 
-
-    var analysisAddAllTime by mutableDoubleStateOf(0.00)
+    var analysisAddAllTime by mutableStateOf(FinUiState())
         private set
-
-    var analysisSaleAllTime by mutableDoubleStateOf(0.00)
+    var analysisSaleAllTime by mutableStateOf(FinUiState())
         private set
-
-    var analysisWriteOffAllTime by mutableDoubleStateOf(0.00)
+    var analysisWriteOffAllTime by mutableStateOf(FinUiState())
         private set
-
-    var analysisWriteOffOwnNeedsAllTime by mutableDoubleStateOf(0.00)
+    var analysisWriteOffOwnNeedsAllTime by mutableStateOf(FinUiState())
         private set
-
-    var analysisWriteOffScrapAllTime by mutableDoubleStateOf(0.00)
+    var analysisWriteOffScrapAllTime by mutableStateOf(FinUiState())
         private set
-
     var analysisSaleSoldAllTime by mutableDoubleStateOf(0.00)
         private set
-
     var analysisWriteOffOwnNeedsMoneyAllTime by mutableDoubleStateOf(0.00)
         private set
-
     var analysisWriteOffScrapMoneyAllTime by mutableDoubleStateOf(0.00)
         private set
-
-    var analysisAddAverageValueAllTime by mutableDoubleStateOf(0.00)
+    var analysisAddAverageValueAllTime by mutableStateOf(FinUiState())
         private set
 
     init {
         viewModelScope.launch {
             analysisAddAllTime = itemsRepository.getAnalysisAddAllTime(itemId, name)
                 .filterNotNull()
-                .first().toDouble()
-
+                .first().toFinUiState()
             analysisSaleAllTime= itemsRepository.getAnalysisSaleAllTime(itemId, name)
                 .filterNotNull()
-                .first().toDouble()
-
+                .first().toFinUiState()
             analysisWriteOffAllTime = itemsRepository.getAnalysisWriteOffAllTime(itemId, name)
                 .filterNotNull()
-                .first().toDouble()
-
+                .first().toFinUiState()
             analysisWriteOffOwnNeedsAllTime = itemsRepository.getAnalysisWriteOffOwnNeedsAllTime(itemId, name)
                 .filterNotNull()
-                .first().toDouble()
-
+                .first().toFinUiState()
             analysisWriteOffScrapAllTime = itemsRepository.getAnalysisWriteOffScrapAllTime(itemId, name)
                 .filterNotNull()
-                .first().toDouble()
-
+                .first().toFinUiState()
             analysisSaleSoldAllTime = itemsRepository.getAnalysisSaleSoldAllTime(itemId, name)
                 .filterNotNull()
                 .first().toDouble()
-
             analysisWriteOffOwnNeedsMoneyAllTime = itemsRepository.getAnalysisWriteOffOwnNeedsMoneyAllTime(itemId, name)
                 .filterNotNull()
                 .first().toDouble()
-
             analysisWriteOffScrapMoneyAllTime= itemsRepository.getAnalysisWriteOffScrapMoneyAllTime(itemId, name)
                 .filterNotNull()
                 .first().toDouble()
-
             analysisAddAverageValueAllTime = itemsRepository.getAnalysisAddAverageValueAllTime(itemId, name)
                 .filterNotNull()
-                .first().toDouble()
+                .first().toFinUiState()
         }
     }
 
@@ -120,6 +105,11 @@ class FinanceAnalysisViewModel(
 
 data class AnalysisAddAnimalAllTimeUiState(val itemList: List<AnimalTitSuff> = listOf())
 data class AnalysisSaleBuyerAllTimeUiState(val itemList: List<AnalysisSaleBuyerAllTime> = listOf())
+
+fun Fin.toFinUiState(
+): FinUiState = FinUiState(
+    title, priceAll
+)
 
 data class AnalysisSaleBuyerAllTime(
     val buyer: String,

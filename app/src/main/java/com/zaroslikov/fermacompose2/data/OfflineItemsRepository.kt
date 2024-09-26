@@ -29,6 +29,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -173,17 +174,17 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> =
         itemDao.getCurrentBalanceWarehouse(id)
 
-    override fun getAnalysisAddAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisAddAllTime(id, name)
-    override fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisSaleAllTime(id, name)
-    override fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffAllTime(id, name)
-    override fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTime(id, name)
-    override fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Double>  = itemDao.getAnalysisWriteOffScrapMoneyAllTime(id,name)
+    override fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin> = itemDao.getAnalysisAddAllTime(id, name)
+    override fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin> = itemDao.getAnalysisSaleAllTime(id, name)
+    override fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Fin> = itemDao.getAnalysisWriteOffAllTime(id, name)
+    override fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Fin> = itemDao.getAnalysisWriteOffOwnNeedsAllTime(id, name)
+    override fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Fin>  = itemDao.getAnalysisWriteOffScrapAllTime(id,name)
     override fun getAnalysisSaleSoldAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisSaleSoldAllTime(id, name)
     override fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTime(id, name)
     override fun getAnalysisWriteOffScrapMoneyAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisWriteOffScrapMoneyAllTime(id, name)
-    override fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Double> = itemDao.getAnalysisAddAverageValueAllTime(id, name)
-    override fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<Double>> = itemDao.getAnalysisAddAnimalAllTime(id, name)
-    override fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<Double>> = itemDao.getAnalysisSaleBuyerAllTime(id,name)
+    override fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Fin> = itemDao.getAnalysisAddAverageValueAllTime(id, name)
+    override fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>> = itemDao.getAnalysisAddAnimalAllTime(id, name)
+    override fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTime(id,name)
 
     override suspend fun insertIncubator(item: Incubator) =
         itemDao.insertIncubator(item)

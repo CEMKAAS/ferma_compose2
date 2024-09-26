@@ -33,6 +33,7 @@ import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryViewModel
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesViewModel
+import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceMountViewModel
@@ -71,6 +72,8 @@ object AppViewModelProvider {
         initializer {
             ProjectAddViewModel(inventoryApplication().container.itemsRepository)
         }
+
+
         initializer {
             AddIncubatorViewModel(
                 inventoryApplication().container.itemsRepository
@@ -90,7 +93,7 @@ object AppViewModelProvider {
             )
         }
 
-
+        //Incubator
         initializer {
             IncubatorViewModel(
                 this.createSavedStateHandle(),
@@ -141,7 +144,6 @@ object AppViewModelProvider {
             )
         }
 
-
         initializer {
             FinanceCategoryViewModel(
                 this.createSavedStateHandle(),
@@ -151,6 +153,13 @@ object AppViewModelProvider {
 
         initializer {
             FinanceIncomeExpensesViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
+        initializer {
+            FinanceAnalysisViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )
@@ -245,6 +254,7 @@ object AppViewModelProvider {
             )
         }
 
+        //Animal
         initializer {
             AnimalViewModel(
                 this.createSavedStateHandle(),

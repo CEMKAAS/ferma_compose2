@@ -289,7 +289,7 @@ fun CardRow(
 ) {
     Card(modifier = modifier) {
         Text(
-            text = fin.category, textAlign = TextAlign.Start,
+            text = fin.title, textAlign = TextAlign.Start,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
@@ -398,9 +398,14 @@ fun TransactionRow(
 //}
 
 data class Fin(
-    val category: String,
+    val title: String, // может быть категория, название или суффикс
     val priceAll: Double
 )
+data class FinUiState(
+    val title:String = "",
+    val priceAll:Double = 0.0
+)
+
 
 data class FinTit(
     val Title: String,

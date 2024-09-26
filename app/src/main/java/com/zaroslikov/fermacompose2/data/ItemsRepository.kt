@@ -170,15 +170,15 @@ interface ItemsRepository {
 
 
     // Analysis
-    fun getAnalysisAddAllTime(id: Int, name: String): Flow<Double>
-    fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Double>
-    fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Double>
-    fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Double>
-    fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin>
+    fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin>
+    fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Fin>
+    fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Fin>
+    fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisSaleSoldAllTime(id: Int, name: String): Flow<Double>
     fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int, name: String): Flow<Double>
     fun getAnalysisWriteOffScrapMoneyAllTime(id: Int, name: String): Flow<Double>
-    fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Double>
+    fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
     fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
 
@@ -219,12 +219,9 @@ interface ItemsRepository {
     fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>>
     fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>>
 
-
     fun getCountAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
     fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
     fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
     fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
     fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>>
-
-
 }
