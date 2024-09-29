@@ -260,7 +260,7 @@ fun AnimalCardContainer(
                             .fillMaxWidth()
                     ) {
                         Text(
-                            text = "${i++}) ${it.Title}",
+                            text = "${i++}) ${it.title}",
                             modifier = modifierText.fillMaxWidth(0.6f)
                         )
                         Text(

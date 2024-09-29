@@ -111,6 +111,8 @@ fun formatter(number: Double): String {
 }
 
 
+
+
 fun dateLong(data: String): Long {
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))

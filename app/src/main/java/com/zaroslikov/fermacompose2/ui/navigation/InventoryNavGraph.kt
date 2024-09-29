@@ -25,6 +25,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCard
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardProduct
@@ -240,6 +241,7 @@ fun InventoryNavHost(
                 navigateToStart = { navController.navigate(StartDestination.route) },
                 navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
                 navigateToEdit = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
+                navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
                 drawerState = drawerState
             )
         }
@@ -284,12 +286,12 @@ fun InventoryNavHost(
                 type = NavType.IntType
             })
         ) {
-            FinanceMountScreen( navigateBack = { navController.popBackStack() },
+            FinanceMountScreen(navigateBack = { navController.popBackStack() },
                 navigateToCategory = {
-                navController.navigate(
-                    "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}"
-                )
-            })
+                    navController.navigate(
+                        "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}"
+                    )
+                })
         }
 
         composable(route = FinanceCategoryDestination.routeWithArgs,
@@ -302,7 +304,10 @@ fun InventoryNavHost(
             }
 
             )) {
-            FinanceCategoryScreen(navigateBack = { navController.popBackStack() })
+            FinanceCategoryScreen(
+                navigateBack = { navController.popBackStack() },
+                navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
+            )
         }
 
         composable(
@@ -313,14 +318,18 @@ fun InventoryNavHost(
                 type = NavType.BoolType
             })
         ) {
-            FinanceIncomeExpensesScreen(navigateBack = { navController.popBackStack() })
+            FinanceIncomeExpensesScreen(
+                navigateBack = { navController.popBackStack() },
+                navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
+            )
+
         }
 
         composable(
             route = FinanceAnalysisDestination.routeWithArgs,
-            arguments = listOf(navArgument(FinanceIncomeExpensesDestination.itemIdArg) {
+            arguments = listOf(navArgument(FinanceAnalysisDestination.itemIdArg) {
                 type = NavType.IntType
-            }, navArgument(FinanceIncomeExpensesDestination.itemIdArgTwo) {
+            }, navArgument(FinanceAnalysisDestination.itemIdArgTwo) {
                 type = NavType.StringType
             })
         ) {

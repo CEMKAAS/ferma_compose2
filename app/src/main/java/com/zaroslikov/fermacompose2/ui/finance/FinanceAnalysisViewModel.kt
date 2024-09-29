@@ -108,7 +108,7 @@ data class AnalysisSaleBuyerAllTimeUiState(val itemList: List<AnalysisSaleBuyerA
 
 fun Fin.toFinUiState(
 ): FinUiState = FinUiState(
-    title, priceAll
+    title?:"", priceAll
 )
 
 data class AnalysisSaleBuyerAllTime(

@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.finance
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +35,7 @@ import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
 
 object FinanceCategoryDestination : NavigationDestination {
     override val route = "FinanceCategory"
@@ -42,7 +44,7 @@ object FinanceCategoryDestination : NavigationDestination {
     const val itemIdArgTwo = "itemCategory"
     const val itemIdArgThree = "itemBoolean"
     val routeWithArgs =
-        "${FinanceCategoryDestination.route}/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgThree}"
+        "${route}/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgThree}"
 }
 
 /**
@@ -53,6 +55,7 @@ object FinanceCategoryDestination : NavigationDestination {
 fun FinanceCategoryScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    navigationToAnalysis: (AnalysisNav) -> Unit,
     viewModel: FinanceCategoryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -67,7 +70,13 @@ fun FinanceCategoryScreen(
         FinanceCategoryBody(
             itemList = financeCategoryState.itemList,
             modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding
+            contentPadding = innerPadding,
+            navigationToAnalysis = {
+                navigationToAnalysis(
+                    AnalysisNav(idProject = viewModel.itemId, name = it)
+                )
+            }
+
         )
     }
 }
@@ -76,9 +85,10 @@ fun FinanceCategoryScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FinanceCategoryBody(
-    itemList: List<FinTit>,
+    itemList: List<Fin>,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    navigationToAnalysis: (String) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,7 +97,8 @@ private fun FinanceCategoryBody(
         FinanceCategoryInventoryList(
             itemList = itemList,
             contentPadding = contentPadding,
-            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+            navigationToAnalysis = navigationToAnalysis
         )
     }
 
@@ -95,9 +106,10 @@ private fun FinanceCategoryBody(
 
 @Composable
 private fun FinanceCategoryInventoryList(
-    itemList: List<FinTit>,
+    itemList: List<Fin>,
     contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigationToAnalysis: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -107,6 +119,7 @@ private fun FinanceCategoryInventoryList(
             FinanceCategoryProductCard(fin = item,
                 modifier = Modifier
                     .padding(8.dp)
+                    .clickable { navigationToAnalysis(item.title!!) }
             )
         }
     }
@@ -114,7 +127,7 @@ private fun FinanceCategoryInventoryList(
 
 @Composable
 fun FinanceCategoryProductCard(
-    fin: FinTit,
+    fin: Fin,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -134,7 +147,7 @@ fun FinanceCategoryProductCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = fin.Title,
+                    text = fin.title?:"",
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),

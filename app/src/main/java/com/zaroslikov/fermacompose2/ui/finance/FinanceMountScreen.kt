@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -91,10 +93,6 @@ fun FinanceMountScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    val incomeMount = viewModel.incomeMountUiState
-    val expensesMount = viewModel.expensesMountUiState
-    val currentBalance = incomeMount - expensesMount
-
     val incomeRow by viewModel.incomeCategoryUiState.collectAsState()
     val expensesRow by viewModel.expensesCategoryUiState.collectAsState()
 
@@ -112,13 +110,16 @@ fun FinanceMountScreen(
         }
     ) { innerPadding ->
         FinanceMountBody(
-            currentBalance = currentBalance,
+            incomeMount = viewModel.incomeMountUiState,
+            expensesMount = viewModel.expensesMountUiState,
             incomeRow = incomeRow.itemList,
             expensesRow = expensesRow.itemList,
             navigateToCategory = navigateToCategory,
             idPT = idProject,
-            modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding
+            modifier = modifier
+                .padding(innerPadding)
+                .padding(5.dp)
+                .verticalScroll(rememberScrollState()),
         )
     }
 }
@@ -127,155 +128,133 @@ fun FinanceMountScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FinanceMountBody(
-    currentBalance: Double,
+    incomeMount: Double,
+    expensesMount: Double,
     incomeRow: List<Fin>,
     expensesRow: List<Fin>,
     navigateToCategory: (FinanceCategoryData) -> Unit,
     idPT: Int,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .padding(contentPadding)
-            .padding(8.dp),
     ) {
 
-        val calendar = Calendar.getInstance()
+//        val calendar = Calendar.getInstance()
+//        Card {
+//            Text(
+//                text = "${SetMount(calendar[Calendar.MONTH] + 1)} ${calendar[Calendar.YEAR]}",
+//                textAlign = TextAlign.Start,
+//                fontSize = 15.sp,
+//                fontWeight = FontWeight.SemiBold,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(5.dp),
+//            )
+//        }
 
-        Card {
+        val modifierCard = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+
+        val modifierHeading = Modifier
+            .wrapContentSize()
+            .padding(6.dp)
+
+        val modifierText = Modifier
+            .wrapContentSize()
+            .padding(vertical = 3.dp, horizontal = 6.dp)
+
+
+        Card(
+            modifier = modifierCard
+        ) {
             Text(
-                text = "${SetMount(calendar[Calendar.MONTH] + 1)} ${calendar[Calendar.YEAR]}",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
+                text = "Данные:", modifier = modifierHeading,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
+                fontSize = 16.sp
             )
+            Text(
+                text = "Доход: ${formatter(incomeMount)} ₽",
+                modifier = modifierText
+            )
+            Text(
+                text = "Расход: ${formatter(expensesMount)} ₽",
+                modifier = modifierText
+            )
+            Text(
+                text = "Прибыль: ${formatter(incomeMount - expensesMount)} ₽",
+                modifier = modifierText
+            )
+
         }
 
-        Text(
-            text = "${formatter(currentBalance)} ₽",
-            textAlign = TextAlign.Start,
-            fontSize = 28.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 2.dp),
-            fontWeight = FontWeight.SemiBold
+        LazyRowMount(
+            list = incomeRow,
+            navigateToCategory = navigateToCategory,
+            idPT = idPT,
+            heading = "Доходы по категории в текущем месяце",
+            headingNull = "Доходов в этом месяце не было :("
         )
-        Text(
-            text = "Текущий доход",
-            textAlign = TextAlign.Start,
-            fontSize = 10.sp,
-            color = Color.Gray,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
+
+        LazyRowMount(
+            list = expensesRow,
+            navigateToCategory = navigateToCategory,
+            idPT = idPT,
+            heading = "Расходы по категории в текущем месяце",
+            headingNull = "Расходов в этом месяце не было нет (Это хорошо)"
         )
-        if (expensesRow.isNotEmpty() && incomeRow.isEmpty()) {
-            Text(
-                text = "А где же доходы в этом месяце?",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-        } else if (incomeRow.isNotEmpty()) {
-            Text(
-                text = "Доходы в текущем месяце",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-            LazyRow {
-                items(items = incomeRow) {
-                    CardMountRow(it, modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            navigateToCategory(
-                                FinanceCategoryData(
-                                    idPT,
-                                    it.category,
-                                    true
-                                )
-                            )
-                        })
-                }
-            }
-        } else {
-            Text(
-                text = "Доходов в этом месяце нет :(",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-        Text(
-            text = "${formatter(currentBalance)} ₽",
-            textAlign = TextAlign.Start,
-            fontSize = 28.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 2.dp),
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = "Расход за месяц",
-            textAlign = TextAlign.Start,
-            fontSize = 10.sp,
-            color = Color.Gray,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-        )
-        if (expensesRow.isNotEmpty()) {
-            Text(
-                text = "Расходы в текущем месяце",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-            LazyRow {
-                items(items = expensesRow) {
-                    CardMountRow(it, modifier = Modifier
-                        .padding(5.dp)
-                        .clickable {
-                            navigateToCategory(
-                                FinanceCategoryData(
-                                    idPT,
-                                    it.category,
-                                    false
-                                )
-                            )
-                        })
-                }
-            }
-        } else {
-            Text(
-                text = "Расходов в этом месяце нет (Это хорошо)",
-                textAlign = TextAlign.Start,
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                fontWeight = FontWeight.SemiBold
-            )
-        }
     }
 }
+
+
+@Composable
+fun LazyRowMount(
+    list: List<Fin>,
+    navigateToCategory: (FinanceCategoryData) -> Unit,
+    idPT: Int,
+    heading: String,
+    headingNull: String
+) {
+    if (list.isNotEmpty()) {
+        Text(
+            text = heading,
+            textAlign = TextAlign.Start,
+            fontSize = 15.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp),
+            fontWeight = FontWeight.SemiBold
+        )
+        LazyRow {
+            items(items = list) {
+                CardMountRow(it, modifier = Modifier
+                    .padding(8.dp)
+                    .clickable {
+                        navigateToCategory(
+                            FinanceCategoryData(
+                                idPT,
+                                "${if (it.title == "") "Не указано " else it.title}",
+                                true
+                            )
+                        )
+                    })
+            }
+        }
+    } else {
+        Text(
+            text = headingNull,
+            textAlign = TextAlign.Start,
+            fontSize = 15.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp),
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -285,7 +264,7 @@ fun CardMountRow(
 ) {
     Card(modifier = modifier) {
         Text(
-            text = fin.category, textAlign = TextAlign.Start,
+            text = fin.title ?: "Не указан", textAlign = TextAlign.Start,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier

@@ -12,18 +12,22 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +42,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
 
 object FinanceIncomeExpensesDestination : NavigationDestination {
     override val route = "FinanceIncomeExpenses"
@@ -45,7 +50,7 @@ object FinanceIncomeExpensesDestination : NavigationDestination {
     const val itemIdArg = "itemId"
     const val itemIdArgTwo = "itemCategory"
     val routeWithArgs =
-        "${FinanceIncomeExpensesDestination.route}/{$itemIdArg}/{$itemIdArgTwo}"
+        "${route}/{$itemIdArg}/{$itemIdArgTwo}"
 }
 
 /**
@@ -56,10 +61,10 @@ object FinanceIncomeExpensesDestination : NavigationDestination {
 fun FinanceIncomeExpensesScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    navigationToAnalysis: (AnalysisNav) -> Unit,
     viewModel: FinanceIncomeExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-//    val coroutineScope = rememberCoroutineScope()
     val titleTopBar = if(viewModel.itemBoolean) "Мои Доходы" else "Мои Расходы"
 
     val financeCategoryState by viewModel.financeCategoryIEState.collectAsState()
@@ -75,7 +80,13 @@ fun FinanceIncomeExpensesScreen(
             itemList = financeCategoryState.itemList,
             productList = financeProduuctState.itemList,
             modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding
+            contentPadding = innerPadding,
+            navigationToAnalysis = {
+                navigationToAnalysis(
+                    AnalysisNav(idProject = viewModel.itemId, name = it)
+                )
+
+            }
         )
     }
 }
@@ -85,9 +96,10 @@ fun FinanceIncomeExpensesScreen(
 @Composable
 private fun FinanceIncomeExpensesBody(
     itemList: List<Fin>,
-    productList: List<FinTit>,
+    productList: List<Fin>,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    navigationToAnalysis: (String) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -105,7 +117,8 @@ private fun FinanceIncomeExpensesBody(
                 itemList = itemList,
                 productList = productList,
                 contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+                navigationToAnalysis = navigationToAnalysis
             )
         }
     }
@@ -115,9 +128,10 @@ private fun FinanceIncomeExpensesBody(
 @Composable
 private fun FinanceIncomeExpensesInventoryList(
     itemList: List<Fin>,
-    productList: List<FinTit>,
+    productList: List<Fin>,
     contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigationToAnalysis: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
@@ -157,6 +171,7 @@ private fun FinanceIncomeExpensesInventoryList(
                 fin = item,
                 modifier = Modifier
                     .padding(8.dp)
+                    .clickable { navigationToAnalysis(item.title!!) }
             )
         }
     }
@@ -184,7 +199,7 @@ fun FinanceIncomProductCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = fin.title,
+                    text = fin.title?:"",
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),
@@ -208,7 +223,7 @@ fun FinanceIncomProductCard(
 
 @Composable
 fun FinanceIncomeExpensesProductCard(
-    fin: FinTit,
+    fin: Fin,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -228,7 +243,7 @@ fun FinanceIncomeExpensesProductCard(
                 modifier = Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = fin.Title,
+                    text = fin.title?:"",
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(6.dp),
@@ -249,3 +264,4 @@ fun FinanceIncomeExpensesProductCard(
         }
     }
 }
+

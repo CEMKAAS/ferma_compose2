@@ -453,7 +453,7 @@ fun SaleEntryContainerProduct(
                     label = { Text(text = "Покупатель") },
                     supportingText = { Text("Выберите или укажите имя покупателя") },
                     trailingIcon = {
-                        IconButton(onClick = { category = "" }) {
+                        IconButton(onClick = { buyer = "" }) {
                             Icon(Icons.Default.Clear, contentDescription = "Стереть")
                         }
                     },

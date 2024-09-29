@@ -31,7 +31,6 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
-import com.zaroslikov.fermacompose2.ui.finance.FinTit
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
@@ -147,8 +146,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
 
     //FinanceTap
-    override fun getIncomeAllList(id: Int): Flow<List<FinTit>> = itemDao.getIncomeAllList(id)
-    override fun getExpensesAllList(id: Int): Flow<List<FinTit>> = itemDao.getExpensesAllList(id)
+    override fun getIncomeAllList(id: Int): Flow<List<Fin>> = itemDao.getIncomeAllList(id)
+    override fun getExpensesAllList(id: Int): Flow<List<Fin>> = itemDao.getExpensesAllList(id)
     override fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>> =
         itemDao.getIncomeCategoryAllList(id)
 
@@ -160,7 +159,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         mount: Int,
         year: Int,
         category: String
-    ): Flow<List<FinTit>> =
+    ): Flow<List<Fin>> =
         itemDao.getProductListCategoryIncomeCurrentMonth(id, mount, year, category)
 
     override fun getProductLisCategoryExpensesCurrentMonth(
@@ -168,7 +167,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         mount: Int,
         year: Int,
         category: String
-    ): Flow<List<FinTit>> =
+    ): Flow<List<Fin>> =
         itemDao.getProductLisCategoryExpensesCurrentMonth(id, mount, year, category)
 
     override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> =

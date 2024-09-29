@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.warehouse
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,8 +40,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFermaWarehouse
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.home.AddTableInsert
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
@@ -58,7 +61,8 @@ object WarehouseDestination : NavigationDestination {
 fun WarehouseScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToEdit:(Int) ->Unit,
+    navigateToEdit: (Int) -> Unit,
+    navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -92,7 +96,7 @@ fun WarehouseScreen(
                     title = "Мой Склад",
                     scope = coroutineScope,
                     drawerState = drawerState,
-                    navigateToEdit = {navigateToEdit(idProject)},
+                    navigateToEdit = { navigateToEdit(idProject) },
                     scrollBehavior = scrollBehavior
                 )
             }
@@ -101,39 +105,52 @@ fun WarehouseScreen(
                 itemList = homeUiState.itemList,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter
+                showBottomFilter = showBottomSheetFilter,
+                navigationToAnalysis = {
+                    navigationToAnalysis(
+                        AnalysisNav(idProject = idProject, name = it)
+                    )
+
+                }
             )
         }
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WarehouseBody(
     itemList: List<WarehouseData>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>
+    showBottomFilter: MutableState<Boolean>,
+    navigationToAnalysis: (String) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+            Column(
+                modifier = modifier
+                    .padding(contentPadding)
+                    .padding(15.dp)
+            ) {
                 Text(
                     text = "Добро пожаловать на Склад!",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
                     text = "В этом разделе указано сколько Вашего товара сейчас на складе (учитываются данные при добавлении, продажи и списании), если колличество Вашего Товара ушло в минус, оно отображаться в этом Разделе не будет!",
                     textAlign = TextAlign.Justify,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
@@ -148,7 +165,10 @@ private fun WarehouseBody(
             WarehouseInventoryList(
                 itemList = itemList,
                 contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_small)
+                ),
+                navigationToAnalysis = navigationToAnalysis
             )
         }
 
@@ -165,7 +185,8 @@ private fun WarehouseBody(
 private fun WarehouseInventoryList(
     itemList: List<WarehouseData>,
     contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigationToAnalysis: (String) -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
@@ -188,6 +209,7 @@ private fun WarehouseInventoryList(
                     warehouseProduct = item,
                     modifier = Modifier
                         .padding(8.dp)
+                        .clickable { navigationToAnalysis(item.Title) }
                 )
             }
         }
@@ -263,4 +285,9 @@ data class WarehouseData(
     val Title: String,
     val ResultCount: Double,
     val suffix: String
+)
+
+data class AnalysisNav(
+    val idProject: Int,
+    val name: String
 )

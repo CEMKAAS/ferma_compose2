@@ -35,6 +35,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -230,22 +231,27 @@ private fun FinanceBody(
                     .padding(2.dp),
                 fontWeight = FontWeight.SemiBold
             )
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
                 Text(
                     text = "${formatter(incomeMount)} ₽",
-                    textAlign = TextAlign.Center,
+//                    textAlign = TextAlign.Center,
                     fontSize = 15.sp,
                     modifier = Modifier
-                        .fillMaxWidth()
+//                        .fillMaxWidth()
                         .padding(2.dp),
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
                     text = "${formatter(expensesMount)} ₽",
-                    textAlign = TextAlign.Center,
+//                    textAlign = TextAlign.Center,
                     fontSize = 15.sp,
                     modifier = Modifier
-                        .fillMaxWidth()
+//                        .fillMaxWidth()
                         .padding(2.dp),
                     fontWeight = FontWeight.SemiBold
                 )
@@ -289,7 +295,7 @@ fun CardRow(
 ) {
     Card(modifier = modifier) {
         Text(
-            text = fin.title, textAlign = TextAlign.Start,
+            text = fin.title ?: "", textAlign = TextAlign.Start,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
@@ -371,45 +377,40 @@ fun TransactionRow(
     Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(5.dp))
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun FinancePrewie() {
-//    FinanceBody(
-//        currentBalance = 155.0,
-//        income = 22.0,
-//        expenses = 33.0,
-//        incomeRow = arrayListOf(),
-//        expensesRow = arrayListOf(),
-//        incomeExpensesList = arrayListOf(
-//            IncomeExpensesDetails(
-//                "Govno",
-//                55.0,
-//                "ED",
-//                88.0,
-//                1,
-//                2,
-//                1996
-//            ), IncomeExpensesDetails("Govno", 55.0, "ED", 88.0, 1, 2, 1996)
-//        ),
-//        navigateToCategory = {},
-//        navigateToIncomeExpenses = {},
-//        idPT = 1
-//    )
-//}
+@Preview(showBackground = true)
+@Composable
+fun FinancePrewie() {
+    FinanceBody(
+        currentBalance = 155.0,
+        income = 22.0,
+        expenses = 33.0,
+        expensesMount = 0.0,
+        incomeMount = 0.0,
+        incomeExpensesList = arrayListOf(
+            IncomeExpensesDetails(
+                "Govno",
+                55.0,
+                "ED",
+                88.0,
+                1,
+                2,
+                1996
+            ), IncomeExpensesDetails("Govno", 55.0, "ED", 88.0, 1, 2, 1996)
+        ),
+        navigateToFinaceMount = {},
+        navigateToIncomeExpenses = {},
+        idPT = 1
+    )
+}
 
 data class Fin(
-    val title: String, // может быть категория, название или суффикс
+    val title: String?, // может быть категория, название или суффикс
     val priceAll: Double
 )
+
 data class FinUiState(
-    val title:String = "",
-    val priceAll:Double = 0.0
-)
-
-
-data class FinTit(
-    val Title: String,
-    val priceAll: Double
+    val title: String = "",
+    val priceAll: Double = 0.0
 )
 
 data class FinanceCategoryData(

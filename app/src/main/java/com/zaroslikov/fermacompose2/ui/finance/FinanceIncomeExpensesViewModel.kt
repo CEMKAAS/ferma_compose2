@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 import java.util.TimeZone
 
-class FinanceIncomeExpensesViewModel (
+class FinanceIncomeExpensesViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[FinanceIncomeExpensesDestination.itemIdArg])
+    val itemId: Int = checkNotNull(savedStateHandle[FinanceIncomeExpensesDestination.itemIdArg])
     val itemBoolean: Boolean =
         checkNotNull(savedStateHandle[FinanceIncomeExpensesDestination.itemIdArgTwo])
 

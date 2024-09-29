@@ -28,7 +28,7 @@ class FinanceCategoryViewModel(
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArg])
+    val itemId: Int = checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArg])
     val itemCategory: String =
         checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArgTwo])
     val itemBoolean: Boolean =
@@ -77,6 +77,6 @@ class FinanceCategoryViewModel(
 /**
  * Ui State for HomeScreen
  */
-data class FinanceCategoryState(val itemList: List<FinTit> = listOf())
+data class FinanceCategoryState(val itemList: List<Fin> = listOf())
 
 
