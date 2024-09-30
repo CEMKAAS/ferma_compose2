@@ -377,10 +377,11 @@ fun MonthYearPicker(
     onMonthSelected: (String) -> Unit,
     onYearSelected: (Int) -> Unit,
     currentYear: Int = 2024,
-    yearRange: IntRange = (1900..currentYear),
+    yearRange: IntRange = (2020..currentYear),
     onDismissRequest: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+//    var category by remember { mutableStateOf(selectedMonth) }
     val months = listOf(
         "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
         "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
@@ -395,7 +396,11 @@ fun MonthYearPicker(
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
+
+
             Column {
+
+
                 // Month Picker
                 ExposedDropdownMenuBox(
                     expanded = expanded,
@@ -415,12 +420,13 @@ fun MonthYearPicker(
                         onDismissRequest = { expanded = false }
                     ) {
                         months.forEach { month ->
-                            DropdownMenuItem(onClick = {
-                                onMonthSelected(month)
-                                expanded = false
-                            }) {
-                                Text(text = month)
-                            }
+                            DropdownMenuItem(
+                                text = { Text(text = month) },
+                                onClick = {
+                                    onMonthSelected(month)
+                                    expanded = false
+                                }
+                            )
                         }
                     }
                 }
@@ -451,7 +457,7 @@ fun MonthYearPicker(
                         Text("Dismiss")
                     }
                     TextButton(
-                        onClick = {  },
+                        onClick = { },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Confirm")
@@ -462,45 +468,6 @@ fun MonthYearPicker(
         }
     }
 }
-
-@Composable
-fun DropdownMenuItem(onClick: () -> Unit, interactionSource: @Composable () -> Unit) {
-    DropdownMenuItem(text = { interactionSource }, onClick = { onClick })
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialogSample(
-    datePickerState: DatePickerState,
-    dateToday: String,
-    onDateSelected: (String) -> Unit
-) {
-    DatePickerDialog(
-        onDismissRequest = {
-            onDateSelected(dateToday)
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val format = SimpleDateFormat("dd.MM.yyyy")
-                    val formattedDate: String =
-                        format.format(datePickerState.selectedDateMillis)
-                    onDateSelected(formattedDate)
-                },
-            ) { Text("Выбрать") }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDateSelected(dateToday)
-                }
-            ) { Text("Назад") }
-        }
-    ) {
-        DatePicker(state = datePickerState)
-    }
-}
-
 
 
 //
