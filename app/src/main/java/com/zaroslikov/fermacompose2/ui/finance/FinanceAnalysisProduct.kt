@@ -72,6 +72,8 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.TimeZone
 
 
 object FinanceAnalysisDestination : NavigationDestination {
@@ -88,12 +90,28 @@ fun FinanceAnalysisProduct(
     navigateBack: () -> Unit,
     viewModel: FinanceAnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    var openCalendarDialog by remember { mutableStateOf(false) }
+    if (openCalendarDialog) {
+
+        MonthYearPicker(
+            selectedMonth = SetMount(viewModel.month+1),
+            selectedYear = viewModel.year.toString(),
+            onMonthSelected = viewModel::updateMonth,
+            onYearSelected = viewModel::updateYear,
+            currentYear = viewModel.year,
+            onDismissRequest = { openCalendarDialog = false }
+        )
+    }
+
+
+
 
     Scaffold(topBar = {
         TopAppBarStart(
             title = viewModel.name,
-            false,
-            navigateUp = navigateBack
+            true,
+            navigateUp = navigateBack,
+            settingUp = { openCalendarDialog = true }
         )
     }) { innerPadding ->
         FinanceAnalysisContainer(
@@ -149,23 +167,16 @@ fun FinanceAnalysisContainer(
 //                onYearSelected = { selectedYear = it }
 //            )
 //        }
-        MonthYearPicker(
-            selectedMonth = "Январь",
-            selectedYear = 2024,
-            onMonthSelected = {},
-            onYearSelected = {},
-            onDismissRequest = {}
+        AlertDialogExample(
+            onDismissRequest = { openAlertDialog = false },
+            onConfirmation = {
+                openAlertDialog = false
+                println("Confirmation registered") // Add logic here to handle confirmation.
+            },
+            dialogTitle = "Сэкономлено",
+            dialogText = "Сэкономлено - это сумма, которую вы сберегли, используя свой товар для личных нужд, вместо того чтобы покупать его в магазине.",
+            icon = Icons.Default.Info
         )
-//        AlertDialogExample(
-//            onDismissRequest = { openAlertDialog = false },
-//            onConfirmation = {
-//                openAlertDialog = false
-//                println("Confirmation registered") // Add logic here to handle confirmation.
-//            },
-//            dialogTitle = "Сэкономлено",
-//            dialogText = "Сэкономлено - это сумма, которую вы сберегли, используя свой товар для личных нужд, вместо того чтобы покупать его в магазине.",
-//            icon = Icons.Default.Info
-//        )
     }
 
     if (openAlertDialogScrap) {
@@ -373,18 +384,19 @@ fun <T> PullOutCard(
 @Composable
 fun MonthYearPicker(
     selectedMonth: String,
-    selectedYear: Int,
-    onMonthSelected: (String) -> Unit,
+    selectedYear: String,
+    onMonthSelected: (Int) -> Unit,
     onYearSelected: (Int) -> Unit,
     currentYear: Int = 2024,
     yearRange: IntRange = (2020..currentYear),
     onDismissRequest: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-//    var category by remember { mutableStateOf(selectedMonth) }
+    var expandedYear by remember { mutableStateOf(false) }
+
     val months = listOf(
         "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь", "За весь год"
     )
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -400,6 +412,7 @@ fun MonthYearPicker(
 
             Column {
 
+                Text(text = selectedMonth + selectedYear)
 
                 // Month Picker
                 ExposedDropdownMenuBox(
@@ -423,7 +436,7 @@ fun MonthYearPicker(
                             DropdownMenuItem(
                                 text = { Text(text = month) },
                                 onClick = {
-                                    onMonthSelected(month)
+                                    onMonthSelected(SetMountRevers(month))
                                     expanded = false
                                 }
                             )
@@ -431,19 +444,35 @@ fun MonthYearPicker(
                     }
                 }
 
-                LazyColumn(
-                    modifier = Modifier.height(200.dp) // Set an appropriate height
+                ExposedDropdownMenuBox(
+                    expanded = expandedYear,
+                    onExpandedChange = { expandedYear = !expandedYear }
                 ) {
-                    items(yearRange.toList()) { year ->
-                        Text(
-                            text = year.toString(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                                .clickable { onYearSelected(year) }
-                        )
+                    TextField(
+                        value = selectedYear,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Выберети год") },
+                        trailingIcon = {
+                            Icon(Icons.Filled.ArrowDropDown, null)
+                        }
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        yearRange.toList().forEach { year ->
+                            DropdownMenuItem(
+                                text = { Text(text = year.toString()) },
+                                onClick = {
+                                    onYearSelected(year)
+                                    expandedYear = false
+                                }
+                            )
+                        }
                     }
                 }
+
 
                 Row(
                     modifier = Modifier
@@ -454,18 +483,55 @@ fun MonthYearPicker(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Dismiss")
+                        Text("Отмена")
                     }
                     TextButton(
                         onClick = { },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("Confirm")
+                        Text("Принять")
                     }
                 }
 
             }
         }
+    }
+}
+
+fun SetMount(mount: Int): String {
+    return when (mount) {
+        1 -> "Январь"
+        2 -> "Февраль"
+        3 -> "Март"
+        4 -> "Апрель"
+        5 -> "Май"
+        6 -> "Июнь"
+        7 -> "Июль"
+        8 -> "Август"
+        9 -> "Сентябрь"
+        10 -> "Октябрь"
+        11 -> "Ноябрь"
+        12 -> "Декабрь"
+        else -> "За весь год"
+    }
+}
+
+fun SetMountRevers(mount: String): Int {
+    return when (mount) {
+        "Январь" -> 1
+        "Февраль" -> 2
+        "Март" -> 3
+        "Апрель" -> 4
+        "Май" -> 5
+        "Июнь" -> 6
+        "Июль" -> 7
+        "Август" -> 8
+        "Сентябрь" -> 9
+        "Октябрь" -> 10
+        "Ноябрь" -> 11
+        "Декабрь" -> 12
+        else -> 0
+
     }
 }
 

@@ -286,8 +286,8 @@ interface ItemDao {
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
     // Analysis
-    @Query("SELECT suffix as title, COALESCE(SUM(disc), 0) AS priceAll from MyFerma Where idPT=:id and title=:name")
-    fun getAnalysisAddAllTime(id: Int,name:String): Flow<Fin>
+    @Query("SELECT suffix as title, COALESCE(SUM(disc), 0) AS priceAll from MyFerma Where idPT=:id and title=:name and (mount = :month OR :month IS NULL) and year=:year")
+    fun getAnalysisAddAllTime(id: Int,name:String, month:Int?, year: Int): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discSale), 0) AS priceAll from MyFermaSale Where idPT=:id and titleSale=:name")
     fun getAnalysisSaleAllTime(id: Int,name:String): Flow<Fin>

@@ -12,6 +12,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCoutUiStateLimit
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEditUiState
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.home.AddTableUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -19,6 +20,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.TimeZone
 
 class FinanceAnalysisViewModel(
     savedStateHandle: SavedStateHandle,
@@ -27,6 +30,14 @@ class FinanceAnalysisViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArg])
     val name: String = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArgTwo])
+
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    var month by mutableStateOf(calendar.get(Calendar.MONTH))
+        private set
+    var year by mutableStateOf(calendar.get(Calendar.YEAR))
+        private set
+
+
 
     var analysisAddAllTime by mutableStateOf(FinUiState())
         private set
@@ -100,6 +111,16 @@ class FinanceAnalysisViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
+
+    fun updateMonth(itemDetails: Int) {
+        month =
+            itemDetails
+    }
+
+    fun updateYear(itemDetails: Int) {
+        year =
+            itemDetails
+    }
 
 }
 
