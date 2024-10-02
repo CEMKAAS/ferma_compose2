@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
@@ -32,9 +33,9 @@ class FinanceAnalysisViewModel(
     val name: String = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArgTwo])
 
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    var month by mutableStateOf(calendar.get(Calendar.MONTH))
+    var month: Int by mutableIntStateOf(0)
         private set
-    var year by mutableStateOf(calendar.get(Calendar.YEAR))
+    var year : Int by mutableIntStateOf(0)
         private set
 
 
@@ -60,7 +61,7 @@ class FinanceAnalysisViewModel(
 
     init {
         viewModelScope.launch {
-            analysisAddAllTime = itemsRepository.getAnalysisAddAllTime(itemId, name)
+            analysisAddAllTime = itemsRepository.getAnalysisAddAllTime(itemId, name, month, year )
                 .filterNotNull()
                 .first().toFinUiState()
             analysisSaleAllTime= itemsRepository.getAnalysisSaleAllTime(itemId, name)

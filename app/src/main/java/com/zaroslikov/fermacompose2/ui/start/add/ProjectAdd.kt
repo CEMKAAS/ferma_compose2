@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -263,6 +265,40 @@ fun AddProjectContainer(
     }
 }
 
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun DatePickerDialogSample(
+//    datePickerState: DatePickerState,
+//    dateToday: String,
+//    onDateSelected: (String) -> Unit
+//) {
+//    DatePickerDialog(
+//        onDismissRequest = {
+//            onDateSelected(dateToday)
+//        },
+//        confirmButton = {
+//            TextButton(
+//                onClick = {
+//                    val format = SimpleDateFormat("dd.MM.yyyy")
+//                    val formattedDate: String =
+//                        format.format(datePickerState.selectedDateMillis)
+//                    onDateSelected(formattedDate)
+//                },
+//            ) { Text("Выбрать") }
+//        },
+//        dismissButton = {
+//            TextButton(
+//                onClick = {
+//                    onDateSelected(dateToday)
+//                }
+//            ) { Text("Назад") }
+//        }
+//    ) {
+//        DatePicker(state = datePickerState)
+//    }
+//}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialogSample(
@@ -277,7 +313,7 @@ fun DatePickerDialogSample(
         confirmButton = {
             TextButton(
                 onClick = {
-                    val format = SimpleDateFormat("dd.MM.yyyy")
+                    val format = SimpleDateFormat("MM.yyyy")
                     val formattedDate: String =
                         format.format(datePickerState.selectedDateMillis)
                     onDateSelected(formattedDate)
@@ -292,9 +328,10 @@ fun DatePickerDialogSample(
             ) { Text("Назад") }
         }
     ) {
-        DatePicker(state = datePickerState)
+        DatePicker(state = datePickerState, dateFormatter = DatePickerDefaults.dateFormatter())
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -330,7 +367,6 @@ fun DatePickerDialogSampleNoLimit(
 }
 
 
-
 //@Preview(showBackground = true)
 //@Composable
 //fun AddProjectPrewie() {
@@ -342,7 +378,7 @@ fun DatePickerDialogSampleNoLimit(
 //}
 
 @OptIn(ExperimentalMaterial3Api::class)
-object PastOrPresentSelectableDates: SelectableDates {
+object PastOrPresentSelectableDates : SelectableDates {
     override fun isSelectableDate(utcTimeMillis: Long): Boolean {
         return utcTimeMillis <= System.currentTimeMillis()
     }

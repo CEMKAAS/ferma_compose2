@@ -426,11 +426,17 @@ fun MonthYearPicker(
                         label = { Text("Выберети месяц") },
                         trailingIcon = {
                             Icon(Icons.Filled.ArrowDropDown, null)
-                        }
+                        },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp),
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        onDismissRequest = {
+                            expanded = false
+                        }
                     ) {
                         months.forEach { month ->
                             DropdownMenuItem(
