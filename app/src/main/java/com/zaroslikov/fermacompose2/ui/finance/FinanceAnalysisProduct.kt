@@ -50,6 +50,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ScopeUpdateScope
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,10 +68,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.TopAppBarCalendar
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import java.text.SimpleDateFormat
@@ -93,28 +96,28 @@ fun FinanceAnalysisProduct(
     viewModel: FinanceAnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     var openCalendarDialog by remember { mutableStateOf(false) }
-//    if (openCalendarDialog) {
-//
-//        MonthYearPicker(
-//            selectedMonth = SetMount(viewModel.month+1),
-//            selectedYear = viewModel.year.toString(),
-//            onMonthSelected = viewModel::updateMonth,
-//            onYearSelected = viewModel::updateYear,
-//            currentYear = viewModel.year,
-//            onDismissRequest = { openCalendarDialog = false }
-//        )
-//    }
+    var text by remember { mutableStateOf("все время") }
+
     if (openCalendarDialog) {
         DateRangePickerModal(
-            onDateRangeSelected = {},
-            onDismiss = {openCalendarDialog = false}
+            onDateRangeSelected = {
+                Pair(it.first?.let { it1 -> viewModel.updateDateBegin(it1) },
+                    it.second?.let { it1 -> viewModel.updateDateEnd(it1) })
+            },
+            onDismiss = { openCalendarDialog = false },
+            dateBegin = viewModel.dateBegin,
+            dateEnd = viewModel.dateEnd,
+            upAnalisis = {
+                viewModel.upAnalisis()
+                val format = SimpleDateFormat("dd.MM.yyyy")
+                text = "${format.format(viewModel.dateBegin)} - ${
+                        format.format(viewModel.dateEnd)}"
+            }
         )
     }
 
-
-
     Scaffold(topBar = {
-        TopAppBarStart(
+        TopAppBarCalendar(
             title = viewModel.name,
             true,
             navigateUp = navigateBack,
@@ -126,6 +129,7 @@ fun FinanceAnalysisProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
+            text = text,
             analysisAddAllTime = viewModel.analysisAddAllTime,
             analysisSaleAllTime = viewModel.analysisSaleAllTime,
             analysisWriteOffAllTime = viewModel.analysisWriteOffAllTime,
@@ -144,6 +148,7 @@ fun FinanceAnalysisProduct(
 @Composable
 fun FinanceAnalysisContainer(
     modifier: Modifier,
+    text: String,
     analysisAddAllTime: FinUiState,
     analysisSaleAllTime: FinUiState,
     analysisWriteOffAllTime: FinUiState,
@@ -203,7 +208,7 @@ fun FinanceAnalysisContainer(
             modifier = modifierCard
         ) {
             Text(
-                text = "Данные по продукции за все время:", modifier = modifierHeading,
+                text = "Данные по продукции за $text:", modifier = modifierHeading,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
@@ -231,17 +236,19 @@ fun FinanceAnalysisContainer(
                 text = "  На утилизацию: ${formatter(analysisWriteOffScrapAllTime.priceAll)} ${analysisWriteOffScrapAllTime.title}",
                 modifier = modifierText
             )
-            Text(
-                text = "На скаде: ${formatter(analysisAddAllTime.priceAll - analysisSaleAllTime.priceAll - analysisWriteOffAllTime.priceAll)} ${analysisAddAllTime.title}",
-                modifier = modifierText
-            )
+            if (text == "все время") {
+                Text(
+                    text = "На скаде: ${formatter(analysisAddAllTime.priceAll - analysisSaleAllTime.priceAll - analysisWriteOffAllTime.priceAll)} ${analysisAddAllTime.title}",
+                    modifier = modifierText
+                )
+            }
         }
 
         Card(
             modifier = modifierCard
         ) {
             Text(
-                text = "Данные по финансам за все время:", modifier = modifierHeading,
+                text = "Данные по финансам за $text:", modifier = modifierHeading,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
@@ -377,9 +384,17 @@ fun <T> PullOutCard(
 @Composable
 fun DateRangePickerModal(
     onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    upAnalisis: () -> Unit,
+    dateBegin: Long,
+    dateEnd: Long
 ) {
-    val dateRangePickerState = rememberDateRangePickerState()
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val dateRangePickerState = rememberDateRangePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedStartDateMillis = dateBegin,
+        initialSelectedEndDateMillis = dateEnd
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
@@ -392,6 +407,7 @@ fun DateRangePickerModal(
                             dateRangePickerState.selectedEndDateMillis
                         )
                     )
+                    upAnalisis()
                     onDismiss()
                 }
             ) {

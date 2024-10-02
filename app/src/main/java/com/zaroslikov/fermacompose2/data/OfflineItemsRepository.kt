@@ -176,8 +176,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> =
         itemDao.getCurrentBalanceWarehouse(id)
 
-    override fun getAnalysisAddAllTime(id: Int, name: String, month: Int, year: Int): Flow<Fin> =
-        itemDao.getAnalysisAddAllTime(id, name, month, year)
+    override fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin> =
+        itemDao.getAnalysisAddAllTime(id, name)
 
     override fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin> =
         itemDao.getAnalysisSaleAllTime(id, name)
@@ -210,6 +210,83 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         id: Int,
         name: String
     ): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTime(id, name)
+
+        //analysis Range
+    override fun getAnalysisAddAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin> = itemDao.getAnalysisAddAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisSaleAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin> = itemDao.getAnalysisSaleAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisWriteOffAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin> = itemDao.getAnalysisWriteOffAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisWriteOffOwnNeedsAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin> = itemDao.getAnalysisWriteOffOwnNeedsAllTimeRange(id, name, dateBegin, dateEnd)
+    override fun getAnalysisWriteOffScrapAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin> = itemDao.getAnalysisWriteOffScrapAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisSaleSoldAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double> = itemDao.getAnalysisSaleSoldAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double> = itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisWriteOffScrapMoneyAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double> = itemDao.getAnalysisWriteOffScrapMoneyAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisAddAverageValueAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin> = itemDao.getAnalysisAddAverageValueAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisAddAnimalAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnimalTitSuff>> = itemDao.getAnalysisAddAnimalAllTimeRange(id, name, dateBegin, dateEnd)
+
+    override fun getAnalysisSaleBuyerAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTimeRange(id, name, dateBegin, dateEnd)
 
     override suspend fun insertIncubator(item: Incubator) =
         itemDao.insertIncubator(item)

@@ -32,6 +32,7 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
+import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
@@ -169,8 +170,7 @@ interface ItemsRepository {
 
 
     // Analysis
-    fun getAnalysisAddAllTime(id: Int, name: String, month:Int, year: Int): Flow<Fin>
-    fun getAnalysisAddAllTimeList(id: Int, name: String, month:Int): Flow<List<Fin>>
+    fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Fin>
@@ -181,6 +181,19 @@ interface ItemsRepository {
     fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
     fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    //AnalisisRange
+     fun getAnalysisAddAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+     fun getAnalysisSaleAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+     fun getAnalysisWriteOffAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+     fun getAnalysisWriteOffOwnNeedsAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+     fun getAnalysisWriteOffScrapAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+     fun getAnalysisSaleSoldAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
+     fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
+     fun getAnalysisWriteOffScrapMoneyAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
+     fun getAnalysisAddAverageValueAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+     fun getAnalysisAddAnimalAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<List<AnimalTitSuff>>
+     fun getAnalysisSaleBuyerAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<List<AnalysisSaleBuyerAllTime>>
 
 
     suspend fun insertIncubator(item: Incubator)

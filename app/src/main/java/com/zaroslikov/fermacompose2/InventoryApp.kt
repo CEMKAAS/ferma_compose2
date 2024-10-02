@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
@@ -297,6 +298,43 @@ fun TopAppBarStart2(
         }
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarCalendar(
+    title: String,
+    settingBoolean: Boolean,
+    navigateUp: () -> Unit = {},
+    settingUp: () -> Unit = {}
+) {
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.largeTopAppBarColors(
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        title = {
+            Text(text = title)
+        },
+        navigationIcon = {
+            IconButton(onClick = navigateUp) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Назад"
+                )
+            }
+        },
+        actions = {
+            if (settingBoolean) {
+                IconButton(onClick = settingUp) {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Настройка"
+                    )
+                }
+            }
+        }
+    )
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
