@@ -170,6 +170,7 @@ interface ItemsRepository {
 
     // Analysis
     fun getAnalysisAddAllTime(id: Int, name: String, month:Int, year: Int): Flow<Fin>
+    fun getAnalysisAddAllTimeList(id: Int, name: String, month:Int): Flow<List<Fin>>
     fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Fin>

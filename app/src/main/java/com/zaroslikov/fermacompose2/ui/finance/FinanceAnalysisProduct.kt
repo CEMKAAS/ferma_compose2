@@ -38,6 +38,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -47,6 +48,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -91,18 +93,23 @@ fun FinanceAnalysisProduct(
     viewModel: FinanceAnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     var openCalendarDialog by remember { mutableStateOf(false) }
+//    if (openCalendarDialog) {
+//
+//        MonthYearPicker(
+//            selectedMonth = SetMount(viewModel.month+1),
+//            selectedYear = viewModel.year.toString(),
+//            onMonthSelected = viewModel::updateMonth,
+//            onYearSelected = viewModel::updateYear,
+//            currentYear = viewModel.year,
+//            onDismissRequest = { openCalendarDialog = false }
+//        )
+//    }
     if (openCalendarDialog) {
-
-        MonthYearPicker(
-            selectedMonth = SetMount(viewModel.month+1),
-            selectedYear = viewModel.year.toString(),
-            onMonthSelected = viewModel::updateMonth,
-            onYearSelected = viewModel::updateYear,
-            currentYear = viewModel.year,
-            onDismissRequest = { openCalendarDialog = false }
+        DateRangePickerModal(
+            onDateRangeSelected = {},
+            onDismiss = {openCalendarDialog = false}
         )
     }
-
 
 
 
@@ -154,19 +161,6 @@ fun FinanceAnalysisContainer(
     var openAlertDialogScrap by remember { mutableStateOf(false) }
 
     if (openAlertDialog) {
-
-//        @Composable
-//        fun MyCalendarScreen() {
-//            var selectedMonth by remember { mutableStateOf("January") }
-//            var selectedYear by remember { mutableStateOf(2022) }
-//
-//            MonthYearPicker(
-//                selectedMonth = selectedMonth,
-//                selectedYear = selectedYear,
-//                onMonthSelected = { selectedMonth = it },
-//                onYearSelected = { selectedYear = it }
-//            )
-//        }
         AlertDialogExample(
             onDismissRequest = { openAlertDialog = false },
             onConfirmation = {
@@ -379,167 +373,216 @@ fun <T> PullOutCard(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonthYearPicker(
-    selectedMonth: String,
-    selectedYear: String,
-    onMonthSelected: (Int) -> Unit,
-    onYearSelected: (Int) -> Unit,
-    currentYear: Int = 2024,
-    yearRange: IntRange = (2020..currentYear),
-    onDismissRequest: () -> Unit,
+fun DateRangePickerModal(
+    onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
+    onDismiss: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var expandedYear by remember { mutableStateOf(false) }
+    val dateRangePickerState = rememberDateRangePickerState()
 
-    val months = listOf(
-        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь", "За весь год"
-    )
-
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        // Draw a rectangle shape with rounded corners inside the dialog
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(375.dp)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-
-
-            Column {
-
-                Text(text = selectedMonth + selectedYear)
-
-                // Month Picker
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
-                    TextField(
-                        value = selectedMonth,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Выберети месяц") },
-                        trailingIcon = {
-                            Icon(Icons.Filled.ArrowDropDown, null)
-                        },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .padding(bottom = 10.dp),
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onDateRangeSelected(
+                        Pair(
+                            dateRangePickerState.selectedStartDateMillis,
+                            dateRangePickerState.selectedEndDateMillis
+                        )
                     )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-                            expanded = false
-                        }
-                    ) {
-                        months.forEach { month ->
-                            DropdownMenuItem(
-                                text = { Text(text = month) },
-                                onClick = {
-                                    onMonthSelected(SetMountRevers(month))
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
+                    onDismiss()
                 }
-
-                ExposedDropdownMenuBox(
-                    expanded = expandedYear,
-                    onExpandedChange = { expandedYear = !expandedYear }
-                ) {
-                    TextField(
-                        value = selectedYear,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Выберети год") },
-                        trailingIcon = {
-                            Icon(Icons.Filled.ArrowDropDown, null)
-                        }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        yearRange.toList().forEach { year ->
-                            DropdownMenuItem(
-                                text = { Text(text = year.toString()) },
-                                onClick = {
-                                    onYearSelected(year)
-                                    expandedYear = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    TextButton(
-                        onClick = { onDismissRequest() },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text("Отмена")
-                    }
-                    TextButton(
-                        onClick = { },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text("Принять")
-                    }
-                }
-
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
             }
         }
+    ) {
+        DateRangePicker(
+            state = dateRangePickerState,
+            title = {
+                Text(
+                    text = "Select date range"
+                )
+            },
+            showModeToggle = false,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(500.dp)
+                .padding(16.dp)
+        )
     }
 }
 
-fun SetMount(mount: Int): String {
-    return when (mount) {
-        1 -> "Январь"
-        2 -> "Февраль"
-        3 -> "Март"
-        4 -> "Апрель"
-        5 -> "Май"
-        6 -> "Июнь"
-        7 -> "Июль"
-        8 -> "Август"
-        9 -> "Сентябрь"
-        10 -> "Октябрь"
-        11 -> "Ноябрь"
-        12 -> "Декабрь"
-        else -> "За весь год"
-    }
-}
 
-fun SetMountRevers(mount: String): Int {
-    return when (mount) {
-        "Январь" -> 1
-        "Февраль" -> 2
-        "Март" -> 3
-        "Апрель" -> 4
-        "Май" -> 5
-        "Июнь" -> 6
-        "Июль" -> 7
-        "Август" -> 8
-        "Сентябрь" -> 9
-        "Октябрь" -> 10
-        "Ноябрь" -> 11
-        "Декабрь" -> 12
-        else -> 0
-
-    }
-}
+//
+//
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun MonthYearPicker(
+//    selectedMonth: String,
+//    selectedYear: String,
+//    onMonthSelected: (Int) -> Unit,
+//    onYearSelected: (Int) -> Unit,
+//    currentYear: Int = 2024,
+//    yearRange: IntRange = (2020..currentYear),
+//    onDismissRequest: () -> Unit,
+//) {
+//    var expanded by remember { mutableStateOf(false) }
+//    var expandedYear by remember { mutableStateOf(false) }
+//
+//    val months = listOf(
+//        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+//        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь", "За весь год"
+//    )
+//
+//    Dialog(onDismissRequest = { onDismissRequest() }) {
+//        // Draw a rectangle shape with rounded corners inside the dialog
+//        Card(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(375.dp)
+//                .padding(16.dp),
+//            shape = RoundedCornerShape(16.dp),
+//        ) {
+//
+//
+//            Column {
+//
+//                Text(text = selectedMonth + selectedYear)
+//
+//                // Month Picker
+//                ExposedDropdownMenuBox(
+//                    expanded = expanded,
+//                    onExpandedChange = { expanded = !expanded }
+//                ) {
+//                    TextField(
+//                        value = selectedMonth,
+//                        onValueChange = {},
+//                        readOnly = true,
+//                        label = { Text("Выберети месяц") },
+//                        trailingIcon = {
+//                            Icon(Icons.Filled.ArrowDropDown, null)
+//                        },
+//                        modifier = Modifier
+//                            .menuAnchor()
+//                            .fillMaxWidth()
+//                            .padding(bottom = 10.dp),
+//                    )
+//                    ExposedDropdownMenu(
+//                        expanded = expanded,
+//                        onDismissRequest = {
+//                            expanded = false
+//                        }
+//                    ) {
+//                        months.forEach { month ->
+//                            DropdownMenuItem(
+//                                text = { Text(text = month) },
+//                                onClick = {
+//                                    onMonthSelected(SetMountRevers(month))
+//                                    expanded = false
+//                                }
+//                            )
+//                        }
+//                    }
+//                }
+//
+//                ExposedDropdownMenuBox(
+//                    expanded = expandedYear,
+//                    onExpandedChange = { expandedYear = !expandedYear }
+//                ) {
+//                    TextField(
+//                        value = selectedYear,
+//                        onValueChange = {},
+//                        readOnly = true,
+//                        label = { Text("Выберети год") },
+//                        trailingIcon = {
+//                            Icon(Icons.Filled.ArrowDropDown, null)
+//                        }
+//                    )
+//                    ExposedDropdownMenu(
+//                        expanded = expanded,
+//                        onDismissRequest = { expanded = false }
+//                    ) {
+//                        yearRange.toList().forEach { year ->
+//                            DropdownMenuItem(
+//                                text = { Text(text = year.toString()) },
+//                                onClick = {
+//                                    onYearSelected(year)
+//                                    expandedYear = false
+//                                }
+//                            )
+//                        }
+//                    }
+//                }
+//
+//
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.Center,
+//                ) {
+//                    TextButton(
+//                        onClick = { onDismissRequest() },
+//                        modifier = Modifier.padding(8.dp),
+//                    ) {
+//                        Text("Отмена")
+//                    }
+//                    TextButton(
+//                        onClick = { },
+//                        modifier = Modifier.padding(8.dp),
+//                    ) {
+//                        Text("Принять")
+//                    }
+//                }
+//
+//            }
+//        }
+//    }
+//}
+//
+//fun SetMount(mount: Int): String {
+//    return when (mount) {
+//        1 -> "Январь"
+//        2 -> "Февраль"
+//        3 -> "Март"
+//        4 -> "Апрель"
+//        5 -> "Май"
+//        6 -> "Июнь"
+//        7 -> "Июль"
+//        8 -> "Август"
+//        9 -> "Сентябрь"
+//        10 -> "Октябрь"
+//        11 -> "Ноябрь"
+//        12 -> "Декабрь"
+//        else -> "За весь год"
+//    }
+//}
+//
+//fun SetMountRevers(mount: String): Int {
+//    return when (mount) {
+//        "Январь" -> 1
+//        "Февраль" -> 2
+//        "Март" -> 3
+//        "Апрель" -> 4
+//        "Май" -> 5
+//        "Июнь" -> 6
+//        "Июль" -> 7
+//        "Август" -> 8
+//        "Сентябрь" -> 9
+//        "Октябрь" -> 10
+//        "Ноябрь" -> 11
+//        "Декабрь" -> 12
+//        else -> 0
+//
+//    }
+//}
 
 
 //
