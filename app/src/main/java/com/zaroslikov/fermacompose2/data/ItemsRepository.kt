@@ -137,6 +137,10 @@ interface ItemsRepository {
     fun getExpenses(id: Int): Flow<Double>
 
 
+    fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double>
+    fun getExpensesMountFin(id: Int, mount: Int, year: Int): Flow<Double>
+
+
     fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
     fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
     fun getOwnNeedMonth(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
@@ -173,15 +177,15 @@ interface ItemsRepository {
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
     fun getProductListCategoryIncomeCurrentMonth(
         id: Int,
-        mount: Int,
-        year: Int,
+        dateBegin: String,
+        dateEnd: String,
         category: String
     ): Flow<List<Fin>>
 
     fun getProductLisCategoryExpensesCurrentMonth(
         id: Int,
-        mount: Int,
-        year: Int,
+        dateBegin: String,
+        dateEnd: String,
         category: String
     ): Flow<List<Fin>>
 

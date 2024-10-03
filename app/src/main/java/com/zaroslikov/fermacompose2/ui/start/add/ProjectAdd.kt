@@ -313,7 +313,7 @@ fun DatePickerDialogSample(
         confirmButton = {
             TextButton(
                 onClick = {
-                    val format = SimpleDateFormat("MM.yyyy")
+                    val format = SimpleDateFormat("dd.MM.yyyy")
                     val formattedDate: String =
                         format.format(datePickerState.selectedDateMillis)
                     onDateSelected(formattedDate)

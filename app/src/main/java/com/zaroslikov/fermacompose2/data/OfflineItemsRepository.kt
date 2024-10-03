@@ -129,6 +129,10 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentBalance(id: Int): Flow<Double> = itemDao.getCurrentBalance(id)
     override fun getIncome(id: Int): Flow<Double> = itemDao.getIncome(id)
     override fun getExpenses(id: Int): Flow<Double> = itemDao.getExpenses(id)
+    override fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double> = itemDao.getIncomeMountFin(id, mount, year)
+    override fun getExpensesMountFin(id: Int, mount: Int, year: Int): Flow<Double> = itemDao.getExpensesMountFin(id, mount, year)
+
+
     override fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
         itemDao.getIncomeMount(id, dateBegin,dateEnd)
     override fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
@@ -162,19 +166,19 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getProductListCategoryIncomeCurrentMonth(
         id: Int,
-        mount: Int,
-        year: Int,
+        dateBegin: String,
+        dateEnd: String,
         category: String
     ): Flow<List<Fin>> =
-        itemDao.getProductListCategoryIncomeCurrentMonth(id, mount, year, category)
+        itemDao.getProductListCategoryIncomeCurrentMonth(id, dateBegin, dateEnd, category)
 
     override fun getProductLisCategoryExpensesCurrentMonth(
         id: Int,
-        mount: Int,
-        year: Int,
+        dateBegin: String,
+        dateEnd: String,
         category: String
     ): Flow<List<Fin>> =
-        itemDao.getProductLisCategoryExpensesCurrentMonth(id, mount, year, category)
+        itemDao.getProductLisCategoryExpensesCurrentMonth(id, dateBegin, dateEnd, category)
 
     override fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>> =
         itemDao.getCurrentBalanceWarehouse(id)

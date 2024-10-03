@@ -389,7 +389,6 @@ fun DateRangePickerModal(
     dateBegin: Long,
     dateEnd: Long
 ) {
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val dateRangePickerState = rememberDateRangePickerState(
         selectableDates = PastOrPresentSelectableDates,
         initialSelectedStartDateMillis = dateBegin,
@@ -416,7 +415,7 @@ fun DateRangePickerModal(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text("Назад")
             }
         }
     ) {
@@ -424,7 +423,7 @@ fun DateRangePickerModal(
             state = dateRangePickerState,
             title = {
                 Text(
-                    text = "Select date range"
+                    text = "Выберите период"
                 )
             },
             showModeToggle = false,

@@ -249,7 +249,7 @@ private fun FinanceMountBody(
             navigateToCategory = navigateToCategory,
             idPT = idPT,
             heading = "Расходы по категории за $text",
-            headingNull = "Расходов за $text не было нет (Это хорошо)"
+            headingNull = "Расходов за $text не было (Это хорошо)"
         )
     }
 }

@@ -46,28 +46,24 @@ class FinanceViewModel(
 
     init {
         viewModelScope.launch {
+
             currentBalanceUiState = itemsRepository.getCurrentBalance(itemId)
                 .filterNotNull()
                 .first().toDouble()
-        }
-        viewModelScope.launch {
+
             incomeUiState = itemsRepository.getIncome(itemId)
                 .filterNotNull()
                 .first().toDouble()
-        }
-        viewModelScope.launch {
+
             expensesUiState = itemsRepository.getExpenses(itemId)
                 .filterNotNull()
                 .first().toDouble()
-        }
 
-        viewModelScope.launch {
-            incomeMountUiState = itemsRepository.getIncomeMount(itemId, month, year)
+            incomeMountUiState = itemsRepository.getIncomeMountFin(itemId, month, year)
                 .filterNotNull()
                 .first().toDouble()
-        }
-        viewModelScope.launch {
-            expensesMountUiState = itemsRepository.getExpensesMount(itemId, month, year)
+
+            expensesMountUiState = itemsRepository.getExpensesMountFin(itemId, month, year)
                 .filterNotNull()
                 .first().toDouble()
         }

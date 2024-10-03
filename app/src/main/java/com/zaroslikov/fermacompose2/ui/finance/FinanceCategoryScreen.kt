@@ -43,8 +43,10 @@ object FinanceCategoryDestination : NavigationDestination {
     const val itemIdArg = "itemId"
     const val itemIdArgTwo = "itemCategory"
     const val itemIdArgThree = "itemBoolean"
+    const val itemIdArgFour = "itemDateBegin"
+    const val itemIdArgFive = "itemDateEnd"
     val routeWithArgs =
-        "${route}/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgThree}"
+        "${route}/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgThree}/${itemIdArgFour}/${itemIdArgFive}"
 }
 
 /**

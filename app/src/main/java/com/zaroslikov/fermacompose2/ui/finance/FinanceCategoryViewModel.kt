@@ -33,17 +33,16 @@ class FinanceCategoryViewModel(
         checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArgTwo])
     val itemBoolean: Boolean =
         checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArgThree])
+    val dateBegin: String =
+        checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArgFour])
+    val dateEnd: String =
+        checkNotNull(savedStateHandle[FinanceCategoryDestination.itemIdArgFive])
 
-
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val month = calendar[Calendar.MONTH] + 1
-    val year = calendar[Calendar.YEAR]
 
     val financeCategoryUiState: StateFlow<FinanceCategoryState> = if (itemBoolean) {
         itemsRepository.getProductListCategoryIncomeCurrentMonth(
             itemId,
-            month,
-            year,
+            dateBegin, dateEnd,
             itemCategory
         )
             .map { FinanceCategoryState(it) }
@@ -55,8 +54,7 @@ class FinanceCategoryViewModel(
     } else {
         itemsRepository.getProductLisCategoryExpensesCurrentMonth(
             itemId,
-            month,
-            year,
+            dateBegin, dateEnd,
             itemCategory
         )
             .map { FinanceCategoryState(it) }

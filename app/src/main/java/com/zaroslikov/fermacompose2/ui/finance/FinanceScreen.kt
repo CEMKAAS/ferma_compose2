@@ -416,7 +416,7 @@ data class FinUiState(
 data class FinanceCategoryData(
     val idPT: Int,
     val category: String,
-    val incomeBoolean: Boolean
+    val incomeBoolean: Boolean,
 )
 
 data class FinanceIncomeExpensesData(
