@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.TopAppBarCalendar
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
@@ -71,6 +72,7 @@ import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSampleNoLimit
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 object FinanceMountDestination : NavigationDestination {
@@ -98,23 +100,48 @@ fun FinanceMountScreen(
 
     val idProject = viewModel.itemId
 
-    val selectMonthBottomSheet = remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    var openCalendarDialog by remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf("Текущий месяц") }
+
+    if (openCalendarDialog) {
+        DateRangePickerModal(
+            onDateRangeSelected = {
+                Pair(it.first?.let { it1 -> viewModel.updateDateBegin(it1) },
+                    it.second?.let { it1 -> viewModel.updateDateEnd(it1) })
+            },
+            onDismiss = { openCalendarDialog = false },
+            dateBegin = viewModel.dateBegin,
+            dateEnd = viewModel.dateEnd,
+            upAnalisis = {
+                viewModel.upAnalisis()
+                val format = SimpleDateFormat("dd.MM.yyyy")
+                text = "${format.format(viewModel.dateBegin)} - ${
+                    format.format(viewModel.dateEnd)}"
+            }
+        )
+    }
+
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBarEdit(title = "Текущий месяц", navigateUp = navigateBack)
+            TopAppBarCalendar(
+                    title = text,
+            true,
+            navigateUp = navigateBack,
+            settingUp = { openCalendarDialog = true }
+            )
         }
     ) { innerPadding ->
         FinanceMountBody(
             incomeMount = viewModel.incomeMountUiState,
             expensesMount = viewModel.expensesMountUiState,
+            ownNeedsMonth = viewModel.ownNeedMonthUiState,
+            scrapMonth = viewModel.scrapMonthUiState,
             incomeRow = incomeRow.itemList,
             expensesRow = expensesRow.itemList,
             navigateToCategory = navigateToCategory,
+            text = text,
             idPT = idProject,
             modifier = modifier
                 .padding(innerPadding)
@@ -130,9 +157,12 @@ fun FinanceMountScreen(
 private fun FinanceMountBody(
     incomeMount: Double,
     expensesMount: Double,
+    ownNeedsMonth:Double,
+    scrapMonth:Double,
     incomeRow: List<Fin>,
     expensesRow: List<Fin>,
     navigateToCategory: (FinanceCategoryData) -> Unit,
+    text:String,
     idPT: Int,
     modifier: Modifier = Modifier
 ) {
@@ -179,12 +209,28 @@ private fun FinanceMountBody(
                 text = "Доход: ${formatter(incomeMount)} ₽",
                 modifier = modifierText
             )
+
+            Text(
+                text = "Сэкономлено: ${formatter(ownNeedsMonth)} ₽",
+                modifier = modifierText
+            )
+
             Text(
                 text = "Расход: ${formatter(expensesMount)} ₽",
                 modifier = modifierText
             )
             Text(
+                text = "Потери: ${formatter(scrapMonth)} ₽",
+                modifier = modifierText
+            )
+
+            Text(
                 text = "Прибыль: ${formatter(incomeMount - expensesMount)} ₽",
+                modifier = modifierText
+            )
+
+            Text(
+                text = "Итого: ${formatter(incomeMount + ownNeedsMonth - expensesMount - scrapMonth)} ₽",
                 modifier = modifierText
             )
 
@@ -194,16 +240,16 @@ private fun FinanceMountBody(
             list = incomeRow,
             navigateToCategory = navigateToCategory,
             idPT = idPT,
-            heading = "Доходы по категории в текущем месяце",
-            headingNull = "Доходов в этом месяце не было :("
+            heading = "Доходы по категории за $text",
+            headingNull = "Доходов за $text не было :("
         )
 
         LazyRowMount(
             list = expensesRow,
             navigateToCategory = navigateToCategory,
             idPT = idPT,
-            heading = "Расходы по категории в текущем месяце",
-            headingNull = "Расходов в этом месяце не было нет (Это хорошо)"
+            heading = "Расходы по категории за $text",
+            headingNull = "Расходов за $text не было нет (Это хорошо)"
         )
     }
 }

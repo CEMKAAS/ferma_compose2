@@ -136,16 +136,35 @@ interface ItemsRepository {
     fun getIncome(id: Int): Flow<Double>
     fun getExpenses(id: Int): Flow<Double>
 
-    fun getIncomeMount(id: Int, mount: Int, year: Int): Flow<Double>
-    fun getExpensesMount(id: Int, mount: Int, year: Int): Flow<Double>
 
-    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
-    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
+    fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
+    fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
+    fun getOwnNeedMonth(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
+    fun getScrapMonth(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
+
+    fun getCategoryIncomeCurrentMonth(id: Int, dateBegin: String, dateEnd: String): Flow<List<Fin>>
+    fun getCategoryExpensesCurrentMonth(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<Fin>>
+
     fun getIncomeExpensesCurrentMonth(
         id: Int,
         mount: Int,
         year: Int
     ): Flow<List<IncomeExpensesDetails>>
+
+//    fun getIncomeMount(id: Int, mount: Int, year: Int): Flow<Double>
+//    fun getExpensesMount(id: Int, mount: Int, year: Int): Flow<Double>
+//
+//    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
+//    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
+//    fun getIncomeExpensesCurrentMonth(
+//        id: Int,
+//        mount: Int,
+//        year: Int
+//    ): Flow<List<IncomeExpensesDetails>>
 
 
     fun getIncomeAllList(id: Int): Flow<List<Fin>>
@@ -183,17 +202,82 @@ interface ItemsRepository {
     fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
 
     //AnalisisRange
-     fun getAnalysisAddAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
-     fun getAnalysisSaleAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
-     fun getAnalysisWriteOffAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
-     fun getAnalysisWriteOffOwnNeedsAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
-     fun getAnalysisWriteOffScrapAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
-     fun getAnalysisSaleSoldAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
-     fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
-     fun getAnalysisWriteOffScrapMoneyAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
-     fun getAnalysisAddAverageValueAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
-     fun getAnalysisAddAnimalAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<List<AnimalTitSuff>>
-     fun getAnalysisSaleBuyerAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<List<AnalysisSaleBuyerAllTime>>
+    fun getAnalysisAddAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
+
+    fun getAnalysisSaleAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
+
+    fun getAnalysisWriteOffAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
+
+    fun getAnalysisWriteOffOwnNeedsAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
+
+    fun getAnalysisWriteOffScrapAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
+
+    fun getAnalysisSaleSoldAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffScrapMoneyAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisAddAverageValueAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
+
+    fun getAnalysisAddAnimalAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnimalTitSuff>>
+
+    fun getAnalysisSaleBuyerAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
 
 
     suspend fun insertIncubator(item: Incubator)

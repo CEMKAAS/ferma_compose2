@@ -129,17 +129,20 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentBalance(id: Int): Flow<Double> = itemDao.getCurrentBalance(id)
     override fun getIncome(id: Int): Flow<Double> = itemDao.getIncome(id)
     override fun getExpenses(id: Int): Flow<Double> = itemDao.getExpenses(id)
-    override fun getIncomeMount(id: Int, mount: Int, year: Int): Flow<Double> =
-        itemDao.getIncomeMount(id, mount, year)
+    override fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
+        itemDao.getIncomeMount(id, dateBegin,dateEnd)
+    override fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
+        itemDao.getExpensesMount(id,  dateBegin,dateEnd)
 
-    override fun getExpensesMount(id: Int, mount: Int, year: Int): Flow<Double> =
-        itemDao.getExpensesMount(id, mount, year)
+    override fun getOwnNeedMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double> = itemDao.getOwnNeedMonth(id,dateBegin, dateEnd)
 
-    override fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>> =
-        itemDao.getCategoryIncomeCurrentMonth(id, mount, year)
+    override fun getScrapMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double> = itemDao.getScrapMonth(id,dateBegin, dateEnd)
 
-    override fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>> =
-        itemDao.getCategoryExpensesCurrentMonth(id, mount, year)
+    override fun getCategoryIncomeCurrentMonth(id: Int, dateBegin: String, dateEnd: String): Flow<List<Fin>> =
+        itemDao.getCategoryIncomeCurrentMonth(id, dateBegin,dateEnd)
+
+    override fun getCategoryExpensesCurrentMonth(id: Int, dateBegin: String, dateEnd: String): Flow<List<Fin>> =
+        itemDao.getCategoryExpensesCurrentMonth(id,  dateBegin,dateEnd)
 
     override fun getIncomeExpensesCurrentMonth(
         id: Int,
