@@ -59,20 +59,20 @@ class MainActivity : ComponentActivity() {
 
 
                     //Межстра
-                    interstitialAdLoader = InterstitialAdLoader(this).apply {
-                        setAdLoadListener(object : InterstitialAdLoadListener {
-                            override fun onAdLoaded(ad: InterstitialAd) {
-                                interstitialAd = ad
-                                // The ad was loaded successfully. Now you can show loaded ad.
-                            }
-
-                            override fun onAdFailedToLoad(adRequestError: AdRequestError) {
-                                // Ad failed to load with AdRequestError.
-                                // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
-                            }
-                        })
-                    }
-                    loadInterstitialAd()
+//                    interstitialAdLoader = InterstitialAdLoader(this).apply {
+//                        setAdLoadListener(object : InterstitialAdLoadListener {
+//                            override fun onAdLoaded(ad: InterstitialAd) {
+//                                interstitialAd = ad
+//                                // The ad was loaded successfully. Now you can show loaded ad.
+//                            }
+//
+//                            override fun onAdFailedToLoad(adRequestError: AdRequestError) {
+//                                // Ad failed to load with AdRequestError.
+//                                // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+//                            }
+//                        })
+//                    }
+//                    loadInterstitialAd()
                 }
                 InventoryApp(modifier = Modifier)
 
@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
 
     private fun loadInterstitialAd() {
         val adRequestConfiguration =
-            AdRequestConfiguration.Builder("R-M-10848417-2").build()
+            AdRequestConfiguration.Builder("R-M-12224806-2").build()
         interstitialAdLoader?.loadAd(adRequestConfiguration)
     }
 
@@ -140,7 +140,6 @@ class MainActivity : ComponentActivity() {
 
 
     //Реклама при хапуске приложения
-
     private fun showAppOpenAd() {
         val appOpenAdEventListener = AdEventListener()
         appOpenAd?.setAdEventListener(appOpenAdEventListener)

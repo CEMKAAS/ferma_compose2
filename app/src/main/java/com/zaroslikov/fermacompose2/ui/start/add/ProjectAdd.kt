@@ -78,7 +78,6 @@ fun AddProject(
                 coroutineScope.launch {
                     viewModel.insertTable(it)
                     navigateToStart()
-                    (activity as MainActivity)?.showAd()
                 }
             }
         )

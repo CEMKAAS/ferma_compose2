@@ -209,6 +209,12 @@ interface ItemDao {
     @Query("SELECT COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS ResultCount FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id")
     fun getExpenses(id: Int): Flow<Double>
 
+    @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id")
+    fun getOwnNeed(id: Int): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id")
+    fun getScrap(id: Int): Flow<Double>
+
     @Query("SELECT COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS ResultCount FROM MyFermaSale WHERE MyFermaSale.idPT =:id and mount =:mount and year =:year")
     fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double>
 

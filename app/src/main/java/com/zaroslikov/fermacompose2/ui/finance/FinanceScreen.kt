@@ -110,6 +110,8 @@ fun FinanceScreen(
                 currentBalance = currentBalance,
                 income = income,
                 expenses = expenses,
+                ownNeed = viewModel.ownNeedUiState,
+                scrap = viewModel.scrapUiState,
                 incomeMount = incomeMount,
                 expensesMount = expensesMount,
                 incomeExpensesList = incomeExpensesList.itemList,
@@ -129,6 +131,8 @@ private fun FinanceBody(
     currentBalance: Double,
     income: Double,
     expenses: Double,
+    ownNeed:Double,
+    scrap:Double,
     incomeMount: Double,
     expensesMount: Double,
     incomeExpensesList: List<IncomeExpensesDetails>,
@@ -215,6 +219,41 @@ private fun FinanceBody(
 
             }
         }
+
+        Card(
+            onClick = { navigateToFinaceMount(idPT) },
+            modifier = Modifier
+                .padding(2.dp)
+                .fillMaxWidth(),
+        ) {
+
+            RowCardFin("Сэкономлено", "Потеряно")
+            RowCardFin("${formatter(ownNeed)} ₽", "${formatter(scrap)} ₽")
+
+            RowCardFin("Итог доходов", "Итог Расходов")
+            RowCardFin("${formatter(ownNeed + income)} ₽", "${formatter(scrap+expenses)} ₽")
+
+            Text(
+                text = "Итого",
+                textAlign = TextAlign.Center,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = "${formatter((ownNeed + income) - (scrap+expenses))} ",
+                textAlign = TextAlign.Center,
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp),
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+
 
         Card(
             onClick = { navigateToFinaceMount(idPT) },
@@ -377,31 +416,61 @@ fun TransactionRow(
     Divider(color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(5.dp))
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
+//@Composable
+//fun FinancePrewie() {
+//    FinanceBody(
+//        currentBalance = 155.0,
+//        income = 22.0,
+//        expenses = 33.0,
+//        expensesMount = 0.0,
+//        incomeMount = 0.0,
+//        incomeExpensesList = arrayListOf(
+//            IncomeExpensesDetails(
+//                "Govno",
+//                55.0,
+//                "ED",
+//                88.0,
+//                1,
+//                2,
+//                1996
+//            ), IncomeExpensesDetails("Govno", 55.0, "ED", 88.0, 1, 2, 1996)
+//        ),
+//        navigateToFinaceMount = {},
+//        navigateToIncomeExpenses = {},
+//        idPT = 1
+//    )
+//}
+
 @Composable
-fun FinancePrewie() {
-    FinanceBody(
-        currentBalance = 155.0,
-        income = 22.0,
-        expenses = 33.0,
-        expensesMount = 0.0,
-        incomeMount = 0.0,
-        incomeExpensesList = arrayListOf(
-            IncomeExpensesDetails(
-                "Govno",
-                55.0,
-                "ED",
-                88.0,
-                1,
-                2,
-                1996
-            ), IncomeExpensesDetails("Govno", 55.0, "ED", 88.0, 1, 2, 1996)
-        ),
-        navigateToFinaceMount = {},
-        navigateToIncomeExpenses = {},
-        idPT = 1
-    )
+fun RowCardFin(column1: String, column2: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier
+            .fillMaxWidth(),
+    ) {
+        Text(
+            text = column1,
+//                    textAlign = TextAlign.Center,
+            fontSize = 15.sp,
+            modifier = Modifier
+//                        .fillMaxWidth()
+                .padding(2.dp),
+            fontWeight = FontWeight.SemiBold
+        )
+        Text(
+            text = column2,
+//                    textAlign = TextAlign.Center,
+            fontSize = 15.sp,
+            modifier = Modifier
+//                        .fillMaxWidth()
+                .padding(2.dp),
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
+
 
 data class Fin(
     val title: String?, // может быть категория, название или суффикс
@@ -418,6 +487,14 @@ data class FinanceCategoryData(
     val category: String,
     val incomeBoolean: Boolean,
 )
+data class FinanceCategoryDataNav(
+    val idPT: Int,
+    val category: String,
+    val incomeBoolean: Boolean,
+    val dateBegin:String,
+    val dateEnd:String
+)
+
 
 data class FinanceIncomeExpensesData(
     val idPT: Int,

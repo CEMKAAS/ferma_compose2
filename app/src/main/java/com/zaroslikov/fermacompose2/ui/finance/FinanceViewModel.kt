@@ -38,10 +38,19 @@ class FinanceViewModel(
     var expensesUiState by mutableDoubleStateOf(0.00)
         private set
 
+    var ownNeedUiState by mutableDoubleStateOf(0.00)
+        private set
+    var scrapUiState by mutableDoubleStateOf(0.00)
+        private set
+
+
     var incomeMountUiState by mutableDoubleStateOf(0.00)
         private set
     var expensesMountUiState by mutableDoubleStateOf(0.00)
         private set
+
+
+
 
 
     init {
@@ -59,6 +68,14 @@ class FinanceViewModel(
                 .filterNotNull()
                 .first().toDouble()
 
+            ownNeedUiState = itemsRepository.getOwnNeed(itemId)
+                .filterNotNull()
+                .first().toDouble()
+
+            scrapUiState = itemsRepository.getScrap(itemId)
+                .filterNotNull()
+                .first().toDouble()
+
             incomeMountUiState = itemsRepository.getIncomeMountFin(itemId, month, year)
                 .filterNotNull()
                 .first().toDouble()
@@ -66,6 +83,8 @@ class FinanceViewModel(
             expensesMountUiState = itemsRepository.getExpensesMountFin(itemId, month, year)
                 .filterNotNull()
                 .first().toDouble()
+
+
         }
 
     }

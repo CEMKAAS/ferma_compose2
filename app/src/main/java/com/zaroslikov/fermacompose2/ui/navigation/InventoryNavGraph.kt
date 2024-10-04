@@ -289,21 +289,30 @@ fun InventoryNavHost(
             FinanceMountScreen(navigateBack = { navController.popBackStack() },
                 navigateToCategory = {
                     navController.navigate(
-                        "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}"
+                        "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}/${it.dateBegin}/${it.dateEnd}"
                     )
                 })
         }
 
-        composable(route = FinanceCategoryDestination.routeWithArgs,
-            arguments = listOf(navArgument(FinanceCategoryDestination.itemIdArg) {
-                type = NavType.IntType
-            }, navArgument(FinanceCategoryDestination.itemIdArgTwo) {
-                type = NavType.StringType
-            }, navArgument(FinanceCategoryDestination.itemIdArgThree) {
-                type = NavType.BoolType
-            }
-
-            )) {
+        composable(
+            route = FinanceCategoryDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(FinanceCategoryDestination.itemIdArg) {
+                    type = NavType.IntType
+                },
+                navArgument(FinanceCategoryDestination.itemIdArgTwo) {
+                    type = NavType.StringType
+                },
+                navArgument(FinanceCategoryDestination.itemIdArgThree) {
+                    type = NavType.BoolType
+                },
+                navArgument(FinanceCategoryDestination.itemIdArgFour) {
+                    type = NavType.StringType
+                },
+                navArgument(FinanceCategoryDestination.itemIdArgFive) {
+                    type = NavType.StringType
+                })
+        ) {
             FinanceCategoryScreen(
                 navigateBack = { navController.popBackStack() },
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },

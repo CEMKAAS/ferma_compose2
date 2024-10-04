@@ -135,7 +135,8 @@ interface ItemsRepository {
     fun getCurrentBalance(id: Int): Flow<Double>
     fun getIncome(id: Int): Flow<Double>
     fun getExpenses(id: Int): Flow<Double>
-
+    fun getOwnNeed(id: Int): Flow<Double>
+    fun getScrap(id: Int): Flow<Double>
 
     fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double>
     fun getExpensesMountFin(id: Int, mount: Int, year: Int): Flow<Double>

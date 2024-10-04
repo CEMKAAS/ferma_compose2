@@ -89,7 +89,7 @@ object FinanceMountDestination : NavigationDestination {
 @Composable
 fun FinanceMountScreen(
     navigateBack: () -> Unit,
-    navigateToCategory: (FinanceCategoryData) -> Unit,
+    navigateToCategory: (FinanceCategoryDataNav) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FinanceMountViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {

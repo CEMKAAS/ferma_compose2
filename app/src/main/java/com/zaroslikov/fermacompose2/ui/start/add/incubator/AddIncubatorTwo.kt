@@ -133,8 +133,6 @@ fun AddIncubatorTwo(
                     AppMetrica.reportEvent("Incubator", eventParameters);
 
                     navController.navigate(StartDestination.route)
-                    (activity as MainActivity)?.showAd()
-
                 }
             },
             list = list,

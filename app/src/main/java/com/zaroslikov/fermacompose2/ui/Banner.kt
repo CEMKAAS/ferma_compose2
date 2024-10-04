@@ -22,7 +22,7 @@ fun Banner(modifier: Modifier = Modifier) {
         AndroidView(
             factory = { context ->
                 BannerAdView(context).apply {
-                    setAdUnitId("R-M-10848417-1")
+                    setAdUnitId("R-M-12224806-1")
                     setAdSize(BannerAdSize.stickySize(context, Int.MAX_VALUE))
                     val adRequesr = AdRequest.Builder().build()
                     setBannerAdEventListener(object : BannerAdEventListener {
