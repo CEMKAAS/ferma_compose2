@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -27,6 +28,22 @@ class FinanceViewModel(
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val month = calendar[Calendar.MONTH] + 1
     val year = calendar[Calendar.YEAR]
+
+    private fun calBegin(): String {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        calendar.set(year, month, 1)
+        val format = SimpleDateFormat("yyyy-MM-dd")
+        return format.format(calendar.timeInMillis)
+    }
+
+
+    private fun calEnd(): String {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        val format = SimpleDateFormat("yyyy-MM-dd")
+        return format.format(calendar.timeInMillis)
+    }
 
 
     var currentBalanceUiState by mutableDoubleStateOf(0.00)
@@ -48,9 +65,6 @@ class FinanceViewModel(
         private set
     var expensesMountUiState by mutableDoubleStateOf(0.00)
         private set
-
-
-
 
 
     init {
@@ -83,14 +97,12 @@ class FinanceViewModel(
             expensesMountUiState = itemsRepository.getExpensesMountFin(itemId, month, year)
                 .filterNotNull()
                 .first().toDouble()
-
-
         }
-
     }
 
     val incomeExpensesUiState: StateFlow<IncomeExpensesCategoryUiState> =
-        itemsRepository.getIncomeExpensesCurrentMonth(itemId,month,year).map { IncomeExpensesCategoryUiState(it) }
+        itemsRepository.getIncomeExpensesCurrentMonth(itemId, calBegin(), calEnd())
+            .map { IncomeExpensesCategoryUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -117,7 +129,5 @@ data class IncomeExpensesDetails(
     val count: Double,
     val suffix: String,
     val priceAll: Double,
-    val day: Int,
-    val mount: Int,
-    val year: Int
+    val date: String
 )

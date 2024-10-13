@@ -46,7 +46,7 @@ object FinanceCategoryDestination : NavigationDestination {
     const val itemIdArgFour = "itemDateBegin"
     const val itemIdArgFive = "itemDateEnd"
     val routeWithArgs =
-        "${route}/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgThree}/${itemIdArgFour}/${itemIdArgFive}"
+        "${FinanceCategoryDestination.route}/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgThree}/{$itemIdArgFour}/{$itemIdArgFive}"
 }
 
 /**
@@ -78,7 +78,6 @@ fun FinanceCategoryScreen(
                     AnalysisNav(idProject = viewModel.itemId, name = it)
                 )
             }
-
         )
     }
 }

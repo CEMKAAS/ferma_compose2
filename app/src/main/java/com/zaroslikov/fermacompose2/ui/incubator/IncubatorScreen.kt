@@ -94,7 +94,6 @@ fun IncubatorScreen(
     val projectState by viewModel.homeUiState.collectAsState()
     val project = viewModel.itemUiState
     val projectList by viewModel.projectListAct.collectAsState()
-    val activity = LocalContext.current as Activity
     val coroutineScope = rememberCoroutineScope()
 
     // В приниципе все только доделать переход
@@ -137,14 +136,12 @@ fun IncubatorScreen(
                     viewModel.saveItem()
                     viewModel.saveProject(it.animalTable, it.count)
                     navigateStart()
-                    (activity as MainActivity)?.showAd()
                 }
             },
             saveInNewProject = {
                 coroutineScope.launch {
                     viewModel.saveNewProject(it.animalTable, it.count)
                     navigateStart()
-                    (activity as MainActivity)?.showAd()
                 }
             },
             save = {

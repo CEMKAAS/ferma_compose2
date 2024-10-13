@@ -199,7 +199,7 @@ class MainActivity : ComponentActivity() {
         }
         appOpenAdLoader.setAdLoadListener(appOpenAdLoadListener)
 
-        val AD_UNIT_ID = "R-M-10848417-3"
+        val AD_UNIT_ID = "R-M-12224806-2"
         val adRequestConfiguration = AdRequestConfiguration.Builder(AD_UNIT_ID).build()
         appOpenAdLoader.loadAd(adRequestConfiguration)
         appOpenAdLoader.loadAd(adRequestConfiguration)

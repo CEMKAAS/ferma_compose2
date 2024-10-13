@@ -358,7 +358,7 @@ fun <T> PullOutCard(
                     for (i in list.indices) {
                         Text(
                             text = "${i + 1}) ${itemToString(list[i])}",
-                            modifier = modifierText.fillMaxWidth(0.6f)
+                            modifier = modifierText.fillMaxWidth(0.8f)
                         )
                         if (i == 2 && !expanded)
                             break
@@ -368,7 +368,7 @@ fun <T> PullOutCard(
                 }
             }
 
-            if (list.size >= 3) {
+            if (list.size > 3) {
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,

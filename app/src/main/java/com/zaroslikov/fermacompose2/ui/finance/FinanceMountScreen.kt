@@ -1,14 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.finance
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -74,6 +72,7 @@ import com.zaroslikov.fermacompose2.ui.start.dateLong
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import androidx.compose.material3.OutlinedCard as OutlinedCard1
 
 object FinanceMountDestination : NavigationDestination {
     override val route = "FinanceMount"
@@ -99,7 +98,8 @@ fun FinanceMountScreen(
     val expensesRow by viewModel.expensesCategoryUiState.collectAsState()
 
     val idProject = viewModel.itemId
-
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val formatSQL = SimpleDateFormat("yyyy-MM-dd")
     var openCalendarDialog by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("Текущий месяц") }
 
@@ -114,9 +114,10 @@ fun FinanceMountScreen(
             dateEnd = viewModel.dateEnd,
             upAnalisis = {
                 viewModel.upAnalisis()
-                val format = SimpleDateFormat("dd.MM.yyyy")
+
                 text = "${format.format(viewModel.dateBegin)} - ${
-                    format.format(viewModel.dateEnd)}"
+                    format.format(viewModel.dateEnd)
+                }"
             }
         )
     }
@@ -126,10 +127,10 @@ fun FinanceMountScreen(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarCalendar(
-                    title = text,
-            true,
-            navigateUp = navigateBack,
-            settingUp = { openCalendarDialog = true }
+                title = text,
+                true,
+                navigateUp = navigateBack,
+                settingUp = { openCalendarDialog = true }
             )
         }
     ) { innerPadding ->
@@ -140,7 +141,17 @@ fun FinanceMountScreen(
             scrapMonth = viewModel.scrapMonthUiState,
             incomeRow = incomeRow.itemList,
             expensesRow = expensesRow.itemList,
-            navigateToCategory = navigateToCategory,
+            navigateToCategory = {
+                navigateToCategory(
+                    FinanceCategoryDataNav(
+                        it.idPT,
+                        it.category,
+                        it.incomeBoolean,
+                        formatSQL.format(viewModel.dateBegin),
+                        formatSQL.format(viewModel.dateEnd)
+                    )
+                )
+            },
             text = text,
             idPT = idProject,
             modifier = modifier
@@ -157,12 +168,12 @@ fun FinanceMountScreen(
 private fun FinanceMountBody(
     incomeMount: Double,
     expensesMount: Double,
-    ownNeedsMonth:Double,
-    scrapMonth:Double,
+    ownNeedsMonth: Double,
+    scrapMonth: Double,
     incomeRow: List<Fin>,
     expensesRow: List<Fin>,
     navigateToCategory: (FinanceCategoryData) -> Unit,
-    text:String,
+    text: String,
     idPT: Int,
     modifier: Modifier = Modifier
 ) {
@@ -171,74 +182,60 @@ private fun FinanceMountBody(
         modifier = modifier
     ) {
 
-//        val calendar = Calendar.getInstance()
-//        Card {
-//            Text(
-//                text = "${SetMount(calendar[Calendar.MONTH] + 1)} ${calendar[Calendar.YEAR]}",
-//                textAlign = TextAlign.Start,
-//                fontSize = 15.sp,
-//                fontWeight = FontWeight.SemiBold,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(5.dp),
-//            )
-//        }
-
-        val modifierCard = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-
-        val modifierHeading = Modifier
-            .wrapContentSize()
-            .padding(6.dp)
-
-        val modifierText = Modifier
-            .wrapContentSize()
-            .padding(vertical = 3.dp, horizontal = 6.dp)
 
 
-        Card(
-            modifier = modifierCard
-        ) {
-            Text(
-                text = "Данные:", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+        Row {
+            CardFinace(
+                textTitle = "Доход",
+                textCount = "${formatter(incomeMount)} ₽",
+                float = 0.5f
             )
-            Text(
-                text = "Доход: ${formatter(incomeMount)} ₽",
-                modifier = modifierText
+            CardFinace(
+                textTitle = "Расход", textCount = "${formatter(expensesMount)} ₽", float = 1f
             )
-
-            Text(
-                text = "Сэкономлено: ${formatter(ownNeedsMonth)} ₽",
-                modifier = modifierText
-            )
-
-            Text(
-                text = "Расход: ${formatter(expensesMount)} ₽",
-                modifier = modifierText
-            )
-            Text(
-                text = "Потери: ${formatter(scrapMonth)} ₽",
-                modifier = modifierText
-            )
-
-            Text(
-                text = "Прибыль: ${formatter(incomeMount - expensesMount)} ₽",
-                modifier = modifierText
-            )
-
-            Text(
-                text = "Итого: ${formatter(incomeMount + ownNeedsMonth - expensesMount - scrapMonth)} ₽",
-                modifier = modifierText
-            )
-
         }
+        Row {
+            CardFinace(
+                textTitle = "Сэкономлено",
+                textCount = "${formatter(ownNeedsMonth)} ₽",
+                float = 0.5f
+            )
+            CardFinace(
+                textTitle = "Потери", textCount = "${formatter(scrapMonth)} ₽", float = 1f
+            )
+        }
+
+        Row {
+            CardFinace(
+                textTitle = "Итого доходов",
+                textCount = "${formatter(incomeMount + ownNeedsMonth)} ₽",
+                float = 0.5f
+            )
+            CardFinace(
+                textTitle = "Итого расходов",
+                textCount = "${formatter(expensesMount + scrapMonth)} ₽",
+                float = 1f
+            )
+        }
+
+
+        CardFinace(
+            textTitle = "Итого",
+            textCount = "${formatter(incomeMount + ownNeedsMonth - expensesMount - scrapMonth)} ₽",
+            float = 1f
+        )
 
         LazyRowMount(
             list = incomeRow,
-            navigateToCategory = navigateToCategory,
+            navigateToCategory = {
+                navigateToCategory(
+                    FinanceCategoryData(
+                        it.first,
+                        it.second,
+                        true
+                    )
+                )
+            },
             idPT = idPT,
             heading = "Доходы по категории за $text",
             headingNull = "Доходов за $text не было :("
@@ -246,7 +243,15 @@ private fun FinanceMountBody(
 
         LazyRowMount(
             list = expensesRow,
-            navigateToCategory = navigateToCategory,
+            navigateToCategory = {
+                navigateToCategory(
+                    FinanceCategoryData(
+                        it.first,
+                        it.second,
+                        false
+                    )
+                )
+            },
             idPT = idPT,
             heading = "Расходы по категории за $text",
             headingNull = "Расходов за $text не было (Это хорошо)"
@@ -258,7 +263,7 @@ private fun FinanceMountBody(
 @Composable
 fun LazyRowMount(
     list: List<Fin>,
-    navigateToCategory: (FinanceCategoryData) -> Unit,
+    navigateToCategory: (Pair<Int, String>) -> Unit,
     idPT: Int,
     heading: String,
     headingNull: String
@@ -270,7 +275,7 @@ fun LazyRowMount(
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 5.dp),
+                .padding(8.dp),
             fontWeight = FontWeight.SemiBold
         )
         LazyRow {
@@ -279,10 +284,9 @@ fun LazyRowMount(
                     .padding(8.dp)
                     .clickable {
                         navigateToCategory(
-                            FinanceCategoryData(
+                            Pair(
                                 idPT,
-                                "${if (it.title == "") "Не указано " else it.title}",
-                                true
+                                "${if (it.title == "") "Не указано " else it.title}"
                             )
                         )
                     })
@@ -295,7 +299,7 @@ fun LazyRowMount(
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 5.dp),
+                .padding(8.dp),
             fontWeight = FontWeight.SemiBold
         )
     }
@@ -359,8 +363,6 @@ fun CardMountRow(
 //        }
 //    }
 //}
-
-
 
 
 //@Preview(showBackground = true)

@@ -156,8 +156,8 @@ interface ItemsRepository {
 
     fun getIncomeExpensesCurrentMonth(
         id: Int,
-        mount: Int,
-        year: Int
+        dateBegin: String,
+        dateEnd: String
     ): Flow<List<IncomeExpensesDetails>>
 
 //    fun getIncomeMount(id: Int, mount: Int, year: Int): Flow<Double>

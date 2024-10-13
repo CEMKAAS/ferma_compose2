@@ -153,9 +153,9 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getIncomeExpensesCurrentMonth(
         id: Int,
-        mount: Int,
-        year: Int
-    ): Flow<List<IncomeExpensesDetails>> = itemDao.getIncomeExpensesCurrentMonth(id, mount, year)
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<IncomeExpensesDetails>> = itemDao.getIncomeExpensesCurrentMonth(id, dateBegin, dateEnd)
 
 
     //FinanceTap
