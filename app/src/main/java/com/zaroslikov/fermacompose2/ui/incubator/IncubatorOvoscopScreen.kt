@@ -53,17 +53,7 @@ fun IncubatorOvoscopScreen(
                 title = "Овоскопирование",
                 navigateUp = navigateBack,
             )
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
-
-        ) { innerPadding ->
-
+        }) { innerPadding ->
         IncubatorEditDayContainer(
             day = viewModel.dayVM,
             typeBird = viewModel.typeBirds,
@@ -137,53 +127,41 @@ fun IncubatorEditDayContainer(
 }
 
 fun setOvoskopImage(day: Int, typeBird: String): Int {
-    when (typeBird) {
+    return when (typeBird) {
         "Курицы" -> {
-            return when (day) {
+            when (day) {
                 7 -> R.drawable.chiken1
                 11 -> R.drawable.chiken2
                 16 -> R.drawable.chiken3
-                else -> {
-                    R.drawable.chiken1
-                }
+                else -> R.drawable.chiken1
             }
         }
 
         "Индюки", "Утки" -> {
-            return when (day) {
+            when (day) {
                 8 -> R.drawable.turkeys1
                 14 -> R.drawable.turkeys2
                 25 -> R.drawable.turkeys3
-                else -> {
-                    R.drawable.turkeys1
-                }
+                else -> R.drawable.turkeys1
             }
         }
 
         "Гуси" -> {
-            return when (day) {
+            when (day) {
                 9 -> R.drawable.goose1
                 15 -> R.drawable.goose2
                 21 -> R.drawable.goose3
-                else -> {
-                    R.drawable.goose1
-                }
+                else -> R.drawable.goose1
             }
         }
 
         "Перепела" -> {
-            return when (day) {
+            when (day) {
                 6 -> R.drawable.quail2
                 13 -> R.drawable.quail2
-                else -> {
-                    R.drawable.quail1
-                }
+                else -> R.drawable.quail1
             }
         }
-
-        else -> {
-            return R.drawable.chicken
-        }
+        else -> R.drawable.chicken
     }
-
 }

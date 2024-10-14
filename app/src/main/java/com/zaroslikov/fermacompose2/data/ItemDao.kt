@@ -100,6 +100,9 @@ interface ItemDao {
     @Query("SELECT * from MyIncubator Where idPT=:id")
     fun getIncubator(id: Int): Flow<Incubator>
 
+    @Query("SELECT * from MyIncubator Where idPT=:id and day=:day")
+    fun getIncubatorEditDay(id: Int, day:Int): Flow<Incubator>
+
     @Query("SELECT * from MyFerma WHERE _id = :id")
     fun getItem(id: Int): Flow<AddTable>
 
@@ -118,8 +121,8 @@ interface ItemDao {
     @Query("SELECT MyFerma.category from MyFerma Where idPT=:id group by MyFerma.category ")
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
 
-    @Query("SELECT name from AnimalTable Where idPT=:id")
-    fun getItemsAnimalAddList(id: Int): Flow<List<String>>
+    @Query("SELECT name, type from AnimalTable Where idPT=:id")
+    fun getItemsAnimalAddList(id: Int): Flow<List<Pair<String, String>>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: AddTable)

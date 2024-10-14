@@ -59,4 +59,4 @@ class AddEntryViewModel(
 data class TitleUiState(val titleList: List<String> = listOf())
 
 data class CategoryUiState(val categoryList: List<String> = listOf())
-data class AnimalUiState(val animalList: List<String> = listOf())
+data class AnimalUiState(val animalList: List<Pair<String,String>> = listOf())

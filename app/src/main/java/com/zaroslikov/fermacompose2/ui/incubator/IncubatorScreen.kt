@@ -84,9 +84,9 @@ object IncubatorScreenDestination : NavigationDestination {
 @Composable
 fun IncubatorScreen(
     navigateBack: () -> Unit,
-    navigateDayEdit: (IncubatorEditNav) -> Unit,
+    navigateDayEdit: (Pair<Int, Int>) -> Unit,
     navigateProjectEdit: (Int) -> Unit,
-    navigateOvos: (IncubatorOvosNav) -> Unit,
+    navigateOvos: (Pair<Int, String>) -> Unit,
     navigateStart: () -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -112,7 +112,6 @@ fun IncubatorScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(8.dp),
-//                .verticalScroll(rememberScrollState()),
             incubator = incubator.itemList,
             projectTable = project,
             navigateDayEdit = navigateDayEdit,
@@ -134,13 +133,13 @@ fun IncubatorScreen(
             saveInProject = {
                 coroutineScope.launch {
                     viewModel.saveItem()
-                    viewModel.saveProject(it.animalTable, it.count)
+                    viewModel.saveProject(it.first, it.second)
                     navigateStart()
                 }
             },
             saveInNewProject = {
                 coroutineScope.launch {
-                    viewModel.saveNewProject(it.animalTable, it.count)
+                    viewModel.saveNewProject(it.first, it.second)
                     navigateStart()
                 }
             },
@@ -160,14 +159,14 @@ fun IncubatorContainer(
     modifier: Modifier,
     incubator: List<Incubator>,
     projectTable: IncubatorProjectEditState,
-    navigateDayEdit: (IncubatorEditNav) -> Unit,
-    navigateOvos: (IncubatorOvosNav) -> Unit,
+    navigateDayEdit: (Pair<Int, Int>) -> Unit,
+    navigateOvos: (Pair<Int, String>) -> Unit,
     projectList: List<ProjectTable>,
     onValueChange: (IncubatorProjectEditState) -> Unit = {},
     saveInArh: () -> Unit,
     deleteInc: () -> Unit,
-    saveInProject: (IncubatorAnimalInProject) -> Unit,
-    saveInNewProject: (IncubatorAnimalInProject) -> Unit,
+    saveInProject: (Pair<AnimalTable, String>) -> Unit,
+    saveInNewProject: (Pair<AnimalTable, String>) -> Unit,
     save: (project: ProjectTable) -> Unit
 ) {
 
@@ -217,34 +216,20 @@ fun IncubatorContainer(
     LazyColumn(
         state = scrollState, modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         items(incubator.size) {
-
             val borderStroke = if (day == it) BorderStroke(2.dp, Color.Black) else null
-
             MyRowIncubatorSettting(
                 incubator[it],
                 modifier = Modifier
                     .padding(6.dp)
-                    .clickable {
-                        navigateDayEdit(
-                            IncubatorEditNav(
-                                idPT = projectTable.id,
-                                day = it
-                            )
-                        )
-                    },
+                    .clickable { navigateDayEdit(Pair(projectTable.id, it)) },
                 borderStroke = borderStroke,
                 typeBird = projectTable.type,
-                navigateOvos = {
-                    navigateOvos(
-                        IncubatorOvosNav(
-                            day = it + 1,
-                            typeBirds = projectTable.type
-                        )
-                    )
-                }
+                navigateOvos = { navigateOvos(Pair(it + 1, projectTable.type)) }
             )
         }
+
         item {
             Button(
                 onClick = { openEndDialog.value = true },
@@ -256,7 +241,6 @@ fun IncubatorContainer(
             }
         }
     }
-
 }
 
 
@@ -288,42 +272,32 @@ fun MyRowIncubatorSettting(
             fontSize = 18.sp
         )
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Text(
+            text = "Температура: ${incubator.temp}°C",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(6.dp)
+        )
+        Text(
+            text = "Влажность: ${incubator.damp}%",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(6.dp)
+        )
 
-            Text(
-                text = "Температура ${incubator.temp}°C",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-            )
-            Text(
-                text = "Влажность ${incubator.damp}%",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-            )
-        }
+        Text(
+            text = "Переворачивать: ${incubator.over}",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(6.dp)
+        )
+        Text(
+            text = "Проветривать: ${incubator.airing}",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(6.dp)
+        )
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Переворачивать ${incubator.over}",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-            )
-            Text(
-                text = "Проветривать ${incubator.airing}",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-            )
-        }
         if (ovoscop) {
             TextButton(
                 onClick = navigateOvos,
@@ -368,18 +342,21 @@ fun EndIncubator(
     onValueChange: (IncubatorProjectEditState) -> Unit = {},
     saveInArh: () -> Unit,
     deleteInc: () -> Unit,
-    saveInProject: (IncubatorAnimalInProject) -> Unit,
-    saveInNewProject: (IncubatorAnimalInProject) -> Unit,
+    saveInProject: (Pair<AnimalTable, String>) -> Unit,
+    saveInNewProject: (Pair<AnimalTable, String>) -> Unit,
     save: (project: ProjectTable) -> Unit
 ) {
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val dateEnd: String = format.format(calendar.timeInMillis)
+
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
     var idProject by remember { mutableIntStateOf(1) }
+
     fun validateCount(text: String) {
         isErrorCount = text == ""
     }
+
     fun errorBoolean(): Boolean {
         isErrorCount = projectTable.eggAllEND == ""
         return !isErrorCount
@@ -393,7 +370,6 @@ fun EndIncubator(
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(20.dp))
         ) {
-
 
             Column(
                 modifier = Modifier
@@ -413,9 +389,9 @@ fun EndIncubator(
                         "Мы сохранили инкубатор в архив, чтобы вы не забыли параметры!\nТакже Вы можете добавить птенцов в существующий проект или создать новый для дальнейшей работы.\n"
                                 + "Вы заложили ${projectTable.eggAll} яиц.\nСколько птенцов у Вас вылупилось?",
                         modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp),
-                        fontSize = 15.sp,
+                        fontSize = 15.sp
+                    )
 
-                        )
                     OutlinedTextField(
                         value = projectTable.eggAllEND,
                         onValueChange = {
@@ -446,7 +422,7 @@ fun EndIncubator(
                                 Text("Укажите кол-во яиц, которых заложили в инкубатор")
                             }
                         },
-                        isError = isErrorCount,
+                        isError = isErrorCount
                     )
 
                     if (projectBoolean) {
@@ -464,8 +440,7 @@ fun EndIncubator(
                                     Modifier
                                         .fillMaxWidth()
                                         .selectable(
-                                            selected = (text == selectedOption
-                                                    ),
+                                            selected = (text == selectedOption),
                                             onClick = { onOptionSelected(text) },
                                             role = Role.RadioButton
                                         )
@@ -515,7 +490,7 @@ fun EndIncubator(
                                             )
                                         )
                                         saveInProject(
-                                            IncubatorAnimalInProject(
+                                            Pair(
                                                 AnimalTable(
                                                     name = projectTable.titleProject,
                                                     type = projectTable.type,
@@ -526,12 +501,14 @@ fun EndIncubator(
                                                     image = "",
                                                     arhiv = false,
                                                     idPT = idProject
-                                                ), count = projectTable.eggAllEND
+                                                ),projectTable.eggAllEND
                                             )
                                         )
+                                        //Яндекс статистика
                                         val eventParameters: MutableMap<String, Any> = HashMap()
                                         eventParameters["Тип"] = projectTable.type
-                                        eventParameters["Кол-во"] = "${projectTable.eggAll} ${projectTable.eggAllEND}"
+                                        eventParameters["Кол-во"] =
+                                            "${projectTable.eggAll} ${projectTable.eggAllEND}"
                                         eventParameters["В Проект"] = "Да"
                                         AppMetrica.reportEvent("End Incubator", eventParameters);
 
@@ -558,7 +535,7 @@ fun EndIncubator(
                                         )
                                     )
                                     saveInNewProject(
-                                        IncubatorAnimalInProject(
+                                        Pair(
                                             AnimalTable(
                                                 name = projectTable.titleProject,
                                                 type = projectTable.type,
@@ -575,7 +552,8 @@ fun EndIncubator(
                                     )
                                     val eventParameters: MutableMap<String, Any> = HashMap()
                                     eventParameters["Тип"] = projectTable.type
-                                    eventParameters["Кол-во"] = "${projectTable.eggAll} ${projectTable.eggAllEND}"
+                                    eventParameters["Кол-во"] =
+                                        "${projectTable.eggAll} ${projectTable.eggAllEND}"
                                     eventParameters["В Проект"] = "Новый"
                                     AppMetrica.reportEvent("End Incubator", eventParameters);
 
@@ -585,8 +563,6 @@ fun EndIncubator(
                         ) {
                             Text("Новый проект")
                         }
-
-
                     }
 
                 } else {
@@ -638,68 +614,41 @@ fun EndIncubator(
 }
 
 fun setOvoskop(typeBird: String, day: Int): Boolean {
-    when (typeBird) {
+    return when (typeBird) {
         "Курицы" -> {
-            return when (day) {
+            when (day) {
                 7 -> true
                 11 -> true
                 16 -> true
-                else -> {
-                    false
-                }
+                else -> false
             }
         }
 
         "Индюки", "Утки" -> {
-            return when (day) {
+            when (day) {
                 8 -> true
                 14 -> true
                 25 -> true
-                else -> {
-                    false
-                }
+                else -> false
             }
         }
 
         "Гуси" -> {
-            return when (day) {
+            when (day) {
                 9 -> true
                 15 -> true
                 21 -> true
-                else -> {
-                    false
-                }
+                else -> false
             }
         }
 
         "Перепела" -> {
-            return when (day) {
+            when (day) {
                 6 -> true
                 13 -> true
-                else -> {
-                    false
-                }
+                else -> false
             }
         }
-
-        else -> {
-            return false
-        }
+        else -> false
     }
-
 }
-
-data class IncubatorEditNav(
-    val idPT: Int,
-    var day: Int,
-)
-
-data class IncubatorOvosNav(
-    val day: Int,
-    val typeBirds: String
-)
-
-data class IncubatorAnimalInProject(
-    val animalTable: AnimalTable,
-    val count: String
-)

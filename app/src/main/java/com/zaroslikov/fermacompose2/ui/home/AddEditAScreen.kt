@@ -128,7 +128,7 @@ fun AddEditContainerProduct(
     addTable: AddTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<String>,
+    animalList: List<Pair<String, String>>,
     onValueChange: (AddTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
     deleteAdd: () -> Unit
@@ -140,7 +140,6 @@ fun AddEditContainerProduct(
 
     var openDialog by remember { mutableStateOf(false) }
 
-
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
@@ -148,9 +147,9 @@ fun AddEditContainerProduct(
 
     var selectedItemIndex by remember { mutableStateOf(0) }
 
-
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
+        isErrorTitle = text.contains("/")
     }
 
     fun validateCount(text: String) {
@@ -159,10 +158,10 @@ fun AddEditContainerProduct(
 
     fun errorBoolean(): Boolean {
         isErrorTitle = addTable.title == ""
+        isErrorTitle = addTable.title.contains("/")
         isErrorCount = addTable.count == ""
         return !(isErrorTitle || isErrorCount)
     }
-
 
     Column(modifier = modifier) {
         Box {
@@ -182,7 +181,7 @@ fun AddEditContainerProduct(
                     supportingText = {
                         if (isErrorTitle) {
                             Text(
-                                text = "Не указано имя товара",
+                                text = "Не указано имя товара  или в товаре указан /",
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else {
@@ -394,14 +393,14 @@ fun AddEditContainerProduct(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = item,
+                                    text = "${item.first} - ${item.second}",
                                     fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
                                 selectedItemIndex = index
                                 expandedAni = false
-                                onValueChange(addTable.copy(animal = animalList[selectedItemIndex]))
+                                onValueChange(addTable.copy(animal = animalList[selectedItemIndex].first))
                             }
                         )
                     }

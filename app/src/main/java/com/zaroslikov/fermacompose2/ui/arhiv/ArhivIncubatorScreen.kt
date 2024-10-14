@@ -61,15 +61,7 @@ fun IncubatorArhivScreen(
                 title = projectState.project.titleProject,
                 navigateUp = navigateBack,
             )
-        },
-//        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-//        }
-        ) { innerPadding ->
+        }) { innerPadding ->
 
         IncubatorContainer(
             modifier = Modifier

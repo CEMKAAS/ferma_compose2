@@ -28,6 +28,12 @@ class AddIncubatorTwoViewModel(
 
     private var incubatorArhivList by mutableIntStateOf(0)
 
+    init {
+        viewModelScope.launch {
+
+        }
+    }
+
     fun incubatorFromArchive2(type: String): Int {
         viewModelScope.launch {
             incubatorArhivList = itemsRepository.getIncubatorListArh2(type)

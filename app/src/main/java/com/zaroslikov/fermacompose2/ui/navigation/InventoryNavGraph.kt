@@ -178,7 +178,7 @@ fun InventoryNavHost(
         ) {
             IncubatorScreen(navigateBack = { navController.popBackStack() }, navigateDayEdit = {
                 navController.navigate(
-                    "${IncubatorEditDayScreenDestination.route}/${it.idPT}/${it.day}"
+                    "${IncubatorEditDayScreenDestination.route}/${it.first}/${it.second}"
                 )
             }, navigateProjectEdit = {
                 navController.navigate(

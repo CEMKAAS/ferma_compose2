@@ -135,7 +135,7 @@ fun AddEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<String>,
+    animalList: List<Pair<String,String>>,
     saveInRoomAdd: (AddTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
@@ -160,6 +160,7 @@ fun AddEntryContainerProduct(
 
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
+        isErrorTitle = text.contains("/")
     }
 
     fun validateCount(text: String) {
@@ -168,6 +169,7 @@ fun AddEntryContainerProduct(
 
     fun errorBoolean(): Boolean {
         isErrorTitle = title == ""
+        isErrorTitle = title.contains("/")
         isErrorCount = count == ""
         return !(isErrorTitle || isErrorCount)
     }
@@ -213,12 +215,10 @@ fun AddEntryContainerProduct(
                     supportingText = {
                         if (isErrorTitle) {
                             Text(
-                                text = "Не указано имя товара",
+                                text = "Не указано имя товара или в товаре указан /",
                                 color = MaterialTheme.colorScheme.error
                             )
-                        } else {
-                            Text("Введите или выберите товар")
-                        }
+                        } else Text("Введите или выберите товар")
                     },
                     modifier = Modifier
                         .menuAnchor()
@@ -397,7 +397,7 @@ fun AddEntryContainerProduct(
 
 
         if (animalList.isNotEmpty()) {
-            animal = animalList[selectedItemIndex]
+            animal = "${animalList[selectedItemIndex].first} - ${animalList[selectedItemIndex].second}"
             ExposedDropdownMenuBox(
                 expanded = expandedAni,
                 onExpandedChange = { expandedAni = !expandedAni },
@@ -440,14 +440,14 @@ fun AddEntryContainerProduct(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = item,
+                                    text = "${item.first} - ${item.second}",
                                     fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
                                 selectedItemIndex = index
                                 expandedAni = false
-                                animal = animalList[selectedItemIndex]
+                                animal = "${animalList[selectedItemIndex].first} - ${animalList[selectedItemIndex].second}"
                             }
                         )
                     }
@@ -495,7 +495,7 @@ fun AddEntryContainerProduct(
                                 formattedDateList[2].toInt(),
                                 suffix = suffix,
                                 category = category,
-                                anaimal = animal,
+                                anaimal = animalList[selectedItemIndex].first,
                                 priceAll = 0.0,
                                 note = note
                             )
@@ -504,7 +504,7 @@ fun AddEntryContainerProduct(
                         eventParameters["Имя"] = title
                         eventParameters["Кол-во"] = "$title $count"
                         eventParameters["Категория"] = category
-                        eventParameters["Животное"] = animal
+                        eventParameters["Животное"] = animalList[selectedItemIndex].first
                         eventParameters["Примечание"] = note
                         AppMetrica.reportEvent("Add Products", eventParameters);
                     }

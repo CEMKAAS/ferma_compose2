@@ -47,7 +47,6 @@ fun IncubatorEditDayScreen(
     viewModel: IncubatorEditDayViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val day = viewModel.day + 1
-    val incubator = viewModel.incubatorState
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -59,9 +58,8 @@ fun IncubatorEditDayScreen(
             )
         }
     ) { innerPadding ->
-
         IncubatorEditDayContainer(
-            incubator,
+            viewModel.incubatorState,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(8.dp),

@@ -25,24 +25,25 @@ class IncubatorEditDayViewModel(
     var incubatorState by mutableStateOf(IncubatorUiState())
         private set
 
-    fun updateUiState(itemDetails: IncubatorUiState) {
-        incubatorState =
-            itemDetails
-    }
-
-
     init {
         viewModelScope.launch {
-            incubatorState = itemsRepository.getIncubator(itemId)
+            incubatorState = itemsRepository.getIncubatorEditDay(itemId, day)
                 .filterNotNull()
                 .first()
                 .toIncubatorUiState()
         }
     }
 
+    fun updateUiState(itemDetails: IncubatorUiState) {
+        incubatorState =
+            itemDetails
+    }
+
     suspend fun saveItem() {
         itemsRepository.updateIncubator(incubatorState.toIncubator())
     }
+
+
 }
 
 data class IncubatorUiState(

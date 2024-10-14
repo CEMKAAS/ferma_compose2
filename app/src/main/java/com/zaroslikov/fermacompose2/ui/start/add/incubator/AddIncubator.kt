@@ -73,15 +73,26 @@ object AddIncubatorDestination : NavigationDestination {
 
 @Composable
 fun AddIncubator(
-    navigateBack: () -> Unit,
-    navigateContinue: (AddIncubatorList) -> Unit,
+    navigateBack: () -> Unit
     viewModel: AddIncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
+
+    if (shouldShowTwo) AddIncubatorContainerOne(navigateBack = navigateBack, navigateContinue = false) else AddIncubatorTwoContainer()
+
+}
+
+@Composable
+fun AddIncubatorContainerOne(
+    navigateBack: () -> Unit,
+    navigateContinue: Boolean
 ) {
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
         }
     ) { innerPadding ->
+
         AddIncubatorContainer(
             modifier = Modifier
                 .padding(innerPadding)
@@ -92,6 +103,7 @@ fun AddIncubator(
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddIncubatorContainer(
@@ -99,7 +111,6 @@ fun AddIncubatorContainer(
     navigateContinue: (AddIncubatorList) -> Unit,
     number: Int
 ) {
-
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
     //Календарь
@@ -179,7 +190,9 @@ fun AddIncubatorContainer(
                 validateTitle(it)
             },
             label = { Text("Название") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorTitle) {
                     Text(
@@ -258,7 +271,9 @@ fun AddIncubatorContainer(
                 validateCount(it)
             },
             label = { Text("Количество") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorCount) {
                     Text(
@@ -416,26 +431,27 @@ fun AddIncubatorContainer(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
-            Button(onClick = {
+            Button(
+                onClick = {
 
-                if (errorBoolean()) {
-                    navigateContinue(
-                        AddIncubatorList(
-                            title = title,
-                            typeBirds = typeBirds,
-                            count = count,
-                            date1 = date1,
-                            time1 = time1.value,
-                            time2 = time2.value,
-                            time3 = time3.value,
-                            checkedStateAiring = checkedStateAiring.value,
-                            checkedStateOver = checkedStateOver.value
+                    if (errorBoolean()) {
+                        navigateContinue(
+                            AddIncubatorList(
+                                title = title,
+                                typeBirds = typeBirds,
+                                count = count,
+                                date1 = date1,
+                                time1 = time1.value,
+                                time2 = time2.value,
+                                time3 = time3.value,
+                                checkedStateAiring = checkedStateAiring.value,
+                                checkedStateOver = checkedStateOver.value
+                            )
                         )
-                    )
-                }
-            }, modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp)
+                    }
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
             ) {
                 Text(text = "Далее")
             }

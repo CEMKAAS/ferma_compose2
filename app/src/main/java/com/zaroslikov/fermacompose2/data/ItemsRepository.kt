@@ -73,12 +73,14 @@ interface ItemsRepository {
 
     suspend fun getIncubatorList2(id: Int): List<Incubator>
     fun getIncubator(id: Int): Flow<Incubator>
+    fun getIncubatorEditDay(id: Int, day:Int): Flow<Incubator>
+
     fun getItemAdd(id: Int): Flow<AddTable>
 
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
 
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
-    fun getItemsAnimalAddList(id: Int): Flow<List<String>>
+    fun getItemsAnimalAddList(id: Int): Flow<List<Pair<String,String>>>
 
     suspend fun insertProject(projectTable: ProjectTable)
     suspend fun insertProjectLong(projectTable: ProjectTable): Long
