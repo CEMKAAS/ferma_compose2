@@ -143,10 +143,8 @@ object AddIncubatorTwoDestination : NavigationDestination {
 @Composable
 fun AddIncubatorContainerTwo(
     navigateBack: () -> Unit,
-//    navigateContinue: () -> Unit,
-    list: MutableList<Incubator>,
-//    incubator: AddIncubatorList,
-//    onUpdate: (AddIncubatorList) -> Unit
+    navigateContinue: (MutableList<Incubator>) -> Unit,
+    list: MutableList<Incubator>
 ) {
     Scaffold(
         topBar = {
@@ -158,9 +156,8 @@ fun AddIncubatorContainerTwo(
             modifier = Modifier
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
-            list = list
-//            navigateContinue = navigateContinue,
-//            incubator, onUpdate
+            list = list,
+            navigateContinue = navigateContinue
         )
     }
 }
@@ -169,7 +166,7 @@ fun AddIncubatorContainerTwo(
 @Composable
 fun AddIncubatorTwoContaine(
     modifier: Modifier,
-//    navigateContinue: (MutableList<Incubator>) -> Unit,
+    navigateContinue: (MutableList<Incubator>) -> Unit,
 //    incubatorArh: (Int) -> Unit,
     list: MutableList<Incubator>,
 //    projectList: List<ProjectTable>,
@@ -254,7 +251,7 @@ fun AddIncubatorTwoContaine(
         item {
             Button(
                 onClick = {
-//                    navigateContinue(list)
+                    navigateContinue(list)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1911,7 +1908,7 @@ fun AddIncubatorList.toIncubatorData(): ProjectTable = ProjectTable(
     mode = 0
 )
 
-private fun setIdPT(list: MutableList<Incubator>, idPT: Int): MutableList<Incubator> {
+fun setIdPT(list: MutableList<Incubator>, idPT: Long): MutableList<Incubator> {
     list.forEach {
         it.idPT = idPT
     }

@@ -61,8 +61,6 @@ class AddIncubatorTwoViewModel(
 //                .filterNotNull().
 //
 //        }
-//
-//
 //    }
 //
 //    suspend fun IncubatorFromArchive(type: String): List<ProjectTable> {
@@ -119,6 +117,9 @@ class AddIncubatorTwoViewModel(
             .filterNotNull()
             .first()
             .toInt()
+
+
+
 
         return sexState
     }

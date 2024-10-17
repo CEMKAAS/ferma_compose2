@@ -25,5 +25,5 @@ data class Incubator(
     var over: String,
     var airing: String,
     @ColumnInfo(name = "idPT")
-    var idPT: Int
+    var idPT: Long
 )

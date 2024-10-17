@@ -150,26 +150,24 @@ fun InventoryNavHost(
 
 
         composable(route = AddIncubatorDestination.route) {
-            AddIncubator(navigateBack = { navController.popBackStack() },
-//                navigateContinue = {
-//                navController.currentBackStackEntry?.savedStateHandle?.set("incubator", it)
-//                navController.navigate(AddIncubatorTwoDestination.route)
-//            }
+            AddIncubator(
+                navigateBack = { navController.popBackStack() },
+                navigateContinue = { navController.navigate(StartDestination.route) }
             )
         }
 
-        composable(
-            route = AddIncubatorTwoDestination.route
-        ) {
-//            navController.previousBackStackEntry?.savedStateHandle?.get<AddIncubatorList>("incubator")
-//                ?.let {
-//                    AddIncubatorTwo(
-//                        navigateBack = { navController.popBackStack() },
-//                        navController,
-//                        projectIncubatorList = it
-//                    )
-//                }
-        }
+//        composable(
+//            route = AddIncubatorTwoDestination.route
+//        ) {
+////            navController.previousBackStackEntry?.savedStateHandle?.get<AddIncubatorList>("incubator")
+////                ?.let {
+////                    AddIncubatorTwo(
+////                        navigateBack = { navController.popBackStack() },
+////                        navController,
+////                        projectIncubatorList = it
+////                    )
+////                }
+//        }
 
         composable(
             route = IncubatorScreenDestination.routeWithArgs,
