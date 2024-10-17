@@ -128,7 +128,7 @@ fun AddEditContainerProduct(
     addTable: AddTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<Pair<String, String>>,
+    animalList: List<PairString>,
     onValueChange: (AddTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
     deleteAdd: () -> Unit
@@ -393,14 +393,14 @@ fun AddEditContainerProduct(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "${item.first} - ${item.second}",
+                                    text = "${item.name} - ${item.type}",
                                     fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
                                 selectedItemIndex = index
                                 expandedAni = false
-                                onValueChange(addTable.copy(animal = animalList[selectedItemIndex].first))
+                                onValueChange(addTable.copy(animal = animalList[selectedItemIndex].name))
                             }
                         )
                     }

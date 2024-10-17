@@ -1,26 +1,18 @@
 package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
 import android.app.Activity
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
@@ -28,43 +20,35 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import io.appmetrica.analytics.AppMetrica
@@ -78,221 +62,114 @@ object AddIncubatorTwoDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-@Composable
-fun AddIncubatorTwo(
-    navigateBack: () -> Unit,
-    navController: NavController,
-    projectIncubatorList: AddIncubatorList,
-    viewModel: AddIncubatorTwoViewModel = viewModel(factory = AppViewModelProvider.Factory)
-) {
-
-    val list = setAutoIncubator(
-        setIncubator(projectIncubatorList.typeBirds),
-        projectIncubatorList.checkedStateAiring,
-        projectIncubatorList.checkedStateOver
-    )
-    // Доставка из ахива
-//    val project = viewModel.incubatorFromArchive(projectIncubatorList.typeBirds).collectAsState()
-//
-//    val projectCopy = project.value.itemList
-//
-//    val countProject = viewModel.incubatorFromArchive2(projectIncubatorList.typeBirds)
-//    val openEndDialog = remember { mutableStateOf(false) }
-//
-//
-//    if (countProject == 0) {
-//        openEndDialog.value = false
-//    } else {
-//        openEndDialog.value = true
-//    }
-
-    val activity = LocalContext.current as Activity
-    val scope = rememberCoroutineScope()
-    Scaffold(
-        topBar = {
-            TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
-        }
-    ) { innerPadding ->
-        AddIncubatorTwoContainer(
-            modifier = Modifier
-                .padding(innerPadding),
-            navigateContinue = {
-                scope.launch {
-
-                    val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
-
-                    viewModel.saveIncubator(
-                        setIdPT(it, idPT)
-                    )
-                    val eventParameters: MutableMap<String, Any> = HashMap()
-                    eventParameters["Имя"] = projectIncubatorList.title
-                    eventParameters["Тип"] = projectIncubatorList.typeBirds
-                    eventParameters["Кол-во"] = projectIncubatorList.count
-                    eventParameters["АвтоОхл"] = projectIncubatorList.checkedStateAiring
-                    eventParameters["АвтоПрев"] = projectIncubatorList.checkedStateAiring
-                    AppMetrica.reportEvent("Incubator", eventParameters);
-
-                    navController.navigate(StartDestination.route)
-                }
-            },
-            list = list,
-//            projectList = projectCopy,
-//            openEndDialog = openEndDialog
-//            incubatorArh= {
-//                    scope.launch {
-//                       // val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
-//                        list = viewModel.saveIncubator3(it).toMutableList()
-////                        viewModel.saveIncubator2(it, idPT)
-//                        openEndDialog.value = false
-////                        (activity as MainActivity)?.showAd()
-//
-////                        navController.navigate(StartDestination.route)
-//                    }
-//            },
-
-        )
-        DialogExamples()
-    }
-}
-
-@Composable
-fun DialogExamples() {
-    val openAlertDialog = remember { mutableStateOf(true) }
-    when {
-        openAlertDialog.value -> {
-            AlertDialogExample(
-                onDismissRequest = { openAlertDialog.value = false },
-                onConfirmation = {
-                    openAlertDialog.value = false
-                },
-                dialogTitle = "Справка",
-                dialogText = "Если ваш инкубатор имеет погрешность, вы можете установить необходимую температуру здесь или воспользоваться рекомендованными значениями, которые можно изменять в процессе. \nРекомендуем вести ежедневный журнал и тщательно записывать данные, чтобы в будущем иметь возможность обратиться к этой информации из архива.",
-                icon = Icons.Default.Info
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AlertDialogExample(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
-    icon: ImageVector,
-) {
-    AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText, textAlign = TextAlign.Justify)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text("Отлично!")
-            }
-        }
-    )
-}
-
-
-//@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
-//fun ArhivIncubatorChoice(
-//    openDialog: MutableState<Boolean>,
-//    projectList: List<ProjectTable>,
-////    incubatorArh: (Int) -> Unit,
-//
+//fun AddIncubatorTwo(
+//    navigateBack: () -> Unit,
+//    navController: NavController,
+//    projectIncubatorList: AddIncubatorList,
+//    viewModel: AddIncubatorTwoViewModel = viewModel(factory = AppViewModelProvider.Factory)
 //) {
-//    var idProject by remember { mutableIntStateOf(1) }
 //
-//    AlertDialog(
-//        onDismissRequest = { openDialog.value = false },
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clip(shape = RoundedCornerShape(20.dp))
-//    ) {
+//    val list = setAutoIncubator(
+//        setIncubator(projectIncubatorList.typeBirds),
+//        projectIncubatorList.checkedStateAiring,
+//        projectIncubatorList.checkedStateOver
+//    )
+//    // Доставка из ахива
+////    val project = viewModel.incubatorFromArchive(projectIncubatorList.typeBirds).collectAsState()
+////
+////    val projectCopy = project.value.itemList
+////
+////    val countProject = viewModel.incubatorFromArchive2(projectIncubatorList.typeBirds)
+////    val openEndDialog = remember { mutableStateOf(false) }
+////
+////
+////    if (countProject == 0) {
+////        openEndDialog.value = false
+////    } else {
+////        openEndDialog.value = true
+////    }
 //
-//        Column(
-//            modifier = Modifier
-//                .background(color = Color.LightGray)
-//                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
-//            verticalArrangement = Arrangement.Center,
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            Text(
-//                "Выбрать данные из архива?",
-//                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-//                fontSize = 19.sp
-//            )
-//            Text(
-//                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
-//                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
-//            )
-//            Spacer(modifier = Modifier.padding(vertical = 10.dp))
-//
-//            val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
-//            idProject = selectedOption.id
-//            Column(Modifier.selectableGroup()) {
-//                projectList.forEach { text ->
-//                    Row(
-//                        Modifier
-//                            .fillMaxWidth()
-//                            .selectable(
-//                                selected = (text == selectedOption),
-//                                onClick = { onOptionSelected(text) },
-//                                role = Role.RadioButton
-//                            )
-//                            .padding(horizontal = 16.dp),
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        RadioButton(
-//                            selected = (text == selectedOption),
-//                            onClick = null
-//                        )
-//                        Text(text.titleProject)
-//                    }
-//                }
-//            }
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.Center,
-//            ) {
-//                TextButton(
-//                    onClick = { openDialog.value = false }, modifier = Modifier.padding(8.dp)
-//                ) {
-//                    Text("Отмена")
-//                }
-//                if (projectList[0].titleProject != "Ищем инкубаторы... Подождите пожалуйста") {
-//                    TextButton(
-//                        onClick = {
-//                            incubatorArh(idProject)
-//                        }, modifier = Modifier.padding(8.dp)
-//                    )
-//                    { Text("Выбрать") }
-//                }
-//            }
+//    val activity = LocalContext.current as Activity
+//    val scope = rememberCoroutineScope()
+//    Scaffold(
+//        topBar = {
+//            TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
 //        }
+//    ) { innerPadding ->
+//        AddIncubatorTwoContainer(
+//            modifier = Modifier
+//                .padding(innerPadding),
+//            navigateContinue = {
+//                scope.launch {
+//
+//                    val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
+//
+//                    viewModel.saveIncubator(
+//                        setIdPT(it, idPT)
+//                    )
+//                    val eventParameters: MutableMap<String, Any> = HashMap()
+//                    eventParameters["Имя"] = projectIncubatorList.title
+//                    eventParameters["Тип"] = projectIncubatorList.typeBirds
+//                    eventParameters["Кол-во"] = projectIncubatorList.count
+//                    eventParameters["АвтоОхл"] = projectIncubatorList.checkedStateAiring
+//                    eventParameters["АвтоПрев"] = projectIncubatorList.checkedStateAiring
+//                    AppMetrica.reportEvent("Incubator", eventParameters);
+//
+//                    navController.navigate(StartDestination.route)
+//                }
+//            },
+//            list = list,
+////            projectList = projectCopy,
+////            openEndDialog = openEndDialog
+////            incubatorArh= {
+////                    scope.launch {
+////                       // val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
+////                        list = viewModel.saveIncubator3(it).toMutableList()
+//////                        viewModel.saveIncubator2(it, idPT)
+////                        openEndDialog.value = false
+//////                        (activity as MainActivity)?.showAd()
+////
+//////                        navController.navigate(StartDestination.route)
+////                    }
+////            },
+//
+//        )
+//        DialogExamples()
 //    }
 //}
 
 
 @Composable
-fun AddIncubatorTwoContainer(
-    modifier: Modifier, navigateContinue: (MutableList<Incubator>) -> Unit,
+fun AddIncubatorContainerTwo(
+    navigateBack: () -> Unit,
+//    navigateContinue: () -> Unit,
+    list: MutableList<Incubator>,
+//    incubator: AddIncubatorList,
+//    onUpdate: (AddIncubatorList) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
+        }
+    ) { innerPadding ->
+
+        AddIncubatorTwoContaine(
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
+            list = list
+//            navigateContinue = navigateContinue,
+//            incubator, onUpdate
+        )
+    }
+}
+
+
+@Composable
+fun AddIncubatorTwoContaine(
+    modifier: Modifier,
+//    navigateContinue: (MutableList<Incubator>) -> Unit,
 //    incubatorArh: (Int) -> Unit,
     list: MutableList<Incubator>,
 //    projectList: List<ProjectTable>,
@@ -377,7 +254,7 @@ fun AddIncubatorTwoContainer(
         item {
             Button(
                 onClick = {
-                    navigateContinue(list)
+//                    navigateContinue(list)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -537,7 +414,7 @@ fun MyRowIncubatorAdd(incubator: Incubator) {
 }
 
 
-private fun setIncubator(typeIncubator: String): MutableList<Incubator> {
+fun setIncubator(typeIncubator: String): MutableList<Incubator> {
     val incubator: MutableList<Incubator> = mutableListOf()
     when (typeIncubator) {
         "Курицы" -> {
@@ -2041,7 +1918,7 @@ private fun setIdPT(list: MutableList<Incubator>, idPT: Int): MutableList<Incuba
     return list
 }
 
-private fun setAutoIncubator(
+fun setAutoIncubator(
     list: MutableList<Incubator>,
     airing: Boolean,
     over: Boolean
@@ -2059,6 +1936,141 @@ private fun setAutoIncubator(
     }
     return list
 }
+
+
+@Composable
+fun DialogExamples() {
+    val openAlertDialog = remember { mutableStateOf(true) }
+    when {
+        openAlertDialog.value -> {
+            AlertDialogExample(
+                onDismissRequest = { openAlertDialog.value = false },
+                onConfirmation = {
+                    openAlertDialog.value = false
+                },
+                dialogTitle = "Справка",
+                dialogText = "Если ваш инкубатор имеет погрешность, вы можете установить необходимую температуру здесь или воспользоваться рекомендованными значениями, которые можно изменять в процессе. \nРекомендуем вести ежедневный журнал и тщательно записывать данные, чтобы в будущем иметь возможность обратиться к этой информации из архива.",
+                icon = Icons.Default.Info
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertDialogExample(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = "Example Icon")
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText, textAlign = TextAlign.Justify)
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Отлично!")
+            }
+        }
+    )
+}
+
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun ArhivIncubatorChoice(
+//    openDialog: MutableState<Boolean>,
+//    projectList: List<ProjectTable>,
+////    incubatorArh: (Int) -> Unit,
+//
+//) {
+//    var idProject by remember { mutableIntStateOf(1) }
+//
+//    AlertDialog(
+//        onDismissRequest = { openDialog.value = false },
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clip(shape = RoundedCornerShape(20.dp))
+//    ) {
+//
+//        Column(
+//            modifier = Modifier
+//                .background(color = Color.LightGray)
+//                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Text(
+//                "Выбрать данные из архива?",
+//                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+//                fontSize = 19.sp
+//            )
+//            Text(
+//                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
+//                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+//            )
+//            Spacer(modifier = Modifier.padding(vertical = 10.dp))
+//
+//            val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
+//            idProject = selectedOption.id
+//            Column(Modifier.selectableGroup()) {
+//                projectList.forEach { text ->
+//                    Row(
+//                        Modifier
+//                            .fillMaxWidth()
+//                            .selectable(
+//                                selected = (text == selectedOption),
+//                                onClick = { onOptionSelected(text) },
+//                                role = Role.RadioButton
+//                            )
+//                            .padding(horizontal = 16.dp),
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        RadioButton(
+//                            selected = (text == selectedOption),
+//                            onClick = null
+//                        )
+//                        Text(text.titleProject)
+//                    }
+//                }
+//            }
+//
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.Center,
+//            ) {
+//                TextButton(
+//                    onClick = { openDialog.value = false }, modifier = Modifier.padding(8.dp)
+//                ) {
+//                    Text("Отмена")
+//                }
+//                if (projectList[0].titleProject != "Ищем инкубаторы... Подождите пожалуйста") {
+//                    TextButton(
+//                        onClick = {
+//                            incubatorArh(idProject)
+//                        }, modifier = Modifier.padding(8.dp)
+//                    )
+//                    { Text("Выбрать") }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 //

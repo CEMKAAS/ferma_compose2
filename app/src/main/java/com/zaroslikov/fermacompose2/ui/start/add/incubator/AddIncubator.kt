@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -73,19 +74,61 @@ object AddIncubatorDestination : NavigationDestination {
 
 @Composable
 fun AddIncubator(
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
     viewModel: AddIncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
 
-    if (shouldShowTwo) AddIncubatorContainerOne(navigateBack = navigateBack, navigateContinue = false) else AddIncubatorTwoContainer()
+    val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
+
+    //Календарь
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val formattedDate: String = format.format(calendar.timeInMillis)
+
+    var incubator by rememberSaveable {
+        mutableStateOf(
+            AddIncubatorList(
+                "Мой Инкубатор",
+                typeBirdsList[0],
+                "0",
+                formattedDate,
+                "08:00",
+                "12:00",
+                "18:00",
+                checkedStateAiring = false,
+                checkedStateOver = false
+            )
+        )
+    }
+
+    val list = setAutoIncubator(
+        setIncubator(incubator.typeBirds),
+        incubator.checkedStateAiring,
+        incubator.checkedStateOver
+    )
+
+    if (shouldShowTwo) AddIncubatorContainerOne(
+        navigateBack = navigateBack,
+        navigateContinue = { shouldShowTwo = false },
+        incubator = incubator
+    ) { newIncubator ->
+        incubator = newIncubator
+    } else AddIncubatorContainerTwo(
+        navigateBack = { shouldShowTwo = false },
+//        navigateContinue = { },
+//        incubator = incubator
+        list = list
+    )
 
 }
 
 @Composable
 fun AddIncubatorContainerOne(
     navigateBack: () -> Unit,
-    navigateContinue: Boolean
+    navigateContinue: () -> Unit,
+    incubator: AddIncubatorList,
+    onUpdate: (AddIncubatorList) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -98,7 +141,7 @@ fun AddIncubatorContainerOne(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
             navigateContinue = navigateContinue,
-            number = viewModel.countProject()
+            incubator, onUpdate
         )
     }
 }
@@ -108,8 +151,9 @@ fun AddIncubatorContainerOne(
 @Composable
 fun AddIncubatorContainer(
     modifier: Modifier,
-    navigateContinue: (AddIncubatorList) -> Unit,
-    number: Int
+    navigateContinue: () -> Unit,
+    incubator: AddIncubatorList,
+    onUpdate: (AddIncubatorList) -> Unit
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
@@ -118,21 +162,10 @@ fun AddIncubatorContainer(
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
 
-    var title by remember { mutableStateOf("Мой Инкубатор") }
-    var typeBirds by rememberSaveable { mutableStateOf(typeBirdsList[0]) }
-    var count by rememberSaveable { mutableStateOf("0") }
-    var date1 by remember { mutableStateOf(formattedDate) }
-    val time1 = rememberSaveable { mutableStateOf("08:00") }
-    val time2 = rememberSaveable { mutableStateOf("12:00") }
-    val time3 = rememberSaveable { mutableStateOf("18:00") }
-
     var expandedTypeBirds by remember { mutableStateOf(false) }
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
-
-    val checkedStateAiring = remember { mutableStateOf(false) }
-    val checkedStateOver = remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
@@ -147,8 +180,8 @@ fun AddIncubatorContainer(
 
 
     if (openDialog) {
-        DatePickerDialogSample(datePickerState, date1) { date ->
-            date1 = date
+        DatePickerDialogSample(datePickerState, incubator.date1) { date ->
+            onUpdate(incubator.copy(date1 = date))
             openDialog = false
         }
     }
@@ -162,31 +195,31 @@ fun AddIncubatorContainer(
     }
 
     fun errorBoolean(): Boolean {
-        isErrorTitle = title == ""
-        isErrorCount = count == ""
+        isErrorTitle = incubator.title == ""
+        isErrorCount = incubator.count == ""
         return !(isErrorTitle || isErrorCount)
     }
 
-    val showDialogTime1 = remember { mutableStateOf(false) }
-    val showDialogTime2 = remember { mutableStateOf(false) }
-    val showDialogTime3 = remember { mutableStateOf(false) }
+//    val showDialogTime1 = remember { mutableStateOf(false) }
+//    val showDialogTime2 = remember { mutableStateOf(false) }
+//    val showDialogTime3 = remember { mutableStateOf(false) }
 
-    if (showDialogTime1.value) {
-        TimePicker(time = time1, showDialog = showDialogTime1)
-    }
-    if (showDialogTime2.value) {
-        TimePicker(time = time2, showDialog = showDialogTime2)
-    }
-    if (showDialogTime3.value) {
-        TimePicker(time = time3, showDialog = showDialogTime3)
-    }
+//    if (showDialogTime1.value) {
+//        TimePicker(time = time1, showDialog = showDialogTime1)
+//    }
+//    if (showDialogTime2.value) {
+//        TimePicker(time = time2, showDialog = showDialogTime2)
+//    }
+//    if (showDialogTime3.value) {
+//        TimePicker(time = time3, showDialog = showDialogTime3)
+//    }
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
 
         OutlinedTextField(
-            value = title,
+            value = incubator.title,
             onValueChange = {
-                title = it
+                onUpdate(incubator.copy(title = it))
                 validateTitle(it)
             },
             label = { Text("Название") },
@@ -222,7 +255,7 @@ fun AddIncubatorContainer(
                 onExpandedChange = { expandedTypeBirds = !expandedTypeBirds },
             ) {
                 OutlinedTextField(
-                    value = typeBirds,
+                    value = incubator.typeBirds,
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTypeBirds) },
@@ -256,7 +289,7 @@ fun AddIncubatorContainer(
                             onClick = {
                                 selectedItemIndex = index
                                 expandedTypeBirds = false
-                                typeBirds = typeBirdsList[selectedItemIndex]
+                                onUpdate(incubator.copy(typeBirds = typeBirdsList[selectedItemIndex]))
                             }
                         )
                     }
@@ -265,9 +298,9 @@ fun AddIncubatorContainer(
         }
 
         OutlinedTextField(
-            value = count,
+            value = incubator.count,
             onValueChange = {
-                count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                onUpdate(incubator.copy(count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                 validateCount(it)
             },
             label = { Text("Количество") },
@@ -300,7 +333,7 @@ fun AddIncubatorContainer(
 
 
         OutlinedTextField(
-            value = date1,
+            value = incubator.date1,
             onValueChange = {},
             readOnly = true,
             label = { Text("Дата") },
@@ -413,13 +446,13 @@ fun AddIncubatorContainer(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = checkedStateAiring.value,
-                onCheckedChange = { checkedStateAiring.value = it }
+                checked = incubator.checkedStateAiring,
+                onCheckedChange = { onUpdate(incubator.copy(checkedStateAiring = it)) }
             )
             Text(text = "Авто охлаждение")
             Checkbox(
-                checked = checkedStateOver.value,
-                onCheckedChange = { checkedStateOver.value = it }
+                checked = incubator.checkedStateOver,
+                onCheckedChange = { onUpdate(incubator.copy(checkedStateOver = it)) }
             )
             Text(text = "Авто переворот")
         }
@@ -435,19 +468,7 @@ fun AddIncubatorContainer(
                 onClick = {
 
                     if (errorBoolean()) {
-                        navigateContinue(
-                            AddIncubatorList(
-                                title = title,
-                                typeBirds = typeBirds,
-                                count = count,
-                                date1 = date1,
-                                time1 = time1.value,
-                                time2 = time2.value,
-                                time3 = time3.value,
-                                checkedStateAiring = checkedStateAiring.value,
-                                checkedStateOver = checkedStateOver.value
-                            )
-                        )
+                        navigateContinue()
                     }
                 }, modifier = Modifier
                     .fillMaxWidth()
@@ -458,19 +479,6 @@ fun AddIncubatorContainer(
         }
     }
 }
-
-@Parcelize
-data class AddIncubatorList(
-    val title: String,
-    val typeBirds: String,
-    val count: String,
-    val date1: String,
-    val time1: String,
-    val time2: String,
-    val time3: String,
-    val checkedStateAiring: Boolean,
-    val checkedStateOver: Boolean
-) : Parcelable
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -516,3 +524,29 @@ fun TimePicker(time: MutableState<String>, showDialog: MutableState<Boolean>) {
         }
     }
 }
+
+data class AddIncubatorList(
+    val title: String,
+    val typeBirds: String,
+    val count: String,
+    val date1: String,
+    val time1: String,
+    val time2: String,
+    val time3: String,
+    val checkedStateAiring: Boolean,
+    val checkedStateOver: Boolean
+)
+
+
+//@Parcelize
+//data class AddIncubatorList(
+//    val title: String,
+//    val typeBirds: String,
+//    val count: String,
+//    val date1: String,
+//    val time1: String,
+//    val time2: String,
+//    val time3: String,
+//    val checkedStateAiring: Boolean,
+//    val checkedStateOver: Boolean
+//) : Parcelable

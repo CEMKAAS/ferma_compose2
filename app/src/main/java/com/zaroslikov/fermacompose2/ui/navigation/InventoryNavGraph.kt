@@ -86,7 +86,6 @@ import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubator
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorList
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwo
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
@@ -151,23 +150,25 @@ fun InventoryNavHost(
 
 
         composable(route = AddIncubatorDestination.route) {
-            AddIncubator(navigateBack = { navController.popBackStack() }, navigateContinue = {
-                navController.currentBackStackEntry?.savedStateHandle?.set("incubator", it)
-                navController.navigate(AddIncubatorTwoDestination.route)
-            })
+            AddIncubator(navigateBack = { navController.popBackStack() },
+//                navigateContinue = {
+//                navController.currentBackStackEntry?.savedStateHandle?.set("incubator", it)
+//                navController.navigate(AddIncubatorTwoDestination.route)
+//            }
+            )
         }
 
         composable(
             route = AddIncubatorTwoDestination.route
         ) {
-            navController.previousBackStackEntry?.savedStateHandle?.get<AddIncubatorList>("incubator")
-                ?.let {
-                    AddIncubatorTwo(
-                        navigateBack = { navController.popBackStack() },
-                        navController,
-                        projectIncubatorList = it
-                    )
-                }
+//            navController.previousBackStackEntry?.savedStateHandle?.get<AddIncubatorList>("incubator")
+//                ?.let {
+//                    AddIncubatorTwo(
+//                        navigateBack = { navController.popBackStack() },
+//                        navController,
+//                        projectIncubatorList = it
+//                    )
+//                }
         }
 
         composable(
@@ -185,9 +186,9 @@ fun InventoryNavHost(
                     "${IncubatorProjectEditDestination.route}/${it}"
                 )
             }, navigateOvos = {
-                navController.navigate(
-                    "${IncubatorOvoscopDestination.route}/${it.day}/${it.typeBirds}"
-                )
+//                navController.navigate(
+//                    "${IncubatorOvoscopDestination.route}/${it.day}/${it.typeBirds}"
+//                )
             }, navigateStart = {
                 navController.navigate(StartDestination.route)
             })

@@ -40,6 +40,7 @@ import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
@@ -122,7 +123,7 @@ interface ItemDao {
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
 
     @Query("SELECT name, type from AnimalTable Where idPT=:id")
-    fun getItemsAnimalAddList(id: Int): Flow<List<Pair<String, String>>>
+    fun getItemsAnimalAddList(id: Int): Flow<List<PairString>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: AddTable)

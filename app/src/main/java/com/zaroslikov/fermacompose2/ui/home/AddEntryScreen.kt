@@ -135,7 +135,7 @@ fun AddEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<Pair<String,String>>,
+    animalList: List<PairString>,
     saveInRoomAdd: (AddTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
@@ -397,7 +397,7 @@ fun AddEntryContainerProduct(
 
 
         if (animalList.isNotEmpty()) {
-            animal = "${animalList[selectedItemIndex].first} - ${animalList[selectedItemIndex].second}"
+            animal = "${animalList[selectedItemIndex].name} - ${animalList[selectedItemIndex].type}"
             ExposedDropdownMenuBox(
                 expanded = expandedAni,
                 onExpandedChange = { expandedAni = !expandedAni },
@@ -440,14 +440,14 @@ fun AddEntryContainerProduct(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "${item.first} - ${item.second}",
+                                    text = "${item.name} - ${item.type}",
                                     fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
                                 selectedItemIndex = index
                                 expandedAni = false
-                                animal = "${animalList[selectedItemIndex].first} - ${animalList[selectedItemIndex].second}"
+                                animal = "${animalList[selectedItemIndex].name} - ${animalList[selectedItemIndex].type}"
                             }
                         )
                     }
@@ -495,7 +495,7 @@ fun AddEntryContainerProduct(
                                 formattedDateList[2].toInt(),
                                 suffix = suffix,
                                 category = category,
-                                anaimal = animalList[selectedItemIndex].first,
+                                anaimal = animalList[selectedItemIndex].name,
                                 priceAll = 0.0,
                                 note = note
                             )
@@ -504,7 +504,7 @@ fun AddEntryContainerProduct(
                         eventParameters["Имя"] = title
                         eventParameters["Кол-во"] = "$title $count"
                         eventParameters["Категория"] = category
-                        eventParameters["Животное"] = animalList[selectedItemIndex].first
+                        eventParameters["Животное"] = animalList[selectedItemIndex].type
                         eventParameters["Примечание"] = note
                         AppMetrica.reportEvent("Add Products", eventParameters);
                     }
