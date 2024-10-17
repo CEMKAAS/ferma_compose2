@@ -155,7 +155,8 @@ fun AddIncubatorContainerTwo(
         AddIncubatorTwoContaine(
             modifier = Modifier
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState()),
+//                .verticalScroll(rememberScrollState()),
+                     ,
             list = list,
             navigateContinue = navigateContinue
         )

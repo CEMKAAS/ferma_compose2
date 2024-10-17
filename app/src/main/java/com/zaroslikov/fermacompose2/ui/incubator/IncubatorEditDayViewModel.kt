@@ -53,7 +53,7 @@ data class IncubatorUiState(
     val damp: String = "",
     var over: String = "",
     var airing: String = "",
-    var idPT: Int = 0
+    var idPT: Long = 0
 )
 
 fun Incubator.toIncubatorUiState(): IncubatorUiState =  IncubatorUiState(

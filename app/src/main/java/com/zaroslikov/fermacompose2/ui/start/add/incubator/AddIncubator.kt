@@ -111,36 +111,38 @@ fun AddIncubator(
 
     val incubator = viewModel.incubatorUiState
 
-    var list = mutableListOf<Incubator>()
+    val list = setAutoIncubator(
+        setIncubator(incubator.type),
+        incubator.airing,
+        incubator.over
+    )
+
     val scope = rememberCoroutineScope()
 
     if (shouldShowTwo) AddIncubatorContainerOne(
         navigateBack = navigateBack,
-        navigateContinue = { list = setAutoIncubator(
-                setIncubator(incubator.type),
-                incubator.airing,
-                incubator.over
-            )
-            shouldShowTwo = false},
+        navigateContinue = {
+            shouldShowTwo = false
+        },
         incubator = incubator,
         onUpdate = viewModel::updateUiState,
 
-    ) else AddIncubatorContainerTwo(
+        ) else AddIncubatorContainerTwo(
         navigateBack = {
-            shouldShowTwo = false
+            shouldShowTwo = true
         },
         navigateContinue = {
             scope.launch {
-                    viewModel.saveProject(it)
+                viewModel.saveProject(it)
 
-                    val eventParameters: MutableMap<String, Any> = HashMap()
-                    eventParameters["Имя"] = incubator.titleProject
-                    eventParameters["Тип"] = incubator.type
-                    eventParameters["Кол-во"] = incubator.eggAll
-                    eventParameters["АвтоОхл"] = incubator.airing
-                    eventParameters["АвтоПрев"] = incubator.over
-                    AppMetrica.reportEvent("Incubator", eventParameters);
-                }
+                val eventParameters: MutableMap<String, Any> = HashMap()
+                eventParameters["Имя"] = incubator.titleProject
+                eventParameters["Тип"] = incubator.type
+                eventParameters["Кол-во"] = incubator.eggAll
+                eventParameters["АвтоОхл"] = incubator.airing
+                eventParameters["АвтоПрев"] = incubator.over
+                AppMetrica.reportEvent("Incubator", eventParameters);
+            }
         },
         list = list
     )
