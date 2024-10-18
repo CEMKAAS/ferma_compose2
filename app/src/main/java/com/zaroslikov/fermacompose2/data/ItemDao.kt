@@ -67,6 +67,9 @@ interface ItemDao {
     @Query("SELECT COUNT(*) AS row_count from МyINCUBATOR Where TYPE =:type and mode = 0 and ARHIVE = 1")
     fun getIncubatorListArh2(type: String): Flow<Int>
 
+    @Query("SELECT * from MyIncubator Where idPT =:idPT")
+    fun getIncubatorListArh3(idPT: Int): Flow<List<Incubator>>
+
     @Query("SELECT * from МyINCUBATOR Where mode = 1 and ARHIVE = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>
 

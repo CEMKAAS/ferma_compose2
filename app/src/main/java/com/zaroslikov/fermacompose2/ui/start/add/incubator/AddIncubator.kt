@@ -35,7 +35,9 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -84,6 +86,10 @@ fun AddIncubator(
     navigateContinue: () -> Unit
 ) {
     var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
+    val openEndDialog = remember { mutableStateOf(false) }
+    var countRow by remember { mutableIntStateOf(0) }
+
+    val incubator = viewModel.incubatorUiState
 
 //    val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 //
@@ -108,8 +114,10 @@ fun AddIncubator(
 //        )
 //    }
 
+//         Доставка из ахива
+    val projectList = viewModel.incubatorFromArchive(incubator.type).collectAsState()
 
-    val incubator = viewModel.incubatorUiState
+    openEndDialog.value = !(countRow == 0 && shouldShowTwo)
 
     val list = setAutoIncubator(
         setIncubator(incubator.type),
@@ -117,17 +125,35 @@ fun AddIncubator(
         incubator.over
     )
 
+
+    if (openEndDialog.value) {
+        ArhivIncubatorChoice(
+            openDialog = openEndDialog,
+            projectList = projectList.value.itemList,
+            incubatorArh = {
+                list.clear()
+                list.addAll(viewModel.incubatorFromArchive3(it).value.itemList.toMutableList())
+            }
+
+        )
+    }
+
     val scope = rememberCoroutineScope()
 
-    if (shouldShowTwo) AddIncubatorContainerOne(
-        navigateBack = navigateBack,
-        navigateContinue = {
-            shouldShowTwo = false
-        },
-        incubator = incubator,
-        onUpdate = viewModel::updateUiState,
+    if (shouldShowTwo)
+        AddIncubatorContainerOne(
+            navigateBack = navigateBack,
+            navigateContinue = {
+                shouldShowTwo = false
 
-        ) else AddIncubatorContainerTwo(
+                scope.launch {
+                    countRow = viewModel.incubatorFromArchive2(incubator.type)
+                }
+            },
+            incubator = incubator,
+            onUpdate = viewModel::updateUiState
+        )
+    else AddIncubatorContainerTwo(
         navigateBack = {
             shouldShowTwo = true
         },
@@ -144,6 +170,7 @@ fun AddIncubator(
                 AppMetrica.reportEvent("Incubator", eventParameters);
             }
         },
+
         list = list
     )
 

@@ -14,8 +14,12 @@ import com.zaroslikov.fermacompose2.ui.home.AddTableUiState
 import com.zaroslikov.fermacompose2.ui.home.toAddTableUiState
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -69,11 +73,34 @@ class AddIncubatorViewModel(
 
     }
 
+    suspend fun incubatorFromArchive2(type: String): Int {
+        return itemsRepository.getIncubatorListArh2(type)
+            .filterNotNull()
+            .first()
+            .toInt()
+    }
 
-    suspend fun saveIncubator(list: MutableList<Incubator>) {
-        list.forEach {
-            itemsRepository.insertIncubator(it)
-        }
+
+    fun incubatorFromArchive(type: String): StateFlow<IncubatorProjectListUiState2> {
+        return itemsRepository.getIncubatorListArh(type).map { IncubatorProjectListUiState2(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = IncubatorProjectListUiState2()
+            )
+    }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 1_000L
+    }
+
+    fun incubatorFromArchive3(idPT: Int): StateFlow<IncubatorArhListUiState> {
+        return itemsRepository.getIncubatorListArh3(idPT).map { IncubatorArhListUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = IncubatorArhListUiState()
+            )
     }
 
 
