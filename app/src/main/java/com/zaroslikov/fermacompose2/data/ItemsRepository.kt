@@ -52,13 +52,7 @@ interface ItemsRepository {
      */
     fun getItemStream(id: Int): Flow<AddTable?>
 
-    fun getIncubatorListArh(type: String): Flow<List<ProjectTable>>
-
-    fun getIncubatorListArh2(type: String): Flow<Int>
-
-    fun getIncubatorListArh3(idPT: Int): Flow<List<Incubator>>
     suspend fun getIncubatorListArh4(idPT: Int): List<Incubator>
-    fun getIncubatorListArh5(): Flow<List<ProjectTable>>
     suspend fun getIncubatorListArh6(type: String): List<ProjectTable>
 
     fun getAllProject(): Flow<List<ProjectTable>>

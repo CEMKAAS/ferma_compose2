@@ -55,113 +55,23 @@ import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 
-
-object AddIncubatorTwoDestination : NavigationDestination {
-    override val route = "AddIncubatorTwo"
-    override val titleRes = R.string.app_name
-    const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
-}
-
-//@Composable
-//fun AddIncubatorTwo(
-//    navigateBack: () -> Unit,
-//    navController: NavController,
-//    projectIncubatorList: AddIncubatorList,
-//    viewModel: AddIncubatorTwoViewModel = viewModel(factory = AppViewModelProvider.Factory)
-//) {
-//
-//    val list = setAutoIncubator(
-//        setIncubator(projectIncubatorList.typeBirds),
-//        projectIncubatorList.checkedStateAiring,
-//        projectIncubatorList.checkedStateOver
-//    )
-//    // Доставка из ахива
-////    val project = viewModel.incubatorFromArchive(projectIncubatorList.typeBirds).collectAsState()
-////
-////    val projectCopy = project.value.itemList
-////
-////    val countProject = viewModel.incubatorFromArchive2(projectIncubatorList.typeBirds)
-////    val openEndDialog = remember { mutableStateOf(false) }
-////
-////
-////    if (countProject == 0) {
-////        openEndDialog.value = false
-////    } else {
-////        openEndDialog.value = true
-////    }
-//
-//    val activity = LocalContext.current as Activity
-//    val scope = rememberCoroutineScope()
-//    Scaffold(
-//        topBar = {
-//            TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
-//        }
-//    ) { innerPadding ->
-//        AddIncubatorTwoContainer(
-//            modifier = Modifier
-//                .padding(innerPadding),
-//            navigateContinue = {
-//                scope.launch {
-//
-//                    val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
-//
-//                    viewModel.saveIncubator(
-//                        setIdPT(it, idPT)
-//                    )
-//                    val eventParameters: MutableMap<String, Any> = HashMap()
-//                    eventParameters["Имя"] = projectIncubatorList.title
-//                    eventParameters["Тип"] = projectIncubatorList.typeBirds
-//                    eventParameters["Кол-во"] = projectIncubatorList.count
-//                    eventParameters["АвтоОхл"] = projectIncubatorList.checkedStateAiring
-//                    eventParameters["АвтоПрев"] = projectIncubatorList.checkedStateAiring
-//                    AppMetrica.reportEvent("Incubator", eventParameters);
-//
-//                    navController.navigate(StartDestination.route)
-//                }
-//            },
-//            list = list,
-////            projectList = projectCopy,
-////            openEndDialog = openEndDialog
-////            incubatorArh= {
-////                    scope.launch {
-////                       // val idPT = viewModel.savaProject(projectIncubatorList.toIncubatorData())
-////                        list = viewModel.saveIncubator3(it).toMutableList()
-//////                        viewModel.saveIncubator2(it, idPT)
-////                        openEndDialog.value = false
-//////                        (activity as MainActivity)?.showAd()
-////
-//////                        navController.navigate(StartDestination.route)
-////                    }
-////            },
-//
-//        )
-//        DialogExamples()
-//    }
-//}
-
-
 @Composable
 fun AddIncubatorContainerTwo(
+    name: String,
     navigateBack: () -> Unit,
     navigateContinue: (MutableList<Incubator>) -> Unit,
-    list: MutableList<Incubator>,
-//    onUpdate: (List<Incubator>) -> Unit = {}
+    list: MutableList<Incubator>
 ) {
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
+            TopAppBarEdit(title = name, navigateUp = navigateBack)
         }
     ) { innerPadding ->
-
         AddIncubatorTwoContaine(
             modifier = Modifier
                 .padding(innerPadding),
-//                .verticalScroll(rememberScrollState()),
             list = list,
-            navigateContinue = navigateContinue,
-//            onUpdate = onUpdate
-
+            navigateContinue = navigateContinue
         )
     }
 }
@@ -171,11 +81,7 @@ fun AddIncubatorContainerTwo(
 fun AddIncubatorTwoContaine(
     modifier: Modifier,
     navigateContinue: (MutableList<Incubator>) -> Unit,
-//    incubatorArh: (Int) -> Unit,
-    list: MutableList<Incubator>,
-//    onUpdate: (List<Incubator>) -> Unit = {}
-//    projectList: List<ProjectTable>,
-//    openEndDialog: MutableState<Boolean>,
+    list: MutableList<Incubator>
 ) {
 
     LazyColumn(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -190,7 +96,7 @@ fun AddIncubatorTwoContaine(
                     text = "День",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth(0.16f)
+                        .fillMaxWidth(0.15f)
                         .padding(6.dp)
                 )
                 Divider(
@@ -229,7 +135,7 @@ fun AddIncubatorTwoContaine(
                     text = "Поворот",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .fillMaxWidth(0.3f)
+                        .fillMaxWidth(0.31f)
                         .padding(6.dp)
                 )
                 Divider(
@@ -267,21 +173,12 @@ fun AddIncubatorTwoContaine(
             }
         }
     }
-
-//    if (openEndDialog.value) {
-//        ArhivIncubatorChoice(
-//            openDialog = openEndDialog,
-//            projectList = projectList
-//                    incubatorArh = incubatorArh
-//        )
-//    }
 }
 
 
 @Composable
 fun MyRowIncubatorAdd(
-    incubator: Incubator,
-//    onUpdate: (List<Incubator>) -> Unit = {}
+    incubator: Incubator
 ) {
     var tempDay by remember { mutableStateOf(incubator.temp) }
     var dampDay by remember { mutableStateOf(incubator.damp) }
@@ -299,7 +196,7 @@ fun MyRowIncubatorAdd(
             text = incubator.day.toString(),
             textAlign = TextAlign.Center,
             modifier = Modifier
-                .fillMaxWidth(0.16f)
+                .fillMaxWidth(0.15f)
                 .padding(6.dp),
         )
         Divider(
@@ -309,10 +206,9 @@ fun MyRowIncubatorAdd(
                 .width(1.dp)
         )
         BasicTextField(
-            value = incubator.temp,
+            value = tempDay,
             onValueChange = {
                 tempDay = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
-//                onUpdate(listOf( incubator.copy(temp = it)))
                 incubator.temp = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -373,7 +269,7 @@ fun MyRowIncubatorAdd(
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
             modifier = Modifier
-                .fillMaxWidth(0.3f)
+                .fillMaxWidth(0.31f)
                 .padding(6.dp),
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Next,
@@ -1933,14 +1829,10 @@ fun setAutoIncubator(
 ): MutableList<Incubator> {
 
     if (airing) {
-        list.forEach {
-            it.airing = "Авто"
-        }
+        list.forEach { it.airing = "Авто" }
     }
     if (over) {
-        list.forEach {
-            it.over = "Авто"
-        }
+        list.forEach { it.over = "Авто" }
     }
     return list
 }
@@ -2028,8 +1920,9 @@ fun ArhivIncubatorChoice(
                 fontSize = 19.sp
             )
             Text(
-                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+                "Введённые Вами данные останутся неизменными. Значения температуры, влажности, поворота и проветривания будут взяты из выбранного архива.",
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp),
+                textAlign = TextAlign.Justify
             )
             Spacer(modifier = Modifier.padding(vertical = 10.dp))
 
@@ -2046,14 +1939,15 @@ fun ArhivIncubatorChoice(
                                 onClick = { onOptionSelected(text) },
                                 role = Role.RadioButton
                             )
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 16.dp,
+                                vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = (text == selectedOption),
                             onClick = null
                         )
-                        Text(text.titleProject)
+                        Text(text.titleProject, modifier = Modifier.padding(start = 4.dp))
                     }
                 }
             }
@@ -2077,667 +1971,3 @@ fun ArhivIncubatorChoice(
         }
     }
 }
-
-
-//
-//private fun setIncubator1(typeIncubator: String): IncubatorTemp{
-//    when (typeIncubator) {
-//        "Курицы" -> {
-//            return IncubatorList(
-//                massTemp = mutableListOf(
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.3",
-//                    "37.3",
-//                    "37.0",
-//                    "37.0",
-//                    "37.0",
-//                    ),
-//                massDamp = mutableListOf(
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "47",
-//                    "47",
-//                    "70",
-//                    "70",
-//                    "70"
-//                ),
-//                massAiring = mutableListOf(
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 20 мин",
-//                    "2 раза по 20 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин"
-//                ),
-//                massOver = mutableListOf(
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "0"
-//                )
-//            )
-//        }
-//
-//        "Гуси" -> {
-//            return IncubatorList(
-//                massTemp = mutableListOf(
-//                    "38.0",
-//                    "37.8",
-//                    "37.8",
-//                    "37.6",
-//                    "37.6",
-//                    "37.6",
-//                    "37.6",
-//                    "37.6",
-//                    "37.6",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3",
-//                    "37.3"
-//                ),
-//                massDamp = mutableListOf(
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "70",
-//                    "70",
-//                    "70",
-//                    "70",
-//                    "70",
-//                    "70",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75"
-//                ),
-//                massAiring = mutableListOf(
-//                    "нет",
-//                    "1 раз по 20 мин",
-//                    "1 раз по 20 мин",
-//                    "1 раз по 20 мин",
-//                    "1 раз по 20 мин",
-//                    "2 раз по 20 мин",
-//                    "2 раз по 20 мин",
-//                    "2 раз по 20 мин",
-//                    "2 раз по 20 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин",
-//                    "3 раза по 45 мин"
-//                ),
-//                massOver = mutableListOf(
-//                    "3-4",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "10",
-//                    "0",
-//                    "0",
-//                    "0"
-//                )
-//            )
-//        }
-//
-//        "Перепела" -> {
-//            return IncubatorList(
-//                massTemp = mutableListOf(
-//                    "38.0",
-//                    "38.0",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5"
-//                ),
-//                massDamp = mutableListOf(
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "55",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5"
-//                ),
-//                massAiring = mutableListOf(
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "1 раз по 5 мин",
-//                    "нет",
-//                    "нет",
-//                    "нет"
-//                ),
-//                massOver = mutableListOf(
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "3-6",
-//                    "нет",
-//                    "нет"
-//                )
-//            )
-//        }
-//
-//        "Индюки" -> {
-//            return IncubatorList(
-//                massTemp = mutableListOf(
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.7",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5"
-//                ),
-//                massDamp = mutableListOf(
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "45",
-//                    "45",
-//                    "45",
-//                    "45",
-//                    "45",
-//                    "45",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65",
-//                    "65"
-//                ),
-//                massAiring = mutableListOf(
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "4 раза по 10 мин",
-//                    "нет",
-//                    "нет",
-//                    "нет"
-//                ),
-//                massOver = mutableListOf(
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "нет",
-//                    "нет",
-//                    "нет"
-//                )
-//            )
-//        }
-//
-//        "Утки" -> {
-//            return IncubatorList(
-//                massTemp = mutableListOf(
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "38.0",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.8",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5"
-//                ),
-//                massDamp = mutableListOf(
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "75",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "90",
-//                    "90",
-//                    "90",
-//                    "90"
-//                ),
-//                massAiring = mutableListOf(
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 20 мин",
-//                    "2 раза по 20 мин",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 15 мин",
-//                    "2 раза по 15 мин",
-//                    "нет",
-//                    "нет",
-//                    "нет"
-//                ),
-//                massOver = mutableListOf(
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4",
-//                    "4-6",
-//                    "4-6",
-//                    "4-6",
-//                    "4-6",
-//                    "4-6",
-//                    "4-6",
-//                    "4-6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "6",
-//                    "нет",
-//                    "нет",
-//                    "нет"
-//                )
-//            )
-//        }
-//
-//        else -> {
-//            return IncubatorList(
-//                massTemp = mutableListOf(
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.9",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.5",
-//                    "37.3",
-//                    "37.3",
-//                    "37.0",
-//                    "37.0",
-//                    "37.0"
-//                ),
-//                massDamp = mutableListOf(
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "66",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "60",
-//                    "47",
-//                    "47",
-//                    "70",
-//                    "70",
-//                    "70"
-//                ),
-//                massAiring = mutableListOf(
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "нет",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 20 мин",
-//                    "2 раза по 20 мин",
-//                    "2 раза по 5 мин",
-//                    "2 раза по 5 мин"
-//                ),
-//                massOver = mutableListOf(
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "2-3",
-//                    "0"
-//                )
-//            )
-//        }
-//    }
-//}

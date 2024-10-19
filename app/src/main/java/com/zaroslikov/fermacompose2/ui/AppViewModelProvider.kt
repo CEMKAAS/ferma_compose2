@@ -26,7 +26,6 @@ import com.zaroslikov.fermacompose2.InventoryApplication
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEditViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
-import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsCard
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
@@ -50,7 +49,6 @@ import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddViewModel
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoViewModel
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
@@ -72,15 +70,8 @@ object AppViewModelProvider {
             ProjectAddViewModel(inventoryApplication().container.itemsRepository)
         }
 
-
         initializer {
             AddIncubatorViewModel(
-                inventoryApplication().container.itemsRepository
-            )
-        }
-        initializer {
-            AddIncubatorTwoViewModel(
-                this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )
         }

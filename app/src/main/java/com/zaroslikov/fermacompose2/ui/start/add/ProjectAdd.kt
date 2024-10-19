@@ -63,8 +63,6 @@ fun AddProject(
     navigateToStart: () -> Unit,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val activity = LocalContext.current as Activity
-
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {

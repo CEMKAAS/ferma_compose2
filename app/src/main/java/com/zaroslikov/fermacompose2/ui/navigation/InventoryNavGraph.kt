@@ -85,8 +85,6 @@ import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ProjectAddDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubator
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorList
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorTwoDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
@@ -147,27 +145,12 @@ fun InventoryNavHost(
             )
         }
 
-
-
         composable(route = AddIncubatorDestination.route) {
             AddIncubator(
                 navigateBack = { navController.popBackStack() },
                 navigateContinue = { navController.navigate(StartDestination.route) }
             )
         }
-
-//        composable(
-//            route = AddIncubatorTwoDestination.route
-//        ) {
-////            navController.previousBackStackEntry?.savedStateHandle?.get<AddIncubatorList>("incubator")
-////                ?.let {
-////                    AddIncubatorTwo(
-////                        navigateBack = { navController.popBackStack() },
-////                        navController,
-////                        projectIncubatorList = it
-////                    )
-////                }
-//        }
 
         composable(
             route = IncubatorScreenDestination.routeWithArgs,

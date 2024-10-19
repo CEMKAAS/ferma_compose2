@@ -89,13 +89,13 @@ fun AddIncubator(
     var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
     var openEndDialog by rememberSaveable { mutableStateOf(false) }
     var listBoolean by rememberSaveable { mutableStateOf(false) }
-   
+
+
     val incubator = viewModel.incubatorUiState
 
 //   Доставка из ахива
     viewModel.incubatorFromArchive5(incubator.type)
     val projectList = viewModel.items2.value
-
 
     val list = setAutoIncubator(
         setIncubator(incubator.type),
@@ -124,73 +124,32 @@ fun AddIncubator(
         )
     }
 
-//    countRow = projectList.value.size
-
-//    val items by viewModel.items
-//
-//    val list: MutableList<Incubator> = mutableListOf()
-
-//
-//    if (projectList.isEmpty()) {
-//        list.addAll(
-//            setAutoIncubator(
-//                setIncubator(incubator.type),
-//                incubator.airing,
-//                incubator.over
-//            )
-//        )
-//    } else {
-////        viewModel.incubatorFromArchive3(countRow.intValue)
-////            .collectAsState().value.itemList.toMutableList()\
-//        list.clear()
-//        list.addAll(
-//            viewModel.items.value.toMutableList()
-//        )
-//    }
-
-
     if (shouldShowTwo)
         AddIncubatorContainerOne(
             navigateBack = navigateBack,
-            navigateContinue = {
-
-                if (projectList.isEmpty()) shouldShowTwo = false else openEndDialog = true
-
-//                shouldShowTwo = false
-//                viewModel.incubatorFromArchive4(countRow.intValue)
-            },
+            navigateContinue = { if (projectList.isEmpty()) shouldShowTwo = false else openEndDialog = true },
             incubator = incubator,
-            onUpdate = viewModel::updateUiState,
-            projectList = projectList,
-//            arhivId = {},
-//            boolean = openEndDialog,
-//            countRow = countRow
-
-        )
+            onUpdate = viewModel::updateUiState
+            )
     else AddIncubatorContainerTwo(
+        name = incubator.titleProject,
         navigateBack = {
+            listBoolean = false
             shouldShowTwo = true
         },
         navigateContinue = {
-//            scope.launch {
             viewModel.saveProject(it)
-//                    items.toMutableList()
-
-
-//                val eventParameters: MutableMap<String, Any> = HashMap()
-//                eventParameters["Имя"] = incubator.titleProject
-//                eventParameters["Тип"] = incubator.type
-//                eventParameters["Кол-во"] = incubator.eggAll
-//                eventParameters["АвтоОхл"] = incubator.airing
-//                eventParameters["АвтоПрев"] = incubator.over
-//                AppMetrica.reportEvent("Incubator", eventParameters);
-//            }
+            val eventParameters: MutableMap<String, Any> = HashMap()
+            eventParameters["Имя"] = incubator.titleProject
+            eventParameters["Тип"] = incubator.type
+            eventParameters["Кол-во"] = incubator.eggAll
+            eventParameters["АвтоОхл"] = incubator.airing
+            eventParameters["АвтоПрев"] = incubator.over
+            AppMetrica.reportEvent("Incubator", eventParameters);
+            navigateContinue()
         },
         list = if (listBoolean) list2 else list
-
-//        onUpdate = viewModel::updateiArchive4
     )
-
 }
 
 @Composable
@@ -199,10 +158,6 @@ fun AddIncubatorContainerOne(
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
-    projectList: List<ProjectTable>,
-//    arhivId: (Int) -> Unit,
-//    boolean: MutableState<Boolean>,
-//    countRow: MutableState<Int>
 ) {
     Scaffold(
         topBar = {
@@ -215,11 +170,7 @@ fun AddIncubatorContainerOne(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
             navigateContinue = navigateContinue,
-            incubator, onUpdate,
-            projectList = projectList,
-//            arhivId = arhivId,
-//            boolean = boolean,
-//            countRow = countRow
+            incubator, onUpdate
         )
     }
 }
@@ -231,18 +182,12 @@ fun AddIncubatorContainer(
     modifier: Modifier,
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
-    onUpdate: (IncubatorProjectEditState) -> Unit = {},
-    projectList: List<ProjectTable>,
-//    arhivId: (Int) -> Unit,
-//    boolean: MutableState<Boolean>,
-//    countRow: MutableState<Int>
+    onUpdate: (IncubatorProjectEditState) -> Unit = {}
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
     //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val formattedDate: String = format.format(calendar.timeInMillis)
 
     var expandedTypeBirds by remember { mutableStateOf(false) }
 
@@ -259,7 +204,6 @@ fun AddIncubatorContainer(
         selectableDates = PastOrPresentSelectableDates,
         initialSelectedDateMillis = calendar.timeInMillis
     )
-
 
     if (openDialog) {
         DatePickerDialogSample(datePickerState, incubator.data) { date ->
@@ -417,7 +361,6 @@ fun AddIncubatorContainer(
             )
         )
 
-
         OutlinedTextField(
             value = incubator.data,
             onValueChange = {},
@@ -441,28 +384,6 @@ fun AddIncubatorContainer(
                 }
                 .padding(bottom = 10.dp),
         )
-
-//        Column(
-//            Modifier
-//                .selectableGroup()
-//                .fillMaxWidth()
-//        ) {
-//            projectList.forEach { text ->
-//                val checkedState = remember { mutableStateOf(false) }
-//                Row {
-//                    Checkbox(
-//                        checked = checkedState.value,
-//                        onCheckedChange = {
-//                            checkedState.value = it
-//                            countRow.value = text.id
-//                            boolean.value = it
-//                        }
-//                    )
-//                    Text(text = text.titleProject)
-//                }
-//            }
-//        }
-
 
 //        if (projectList.isNotEmpty()) {
 //        Text(
@@ -508,7 +429,6 @@ fun AddIncubatorContainer(
 //            modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
 //        )
 //        }
-
 
 //
 //        OutlinedTextField(
@@ -589,7 +509,6 @@ fun AddIncubatorContainer(
 //                }
 //                .padding(bottom = 2.dp)
 //        )
-
 
         Row(
             Modifier
@@ -689,17 +608,3 @@ data class AddIncubatorList(
     val checkedStateAiring: Boolean,
     val checkedStateOver: Boolean
 )
-
-
-//@Parcelize
-//data class AddIncubatorList(
-//    val title: String,
-//    val typeBirds: String,
-//    val count: String,
-//    val date1: String,
-//    val time1: String,
-//    val time2: String,
-//    val time3: String,
-//    val checkedStateAiring: Boolean,
-//    val checkedStateOver: Boolean
-//) : Parcelable

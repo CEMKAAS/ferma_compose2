@@ -223,7 +223,7 @@ fun IncubatorContainer(
                 incubator[it],
                 modifier = Modifier
                     .padding(6.dp)
-                    .clickable { navigateDayEdit(Pair(projectTable.id, it)) },
+                    .clickable { navigateDayEdit(Pair(projectTable.id, it+1)) },
                 borderStroke = borderStroke,
                 typeBird = projectTable.type,
                 navigateOvos = { navigateOvos(Pair(it + 1, projectTable.type)) }
@@ -386,10 +386,10 @@ fun EndIncubator(
                         fontSize = 19.sp, fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        "Мы сохранили инкубатор в архив, чтобы вы не забыли параметры!\nТакже Вы можете добавить птенцов в существующий проект или создать новый для дальнейшей работы.\n"
-                                + "Вы заложили ${projectTable.eggAll} яиц.\nСколько птенцов у Вас вылупилось?",
+                        "Инкубатор добавлен в архив!\nВы можете добавить птенцов в текущий проект или создать новый.\n"
+                                + "Сколько птенцов у Вас вылупилось из ${projectTable.eggAll} яиц?",
                         modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp),
-                        fontSize = 15.sp
+                        fontSize = 15.sp, textAlign = TextAlign.Justify
                     )
 
                     OutlinedTextField(
@@ -418,8 +418,6 @@ fun EndIncubator(
                                     text = "Не указано кол-во яиц",
                                     color = MaterialTheme.colorScheme.error
                                 )
-                            } else {
-                                Text("Укажите кол-во яиц, которых заложили в инкубатор")
                             }
                         },
                         isError = isErrorCount
@@ -444,7 +442,7 @@ fun EndIncubator(
                                             onClick = { onOptionSelected(text) },
                                             role = Role.RadioButton
                                         )
-                                        .padding(horizontal = 8.dp),
+                                        .padding(horizontal = 8.dp,  vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
