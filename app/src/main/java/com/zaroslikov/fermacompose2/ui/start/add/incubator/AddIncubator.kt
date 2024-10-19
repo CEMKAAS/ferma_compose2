@@ -68,6 +68,7 @@ import java.util.TimeZone
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.sp
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
@@ -92,15 +93,19 @@ fun AddIncubator(
 
     val incubator = viewModel.incubatorUiState
 
-
-
 //   Доставка из ахива
-    val projectList = viewModel.incubatorFromArchive(incubator.type).collectAsState()
+    val projectList = viewModel.items2
+
+
+//    val list = setAutoIncubator(
+//        setIncubator(incubator.type),
+//        incubator.airing,
+//        incubator.over
+//    )
+//    val list3 = viewModel.incubatorFromArchive3(countRow.intValue).collectAsState().value.itemList
 
 //    openEndDialog = countRow != 0 && !shouldShowTwo
-
 //   val list2 = viewModel.items.value.toMutableList()
-
 
 //    if (openEndDialog) {
 //        ArhivIncubatorChoice(
@@ -118,24 +123,31 @@ fun AddIncubator(
 //                    shouldShowTwo = false
 //                }
 //            },
-//
 //            )
 //    }
 
-    val items by viewModel.items
+//    val items by viewModel.items
 //
-//    val list = if (!openEndDialog.value) {
-//        setAutoIncubator(
-//            setIncubator(incubator.type),
-//            incubator.airing,
-//            incubator.over
-//        )
-//    } else {
-////        viewModel.incubatorFromArchive3(countRow.intValue)
-////            .collectAsState().value.itemList.toMutableList()
-//        items.toMutableList()
-//    }
+    val list: MutableList<Incubator> = mutableListOf()
 
+
+
+    if (!openEndDialog.value) {
+        list.addAll(
+            setAutoIncubator(
+                setIncubator(incubator.type),
+                incubator.airing,
+                incubator.over
+            )
+        )
+    } else {
+//        viewModel.incubatorFromArchive3(countRow.intValue)
+//            .collectAsState().value.itemList.toMutableList()\
+//        list.clear()
+        list.addAll(
+            viewModel.items.value.toMutableList()
+        )
+    }
 
 
     if (shouldShowTwo)
@@ -150,7 +162,7 @@ fun AddIncubator(
             },
             incubator = incubator,
             onUpdate = viewModel::updateUiState,
-            projectList = projectList.value.itemList,
+            projectList = projectList.value,
             arhivId = {},
             boolean = openEndDialog,
             countRow = countRow
@@ -161,21 +173,21 @@ fun AddIncubator(
             shouldShowTwo = true
         },
         navigateContinue = {
-            scope.launch {
-                viewModel.saveProject(
+//            scope.launch {
+                viewModel.saveProject(it)
 //                    items.toMutableList()
-                )
 
-                val eventParameters: MutableMap<String, Any> = HashMap()
-                eventParameters["Имя"] = incubator.titleProject
-                eventParameters["Тип"] = incubator.type
-                eventParameters["Кол-во"] = incubator.eggAll
-                eventParameters["АвтоОхл"] = incubator.airing
-                eventParameters["АвтоПрев"] = incubator.over
-                AppMetrica.reportEvent("Incubator", eventParameters);
-            }
+
+//                val eventParameters: MutableMap<String, Any> = HashMap()
+//                eventParameters["Имя"] = incubator.titleProject
+//                eventParameters["Тип"] = incubator.type
+//                eventParameters["Кол-во"] = incubator.eggAll
+//                eventParameters["АвтоОхл"] = incubator.airing
+//                eventParameters["АвтоПрев"] = incubator.over
+//                AppMetrica.reportEvent("Incubator", eventParameters);
+//            }
         },
-        list = items.toMutableList()
+        list = list
 
 //        onUpdate = viewModel::updateiArchive4
     )
@@ -431,50 +443,72 @@ fun AddIncubatorContainer(
                 .padding(bottom = 10.dp),
         )
 
-        if (projectList.isNotEmpty()) {
-            Text(
-                "Выбрать данные из архива?",
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
-                fontSize = 19.sp
-            )
-            Text(
-                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
-            )
-            Spacer(modifier = Modifier.padding(vertical = 10.dp))
-            val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
-//            idProject = selectedOption.id
-            Column(Modifier.selectableGroup()) {
-                projectList.forEach { text ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = (text == selectedOption),
-                                onClick = { onOptionSelected(text) },
-                                role = Role.RadioButton
-                            )
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (text == selectedOption),
-                            onClick = {
-                                countRow.value = selectedOption.id
-                                boolean.value = true
-                                arhivId(selectedOption.id)
-                            }
-                        )
-                        Text(text.titleProject)
-                    }
+        Column(
+            Modifier
+                .selectableGroup()
+                .fillMaxWidth()
+        ) {
+            projectList.forEach { text ->
+                val checkedState = remember { mutableStateOf(false) }
+                Row {
+                    Checkbox(
+                        checked = checkedState.value,
+                        onCheckedChange = {
+                            checkedState.value = it
+                            countRow.value = text.id
+                            boolean.value = it
+                        }
+                    )
+                    Text(text = text.titleProject)
                 }
             }
-
-            Text(
-                "${selectedOption.id}",
-                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
-            )
         }
+
+
+//        if (projectList.isNotEmpty()) {
+//        Text(
+//            "Выбрать данные из архива?",
+//            modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+//            fontSize = 19.sp
+//        )
+//        Text(
+//            "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
+//            modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+//        )
+//        Spacer(modifier = Modifier.padding(vertical = 10.dp))
+//        val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
+////            idProject = selectedOption.id
+//        Column(Modifier.selectableGroup()) {
+//            projectList.forEach { text ->
+//                Row(
+//                    Modifier
+//                        .fillMaxWidth()
+//                        .selectable(
+//                            selected = (text == selectedOption),
+//                            onClick = { onOptionSelected(text) },
+//                            role = Role.RadioButton
+//                        )
+//                        .padding(horizontal = 16.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    RadioButton(
+//                        selected = (text == selectedOption),
+//                        onClick = {
+//                            countRow.value = selectedOption.id
+//                            boolean.value = true
+//                            arhivId(selectedOption.id)
+//                        }
+//                    )
+//                    Text(text.titleProject)
+//                }
+//            }
+//        }
+//
+//        Text(
+//            "${selectedOption.id}",
+//            modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+//        )
+//        }
 
 
 //

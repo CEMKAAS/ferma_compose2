@@ -53,7 +53,6 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 
 
@@ -1921,6 +1920,7 @@ fun AddIncubatorList.toIncubatorData(): ProjectTable = ProjectTable(
 
 fun setIdPT(list: MutableList<Incubator>, idPT: Long): MutableList<Incubator> {
     list.forEach {
+        it.id = 0
         it.idPT = idPT
     }
     return list

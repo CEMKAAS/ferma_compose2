@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey
 data class Incubator(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Int = 0,
+    var id: Int = 0,
     val day: Int,
     var temp: String,
     var damp: String,
