@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,12 +54,17 @@ class AddIncubatorViewModel(
     )
         private set
 
+    var list = mutableStateOf(emptyList<Incubator>())
+
+
     fun updateUiState(itemDetails: IncubatorProjectEditState) {
         incubatorUiState =
             itemDetails
     }
 
-    suspend fun saveProject(list: MutableList<Incubator>) {
+    suspend fun saveProject(
+//        list: MutableList<Incubator>
+    ) {
 
         val idPT = itemsRepository.insertProjectLong(incubatorUiState.toProjectTable())
 
@@ -67,18 +73,18 @@ class AddIncubatorViewModel(
 //            .first()
 //            .toInt()
 //
-        setIdPT(list, idPT).forEach {
+        setIdPT(items.value.toMutableList(), idPT).forEach {
             itemsRepository.insertIncubator(it)
         }
 
     }
 
-    suspend fun incubatorFromArchive2(type: String): Int {
-        return itemsRepository.getIncubatorListArh2(type)
-            .filterNotNull()
-            .first()
-            .toInt()
-    }
+//    suspend fun incubatorFromArchive2(type: String): Int {
+//        return itemsRepository.getIncubatorListArh2(type)
+//            .filterNotNull()
+//            .first()
+//            .toInt()
+//    }
 
 
     fun incubatorFromArchive(type: String): StateFlow<IncubatorProjectListUiState2> {
@@ -90,10 +96,6 @@ class AddIncubatorViewModel(
             )
     }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 1_000L
-    }
-
     fun incubatorFromArchive3(idPT: Int): StateFlow<IncubatorArhListUiState> {
         return itemsRepository.getIncubatorListArh3(idPT).map { IncubatorArhListUiState(it) }
             .stateIn(
@@ -103,6 +105,27 @@ class AddIncubatorViewModel(
             )
     }
 
+    private val _items = mutableStateOf<List<Incubator>>(
+        setAutoIncubator(
+            setIncubator(incubatorUiState.type),
+            incubatorUiState.airing,
+            incubatorUiState.over
+        )
+    )
+    val items: State<List<Incubator>> = _items
+
+
+    fun incubatorFromArchive4(idPT: Int) {
+        viewModelScope.launch {
+            _items.value = itemsRepository.getIncubatorListArh4(idPT)
+        }
+
+    }
+//
+//
+//    fun updateiArchive4(item: List<Incubator>) {
+//        _items.value = item
+//    }
 
 //    private var countIncubator by mutableIntStateOf(0)
 //
@@ -116,5 +139,9 @@ class AddIncubatorViewModel(
 //        return countIncubator
 //    }
 
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 1_000L
+    }
 
 }

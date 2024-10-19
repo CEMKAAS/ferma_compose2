@@ -137,6 +137,6 @@ class AddIncubatorTwoViewModel(
 
 }
 
-data class IncubatorProjectListUiState2(val itemList: List<ProjectTable> = listOf(ProjectTable(0,"Ищем инкубаторы... Подождите пожалуйста","","","","","","","","","","","",0)))
+data class IncubatorProjectListUiState2(val itemList: List<ProjectTable> = listOf())
 
 data class IncubatorArhListUiState(val itemList: List<Incubator> = listOf())

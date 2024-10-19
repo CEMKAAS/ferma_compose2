@@ -1,16 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
-import android.os.Parcelable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,20 +57,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
-import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.sp
+import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import io.appmetrica.analytics.AppMetrica
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 object AddIncubatorDestination : NavigationDestination {
@@ -86,72 +86,75 @@ fun AddIncubator(
     navigateContinue: () -> Unit
 ) {
     var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
-    val openEndDialog = remember { mutableStateOf(false) }
-    var countRow by remember { mutableIntStateOf(0) }
+    val openEndDialog = rememberSaveable { mutableStateOf(false) }
+    val countRow = remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
 
     val incubator = viewModel.incubatorUiState
 
-//    val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
-//
-//    //Календарь
-//    val format = SimpleDateFormat("dd.MM.yyyy")
-//    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-//    val formattedDate: String = format.format(calendar.timeInMillis)
-//
-//    var incubator by rememberSaveable {
-//        mutableStateOf(
-//            AddIncubatorList(
-//                "Мой Инкубатор",
-//                typeBirdsList[0],
-//                "0",
-//                formattedDate,
-//                "08:00",
-//                "12:00",
-//                "18:00",
-//                checkedStateAiring = false,
-//                checkedStateOver = false
-//            )
-//        )
-//    }
 
-//         Доставка из ахива
+
+//   Доставка из ахива
     val projectList = viewModel.incubatorFromArchive(incubator.type).collectAsState()
 
-    openEndDialog.value = !(countRow == 0 && shouldShowTwo)
+//    openEndDialog = countRow != 0 && !shouldShowTwo
 
-    val list = setAutoIncubator(
-        setIncubator(incubator.type),
-        incubator.airing,
-        incubator.over
-    )
+//   val list2 = viewModel.items.value.toMutableList()
 
 
-    if (openEndDialog.value) {
-        ArhivIncubatorChoice(
-            openDialog = openEndDialog,
-            projectList = projectList.value.itemList,
-            incubatorArh = {
-                list.clear()
-                list.addAll(viewModel.incubatorFromArchive3(it).value.itemList.toMutableList())
-            }
+//    if (openEndDialog) {
+//        ArhivIncubatorChoice(
+//            openDialog = {
+//                countRow = 0
+//                openEndDialog = false
+//                shouldShowTwo = false
+//            },
+//            projectList = projectList.value.itemList,
+//            incubatorArh = {
+//                countRow = 0
+//                scope.launch {
+//                    list2 = viewModel.incubatorFromArchive4(it).toMutableList()
+//                    openEndDialog = false
+//                    shouldShowTwo = false
+//                }
+//            },
+//
+//            )
+//    }
 
-        )
-    }
+    val items by viewModel.items
+//
+//    val list = if (!openEndDialog.value) {
+//        setAutoIncubator(
+//            setIncubator(incubator.type),
+//            incubator.airing,
+//            incubator.over
+//        )
+//    } else {
+////        viewModel.incubatorFromArchive3(countRow.intValue)
+////            .collectAsState().value.itemList.toMutableList()
+//        items.toMutableList()
+//    }
 
-    val scope = rememberCoroutineScope()
+
 
     if (shouldShowTwo)
         AddIncubatorContainerOne(
             navigateBack = navigateBack,
             navigateContinue = {
                 shouldShowTwo = false
-
-                scope.launch {
-                    countRow = viewModel.incubatorFromArchive2(incubator.type)
-                }
+//                scope.launch {
+//                    countRow = viewModel.incubatorFromArchive2(incubator.type)
+//                }
+                viewModel.incubatorFromArchive4(countRow.intValue)
             },
             incubator = incubator,
-            onUpdate = viewModel::updateUiState
+            onUpdate = viewModel::updateUiState,
+            projectList = projectList.value.itemList,
+            arhivId = {},
+            boolean = openEndDialog,
+            countRow = countRow
+
         )
     else AddIncubatorContainerTwo(
         navigateBack = {
@@ -159,7 +162,9 @@ fun AddIncubator(
         },
         navigateContinue = {
             scope.launch {
-                viewModel.saveProject(it)
+                viewModel.saveProject(
+//                    items.toMutableList()
+                )
 
                 val eventParameters: MutableMap<String, Any> = HashMap()
                 eventParameters["Имя"] = incubator.titleProject
@@ -170,8 +175,9 @@ fun AddIncubator(
                 AppMetrica.reportEvent("Incubator", eventParameters);
             }
         },
+        list = items.toMutableList()
 
-        list = list
+//        onUpdate = viewModel::updateiArchive4
     )
 
 }
@@ -181,7 +187,11 @@ fun AddIncubatorContainerOne(
     navigateBack: () -> Unit,
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
-    onUpdate: (IncubatorProjectEditState) -> Unit = {}
+    onUpdate: (IncubatorProjectEditState) -> Unit = {},
+    projectList: List<ProjectTable>,
+    arhivId: (Int) -> Unit,
+    boolean: MutableState<Boolean>,
+    countRow: MutableState<Int>
 ) {
     Scaffold(
         topBar = {
@@ -194,7 +204,11 @@ fun AddIncubatorContainerOne(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState()),
             navigateContinue = navigateContinue,
-            incubator, onUpdate
+            incubator, onUpdate,
+            projectList = projectList,
+            arhivId = arhivId,
+            boolean = boolean,
+            countRow = countRow
         )
     }
 }
@@ -206,7 +220,11 @@ fun AddIncubatorContainer(
     modifier: Modifier,
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
-    onUpdate: (IncubatorProjectEditState) -> Unit = {}
+    onUpdate: (IncubatorProjectEditState) -> Unit = {},
+    projectList: List<ProjectTable>,
+    arhivId: (Int) -> Unit,
+    boolean: MutableState<Boolean>,
+    countRow: MutableState<Int>
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
@@ -412,7 +430,53 @@ fun AddIncubatorContainer(
                 }
                 .padding(bottom = 10.dp),
         )
-//
+
+        if (projectList.isNotEmpty()) {
+            Text(
+                "Выбрать данные из архива?",
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 5.dp),
+                fontSize = 19.sp
+            )
+            Text(
+                "Данные которые Вы ввели не изменятся, температура, влажность, поворот и проветривание, будут добавлены из выбраного архива",
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+            )
+            Spacer(modifier = Modifier.padding(vertical = 10.dp))
+            val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
+//            idProject = selectedOption.id
+            Column(Modifier.selectableGroup()) {
+                projectList.forEach { text ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (text == selectedOption),
+                                onClick = { onOptionSelected(text) },
+                                role = Role.RadioButton
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (text == selectedOption),
+                            onClick = {
+                                countRow.value = selectedOption.id
+                                boolean.value = true
+                                arhivId(selectedOption.id)
+                            }
+                        )
+                        Text(text.titleProject)
+                    }
+                }
+            }
+
+            Text(
+                "${selectedOption.id}",
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 10.dp)
+            )
+        }
+
+
 //
 //        OutlinedTextField(
 //            value = time1.value,

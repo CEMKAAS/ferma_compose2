@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.start.add.incubator
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,14 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
@@ -32,12 +29,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -55,17 +49,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.StartDestination
-import io.appmetrica.analytics.AppMetrica
-import kotlinx.coroutines.launch
 
 
 object AddIncubatorTwoDestination : NavigationDestination {
@@ -157,7 +146,8 @@ object AddIncubatorTwoDestination : NavigationDestination {
 fun AddIncubatorContainerTwo(
     navigateBack: () -> Unit,
     navigateContinue: (MutableList<Incubator>) -> Unit,
-    list: MutableList<Incubator>
+    list: MutableList<Incubator>,
+//    onUpdate: (List<Incubator>) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -167,11 +157,12 @@ fun AddIncubatorContainerTwo(
 
         AddIncubatorTwoContaine(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(innerPadding),
 //                .verticalScroll(rememberScrollState()),
-                     ,
             list = list,
-            navigateContinue = navigateContinue
+            navigateContinue = navigateContinue,
+//            onUpdate = onUpdate
+
         )
     }
 }
@@ -183,6 +174,7 @@ fun AddIncubatorTwoContaine(
     navigateContinue: (MutableList<Incubator>) -> Unit,
 //    incubatorArh: (Int) -> Unit,
     list: MutableList<Incubator>,
+//    onUpdate: (List<Incubator>) -> Unit = {}
 //    projectList: List<ProjectTable>,
 //    openEndDialog: MutableState<Boolean>,
 ) {
@@ -259,14 +251,15 @@ fun AddIncubatorTwoContaine(
         item { Divider(color = Color.DarkGray, thickness = 1.dp) }
         item { Divider(color = Color.DarkGray, thickness = 1.dp) }
         items(list.size) {
-            MyRowIncubatorAdd(list[it])
+            MyRowIncubatorAdd(
+                list[it],
+//                onUpdate = onUpdate
+            )
         }
 
         item {
             Button(
-                onClick = {
-                    navigateContinue(list)
-                },
+                onClick = { navigateContinue(list) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp, horizontal = 8.dp)
@@ -287,7 +280,10 @@ fun AddIncubatorTwoContaine(
 
 
 @Composable
-fun MyRowIncubatorAdd(incubator: Incubator) {
+fun MyRowIncubatorAdd(
+    incubator: Incubator,
+//    onUpdate: (List<Incubator>) -> Unit = {}
+) {
     var tempDay by remember { mutableStateOf(incubator.temp) }
     var dampDay by remember { mutableStateOf(incubator.damp) }
     var overDay by remember { mutableStateOf(incubator.over) }
@@ -314,9 +310,10 @@ fun MyRowIncubatorAdd(incubator: Incubator) {
                 .width(1.dp)
         )
         BasicTextField(
-            value = tempDay,
+            value = incubator.temp,
             onValueChange = {
                 tempDay = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+//                onUpdate(listOf( incubator.copy(temp = it)))
                 incubator.temp = it
             },
             textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -2005,13 +2002,14 @@ fun AlertDialogExample(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArhivIncubatorChoice(
-    openDialog: MutableState<Boolean>,
+    openDialog: () -> Unit,
     projectList: List<ProjectTable>,
-    incubatorArh: (Int) -> Unit) {
+    incubatorArh: (Int) -> Unit
+) {
     var idProject by remember { mutableIntStateOf(1) }
 
     AlertDialog(
-        onDismissRequest = { openDialog.value = false },
+        onDismissRequest = openDialog,
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(20.dp))
@@ -2064,7 +2062,7 @@ fun ArhivIncubatorChoice(
                 horizontalArrangement = Arrangement.Center,
             ) {
                 TextButton(
-                    onClick = { openDialog.value = false }, modifier = Modifier.padding(8.dp)
+                    onClick = openDialog, modifier = Modifier.padding(8.dp)
                 ) {
                     Text("Отмена")
                 }

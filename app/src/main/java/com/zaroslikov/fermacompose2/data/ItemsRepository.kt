@@ -57,6 +57,7 @@ interface ItemsRepository {
     fun getIncubatorListArh2(type: String): Flow<Int>
 
     fun getIncubatorListArh3(idPT: Int): Flow<List<Incubator>>
+    suspend fun getIncubatorListArh4(idPT: Int): List<Incubator>
 
     fun getAllProject(): Flow<List<ProjectTable>>
     fun getAllProjectArh(): Flow<List<ProjectTable>>
