@@ -47,7 +47,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getIncubatorListArh3(idPT: Int): Flow<List<Incubator>> = itemDao.getIncubatorListArh3(idPT)
     override suspend fun getIncubatorListArh4(idPT: Int): List<Incubator>  = itemDao.getIncubatorListArh4(idPT)
     override fun getIncubatorListArh5(): Flow<List<ProjectTable>> = itemDao.getIncubatorListArh5()
-    override suspend fun getIncubatorListArh6(): List<ProjectTable> = itemDao.getIncubatorListArh6()
+    override suspend fun getIncubatorListArh6(type: String): List<ProjectTable> = itemDao.getIncubatorListArh6(type)
 
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
     override fun getAllProjectArh(): Flow<List<ProjectTable>> = itemDao.getAllProjectArh()

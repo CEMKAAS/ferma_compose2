@@ -87,85 +87,84 @@ fun AddIncubator(
     navigateContinue: () -> Unit
 ) {
     var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
-    val openEndDialog = rememberSaveable { mutableStateOf(false) }
-    val countRow = remember { mutableIntStateOf(0) }
-    val scope = rememberCoroutineScope()
-
+    var openEndDialog by rememberSaveable { mutableStateOf(false) }
+    var listBoolean by rememberSaveable { mutableStateOf(false) }
+   
     val incubator = viewModel.incubatorUiState
 
 //   Доставка из ахива
-    val projectList = viewModel.items2
+    viewModel.incubatorFromArchive5(incubator.type)
+    val projectList = viewModel.items2.value
 
 
-//    val list = setAutoIncubator(
-//        setIncubator(incubator.type),
-//        incubator.airing,
-//        incubator.over
-//    )
-//    val list3 = viewModel.incubatorFromArchive3(countRow.intValue).collectAsState().value.itemList
+    val list = setAutoIncubator(
+        setIncubator(incubator.type),
+        incubator.airing,
+        incubator.over
+    )
+    val list2 = viewModel.items.value.toMutableList()
 
-//    openEndDialog = countRow != 0 && !shouldShowTwo
-//   val list2 = viewModel.items.value.toMutableList()
 
-//    if (openEndDialog) {
-//        ArhivIncubatorChoice(
-//            openDialog = {
-//                countRow = 0
-//                openEndDialog = false
-//                shouldShowTwo = false
-//            },
-//            projectList = projectList.value.itemList,
-//            incubatorArh = {
-//                countRow = 0
-//                scope.launch {
-//                    list2 = viewModel.incubatorFromArchive4(it).toMutableList()
-//                    openEndDialog = false
-//                    shouldShowTwo = false
-//                }
-//            },
-//            )
-//    }
+    if (openEndDialog) {
+        ArhivIncubatorChoice(
+            openDialog = {
+                listBoolean = false
+                openEndDialog = false
+                shouldShowTwo = false
+            },
+            projectList = projectList,
+            incubatorArh = {
+                viewModel.incubatorFromArchive4(it)
+            },
+            incubatorArh2 = {
+                listBoolean = true
+                openEndDialog = false
+                shouldShowTwo = false
+            }
+        )
+    }
+
+//    countRow = projectList.value.size
 
 //    val items by viewModel.items
 //
-    val list: MutableList<Incubator> = mutableListOf()
+//    val list: MutableList<Incubator> = mutableListOf()
 
-
-
-    if (!openEndDialog.value) {
-        list.addAll(
-            setAutoIncubator(
-                setIncubator(incubator.type),
-                incubator.airing,
-                incubator.over
-            )
-        )
-    } else {
-//        viewModel.incubatorFromArchive3(countRow.intValue)
-//            .collectAsState().value.itemList.toMutableList()\
+//
+//    if (projectList.isEmpty()) {
+//        list.addAll(
+//            setAutoIncubator(
+//                setIncubator(incubator.type),
+//                incubator.airing,
+//                incubator.over
+//            )
+//        )
+//    } else {
+////        viewModel.incubatorFromArchive3(countRow.intValue)
+////            .collectAsState().value.itemList.toMutableList()\
 //        list.clear()
-        list.addAll(
-            viewModel.items.value.toMutableList()
-        )
-    }
+//        list.addAll(
+//            viewModel.items.value.toMutableList()
+//        )
+//    }
 
 
     if (shouldShowTwo)
         AddIncubatorContainerOne(
             navigateBack = navigateBack,
             navigateContinue = {
-                shouldShowTwo = false
-//                scope.launch {
-//                    countRow = viewModel.incubatorFromArchive2(incubator.type)
-//                }
-                viewModel.incubatorFromArchive4(countRow.intValue)
+
+                if (projectList.isEmpty()) shouldShowTwo = false else openEndDialog = true
+
+//                shouldShowTwo = false
+//                viewModel.incubatorFromArchive4(countRow.intValue)
             },
             incubator = incubator,
             onUpdate = viewModel::updateUiState,
-            projectList = projectList.value,
-            arhivId = {},
-            boolean = openEndDialog,
-            countRow = countRow
+            projectList = projectList,
+//            arhivId = {},
+//            boolean = openEndDialog,
+//            countRow = countRow
 
         )
     else AddIncubatorContainerTwo(
@@ -174,7 +173,7 @@ fun AddIncubator(
         },
         navigateContinue = {
 //            scope.launch {
-                viewModel.saveProject(it)
+            viewModel.saveProject(it)
 //                    items.toMutableList()
 
 
@@ -187,7 +186,7 @@ fun AddIncubator(
 //                AppMetrica.reportEvent("Incubator", eventParameters);
 //            }
         },
-        list = list
+        list = if (listBoolean) list2 else list
 
 //        onUpdate = viewModel::updateiArchive4
     )
@@ -201,9 +200,9 @@ fun AddIncubatorContainerOne(
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
     projectList: List<ProjectTable>,
-    arhivId: (Int) -> Unit,
-    boolean: MutableState<Boolean>,
-    countRow: MutableState<Int>
+//    arhivId: (Int) -> Unit,
+//    boolean: MutableState<Boolean>,
+//    countRow: MutableState<Int>
 ) {
     Scaffold(
         topBar = {
@@ -218,9 +217,9 @@ fun AddIncubatorContainerOne(
             navigateContinue = navigateContinue,
             incubator, onUpdate,
             projectList = projectList,
-            arhivId = arhivId,
-            boolean = boolean,
-            countRow = countRow
+//            arhivId = arhivId,
+//            boolean = boolean,
+//            countRow = countRow
         )
     }
 }
@@ -234,9 +233,9 @@ fun AddIncubatorContainer(
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
     projectList: List<ProjectTable>,
-    arhivId: (Int) -> Unit,
-    boolean: MutableState<Boolean>,
-    countRow: MutableState<Int>
+//    arhivId: (Int) -> Unit,
+//    boolean: MutableState<Boolean>,
+//    countRow: MutableState<Int>
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
@@ -443,26 +442,26 @@ fun AddIncubatorContainer(
                 .padding(bottom = 10.dp),
         )
 
-        Column(
-            Modifier
-                .selectableGroup()
-                .fillMaxWidth()
-        ) {
-            projectList.forEach { text ->
-                val checkedState = remember { mutableStateOf(false) }
-                Row {
-                    Checkbox(
-                        checked = checkedState.value,
-                        onCheckedChange = {
-                            checkedState.value = it
-                            countRow.value = text.id
-                            boolean.value = it
-                        }
-                    )
-                    Text(text = text.titleProject)
-                }
-            }
-        }
+//        Column(
+//            Modifier
+//                .selectableGroup()
+//                .fillMaxWidth()
+//        ) {
+//            projectList.forEach { text ->
+//                val checkedState = remember { mutableStateOf(false) }
+//                Row {
+//                    Checkbox(
+//                        checked = checkedState.value,
+//                        onCheckedChange = {
+//                            checkedState.value = it
+//                            countRow.value = text.id
+//                            boolean.value = it
+//                        }
+//                    )
+//                    Text(text = text.titleProject)
+//                }
+//            }
+//        }
 
 
 //        if (projectList.isNotEmpty()) {

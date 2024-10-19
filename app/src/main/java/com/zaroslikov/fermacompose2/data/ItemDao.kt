@@ -75,8 +75,8 @@ interface ItemDao {
     @Query("SELECT * from МyINCUBATOR Where mode = 0 and ARHIVE = 1")
     fun getIncubatorListArh5(): Flow<List<ProjectTable>>
 
-    @Query("SELECT * from МyINCUBATOR Where mode = 0 and ARHIVE = 1")
-    suspend fun getIncubatorListArh6(): List<ProjectTable>
+    @Query("SELECT * from МyINCUBATOR Where TYPE =:type and mode = 0 and ARHIVE = 1")
+    suspend fun getIncubatorListArh6(type: String): List<ProjectTable>
 
     @Query("SELECT * from МyINCUBATOR Where mode = 1 and ARHIVE = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>

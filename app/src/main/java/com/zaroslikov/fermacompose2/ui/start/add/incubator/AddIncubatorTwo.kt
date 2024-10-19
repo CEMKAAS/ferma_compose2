@@ -2004,9 +2004,9 @@ fun AlertDialogExample(
 fun ArhivIncubatorChoice(
     openDialog: () -> Unit,
     projectList: List<ProjectTable>,
-    incubatorArh: (Int) -> Unit
+    incubatorArh: (Int) -> Unit,
+    incubatorArh2: () -> Unit
 ) {
-    var idProject by remember { mutableIntStateOf(1) }
 
     AlertDialog(
         onDismissRequest = openDialog,
@@ -2034,7 +2034,8 @@ fun ArhivIncubatorChoice(
             Spacer(modifier = Modifier.padding(vertical = 10.dp))
 
             val (selectedOption, onOptionSelected) = remember { mutableStateOf(projectList[0]) }
-            idProject = selectedOption.id
+
+            incubatorArh(selectedOption.id)
             Column(Modifier.selectableGroup()) {
                 projectList.forEach { text ->
                     Row(
@@ -2066,14 +2067,12 @@ fun ArhivIncubatorChoice(
                 ) {
                     Text("Отмена")
                 }
-                if (projectList[0].titleProject != "Ищем инкубаторы... Подождите пожалуйста") {
-                    TextButton(
-                        onClick = {
-                            incubatorArh(idProject)
-                        }, modifier = Modifier.padding(8.dp)
-                    )
-                    { Text("Выбрать") }
-                }
+
+                TextButton(
+                    onClick = { incubatorArh2() },
+                    modifier = Modifier.padding(8.dp)
+                )
+                { Text("Выбрать") }
             }
         }
     }

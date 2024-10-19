@@ -54,8 +54,6 @@ class AddIncubatorViewModel(
         viewModelScope.launch {
             val idPT = itemsRepository.insertProjectLong(incubatorUiState.toProjectTable())
             setIdPT(list, idPT).forEach {
-                val string = it.id
-                val sd = string
                 itemsRepository.insertIncubator(it)
             }
         }
@@ -109,16 +107,14 @@ class AddIncubatorViewModel(
         }
     }
 
+
+
     private val _items2 = mutableStateOf<List<ProjectTable>>(emptyList())
     val items2: State<List<ProjectTable>> = _items2
 
-    init {
-        incubatorFromArchive5()
-    }
-
-    private fun incubatorFromArchive5() {
+   fun incubatorFromArchive5(type: String) {
         viewModelScope.launch {
-            _items2.value = itemsRepository.getIncubatorListArh6()
+            _items2.value = itemsRepository.getIncubatorListArh6(type)
         }
     }
 
