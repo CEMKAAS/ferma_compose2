@@ -164,7 +164,7 @@ fun AddIncubatorContainerOne(
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
-    onScheduleReminder: (Reminder) -> Unit,
+    onScheduleReminder: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -191,7 +191,7 @@ fun AddIncubatorContainer(
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
-    onScheduleReminder: (Reminder) -> Unit
+    onScheduleReminder: (String) -> Unit
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
@@ -241,6 +241,7 @@ fun AddIncubatorContainer(
 
     if (showDialogTime1) {
         TimePicker(time = incubator.time1, showDialog = {
+            onScheduleReminder(it)
             onUpdate(incubator.copy(time1 = it))
             showDialogTime1 = false
         })
@@ -390,9 +391,7 @@ fun AddIncubatorContainer(
             trailingIcon = {
                 IconButton(onClick = {
                     openDialog = true
-                    onScheduleReminder(
-                        Reminder( R.string.five_seconds, FIVE_SECONDS, TimeUnit.SECONDS, incubator.titleProject)
-                    )
+
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_calendar_month_24),
@@ -420,6 +419,7 @@ fun AddIncubatorContainer(
             trailingIcon = {
                 IconButton(onClick = {
                     showDialogTime1 = true
+
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_access_time_24),
@@ -532,7 +532,7 @@ fun AddIncubatorContainer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePicker(time: String, showDialog:(String) -> Unit) {
+fun TimePicker(time: String, showDialog: (String) -> Unit) {
     val timsa = time.split(":").toTypedArray()
     val timeState = rememberTimePickerState(
         initialHour = timsa[0].toInt(),
@@ -557,8 +557,8 @@ fun TimePicker(time: String, showDialog:(String) -> Unit) {
                     .padding(top = 12.dp)
                     .fillMaxWidth(), horizontalArrangement = Arrangement.End
             ) {
-                TextButton(onClick =  {
-                    showDialog("${timeState.hour}:${timeState.minute}0")
+                TextButton(onClick = {
+                    showDialog("${timeState.hour}:${timeState.minute}")
                 }) {
                     Text(text = "Принять")
                 }

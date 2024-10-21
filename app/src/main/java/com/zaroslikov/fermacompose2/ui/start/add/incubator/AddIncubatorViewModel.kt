@@ -23,6 +23,9 @@ class AddIncubatorViewModel(
     private val waterRepository: WaterRepository
 ) : ViewModel() {
 
+    internal val plants = waterRepository.plants
+
+
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
@@ -74,14 +77,14 @@ class AddIncubatorViewModel(
     private val _items2 = mutableStateOf<List<ProjectTable>>(emptyList())
     val items2: State<List<ProjectTable>> = _items2
 
-   fun incubatorFromArchive5(type: String) {
+    fun incubatorFromArchive5(type: String) {
         viewModelScope.launch {
             _items2.value = itemsRepository.getIncubatorListArh6(type)
         }
     }
 
-    fun scheduleReminder(reminder: Reminder) {
-        waterRepository.scheduleReminder(reminder.duration, reminder.unit, reminder.plantName)
+    fun scheduleReminder(string: String) {
+        waterRepository.scheduleReminder(string)
     }
 
 

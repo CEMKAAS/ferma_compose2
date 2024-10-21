@@ -18,26 +18,33 @@ package com.zaroslikov.fermacompose2
 
 
 import android.app.Application
+import androidx.work.Configuration
 import com.yandex.mobile.ads.common.MobileAds
 import com.zaroslikov.fermacompose2.data.AppContainer
 import com.zaroslikov.fermacompose2.data.AppDataContainer
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 
-class InventoryApplication : Application() {
+class InventoryApplication: Application(), Configuration.Provider  {
 
     /**
      * AppContainer instance used by the rest of classes to obtain dependencies
      */
     lateinit var container: AppContainer
+//    lateinit var container2: AppContainer2
 
     override fun onCreate() {
         super.onCreate()
         val config =
             AppMetricaConfig.newConfigBuilder("7bc20e66-fc56-4002-ac33-4cc15dd28213").build()
         AppMetrica.activate(this, config)
-        MobileAds.initialize(this) {  }
+        MobileAds.initialize(this) { }
         container = AppDataContainer(this)
-
+//        container2 = DefaultAppContainer(this)
     }
-}
+
+    override fun getWorkManagerConfiguration() = Configuration.Builder()
+        .setMinimumLoggingLevel(android.util.Log.INFO)
+        .build()
+    }
+

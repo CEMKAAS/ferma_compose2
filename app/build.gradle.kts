@@ -78,6 +78,7 @@ dependencies {
 
     implementation (libs.mobileads)
 
+
     // AppMetrica SDK.
     implementation("io.appmetrica.analytics:analytics:6.5.0")
 

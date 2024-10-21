@@ -25,7 +25,7 @@ import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
  */
 interface AppContainer {
     val itemsRepository: ItemsRepository
-    val waterRepository: WaterRepository
+    val waterRepository : WaterRepository
 }
 
 /**
@@ -40,6 +40,5 @@ class AppDataContainer(private val context: Context) : AppContainer {
     }
 
     override val waterRepository = WorkManagerWaterRepository(context)
-
-
 }
+
