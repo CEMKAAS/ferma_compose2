@@ -81,6 +81,8 @@ dependencies {
     // AppMetrica SDK.
     implementation("io.appmetrica.analytics:analytics:6.5.0")
 
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+
 }
 
 //

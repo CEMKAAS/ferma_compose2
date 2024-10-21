@@ -17,12 +17,15 @@
 package com.zaroslikov.fermacompose2.data
 
 import android.content.Context
+import com.zaroslikov.fermacompose2.data.water.WaterRepository
+import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
 
 /**
  * App container for Dependency injection.
  */
 interface AppContainer {
     val itemsRepository: ItemsRepository
+    val waterRepository: WaterRepository
 }
 
 /**
@@ -35,4 +38,8 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val itemsRepository: ItemsRepository by lazy {
         OfflineItemsRepository(InventoryDatabase.getDatabase(context).itemDao())
     }
+
+    override val waterRepository = WorkManagerWaterRepository(context)
+
+
 }

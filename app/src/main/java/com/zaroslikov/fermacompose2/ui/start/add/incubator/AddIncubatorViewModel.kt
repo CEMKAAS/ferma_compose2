@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.fermacompose2.data.water.Reminder
+import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
 import kotlinx.coroutines.launch
@@ -17,7 +19,8 @@ import java.util.Calendar
 import java.util.TimeZone
 
 class AddIncubatorViewModel(
-    private val itemsRepository: ItemsRepository
+    private val itemsRepository: ItemsRepository,
+    private val waterRepository: WaterRepository
 ) : ViewModel() {
 
     val format = SimpleDateFormat("dd.MM.yyyy")
@@ -59,55 +62,14 @@ class AddIncubatorViewModel(
         }
     }
 
-
-//    suspend fun incubatorFromArchive2(type: String): Int {
-//        return itemsRepository.getIncubatorListArh2(type)
-//            .filterNotNull()
-//            .first()
-//            .toInt()
-//    }
-
-// TODO ХУЙНЯ КОТОРАЯ ПРИГАЕТ
-//    fun incubatorFromArchive(type: String): StateFlow<IncubatorProjectListUiState2> {
-//        return itemsRepository.getIncubatorListArh(type).map { IncubatorProjectListUiState2(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = IncubatorProjectListUiState2()
-//            )
-//    }
-//TODO ХУЙНЯ КОТОРАЯ ПРЫГАЕТ
-//    fun incubatorFromArchive2(): StateFlow<IncubatorProjectListUiState2> {
-//        return itemsRepository.getIncubatorListArh5().map {IncubatorProjectListUiState2(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = IncubatorProjectListUiState2()
-//            )
-//    }
-
-//TODO ХУЙНЯ КОТОРАЯ ПРЫГАЕТ
-//    fun incubatorFromArchive3(idPT: Int): StateFlow<IncubatorArhListUiState> {
-//        return itemsRepository.getIncubatorListArh3(idPT).map { IncubatorArhListUiState(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = IncubatorArhListUiState()
-//            )
-//    }
-
-
     private val _items = mutableStateOf<List<Incubator>>(emptyList())
     val items: State<List<Incubator>> = _items
-
 
     fun incubatorFromArchive4(idPT: Int) {
         viewModelScope.launch {
             _items.value = itemsRepository.getIncubatorListArh4(idPT)
         }
     }
-
-
 
     private val _items2 = mutableStateOf<List<ProjectTable>>(emptyList())
     val items2: State<List<ProjectTable>> = _items2
@@ -118,11 +80,13 @@ class AddIncubatorViewModel(
         }
     }
 
+    fun scheduleReminder(reminder: Reminder) {
+        waterRepository.scheduleReminder(reminder.duration, reminder.unit, reminder.plantName)
+    }
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
 }
-
-data class IncubatorProjectListUiState2(val itemList: List<ProjectTable> = listOf())

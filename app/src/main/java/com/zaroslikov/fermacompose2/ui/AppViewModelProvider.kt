@@ -72,7 +72,8 @@ object AppViewModelProvider {
 
         initializer {
             AddIncubatorViewModel(
-                inventoryApplication().container.itemsRepository
+                inventoryApplication().container.itemsRepository,
+                inventoryApplication().container.waterRepository
             )
         }
 
