@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.data.Alarm.AlarmRepository
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
@@ -20,7 +21,8 @@ import java.util.TimeZone
 
 class AddIncubatorViewModel(
     private val itemsRepository: ItemsRepository,
-    private val waterRepository: WaterRepository
+    private val waterRepository: WaterRepository,
+    private val alarmRepository: AlarmRepository
 ) : ViewModel() {
 
     internal val plants = waterRepository.plants
@@ -85,6 +87,10 @@ class AddIncubatorViewModel(
 
     fun scheduleReminder(string: String) {
         waterRepository.scheduleReminder(string)
+    }
+
+    fun scheduleReminder2(string: String) {
+        alarmRepository.setDailyAlarm(string)
     }
 
 
