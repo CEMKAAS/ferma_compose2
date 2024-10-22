@@ -1,9 +1,14 @@
 package com.zaroslikov.fermacompose2
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
@@ -17,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.yandex.mobile.ads.appopenad.AppOpenAd
 import com.yandex.mobile.ads.appopenad.AppOpenAdEventListener
@@ -39,6 +45,11 @@ import java.util.Date
 
 class MainActivity : ComponentActivity() {
 
+    companion object {
+        private var TAG = "MainActivity"
+        const val REQUEST_CODE_NOTIFICATION_PERMISSIONS = 11
+    }
+
     private var appOpenAd: AppOpenAd? = null
     private var isAdShownOnColdStart = false
 
@@ -46,6 +57,8 @@ class MainActivity : ComponentActivity() {
     private var interstitialAdLoader: InterstitialAdLoader? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        getNotificationPermissions()
         setContent {
 
             FermaCompose2Theme {
@@ -81,8 +94,67 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //Реклама при клике
 
+    private fun getNotificationPermissions() {
+        try {
+            // Check if the app already has the permissions.
+            val hasAccessNotificationPolicyPermission =
+                checkSelfPermission(Manifest.permission.ACCESS_NOTIFICATION_POLICY) == PackageManager.PERMISSION_GRANTED
+            val hasPostNotificationsPermission =
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
+            // If the app doesn't have the permissions, request them.
+            when {
+                !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
+                    // Request the permissions.
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(
+                            Manifest.permission.ACCESS_NOTIFICATION_POLICY,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ),
+                        REQUEST_CODE_NOTIFICATION_PERMISSIONS
+                    )
+                }
+                else -> {
+                    // proceed
+                    Log.d(TAG, "Notification Permissions : previously granted successfully")
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            // Check if the user granted the permissions.
+            REQUEST_CODE_NOTIFICATION_PERMISSIONS -> {
+                val hasAccessNotificationPolicyPermission =
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED
+                val hasPostNotificationsPermission =
+                    grantResults[1] == PackageManager.PERMISSION_GRANTED
+
+                // If the user denied the permissions, show a check.
+                when {
+                    !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
+                        getNotificationPermissions()
+                    }
+                    else -> {
+                        Log.d(TAG, "Notification Permissions : Granted successfully")
+                    }
+                }
+            }
+        }
+    }
+
+    //Реклама при клике
     private fun loadInterstitialAd() {
         val adRequestConfiguration =
             AdRequestConfiguration.Builder("R-M-12224806-2").build()
@@ -207,21 +279,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        val manager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val dat = Date()
-        val cal_now = Calendar.getInstance()
-        cal_now.time = dat
-        val cal_alarm = Calendar.getInstance()
-        cal_alarm.time = dat
-        cal_alarm[Calendar.HOUR_OF_DAY] = 20
-        cal_alarm[Calendar.MINUTE] = 0
-        cal_alarm[Calendar.SECOND] = 0
-        if (cal_alarm.before(cal_now)) {
-            cal_alarm.add(Calendar.DATE, 1)
-        }
-        val myIntent = Intent(this@MainActivity, AlarmReceiver::class.java)
-        manager[AlarmManager.RTC_WAKEUP, cal_alarm.timeInMillis] =
-            PendingIntent.getBroadcast(this@MainActivity, 0, myIntent, PendingIntent.FLAG_IMMUTABLE)
+//        val manager = getSystemService(ALARM_SERVICE) as AlarmManager
+//        val dat = Date()
+//        val cal_now = Calendar.getInstance()
+//        cal_now.time = dat
+//        val cal_alarm = Calendar.getInstance()
+//        cal_alarm.time = dat
+//        cal_alarm[Calendar.HOUR_OF_DAY] = 20
+//        cal_alarm[Calendar.MINUTE] = 0
+//        cal_alarm[Calendar.SECOND] = 0
+//        if (cal_alarm.before(cal_now)) {
+//            cal_alarm.add(Calendar.DATE, 1)
+//        }
+//        val myIntent = Intent(this@MainActivity, AlarmReceiver::class.java)
+//        manager[AlarmManager.RTC_WAKEUP, cal_alarm.timeInMillis] =
+//            PendingIntent.getBroadcast(this@MainActivity, 0, myIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
 
