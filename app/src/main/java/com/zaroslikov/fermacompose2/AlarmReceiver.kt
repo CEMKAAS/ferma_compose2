@@ -13,7 +13,6 @@ import androidx.core.app.NotificationCompat
 
 
 class AlarmReceiver : BroadcastReceiver() {
-    private var notifManager: NotificationManager? = null
 
     // Установка уведомления, делал не я, поэтому хз, что и как тут
     override fun onReceive(context: Context, intent: Intent) {

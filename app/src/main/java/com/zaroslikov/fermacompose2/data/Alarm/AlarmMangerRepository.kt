@@ -15,7 +15,8 @@ class AlarmMangerRepository(private val context: Context) : AlarmRepository {
     override fun setDailyAlarm(string: String) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(context,
+            0, intent, FLAG_IMMUTABLE)
 
         val split = string.split(":")
         val calendar = Calendar.getInstance()
@@ -40,6 +41,15 @@ class AlarmMangerRepository(private val context: Context) : AlarmRepository {
 //            }
 //        }
 
+
+//        alarmManager.setRepeating(
+//            AlarmManager.RTC_WAKEUP,
+//            calendar.timeInMillis + 0 * AlarmManager.INTERVAL_DAY,
+//            AlarmManager.INTERVAL_DAY,
+//            pendingIntent
+//        )
+
+
         // Установка повторяющегося будильника
         for (i in 0 until 21) {
             alarmManager.setRepeating(
@@ -49,5 +59,8 @@ class AlarmMangerRepository(private val context: Context) : AlarmRepository {
                 pendingIntent
             )
         }
+
+
+
     }
 }

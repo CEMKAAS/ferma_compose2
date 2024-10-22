@@ -25,7 +25,7 @@ class AddIncubatorViewModel(
     private val alarmRepository: AlarmRepository
 ) : ViewModel() {
 
-    internal val plants = waterRepository.plants
+
 
 
     val format = SimpleDateFormat("dd.MM.yyyy")
@@ -94,8 +94,7 @@ class AddIncubatorViewModel(
     }
 
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+    fun scheduleReminder3(string: String) {
+        alarmRepository.setDailyAlarm(string)
     }
-
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,6 +69,7 @@ import java.util.TimeZone
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.water.Reminder
@@ -135,7 +137,8 @@ fun AddIncubator(
             },
             incubator = incubator,
             onUpdate = viewModel::updateUiState,
-            onScheduleReminder = { viewModel.scheduleReminder2(it) }
+            onScheduleReminder = { viewModel.scheduleReminder2(it) },
+            onScheduleReminder2 = { viewModel.scheduleReminder3(it) },
         )
     else AddIncubatorContainerTwo(
         name = incubator.titleProject,
@@ -165,6 +168,7 @@ fun AddIncubatorContainerOne(
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
     onScheduleReminder: (String) -> Unit,
+    onScheduleReminder2: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -178,7 +182,8 @@ fun AddIncubatorContainerOne(
                 .verticalScroll(rememberScrollState()),
             navigateContinue = navigateContinue,
             incubator, onUpdate,
-            onScheduleReminder = onScheduleReminder
+            onScheduleReminder = onScheduleReminder,
+            onScheduleReminder2 = onScheduleReminder2
         )
     }
 }
@@ -191,7 +196,8 @@ fun AddIncubatorContainer(
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
-    onScheduleReminder: (String) -> Unit
+    onScheduleReminder: (String) -> Unit,
+    onScheduleReminder2: (String) -> Unit
 ) {
     val typeBirdsList = arrayListOf("Курицы", "Гуси", "Перепела", "Индюки", "Утки")
 
@@ -241,20 +247,22 @@ fun AddIncubatorContainer(
 
     if (showDialogTime1) {
         TimePicker(time = incubator.time1, showDialog = {
-            onScheduleReminder(it)
             onUpdate(incubator.copy(time1 = it))
+            onScheduleReminder(it)
             showDialogTime1 = false
         })
     }
     if (showDialogTime2) {
         TimePicker(time = incubator.time2, showDialog = {
-            onUpdate(incubator.copy(time1 = it))
+            onUpdate(incubator.copy(time2 = it))
+            onScheduleReminder2(it)
             showDialogTime2 = false
         })
     }
     if (showDialogTime3) {
         TimePicker(time = incubator.time3, showDialog = {
-            onUpdate(incubator.copy(time1 = it))
+            onUpdate(incubator.copy(time3 = it))
+            onScheduleReminder(it)
             showDialogTime3 = false
         })
     }
@@ -538,35 +546,38 @@ fun TimePicker(time: String, showDialog: (String) -> Unit) {
         initialHour = timsa[0].toInt(),
         initialMinute = timsa[1].toInt()
     )
-    AlertDialog(
-        onDismissRequest = { showDialog(time) },
-        modifier = Modifier
+    Dialog(
+        onDismissRequest = { showDialog(time) }
+    ) {
+        Card(
+            modifier = Modifier
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(20.dp))
-    ) {
-        Column(
-            modifier = Modifier
-                .background(color = Color.LightGray)
-                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TimePicker(state = timeState)
-            Row(
+            Column(
                 modifier = Modifier
-                    .padding(top = 12.dp)
-                    .fillMaxWidth(), horizontalArrangement = Arrangement.End
+                    .background(color = Color.LightGray)
+                    .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextButton(onClick = {
-                    showDialog("${timeState.hour}:${timeState.minute}")
-                }) {
-                    Text(text = "Принять")
-                }
+                TimePicker(state = timeState)
+                Row(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth(), horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = {
+                        showDialog("${timeState.hour}:${timeState.minute}")
+                    }) {
+                        Text(text = "Принять")
+                    }
 
-                TextButton(onClick = {
-                    showDialog(time)
-                }) {
-                    Text(text = "Назад")
+                    TextButton(onClick = {
+                        showDialog(time)
+                    }) {
+                        Text(text = "Назад")
+                    }
                 }
             }
         }
