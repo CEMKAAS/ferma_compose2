@@ -137,8 +137,8 @@ fun AddIncubator(
             },
             incubator = incubator,
             onUpdate = viewModel::updateUiState,
-            onScheduleReminder = { viewModel.scheduleReminder2(it) },
-            onScheduleReminder2 = { viewModel.scheduleReminder3(it) },
+            onScheduleReminder = { viewModel.scheduleReminder(it) },
+            onScheduleReminder2 = { viewModel.scheduleReminder(it) },
         )
     else AddIncubatorContainerTwo(
         name = incubator.titleProject,

@@ -4,5 +4,4 @@ import java.util.concurrent.TimeUnit
 
 interface WaterRepository {
     fun scheduleReminder(string: String)
-    val plants: List<Plant>
 }

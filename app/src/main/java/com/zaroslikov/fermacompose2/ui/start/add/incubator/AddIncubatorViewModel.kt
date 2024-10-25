@@ -25,9 +25,6 @@ class AddIncubatorViewModel(
     private val alarmRepository: AlarmRepository
 ) : ViewModel() {
 
-
-
-
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)

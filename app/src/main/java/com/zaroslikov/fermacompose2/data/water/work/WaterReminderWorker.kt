@@ -20,23 +20,23 @@ workerParams: WorkerParameters
 
     override suspend fun doWork(): Result {
 
-        val plantName = inputData.getString(nameKey)
+//        val plantName = inputData.getString(nameKey)
 
         makePlantReminderNotification(
-            applicationContext.resources.getString(R.string.time_to_water, plantName),
+//            applicationContext.resources.getString(R.string.time_to_water, plantName),
             applicationContext
         )
 
         return Result.success()
     }
 
-    companion object {
-        const val nameKey = "NAME"
-    }
+//    companion object {
+//        const val nameKey = "NAME"
+//    }
 }
 
 fun makePlantReminderNotification(
-    message: String,
+//    message: String,
     context: Context
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -61,7 +61,7 @@ fun makePlantReminderNotification(
     val builder = NotificationCompat.Builder(context, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setContentTitle(NOTIFICATION_TITLE)
-        .setContentText(message)
+        .setContentText("message")
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setVibrate(LongArray(0))
         .setContentIntent(pendingIntent)
