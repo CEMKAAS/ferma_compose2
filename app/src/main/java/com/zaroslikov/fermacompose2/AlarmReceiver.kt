@@ -57,7 +57,7 @@ class AlarmReceiver : BroadcastReceiver() {
             pendingIntent =
                 PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             builder.setContentTitle("Время пришло!") // required
-                .setSmallIcon(R.drawable.ic_launcher_foreground) // required
+                .setSmallIcon(R.drawable.ic_stat_name) // required
                 .setContentText("Пора внести товар и расходы за сегодня!") // required
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setAutoCancel(true)
@@ -71,7 +71,7 @@ class AlarmReceiver : BroadcastReceiver() {
             pendingIntent = PendingIntent.getActivity(context, 0, intent,
                 PendingIntent.FLAG_IMMUTABLE)
             builder.setContentTitle("Время пришло!") // required
-                .setSmallIcon(R.drawable.ic_launcher_foreground) // required
+                .setSmallIcon(R.drawable.ic_stat_name) // required
                 .setContentText("Пора внести товар и расходы за сегодня!") // required
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setAutoCancel(true)

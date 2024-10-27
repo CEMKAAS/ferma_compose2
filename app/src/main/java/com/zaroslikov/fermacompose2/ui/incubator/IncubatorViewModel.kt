@@ -11,6 +11,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.home.HomeUiState
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +27,8 @@ import java.util.TimeZone
 
 class IncubatorViewModel(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository
+    private val itemsRepository: ItemsRepository,
+    private val waterRepository: WaterRepository
 ) : ViewModel() {
 
     val itemId: Int = checkNotNull(savedStateHandle[IncubatorScreenDestination.itemIdArg])
@@ -74,6 +76,7 @@ class IncubatorViewModel(
     }
 
     suspend fun saveItem() {
+        waterRepository.cancelAllNotifications(itemUiState.titleProject)
         itemsRepository.updateProject(itemUiState.toProjectTable())
     }
 
@@ -89,6 +92,7 @@ class IncubatorViewModel(
     }
 
     suspend fun saveNewProjectArh(project: ProjectTable) {
+        waterRepository.cancelAllNotifications(itemUiState.titleProject)
         val format = SimpleDateFormat("dd.MM.yyyy")
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         val dateEnd: String = format.format(calendar.timeInMillis)
@@ -97,7 +101,7 @@ class IncubatorViewModel(
 
 
     suspend fun saveNewProject(animalTable: AnimalTable, count: String) {
-
+        waterRepository.cancelAllNotifications(itemUiState.titleProject)
         val idPT = itemsRepository.insertProjectLong(itemUiState.toProjectTable())
 
         val id = itemsRepository.insertAnimalTable(animalTable.copy(idPT = idPT.toInt()))
@@ -112,6 +116,7 @@ class IncubatorViewModel(
     }
 
     suspend fun deleteItem() {
+        waterRepository.cancelAllNotifications(itemUiState.titleProject)
         itemsRepository.deleteProject(itemUiState.toProjectTable())
     }
 

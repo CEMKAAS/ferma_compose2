@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,8 +30,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,6 +57,8 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimeOutlinedTextField
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -76,6 +82,18 @@ fun IncubatorProjectEditScreen(
 ) {
 
     val coroutineScope = rememberCoroutineScope()
+    val countTime = rememberSaveable { mutableIntStateOf(0) }
+   val project = viewModel.projectState
+
+    if (project.time1 == "") {
+        countTime.intValue = 0
+    } else if (project.time2 == "") {
+        countTime.intValue = 1
+    } else if (project.time3 == "") {
+        countTime.intValue = 2
+    } else{
+        countTime.intValue = 3
+    }
 
     Scaffold(
         topBar = {
@@ -87,7 +105,7 @@ fun IncubatorProjectEditScreen(
     ) { innerPadding ->
 
         IncubatorEditDayContainer(
-            project = viewModel.projectState,
+            project = project,
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(8.dp)
@@ -96,12 +114,7 @@ fun IncubatorProjectEditScreen(
             saveInRoomAdd = {
                 if (it) {
                     coroutineScope.launch {
-                        viewModel.saveItem()
-//                        Toast.makeText(
-//                            context,
-//                            "Обновлено: ${viewModel.itemUiState.title} ${viewModel.itemUiState.count} ${viewModel.itemUiState.suffix} за ${viewModel.itemUiState.priceAll} ₽",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
+                        viewModel.saveItem(countTime.intValue)
                         onNavigateUp()
                     }
                 }
@@ -111,7 +124,8 @@ fun IncubatorProjectEditScreen(
                     viewModel.deleteItem()
                     navigateStart()
                 }
-            }
+            },
+            countTime = countTime
         )
     }
 }
@@ -124,11 +138,15 @@ fun IncubatorEditDayContainer(
     onValueChange: (IncubatorProjectEditState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
     deleteRoom: () -> Unit,
+    countTime: MutableIntState
 ) {
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
+
+
+
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
@@ -158,38 +176,35 @@ fun IncubatorEditDayContainer(
         return !(isErrorTitle || isErrorCount)
     }
 
-    val showDialogTime1 = remember { mutableStateOf(false) }
-    val showDialogTime2 = remember { mutableStateOf(false) }
-    val showDialogTime3 = remember { mutableStateOf(false) }
+    var showDialogTime1 by remember { mutableStateOf(false) }
+    var showDialogTime2 by remember { mutableStateOf(false) }
+    var showDialogTime3 by remember { mutableStateOf(false) }
 
-    if (showDialogTime1.value) {
-        onValueChange(
-            project.copy(
-                time1 = TimePickerEdit(
-                    project.time1,
-                    showDialog = showDialogTime1
-                )
-            )
+    if (showDialogTime1) {
+        TimePicker(
+            time =  if (project.time1 == "") "08:00" else project.time1,
+            showDialog = {
+                onValueChange(project.copy(time1 = it))
+                showDialogTime1 = false
+            }
         )
     }
-    if (showDialogTime2.value) {
-        onValueChange(
-            project.copy(
-                time1 = TimePickerEdit(
-                    time = project.time2,
-                    showDialog = showDialogTime2
-                )
-            )
+    if (showDialogTime2) {
+        TimePicker(
+            time =  if (project.time2 == "") "12:00" else project.time2,
+            showDialog = {
+                onValueChange(project.copy(time2 = it))
+                showDialogTime2 = false
+            }
         )
     }
-    if (showDialogTime3.value) {
-        onValueChange(
-            project.copy(
-                time1 = TimePickerEdit(
-                    time = project.time3,
-                    showDialog = showDialogTime3
-                )
-            )
+    if (showDialogTime3) {
+        TimePicker(
+            time =  if (project.time3 == "") "18:00" else project.time3,
+            showDialog = {
+                onValueChange(project.copy(time3 = it))
+                showDialogTime3 = false
+            }
         )
     }
 
@@ -231,7 +246,11 @@ fun IncubatorEditDayContainer(
         OutlinedTextField(
             value = project.eggAll,
             onValueChange = {
-                onValueChange(project.copy(eggAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                onValueChange(
+                    project.copy(
+                        eggAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                    )
+                )
                 validateCount(project.eggAll)
             },
             label = { Text("Количество") },
@@ -286,84 +305,48 @@ fun IncubatorEditDayContainer(
                 .padding(bottom = 10.dp),
         )
 
-//        OutlinedTextField(
-//            value = project.time1,
-//            onValueChange = {
-//            },
-//            readOnly = true,
-//            label = { Text("Уведомление 1") },
-//            supportingText = {
-//                Text("Укажите время уведомления")
-//            },
-//            trailingIcon = {
-//                IconButton(onClick = {
-//                    showDialogTime1.value = true
-//                }) {
-//                    Icon(
-//                        painter = painterResource(R.drawable.baseline_access_time_24),
-//                        contentDescription = "Показать меню"
-//                    )
-//                }
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .clickable {
-//                    showDialogTime1.value = true
-//                }
-//                .padding(bottom = 2.dp)
-//        )
-//
-//        OutlinedTextField(
-//            value = project.time2,
-//            onValueChange = {},
-//            readOnly = true,
-//            label = { Text("Уведомление 2") },
-//            supportingText = {
-//                Text("Укажите время уведомления")
-//            },
-//            trailingIcon = {
-//                IconButton(onClick = {
-//                    showDialogTime2.value = true
-//                }) {
-//                    Icon(
-//                        painter = painterResource(R.drawable.baseline_access_time_24),
-//                        contentDescription = "Показать меню"
-//                    )
-//                }
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .clickable {
-//                    showDialogTime2.value = true
-//                }
-//                .padding(bottom = 2.dp)
-//        )
-//
-//        OutlinedTextField(
-//            value = project.time3,
-//            onValueChange = { },
-//            readOnly = true,
-//            label = { Text("Уведомление 3") },
-//            supportingText = {
-//                Text("Укажите время уведомления")
-//            },
-//            trailingIcon = {
-//                IconButton(onClick = {
-//                    showDialogTime3.value = true
-//                }) {
-//                    Icon(
-//                        painter = painterResource(R.drawable.baseline_access_time_24),
-//                        contentDescription = "Показать меню"
-//                    )
-//                }
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .clickable {
-//                    showDialogTime3.value = true
-//                }
-//                .padding(bottom = 2.dp)
-//        )
+        if (countTime.intValue > 0) {
+            TimeOutlinedTextField(
+                time =  if (project.time1 == "") "08:00" else project.time1,
+                count = 1,
+                countTime = countTime,
+                showDialog = { showDialogTime1 = true },
+            )
+        }
+
+        if (countTime.intValue > 1) {
+            TimeOutlinedTextField(
+                time = if (project.time2 == "") "12:00" else project.time2,
+                count = 2,
+                countTime = countTime,
+                showDialog = { showDialogTime2 = true },
+            )
+        }
+
+        if (countTime.intValue > 2) {
+            TimeOutlinedTextField(
+                time =  if (project.time3 == "") "18:00" else project.time3,
+                count = 3,
+                countTime = countTime,
+                showDialog = { showDialogTime3 = true },
+            )
+        }
+
+        if (countTime.intValue < 3) {
+            OutlinedButton(
+                onClick = { countTime.intValue++ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp, horizontal = 20.dp)
+            ) {
+                Text(text = "Добавить напоминание")
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Удалить",
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
+        }
 
         Button(
             onClick = { saveInRoomAdd(errorBoolean()) },
@@ -389,54 +372,5 @@ fun IncubatorEditDayContainer(
             )
             Text(text = " Удалить ")
         }
-
-
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TimePickerEdit(time: String, showDialog: MutableState<Boolean>): String {
-    var time1 = time
-    val timsa = time.split(":").toTypedArray()
-    val timeState = rememberTimePickerState(
-        initialHour = timsa[0].toInt(),
-        initialMinute = timsa[1].toInt()
-    )
-    AlertDialog(
-        onDismissRequest = { showDialog.value = false },
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(20.dp))
-    ) {
-        Column(
-            modifier = Modifier
-                .background(color = Color.LightGray)
-                .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            androidx.compose.material3.TimePicker(state = timeState)
-            Row(
-                modifier = Modifier
-                    .padding(top = 12.dp)
-                    .fillMaxWidth(), horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = {
-                    showDialog.value = false
-                    time1 = "${timeState.hour}:${timeState.minute}0"
-
-                }) {
-                    Text(text = "Принять")
-                }
-
-                TextButton(onClick = {
-                    showDialog.value = false
-                }) {
-                    Text(text = "Назад")
-                }
-            }
-        }
-    }
-    return time1
 }

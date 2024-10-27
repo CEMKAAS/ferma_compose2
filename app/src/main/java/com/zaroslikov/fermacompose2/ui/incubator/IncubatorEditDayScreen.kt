@@ -69,10 +69,9 @@ fun IncubatorEditDayScreen(
                     onNavigateUp()
                 }
             },
-            onValueChange = viewModel::updateUiState,
+            onValueChange = viewModel::updateUiState
         )
     }
-
 }
 
 @Composable

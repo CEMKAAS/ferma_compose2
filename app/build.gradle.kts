@@ -69,6 +69,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.ui.text.google.fonts)
+    testImplementation("org.testng:testng:6.9.6")
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
 
@@ -80,7 +81,7 @@ dependencies {
 
 
     // AppMetrica SDK.
-    implementation("io.appmetrica.analytics:analytics:6.5.0")
+    implementation("io.appmetrica.analytics:analytics:7.2.2")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 

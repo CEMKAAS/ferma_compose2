@@ -87,7 +87,7 @@ object HomeDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
-    navigateToStart:()-> Unit,
+    navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
@@ -100,14 +100,12 @@ fun AddScreen(
     val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
 
-    val showBottomSheetFilter = remember { mutableStateOf(false) }
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navigateToStart =  navigateToStart,
+                navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
                 3,
@@ -146,8 +144,7 @@ fun AddScreen(
                 itemList = homeUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter
+                contentPadding = innerPadding
             )
         }
     }
@@ -161,26 +158,31 @@ private fun AddBody(
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+            Column(modifier = modifier
+                .padding(contentPadding)
+                .padding(15.dp)) {
                 Text(
                     text = "Добро пожаловать в раздел \"Мои Товары!\"",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
                     text = "В этом разделе Вы можете добавлять товары, которые поступают с вашей фермы! Каждому товару можно назначить кол-во, категорию и животное, если оно занесено в разделе \"Мои Животные\"",
                     textAlign = TextAlign.Justify,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
@@ -199,15 +201,9 @@ private fun AddBody(
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
         }
-
-        if (showBottomFilter.value) {
-//            FilterProductSheet(
-//                showBottom = showBottomFilter
-//            )
-        }
-
     }
 }
+
 
 @Composable
 private fun InventoryList(
@@ -221,7 +217,7 @@ private fun InventoryList(
         contentPadding = contentPadding
     ) {
         items(items = itemList, key = { it.id }) { item ->
-           AddProductCard(addProduct = item,
+            AddProductCard(addProduct = item,
                 modifier = Modifier
                     .padding(8.dp)
                     .clickable { onItemClick(item) })
@@ -261,7 +257,8 @@ fun AddProductCard(
 
                 if (addProduct.category == "Без категории" || addProduct.category == "") {
 
-                }else{
+
+                } else {
                     Text(
                         text = "Категория: ${addProduct.category}",
                         modifier = Modifier
@@ -287,7 +284,14 @@ fun AddProductCard(
                     )
                 }
                 Text(
-                    text = "Дата: ${String.format("%02d.%02d.%d", addProduct.day, addProduct.mount,addProduct.year)}",
+                    text = "Дата: ${
+                        String.format(
+                            "%02d.%02d.%d",
+                            addProduct.day,
+                            addProduct.mount,
+                            addProduct.year
+                        )
+                    }",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .wrapContentSize()
@@ -307,250 +311,8 @@ fun AddProductCard(
     }
 }
 
-
-//@Preview()
-//@Composable
-//fun Card() {
-//    AddProductCard(
-//        addProduct = AddTable(
-//            0,
-//            "Мясо Коровы",
-//            150.50,
-//            25,
-//            12,
-//            2025,
-//            "0",
-//            1,
-//            "кг",
-//            "Животноводство",
-//            "Борька"
-//        )
-//    )
-//}
-
-
 data class navigateId(
     val id: Int,
     val idPT: Int
 
 )
-
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun AddProductSheetPP() {
-//
-//    var title by remember { mutableStateOf("") }
-//    var count by rememberSaveable { mutableStateOf("") }
-//    var category by rememberSaveable { mutableStateOf("") }
-//
-//    val coffeeDrinks = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
-//    var expanded by remember { mutableStateOf(false) }
-//
-//
-//    var suffix by remember { mutableStateOf("Ед.") }
-//    var expandedSuf by remember { mutableStateOf(false) }
-//
-//
-//    Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-//        Box {
-//                ExposedDropdownMenuBox(
-//                    expanded = expanded,
-//                    onExpandedChange = {
-//                        expanded = !expanded
-//                    }
-//                ) {
-//                    OutlinedTextField(
-//                        value = title,
-//                        onValueChange = { title = it },
-//                        label = { Text(text = "Товар") },
-//                        supportingText = {
-//                            Text("Выберите или укажите товар")
-//                        },
-//                        modifier = Modifier
-//                            .menuAnchor()
-//                            .fillMaxWidth()
-//                    )
-//
-//                    val filteredOptions =
-//                        coffeeDrinks.filter { it.contains(title, ignoreCase = true) }
-//                    if (filteredOptions.isNotEmpty()) {
-//                        ExposedDropdownMenu(
-//                            expanded = expanded,
-//                            onDismissRequest = {
-//                                // We shouldn't hide the menu when the user enters/removes any character
-//                            }
-//                        ) {
-//                            filteredOptions.forEach { item ->
-//                                DropdownMenuItem(
-//                                    text = { Text(text = item) },
-//                                    onClick = {
-//                                        title = item
-//                                        expanded = false
-//                                    }
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//    Box {
-//        OutlinedTextField(
-//            value = count,
-//            onValueChange = { count = it },
-//            label = { Text("Количество") },
-//            modifier = Modifier.fillMaxWidth(),
-//            supportingText = {
-//                Text("Укажите кол-во товара, которое хотите сохранить на склад")
-//            },
-//            trailingIcon = {
-//                IconButton(onClick = { expandedSuf = true }) {
-//                    Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
-//                }
-//            },
-//            suffix = {
-//                Text(text = suffix)
-//            },
-//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-////            isError = () TODO
-//        )
-//        DropdownMenu(
-//            expanded = expandedSuf,
-//            onDismissRequest = { expandedSuf = false },
-//            //todo чтобы был слева
-//        ) {
-//            DropdownMenuItem(
-//                onClick = { suffix = "Шт." },
-//                text = { Text("Шт.") }
-//            )
-//            DropdownMenuItem(
-//                onClick = { suffix = "Кг." },
-//                text = { Text("Кг.") }
-//            )
-//            DropdownMenuItem(
-//                onClick = { suffix = "Л." },
-//                text = { Text("Л.") }
-//            )
-//        }
-//
-//    }
-//
-//        OutlinedTextField(
-//            value = category,
-//            onValueChange = { category = it },
-//            label = { Text("Категория") },
-//            modifier = Modifier.fillMaxWidth(),
-//            supportingText = {
-//                Text("Укажите категорию в которую хотите отнести товар")
-//            },
-//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-////            isError = () TODO
-//        )
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 10.dp),
-//            horizontalArrangement = Arrangement.Center
-//        ) {
-//            Button(onClick = {
-//            }) {
-//                Text(text = "Добавить")
-//                //TODO Изображение
-//            }
-//        }
-//    }
-//}
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun AddProductSheetPPRewie() {
-//    AddProductSheetPP()
-//}
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun AddProductDetailsSheet(
-//    showBottom: MutableState<Boolean>,
-//    addTable: AddTable,
-//    saveInRoomAdd: (AddTableInsert) -> Unit,
-//    sheetState: SheetState
-//) {
-//
-//    //Дата
-//    var openDialog by remember { mutableStateOf(false) }
-//    val datePickerState = rememberDatePickerState()
-//
-//    ModalBottomSheet(
-//        onDismissRequest = { showBottom.value = false },
-//        sheetState = sheetState
-//    ) {
-//
-//        var title by rememberSaveable { mutableStateOf(addTable.title) }
-//        var count by rememberSaveable { mutableStateOf(addTable.count.toString()) }
-//        var date by rememberSaveable { mutableStateOf("${addTable.day}.${addTable.mount}.${addTable.year}") }
-//
-//        //запоминает состояние для BottomShee
-//        if (openDialog) {
-//            DatePickerDialogSample(datePickerState, date) { date1 ->
-//                date = date1
-//                openDialog = false
-//            }
-//        }
-//
-//
-//        Column(modifier = Modifier.padding(5.dp, 5.dp)) {
-//
-//            OutlinedTextField(
-//                value = title,
-//                onValueChange = { title = it },
-//                label = { Text("Товар") },
-//                modifier = Modifier.fillMaxWidth(),
-//                supportingText = {
-//                    Text("Введите или выберите товар")
-//                }
-//            )
-//
-//            OutlinedTextField(
-//                value = count,
-//                onValueChange = { count = it },
-//                label = { Text("Количество") },
-//                modifier = Modifier.fillMaxWidth(),
-//                supportingText = {
-//                    Text("Укажите кол-во товара, которое хотите сохранить на склад")
-//                },
-//                suffix = { Text(text = "Шт.") },
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-////            isError = () TODO
-//            )
-//
-//            OutlinedTextField(
-//                value = date,
-//                onValueChange = { date = it },
-//                label = { Text("Дата") },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .clickable { openDialog = true },
-//                supportingText = {
-//                    Text("Выберите дату")
-//                },
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-//
-////            isError = () TODO
-//            )
-//
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(vertical = 10.dp),
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//                Button(onClick = {
-//
-//                }) {
-//                    Text(text = "Добавить")
-//                    //TODO Изображение
-//                }
-//            }
-//        }
-//    }
-//}

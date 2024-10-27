@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.start
 
-import android.icu.text.DecimalFormat
 import androidx.compose.foundation.Image
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ModalDrawerSheet
@@ -24,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -108,6 +108,13 @@ fun formatter(number: Double): String {
     numberFormat.minimumFractionDigits = 0
     numberFormat.maximumFractionDigits = 2
     return numberFormat.format(number).toString()
+}
+
+fun formatterTime(hour: Int, minute: Int): String {
+    val formattedHour = hour.toString().padStart(2, '0')
+    val formattedMinute = minute.toString().padStart(2, '0')
+
+    return "$formattedHour:$formattedMinute"
 }
 
 

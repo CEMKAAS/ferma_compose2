@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,14 +24,17 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Tab
@@ -69,11 +73,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart2
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -99,15 +105,25 @@ fun StartScreen(
 
     val projectListArh by viewModel.getAllProjectArh.collectAsState()
     val projectListAct by viewModel.getAllProjectAct.collectAsState()
-    val infoBottomSheet = remember { mutableStateOf(false) }
+    var infoBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    var showDialogTime by remember { mutableStateOf(false) }
+
+    if (showDialogTime) {
+        TimePicker(time = if (viewModel.time == "") "20:00" else viewModel.time, showDialog = {
+            viewModel.onUpdate(time1 = it)
+            showDialogTime = false
+        })
+    }
+
     Scaffold(
         topBar = {
             TopAppBarStart2(
                 title = "Мое Хозяйство",
-                infoBottomSheet = infoBottomSheet
+                infoBottomSheet = { infoBottomSheet = true }
             )
         }, floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -124,15 +140,28 @@ fun StartScreen(
             projectListAct = projectListAct.projectList,
             navigateToItemIncubator = navigateToItemIncubator,
             navigateToItemProjectArh = navigateToItemProjectArh,
-            navigateToItemIncubatorArh = navigateToItemIncubatorArh,
-            infoBottomSheet = infoBottomSheet,
-            sheetState = sheetState
+            navigateToItemIncubatorArh = navigateToItemIncubatorArh
         )
+
+        if (infoBottomSheet) {
+            InfoBottomSheet(
+                infoBottomSheet = { infoBottomSheet = false },
+                saveBottomSheet = {
+                    viewModel.saveItem()
+                    infoBottomSheet = false
+                },
+                sheetState = sheetState,
+                time = viewModel.time,
+                showDialogTime = { showDialogTime = true },
+                clearTime = { viewModel.onUpdate("") }
+            )
+        }
+
     }
 }
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StartScreenContainer(
     modifier: Modifier,
@@ -141,9 +170,7 @@ fun StartScreenContainer(
     navigateToItemProjectArh: (Int) -> Unit,
     navigateToItemIncubatorArh: (Int) -> Unit,
     projectListArh: List<ProjectTable>,
-    projectListAct: List<ProjectTable>,
-    infoBottomSheet: MutableState<Boolean>,
-    sheetState: SheetState
+    projectListAct: List<ProjectTable>
 ) {
     var state by remember { mutableStateOf(0) }
     val titles = listOf("Действующие", "Архив")
@@ -205,7 +232,6 @@ fun StartScreenContainer(
                         )
                     }
                 }
-
                 HorizontalPager(
                     state = pagerState,
                     verticalAlignment = Alignment.Top,
@@ -274,52 +300,41 @@ fun StartScreenContainer(
 
         }
     }
-    if (infoBottomSheet.value) {
-        InfoBottomSheet(
-            infoBottomSheet = infoBottomSheet,
-            sheetState = sheetState
-        )
-    }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoBottomSheet(
-    infoBottomSheet: MutableState<Boolean>,
-    sheetState: SheetState
+    infoBottomSheet: () -> Unit,
+    sheetState: SheetState,
+    time: String,
+    showDialogTime: () -> Unit,
+    saveBottomSheet: () -> Unit,
+    clearTime: () -> Unit
 ) {
-
     val anonotatedString = buildAnnotatedString {
         withStyle(
             style = SpanStyle(
                 fontSize = 20.sp,
             )
-        ) {
-            append("Не упусти возможность присоединиться к нашей ")
-        }
+        ) { append("Не упусти возможность присоединиться к нашей ") }
         pushStringAnnotation(tag = "URL", annotation = "https://vk.com/myfermaapp")
         withStyle(
             style = SpanStyle(
                 color = Color.Blue,
-                fontSize = 20.sp,
-
-                )
+                fontSize = 20.sp
+            )
         ) {
             append("группе в ВКонтакте!")
         }
         pop()
     }
 
-
     ModalBottomSheet(
-        onDismissRequest = { infoBottomSheet.value = false },
+        onDismissRequest = infoBottomSheet,
         sheetState = sheetState
     ) {
-
         Column(modifier = Modifier.padding(15.dp)) {
-
             Text(
                 text = "Мое Хозяйство v2.11",
                 modifier = Modifier
@@ -329,7 +344,6 @@ fun InfoBottomSheet(
                 fontSize = 26.sp,
                 textAlign = TextAlign.Center
             )
-
             Text(
                 text = "Привет, дорогой друг!",
                 modifier = Modifier
@@ -339,7 +353,6 @@ fun InfoBottomSheet(
                 textAlign = TextAlign.Center
             )
             val uriHandler = LocalUriHandler.current
-
             ClickableText(
                 text = anonotatedString,
                 style = TextStyle(
@@ -358,18 +371,46 @@ fun InfoBottomSheet(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
             Text(
-                text = "Это отличный способ быть в курсе всех новостей, делиться своими впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство ещё лучше!",
+                text = "Это отличный способ быть в курсе всех новостей, делиться своими впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство ещё лучше!\nЧтобы отключить ежедневные уведомления, нажмите на \"Х\" и \"Спасибо!\" ",
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 20.sp,
                 textAlign = TextAlign.Justify
             )
-
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth().padding(vertical = 10.dp)
+            ) {
+                OutlinedTextField(
+                    value = time,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Уведомление") },
+                    supportingText = {
+                        Text("Укажите время для уведомления")
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = showDialogTime) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_access_time_24),
+                                contentDescription = "Показать меню"
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .clickable { showDialogTime() }
+                        .padding(bottom = 2.dp)
+                )
+                IconButton(onClick = clearTime, modifier = Modifier.padding(bottom = 13.dp)) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Удалить")
+                }
+            }
             Button(
-                onClick = {
-                    infoBottomSheet.value = false
-                }, modifier = Modifier
+                onClick = saveBottomSheet, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 35.dp)
+                    .padding(vertical = 10.dp)
 
             ) {
                 Text(text = "Спасибо!")
@@ -420,25 +461,11 @@ fun setImageIncubatorCard(projectTable: ProjectTable): IncubatorCardImage {
     var day = "Идет 0 день "
     var image = R.drawable.chicken
     when (projectTable.type) {
-        "Курицы" -> {
-            image = R.drawable.chicken
-        }
-
-        "Гуси" -> {
-            image = R.drawable.external_goose_birds_icongeek26_outline_icongeek26
-        }
-
-        "Перепела" -> {
-            image = R.drawable.quail
-        }
-
-        "Утки" -> {
-            image = R.drawable.duck
-        }
-
-        "Индюки" -> {
-            image = R.drawable.turkeycock
-        }
+        "Курицы" -> image = R.drawable.chicken
+        "Гуси" -> image = R.drawable.external_goose_birds_icongeek26_outline_icongeek26
+        "Перепела" -> image = R.drawable.quail
+        "Утки" -> image = R.drawable.duck
+        "Индюки" -> image = R.drawable.turkeycock
     }
     if (projectTable.arhive == "0") {
         var diff: Long = 0
@@ -453,10 +480,10 @@ fun setImageIncubatorCard(projectTable: ProjectTable): IncubatorCardImage {
         val date2: Date = myFormat.parse(dateBefore222)
         diff = date2.time - date1.time
         day = "Идет ${TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1} день"
-
     } else {
         day = "Завершён"
     }
+
     return IncubatorCardImage(image, day)
 }
 
@@ -471,12 +498,7 @@ fun CardFerma(
     projectTable: ProjectTable, modifier: Modifier = Modifier,
     colorFilter: ColorFilter?
 ) {
-
-    val date = if (colorFilter == null) {
-        projectTable.data
-    } else {
-        "Завершен"
-    }
+    val date = if (colorFilter == null) projectTable.data else "Завершен"
 
     Card(
         modifier = modifier,
@@ -498,7 +520,6 @@ fun CardFerma(
                 .fillMaxWidth()
                 .padding(vertical = 5.dp, horizontal = 5.dp)
         )
-
         Text(
             text = date, fontSize = 15.sp,
             modifier = Modifier
@@ -508,43 +529,4 @@ fun CardFerma(
         )
     }
 }
-
-//fun byteArrayToBitmap(data: ByteArray): Bitmap {
-//    return BitmapFactory.decodeByteArray(data, 0, data.size)
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun StartScreenContainerPrewie(
-//    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-//    scope: CoroutineScope = rememberCoroutineScope(),
-//    navController: NavHostController = rememberNavController(),
-//) {
-//    StartScreenContainer(
-//        modifier = Modifier.fillMaxSize(),
-//        navController = navController,
-//    )
-//}
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun StartScreenPrewie(
-//    navController: NavHostController = rememberNavController(),
-//    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-//    scope: CoroutineScope = rememberCoroutineScope(),
-//
-//
-//    ) {
-//    StartScreen(navController)
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun StartScreenPrewie() {
-//
-//
-//
-//}
-
 

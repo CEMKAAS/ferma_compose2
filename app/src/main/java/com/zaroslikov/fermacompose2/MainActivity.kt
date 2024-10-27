@@ -6,7 +6,9 @@ import android.content.res.Configuration
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -37,6 +39,9 @@ import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
+import com.zaroslikov.fermacompose2.data.water.WaterRepository
+import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
+import com.zaroslikov.fermacompose2.data.water.work.WaterReminderWorker
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
 import java.util.Calendar
@@ -57,6 +62,10 @@ class MainActivity : ComponentActivity() {
     private var interstitialAdLoader: InterstitialAdLoader? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (isFirstLaunch(this)) {
+            WorkManagerWaterRepository(this).setupDailyReminder()
+        }
 
         getNotificationPermissions()
         setContent {
@@ -97,33 +106,20 @@ class MainActivity : ComponentActivity() {
 
     private fun getNotificationPermissions() {
         try {
-            // Check if the app already has the permissions.
             val hasAccessNotificationPolicyPermission =
                 checkSelfPermission(Manifest.permission.ACCESS_NOTIFICATION_POLICY) == PackageManager.PERMISSION_GRANTED
             val hasPostNotificationsPermission =
                 checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-
-            // If the app doesn't have the permissions, request them.
             when {
                 !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
-                    // Request the permissions.
                     ActivityCompat.requestPermissions(
                         this,
                         arrayOf(
                             Manifest.permission.ACCESS_NOTIFICATION_POLICY,
                             Manifest.permission.POST_NOTIFICATIONS
-                        ),
-                        REQUEST_CODE_NOTIFICATION_PERMISSIONS
-                    )
-                }
-                else -> {
-                    // proceed
-                    Log.d(TAG, "Notification Permissions : previously granted successfully")
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+                        ), REQUEST_CODE_NOTIFICATION_PERMISSIONS) }
+                else -> Log.d(TAG, "Notification Permissions : previously granted successfully") }
+        } catch (e: Exception) { e.printStackTrace() }
     }
 
     override fun onRequestPermissionsResult(
@@ -134,14 +130,11 @@ class MainActivity : ComponentActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
-            // Check if the user granted the permissions.
             REQUEST_CODE_NOTIFICATION_PERMISSIONS -> {
                 val hasAccessNotificationPolicyPermission =
                     grantResults[0] == PackageManager.PERMISSION_GRANTED
                 val hasPostNotificationsPermission =
                     grantResults[1] == PackageManager.PERMISSION_GRANTED
-
-                // If the user denied the permissions, show a check.
                 when {
                     !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
                         getNotificationPermissions()
@@ -164,35 +157,17 @@ class MainActivity : ComponentActivity() {
     fun showAd() {
         interstitialAd?.apply {
             setAdEventListener(object : InterstitialAdEventListener {
-                override fun onAdShown() {
-                    // Called when ad is shown.
-                }
-
+                override fun onAdShown() {}
                 override fun onAdFailedToShow(adError: AdError) {
-                    // Called when an InterstitialAd failed to show.
-                    // Clean resources after Ad dismissed
                     destroyInterstitialAd()
-
-                    // Now you can preload the next interstitial ad.
                     loadInterstitialAd()
                 }
-
                 override fun onAdDismissed() {
-                    // Called when ad is dismissed.
-                    // Clean resources after Ad dismissed
                     destroyInterstitialAd()
-
-                    // Now you can preload the next interstitial ad.
                     loadInterstitialAd()
                 }
-
-                override fun onAdClicked() {
-                    // Called when a click is recorded for an ad.
-                }
-
-                override fun onAdImpression(impressionData: ImpressionData?) {
-                    // Called when an impression is recorded for an ad.
-                }
+                override fun onAdClicked() {}
+                override fun onAdImpression(impressionData: ImpressionData?) {}
             })
             show(this@MainActivity)
         }
@@ -210,7 +185,6 @@ class MainActivity : ComponentActivity() {
         interstitialAd = null
     }
 
-
     //Реклама при хапуске приложения
     private fun showAppOpenAd() {
         val appOpenAdEventListener = AdEventListener()
@@ -219,31 +193,17 @@ class MainActivity : ComponentActivity() {
     }
 
     private inner class AdEventListener : AppOpenAdEventListener {
-        override fun onAdShown() {
-            // Called when ad is shown.
-        }
-
+        override fun onAdShown() {}
         override fun onAdFailedToShow(adError: AdError) {
-            // Called when ad failed to show.
             clearAppOpenAd()
             loadAppOpenAd()
         }
-
         override fun onAdDismissed() {
-            // Called when ad is dismissed.
-            // Clean resources after dismiss and preload new ad.
             clearAppOpenAd()
             loadAppOpenAd()
         }
-
-        override fun onAdClicked() {
-            // Called when a click is recorded for an ad.
-        }
-
-        override fun onAdImpression(impressionData: ImpressionData?) {
-            // Called when an impression is recorded for an ad.
-            // Get Impression Level Revenue Data in argument.
-        }
+        override fun onAdClicked() {}
+        override fun onAdImpression(impressionData: ImpressionData?) {}
     }
 
 
@@ -263,11 +223,7 @@ class MainActivity : ComponentActivity() {
                     isAdShownOnColdStart = true
                 }
             }
-
-            override fun onAdFailedToLoad(adRequestError: AdRequestError) {
-                // Ad failed to load with AdRequestError.
-                // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
-            }
+            override fun onAdFailedToLoad(adRequestError: AdRequestError) {}
         }
         appOpenAdLoader.setAdLoadListener(appOpenAdLoadListener)
 
@@ -277,24 +233,17 @@ class MainActivity : ComponentActivity() {
         appOpenAdLoader.loadAd(adRequestConfiguration)
     }
 
-    override fun onStart() {
-        super.onStart()
-//        val manager = getSystemService(ALARM_SERVICE) as AlarmManager
-//        val dat = Date()
-//        val cal_now = Calendar.getInstance()
-//        cal_now.time = dat
-//        val cal_alarm = Calendar.getInstance()
-//        cal_alarm.time = dat
-//        cal_alarm[Calendar.HOUR_OF_DAY] = 20
-//        cal_alarm[Calendar.MINUTE] = 0
-//        cal_alarm[Calendar.SECOND] = 0
-//        if (cal_alarm.before(cal_now)) {
-//            cal_alarm.add(Calendar.DATE, 1)
-//        }
-//        val myIntent = Intent(this@MainActivity, AlarmReceiver::class.java)
-//        manager[AlarmManager.RTC_WAKEUP, cal_alarm.timeInMillis] =
-//            PendingIntent.getBroadcast(this@MainActivity, 0, myIntent, PendingIntent.FLAG_IMMUTABLE)
+}
+// Функция для проверки первого запуска приложения
+ fun isFirstLaunch(context: Context): Boolean {
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", true)
+
+
+    if (isFirstLaunch) {
+        sharedPreferences.edit().putBoolean("is_first_launch", false).apply()
+        sharedPreferences.edit().putString("app_notifications", "20:00").apply()
     }
 
-
+    return isFirstLaunch
 }

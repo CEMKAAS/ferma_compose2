@@ -8,19 +8,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class IncubatorProjectEditViewModel(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository
+    private val itemsRepository: ItemsRepository,
+    private val waterRepository: WaterRepository
 ) : ViewModel() {
 
     val itemId: Int = checkNotNull(savedStateHandle[IncubatorScreenDestination.itemIdArg])
 
     var projectState by mutableStateOf(IncubatorProjectEditState())
         private set
+
+    val name = projectState.titleProject
 
     init {
         viewModelScope.launch {
@@ -36,16 +40,24 @@ class IncubatorProjectEditViewModel(
             itemDetails
     }
 
-    suspend fun saveItem() {
+    suspend fun saveItem(count:Int) {
         itemsRepository.updateProject(projectState.toProjectTable())
+
+        projectState =  when (count) {
+            0 -> projectState.copy(time1 = "", time2 = "", time3 = "")
+            1 -> projectState.copy(time2 = "", time3 = "")
+            2 -> projectState.copy(time3 = "")
+            else -> {projectState}
+        }
+
+        waterRepository.cancelAllNotifications(name)
+        waterRepository.scheduleReminder(listOf(projectState.time1, projectState.time2,projectState.time3), projectState.titleProject)
     }
 
     suspend fun deleteItem() {
+        waterRepository.cancelAllNotifications(projectState.titleProject)
         itemsRepository.deleteProject(projectState.toProjectTable())
     }
-
-
-
 }
 
 fun IncubatorProjectEditState.toProjectTable(): ProjectTable = ProjectTable(

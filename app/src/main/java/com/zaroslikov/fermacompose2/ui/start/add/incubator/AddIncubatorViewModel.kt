@@ -21,8 +21,7 @@ import java.util.TimeZone
 
 class AddIncubatorViewModel(
     private val itemsRepository: ItemsRepository,
-    private val waterRepository: WaterRepository,
-    private val alarmRepository: AlarmRepository
+    private val waterRepository: WaterRepository
 ) : ViewModel() {
 
     val format = SimpleDateFormat("dd.MM.yyyy")
@@ -32,7 +31,7 @@ class AddIncubatorViewModel(
     var incubatorUiState by mutableStateOf(
         IncubatorProjectEditState(
             id = 0,
-            titleProject = "Мое Хозяйство",
+            titleProject = "",
             type = "Курицы",
             data = formattedDate,
             eggAll = "0",
@@ -55,12 +54,29 @@ class AddIncubatorViewModel(
             itemDetails
     }
 
-    fun saveProject(list: MutableList<Incubator>) {
+    fun saveProject(list: MutableList<Incubator>, count: Int) {
         viewModelScope.launch {
+
+            incubatorUiState =  when (count) {
+                0 -> incubatorUiState.copy(time1 = "", time2 = "", time3 = "")
+                1 -> incubatorUiState.copy(time2 = "", time3 = "")
+                2 -> incubatorUiState.copy(time3 = "")
+                else -> {incubatorUiState}
+            }
+
             val idPT = itemsRepository.insertProjectLong(incubatorUiState.toProjectTable())
+
             setIdPT(list, idPT).forEach {
                 itemsRepository.insertIncubator(it)
             }
+
+            waterRepository.scheduleReminder(
+                listOf(
+                    incubatorUiState.time1,
+                    incubatorUiState.time2,
+                    incubatorUiState.time3
+                ), incubatorUiState.titleProject
+            )
         }
     }
 
@@ -80,18 +96,5 @@ class AddIncubatorViewModel(
         viewModelScope.launch {
             _items2.value = itemsRepository.getIncubatorListArh6(type)
         }
-    }
-
-    fun scheduleReminder(string: String) {
-        waterRepository.scheduleReminder(string)
-    }
-
-    fun scheduleReminder2(string: String) {
-        alarmRepository.setDailyAlarm(string)
-    }
-
-
-    fun scheduleReminder3(string: String) {
-        alarmRepository.setDailyAlarm(string)
     }
 }

@@ -279,7 +279,7 @@ fun TopAppBarStart(
 @Composable
 fun TopAppBarStart2(
     title: String,
-    infoBottomSheet: MutableState<Boolean>
+    infoBottomSheet: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -289,7 +289,7 @@ fun TopAppBarStart2(
             Text(text = title)
         },
         actions = {
-            IconButton(onClick = { infoBottomSheet.value = true }) {
+            IconButton(onClick = infoBottomSheet) {
                 Icon(
                     imageVector = Icons.Filled.Info,
                     contentDescription = "Информация"
@@ -334,7 +334,6 @@ fun TopAppBarCalendar(
         }
     )
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

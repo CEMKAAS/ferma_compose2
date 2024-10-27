@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.data.water.work
 
+import android.app.Notification
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -14,29 +15,35 @@ import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
 
 class WaterReminderWorker(
-context: Context,
-workerParams: WorkerParameters
+    context: Context,
+    workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
 
-//        val plantName = inputData.getString(nameKey)
+        val name = inputData.getString("name")
+        val id = inputData.getString("CHANNEL_ID")
+        val title = inputData.getString("NOTIFICATION_TITLE")
+        val notification = inputData.getInt("NOTIFICATION_ID", 2)
+
 
         makePlantReminderNotification(
-//            applicationContext.resources.getString(R.string.time_to_water, plantName),
-            applicationContext
+            name ?: "Инкубатор",
+            id ?: "Мое Хозяйство",
+            title?: "Пора внести товар и расходы за сегодня!",
+            notification,
+            applicationContext,
         )
 
         return Result.success()
     }
-
-//    companion object {
-//        const val nameKey = "NAME"
-//    }
 }
 
 fun makePlantReminderNotification(
-//    message: String,
+    name: String,
+    id: String,
+    title: String,
+    notification: Int,
     context: Context
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -44,7 +51,7 @@ fun makePlantReminderNotification(
         // the NotificationChannel class is new and not in the support library
         val importance = NotificationManager.IMPORTANCE_HIGH
         val channel = NotificationChannel(
-            CHANNEL_ID,
+            id,
             VERBOSE_NOTIFICATION_CHANNEL_NAME,
             importance
         )
@@ -58,16 +65,16 @@ fun makePlantReminderNotification(
 
     val pendingIntent: PendingIntent = createPendingIntent(context)
 
-    val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
-        .setContentTitle(NOTIFICATION_TITLE)
-        .setContentText("message")
+    val builder = NotificationCompat.Builder(context, id)
+        .setSmallIcon(R.drawable.ic_stat_name)
+        .setContentTitle(name)
+        .setContentText(title)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setVibrate(LongArray(0))
         .setContentIntent(pendingIntent)
         .setAutoCancel(true)
 
-    NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
+    NotificationManagerCompat.from(context).notify(notification, builder.build())
 }
 
 fun createPendingIntent(appContext: Context): PendingIntent {

@@ -63,7 +63,10 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
 
         initializer {
-            StartScreenViewModel(inventoryApplication().container.itemsRepository)
+            StartScreenViewModel(
+                inventoryApplication().container.itemsRepository,
+                inventoryApplication().container.waterRepository
+            )
         }
 
         initializer {
@@ -73,15 +76,15 @@ object AppViewModelProvider {
         initializer {
             AddIncubatorViewModel(
                 inventoryApplication().container.itemsRepository,
-                inventoryApplication().container.waterRepository,
-                inventoryApplication().container.alarmRepositiry
+                inventoryApplication().container.waterRepository
             )
         }
 
         initializer {
             IncubatorProjectEditViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
+                inventoryApplication().container.itemsRepository,
+                inventoryApplication().container.waterRepository
             )
         }
 
@@ -89,7 +92,8 @@ object AppViewModelProvider {
         initializer {
             IncubatorViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
+                inventoryApplication().container.itemsRepository,
+                inventoryApplication().container.waterRepository
             )
         }
 

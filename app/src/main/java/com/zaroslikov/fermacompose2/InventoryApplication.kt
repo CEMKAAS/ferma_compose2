@@ -31,7 +31,6 @@ class InventoryApplication: Application(), Configuration.Provider  {
      * AppContainer instance used by the rest of classes to obtain dependencies
      */
     lateinit var container: AppContainer
-//    lateinit var container2: AppContainer2
 
     override fun onCreate() {
         super.onCreate()
@@ -40,7 +39,6 @@ class InventoryApplication: Application(), Configuration.Provider  {
         AppMetrica.activate(this, config)
         MobileAds.initialize(this) { }
         container = AppDataContainer(this)
-//        container2 = DefaultAppContainer(this)
     }
 
     override fun getWorkManagerConfiguration() = Configuration.Builder()

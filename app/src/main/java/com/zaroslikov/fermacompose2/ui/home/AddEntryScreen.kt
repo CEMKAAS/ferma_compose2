@@ -170,10 +170,9 @@ fun AddEntryContainerProduct(
     fun errorBoolean(): Boolean {
         isErrorTitle = title == ""
         isErrorTitle = title.contains("/")
-        isErrorCount = count == ""
+         isErrorCount = count == ""
         return !(isErrorTitle || isErrorCount)
     }
-
 
     //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
@@ -447,7 +446,8 @@ fun AddEntryContainerProduct(
                             onClick = {
                                 selectedItemIndex = index
                                 expandedAni = false
-                                animal = "${animalList[selectedItemIndex].name} - ${animalList[selectedItemIndex].type}"
+                                animal =
+                                    "${animalList[selectedItemIndex].name} - ${animalList[selectedItemIndex].type}"
                             }
                         )
                     }
@@ -495,7 +495,7 @@ fun AddEntryContainerProduct(
                                 formattedDateList[2].toInt(),
                                 suffix = suffix,
                                 category = category,
-                                anaimal = animalList[selectedItemIndex].name,
+                                anaimal = if (animalList.isNotEmpty()) animalList[selectedItemIndex].name else "",
                                 priceAll = 0.0,
                                 note = note
                             )
@@ -504,7 +504,7 @@ fun AddEntryContainerProduct(
                         eventParameters["Имя"] = title
                         eventParameters["Кол-во"] = "$title $count"
                         eventParameters["Категория"] = category
-                        eventParameters["Животное"] = animalList[selectedItemIndex].type
+                        eventParameters["Животное"] = if (animalList.isNotEmpty()) animalList[selectedItemIndex].type else ""
                         eventParameters["Примечание"] = note
                         AppMetrica.reportEvent("Add Products", eventParameters);
                     }

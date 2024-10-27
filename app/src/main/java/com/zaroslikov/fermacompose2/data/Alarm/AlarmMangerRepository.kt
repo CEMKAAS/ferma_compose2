@@ -3,11 +3,9 @@ package com.zaroslikov.fermacompose2.data.Alarm
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
 import com.zaroslikov.fermacompose2.AlarmReceiver
-import com.zaroslikov.fermacompose2.AlarmReceiver2
 import java.util.Calendar
 
 class AlarmMangerRepository(private val context: Context) : AlarmRepository {

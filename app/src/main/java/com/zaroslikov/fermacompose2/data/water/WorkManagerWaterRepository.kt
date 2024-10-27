@@ -1,97 +1,114 @@
 package com.zaroslikov.fermacompose2.data.water
 
 import android.content.Context
-import androidx.work.Configuration
+import android.content.SharedPreferences
 import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequest
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.zaroslikov.fermacompose2.data.water.work.FIVE_SECONDS
+import com.zaroslikov.fermacompose2.data.water.work.CHANNEL_ID
+import com.zaroslikov.fermacompose2.data.water.work.CHANNEL_ID2
+import com.zaroslikov.fermacompose2.data.water.work.NOTIFICATION_ID
+import com.zaroslikov.fermacompose2.data.water.work.NOTIFICATION_ID2
+import com.zaroslikov.fermacompose2.data.water.work.NOTIFICATION_TITLE
+import com.zaroslikov.fermacompose2.data.water.work.NOTIFICATION_TITLE2
 import com.zaroslikov.fermacompose2.data.water.work.WaterReminderWorker
-import java.sql.Time
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
-class WorkManagerWaterRepository(context: Context) : WaterRepository {
+class WorkManagerWaterRepository(private var context: Context) : WaterRepository {
 
     private val workManager = WorkManager.getInstance(context)
 
-    override fun scheduleReminder(string: String) {
+    override fun scheduleReminder(list: List<String>, name: String) {
 
-//        for (day in 0 until durationDays) {
-//            for (time in times) {
-        val sd = string.split(":")
+        list.forEach {
+            if (it != "") {
+                val sd = it.split(":")
 
+                val calendar = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, sd[0].toInt())
+                    set(Calendar.MINUTE, sd[1].toInt())
+                    set(Calendar.SECOND, 0)
+                }
+
+                val data = Data.Builder()
+                    .putString("name", name)
+                    .putString("CHANNEL_ID", CHANNEL_ID)
+                    .putString("NOTIFICATION_TITLE", NOTIFICATION_TITLE.toString())
+                    .putInt("NOTIFICATION_ID", NOTIFICATION_ID)
+                    .build()
+
+
+                val workRequest =
+                    PeriodicWorkRequestBuilder<WaterReminderWorker>(
+                        15,
+                        TimeUnit.MINUTES
+                    ).setInitialDelay(
+                        calendar.timeInMillis - System.currentTimeMillis(),
+                        TimeUnit.MILLISECONDS
+                    ).setInputData(data).addTag(name).build()
+
+                workManager.enqueueUniquePeriodicWork(
+                    it,
+                    ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                    workRequest
+                )
+            }
+        }
+    }
+
+    override fun cancelAllNotifications(name: String) {
+        workManager.cancelAllWorkByTag(name)
+    }
+
+    override fun setupDailyReminder() {
+        val isFirstLaunch = getTimeReminder()
+        val sd = isFirstLaunch.split(":")
 
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, sd[0].toInt())
             set(Calendar.MINUTE, sd[1].toInt())
             set(Calendar.SECOND, 0)
-//            set(
-//                Calendar.DAY_OF_YEAR,
-//                Calendar.getInstance().get(Calendar.DAY_OF_YEAR) + day
-//            )
         }
 
-        val workRequest = PeriodicWorkRequestBuilder<WaterReminderWorker>(21, TimeUnit.DAYS)
-            .setInitialDelay(
-                calendar.timeInMillis - System.currentTimeMillis(),
-                TimeUnit.MILLISECONDS
-            )
-            .addTag("time1")
+        val data = Data.Builder()
+            .putString("name", "Мое Хозяйство")
+            .putString("CHANNEL_ID", CHANNEL_ID2)
+            .putString("NOTIFICATION_TITLE", NOTIFICATION_TITLE2.toString())
+            .putInt("NOTIFICATION_ID", NOTIFICATION_ID2)
             .build()
 
 
-//        val workRequest = OneTimeWorkRequestBuilder<WaterReminderWorker>()
-//            .setInitialDelay(
-//                calendar.timeInMillis - System.currentTimeMillis(),
-//                TimeUnit.MILLISECONDS
-//            )
-//            .addTag()
-//            .build()
+        val workRequest =
+            PeriodicWorkRequestBuilder<WaterReminderWorker>(
+                15,
+                TimeUnit.MINUTES
+            ).setInitialDelay(
+                calendar.timeInMillis - System.currentTimeMillis(),
+                TimeUnit.MILLISECONDS
+            ).setInputData(data).addTag("7bc20e66-fc56-4002-ac33-4cc15dd28213").build()
 
-        workManager.enqueue(workRequest)
+        workManager.enqueueUniquePeriodicWork(
+            "7bc20e66-fc56-4002-ac33-4cc15dd28213",
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            workRequest
+        )
     }
 
-//    workManager.enqueue(workRequestBuilder)
+    override fun getTimeReminder(): String {
+        val sharedPreferences: SharedPreferences =
+            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("app_notifications", null) ?: "20:00"
+    }
+
+    override fun setTimeReminder(time: String) {
+        val sharedPreferences: SharedPreferences =
+            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString("app_notifications", time).apply()
+    }
+
+
 }
-
-//        val workRequestBuilder = OneTimeWorkRequestBuilder<WaterReminderWorker>()
-//            .setInitialDelay(duration, unit)
-//            .setInputData(data.build())
-//            .build()
-
-
-//это не совсем верно
-//        val workRequestBuilder =
-//            PeriodicWorkRequest.Builder(WaterReminderWorker::class.java, 1, TimeUnit.DAYS)
-//                .setInitialDelay(cal(string),TimeUnit.MILLISECONDS)
-//                .build()
-
-
-//        workManager.enqueueUniqueWork(
-//            plantName + duration,
-//            ExistingWorkPolicy.REPLACE,
-//            workRequestBuilder
-//        )
-//}
-//
-//private fun cal(string: String): Long {
-//    val sd = string.split(":")
-//    val calendar = Calendar.getInstance().apply {
-//        set(Calendar.HOUR_OF_DAY, sd[0].toInt())
-//        set(Calendar.MINUTE, sd[1].toInt())
-//        set(Calendar.SECOND, 0)
-//    }
-//
-//    var initialDelay = calendar.timeInMillis - System.currentTimeMillis()
-//    if (initialDelay < 0) {
-//        initialDelay += TimeUnit.DAYS.toMillis(1)
-//    }
-//    return initialDelay
-//}
-//}
 

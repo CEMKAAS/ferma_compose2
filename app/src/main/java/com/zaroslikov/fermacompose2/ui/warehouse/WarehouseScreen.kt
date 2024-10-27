@@ -209,7 +209,7 @@ private fun WarehouseInventoryList(
                     warehouseProduct = item,
                     modifier = Modifier
                         .padding(8.dp)
-                        .clickable { navigationToAnalysis(item.Title) }
+                        .clickable { navigationToAnalysis(item.Title.replace("/", "-"))}
                 )
             }
         }

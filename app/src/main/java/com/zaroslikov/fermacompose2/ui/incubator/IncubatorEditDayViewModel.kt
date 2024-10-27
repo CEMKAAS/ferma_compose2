@@ -43,7 +43,6 @@ class IncubatorEditDayViewModel(
         itemsRepository.updateIncubator(incubatorState.toIncubator())
     }
 
-
 }
 
 data class IncubatorUiState(
