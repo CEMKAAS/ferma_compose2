@@ -60,6 +60,7 @@ import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimeOutlinedTextField
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
 import com.zaroslikov.fermacompose2.ui.start.dateLong
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -115,6 +116,16 @@ fun IncubatorProjectEditScreen(
                 if (it) {
                     coroutineScope.launch {
                         viewModel.saveItem(countTime.intValue)
+                        val eventParameters: MutableMap<String, Any> = HashMap()
+                        eventParameters["Имя"] = project.titleProject
+                        eventParameters["Тип"] = project.type
+                        eventParameters["Кол-во"] = project.eggAll
+                        eventParameters["АвтоОхл"] = project.airing
+                        eventParameters["АвтоПрев"] = project.over
+                        eventParameters["Увед1"] =project.time1
+                        eventParameters["Увед2"] = project.time2
+                        eventParameters["Увед3"] = project.time3
+                        AppMetrica.reportEvent("Incubator Edit", eventParameters)
                         onNavigateUp()
                     }
                 }

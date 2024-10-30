@@ -36,6 +36,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
+import io.appmetrica.analytics.AppMetrica
 
 object FinanceCategoryDestination : NavigationDestination {
     override val route = "FinanceCategory"
@@ -73,10 +74,8 @@ fun FinanceCategoryScreen(
             itemList = financeCategoryState.itemList,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding,
-            navigationToAnalysis = {
-                navigationToAnalysis(
-                    AnalysisNav(idProject = viewModel.itemId, name = it)
-                )
+            navigationToAnalysis = { navigationToAnalysis(AnalysisNav(idProject = viewModel.itemId, name = it))
+                AppMetrica.reportEvent("Анализ через финансы")
             }
         )
     }

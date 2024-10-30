@@ -30,6 +30,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import io.appmetrica.analytics.AppMetrica
 
 
 object AnimalCardDestination : NavigationDestination {
@@ -126,6 +127,7 @@ fun AnimalCardContainer(
                             table = "Вес"
                         )
                     )
+                    AppMetrica.reportEvent("Животные Вес")
                 }
             ) {
                 var i = 1
@@ -154,6 +156,7 @@ fun AnimalCardContainer(
                             table = "Размер"
                         )
                     )
+                    AppMetrica.reportEvent("Животные Размер")
                 }
             ) {
                 var i = 1
@@ -180,6 +183,7 @@ fun AnimalCardContainer(
                             table = "Количество"
                         )
                     )
+                    AppMetrica.reportEvent("Животные Ко-во")
                 }
             ) {
                 var i = 1
@@ -209,6 +213,7 @@ fun AnimalCardContainer(
                         table = "Прививки"
                     )
                 )
+                AppMetrica.reportEvent("Животные Прививки")
             }
         ) {
             var i = 1

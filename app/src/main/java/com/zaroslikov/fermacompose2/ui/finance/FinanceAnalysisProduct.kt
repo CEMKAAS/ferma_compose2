@@ -76,6 +76,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import io.appmetrica.analytics.AppMetrica
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
@@ -121,7 +122,9 @@ fun FinanceAnalysisProduct(
             title = viewModel.name,
             true,
             navigateUp = navigateBack,
-            settingUp = { openCalendarDialog = true }
+            settingUp = { openCalendarDialog = true
+                AppMetrica.reportEvent("Диапазон Анализ")
+            }
         )
     }) { innerPadding ->
         FinanceAnalysisContainer(

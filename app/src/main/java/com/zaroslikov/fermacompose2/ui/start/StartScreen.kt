@@ -80,6 +80,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
+import io.appmetrica.analytics.AppMetrica
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -123,7 +124,9 @@ fun StartScreen(
         topBar = {
             TopAppBarStart2(
                 title = "Мое Хозяйство",
-                infoBottomSheet = { infoBottomSheet = true }
+                infoBottomSheet = { infoBottomSheet = true
+                AppMetrica.reportEvent("Информация")
+                }
             )
         }, floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -148,12 +151,15 @@ fun StartScreen(
                 infoBottomSheet = { infoBottomSheet = false },
                 saveBottomSheet = {
                     viewModel.saveItem()
+                    AppMetrica.reportEvent("УведОбщ - ${viewModel.time}")
                     infoBottomSheet = false
                 },
                 sheetState = sheetState,
                 time = viewModel.time,
                 showDialogTime = { showDialogTime = true },
-                clearTime = { viewModel.onUpdate("") }
+                clearTime = { viewModel.onUpdate("")
+                    AppMetrica.reportEvent("УведОбщ - нет")
+                }
             )
         }
 
@@ -254,6 +260,7 @@ fun StartScreenContainer(
                                                 .padding(8.dp)
                                                 .clickable {
                                                     navigateToItemIncubator(it.id)
+                                                    AppMetrica.reportEvent("Переход на инкуб")
                                                 },
                                             colorFilter = null
                                         )
@@ -278,6 +285,7 @@ fun StartScreenContainer(
                                                 .padding(8.dp)
                                                 .clickable {
                                                     navigateToItemIncubatorArh(it.id)
+                                                    AppMetrica.reportEvent("Переход Архив Инкуб")
                                                 },
                                             colorFilter = ColorFilter.tint(Color.Gray)
                                         )
@@ -287,6 +295,7 @@ fun StartScreenContainer(
                                                 .padding(8.dp)
                                                 .clickable {
                                                     navigateToItemProjectArh(it.id)
+                                                    AppMetrica.reportEvent("Переход Архив Хоз")
                                                 },
                                             colorFilter = ColorFilter.tint(Color.Gray)
                                         )
@@ -313,11 +322,6 @@ fun InfoBottomSheet(
     clearTime: () -> Unit
 ) {
     val anonotatedString = buildAnnotatedString {
-        withStyle(
-            style = SpanStyle(
-                fontSize = 20.sp,
-            )
-        ) { append("Не упусти возможность присоединиться к нашей ") }
         pushStringAnnotation(tag = "URL", annotation = "https://vk.com/myfermaapp")
         withStyle(
             style = SpanStyle(
@@ -325,7 +329,7 @@ fun InfoBottomSheet(
                 fontSize = 20.sp
             )
         ) {
-            append("группе в ВКонтакте!")
+            append("Присоединиться!")
         }
         pop()
     }
@@ -336,12 +340,12 @@ fun InfoBottomSheet(
     ) {
         Column(modifier = Modifier.padding(15.dp)) {
             Text(
-                text = "Мое Хозяйство v2.11",
+                text = "Мое Хозяйство v2.12",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(6.dp),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 26.sp,
+                fontSize = 24.sp,
                 textAlign = TextAlign.Center
             )
             Text(
@@ -349,8 +353,15 @@ fun InfoBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(6.dp),
-                fontSize = 20.sp,
+                fontSize = 15.sp,
                 textAlign = TextAlign.Center
+            )
+
+            Text(
+                text = "Присоединяйcя к нашей группе ВКонтакте! Это отличный способ оставаться в курсе новостей, делиться впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство еще лучше!",
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 15.sp,
+                textAlign = TextAlign.Justify
             )
             val uriHandler = LocalUriHandler.current
             ClickableText(
@@ -368,19 +379,14 @@ fun InfoBottomSheet(
                         uriHandler.openUri(uri)
                     }
                 },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            )
-            Text(
-                text = "Это отличный способ быть в курсе всех новостей, делиться своими впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство ещё лучше!\nЧтобы отключить ежедневные уведомления, нажмите на \"Х\" и \"Спасибо!\" ",
-                modifier = Modifier.fillMaxWidth(),
-                fontSize = 20.sp,
-                textAlign = TextAlign.Justify
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 15.dp),
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
-                    .fillMaxWidth().padding(vertical = 10.dp)
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp)
             ) {
                 OutlinedTextField(
                     value = time,
@@ -388,7 +394,7 @@ fun InfoBottomSheet(
                     readOnly = true,
                     label = { Text("Уведомление") },
                     supportingText = {
-                        Text("Укажите время для уведомления")
+                        Text("Чтобы отключить ежедневные уведомления, нажмите на \"Х\" и \"Спасибо!\"")
                     },
                     trailingIcon = {
                         IconButton(onClick = showDialogTime) {
@@ -410,7 +416,7 @@ fun InfoBottomSheet(
             Button(
                 onClick = saveBottomSheet, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp)
+                    .padding(bottom = 20.dp)
 
             ) {
                 Text(text = "Спасибо!")

@@ -46,7 +46,7 @@ fun IncubatorEditDayScreen(
     onNavigateUp: () -> Unit,
     viewModel: IncubatorEditDayViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val day = viewModel.day + 1
+    val day = viewModel.day
 
     val coroutineScope = rememberCoroutineScope()
 

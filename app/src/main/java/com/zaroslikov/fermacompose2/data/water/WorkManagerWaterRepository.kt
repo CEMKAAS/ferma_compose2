@@ -43,8 +43,8 @@ class WorkManagerWaterRepository(private var context: Context) : WaterRepository
 
                 val workRequest =
                     PeriodicWorkRequestBuilder<WaterReminderWorker>(
-                        15,
-                        TimeUnit.MINUTES
+                        1,
+                        TimeUnit.DAYS
                     ).setInitialDelay(
                         calendar.timeInMillis - System.currentTimeMillis(),
                         TimeUnit.MILLISECONDS
@@ -83,8 +83,8 @@ class WorkManagerWaterRepository(private var context: Context) : WaterRepository
 
         val workRequest =
             PeriodicWorkRequestBuilder<WaterReminderWorker>(
-                15,
-                TimeUnit.MINUTES
+                1,
+                TimeUnit.DAYS
             ).setInitialDelay(
                 calendar.timeInMillis - System.currentTimeMillis(),
                 TimeUnit.MILLISECONDS

@@ -70,6 +70,7 @@ import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSampleNoLimit
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import io.appmetrica.analytics.AppMetrica
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import androidx.compose.material3.OutlinedCard as OutlinedCard1
@@ -130,7 +131,9 @@ fun FinanceMountScreen(
                 title = text,
                 true,
                 navigateUp = navigateBack,
-                settingUp = { openCalendarDialog = true }
+                settingUp = { openCalendarDialog = true
+                    AppMetrica.reportEvent("Финансы Месяц Диапазон")
+                }
             )
         }
     ) { innerPadding ->

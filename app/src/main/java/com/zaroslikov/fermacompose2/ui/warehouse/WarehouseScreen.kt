@@ -48,6 +48,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import io.appmetrica.analytics.AppMetrica
 
 object WarehouseDestination : NavigationDestination {
     override val route = "warehouse"
@@ -107,10 +108,8 @@ fun WarehouseScreen(
                 contentPadding = innerPadding,
                 showBottomFilter = showBottomSheetFilter,
                 navigationToAnalysis = {
-                    navigationToAnalysis(
-                        AnalysisNav(idProject = idProject, name = it)
-                    )
-
+                    navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
+                    AppMetrica.reportEvent("Анализ через склад")
                 }
             )
         }

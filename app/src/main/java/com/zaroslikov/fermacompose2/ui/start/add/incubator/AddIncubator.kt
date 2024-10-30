@@ -143,6 +143,9 @@ fun AddIncubator(
             eventParameters["Кол-во"] = incubator.eggAll
             eventParameters["АвтоОхл"] = incubator.airing
             eventParameters["АвтоПрев"] = incubator.over
+            eventParameters["Увед1"] = incubator.time1
+            eventParameters["Увед2"] = incubator.time2
+            eventParameters["Увед3"] = incubator.time3
             AppMetrica.reportEvent("Incubator", eventParameters);
             navigateContinue()
         },
@@ -553,7 +556,7 @@ fun TimePicker(time: String, showDialog: (String) -> Unit) {
                         .fillMaxWidth(), horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = {
-                        showDialog(formatterTime(timeState.hour,timeState.minute ))
+                        showDialog(formatterTime(timeState.hour, timeState.minute))
                     }) {
                         Text(text = "Принять")
                     }

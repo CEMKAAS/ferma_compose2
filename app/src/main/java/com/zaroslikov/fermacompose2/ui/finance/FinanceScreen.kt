@@ -58,6 +58,7 @@ import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.theme.errorLight
 import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
+import io.appmetrica.analytics.AppMetrica
 
 object FinanceDestination : NavigationDestination {
     override val route = "Finance"
@@ -180,7 +181,10 @@ private fun FinanceBody(
         )
         Row {
             Card(
-                onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, true)) },
+                onClick = {
+                    navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, true))
+                    AppMetrica.reportEvent("Финансы Доход")
+                },
                 modifier = Modifier
                     .padding(2.dp)
                     .fillMaxWidth(0.5f),
@@ -205,7 +209,10 @@ private fun FinanceBody(
                 )
             }
             Card(
-                onClick = { navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, false)) },
+                onClick = {
+                    navigateToIncomeExpenses(FinanceIncomeExpensesData(idPT, false))
+                    AppMetrica.reportEvent("Финансы Расход")
+                },
                 modifier = Modifier
                     .padding(2.dp)
                     .fillMaxWidth(1f)
@@ -277,7 +284,10 @@ private fun FinanceBody(
         }
 
         Card(
-            onClick = { expanded = !expanded },
+            onClick = {
+                expanded = !expanded
+                AppMetrica.reportEvent("Финансы Подробно")
+            },
             modifier = Modifier
                 .padding(2.dp)
                 .fillMaxWidth()
@@ -304,7 +314,10 @@ private fun FinanceBody(
 
 
         Card(
-            onClick = { navigateToFinaceMount(idPT) },
+            onClick = {
+                navigateToFinaceMount(idPT)
+                AppMetrica.reportEvent("Финансы Месяц")
+            },
             modifier = Modifier
                 .padding(2.dp)
                 .fillMaxWidth(),

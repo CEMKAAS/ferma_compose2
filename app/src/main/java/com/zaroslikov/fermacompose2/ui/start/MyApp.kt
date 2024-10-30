@@ -19,6 +19,7 @@ import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
+import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -92,6 +93,7 @@ fun DrawerSheet(
                                     idPTNavigation
                                 )
                             )
+                            AppMetrica.reportEvent("Переход ${it.text}")
                         }
                         drawerState.apply {
                             if (isClosed) open() else close()
