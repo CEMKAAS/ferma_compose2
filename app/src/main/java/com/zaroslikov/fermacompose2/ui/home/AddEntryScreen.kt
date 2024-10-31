@@ -151,6 +151,7 @@ fun AddEntryContainerProduct(
     var expandedAni by remember { mutableStateOf(false) }
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
+    var isErrorSlash by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
@@ -160,7 +161,7 @@ fun AddEntryContainerProduct(
 
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
-        isErrorTitle = text.contains("/")
+        isErrorSlash = text.contains("/")
     }
 
     fun validateCount(text: String) {
@@ -168,10 +169,10 @@ fun AddEntryContainerProduct(
     }
 
     fun errorBoolean(): Boolean {
+        isErrorSlash = title.contains("/")
         isErrorTitle = title == ""
-        isErrorTitle = title.contains("/")
-         isErrorCount = count == ""
-        return !(isErrorTitle || isErrorCount)
+        isErrorCount = count == ""
+        return !(isErrorTitle || isErrorCount || isErrorSlash)
     }
 
     //Календарь
@@ -214,7 +215,12 @@ fun AddEntryContainerProduct(
                     supportingText = {
                         if (isErrorTitle) {
                             Text(
-                                text = "Не указано имя товара или в товаре указан /",
+                                text = "Не указано имя товара",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        } else if (isErrorSlash) {
+                            Text(
+                                text = "В имени товара указан /",
                                 color = MaterialTheme.colorScheme.error
                             )
                         } else Text("Введите или выберите товар")
@@ -504,7 +510,8 @@ fun AddEntryContainerProduct(
                         eventParameters["Имя"] = title
                         eventParameters["Кол-во"] = "$title $count"
                         eventParameters["Категория"] = category
-                        eventParameters["Животное"] = if (animalList.isNotEmpty()) animalList[selectedItemIndex].type else ""
+                        eventParameters["Животное"] =
+                            if (animalList.isNotEmpty()) animalList[selectedItemIndex].type else ""
                         eventParameters["Примечание"] = note
                         AppMetrica.reportEvent("Add Products", eventParameters);
                     }
