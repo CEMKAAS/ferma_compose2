@@ -86,7 +86,7 @@ fun AddEntryProduct(
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Мои Товары", navigateUp = navigateBack)
+            TopAppBarEdit(title = "Моя Продукция", navigateUp = navigateBack)
         }
     ) { innerPadding ->
 

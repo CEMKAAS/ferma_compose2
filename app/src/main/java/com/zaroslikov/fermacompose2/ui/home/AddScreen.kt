@@ -117,7 +117,7 @@ fun AddScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarFerma(
-                    title = "Мои Товары",
+                    title = "Моя Продукция",
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
@@ -310,9 +310,3 @@ fun AddProductCard(
         }
     }
 }
-
-data class navigateId(
-    val id: Int,
-    val idPT: Int
-
-)

@@ -21,13 +21,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -85,6 +88,25 @@ fun AddIncubatorTwoContaine(
 ) {
 
     LazyColumn(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+
+        item {
+            Card(
+                modifier = Modifier.padding(14.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Внимание",
+                        modifier = Modifier.padding(10.dp)
+                    )
+                    Text(
+                        text = "Значения в таблице являются ориентировочными. Корректируйте её по своему усмотрению, в будущем значения могут быть изменены.",
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+            }
+        }
+        item { HorizontalDivider(thickness = 1.dp, color = Color.DarkGray) }
         item {
             Row(
                 modifier = Modifier
@@ -99,12 +121,7 @@ fun AddIncubatorTwoContaine(
                         .fillMaxWidth(0.15f)
                         .padding(6.dp)
                 )
-                Divider(
-                    color = Color.DarkGray,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                )
+                VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
                 Text(
                     text = "°C",
                     textAlign = TextAlign.Center,
@@ -112,12 +129,7 @@ fun AddIncubatorTwoContaine(
                         .fillMaxWidth(0.16f)
                         .padding(6.dp)
                 )
-                Divider(
-                    color = Color.DarkGray,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                )
+                VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
                 Text(
                     text = "%",
                     textAlign = TextAlign.Center,
@@ -125,12 +137,7 @@ fun AddIncubatorTwoContaine(
                         .fillMaxWidth(0.16f)
                         .padding(6.dp)
                 )
-                Divider(
-                    color = Color.DarkGray,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                )
+                VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
                 Text(
                     text = "Поворот",
                     textAlign = TextAlign.Center,
@@ -138,12 +145,7 @@ fun AddIncubatorTwoContaine(
                         .fillMaxWidth(0.31f)
                         .padding(6.dp)
                 )
-                Divider(
-                    color = Color.DarkGray,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                )
+                VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
                 Text(
                     text = "Проветривание",
                     textAlign = TextAlign.Center,
@@ -153,15 +155,8 @@ fun AddIncubatorTwoContaine(
                 )
             }
         }
-        item { Divider(color = Color.DarkGray, thickness = 1.dp) }
-        item { Divider(color = Color.DarkGray, thickness = 1.dp) }
-        items(list.size) {
-            MyRowIncubatorAdd(
-                list[it],
-//                onUpdate = onUpdate
-            )
-        }
-
+        item { HorizontalDivider(thickness = 2.dp, color = Color.DarkGray) }
+        items(list.size) { MyRowIncubatorAdd(list[it]) }
         item {
             Button(
                 onClick = { navigateContinue(list) },
@@ -199,12 +194,7 @@ fun MyRowIncubatorAdd(
                 .fillMaxWidth(0.15f)
                 .padding(6.dp),
         )
-        Divider(
-            color = Color.DarkGray,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(1.dp)
-        )
+        VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
         BasicTextField(
             value = tempDay,
             onValueChange = {
@@ -226,13 +216,7 @@ fun MyRowIncubatorAdd(
             }
             )
         )
-        Divider(
-            color = Color.DarkGray,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(1.dp)
-        )
-
+        VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
         BasicTextField(
             value = dampDay,
             onValueChange = {
@@ -254,13 +238,7 @@ fun MyRowIncubatorAdd(
             }
             )
         )
-        Divider(
-            color = Color.DarkGray,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(1.dp)
-        )
-
+        VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
         BasicTextField(
             value = overDay,
             onValueChange = {
@@ -283,12 +261,7 @@ fun MyRowIncubatorAdd(
             }
             )
         )
-        Divider(
-            color = Color.DarkGray,
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(1.dp)
-        )
+        VerticalDivider(thickness = 1.dp, color = Color.DarkGray)
         BasicTextField(
             value = airingDay,
             onValueChange = {
@@ -313,7 +286,7 @@ fun MyRowIncubatorAdd(
         )
 
     }
-    Divider(color = Color.DarkGray, thickness = 1.dp)
+    HorizontalDivider(thickness = 1.dp, color = Color.DarkGray)
 }
 
 

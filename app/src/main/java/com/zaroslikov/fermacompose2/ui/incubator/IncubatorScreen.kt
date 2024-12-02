@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +25,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -47,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -252,7 +256,6 @@ fun MyRowIncubatorSettting(
     typeBird: String,
     navigateOvos: () -> Unit,
 ) {
-
     var ovoscop by rememberSaveable { mutableStateOf(false) }
     ovoscop = setOvoskop(typeBird, incubator.day)
 
@@ -272,42 +275,47 @@ fun MyRowIncubatorSettting(
             fontSize = 18.sp
         )
 
-        Text(
-            text = "Температура: ${incubator.temp}°C",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(6.dp)
-        )
-        Text(
-            text = "Влажность: ${incubator.damp}%",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(6.dp)
-        )
-
-        Text(
-            text = "Переворачивать: ${incubator.over}",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(6.dp)
-        )
-        Text(
-            text = "Проветривать: ${incubator.airing}",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(6.dp)
-        )
-
-        if (ovoscop) {
-            TextButton(
-                onClick = navigateOvos,
-                modifier = Modifier.fillMaxWidth()
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(if (ovoscop) 0.85f else 1f)
             ) {
                 Text(
-                    text = "Овоскопирование",
-                    textAlign = TextAlign.Center,
+                    text = "Температура: ${incubator.temp}°C",
+                    textAlign = TextAlign.Start,
                     modifier = Modifier
+                        .padding(6.dp)
                 )
+                Text(
+                    text = "Влажность: ${incubator.damp}%",
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .padding(6.dp)
+                )
+
+                Text(
+                    text = "Переворачивать: ${incubator.over}",
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .padding(6.dp)
+                )
+                Text(
+                    text = "Проветривать: ${incubator.airing}",
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .padding(6.dp)
+                )
+            }
+            if (ovoscop) {
+                IconButton(onClick = navigateOvos) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_ovos2),
+                        contentDescription = "Овоскоп",
+                        modifier = Modifier.size(36.dp)
+
+                    )
+                }
             }
         }
     }

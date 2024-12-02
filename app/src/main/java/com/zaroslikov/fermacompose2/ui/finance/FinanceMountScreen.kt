@@ -2,7 +2,10 @@ package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -125,13 +128,14 @@ fun FinanceMountScreen(
 
 
     Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+//        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarCalendar(
                 title = text,
                 true,
                 navigateUp = navigateBack,
-                settingUp = { openCalendarDialog = true
+                settingUp = {
+                    openCalendarDialog = true
                     AppMetrica.reportEvent("Финансы Месяц Диапазон")
                 }
             )
@@ -157,10 +161,10 @@ fun FinanceMountScreen(
             },
             text = text,
             idPT = idProject,
-            modifier = modifier
-                .padding(innerPadding)
-                .padding(5.dp)
+            modifier = Modifier
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
+            contentPadding = innerPadding
         )
     }
 }
@@ -178,14 +182,17 @@ private fun FinanceMountBody(
     navigateToCategory: (FinanceCategoryData) -> Unit,
     text: String,
     idPT: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
+
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
+            .padding(contentPadding)
+            .padding(5.dp)
     ) {
-
-
 
         Row {
             CardFinace(

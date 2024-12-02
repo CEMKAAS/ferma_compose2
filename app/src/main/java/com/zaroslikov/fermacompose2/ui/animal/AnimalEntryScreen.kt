@@ -128,6 +128,7 @@ fun AnimalEntryContainer(
     var size by remember { mutableStateOf("0") }
     var count by remember { mutableStateOf("1") }
     var note by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
 
 
     var expandedSex by remember { mutableStateOf(false) }
@@ -135,6 +136,7 @@ fun AnimalEntryContainer(
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorType by rememberSaveable { mutableStateOf(false) }
+    var isErrorPrice by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
@@ -148,11 +150,15 @@ fun AnimalEntryContainer(
     fun validateType(text: String) {
         isErrorType = text == ""
     }
+    fun validatePrice(text: String) {
+        isErrorPrice = text == ""
+    }
 
     fun errorBoolean(): Boolean {
         isErrorTitle = title == ""
         isErrorType = type == ""
-        return !(isErrorTitle || isErrorType)
+        isErrorPrice = price == ""
+        return !(isErrorTitle || isErrorType || isErrorPrice)
     }
 
     //Календарь
@@ -260,10 +266,7 @@ fun AnimalEntryContainer(
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expandedType,
-                        onDismissRequest = {
-//                            expandedCat = false
-                            // We shouldn't hide the menu when the user enters/removes any character
-                        }
+                        onDismissRequest = {}
                     ) {
                         filteredOptions.forEach { item ->
                             DropdownMenuItem(
@@ -278,6 +281,39 @@ fun AnimalEntryContainer(
                 }
             }
         }
+
+        OutlinedTextField(
+            value = price,
+            onValueChange = {
+                price = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                validatePrice(price)
+            },
+            label = { Text("Стоимость") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                if (isErrorPrice) {
+                    Text(
+                        text = "Не указана стоимость за товар!",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Text("Укажите стоимость за купленный товар")
+                }
+            },
+            suffix = { Text(text = "₽") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }),
+            isError = isErrorPrice
+        )
 
         OutlinedTextField(
             value = date1,

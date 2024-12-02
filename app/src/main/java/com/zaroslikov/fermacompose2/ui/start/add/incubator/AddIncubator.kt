@@ -205,12 +205,13 @@ fun AddIncubatorContainer(
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState(
-        selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = calendar.timeInMillis
-    )
+
 
     if (openDialog) {
+        val datePickerState = rememberDatePickerState(
+            selectableDates = PastOrPresentSelectableDates,
+            initialSelectedDateMillis = calendar.timeInMillis
+        )
         DatePickerDialogSample(datePickerState, incubator.data) { date ->
             onUpdate(incubator.copy(data = date))
             openDialog = false

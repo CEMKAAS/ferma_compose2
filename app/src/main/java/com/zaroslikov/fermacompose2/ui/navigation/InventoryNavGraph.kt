@@ -167,9 +167,9 @@ fun InventoryNavHost(
                     "${IncubatorProjectEditDestination.route}/${it}"
                 )
             }, navigateOvos = {
-//                navController.navigate(
-//                    "${IncubatorOvoscopDestination.route}/${it.day}/${it.typeBirds}"
-//                )
+                navController.navigate(
+                    "${IncubatorOvoscopDestination.route}/${it.first}/${it.second}"
+                )
             }, navigateStart = {
                 navController.navigate(StartDestination.route)
             })

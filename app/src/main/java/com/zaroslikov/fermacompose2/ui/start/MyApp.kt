@@ -1,6 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.start
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -10,7 +15,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
@@ -39,6 +47,7 @@ fun DrawerSheet(
     x: Int,
     idPTNavigation: String
 ) {
+    val context = LocalContext.current
     val drawerItems = listOf(
 
         DrawerItems(
@@ -51,7 +60,7 @@ fun DrawerSheet(
             R.drawable.baseline_currency_ruble_24, "Мой Финансы", FinanceDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_add_circle_outline_24, "Мои Товары", HomeDestination.route
+            R.drawable.baseline_add_circle_outline_24, "Моя Продукция", HomeDestination.route
         ),
         DrawerItems(
             R.drawable.baseline_add_card_24, "Мои Продажи", SaleDestination.route
@@ -64,6 +73,9 @@ fun DrawerSheet(
         ),
         DrawerItems(
             R.drawable.baseline_cruelty_free_24, "Мои Животные", AnimalDestination.route
+        ),
+        DrawerItems(
+            R.drawable.baseline_edit_document_24, "Мои Заметки", AnimalDestination.route
         )
 
     )
@@ -72,7 +84,7 @@ fun DrawerSheet(
         mutableStateOf(drawerItems[x])
     }
 
-    ModalDrawerSheet() {
+    ModalDrawerSheet {
         drawerItems.forEach {
             NavigationDrawerItem(
                 label = { Text(text = it.text) },
@@ -102,6 +114,18 @@ fun DrawerSheet(
                 }
             )
         }
+
+        Button(
+            onClick = {
+                AppMetrica.reportEvent("Переход в группу")
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/myfermaapp"))
+                context.startActivity(intent)
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Text(text = "Вступить в группу VK!")
+        }
     }
 }
 
@@ -120,10 +144,8 @@ fun formatterTime(hour: Int, minute: Int): String {
 }
 
 
-
-
 fun dateLong(data: String): Long {
-    val format = SimpleDateFormat("dd.MM.yyyy")
+    val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
 
     return if (data == "") {
@@ -133,8 +155,6 @@ fun dateLong(data: String): Long {
         dateLong?.time ?: calendar.timeInMillis
     }
 }
-
-
 
 
 data class DrawerItems(

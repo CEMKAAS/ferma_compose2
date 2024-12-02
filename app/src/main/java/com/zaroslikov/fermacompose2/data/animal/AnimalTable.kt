@@ -27,6 +27,7 @@ data class AnimalTable(
     val note : String,
     val image:String,
     val arhiv: Boolean,
+    val price: Double,
     @ColumnInfo(name = "idPT")
     val idPT: Int,
     )
