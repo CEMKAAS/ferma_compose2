@@ -18,8 +18,9 @@ import androidx.room.PrimaryKey
 data class NoteTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
-    val id: Int = 0,
+    val id: Long = 0,
     val title: String,
     val note : String,
-    val idPT: Int
+    val date : String,
+    val idPT: Long
 )

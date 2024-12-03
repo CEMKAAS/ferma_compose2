@@ -16,7 +16,11 @@
 
 package com.zaroslikov.fermacompose2.data
 
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -25,6 +29,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
+import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
@@ -42,14 +47,7 @@ import kotlinx.coroutines.flow.Flow
  * Repository that provides insert, update, delete, and retrieve of [Item] from a given data source.
  */
 interface ItemsRepository {
-    /**
-     * Retrieve all the items from the the given data source.
-     */
     fun getAllItemsStream(id: Int): Flow<List<AddTable>>
-
-    /**
-     * Retrieve an item from the given data source that matches with the [id].
-     */
     fun getItemStream(id: Int): Flow<AddTable?>
 
     suspend fun getIncubatorListArh4(idPT: Int): List<Incubator>
@@ -73,7 +71,7 @@ interface ItemsRepository {
 
     suspend fun getIncubatorList2(id: Int): List<Incubator>
     fun getIncubator(id: Int): Flow<Incubator>
-    fun getIncubatorEditDay(id: Int, day:Int): Flow<Incubator>
+    fun getIncubatorEditDay(id: Int, day: Int): Flow<Incubator>
 
     fun getItemAdd(id: Int): Flow<AddTable>
 
@@ -146,8 +144,8 @@ interface ItemsRepository {
 
     fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
     fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
-    fun getOwnNeedMonth(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
-    fun getScrapMonth(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
+    fun getOwnNeedMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
+    fun getScrapMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
     fun getCategoryIncomeCurrentMonth(id: Int, dateBegin: String, dateEnd: String): Flow<List<Fin>>
     fun getCategoryExpensesCurrentMonth(
@@ -161,18 +159,6 @@ interface ItemsRepository {
         dateBegin: String,
         dateEnd: String
     ): Flow<List<IncomeExpensesDetails>>
-
-//    fun getIncomeMount(id: Int, mount: Int, year: Int): Flow<Double>
-//    fun getExpensesMount(id: Int, mount: Int, year: Int): Flow<Double>
-//
-//    fun getCategoryIncomeCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
-//    fun getCategoryExpensesCurrentMonth(id: Int, mount: Int, year: Int): Flow<List<Fin>>
-//    fun getIncomeExpensesCurrentMonth(
-//        id: Int,
-//        mount: Int,
-//        year: Int
-//    ): Flow<List<IncomeExpensesDetails>>
-
 
     fun getIncomeAllList(id: Int): Flow<List<Fin>>
     fun getExpensesAllList(id: Int): Flow<List<Fin>>
@@ -328,4 +314,12 @@ interface ItemsRepository {
     fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
     fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
     fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>>
+
+
+    //Note
+    fun getAllNote(id: Int): Flow<List<NoteTable>>
+    fun getNote(id: Int): Flow<NoteTable>
+    suspend fun insertNote(item: NoteTable)
+    suspend fun updateNote(item: NoteTable)
+    suspend fun deleteNote(item: NoteTable)
 }

@@ -24,6 +24,7 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.ui.note.NoteDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
@@ -75,7 +76,7 @@ fun DrawerSheet(
             R.drawable.baseline_cruelty_free_24, "Мои Животные", AnimalDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_edit_document_24, "Мои Заметки", AnimalDestination.route
+            R.drawable.baseline_edit_document_24, "Мои Заметки", NoteDestination.route
         )
 
     )

@@ -30,6 +30,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
+import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
@@ -103,7 +104,7 @@ interface ItemDao {
     fun getIncubator(id: Int): Flow<Incubator>
 
     @Query("SELECT * from MyIncubator Where idPT=:id and day=:day")
-    fun getIncubatorEditDay(id: Int, day:Int): Flow<Incubator>
+    fun getIncubatorEditDay(id: Int, day: Int): Flow<Incubator>
 
     @Query("SELECT * from MyFerma WHERE _id = :id")
     fun getItem(id: Int): Flow<AddTable>
@@ -204,8 +205,10 @@ interface ItemDao {
 
 
     //Finance
-    @Query("SELECT COALESCE(" +
-            "(SELECT SUM(PRICE) FROM MyFermaSale WHERE idPT =:id), 0) - COALESCE((SELECT SUM(countEXPENSES) FROM MyFermaEXPENSES WHERE idPT=:id), 0) AS PriceDifference;")
+    @Query(
+        "SELECT COALESCE(" +
+                "(SELECT SUM(PRICE) FROM MyFermaSale WHERE idPT =:id), 0) - COALESCE((SELECT SUM(countEXPENSES) FROM MyFermaEXPENSES WHERE idPT=:id), 0) AS PriceDifference;"
+    )
     fun getCurrentBalance(id: Int): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS ResultCount FROM MyFermaSale WHERE MyFermaSale.idPT =:id")
@@ -227,22 +230,26 @@ interface ItemDao {
     fun getExpensesMountFin(id: Int, mount: Int, year: Int): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS ResultCount FROM MyFermaSale WHERE MyFermaSale.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getIncomeMount(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
+    fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS ResultCount FROM MyFermaEXPENSES WHERE MyFermaEXPENSES.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getExpensesMount(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
+    fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and statusWRITEOFF=0")
-    fun getOwnNeedMonth(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
+    fun getOwnNeedMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and statusWRITEOFF=1")
-    fun getScrapMonth(id: Int, dateBegin:String, dateEnd: String): Flow<Double>
+    fun getScrapMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
     @Query("SELECT MyFermaSale.category as title, COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS priceAll FROM MyFermaSale Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) group by MyFermaSale.category ORDER BY MyFermaSale.PRICE DESC")
-    fun getCategoryIncomeCurrentMonth(id: Int, dateBegin:String, dateEnd: String): Flow<List<Fin>>
+    fun getCategoryIncomeCurrentMonth(id: Int, dateBegin: String, dateEnd: String): Flow<List<Fin>>
 
     @Query("SELECT MyFermaEXPENSES.category as title, COALESCE(SUM(MyFermaEXPENSES.countEXPENSES), 0.0) AS priceAll FROM MyFermaEXPENSES Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) group by MyFermaEXPENSES.category ORDER BY MyFermaEXPENSES.countEXPENSES DESC")
-    fun getCategoryExpensesCurrentMonth(id: Int, dateBegin:String, dateEnd: String): Flow<List<Fin>>
+    fun getCategoryExpensesCurrentMonth(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<Fin>>
 
 
 //    @Query("SELECT COALESCE(SUM(MyFermaSale.PRICE), 0.0) AS ResultCount FROM MyFermaSale WHERE MyFermaSale.idPT =:id and mount=:mount and year=:year")
@@ -325,31 +332,31 @@ interface ItemDao {
 
     // Analysis
     @Query("SELECT suffix as title, COALESCE(SUM(disc), 0) AS priceAll from MyFerma Where idPT=:id and title=:name")
-    fun getAnalysisAddAllTime(id: Int,name:String): Flow<Fin>
+    fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discSale), 0) AS priceAll from MyFermaSale Where idPT=:id and titleSale=:name")
-    fun getAnalysisSaleAllTime(id: Int,name:String): Flow<Fin>
+    fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name")
-    fun getAnalysisWriteOffAllTime(id: Int,name:String): Flow<Fin>
+    fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0")
-    fun getAnalysisWriteOffOwnNeedsAllTime(id: Int,name:String): Flow<Fin>
+    fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1")
-    fun getAnalysisWriteOffScrapAllTime(id: Int,name:String): Flow<Fin>
+    fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Fin>
 
     @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from MyFermaSale Where idPT=:id and titleSale=:name")
-    fun getAnalysisSaleSoldAllTime(id: Int,name:String): Flow<Double>
+    fun getAnalysisSaleSoldAllTime(id: Int, name: String): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0")
-    fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int,name:String): Flow<Double>
+    fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int, name: String): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1")
-    fun getAnalysisWriteOffScrapMoneyAllTime(id: Int,name:String): Flow<Double>
+    fun getAnalysisWriteOffScrapMoneyAllTime(id: Int, name: String): Flow<Double>
 
     @Query("SELECT suffix as title, CASE WHEN COALESCE(SUM(disc), 0) = 0 THEN 0 ELSE COALESCE(SUM(disc), 0) / 365 END AS priceAll from MyFerma Where idPT=:id and title=:name")
-    fun getAnalysisAddAverageValueAllTime(id: Int,name:String): Flow<Fin>
+    fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Fin>
 
     @Query("SELECT animal as title, COALESCE(SUM(disc),0) AS priceAll, suffix from MyFerma Where idPT=:id and title=:name GROUP BY animal ORDER BY priceAll DESC")
     fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
@@ -359,38 +366,92 @@ interface ItemDao {
 
     //AnalisisRange
     @Query("SELECT suffix as title, COALESCE(SUM(disc), 0) AS priceAll from MyFerma Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisAddAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+    fun getAnalysisAddAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discSale), 0) AS priceAll from MyFermaSale Where idPT=:id and titleSale=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisSaleAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+    fun getAnalysisSaleAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisWriteOffAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+    fun getAnalysisWriteOffAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisWriteOffOwnNeedsAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+    fun getAnalysisWriteOffOwnNeedsAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
 
     @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisWriteOffScrapAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+    fun getAnalysisWriteOffScrapAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
 
     @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from MyFermaSale Where idPT=:id and titleSale=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisSaleSoldAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
+    fun getAnalysisSaleSoldAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
+    fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisWriteOffScrapMoneyAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Double>
+    fun getAnalysisWriteOffScrapMoneyAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
 
     @Query("SELECT suffix as title, CASE WHEN COALESCE(SUM(disc), 0) = 0 THEN 0 ELSE COALESCE(SUM(disc), 0) / 365 END AS priceAll from MyFerma Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
-    fun getAnalysisAddAverageValueAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<Fin>
+    fun getAnalysisAddAverageValueAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
 
     @Query("SELECT animal as title, COALESCE(SUM(disc),0) AS priceAll, suffix from MyFerma Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY animal ORDER BY priceAll DESC ")
-    fun getAnalysisAddAnimalAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<List<AnimalTitSuff>>
+    fun getAnalysisAddAnimalAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnimalTitSuff>>
 
     @Query("SELECT Buyer As buyer, COALESCE(SUM(PRICE),0) AS resultPrice, COALESCE(SUM(discSale),0) AS resultCount, suffix from MyFermaSale Where idPT=:id  and titleSale =:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY ResultPrice DESC")
-    fun getAnalysisSaleBuyerAllTimeRange(id: Int,name:String, dateBegin:String, dateEnd:String): Flow<List<AnalysisSaleBuyerAllTime>>
-
+    fun getAnalysisSaleBuyerAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -468,7 +529,6 @@ interface ItemDao {
     @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
     fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>>
 
-
     @Query("SELECT id, count as weight, date, idAnimal from AnimalCountTable Where idAnimal=:id ORDER BY id DESC")
     fun getCountAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
 
@@ -483,5 +543,25 @@ interface ItemDao {
 
     @Query("SELECT title,COALESCE(SUM(disc), 0.0) AS priceAll, suffix from MyFerma Where animal=:name GROUP BY Title ORDER BY priceAll DESC")
     fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>>
+
+    /*
+     *
+    Note
+     *
+     */
+    @Query("SELECT * from NoteFerma Where idPT=:id ORDER BY strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) DESC")
+    fun getAllNote(id: Int): Flow<List<NoteTable>>
+
+    @Query("SELECT * from NoteFerma Where _id=:id")
+    fun getNote(id: Int): Flow<NoteTable>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertNote(item: NoteTable)
+
+    @Update
+    suspend fun updateNote(item: NoteTable)
+
+    @Delete
+    suspend fun deleteNote(item: NoteTable)
 
 }

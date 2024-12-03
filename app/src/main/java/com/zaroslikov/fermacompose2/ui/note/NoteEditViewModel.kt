@@ -1,105 +1,62 @@
-//package com.zaroslikov.fermacompose2.ui.note
-//
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.setValue
-//import androidx.lifecycle.SavedStateHandle
-//import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.viewModelScope
-//import com.zaroslikov.fermacompose2.data.ItemsRepository
-//import com.zaroslikov.fermacompose2.data.ferma.AddTable
-//import kotlinx.coroutines.flow.SharingStarted
-//import kotlinx.coroutines.flow.StateFlow
-//import kotlinx.coroutines.flow.filterNotNull
-//import kotlinx.coroutines.flow.first
-//import kotlinx.coroutines.flow.map
-//import kotlinx.coroutines.flow.stateIn
-//import kotlinx.coroutines.launch
-//
-//class AddEditViewModel(
-//    savedStateHandle: SavedStateHandle,
-//    private val itemsRepository: ItemsRepository
-//) : ViewModel() {
-//
-//    private val itemId: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArg])
-//    private val itemIdPT: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArgTwo])
-//
-//    var itemUiState by mutableStateOf(AddTableUiState())
-//        private set
-//
-//    init {
-//        viewModelScope.launch {
-//            itemUiState = itemsRepository.getItemAdd(itemId)
-//                .filterNotNull()
-//                .first()
-//                .toAddTableUiState()
-//        }
-//    }
-//
-//    fun updateUiState(itemDetails: AddTableUiState) {
-//        itemUiState =
-//            itemDetails
-//    }
-//
-//    val titleUiState: StateFlow<TitleUiState> =
-//        itemsRepository.getItemsTitleAddList(itemIdPT).map { TitleUiState(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = TitleUiState()
-//            )
-//
-//
-//    val categoryUiState: StateFlow<CategoryUiState> =
-//        itemsRepository.getItemsCategoryAddList(itemIdPT).map { CategoryUiState(it) }
-//            .filterNotNull()
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = CategoryUiState()
-//            )
-//
-//    val animalUiState: StateFlow<AnimalUiState> =
-//        itemsRepository.getItemsAnimalAddList(itemIdPT).map { AnimalUiState(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = AnimalUiState()
-//            )
-//
-//    suspend fun saveItem() {
-//        itemsRepository.updateItem(itemUiState.toAddTable())
-//    }
-//
-//    suspend fun deleteItem() {
-//        itemsRepository.deleteItem(itemUiState.toAddTable())
-//    }
-//
-//    companion object {
-//        private const val TIMEOUT_MILLIS = 5_000L
-//    }
-//
-//}
-//
-//data class AddTableUiState(
-//    val id: Int = 0,
-//    val title: String = "", // название
-//    val count: String = "", // Кол-во
-//    val day: Int = 27,  // день
-//    val mount: Int = 6, // месяц
-//    val year: Int = 2024, // время
-//    val priceAll: Double = 0.0,
-//    var suffix: String = "",
-//    var category: String = "",
-//    var animal: String = "",
-//    val note:String = "",
-//    val idPT: Int = 0
-//)
-//
-//fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
-//    id, title, count.toString(), day, mount, year, priceAll, suffix, category, animal,note, idPT
-//)
-//
-//fun AddTableUiState.toAddTable(): AddTable = AddTable(
-//    id, title, count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), day, mount, year, priceAll, suffix, category, animal,note, idPT,
-//)
+package com.zaroslikov.fermacompose2.ui.note
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.NoteTable
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+
+class NoteEditViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val itemsRepository: ItemsRepository
+) : ViewModel() {
+
+    private val itemId: Int = checkNotNull(savedStateHandle[NoteEditDestination.itemIdArg])
+
+    var itemUiState by mutableStateOf(NoteTableUiState())
+        private set
+
+    init {
+        viewModelScope.launch {
+            itemUiState = itemsRepository.getNote(itemId)
+                .filterNotNull()
+                .first()
+                .toNoteTableUiState()
+        }
+    }
+
+    fun updateUiState(itemDetails: NoteTableUiState) {
+        itemUiState =
+            itemDetails
+    }
+    suspend fun saveItem() {
+        itemsRepository.updateNote(itemUiState.toNoteTable())
+    }
+
+    suspend fun deleteItem() {
+        itemsRepository.deleteNote(itemUiState.toNoteTable())
+    }
+
+}
+
+data class NoteTableUiState(
+    val id: Long = 0,
+    val title: String = "",
+    val note:String = "",
+    val date: String = "",
+    val idPT: Long = 0
+)
+
+fun NoteTable.toNoteTableUiState(): NoteTableUiState = NoteTableUiState(
+    id, title, note, date, idPT
+)
+
+fun NoteTableUiState.toNoteTable(): NoteTable = NoteTable(
+    id, title,note, date, idPT
+)

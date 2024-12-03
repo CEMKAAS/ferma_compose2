@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.ui
 
 import android.app.Application
@@ -44,6 +28,9 @@ import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorViewModel
+import com.zaroslikov.fermacompose2.ui.note.NoteEditViewModel
+import com.zaroslikov.fermacompose2.ui.note.NoteEntryViewModel
+import com.zaroslikov.fermacompose2.ui.note.NoteViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleEditViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
 import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
@@ -56,9 +43,7 @@ import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditViewModel
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryViewModel
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffViewModel
 
-/**
- * Provides Factory to create instance of ViewModel for the entire Inventory app
- */
+
 object AppViewModelProvider {
     val Factory = viewModelFactory {
 
@@ -284,6 +269,27 @@ object AppViewModelProvider {
                 inventoryApplication().container.itemsRepository
             )
         }
+
+        //Note
+        initializer {
+            NoteEditViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+        initializer {
+            NoteEntryViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+        initializer {
+            NoteViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
         initializer {
             FinanceArhivViewModel(
                 this.createSavedStateHandle(),
@@ -293,9 +299,5 @@ object AppViewModelProvider {
     }
 }
 
-/**
- * Extension function to queries for [Application] object and returns an instance of
- * [InventoryApplication].
- */
 fun CreationExtras.inventoryApplication(): InventoryApplication =
     (this[AndroidViewModelFactory.APPLICATION_KEY] as InventoryApplication)

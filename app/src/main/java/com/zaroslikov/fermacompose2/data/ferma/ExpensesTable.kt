@@ -30,7 +30,6 @@ data class ExpensesTable(
     val year: Int, // время
     @ColumnInfo(name = "countEXPENSES")
     val priceAll: Double, //Заголовок кол-во товара
-
     var suffix: String,
     var category: String,
     val note : String,

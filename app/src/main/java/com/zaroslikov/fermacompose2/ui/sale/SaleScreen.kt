@@ -324,30 +324,12 @@ fun SaleProductCard(
     }
 }
 
-
-//@Preview()
-//@Composable
-//fun Card() {
-//    SaleProductCard(
-//        saleTable = SaleTable(
-//            0,
-//            "Мясо Коровы",
-//            150.50,
-//            25,
-//            12,
-//            2025,
-//            "0",
-//            "кг",
-//            "Животноводство",
-//            "Борька",
-//            "Тетя Надя",
-//            1
-//        )
-//    )
-//}
-
-
 data class navigateId(
     val id: Int,
     val idPT: Int
+)
+
+data class navigateId2(
+    val id: Long,
+    val idPT: Long
 )

@@ -70,15 +70,16 @@ data class AnimalEditUiState(
     val note: String = "",
     val image: String = "",
     val arhiv: Boolean = false,
+    val price: String = "",
     val idPT: Int = 0,
 )
 
 fun AnimalTable.toAnimaEditUiState(
 ): AnimalEditUiState = AnimalEditUiState(
-    id, name, type, data, groop, sex, note, image, arhiv, idPT
+    id, name, type, data, groop, sex, note, image, arhiv, price.toString(), idPT
 )
 
 fun AnimalEditUiState.toAnimalTable(): AnimalTable = AnimalTable(
-    id, name, type, data, groop, sex, note, image, arhiv, idPT
+    id, name, type, data, groop, sex, note, image, arhiv, price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), idPT
 )
 

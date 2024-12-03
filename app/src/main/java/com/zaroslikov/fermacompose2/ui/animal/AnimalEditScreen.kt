@@ -129,6 +129,7 @@ fun AnimalEditContainer(
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorType by rememberSaveable { mutableStateOf(false) }
+    var isErrorPrice by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
     var selectedItemIndex by remember { mutableStateOf(0) }
@@ -147,11 +148,15 @@ fun AnimalEditContainer(
     fun validateType(text: String) {
         isErrorType = text == ""
     }
+    fun validatePrice(text: String) {
+        isErrorPrice = text == ""
+    }
 
     fun errorBoolean(): Boolean {
         isErrorTitle = animalEditUiState.name == ""
         isErrorType = animalEditUiState.type == ""
-        return !(isErrorTitle || isErrorType)
+        isErrorPrice = animalEditUiState.price == ""
+        return !(isErrorTitle || isErrorType || isErrorPrice)
     }
 
 
@@ -255,6 +260,39 @@ fun AnimalEditContainer(
                 }
             }
         }
+
+        OutlinedTextField(
+            value = animalEditUiState.price,
+            onValueChange = {
+                onValueChange(animalEditUiState.copy(price = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                validatePrice(it)
+            },
+            label = { Text("Стоимость") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                if (isErrorPrice) {
+                    Text(
+                        text = "Не указана стоимость животного!",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Text("Укажите за сколько купили животного")
+                }
+            },
+            suffix = { Text(text = "₽") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }),
+            isError = isErrorPrice
+        )
 
         if (openDialog) {
             DatePickerDialogSample(datePickerState, animalEditUiState.data) { date ->

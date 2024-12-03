@@ -116,6 +116,7 @@ fun AnimalCardContainer(
                 Text(text = "Пол: ${animalTable.sex}", modifier = modifierText)
             }
             Text(text = "Дата добавления: ${animalTable.data}", modifier = modifierText)
+            Text(text = "Стомость: ${animalTable.price} ₽", modifier = modifierText)
         }
 
         if (!animalTable.groop) {

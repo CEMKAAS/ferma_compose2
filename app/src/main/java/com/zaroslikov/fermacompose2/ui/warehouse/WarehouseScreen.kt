@@ -85,7 +85,7 @@ fun WarehouseScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                1,//ToDo 3
+                1,
                 idProject.toString()
             )
         },

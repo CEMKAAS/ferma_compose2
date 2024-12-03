@@ -7,6 +7,7 @@ import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
+import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
@@ -39,6 +40,15 @@ class ExpensesEntryViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = CategoryUiState()
             )
+
+    val animalUiState: StateFlow<AnimalUiState> =
+        itemsRepository.getItemsAnimalAddList(itemId).map { AnimalUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = AnimalUiState()
+            )
+
 
     suspend fun saveItem(expensesTable: ExpensesTable) {
         itemsRepository.insertExpenses(expensesTable)

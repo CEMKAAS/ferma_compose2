@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.data
 
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
@@ -24,6 +8,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
+import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
@@ -38,10 +23,13 @@ import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAllItemsStream(id: Int): Flow<List<AddTable>> = itemDao.getAllItems(id)
-
     override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
-    override suspend fun getIncubatorListArh4(idPT: Int): List<Incubator>  = itemDao.getIncubatorListArh4(idPT)
-    override suspend fun getIncubatorListArh6(type: String): List<ProjectTable> = itemDao.getIncubatorListArh6(type)
+    override suspend fun getIncubatorListArh4(idPT: Int): List<Incubator> =
+        itemDao.getIncubatorListArh4(idPT)
+
+    override suspend fun getIncubatorListArh6(type: String): List<ProjectTable> =
+        itemDao.getIncubatorListArh6(type)
+
     override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
     override fun getAllProjectArh(): Flow<List<ProjectTable>> = itemDao.getAllProjectArh()
     override fun getAllProjectAct(): Flow<List<ProjectTable>> = itemDao.getAllProjectAct()
@@ -55,7 +43,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getIncubatorList(id: Int): Flow<List<Incubator>> = itemDao.getIncubatorList(id)
     override suspend fun getIncubatorList2(id: Int): List<Incubator> = itemDao.getIncubatorList2(id)
     override fun getIncubator(id: Int): Flow<Incubator> = itemDao.getIncubator(id)
-    override fun getIncubatorEditDay(id: Int, day: Int): Flow<Incubator> = itemDao.getIncubatorEditDay(id, day)
+    override fun getIncubatorEditDay(id: Int, day: Int): Flow<Incubator> =
+        itemDao.getIncubatorEditDay(id, day)
 
     override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)
     override fun getItemsTitleAddList(id: Int): Flow<List<String>> =
@@ -130,32 +119,47 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getIncome(id: Int): Flow<Double> = itemDao.getIncome(id)
     override fun getExpenses(id: Int): Flow<Double> = itemDao.getExpenses(id)
     override fun getOwnNeed(id: Int): Flow<Double> = itemDao.getOwnNeed(id)
-    override fun getScrap(id: Int): Flow<Double>  = itemDao.getScrap(id)
+    override fun getScrap(id: Int): Flow<Double> = itemDao.getScrap(id)
 
-    override fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double> = itemDao.getIncomeMountFin(id, mount, year)
-    override fun getExpensesMountFin(id: Int, mount: Int, year: Int): Flow<Double> = itemDao.getExpensesMountFin(id, mount, year)
+    override fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double> =
+        itemDao.getIncomeMountFin(id, mount, year)
+
+    override fun getExpensesMountFin(id: Int, mount: Int, year: Int): Flow<Double> =
+        itemDao.getExpensesMountFin(id, mount, year)
 
 
     override fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
-        itemDao.getIncomeMount(id, dateBegin,dateEnd)
+        itemDao.getIncomeMount(id, dateBegin, dateEnd)
+
     override fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
-        itemDao.getExpensesMount(id,  dateBegin,dateEnd)
+        itemDao.getExpensesMount(id, dateBegin, dateEnd)
 
-    override fun getOwnNeedMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double> = itemDao.getOwnNeedMonth(id,dateBegin, dateEnd)
+    override fun getOwnNeedMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
+        itemDao.getOwnNeedMonth(id, dateBegin, dateEnd)
 
-    override fun getScrapMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double> = itemDao.getScrapMonth(id,dateBegin, dateEnd)
+    override fun getScrapMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
+        itemDao.getScrapMonth(id, dateBegin, dateEnd)
 
-    override fun getCategoryIncomeCurrentMonth(id: Int, dateBegin: String, dateEnd: String): Flow<List<Fin>> =
-        itemDao.getCategoryIncomeCurrentMonth(id, dateBegin,dateEnd)
+    override fun getCategoryIncomeCurrentMonth(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<Fin>> =
+        itemDao.getCategoryIncomeCurrentMonth(id, dateBegin, dateEnd)
 
-    override fun getCategoryExpensesCurrentMonth(id: Int, dateBegin: String, dateEnd: String): Flow<List<Fin>> =
-        itemDao.getCategoryExpensesCurrentMonth(id,  dateBegin,dateEnd)
+    override fun getCategoryExpensesCurrentMonth(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<Fin>> =
+        itemDao.getCategoryExpensesCurrentMonth(id, dateBegin, dateEnd)
 
     override fun getIncomeExpensesCurrentMonth(
         id: Int,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<IncomeExpensesDetails>> = itemDao.getIncomeExpensesCurrentMonth(id, dateBegin, dateEnd)
+    ): Flow<List<IncomeExpensesDetails>> =
+        itemDao.getIncomeExpensesCurrentMonth(id, dateBegin, dateEnd)
 
 
     //FinanceTap
@@ -221,7 +225,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         name: String
     ): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTime(id, name)
 
-        //analysis Range
+    //analysis Range
     override fun getAnalysisAddAllTimeRange(
         id: Int,
         name: String,
@@ -249,6 +253,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         dateBegin: String,
         dateEnd: String
     ): Flow<Fin> = itemDao.getAnalysisWriteOffOwnNeedsAllTimeRange(id, name, dateBegin, dateEnd)
+
     override fun getAnalysisWriteOffScrapAllTimeRange(
         id: Int,
         name: String,
@@ -268,14 +273,16 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<Double> = itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(id, name, dateBegin, dateEnd)
+    ): Flow<Double> =
+        itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(id, name, dateBegin, dateEnd)
 
     override fun getAnalysisWriteOffScrapMoneyAllTimeRange(
         id: Int,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<Double> = itemDao.getAnalysisWriteOffScrapMoneyAllTimeRange(id, name, dateBegin, dateEnd)
+    ): Flow<Double> =
+        itemDao.getAnalysisWriteOffScrapMoneyAllTimeRange(id, name, dateBegin, dateEnd)
 
     override fun getAnalysisAddAverageValueAllTimeRange(
         id: Int,
@@ -289,14 +296,16 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<AnimalTitSuff>> = itemDao.getAnalysisAddAnimalAllTimeRange(id, name, dateBegin, dateEnd)
+    ): Flow<List<AnimalTitSuff>> =
+        itemDao.getAnalysisAddAnimalAllTimeRange(id, name, dateBegin, dateEnd)
 
     override fun getAnalysisSaleBuyerAllTimeRange(
         id: Int,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTimeRange(id, name, dateBegin, dateEnd)
+    ): Flow<List<AnalysisSaleBuyerAllTime>> =
+        itemDao.getAnalysisSaleBuyerAllTimeRange(id, name, dateBegin, dateEnd)
 
     override suspend fun insertIncubator(item: Incubator) =
         itemDao.insertIncubator(item)
@@ -377,5 +386,13 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>> =
         itemDao.getProductAnimal(name)
+
+    /**Note**/
+    override fun getAllNote(id: Int): Flow<List<NoteTable>> = itemDao.getAllNote(id)
+    override fun getNote(id: Int): Flow<NoteTable> = itemDao.getNote(id)
+
+    override suspend fun insertNote(item: NoteTable) = itemDao.insertNote(item)
+    override suspend fun updateNote(item: NoteTable) = itemDao.updateNote(item)
+    override suspend fun deleteNote(item: NoteTable) = itemDao.deleteNote(item)
 
 }

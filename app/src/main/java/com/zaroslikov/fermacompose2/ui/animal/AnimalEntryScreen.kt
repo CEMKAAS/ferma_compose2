@@ -295,11 +295,11 @@ fun AnimalEntryContainer(
             supportingText = {
                 if (isErrorPrice) {
                     Text(
-                        text = "Не указана стоимость за товар!",
+                        text = "Не указана стоимость животного!",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите стоимость за купленный товар")
+                    Text("Укажите за сколько купили животного")
                 }
             },
             suffix = { Text(text = "₽") },
@@ -542,6 +542,7 @@ fun AnimalEntryContainer(
                                     note = note,
                                     image = "0",
                                     arhiv = false,
+                                    price = price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                                     idPT = idPT
                                 ),
                                 AnimalCountTable(

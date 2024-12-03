@@ -1,22 +1,5 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.ui.navigation
 
-import android.app.Person
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,8 +8,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
-import com.zaroslikov.fermacompose2.ui.animal.AnimalCard
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
@@ -71,6 +52,12 @@ import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreenDestination
+import com.zaroslikov.fermacompose2.ui.note.NoteDestination
+import com.zaroslikov.fermacompose2.ui.note.NoteEditDestination
+import com.zaroslikov.fermacompose2.ui.note.NoteEditProduct
+import com.zaroslikov.fermacompose2.ui.note.NoteEntryDestination
+import com.zaroslikov.fermacompose2.ui.note.NoteEntryProduct
+import com.zaroslikov.fermacompose2.ui.note.NoteScreen
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleEditProduct
@@ -96,10 +83,6 @@ import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryProduct
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffScreen
 
-
-/**
- * Provides Navigation graph for the application.
- */
 @Composable
 fun InventoryNavHost(
     navController: NavHostController,
@@ -599,6 +582,45 @@ fun InventoryNavHost(
                 navigateBack = { navController.popBackStack() },
                 navigateStart = { navController.navigateUp() }
             )
+        }
+
+        //Note
+        composable(
+            route = NoteDestination.routeWithArgs,
+            arguments = listOf(navArgument(HomeDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            NoteScreen(drawerState = drawerState, navigateToStart = {
+                navController.navigate(StartDestination.route)
+            }, navigateToModalSheet = {
+                navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+            }, navigateToItemAdd = {
+                navController.navigate(
+                    "${NoteEntryDestination.route}/${it}"
+                )
+            }, navigateToItemUpdate = {
+                navController.navigate(
+                    "${NoteEditDestination.route}/${it}"
+                )
+            })
+        }
+        composable(
+            route = NoteEntryDestination.routeWithArgs,
+            arguments = listOf(navArgument(NoteEntryDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            NoteEntryProduct(navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() })
+        }
+
+        composable(route = NoteEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(NoteEditDestination.itemIdArg) {
+                type = NavType.IntType
+            })) {
+            NoteEditProduct(navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() })
         }
     }
 }

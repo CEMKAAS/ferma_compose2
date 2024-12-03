@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -17,10 +17,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,29 +39,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Date
 import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 object ExpensesEntryDestination : NavigationDestination {
     override val route = "ExpensesEntry"
@@ -130,6 +140,7 @@ fun ExpensesEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
+    animalList: List<AnimalTable>
     saveInRoomSale: (ExpensesTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
@@ -138,6 +149,13 @@ fun ExpensesEntryContainerProduct(
     var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
+    var countAnimal2 by remember { mutableStateOf(0)}
+    var foodDay2 by remember { mutableStateOf(0)}
+    var countAnimal by remember { mutableStateOf(countAnimal2.toString()) }
+    var foodDay by remember { mutableStateOf(foodDay2.toString()) }
+    var food by remember { mutableStateOf(false) }
+    var showWarehouse by remember { mutableStateOf(false) }
+    var day by remember { mutableStateOf(1)}
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
@@ -170,8 +188,7 @@ fun ExpensesEntryContainerProduct(
         isErrorPrice = priceAll == ""
         return !(isErrorTitle || isErrorCount || isErrorPrice)
     }
-
-//Календарь
+    //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
@@ -185,6 +202,7 @@ fun ExpensesEntryContainerProduct(
     )
 
     var date1 by remember { mutableStateOf(formattedDate) }
+    var date2 by remember { mutableStateOf(formattedDate) }
 
     if (openDialog) {
         DatePickerDialogSample(state, date1) { date ->
@@ -193,6 +211,19 @@ fun ExpensesEntryContainerProduct(
         }
     }
 
+    if (openDialog) {
+        DatePickerDialogSample(state, date1) { date ->
+            date1 = date
+            openDialog = false
+        }
+        val dateBefore: Date = format.parse(date1)
+        val dateAfter: Date = format.parse(date2)
+        day = (TimeUnit.DAYS.convert(
+            dateAfter.time - dateBefore.time,
+            TimeUnit.MILLISECONDS
+        )).toInt()
+        //TODO Расчет Корма
+    }
 
     Column(modifier = modifier) {
         Box {
@@ -242,9 +273,7 @@ fun ExpensesEntryContainerProduct(
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expanded,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
+                        onDismissRequest = {}
                     ) {
                         filteredOptions.forEach { item ->
                             DropdownMenuItem(
@@ -266,6 +295,8 @@ fun ExpensesEntryContainerProduct(
                 onValueChange = {
                     count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                     validateCount(count)
+                    //TODO рассчет дня
+                    //TODO Расчет Корма
                 },
                 label = { Text("Количество") },
                 modifier = Modifier
@@ -331,7 +362,6 @@ fun ExpensesEntryContainerProduct(
                     text = { Text("М.") }
                 )
             }
-
         }
 
         OutlinedTextField(
@@ -409,10 +439,7 @@ fun ExpensesEntryContainerProduct(
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expandedCat,
-                        onDismissRequest = {
-//                            expandedCat = false
-                            // We shouldn't hide the menu when the user enters/removes any character
-                        }
+                        onDismissRequest = {}
                     ) {
                         filteredOptions.forEach { item ->
                             DropdownMenuItem(
@@ -427,6 +454,144 @@ fun ExpensesEntryContainerProduct(
                 }
             }
         }
+
+        Card {
+            Column(
+                Modifier
+                    .selectableGroup()
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            ) {
+                Text(
+                    text = "Доп. настройки",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp)
+                        .padding(top = 10.dp)
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = food,
+                        onCheckedChange = { food = it }
+                    )
+                    Text(text = "Корм")
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = showWarehouse,
+                        onCheckedChange = { showWarehouse = it }
+                    )
+                    Text(text = "Отображать на складе")
+                }
+
+            }
+        }
+
+        if (food) {
+            Text(text = "Выберите животных или укажите ежедневный расход в ручную")
+
+            animalList.forEach {
+                var selected by remember { mutableStateOf(false) }
+
+                FilterChip(
+                    onClick = {
+                        selected = !selected
+                        if (selected) {
+                            foodDay2 += it.foodDay
+                            countAnimal += 0
+                            //TODO рассчет дня
+                        } else {
+                            foodDay2 -= it.foodDay
+                            countAnimal += 0
+                            //TODO рассчет дня
+                        }
+                    },
+                    label = {
+                        Text(it.name)
+                    },
+                    selected = selected
+                )
+            }
+            Row {
+
+                OutlinedTextField(
+                    value = foodDay,
+                    onValueChange = {
+                        foodDay = it.replace(Regex("[^\\d.]"), "")
+                        //TODO рассчет дня
+                    },
+                    label = { Text("Расход") },
+                    modifier = Modifier
+//                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
+                    suffix = { Text(text = "г") },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    }
+                    )
+                )
+
+                OutlinedTextField(
+                    value = countAnimal,
+                    onValueChange = {
+                        countAnimal = it.replace(Regex("[^\\d.]"), "")
+                        //TODO рассчет дня
+                    },
+                    label = { Text("Кол-во голов") },
+                    modifier = Modifier
+//                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
+                    suffix = { Text(text = "шт.") },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        focusManager.moveFocus(
+                            FocusDirection.Down
+                        )
+                    }
+                    )
+                )
+            }
+        }
+
+
+
+
+        OutlinedTextField(
+            value = date1,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Дата окончания кормов") },
+            supportingText = {
+                Text("Выберите дату сами или введите вручную")
+            },
+            trailingIcon = {
+                IconButton(onClick = { openDialog = true }) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_calendar_month_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 2.dp)
+                .clickable {
+                    openDialog = true
+                }
+        )
+
+
 
         OutlinedTextField(
             value = date1,
@@ -515,6 +680,15 @@ fun ExpensesEntryContainerProduct(
     }
 }
 
+fun SettingDay(date:String,count:Double, foodDay:Int,countAnimal:Int) : String {
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    val dateLocal = LocalDate.parse(date, formatter)
+    val newDate = dateLocal.plusDays((count/((foodDay.toDouble()/1000)*countAnimal.toDouble()))
+        .toLong())
+    return newDate.format(formatter)
+}
+
+
 
 data class ExpensesTableInsert(
     var id: Int,
@@ -526,5 +700,5 @@ data class ExpensesTableInsert(
     var priceAll: Double,
     var suffix: String,
     var category: String,
-    var note:String
+    var note: String
 )
