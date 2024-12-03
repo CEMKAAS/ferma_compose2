@@ -14,6 +14,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -99,6 +100,9 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemsCategoryExpensesList(id: Int): Flow<List<String>> =
         itemDao.getItemsCategoryExpensesList(id)
+
+    override fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>> =
+        itemDao.getItemsAnimalExpensesList(id)
 
     override suspend fun insertExpenses(item: ExpensesTable) = itemDao.insertExpenses(item)
     override suspend fun updateExpenses(item: ExpensesTable) = itemDao.updateExpenses(item)

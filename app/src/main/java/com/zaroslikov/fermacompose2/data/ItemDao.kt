@@ -36,6 +36,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -177,6 +178,9 @@ interface ItemDao {
 
     @Query("SELECT MyFermaEXPENSES.category from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.category")
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
+
+    @Query("SELECT a.name as name, a.foodDay as foodDay, c.count as countAnimal from AnimalTable as a JOIN AnimalCountTable as c ON a.id = c.idAnimal Where idPT=:id")
+    fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertExpenses(item: ExpensesTable)
@@ -546,7 +550,7 @@ interface ItemDao {
 
     /*
      *
-    Note
+     * Note
      *
      */
     @Query("SELECT * from NoteFerma Where idPT=:id ORDER BY strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) DESC")

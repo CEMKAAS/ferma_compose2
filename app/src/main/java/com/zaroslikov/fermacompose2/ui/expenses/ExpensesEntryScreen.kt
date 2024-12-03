@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -24,6 +26,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +37,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -87,6 +91,7 @@ fun ExpensesEntryProduct(
     val context = LocalContext.current
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
+    val animalUiState by viewModel.animalUiState.collectAsState()
 
     val idProject = viewModel.itemId
 
@@ -104,6 +109,7 @@ fun ExpensesEntryProduct(
                 .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
+            animalList = animalUiState.animalList,
             saveInRoomSale = {
                 coroutineScope.launch {
                     viewModel.saveItem(
@@ -129,7 +135,7 @@ fun ExpensesEntryProduct(
                     ).show()
                     onNavigateUp()
                 }
-            },
+            }
         )
     }
 }
@@ -140,7 +146,7 @@ fun ExpensesEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<AnimalTable>
+    animalList: List<AnimalExpensesList>,
     saveInRoomSale: (ExpensesTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
@@ -149,13 +155,16 @@ fun ExpensesEntryContainerProduct(
     var suffix by remember { mutableStateOf("Шт.") }
     var priceAll by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
-    var countAnimal2 by remember { mutableStateOf(0)}
-    var foodDay2 by remember { mutableStateOf(0)}
-    var countAnimal by remember { mutableStateOf(countAnimal2.toString()) }
-    var foodDay by remember { mutableStateOf(foodDay2.toString()) }
+
+    var countAnimal2 by remember { mutableIntStateOf(0) }
+    var foodDay2 by remember { mutableIntStateOf(0) }
+
+    var countAnimal by remember { mutableStateOf("") }
+    var foodDay by remember { mutableStateOf("") }
+
     var food by remember { mutableStateOf(false) }
     var showWarehouse by remember { mutableStateOf(false) }
-    var day by remember { mutableStateOf(1)}
+    var day by remember { mutableStateOf(1) }
 
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
@@ -216,13 +225,7 @@ fun ExpensesEntryContainerProduct(
             date1 = date
             openDialog = false
         }
-        val dateBefore: Date = format.parse(date1)
-        val dateAfter: Date = format.parse(date2)
-        day = (TimeUnit.DAYS.convert(
-            dateAfter.time - dateBefore.time,
-            TimeUnit.MILLISECONDS
-        )).toInt()
-        //TODO Расчет Корма
+        foodDay2 = settingFood(date1, date2, count.toDouble(), countAnimal2)
     }
 
     Column(modifier = modifier) {
@@ -295,7 +298,7 @@ fun ExpensesEntryContainerProduct(
                 onValueChange = {
                     count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                     validateCount(count)
-                    //TODO рассчет дня
+//                    date2 = settingDay(date1, count.toDouble(), foodDay2, countAnimal2)
                     //TODO Расчет Корма
                 },
                 label = { Text("Количество") },
@@ -500,18 +503,30 @@ fun ExpensesEntryContainerProduct(
                         selected = !selected
                         if (selected) {
                             foodDay2 += it.foodDay
-                            countAnimal += 0
-                            //TODO рассчет дня
+                            countAnimal2 += it.countAnimal
                         } else {
                             foodDay2 -= it.foodDay
-                            countAnimal += 0
-                            //TODO рассчет дня
+                            countAnimal2 -= it.countAnimal
                         }
+                        foodDay = foodDay2.toString()
+                        countAnimal = countAnimal2.toString()
+//                        date2 = settingDay(date1, count.toDouble(), foodDay2, countAnimal2)
                     },
                     label = {
                         Text(it.name)
                     },
-                    selected = selected
+                    selected = selected,
+                    leadingIcon = if (selected) {
+                        {
+                            Icon(
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = "Done icon",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                            )
+                        }
+                    } else {
+                        null
+                    },
                 )
             }
             Row {
@@ -520,7 +535,7 @@ fun ExpensesEntryContainerProduct(
                     value = foodDay,
                     onValueChange = {
                         foodDay = it.replace(Regex("[^\\d.]"), "")
-                        //TODO рассчет дня
+//                        date2 = settingDay(date1, count.toDouble(), foodDay2, countAnimal2)
                     },
                     label = { Text("Расход") },
                     modifier = Modifier
@@ -543,7 +558,7 @@ fun ExpensesEntryContainerProduct(
                     value = countAnimal,
                     onValueChange = {
                         countAnimal = it.replace(Regex("[^\\d.]"), "")
-                        //TODO рассчет дня
+//                        date2 = settingDay(date1, count.toDouble(), foodDay2, countAnimal2)
                     },
                     label = { Text("Кол-во голов") },
                     modifier = Modifier
@@ -680,14 +695,24 @@ fun ExpensesEntryContainerProduct(
     }
 }
 
-fun SettingDay(date:String,count:Double, foodDay:Int,countAnimal:Int) : String {
+fun settingDay(date: String, count: Double, foodDay: Int, countAnimal: Int): String {
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
     val dateLocal = LocalDate.parse(date, formatter)
-    val newDate = dateLocal.plusDays((count/((foodDay.toDouble()/1000)*countAnimal.toDouble()))
-        .toLong())
+    val days = (50 / ((200 / 1000) * 2)).toLong()
+    val newDate = dateLocal.plusDays(days)
     return newDate.format(formatter)
 }
 
+fun settingFood(date1: String, date2: String, count: Double, countAnimal: Int): Int {
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val dateBefore: Date = format.parse(date1)
+    val dateAfter: Date = format.parse(date2)
+    val day = (TimeUnit.DAYS.convert(
+        dateAfter.time - dateBefore.time,
+        TimeUnit.MILLISECONDS
+    )).toDouble()
+    return ((count * 1000) / (day * countAnimal.toDouble())).toInt()
+}
 
 
 data class ExpensesTableInsert(

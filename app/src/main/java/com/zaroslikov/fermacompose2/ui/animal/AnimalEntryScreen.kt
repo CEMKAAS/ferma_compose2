@@ -543,6 +543,7 @@ fun AnimalEntryContainer(
                                     image = "0",
                                     arhiv = false,
                                     price = price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+                                    foodDay = 200,
                                     idPT = idPT
                                 ),
                                 AnimalCountTable(

@@ -121,20 +121,20 @@ class AnimalCardViewModel(
 //    )
 //)
 
-data class AnimalCardUiState23(
-    val animalTable2: AnimalTable = AnimalTable(
-        0,
-        "",
-        "",
-        "",
-        true,
-        "",
-        "",
-        "",
-        false,
-        0
-    )
-)
+//data class AnimalCardUiState23(
+//    val animalTable2: AnimalTable = AnimalTable(
+//        0,
+//        "",
+//        "",
+//        "",
+//        true,
+//        "",
+//        "",
+//        "",
+//        false,
+//        0
+//    )
+//)
 
 data class AnimalCoutUiStateLimit(val itemList: List<AnimalCountTable> = listOf())
 

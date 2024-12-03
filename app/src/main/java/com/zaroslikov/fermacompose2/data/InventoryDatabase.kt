@@ -28,6 +28,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
+import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
@@ -35,7 +36,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 /**
  * Database class with a singleton Instance object.
  */
-@Database(entities = [AddTable::class, SaleTable::class, ExpensesTable::class, WriteOffTable::class, ProjectTable::class, Incubator::class, AnimalTable::class, AnimalCountTable::class, AnimalSizeTable::class, AnimalVaccinationTable::class, AnimalWeightTable::class], version = 1, exportSchema = false)
+@Database(entities = [AddTable::class, SaleTable::class, ExpensesTable::class, WriteOffTable::class, ProjectTable::class, Incubator::class, AnimalTable::class, AnimalCountTable::class, AnimalSizeTable::class, AnimalVaccinationTable::class, AnimalWeightTable::class, NoteTable::class], version = 1, exportSchema = false)
 abstract class InventoryDatabase : RoomDatabase() {
 
     abstract fun itemDao(): ItemDao

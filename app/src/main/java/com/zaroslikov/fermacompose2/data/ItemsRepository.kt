@@ -35,6 +35,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
@@ -83,21 +84,10 @@ interface ItemsRepository {
     suspend fun insertProject(projectTable: ProjectTable)
     suspend fun insertProjectLong(projectTable: ProjectTable): Long
 
-    /**
-     * Insert item in the data source
-     */
     suspend fun insertItem(item: AddTable)
 
-    /**
-     * Delete item from the data source
-     */
     suspend fun deleteItem(item: AddTable)
-
-    /**
-     * Update item in the data source
-     */
     suspend fun updateItem(item: AddTable)
-
 
     fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
     fun getItemSale(id: Int): Flow<SaleTable>
@@ -116,6 +106,8 @@ interface ItemsRepository {
     fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
 
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
+
+    fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
 
     suspend fun insertExpenses(item: ExpensesTable)
 
@@ -164,6 +156,7 @@ interface ItemsRepository {
     fun getExpensesAllList(id: Int): Flow<List<Fin>>
     fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>>
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
+
     fun getProductListCategoryIncomeCurrentMonth(
         id: Int,
         dateBegin: String,

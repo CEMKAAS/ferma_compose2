@@ -10,6 +10,7 @@ import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
+import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.BuyerUiState
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,12 +42,12 @@ class ExpensesEntryViewModel(
                 initialValue = CategoryUiState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalAddList(itemId).map { AnimalUiState(it) }
+    val animalUiState: StateFlow<AnimalExpensesUiState> =
+        itemsRepository.getItemsAnimalExpensesList(itemId).map { AnimalExpensesUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
+                initialValue = AnimalExpensesUiState()
             )
 
 
@@ -59,3 +60,7 @@ class ExpensesEntryViewModel(
     }
 
 }
+
+
+data class AnimalExpensesUiState(val animalList: List<AnimalExpensesList> = listOf())
+data class AnimalExpensesList(val name: String, val foodDay: Int, val countAnimal: Int)
