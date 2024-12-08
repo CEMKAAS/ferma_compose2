@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
@@ -55,7 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
@@ -94,7 +93,7 @@ fun WriteOffEditProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            titleList = titleUiState.titleList,
+            titleList = titleUiState.animalList,
             writeOffTable = viewModel.itemUiState,
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {
@@ -109,14 +108,13 @@ fun WriteOffEditProduct(
                         onNavigateUp()
                     }
                 }
-            },
-            deleteAdd = {
-                coroutineScope.launch {
-                    viewModel.deleteItem()
-                    onNavigateUp()
-                }
             }
-        )
+        ) {
+            coroutineScope.launch {
+                viewModel.deleteItem()
+                onNavigateUp()
+            }
+        }
     }
 }
 
@@ -125,7 +123,7 @@ fun WriteOffEditProduct(
 fun WriteOffEditContainerProduct(
     modifier: Modifier,
     writeOffTable: WriteOffTableUiState,
-    titleList: List<String>,
+    titleList: List<PairString>,
     onValueChange: (WriteOffTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
     deleteAdd: () -> Unit
@@ -190,15 +188,14 @@ fun WriteOffEditContainerProduct(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = item,
+                                    text = "${item.name} - ${item.type}",
                                     fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
                                 selectedItemIndex = index
                                 expanded = false
-//                                title = titleList[selectedItemIndex]
-                                onValueChange(writeOffTable.copy(title = item))
+                                onValueChange(writeOffTable.copy(title = item.name))
                             }
                         )
                     }

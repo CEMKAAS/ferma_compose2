@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 
 @Entity(
     tableName = "MyFermaEXPENSES",
@@ -32,7 +33,12 @@ data class ExpensesTable(
     val priceAll: Double, //Заголовок кол-во товара
     var suffix: String,
     var category: String,
-    val note : String,
+    val note: String,
+    val food: Boolean,
+    val showWarehouse: Boolean,
+    val foodEndDay: String,
+    val foodDay: Int,
+    val countAnimal: Int,
     @ColumnInfo(name = "idPT")
     val idPT: Int,
 )

@@ -81,6 +81,6 @@ fun AnimalTable.toAnimaEditUiState(
 )
 
 fun AnimalEditUiState.toAnimalTable(): AnimalTable = AnimalTable(
-    id, name, type, data, groop, sex, note, image, arhiv, price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), foodDay.toInt(), idPT
+    id, name, type, data, groop, sex, note, image, arhiv, price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), foodDay.toDouble(), idPT
 )
 

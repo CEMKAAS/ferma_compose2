@@ -58,6 +58,7 @@ import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
@@ -98,7 +99,7 @@ fun WriteOffEntryProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            titleList = titleUiState.titleList,
+            titleList = titleUiState.animalList,
             saveInRoomSale = {
                 coroutineScope.launch {
                     viewModel.saveItem(
@@ -132,7 +133,7 @@ fun WriteOffEntryProduct(
 @Composable
 fun WriteOffEntryContainerProduct(
     modifier: Modifier,
-    titleList: List<String>,
+    titleList: List<PairString>,
     saveInRoomSale: (WriteOffTableInsert) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
@@ -153,7 +154,7 @@ fun WriteOffEntryContainerProduct(
     var selectedItemIndex by remember { mutableIntStateOf(0) }
 
     fun validatePrice(text: String) {
-        isErrorPrice= text == ""
+        isErrorPrice = text == ""
     }
 
     fun validateCount(text: String) {
@@ -217,14 +218,14 @@ fun WriteOffEntryContainerProduct(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = item,
+                                    text = "${item.name} - ${item.type}",
                                     fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
                                 selectedItemIndex = index
                                 expanded = false
-                                title = titleList[selectedItemIndex]
+                                title = titleList[selectedItemIndex].name
                             }
                         )
                     }
@@ -428,7 +429,7 @@ fun WriteOffEntryContainerProduct(
                                     .toDouble(),
                                 status = status,
                                 note = note
-                                )
+                            )
                         )
                         val eventParameters: MutableMap<String, Any> = HashMap()
                         eventParameters["Имя"] = title
@@ -459,6 +460,6 @@ data class WriteOffTableInsert(
     var status: Int,
     var priceAll: Double,
     var suffix: String,
-    var note:String
+    var note: String
 )
 

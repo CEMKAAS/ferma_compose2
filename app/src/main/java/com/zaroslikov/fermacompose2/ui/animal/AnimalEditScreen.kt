@@ -431,6 +431,39 @@ fun AnimalEditContainer(
         }
 
         OutlinedTextField(
+            value = animalEditUiState.foodDay,
+            onValueChange = {
+                onValueChange(animalEditUiState.copy(foodDay = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                validatePrice(it)
+            },
+            label = { Text("Расход кормов") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            supportingText = {
+                if (isErrorPrice) {
+                    Text(
+                        text = "Не указан ежедневный расход корма на голову",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Text("Укажите ежедневный расход корма на голову")
+                }
+            },
+            suffix = { Text(text = "кг.") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }),
+            isError = isErrorPrice
+        )
+
+        OutlinedTextField(
             value = animalEditUiState.note,
             onValueChange = {
                 onValueChange(animalEditUiState.copy(note = it))

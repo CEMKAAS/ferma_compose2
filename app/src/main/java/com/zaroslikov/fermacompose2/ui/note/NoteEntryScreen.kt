@@ -141,44 +141,44 @@ fun NoteEntryContainer(
                 )
             })
         )
-    }
 
-    OutlinedTextField(
-        value = note,
-        onValueChange = {
-            note = it
-        },
-        label = { Text("Заметка") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            capitalization = KeyboardCapitalization.Sentences
+        OutlinedTextField(
+            value = note,
+            onValueChange = {
+                note = it
+            },
+            label = { Text("Заметка") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Sentences
+            )
         )
-    )
 
-    Button(
-        onClick = {
-            if (errorBoolean()) {
-                saveInRoomAdd(
-                    NoteTableInsert(
-                        title = title,
-                        note = note,
-                        date = date
+        Button(
+            onClick = {
+                if (errorBoolean()) {
+                    saveInRoomAdd(
+                        NoteTableInsert(
+                            title = title,
+                            note = note,
+                            date = date
+                        )
                     )
-                )
-                val eventParameters: MutableMap<String, Any> = HashMap()
-                eventParameters["Заголовок"] = title
-                eventParameters["Заметка"] = note
-                AppMetrica.reportEvent("Заметки", eventParameters);
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 15.dp)
-    ) {
-        Text(text = "Добавить")
+                    val eventParameters: MutableMap<String, Any> = HashMap()
+                    eventParameters["Заголовок"] = title
+                    eventParameters["Заметка"] = note
+                    AppMetrica.reportEvent("Заметки", eventParameters);
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 15.dp)
+        ) {
+            Text(text = "Добавить")
+        }
     }
 }
 

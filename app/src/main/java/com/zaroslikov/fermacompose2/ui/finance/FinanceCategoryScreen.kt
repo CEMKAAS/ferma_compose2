@@ -64,6 +64,7 @@ fun FinanceCategoryScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val financeCategoryState by viewModel.financeCategoryUiState.collectAsState()
 
+
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -74,8 +75,11 @@ fun FinanceCategoryScreen(
             itemList = financeCategoryState.itemList,
             modifier = modifier.fillMaxSize(),
             contentPadding = innerPadding,
-            navigationToAnalysis = { navigationToAnalysis(AnalysisNav(idProject = viewModel.itemId, name = it))
-                AppMetrica.reportEvent("Анализ через финансы")
+            navigationToAnalysis = {
+                if (viewModel.itemBoolean) {
+                    navigationToAnalysis(AnalysisNav(idProject = viewModel.itemId, name = it))
+                    AppMetrica.reportEvent("Анализ через финансы")
+                }
             }
         )
     }
@@ -88,7 +92,7 @@ private fun FinanceCategoryBody(
     itemList: List<Fin>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    navigationToAnalysis: (String) -> Unit
+    navigationToAnalysis: (String) -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

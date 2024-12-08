@@ -46,12 +46,12 @@ class WriteOffEditViewModel(
             itemDetails
     }
 
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleAddList(itemIdPT).map { TitleUiState(it) }
+    val titleUiState: StateFlow<AnimalUiState> =
+        itemsRepository.getItemsWriteoffList(itemIdPT).map { AnimalUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue = AnimalUiState()
             )
 
 

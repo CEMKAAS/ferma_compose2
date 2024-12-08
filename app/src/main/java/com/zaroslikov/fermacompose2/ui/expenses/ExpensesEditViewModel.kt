@@ -11,6 +11,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.toSaleTableUiState
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -86,11 +87,30 @@ data class ExpensesTableUiState(
     val idPT: Int = 0,
     var suffix: String = "",
     var category: String = "",
-    val note:String = ""
+    val note: String = "",
+    val food: Boolean = false,
+    val showWarehouse: Boolean = false,
+    val foodDay: Int = 0,
+    val foodEndDay: String = "",
+    val countAnimal: Int = 0,
 )
 
 fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, category, note
+    id,
+    title,
+    count.toString(),
+    day,
+    mount,
+    year,
+    priceAll.toString(),
+    idPT,
+    suffix,
+    category,
+    note,
+    food,
+    showWarehouse,
+    foodDay,
+    foodEndDay, countAnimal
 )
 
 fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
@@ -104,6 +124,12 @@ fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
     suffix = suffix,
     category = category,
     note = note,
-    idPT = idPT
+    idPT = idPT,
+    foodDay = foodDay,
+    showWarehouse = showWarehouse,
+    food = food,
+    foodEndDay = foodEndDay,
+    countAnimal = countAnimal
+
 )
 

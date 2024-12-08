@@ -27,6 +27,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.NoteTable
@@ -78,6 +79,8 @@ interface ItemsRepository {
 
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
 
+    fun getItemsWriteoffList(id: Int): Flow<List<PairString>>
+
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
     fun getItemsAnimalAddList(id: Int): Flow<List<PairString>>
 
@@ -109,11 +112,14 @@ interface ItemsRepository {
 
     fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
 
-    suspend fun insertExpenses(item: ExpensesTable)
-
+    suspend fun insertExpenses(item: ExpensesTable): Long
     suspend fun updateExpenses(item: ExpensesTable)
-
     suspend fun deleteExpenses(item: ExpensesTable)
+
+
+    suspend fun insertExpensesAnimal(item: ExpensesAnimalTable)
+    suspend fun updateExpensesAnimal(item: ExpensesAnimalTable)
+    suspend fun deleteExpensesAnimal(item: ExpensesAnimalTable)
 
     //WriteOff
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
@@ -131,7 +137,7 @@ interface ItemsRepository {
     fun getScrap(id: Int): Flow<Double>
 
     fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double>
-    fun getExpensesMountFin(id: Int, mount: Int, year: Int): Flow<Double>
+    fun getExpensesMountFin(id: Int, mount: Int, year: Int, yearMonth: String): Flow<Double>
 
 
     fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
@@ -154,6 +160,8 @@ interface ItemsRepository {
 
     fun getIncomeAllList(id: Int): Flow<List<Fin>>
     fun getExpensesAllList(id: Int): Flow<List<Fin>>
+    fun getExpensesAnimalAllList(id: Int): Flow<List<Fin>>
+
     fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>>
     fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>>
 
@@ -171,7 +179,16 @@ interface ItemsRepository {
         category: String
     ): Flow<List<Fin>>
 
+    fun getProductLisCategoryExpensesAnimalCurrentMonth(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<Fin>>
+
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
+    fun getCurrentFoodWarehouse(id: Int): Flow<List<ExpensesTable>>
+
+    fun getCurrentExpensesWarehouse(id: Int): Flow<List<WarehouseData>>
 
 
     // Analysis

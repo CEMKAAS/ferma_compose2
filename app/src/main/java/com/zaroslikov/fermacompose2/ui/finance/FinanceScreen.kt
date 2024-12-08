@@ -137,7 +137,6 @@ fun FinanceScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FinanceBody(
     currentBalance: Double,

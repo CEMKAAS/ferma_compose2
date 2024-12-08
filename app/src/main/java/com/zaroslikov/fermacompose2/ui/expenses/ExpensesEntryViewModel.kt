@@ -4,7 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
@@ -13,6 +15,7 @@ import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.BuyerUiState
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.setIdPT
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -51,8 +54,14 @@ class ExpensesEntryViewModel(
             )
 
 
-    suspend fun saveItem(expensesTable: ExpensesTable) {
-        itemsRepository.insertExpenses(expensesTable)
+    suspend fun saveItem(expensesTable: ExpensesTable, set: MutableSet<Long>) {
+        val id = itemsRepository.insertExpenses(expensesTable)
+
+
+        setExpensesAnimal(set, id, itemId).forEach {
+            itemsRepository.insertExpensesAnimal(it)
+        }
+
     }
 
     companion object {
@@ -61,6 +70,34 @@ class ExpensesEntryViewModel(
 
 }
 
+fun setExpensesAnimal(
+    set: MutableSet<Long>,
+    idExpenses: Long,
+    idPT: Int
+): MutableList<ExpensesAnimalTable> {
+
+    val list = mutableListOf<ExpensesAnimalTable>()
+
+    if (set.isNotEmpty()) {
+        set.forEach {
+            list.add(
+                ExpensesAnimalTable(
+                    id = 0,
+                    idExpenses = idExpenses,
+                    idAnimal = it,
+                    idPT = idPT.toLong()
+                )
+            )
+        }
+    }
+    return list
+}
+
 
 data class AnimalExpensesUiState(val animalList: List<AnimalExpensesList> = listOf())
-data class AnimalExpensesList(val name: String, val foodDay: Int, val countAnimal: Int)
+data class AnimalExpensesList(
+    val id: Int,
+    val name: String,
+    val foodDay: Double,
+    val countAnimal: Int
+)

@@ -94,7 +94,7 @@ class FinanceViewModel(
                 .filterNotNull()
                 .first().toDouble()
 
-            expensesMountUiState = itemsRepository.getExpensesMountFin(itemId, month, year)
+            expensesMountUiState = itemsRepository.getExpensesMountFin(itemId, month, year, "$year-$month")
                 .filterNotNull()
                 .first().toDouble()
         }
@@ -117,12 +117,6 @@ class FinanceViewModel(
 
 data class IncomeCategoryUiState(val itemList: List<Fin> = listOf())
 data class IncomeExpensesCategoryUiState(val itemList: List<IncomeExpensesDetails> = listOf())
-
-data class FinanceDetails(
-    val currentBalanceFinance: Double = 0.0,
-    val incomeFinance: Double = 0.0,
-    val expensesFinance: Double = 0.0
-)
 
 data class IncomeExpensesDetails(
     val title: String,

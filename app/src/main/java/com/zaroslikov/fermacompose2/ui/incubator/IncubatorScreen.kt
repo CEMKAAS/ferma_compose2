@@ -507,7 +507,7 @@ fun EndIncubator(
                                                     image = "",
                                                     arhiv = false,
                                                     idPT = idProject,
-                                                    foodDay = 0,
+                                                    foodDay = 0.0,
                                                     price = 0.0
                                                 ),projectTable.eggAllEND
                                             )
@@ -554,7 +554,7 @@ fun EndIncubator(
                                                 image = "",
                                                 arhiv = false,
                                                 idPT = idProject,
-                                                foodDay = 0,
+                                                foodDay = 0.0,
                                                 price = 0.0
                                             ),
                                             projectTable.eggAllEND

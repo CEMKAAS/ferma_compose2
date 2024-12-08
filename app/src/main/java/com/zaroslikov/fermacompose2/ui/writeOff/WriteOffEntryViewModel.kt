@@ -9,6 +9,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
+import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,12 +24,12 @@ class WriteOffEntryViewModel (
 
     val itemId: Int = checkNotNull(savedStateHandle[WriteOffEntryDestination.itemIdArg])
 
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleAddList(itemId).map { TitleUiState(it) }
+    val titleUiState: StateFlow<AnimalUiState> =
+        itemsRepository.getItemsWriteoffList(itemId).map { AnimalUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue = AnimalUiState()
             )
 
     suspend fun saveItem(writeOffTable: WriteOffTable) {
@@ -40,10 +41,3 @@ class WriteOffEntryViewModel (
     }
 
 }
-
-data class TitleWOUiState(val titleList: List<String> = listOf())
-
-
-/**
- * Ui State for HomeScreen
- */

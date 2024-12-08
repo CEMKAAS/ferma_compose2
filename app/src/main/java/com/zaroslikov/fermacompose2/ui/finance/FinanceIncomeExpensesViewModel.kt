@@ -70,6 +70,15 @@ class FinanceIncomeExpensesViewModel(
             )
     }
 
+    val aminalExpensesUIState: StateFlow<FinanceCategoryState> =
+        itemsRepository.getExpensesAnimalAllList(itemId)
+            .map { FinanceCategoryState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = FinanceCategoryState()
+            )
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -77,7 +86,4 @@ class FinanceIncomeExpensesViewModel(
 
 }
 
-/**
- * Ui State for HomeScreen
- */
 data class FinanceCatState(val itemList: List<Fin> = listOf())

@@ -51,6 +51,17 @@ class FinanceCategoryViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = FinanceCategoryState()
             )
+    } else if (itemCategory == " Мои Животные ") {
+        itemsRepository.getProductLisCategoryExpensesAnimalCurrentMonth(
+            itemId,
+            dateBegin, dateEnd
+        )
+            .map { FinanceCategoryState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = FinanceCategoryState()
+            )
     } else {
         itemsRepository.getProductLisCategoryExpensesCurrentMonth(
             itemId,
@@ -72,9 +83,6 @@ class FinanceCategoryViewModel(
 
 }
 
-/**
- * Ui State for HomeScreen
- */
 data class FinanceCategoryState(val itemList: List<Fin> = listOf())
 
 

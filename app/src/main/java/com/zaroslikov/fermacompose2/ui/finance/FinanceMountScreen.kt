@@ -85,9 +85,6 @@ object FinanceMountDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinanceMountScreen(
@@ -119,9 +116,7 @@ fun FinanceMountScreen(
             upAnalisis = {
                 viewModel.upAnalisis()
 
-                text = "${format.format(viewModel.dateBegin)} - ${
-                    format.format(viewModel.dateEnd)
-                }"
+                text = "${format.format(viewModel.dateBegin)} - ${format.format(viewModel.dateEnd)}"
             }
         )
     }
@@ -169,8 +164,6 @@ fun FinanceMountScreen(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FinanceMountBody(
     incomeMount: Double,
@@ -247,7 +240,7 @@ private fun FinanceMountBody(
                 )
             },
             idPT = idPT,
-            heading = "Доходы по категории за $text",
+            heading = "Доходы по категориям за $text",
             headingNull = "Доходов за $text не было :("
         )
 
@@ -263,7 +256,7 @@ private fun FinanceMountBody(
                 )
             },
             idPT = idPT,
-            heading = "Расходы по категории за $text",
+            heading = "Расходы по категориям за $text",
             headingNull = "Расходов за $text не было (Это хорошо)"
         )
     }
@@ -316,7 +309,6 @@ fun LazyRowMount(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardMountRow(
     fin: Fin,

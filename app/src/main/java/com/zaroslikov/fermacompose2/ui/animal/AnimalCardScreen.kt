@@ -117,6 +117,7 @@ fun AnimalCardContainer(
             }
             Text(text = "Дата добавления: ${animalTable.data}", modifier = modifierText)
             Text(text = "Стомость: ${animalTable.price} ₽", modifier = modifierText)
+            Text(text = "Потребления корма: ${animalTable.foodDay} кг", modifier = modifierText)
         }
 
         if (!animalTable.groop) {

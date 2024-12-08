@@ -129,6 +129,7 @@ fun AnimalEntryContainer(
     var count by remember { mutableStateOf("1") }
     var note by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
+    var foodDay by remember { mutableStateOf("") }
 
 
     var expandedSex by remember { mutableStateOf(false) }
@@ -504,6 +505,32 @@ fun AnimalEntryContainer(
         }
 
         OutlinedTextField(
+            value = foodDay,
+            onValueChange = {
+                foodDay = it
+            },
+            label = { Text(text = "Расход корма") },
+            supportingText = {
+                Text("Укажите ежедневный расход корма на голову")
+            },
+            suffix = { Text(text = "кг.") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Number,
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(
+                    FocusDirection.Down
+                )
+            }
+            )
+        )
+
+        OutlinedTextField(
             value = note,
             onValueChange = {
                 note = it
@@ -543,7 +570,7 @@ fun AnimalEntryContainer(
                                     image = "0",
                                     arhiv = false,
                                     price = price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-                                    foodDay = 200,
+                                    foodDay = foodDay.toDouble(),
                                     idPT = idPT
                                 ),
                                 AnimalCountTable(

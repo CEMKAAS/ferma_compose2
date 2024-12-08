@@ -1,8 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.note
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -12,6 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -35,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -187,9 +194,11 @@ private fun InventoryList(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = contentPadding
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = contentPadding,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         items(items = itemList, key = { it.id }) { item ->
             NoteCard(noteTable = item,
@@ -212,31 +221,39 @@ fun NoteCard(
     ) {
 
         Column(
-            modifier = Modifier.fillMaxWidth(0.7f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
         ) {
             Text(
                 text = noteTable.title,
                 modifier = Modifier
-                    .wrapContentSize()
-                    .padding(6.dp),
+                    .padding(vertical = 6.dp),
                 fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
                 fontSize = 16.sp
             )
 
             Text(
-                text = noteTable.title,
+                text = noteTable.note,
                 modifier = Modifier
-                    .wrapContentSize()
-                    .padding(vertical = 3.dp, horizontal = 6.dp)
+                    .padding(vertical = 6.dp),
+                maxLines = 3
             )
 
-            Text(
-                text = "Последнее редактирование: ${noteTable.note}",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(vertical = 3.dp, horizontal = 6.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.baseline_edit_calendar_24),
+                    contentDescription = "Дата редактирования"
+                )
+                Text(
+                    text = noteTable.date,
+                    modifier = Modifier
+                        .padding(vertical = 6.dp)
+                        .padding(start = 10.dp)
+                )
+            }
+
         }
     }
 }
