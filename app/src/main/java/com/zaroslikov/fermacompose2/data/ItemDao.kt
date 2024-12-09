@@ -38,6 +38,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
+import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -196,6 +197,18 @@ interface ItemDao {
                 ") t ON a.id = t.idAnimal Where a.idPT=:id"
     )
     fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
+
+    @Query(
+        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal, case when e.idAnimal = a.id and e.idExpenses =:idExpenses Then 1 else 0 end as ps  from AnimalTable a JOIN (" +
+                "    SELECT idAnimal, count" +
+                "    FROM animalcounttable" +
+                "    WHERE id IN (" +
+                "        SELECT MAX(id)" +
+                "        FROM animalcounttable " +
+                "    GROUP by idAnimal)" +
+                ") t ON a.id = t.idAnimal JOIN ExpensesAnimalTable e ON e.idAnimal = a.id Where a.idPT=:id"
+    )
+    suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses:Int): List<AnimalExpensesList2>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertExpenses(item: ExpensesTable):Long

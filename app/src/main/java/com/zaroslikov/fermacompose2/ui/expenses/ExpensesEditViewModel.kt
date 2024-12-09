@@ -9,11 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
-import com.zaroslikov.fermacompose2.ui.sale.toSaleTableUiState
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
+import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -30,8 +28,8 @@ class ExpensesEditViewModel(
     private val itemId: Int = checkNotNull(savedStateHandle[ExpensesEditDestination.itemIdArg])
     private val itemIdPT: Int = checkNotNull(savedStateHandle[ExpensesEditDestination.itemIdArgTwo])
 
-    private val _items = mutableStateOf<List<Long>>(emptyList())
-    val items: State<List<Long>> = _items
+    private val _items = mutableStateOf<List<AnimalExpensesList2>>(emptyList())
+    val items: State<List<AnimalExpensesList2>> = _items
     var itemUiState by mutableStateOf(ExpensesTableUiState())
         private set
 
@@ -42,12 +40,12 @@ class ExpensesEditViewModel(
                 .first()
                 .toExpensesTableUiState()
 
+            _items.value = itemsRepository.getItemsAnimalExpensesList2(itemId, itemIdPT)
         }
     }
 
-    fun updateUiState(itemDetails: ExpensesTableUiState) {
-        itemUiState =
-            itemDetails
+    fun updateUiState2(itemDetails: AnimalExpensesList2) {
+        itemDetails.ps
     }
 
     val titleUiState: StateFlow<TitleUiState> =
@@ -75,10 +73,24 @@ class ExpensesEditViewModel(
                 initialValue = AnimalExpensesUiState()
             )
 
-    fun itemlist2(){
+
+//    val animalUiState2: StateFlow<AnimalExpensesUiState2> =
+//        itemsRepository.getItemsAnimalExpensesList2(itemId, itemIdPT).map { AnimalExpensesUiState2(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = AnimalExpensesUiState2()
+//            )
+
+    fun itemlist2() {
         viewModelScope.launch {
-            _items.value = itemsRepository.getItemExpensesAnimal(itemId)
+
         }
+    }
+
+    fun updateUiState(itemDetails: ExpensesTableUiState) {
+        itemUiState =
+            itemDetails
     }
 
 

@@ -6,16 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.Incubator
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
-import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
-import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
-import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
-import com.zaroslikov.fermacompose2.ui.sale.BuyerUiState
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.setIdPT
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -95,9 +87,18 @@ fun setExpensesAnimal(
 
 
 data class AnimalExpensesUiState(val animalList: List<AnimalExpensesList> = listOf())
+data class AnimalExpensesUiState2(val animalList: List<AnimalExpensesList2> = listOf())
+
 data class AnimalExpensesList(
     val id: Int,
     val name: String,
     val foodDay: Double,
     val countAnimal: Int
+)
+data class AnimalExpensesList2(
+    val id: Int,
+    val name: String,
+    val foodDay: Double,
+    val countAnimal: Int,
+    var ps:Boolean
 )

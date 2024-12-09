@@ -37,6 +37,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
+import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
@@ -111,6 +112,8 @@ interface ItemsRepository {
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
 
     fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
+
+    suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses:Int): List<AnimalExpensesList2>
 
     suspend fun insertExpenses(item: ExpensesTable): Long
     suspend fun updateExpenses(item: ExpensesTable)

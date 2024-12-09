@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
@@ -40,6 +39,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -61,7 +61,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
@@ -87,7 +86,7 @@ fun ExpensesEditProduct(
 
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
-    val animalUiState by viewModel.animalUiState.collectAsState()
+//    val animalUiState2 by viewModel.animalUiState2.collectAsState()
 
     viewModel.itemlist2()
     val projectList = viewModel.items.value
@@ -107,7 +106,7 @@ fun ExpensesEditProduct(
             expensesTable = viewModel.itemUiState,
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
-            animalList = animalUiState.animalList,
+//            animalList = animalUiState2.animalList,
             list = projectList,
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {
@@ -128,10 +127,12 @@ fun ExpensesEditProduct(
                     viewModel.deleteItem()
                     onNavigateUp()
                 }
-            }
+            },
+            sd = viewModel::updateUiState2
         )
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -140,11 +141,12 @@ fun ExpensesEditContainerProduct(
     expensesTable: ExpensesTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<AnimalExpensesList>,
-    list:List<Long>,
+//    animalList: List<AnimalExpensesList2>,
+    list: List<AnimalExpensesList2>,
     onValueChange: (ExpensesTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
-    deleteAdd: () -> Unit
+    deleteAdd: () -> Unit,
+    sd: (AnimalExpensesList2) -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
     var expandedSuf by remember { mutableStateOf(false) }
@@ -246,7 +248,11 @@ fun ExpensesEditContainerProduct(
             OutlinedTextField(
                 value = expensesTable.count,
                 onValueChange = {
-                    onValueChange(expensesTable.copy(count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                    onValueChange(
+                        expensesTable.copy(
+                            count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                        )
+                    )
                     validateCount(it)
                 },
                 label = { Text("Количество") },
@@ -330,7 +336,11 @@ fun ExpensesEditContainerProduct(
         OutlinedTextField(
             value = expensesTable.priceAll,
             onValueChange = {
-                onValueChange(expensesTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                onValueChange(
+                    expensesTable.copy(
+                        priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                    )
+                )
                 validatePrice(expensesTable.priceAll)
             },
             label = { Text("Стоимость") },
@@ -412,7 +422,12 @@ fun ExpensesEditContainerProduct(
             }
         }
 
-        var formattedDate = String.format("%02d.%02d.%d", expensesTable.day, expensesTable.mount, expensesTable.year)
+        var formattedDate = String.format(
+            "%02d.%02d.%d",
+            expensesTable.day,
+            expensesTable.mount,
+            expensesTable.year
+        )
 
         if (openDialog) {
             val datePickerState = rememberDatePickerState(
@@ -506,7 +521,14 @@ fun ExpensesEditContainerProduct(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = expensesTable.food,
-                        onCheckedChange = { onValueChange(expensesTable.copy(food = it, showWarehouse = it)) },
+                        onCheckedChange = {
+                            onValueChange(
+                                expensesTable.copy(
+                                    food = it,
+                                    showWarehouse = it
+                                )
+                            )
+                        },
                         enabled = expensesTable.count != ""
                     )
                     Text(text = "Корм")
@@ -514,7 +536,7 @@ fun ExpensesEditContainerProduct(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = expensesTable.showWarehouse,
-                        onCheckedChange = {onValueChange(expensesTable.copy(showWarehouse = it))},
+                        onCheckedChange = { onValueChange(expensesTable.copy(showWarehouse = it)) },
                         enabled = if (expensesTable.count == "") {
                             false
                         } else if (expensesTable.food) {
@@ -549,15 +571,19 @@ fun ExpensesEditContainerProduct(
                         .padding(horizontal = 14.dp)
                         .padding(top = 5.dp)
                 ) {
-                    animalList.forEach {
-                        var selected by remember { mutableStateOf(false) }
-                        if (list.isNotEmpty()) {
-                            if (list.contains(it.id.toLong())) selected = true else selected = false
-                        }
+//                    val itemList = remember { mutableStateListOf(list.toTypedArray()) }
 
+
+//                    if (itemList.isNotEmpty()) {
+
+                    list.forEachIndexed { index, it ->
+//                        if (list.isNotEmpty()) {
+//                            selected = list.contains(it.id.toLong())
+//                        }
+                        var sp by rememberSaveable { mutableStateOf(it.ps) }
                         FilterChip(
                             onClick = {
-                                selected = !selected
+                                sp = !sp
 //                                if (selected) {
 //                                    foodDay2 += it.foodDay
 //                                    countAnimal2 += it.countAnimal
@@ -574,8 +600,8 @@ fun ExpensesEditContainerProduct(
                             label = {
                                 Text(it.name)
                             },
-                            selected = selected,
-                            leadingIcon = if (selected) {
+                            selected = sp,
+                            leadingIcon = if (sp) {
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Done,
@@ -589,17 +615,19 @@ fun ExpensesEditContainerProduct(
                         )
                     }
                 }
-                Text(
-                    text = "Указать ежедневный расход в ручную",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp)
-                        .padding(top = 5.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+            }
+
+            Text(
+                text = "Указать ежедневный расход в ручную",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp)
+                    .padding(top = 5.dp)
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 //                    OutlinedTextField(
 //                        value = foodDay,
 //                        onValueChange = {
@@ -654,9 +682,9 @@ fun ExpensesEditContainerProduct(
 //                        }
 //                        )
 //                    )
-                }
             }
         }
+
 
 
         Button(
