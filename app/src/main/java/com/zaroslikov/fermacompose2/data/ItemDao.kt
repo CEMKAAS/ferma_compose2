@@ -176,6 +176,9 @@ interface ItemDao {
     @Query("SELECT * from MyFermaEXPENSES Where _id=:id")
     fun getItemExpenses(id: Int): Flow<ExpensesTable>
 
+    @Query("SELECT idAnimal from ExpensesAnimalTable Where idExpenses=:id")
+   suspend fun getItemExpensesAnimal(id: Int): List<Long>
+
     @Query("SELECT MyFermaEXPENSES.titleEXPENSES from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.titleEXPENSES")
     fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
 

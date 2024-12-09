@@ -2,29 +2,14 @@ package com.zaroslikov.fermacompose2
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.content.res.Configuration
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.ContentValues.TAG
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.yandex.mobile.ads.appopenad.AppOpenAd
@@ -38,15 +23,9 @@ import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.common.MobileAds
 import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
-import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
-import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
-import com.zaroslikov.fermacompose2.data.water.work.WaterReminderWorker
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
-import java.util.Calendar
-import java.util.Date
 
 
 class MainActivity : ComponentActivity() {

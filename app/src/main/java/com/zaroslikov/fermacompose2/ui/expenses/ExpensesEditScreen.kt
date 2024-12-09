@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -86,7 +87,10 @@ fun ExpensesEditProduct(
 
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
+    val animalUiState by viewModel.animalUiState.collectAsState()
 
+    viewModel.itemlist2()
+    val projectList = viewModel.items.value
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -103,6 +107,8 @@ fun ExpensesEditProduct(
             expensesTable = viewModel.itemUiState,
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
+            animalList = animalUiState.animalList,
+            list = projectList,
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {
                 if (it) {
@@ -127,13 +133,15 @@ fun ExpensesEditProduct(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ExpensesEditContainerProduct(
     modifier: Modifier,
     expensesTable: ExpensesTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
+    animalList: List<AnimalExpensesList>,
+    list:List<Long>,
     onValueChange: (ExpensesTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
     deleteAdd: () -> Unit
@@ -507,7 +515,7 @@ fun ExpensesEditContainerProduct(
                     Checkbox(
                         checked = expensesTable.showWarehouse,
                         onCheckedChange = {onValueChange(expensesTable.copy(showWarehouse = it))},
-                        enabled = if (expensesTable.count != "") {
+                        enabled = if (expensesTable.count == "") {
                             false
                         } else if (expensesTable.food) {
                             false
@@ -515,7 +523,6 @@ fun ExpensesEditContainerProduct(
                     )
                     Text(text = "Отображать на складе")
                 }
-
             }
 
             if (expensesTable.food && (expensesTable.count != "")) {
@@ -536,18 +543,21 @@ fun ExpensesEditContainerProduct(
                         .padding(horizontal = 14.dp)
                         .padding(top = 5.dp)
                 )
-//                FlowRow(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 14.dp)
-//                        .padding(top = 5.dp)
-//                ) {
-//                    animalList.forEach {
-//                        var selected by remember { mutableStateOf(false) }
-//
-//                        FilterChip(
-//                            onClick = {
-//                                selected = !selected
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp)
+                        .padding(top = 5.dp)
+                ) {
+                    animalList.forEach {
+                        var selected by remember { mutableStateOf(false) }
+                        if (list.isNotEmpty()) {
+                            if (list.contains(it.id.toLong())) selected = true else selected = false
+                        }
+
+                        FilterChip(
+                            onClick = {
+                                selected = !selected
 //                                if (selected) {
 //                                    foodDay2 += it.foodDay
 //                                    countAnimal2 += it.countAnimal
@@ -560,25 +570,25 @@ fun ExpensesEditContainerProduct(
 //                                foodDay = foodDay2.toString()
 //                                countAnimal = countAnimal2.toString()
 //                                day = settingDay(date1, count.toDouble(), foodDay2, countAnimal2).second
-//                            },
-//                            label = {
-//                                Text(it.name)
-//                            },
-//                            selected = selected,
-//                            leadingIcon = if (selected) {
-//                                {
-//                                    Icon(
-//                                        imageVector = Icons.Filled.Done,
-//                                        contentDescription = "Done icon",
-//                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-//                                    )
-//                                }
-//                            } else null,
-//                            modifier = Modifier.padding(4.dp)
-//
-//                        )
-//                    }
-//                }
+                            },
+                            label = {
+                                Text(it.name)
+                            },
+                            selected = selected,
+                            leadingIcon = if (selected) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Filled.Done,
+                                        contentDescription = "Done icon",
+                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                    )
+                                }
+                            } else null,
+                            modifier = Modifier.padding(4.dp)
+
+                        )
+                    }
+                }
                 Text(
                     text = "Указать ежедневный расход в ручную",
                     modifier = Modifier

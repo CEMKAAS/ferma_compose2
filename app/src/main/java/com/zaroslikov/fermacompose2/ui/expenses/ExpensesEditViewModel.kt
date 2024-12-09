@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.expenses
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.toSaleTableUiState
@@ -28,6 +30,8 @@ class ExpensesEditViewModel(
     private val itemId: Int = checkNotNull(savedStateHandle[ExpensesEditDestination.itemIdArg])
     private val itemIdPT: Int = checkNotNull(savedStateHandle[ExpensesEditDestination.itemIdArgTwo])
 
+    private val _items = mutableStateOf<List<Long>>(emptyList())
+    val items: State<List<Long>> = _items
     var itemUiState by mutableStateOf(ExpensesTableUiState())
         private set
 
@@ -37,6 +41,7 @@ class ExpensesEditViewModel(
                 .filterNotNull()
                 .first()
                 .toExpensesTableUiState()
+
         }
     }
 
@@ -61,6 +66,21 @@ class ExpensesEditViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = CategoryUiState()
             )
+
+    val animalUiState: StateFlow<AnimalExpensesUiState> =
+        itemsRepository.getItemsAnimalExpensesList(itemId).map { AnimalExpensesUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = AnimalExpensesUiState()
+            )
+
+    fun itemlist2(){
+        viewModelScope.launch {
+            _items.value = itemsRepository.getItemExpensesAnimal(itemId)
+        }
+    }
+
 
     suspend fun saveItem() {
         itemsRepository.updateExpenses(itemUiState.toExpensesTable())

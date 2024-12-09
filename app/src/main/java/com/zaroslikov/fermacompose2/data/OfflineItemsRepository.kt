@@ -98,6 +98,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         itemDao.getAllExpensesItems(id)
 
     override fun getItemExpenses(id: Int): Flow<ExpensesTable> = itemDao.getItemExpenses(id)
+    override suspend fun getItemExpensesAnimal(id: Int): List<Long> = itemDao.getItemExpensesAnimal(id)
 
     override fun getItemsTitleExpensesList(id: Int): Flow<List<String>> =
         itemDao.getItemsTitleExpensesList(id)

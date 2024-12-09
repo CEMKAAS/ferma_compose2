@@ -105,7 +105,7 @@ interface ItemsRepository {
     fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>>
 
     fun getItemExpenses(id: Int): Flow<ExpensesTable>
-
+   suspend fun getItemExpensesAnimal(id: Int): List<Long>
     fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
 
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
