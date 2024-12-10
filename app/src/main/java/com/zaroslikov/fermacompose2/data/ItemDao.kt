@@ -219,7 +219,7 @@ interface ItemDao {
                 "        SELECT MAX(id)" +
                 "        FROM animalcounttable " +
                 "    GROUP by idAnimal)" +
-                ") t ON a.id = t.idAnimal Left Join ExpensesAnimalTable e On e.idAnimal = a.id and e.idExpenses =:idExpenses Where a.idPT=:id ORDER By ps Desc
+                ") t ON a.id = t.idAnimal Left Join ExpensesAnimalTable e On e.idAnimal = a.id and e.idExpenses =:idExpenses Where a.idPT=:id ORDER By ps Desc"
     )
     suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses:Long): List<AnimalExpensesList2>
 
