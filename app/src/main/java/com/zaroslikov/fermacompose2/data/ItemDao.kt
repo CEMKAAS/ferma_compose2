@@ -199,16 +199,17 @@ interface ItemDao {
     fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
 
     @Query(
-        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal, case when e.idAnimal = a.id and e.idExpenses =:idExpenses Then 1 else 0 end as ps  from AnimalTable a JOIN (" +
+        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal, (Select case when e.idAnimal = a.id and e.idExpenses =:idExpenses Then 1 else 0 end as ps From ExpensesAnimalTable e) as ps" +
+                " from AnimalTable a JOIN (" +
                 "    SELECT idAnimal, count" +
                 "    FROM animalcounttable" +
                 "    WHERE id IN (" +
                 "        SELECT MAX(id)" +
                 "        FROM animalcounttable " +
                 "    GROUP by idAnimal)" +
-                ") t ON a.id = t.idAnimal JOIN ExpensesAnimalTable e ON e.idAnimal = a.id Where a.idPT=:id"
+                ") t ON a.id = t.idAnimal Join ExpensesAnimalTable e On e.idAnimal = a.id Where a.idPT=:id GROUP BY a.id"
     )
-    suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses:Int): List<AnimalExpensesList2>
+    suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses:Long): List<AnimalExpensesList2>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertExpenses(item: ExpensesTable):Long

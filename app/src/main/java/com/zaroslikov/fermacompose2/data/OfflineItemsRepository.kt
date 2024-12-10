@@ -112,7 +112,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override suspend fun getItemsAnimalExpensesList2(
         id: Int,
-        idExpenses: Int
+        idExpenses: Long
     ): List<AnimalExpensesList2> = itemDao.getItemsAnimalExpensesList2(id, idExpenses)
 
     override suspend fun insertExpenses(item: ExpensesTable) = itemDao.insertExpenses(item)

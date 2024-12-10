@@ -113,7 +113,7 @@ interface ItemsRepository {
 
     fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
 
-    suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses:Int): List<AnimalExpensesList2>
+    suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses:Long): List<AnimalExpensesList2>
 
     suspend fun insertExpenses(item: ExpensesTable): Long
     suspend fun updateExpenses(item: ExpensesTable)

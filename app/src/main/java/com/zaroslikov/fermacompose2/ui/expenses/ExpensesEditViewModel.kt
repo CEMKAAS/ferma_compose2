@@ -40,7 +40,7 @@ class ExpensesEditViewModel(
                 .first()
                 .toExpensesTableUiState()
 
-            _items.value = itemsRepository.getItemsAnimalExpensesList2(itemId, itemIdPT)
+            _items.value = itemsRepository.getItemsAnimalExpensesList2(itemIdPT,itemId.toLong())
         }
     }
 
