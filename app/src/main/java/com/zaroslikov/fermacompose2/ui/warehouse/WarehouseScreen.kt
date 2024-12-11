@@ -362,7 +362,7 @@ fun WarehouseFoodCard(
 
         val startDate =
             LocalDate.of(warehouseProduct.year, warehouseProduct.mount, warehouseProduct.day)
-        val daysToAdd = warehouseProduct.foodDay
+        val daysToAdd = warehouseProduct.foodDesignedDay
         val endDate = startDate.plusDays(daysToAdd.toLong())
         val currentDate = LocalDate.now()
 

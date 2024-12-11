@@ -422,7 +422,7 @@ interface ItemDao {
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
 
     @Query(
-        "SELECT * From myfermaexpenses Where idPT =:id and food = 1"
+        "SELECT * From myfermaexpenses Where idPT =:id and showFood = 1"
     )
     fun getCurrentFoodWarehouse(id: Int): Flow<List<ExpensesTable>>
 
@@ -432,7 +432,7 @@ interface ItemDao {
                 " FROM (" +
                 "    SELECT titleEXPENSES,suffix, SUM(countEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
                 "    FROM MyFermaEXPENSES" +
-                "    WHERE idPT = :id and showWarehouse = 1 and food != 1" +
+                "    WHERE idPT = :id and showWarehouse = 1 and showFood != 1" +
                 "    GROUP BY titleEXPENSES" +
                 "    UNION ALL" +
                 "    SELECT titleWRITEOFF, suffix, 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount" +

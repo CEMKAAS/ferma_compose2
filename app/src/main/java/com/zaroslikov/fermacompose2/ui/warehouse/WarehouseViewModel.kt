@@ -47,7 +47,7 @@ class WarehouseViewModel(
             )
 
     suspend fun saveItem(writeOffTable: WriteOffTable, expensesTable: ExpensesTable) {
-        itemsRepository.updateExpenses(expensesTable.copy(food = false, showWarehouse = false))
+        itemsRepository.updateExpenses(expensesTable.copy(showFood = false, showWarehouse = false))
         itemsRepository.insertWriteOff(writeOffTable)
     }
 
