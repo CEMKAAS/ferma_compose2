@@ -87,7 +87,6 @@ fun setExpensesAnimal(
 
 
 data class AnimalExpensesUiState(val animalList: List<AnimalExpensesList> = listOf())
-data class AnimalExpensesUiState2(val animalList: List<AnimalExpensesList2> = listOf())
 
 data class AnimalExpensesList(
     val id: Int,

@@ -34,11 +34,13 @@ data class ExpensesTable(
     var suffix: String,
     var category: String,
     val note: String,
-    val food: Boolean,
-    val showWarehouse: Boolean,
-    val foodEndDay: String,
-    val foodDay: Int,
-    val countAnimal: Int,
+    val showFood: Boolean, // Показывать на складе иду
+    val showWarehouse: Boolean, // Показывать на складе
+    val showAnimals:Boolean, // Связывает животных
+    val dailyExpensesFood: Double, // Ежедневный расход еды
+    val countAnimal: Int, // Кол-во животных
+    val foodDesignedDay: Int, // Кол-во дней
+    val lastDayFood: String, //Последний день еды
     @ColumnInfo(name = "idPT")
     val idPT: Int,
 )

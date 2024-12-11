@@ -40,7 +40,7 @@ class ExpensesEditViewModel(
                 .first()
                 .toExpensesTableUiState()
 
-            _items.value = itemsRepository.getItemsAnimalExpensesList2(itemIdPT,itemId.toLong())
+            _items.value = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
         }
     }
 
@@ -116,15 +116,17 @@ data class ExpensesTableUiState(
     val mount: Int = 0, // месяц
     val year: Int = 0, // время
     val priceAll: String = "",
-    val idPT: Int = 0,
     var suffix: String = "",
     var category: String = "",
     val note: String = "",
-    val food: Boolean = false,
-    val showWarehouse: Boolean = false,
-    val foodDay: Int = 0,
-    val foodEndDay: String = "",
-    val countAnimal: Int = 0,
+    val showFood: Boolean = false, // Показывать на складе иду
+    val showWarehouse: Boolean = false, // Показывать на складе
+    val showAnimals: Boolean = false, // Связывает животных
+    val dailyExpensesFood: Double = 0.0, // Ежедневный расход еды
+    val countAnimal: Int = 0, // Кол-во животных
+    val foodDesignedDay: Int = 0, // Кол-во дней
+    val lastDayFood: String = "", //Последний день еды
+    val idPT: Int = 0
 )
 
 fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTableUiState(
@@ -135,14 +137,17 @@ fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTable
     mount,
     year,
     priceAll.toString(),
-    idPT,
     suffix,
     category,
     note,
-    food,
+    showFood,
     showWarehouse,
-    foodDay,
-    foodEndDay, countAnimal
+    showAnimals,
+    dailyExpensesFood,
+    countAnimal,
+    foodDesignedDay,
+    lastDayFood,
+    idPT
 )
 
 fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
@@ -156,12 +161,13 @@ fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
     suffix = suffix,
     category = category,
     note = note,
+    showFood,
+    showWarehouse,
+    showAnimals,
+    dailyExpensesFood,
+    countAnimal,
+    foodDesignedDay,
+    lastDayFood,
     idPT = idPT,
-    foodDay = foodDay,
-    showWarehouse = showWarehouse,
-    food = food,
-    foodEndDay = foodEndDay,
-    countAnimal = countAnimal
-
 )
 

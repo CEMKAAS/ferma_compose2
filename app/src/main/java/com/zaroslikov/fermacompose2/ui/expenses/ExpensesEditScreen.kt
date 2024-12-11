@@ -520,11 +520,11 @@ fun ExpensesEditContainerProduct(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = expensesTable.food,
+                        checked = expensesTable.showFood,
                         onCheckedChange = {
                             onValueChange(
                                 expensesTable.copy(
-                                    food = it,
+                                    showFood = it,
                                     showWarehouse = it
                                 )
                             )
@@ -539,7 +539,7 @@ fun ExpensesEditContainerProduct(
                         onCheckedChange = { onValueChange(expensesTable.copy(showWarehouse = it)) },
                         enabled = if (expensesTable.count == "") {
                             false
-                        } else if (expensesTable.food) {
+                        } else if (expensesTable.showFood) {
                             false
                         } else true
                     )
@@ -547,7 +547,7 @@ fun ExpensesEditContainerProduct(
                 }
             }
 
-            if (expensesTable.food && (expensesTable.count != "")) {
+            if (expensesTable.showFood && (expensesTable.count != "")) {
 
 //                Text(
 //                    text = "${if (expensesTable.title == "") "Корма" else expensesTable.title} хватит на $day",
