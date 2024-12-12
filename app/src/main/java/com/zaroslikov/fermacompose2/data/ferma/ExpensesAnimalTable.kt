@@ -21,5 +21,6 @@ data class ExpensesAnimalTable(
     val id: Long = 0,
     val idExpenses: Long,
     val idAnimal: Long,
+    val percentExpenses: Double,
     val idPT: Long
 )

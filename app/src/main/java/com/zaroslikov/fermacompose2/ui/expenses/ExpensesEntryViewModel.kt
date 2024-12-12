@@ -46,7 +46,7 @@ class ExpensesEntryViewModel(
             )
 
 
-    suspend fun saveItem(expensesTable: ExpensesTable, set: MutableSet<Long>) {
+    suspend fun saveItem(expensesTable: ExpensesTable, set:MutableMap<Long,Double>) {
         val id = itemsRepository.insertExpenses(expensesTable)
 
 
@@ -63,7 +63,7 @@ class ExpensesEntryViewModel(
 }
 
 fun setExpensesAnimal(
-    set: MutableSet<Long>,
+    set:MutableMap<Long,Double>,
     idExpenses: Long,
     idPT: Int
 ): MutableList<ExpensesAnimalTable> {
@@ -76,7 +76,8 @@ fun setExpensesAnimal(
                 ExpensesAnimalTable(
                     id = 0,
                     idExpenses = idExpenses,
-                    idAnimal = it,
+                    idAnimal = it.key,
+                    percentExpenses = it.value,
                     idPT = idPT.toLong()
                 )
             )
@@ -84,7 +85,6 @@ fun setExpensesAnimal(
     }
     return list
 }
-
 
 data class AnimalExpensesUiState(val animalList: List<AnimalExpensesList> = listOf())
 
