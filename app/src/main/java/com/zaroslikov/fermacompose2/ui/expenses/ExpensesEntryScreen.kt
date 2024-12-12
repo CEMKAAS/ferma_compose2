@@ -178,7 +178,7 @@ fun ExpensesEntryContainerProduct(
     var showAnimalsUI by remember { mutableStateOf(false) } // Расход на животных
     var dailyExpensesFoodUI by remember { mutableStateOf("") } //Ежедневный расход
     var countAnimalUI by remember { mutableStateOf("") } // Кол-во животных
-    var foodDesignedDayUI by remember { mutableStateOf(Pair<Int, String>(0,"")) } // Кол-во дней
+    var foodDesignedDayUI by remember { mutableStateOf(Pair<Int, String>(0, "")) } // Кол-во дней
     var dailyExpensesFoodTotal by remember { mutableStateOf(0.0) } // Общий ежедневный расход
     var setDailyExpensesFoodAndCountUI by remember { mutableStateOf(false) } // Уставновить ежедневный расход
 
@@ -201,11 +201,18 @@ fun ExpensesEntryContainerProduct(
     }
 
     fun validateCount(text: String) {
-        isErrorCount = text == ""
+        if (text == "") {
+            isErrorCount = true
+            showFoodUI = false
+            showAnimalsUI = false
+        }
     }
 
     fun validatePrice(text: String) {
-        isErrorPrice = text == ""
+        if (text == "") {
+            isErrorPrice = true
+            showAnimalsUI = false
+        }
     }
 
     fun validateDailyExpensesFood(text: String) {
@@ -326,7 +333,7 @@ fun ExpensesEntryContainerProduct(
                     count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
                     validateCount(count)
 
-                    if(showFoodUI && !setDailyExpensesFoodAndCountUI){
+                    if (showFoodUI && !setDailyExpensesFoodAndCountUI) {
                         foodDesignedDayUI = settingDay(
                             date1,
                             if (count == "") 0.0 else count.toDouble(),
@@ -334,12 +341,12 @@ fun ExpensesEntryContainerProduct(
                         )
                     }
 
-                    if(showFoodUI && setDailyExpensesFoodAndCountUI){
+                    if (showFoodUI && setDailyExpensesFoodAndCountUI) {
                         foodDesignedDayUI = settingDay(
                             date1,
                             if (count == "") 0.0 else count.toDouble(),
                             if (dailyExpensesFoodUI == "") 0.0 else dailyExpensesFoodUI.toDouble(),
-                            if (countAnimalUI=="") 0 else countAnimalUI.toInt()
+                            if (countAnimalUI == "") 0 else countAnimalUI.toInt()
                         )
                     }
                 },
@@ -571,7 +578,36 @@ fun ExpensesEntryContainerProduct(
                         enabled = count != ""
                     )
                     Text(text = "Корм")
+
+                    if (showFoodUI && (count != "")) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp)
+                                .padding(top = 5.dp)
+                        ) {
+                            Checkbox(
+                                checked = setDailyExpensesFoodAndCountUI,
+                                onCheckedChange = {
+                                    setDailyExpensesFoodAndCountUI = !setDailyExpensesFoodAndCountUI
+                                    dailyExpensesFoodTotal = 0.0
+                                    countAnimal = 0
+                                    foodDesignedDayUI = settingDay(
+                                        date1,
+                                        count.toDouble(),
+                                        if (dailyExpensesFoodUI == "") 0.0 else dailyExpensesFoodUI.toDouble(),
+                                        if (countAnimalUI == "") 0 else countAnimalUI.toInt()
+                                    )
+                                    selectedFilters2.clear()
+
+                                }
+                            )
+                            Text(text = "Указать вручную")
+                        }
+                    }
                 }
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = showWarehouseUI,
@@ -606,8 +642,8 @@ fun ExpensesEntryContainerProduct(
             if (showFoodUI && (count != "")) {
                 Text(
                     text = "${if (title == "") "Корма" else title} хватит на ${if (foodDesignedDayUI.first >= 1000) "более" else ""} ${foodDesignedDayUI.first} суток до ${foodDesignedDayUI.second}\n" +
-                            "Ежедневный расход составляет - $dailyExpensesFoodTotal $suffix\n" +
-                            "Кол-во голов -  $countAnimal ",
+                            "Ежедневный расход составляет - ${if (setDailyExpensesFoodAndCountUI) dailyExpensesFoodUI else dailyExpensesFoodTotal} $suffix\n" +
+                            "Кол-во голов -  ${if (setDailyExpensesFoodAndCountUI) countAnimalUI else countAnimal} шт. ",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 14.dp)
@@ -628,64 +664,59 @@ fun ExpensesEntryContainerProduct(
                             .padding(horizontal = 14.dp)
                             .padding(top = 5.dp)
                     ) {
-                        animalList.forEach {
-                            var selected by remember { mutableStateOf(false) }
+                        if (animalList.isNotEmpty()) {
+                            animalList.forEach {
+                                var selected by remember { mutableStateOf(false) }
 
-                            FilterChip(
-                                onClick = {
-                                    selected = !selected
-                                    if (selected) {
-                                        countAnimal += it.countAnimal
-                                        dailyExpensesFoodTotal += (it.foodDay * it.countAnimal)
-                                        selectedFilters2.set(
-                                            it.id.toLong(),
-                                            ((it.foodDay / dailyExpensesFoodTotal) * 100.0)
+                                FilterChip(
+                                    onClick = {
+                                        selected = !selected
+                                        if (selected) {
+                                            countAnimal += it.countAnimal
+                                            dailyExpensesFoodTotal += (it.foodDay * it.countAnimal)
+                                            selectedFilters2.set(
+                                                it.id.toLong(),
+                                                ((it.foodDay / dailyExpensesFoodTotal) * 100.0)
+                                            )
+                                        } else {
+                                            countAnimal -= it.countAnimal
+                                            dailyExpensesFoodTotal -= (it.foodDay * it.countAnimal)
+                                            selectedFilters2.remove(it.id.toLong())
+                                        }
+                                        foodDesignedDayUI = settingDay(
+                                            date1,
+                                            count.toDouble(),
+                                            dailyExpensesFoodTotal
                                         )
-                                    } else {
-                                        countAnimal -= it.countAnimal
-                                        dailyExpensesFoodTotal -= (it.foodDay * it.countAnimal)
-                                        selectedFilters2.remove(it.id.toLong())
-                                    }
-                                    foodDesignedDayUI = settingDay(
-                                        date1,
-                                        count.toDouble(),
-                                        dailyExpensesFoodTotal
-                                    )
-                                },
-                                label = { Text(it.name) },
-                                selected = if (setDailyExpensesFoodAndCountUI) {
-                                    selected = false
-                                    false
-                                } else selected,
-                                leadingIcon = if (selected) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Filled.Done,
-                                            contentDescription = "Done icon",
-                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                        )
-                                    }
-                                } else null,
-                                modifier = Modifier.padding(4.dp)
-                            )
+                                    },
+                                    label = { Text(it.name) },
+                                    selected = if (setDailyExpensesFoodAndCountUI) {
+                                        selected = false
+                                        false
+                                    } else selected,
+                                    leadingIcon = if (selected) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Done,
+                                                contentDescription = "Done icon",
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                            )
+                                        }
+                                    } else null,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+                        } else {
+                            Text(text = "Нет животных")
                         }
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = setDailyExpensesFoodAndCountUI,
-                        onCheckedChange = {
-                            setDailyExpensesFoodAndCountUI = !setDailyExpensesFoodAndCountUI
-                            selectedFilters2.clear()
-                        }
-                    )
-                    Text(text = "Указать вручную")
-                }
-
                 if (setDailyExpensesFoodAndCountUI) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 5.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         OutlinedTextField(
@@ -697,7 +728,7 @@ fun ExpensesEntryContainerProduct(
                                     date1,
                                     count.toDouble(),
                                     if (dailyExpensesFoodUI == "") 0.0 else dailyExpensesFoodUI.toDouble(),
-                                    if (countAnimalUI=="") 0 else countAnimalUI.toInt()
+                                    if (countAnimalUI == "") 0 else countAnimalUI.toInt()
                                 )
 
                             },
@@ -735,7 +766,7 @@ fun ExpensesEntryContainerProduct(
                                     date1,
                                     count.toDouble(),
                                     if (dailyExpensesFoodUI == "") 0.0 else dailyExpensesFoodUI.toDouble(),
-                                    if (countAnimalUI=="") 0 else countAnimalUI.toInt()
+                                    if (countAnimalUI == "") 0 else countAnimalUI.toInt()
                                 )
                             },
                             isError = isErrorСountAnimalUI,
@@ -769,53 +800,59 @@ fun ExpensesEntryContainerProduct(
 
             //РАСПРЕДЕЛЕНИЕ РАСХОДОВ
             if (showAnimalsUI) {
-                val totalFood by remember { mutableStateOf(100f) }
+                val totalFood by remember { mutableFloatStateOf(100f) }
 
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column {
                     FlowRow(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 14.dp)
                             .padding(top = 5.dp)
                     ) {
-                        animalList.forEach { animal ->
-                            var selected by remember { mutableStateOf(false) }
-                            FilterChip(
-                                selected = selected,
-                                onClick = {
-                                    selected = !selected
-                                    if (selected) selectedFilters2.set(animal.id.toLong(), 0.0)
-                                    else selectedFilters2.remove(animal.id.toLong())
-                                    selectedFilters2.forEach {
-                                        selectedFilters2[it.key] =
-                                            (totalFood / selectedFilters2.size).toDouble()
-                                    }
-                                },
-                                label = { Text(animal.name) },
-                                leadingIcon = if (selected) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Filled.Done,
-                                            contentDescription = "Done icon",
-                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                        )
-                                    }
-                                } else null,
-                                modifier = Modifier.padding(4.dp)
-                            )
+                        if (animalList.isNotEmpty()) {
+                            animalList.forEach { animal ->
+                                var selected by remember { mutableStateOf(false) }
+                                FilterChip(
+                                    selected = selected,
+                                    onClick = {
+                                        selected = !selected
+                                        if (selected) selectedFilters2.set(animal.id.toLong(), 0.0)
+                                        else selectedFilters2.remove(animal.id.toLong())
+                                        selectedFilters2.forEach {
+                                            selectedFilters2[it.key] =
+                                                (totalFood / selectedFilters2.size).toDouble()
+                                        }
+                                    },
+                                    label = { Text(animal.name) },
+                                    leadingIcon = if (selected) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Done,
+                                                contentDescription = "Done icon",
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                            )
+                                        }
+                                    } else null,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+                        } else {
+                            Text(text = "Нет животных")
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     // Отображаем слайдеры для каждого выбранного животного
                     selectedFilters2.forEach { animal ->
-                        Column(modifier = Modifier.fillMaxWidth()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp)
+                                .padding(top = 10.dp)
+                        ) {
 
                             Text(
-                                text = "${animal.key}: ${formatter(animal.value * count.toDouble() / 100.0)} ₽ / ${
-                                    formatter(animal.value * priceAll.toDouble() / 100.0)
-                                } $suffix" +
+                                text = "${animal.key}: ${formatter(animal.value * count.toDouble() / 100.0)} $suffix /" +
+                                        " ${formatter(animal.value * priceAll.toDouble() / 100.0)} ₽" +
                                         " -  ${formatter(animal.value)}%",
                                 fontSize = 20.sp
                             )
@@ -866,8 +903,8 @@ fun ExpensesEntryContainerProduct(
                                 showFood = showFoodUI,
                                 showWarehouse = showWarehouseUI,
                                 showAnimals = showAnimalsUI,
-                                dailyExpensesFood = dailyExpensesFoodUI.toDouble(),
-                                countAnimal = countAnimalUI.toInt(),
+                                dailyExpensesFood = if (setDailyExpensesFoodAndCountUI) dailyExpensesFoodUI.toDouble() else dailyExpensesFoodTotal,
+                                countAnimal = if (setDailyExpensesFoodAndCountUI) countAnimalUI.toInt() else countAnimal,
                                 foodDesignedDay = foodDesignedDayUI.first,
                                 lastDayFood = foodDesignedDayUI.second
                             ),
