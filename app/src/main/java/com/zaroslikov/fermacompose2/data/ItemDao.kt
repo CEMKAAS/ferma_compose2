@@ -578,7 +578,7 @@ interface ItemDao {
             " left Join AnimalTable at On at.name = a.animal"+
             " left Join ExpensesAnimalTable ea On ea.idAnimal = at.id" +
             " left Join MyFermaEXPENSES e on ea.idExpenses = e._id" +
-            " Where a.idPT=:id  and a.title =:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY a.animal ORDER BY priceAll DESC")
+            " Where a.idPT=:id  and a.title =:name AND DATE(printf('%04d-%02d-%02d', a.year, a.mount, a.day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY a.animal ORDER BY priceAll DESC")
     fun getAnalysisCostPriceAllTimeRange(id: Int, name: String,
                                          dateBegin: String,
                                          dateEnd: String): Flow<List<AnimalTitSuff>>
@@ -694,5 +694,139 @@ interface ItemDao {
 
     @Delete
     suspend fun deleteNote(item: NoteTable)
+
+    // NewYear Project
+    @Query("SELECT COALESCE(SUM(PRICE), 0) AS priceAll from MyFermaSale Where idPT=:id and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisSaleNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(countEXPENSES), 0) AS priceAll from MyFermaEXPENSES Where idPT=:id and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisExpensesNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisWriteOffOwnNeedsNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisWriteOffScrapNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    @Query("SELECT Buyer As buyer, COALESCE(SUM(PRICE),0) AS resultPrice, COALESCE(SUM(discSale),0) AS resultCount, suffix from MyFermaSale Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY resultCount DESC")
+    fun getAnalysisSaleBuyerNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT title As buyer, COALESCE(SUM(disc),0) AS resultPrice, 0 AS resultCount, suffix from MyFerma Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY title ORDER BY resultPrice DESC")
+    fun getAnalysisAddProductNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT titleSale As buyer, COALESCE(SUM(PRICE),0) AS resultPrice, COALESCE(SUM(discSale),0) AS resultCount, suffix from MyFermaSale Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY titleSale ORDER BY resultPrice DESC")
+    fun getAnalysisSaleProductNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT titleEXPENSES As buyer, COALESCE(SUM(countEXPENSES), 0) AS resultPrice,  COALESCE(SUM(discEXPENSES),0) AS resultCount, suffix from MyFermaEXPENSES Where idPT=:id and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY resultPrice DESC")
+    fun getAnalysisExpensesProductNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+
+    // NewYear
+    @Query("SELECT COALESCE(SUM(PRICE), 0) AS priceAll from MyFermaSale Where DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisSaleNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(countEXPENSES), 0) AS priceAll from MyFermaEXPENSES Where DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisExpensesNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisWriteOffOwnNeedsNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getAnalysisWriteOffScrapNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    @Query("SELECT Buyer As buyer, COALESCE(SUM(PRICE),0) AS resultPrice, COALESCE(SUM(discSale),0) AS resultCount, suffix from MyFermaSale Where DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY resultCount DESC")
+    fun getAnalysisSaleBuyerNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT title As buyer, COALESCE(SUM(disc),0) AS resultPrice, 0 AS resultCount, suffix from MyFerma Where DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY title ORDER BY resultPrice DESC")
+    fun getAnalysisAddProductNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT titleSale As buyer, COALESCE(SUM(PRICE),0) AS resultPrice, COALESCE(SUM(discSale),0) AS resultCount, suffix from MyFermaSale Where DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY titleSale ORDER BY resultPrice DESC")
+    fun getAnalysisSaleProductNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT titleEXPENSES As buyer, COALESCE(SUM(countEXPENSES), 0) AS resultPrice,  COALESCE(SUM(discEXPENSES),0) AS resultCount, suffix from MyFermaEXPENSES Where DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY resultPrice DESC")
+    fun getAnalysisExpensesProductNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    -@Query("SELECT titleEXPENSES As buyer, COALESCE(SUM(countEXPENSES), 0) AS resultPrice,  COALESCE(SUM(discEXPENSES),0) AS resultCount, suffix from MyFermaEXPENSES Where DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY resultPrice DESC")
+    fun getBestProjectNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT COUNT(*) from МyINCUBATOR Where mode = 0 and DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getIncubatorCountNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int>
+
+    @Query("SELECT COALESCE(SUM(EGGALL), 0) AS resultPrice from МyINCUBATOR Where mode = 0 and DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getEggInIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int>
+    @Query("SELECT COALESCE(SUM(EGGALLEND), 0) AS resultPrice from МyINCUBATOR Where mode = 0 and DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    fun getChikenInIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int>
+
+    @Query("SELECT COUNT(*) AS resultPrice from МyINCUBATOR Where mode = 0 and DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY TYPE ORDER BY resultPrice DESC")
+    fun getTypeIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int>
 
 }

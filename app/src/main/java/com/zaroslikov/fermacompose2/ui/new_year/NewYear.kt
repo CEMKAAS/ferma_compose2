@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.new_year
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -16,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
@@ -34,7 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -115,35 +120,7 @@ fun NewYearAnalysisContainer(
     analysisSaleBuyerAllTimeState: List<AnalysisSaleBuyerAllTime>,
     analysisCostPriceAllTimeState: List<AnimalTitSuff>
 ) {
-
-    var openAlertDialog by remember { mutableStateOf(false) }
-    var openAlertDialogScrap by remember { mutableStateOf(false) }
-
-    if (openAlertDialog) {
-        AlertDialogExample(
-            onDismissRequest = { openAlertDialog = false },
-            onConfirmation = {
-                openAlertDialog = false
-                println("Confirmation registered") // Add logic here to handle confirmation.
-            },
-            dialogTitle = "Сэкономлено",
-            dialogText = "Сэкономлено - это сумма, которую вы сберегли, используя свой товар для личных нужд, вместо того чтобы покупать его в магазине.",
-            icon = Icons.Default.Info
-        )
-    }
-
-    if (openAlertDialogScrap) {
-        AlertDialogExample(
-            onDismissRequest = { openAlertDialogScrap = false },
-            onConfirmation = {
-                openAlertDialogScrap = false
-                println("Confirmation registered") // Add logic here to handle confirmation.
-            },
-            dialogTitle = "Потеряно",
-            dialogText = "Потеряно - это сумма денег за товар, которую вы потеряли, по каким либо причинам.",
-            icon = Icons.Default.Info
-        )
-    }
+    val context = LocalContext.current
 
     val modifierCard = Modifier
         .fillMaxWidth()
@@ -172,11 +149,27 @@ fun NewYearAnalysisContainer(
                 text = "Догорой друг! Мы благодарны Вам за то, что провели этот год вместе с нами. Ваша поддержка и доверие вдохновляют нашу команду на новые свершения.\n" +
                         "\n" +
                         "Желаем Вам в новом году здоровья, счастья и процветания! Пусть Ваше хозяйство приносит радость и доход! \n" +
-                        "Не забудьте вступить в нашу группу ВКонтакте, чтобы быть в курсе всех новостей и полезных советов!\n" +
-                        "\n" +
-                        "С наилучшими пожеланиями,  \n" +
-                        "Команда \"Мое хозяйство\"",
+                        // составили не большой топ!
+                        "Не забудьте вступить в нашу группу ВКонтакте, чтобы быть в курсе всех новостей и полезных советов!",
                 modifier = modifierText
+            )
+            TextButton(
+                onClick = {
+                    AppMetrica.reportEvent("Переход в группу из Нового года")
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/myfermaapp"))
+                    context.startActivity(intent)
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            ) {
+                Text(text = "Вступить в группу VK!")
+            }
+
+            Text(
+                text = "С наилучшими пожеланиями,\n" +
+                        "Команда \"Мое хозяйство\"",
+                modifier = modifierText,
+                textAlign = TextAlign.End
             )
         }
 
