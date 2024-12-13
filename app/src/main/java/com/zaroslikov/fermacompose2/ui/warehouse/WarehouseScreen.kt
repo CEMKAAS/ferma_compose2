@@ -241,7 +241,16 @@ private fun WarehouseInventoryList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-
+        item {
+            Button(
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 15.dp)
+            ) {
+                Text(text = "Посмотреть итоги года!")
+            }
+        }
         if (itemList.isNotEmpty()) {
             item {
                 TextButtonWarehouse(

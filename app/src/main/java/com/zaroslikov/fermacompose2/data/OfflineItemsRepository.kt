@@ -265,6 +265,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         name: String
     ): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTime(id, name)
 
+    override fun getAnalysisCostPriceAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>> = itemDao.getAnalysisCostPriceAllTime(id,name)
+
     //analysis Range
     override fun getAnalysisAddAllTimeRange(
         id: Int,
@@ -347,6 +349,13 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     ): Flow<List<AnalysisSaleBuyerAllTime>> =
         itemDao.getAnalysisSaleBuyerAllTimeRange(id, name, dateBegin, dateEnd)
 
+    override fun getAnalysisCostPriceAllTimeRange(
+        id: Int,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnimalTitSuff>> = itemDao.getAnalysisCostPriceAllTimeRange(id,name,dateBegin, dateEnd)
+
     override suspend fun insertIncubator(item: Incubator) =
         itemDao.insertIncubator(item)
 
@@ -390,7 +399,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         itemDao.deleteAnimalSizeTable(animalSizeTable)
 
     override suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
-        itemDao.insertAnimalVaccinationTable(animalVaccinationTable)
+        itemDao.deleteAnimalVaccinationTable(animalVaccinationTable)
 
     override suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
         itemDao.deleteAnimalWeightTable(animalWeightTable)

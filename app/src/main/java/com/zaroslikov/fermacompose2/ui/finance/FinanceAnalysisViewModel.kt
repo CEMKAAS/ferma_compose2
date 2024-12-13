@@ -35,7 +35,7 @@ class FinanceAnalysisViewModel(
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
 
-        calendar.set(year,month, 1 )
+        calendar.set(year, month, 1)
         return calendar.timeInMillis
     }
 
@@ -125,10 +125,18 @@ class FinanceAnalysisViewModel(
                 initialValue = AnalysisSaleBuyerAllTimeUiState()
             )
 
+    var analysisCostPriceTimeState: StateFlow<AnalysisAddAnimalAllTimeUiState> =
+        itemsRepository.getAnalysisCostPriceAllTime(itemId, name)
+            .map { AnalysisAddAnimalAllTimeUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = AnalysisAddAnimalAllTimeUiState()
+            )
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
 
     fun updateDateBegin(dateString: Long) {
         dateBegin = dateString
@@ -137,7 +145,6 @@ class FinanceAnalysisViewModel(
     fun updateDateEnd(dateString: Long) {
         dateEnd = dateString
     }
-
 
     fun upAnalisis() {
 
@@ -149,12 +156,14 @@ class FinanceAnalysisViewModel(
             analysisAddAllTime =
                 itemsRepository.getAnalysisAddAllTimeRange(itemId, name, begin, end)
                     .filterNotNull().first().toFinUiState()
-            analysisSaleAllTime = itemsRepository.getAnalysisSaleAllTimeRange(itemId, name, begin, end)
-                .filterNotNull()
-                .first().toFinUiState()
-            analysisWriteOffAllTime = itemsRepository.getAnalysisWriteOffAllTimeRange(itemId, name, begin, end)
-                .filterNotNull()
-                .first().toFinUiState()
+            analysisSaleAllTime =
+                itemsRepository.getAnalysisSaleAllTimeRange(itemId, name, begin, end)
+                    .filterNotNull()
+                    .first().toFinUiState()
+            analysisWriteOffAllTime =
+                itemsRepository.getAnalysisWriteOffAllTimeRange(itemId, name, begin, end)
+                    .filterNotNull()
+                    .first().toFinUiState()
             analysisWriteOffOwnNeedsAllTime =
                 itemsRepository.getAnalysisWriteOffOwnNeedsAllTimeRange(itemId, name, begin, end)
                     .filterNotNull()
@@ -163,9 +172,10 @@ class FinanceAnalysisViewModel(
                 itemsRepository.getAnalysisWriteOffScrapAllTimeRange(itemId, name, begin, end)
                     .filterNotNull()
                     .first().toFinUiState()
-            analysisSaleSoldAllTime = itemsRepository.getAnalysisSaleSoldAllTimeRange(itemId, name, begin, end)
-                .filterNotNull()
-                .first().toDouble()
+            analysisSaleSoldAllTime =
+                itemsRepository.getAnalysisSaleSoldAllTimeRange(itemId, name, begin, end)
+                    .filterNotNull()
+                    .first().toDouble()
             analysisWriteOffOwnNeedsMoneyAllTime =
                 itemsRepository.getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(itemId, name, begin, end)
                     .filterNotNull()
@@ -180,7 +190,7 @@ class FinanceAnalysisViewModel(
                     .first().toFinUiState()
         }
 
-        analysisAddAnimalAllTimeState=
+        analysisAddAnimalAllTimeState =
             itemsRepository.getAnalysisAddAnimalAllTimeRange(itemId, name, begin, end)
                 .map { AnalysisAddAnimalAllTimeUiState(it) }
                 .stateIn(
@@ -198,9 +208,17 @@ class FinanceAnalysisViewModel(
                     initialValue = AnalysisSaleBuyerAllTimeUiState()
                 )
 
+        analysisCostPriceTimeState =
+            itemsRepository.getAnalysisCostPriceAllTimeRange(itemId, name, begin, end)
+                .map { AnalysisAddAnimalAllTimeUiState(it) }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                    initialValue = AnalysisAddAnimalAllTimeUiState()
+                )
+
     }
 }
-
 
 
 data class AnalysisAddAnimalAllTimeUiState(val itemList: List<AnimalTitSuff> = listOf())

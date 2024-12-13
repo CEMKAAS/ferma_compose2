@@ -49,41 +49,35 @@ class AnimalIndicatorsViewModel(
     }
 
     val indicatorsUiState: StateFlow<AnimalIndicatorsUiState> = when (indicators) {
-        "Количество" -> {
-            itemsRepository.getCountAnimal(itemId).map { AnimalIndicatorsUiState(it) }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = AnimalIndicatorsUiState()
-                )
-        }
 
-        "Размер" -> {
-            itemsRepository.getSizeAnimal(itemId).map { AnimalIndicatorsUiState(it) }
+        "Количество" -> itemsRepository.getCountAnimal(itemId).map { AnimalIndicatorsUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                     initialValue = AnimalIndicatorsUiState()
                 )
-        }
 
-        "Вес" -> {
-            itemsRepository.getWeightAnimal(itemId).map { AnimalIndicatorsUiState(it) }
+        "Размер" -> itemsRepository.getSizeAnimal(itemId).map { AnimalIndicatorsUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                     initialValue = AnimalIndicatorsUiState()
                 )
-        }
 
-        else -> {
-            itemsRepository.getCountAnimal(itemId).map { AnimalIndicatorsUiState(it) }
+        "Вес" -> itemsRepository.getWeightAnimal(itemId).map { AnimalIndicatorsUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                     initialValue = AnimalIndicatorsUiState()
                 )
-        }
+
+        else -> itemsRepository.getCountAnimal(itemId).map { AnimalIndicatorsUiState(it) }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                    initialValue = AnimalIndicatorsUiState()
+                )
+
     }
 
 
@@ -98,17 +92,10 @@ class AnimalIndicatorsViewModel(
 
     suspend fun saveItem(animalIndicatorsVM: AnimalIndicatorsVM) {
         when (indicators) {
-            "Количество" -> {
-                itemsRepository.insertAnimalCountTable(animalIndicatorsVM.toCount())
-            }
 
-            "Размер" -> {
-                itemsRepository.insertAnimalSizeTable(animalIndicatorsVM.toSize())
-            }
-
-            "Вес" -> {
-                itemsRepository.insertAnimalWeightTable(animalIndicatorsVM.toWeight())
-            }
+            "Количество" -> itemsRepository.insertAnimalCountTable(animalIndicatorsVM.toCount())
+            "Размер" -> itemsRepository.insertAnimalSizeTable(animalIndicatorsVM.toSize())
+            "Вес" -> itemsRepository.insertAnimalWeightTable(animalIndicatorsVM.toWeight())
 
             else -> {}
         }
@@ -116,17 +103,10 @@ class AnimalIndicatorsViewModel(
 
     suspend fun updateItem(animalIndicatorsVM: AnimalIndicatorsVM) {
         when (indicators) {
-            "Количество" -> {
-                itemsRepository.updateAnimalCountTable(animalIndicatorsVM.toCount())
-            }
 
-            "Размер" -> {
-                itemsRepository.updateAnimalSizeTable(animalIndicatorsVM.toSize())
-            }
-
-            "Вес" -> {
-                itemsRepository.updateAnimalWeightTable(animalIndicatorsVM.toWeight())
-            }
+            "Количество" -> itemsRepository.updateAnimalCountTable(animalIndicatorsVM.toCount())
+            "Размер" -> itemsRepository.updateAnimalSizeTable(animalIndicatorsVM.toSize())
+            "Вес" -> itemsRepository.updateAnimalWeightTable(animalIndicatorsVM.toWeight())
 
             else -> {}
         }
@@ -134,17 +114,10 @@ class AnimalIndicatorsViewModel(
 
     suspend fun deleteItem() {
         when (indicators) {
-            "Количество" -> {
-                itemsRepository.deleteAnimalCountTable(animalUiState.toCount())
-            }
 
-            "Размер" -> {
-                itemsRepository.deleteAnimalSizeTable(animalUiState.toSize())
-            }
-
-            "Вес" -> {
-                itemsRepository.deleteAnimalWeightTable(animalUiState.toWeight())
-            }
+            "Количество" -> itemsRepository.deleteAnimalCountTable(animalUiState.toCount())
+            "Размер" -> itemsRepository.deleteAnimalSizeTable(animalUiState.toSize())
+            "Вес" -> itemsRepository.deleteAnimalWeightTable(animalUiState.toWeight())
 
             else -> {}
         }

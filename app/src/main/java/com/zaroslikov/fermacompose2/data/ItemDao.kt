@@ -478,6 +478,13 @@ interface ItemDao {
     @Query("SELECT Buyer As buyer, COALESCE(SUM(PRICE),0) AS resultPrice, COALESCE(SUM(discSale),0) AS resultCount, suffix from MyFermaSale Where idPT=:id  and titleSale =:name  GROUP BY buyer ORDER BY ResultPrice DESC")
     fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
 
+    @Query("SELECT at.name As title, COALESCE((SUM((e.countEXPENSES*ea.percentExpenses)/100)/SUM(a.disc)),0) AS priceAll, '₽' AS suffix from MyFerma a" +
+            " left Join AnimalTable at On at.name = a.animal"+
+            " left Join ExpensesAnimalTable ea On ea.idAnimal = at.id" +
+            " left Join MyFermaEXPENSES e on ea.idExpenses = e._id" +
+            " Where a.idPT=:id  and a.title =:name  GROUP BY a.animal ORDER BY priceAll DESC")
+     fun getAnalysisCostPriceAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
+
     //AnalisisRange
     @Query("SELECT suffix as title, COALESCE(SUM(disc), 0) AS priceAll from MyFerma Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisAddAllTimeRange(
@@ -566,6 +573,16 @@ interface ItemDao {
         dateBegin: String,
         dateEnd: String
     ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    @Query("SELECT at.name As title, COALESCE((SUM((e.countEXPENSES*ea.percentExpenses)/100)/SUM(a.disc)),0) AS priceAll, '₽' AS suffix from MyFerma a" +
+            " left Join AnimalTable at On at.name = a.animal"+
+            " left Join ExpensesAnimalTable ea On ea.idAnimal = at.id" +
+            " left Join MyFermaEXPENSES e on ea.idExpenses = e._id" +
+            " Where a.idPT=:id  and a.title =:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY a.animal ORDER BY priceAll DESC")
+    fun getAnalysisCostPriceAllTimeRange(id: Int, name: String,
+                                         dateBegin: String,
+                                         dateEnd: String): Flow<List<AnimalTitSuff>>
+
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
