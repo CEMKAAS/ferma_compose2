@@ -69,10 +69,8 @@ object NewYearDestination : NavigationDestination {
 @Composable
 fun NewYearAnalysis(
     navigateBack: () -> Unit,
-    viewModel: FinanceAnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: NewYearViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-
-    var text by remember { mutableStateOf("все время") }
 
     Scaffold(topBar = {
         TopAppBarCalendar(
@@ -86,19 +84,21 @@ fun NewYearAnalysis(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            text = text,
-            analysisAddAllTime = viewModel.analysisAddAllTime,
-            analysisSaleAllTime = viewModel.analysisSaleAllTime,
-            analysisWriteOffAllTime = viewModel.analysisWriteOffAllTime,
-            analysisWriteOffOwnNeedsAllTime = viewModel.analysisWriteOffOwnNeedsAllTime,
-            analysisWriteOffScrapAllTime = viewModel.analysisWriteOffScrapAllTime,
-            analysisSaleSoldAllTime = viewModel.analysisSaleSoldAllTime,
-            analysisWriteOffOwnNeedsMoneyAllTime = viewModel.analysisWriteOffOwnNeedsMoneyAllTime,
-            analysisWriteOffScrapMoneyAllTime = viewModel.analysisWriteOffScrapMoneyAllTime,
-            analysisAddAverageValueAllTime = viewModel.analysisAddAverageValueAllTime,
-            analysisAddAnimalAllTimeState = viewModel.analysisAddAnimalAllTimeState.collectAsState().value.itemList,
-            analysisSaleBuyerAllTimeState = viewModel.analysisSaleBuyerAllTimeState.collectAsState().value.itemList,
-            analysisCostPriceAllTimeState = viewModel.analysisCostPriceTimeState.collectAsState().value.itemList,
+            saleProject = viewModel.saleProject,
+            expensesProject = viewModel.expensesProject,
+            writeOffOwnNeedsProject = viewModel.writeOffOwnNeedsProject,
+            writeOffScrapProject = viewModel.writeOffScrapProject,
+            countAnimalProject = viewModel.countAnimalProject,
+            bestSale = viewModel.bestSale.collectAsState().value.itemList,
+            bestBuyer = viewModel.bestBuyer.collectAsState().value.itemList,
+            bestExpenses = viewModel.bestExpenses.collectAsState().value.itemList,
+            bestAdd = viewModel.bestAdd.collectAsState().value.itemList,
+            countIncubator = viewModel.countIncubator,
+            eggInIncubator = viewModel.eggInIncubator,
+            chikenInIncubator = viewModel.chikenInIncubator,
+            typeIncubator = viewModel.typeIncubator,
+            bestProject = viewModel.bestProject,
+            boolean = viewModel.itemBoolean
         )
     }
 }
@@ -106,19 +106,21 @@ fun NewYearAnalysis(
 @Composable
 fun NewYearAnalysisContainer(
     modifier: Modifier,
-    text: String,
-    analysisAddAllTime: FinUiState,
-    analysisSaleAllTime: FinUiState,
-    analysisWriteOffAllTime: FinUiState,
-    analysisWriteOffOwnNeedsAllTime: FinUiState,
-    analysisWriteOffScrapAllTime: FinUiState,
-    analysisSaleSoldAllTime: Double,
-    analysisWriteOffOwnNeedsMoneyAllTime: Double,
-    analysisWriteOffScrapMoneyAllTime: Double,
-    analysisAddAverageValueAllTime: FinUiState,
-    analysisAddAnimalAllTimeState: List<AnimalTitSuff>,
-    analysisSaleBuyerAllTimeState: List<AnalysisSaleBuyerAllTime>,
-    analysisCostPriceAllTimeState: List<AnimalTitSuff>
+    saleProject: Double,
+    expensesProject: Double,
+    writeOffOwnNeedsProject: Double,
+    writeOffScrapProject: Double,
+    countAnimalProject: Double,
+    bestSale: List<AnalysisSaleBuyerAllTime>,
+    bestBuyer: List<AnalysisSaleBuyerAllTime>,
+    bestExpenses: List<AnalysisSaleBuyerAllTime>,
+    bestAdd: List<AnalysisSaleBuyerAllTime>,
+    countIncubator: Int,
+    eggInIncubator: Int,
+    chikenInIncubator: Int,
+    typeIncubator: String,
+    bestProject: FinUiState,
+    boolean: Boolean
 ) {
     val context = LocalContext.current
 
@@ -127,11 +129,11 @@ fun NewYearAnalysisContainer(
         .padding(8.dp)
 
     val modifierHeading = Modifier
-        .wrapContentSize()
+        .fillMaxWidth()
         .padding(6.dp)
 
     val modifierText = Modifier
-        .wrapContentSize()
+        .fillMaxWidth()
         .padding(vertical = 3.dp, horizontal = 6.dp)
 
     Column(modifier = modifier) {
@@ -147,10 +149,9 @@ fun NewYearAnalysisContainer(
             )
             Text(
                 text = "Догорой друг! Мы благодарны Вам за то, что провели этот год вместе с нами. Ваша поддержка и доверие вдохновляют нашу команду на новые свершения.\n" +
-                        "\n" +
                         "Желаем Вам в новом году здоровья, счастья и процветания! Пусть Ваше хозяйство приносит радость и доход! \n" +
                         // составили не большой топ!
-                        "Не забудьте вступить в нашу группу ВКонтакте, чтобы быть в курсе всех новостей и полезных советов!",
+                        "Вступайте в нашу группу ВКонтакте, чтобы быть в курсе всех новостей и полезных советов!",
                 modifier = modifierText
             )
             TextButton(
@@ -160,7 +161,7 @@ fun NewYearAnalysisContainer(
                     context.startActivity(intent)
                 }, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(5.dp)
             ) {
                 Text(text = "Вступить в группу VK!")
             }
@@ -173,120 +174,194 @@ fun NewYearAnalysisContainer(
             )
         }
 
-        Card(
-            modifier = modifierCard
-        ) {
-            Text(
-                text = "В этом году Вы:", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = "Получили: ${formatter(analysisAddAllTime.priceAll)} ${analysisAddAllTime.title}",
-                modifier = modifierText
-            )
-            Text(
-                text = "Потратили: ${formatter(analysisSaleAllTime.priceAll)} ${analysisSaleAllTime.title}",
-                modifier = modifierText
-            )
-            Text(
-                text = "Сэкономили: ${formatter(analysisWriteOffOwnNeedsAllTime.priceAll)} ${analysisWriteOffOwnNeedsAllTime.title}",
-                modifier = modifierText
-            )
-            Text(
-                text = "Потеряли: ${formatter(analysisWriteOffScrapAllTime.priceAll)} ${analysisWriteOffScrapAllTime.title}",
-                modifier = modifierText
-            )
-            Text(
-                text = "Итого: ${formatter(analysisAddAllTime.priceAll - analysisSaleAllTime.priceAll - analysisWriteOffAllTime.priceAll)} ${analysisAddAllTime.title}",
-                modifier = modifierText
-            )
-        }
+        CardNewYear(
+            "Небольшая ферма",
+            "На ферме находятся",
+            "$countAnimalProject",
+            modifierCard,
+            modifierText,
+            modifierHeading
+        )
 
-        Card(
-            modifier = modifierCard
-        ) {
-            Text(
-                text = "Животные:", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = "В Вашем Хозяйстве: ${formatter(analysisAddAllTime.priceAll)} ${analysisAddAllTime.title}",
-                modifier = modifierText
-            )
-            Text(
-                text = "Популярный тип: ${formatter(analysisSaleAllTime.priceAll)} ${analysisSaleAllTime.title}",
-                modifier = modifierText
-            )
-        }
-
-
-        PullOutCard(
+        PullOutCardNewYear(
             modifierCard = modifierCard,
             modifierHeading = modifierHeading,
             modifierText = modifierText,
-            name = "Лучшие Животные:",
-            list = analysisAddAnimalAllTimeState
-        ) { analysisAddAnimalAllTimeState ->
-            "${if (analysisAddAnimalAllTimeState.title == "") "Не указано " else analysisAddAnimalAllTimeState.title} ${
-                formatter(
-                    analysisAddAnimalAllTimeState.priceAll
-                )
-            } ${analysisAddAnimalAllTimeState.suffix}"
+            nomination = "Прям как на заводе!",
+            note = "Больше всего продукции вы получили",
+            list = bestAdd,
+            itemToString = {
+                "${if (it.buyer == "") "Не указано " else it.buyer} " +
+                        "${formatter(it.resultCount)} ${it.suffix}"
+            }
+        )
+
+        PullOutCardNewYear(
+            modifierCard = modifierCard,
+            modifierHeading = modifierHeading,
+            modifierText = modifierText,
+            nomination = "Без этого никак!",
+            note = "Эти товары вы покупали чаще всего",
+            list = bestExpenses,
+            itemToString = {
+                "${if (it.buyer == "") "Не указано " else it.buyer} " +
+                        "${formatter(it.resultPrice)} ₽ за  ${formatter(it.resultCount)} ${it.suffix}"
+            }
+        )
+
+        PullOutCardNewYear(
+            modifierCard = modifierCard,
+            modifierHeading = modifierHeading,
+            modifierText = modifierText,
+            nomination = "Лучший клиент",
+            note = "Это ваши преданные клиенты, берегите их!",
+            list = bestBuyer,
+            itemToString = {
+                "${if (it.buyer == "") "Не указано " else it.buyer} " +
+                        "${formatter(it.resultPrice)} ₽"
+            }
+        )
+
+        PullOutCardNewYear(
+            modifierCard = modifierCard,
+            modifierHeading = modifierHeading,
+            modifierText = modifierText,
+            nomination = "Хит Продаж!",
+            note = "Это Ваш самымый популярный товар!",
+            list = bestSale,
+            itemToString = {
+                "${if (it.buyer == "") "Не указано " else it.buyer} " +
+                        "${formatter(it.resultPrice)} ₽ за  ${formatter(it.resultCount)} ${it.suffix}"
+            }
+        )
+
+        if (!boolean) {
+            CardNewYear(
+                "Инкубатор!",
+                "Вы запутили столько инкубаторов",
+                "$countIncubator",
+                modifierCard,
+                modifierText,
+                modifierHeading
+            )
+
+            CardNewYear(
+                "Вкладываю в инкубатор, а в не крипту!",
+                "Вы вложили в инкубатор",
+                "$eggInIncubator яйц",
+                modifierCard,
+                modifierText,
+                modifierHeading
+            )
+
+            CardNewYear(
+                "Мать-наседка!",
+                "Вы выростели",
+                "$chikenInIncubator птенцов - это ${chikenInIncubator * 100 / eggInIncubator}%!",
+                modifierCard,
+                modifierText,
+                modifierHeading
+            )
+
+            CardNewYear(
+                "Итого!",
+                "Чаще всего вы инкубировали яйца",
+                "$typeIncubator",
+                modifierCard,
+                modifierText,
+                modifierHeading
+            )
         }
 
-        PullOutCard(
-            modifierCard = modifierCard,
-            modifierHeading = modifierHeading,
-            modifierText = modifierText,
-            name = "Лучшие покупатели:",
-            list = analysisSaleBuyerAllTimeState
-        ) { analysisSaleBuyerAllTimeState ->
-            "${if (analysisSaleBuyerAllTimeState.buyer == "") "Не указано " else analysisSaleBuyerAllTimeState.buyer} ${
-                formatter(
-                    analysisSaleBuyerAllTimeState.resultPrice
-                )
-            } ₽ за ${formatter(analysisSaleBuyerAllTimeState.resultCount)} ${analysisSaleBuyerAllTimeState.suffix}"
-        }
+        CardNewYear(
+            "Вот это прибыль!",
+            "Ваша прибыль",
+            "$saleProject",
+            modifierCard,
+            modifierText,
+            modifierHeading
+        )
 
-        PullOutCard(
-            modifierCard = modifierCard,
-            modifierHeading = modifierHeading,
-            modifierText = modifierText,
-            name = "Продаваемый товар:",
-            list = analysisCostPriceAllTimeState
-        ) { analysisCostPriceAllTimeState ->
-            "${if (analysisCostPriceAllTimeState.title == "") "Не указано " else "От ${analysisCostPriceAllTimeState.title}"} ${
-                formatter(
-                    analysisCostPriceAllTimeState.priceAll
-                )
-            } ${analysisCostPriceAllTimeState.suffix}"
-        }
-        PullOutCard(
-            modifierCard = modifierCard,
-            modifierHeading = modifierHeading,
-            modifierText = modifierText,
-            name = "Без этого никак:",
-            list = analysisCostPriceAllTimeState
-        ) { analysisCostPriceAllTimeState ->
-            "${if (analysisCostPriceAllTimeState.title == "") "Не указано " else "От ${analysisCostPriceAllTimeState.title}"} ${
-                formatter(
-                    analysisCostPriceAllTimeState.priceAll
-                )
-            } ${analysisCostPriceAllTimeState.suffix}"
-        }
+        CardNewYear(
+            "Расходы это не плохо",
+            "Ваши расходы",
+            "$expensesProject",
+            modifierCard,
+            modifierText,
+            modifierHeading
+        )
+
+        CardNewYear(
+            "Экономия превыше всего!",
+            "Вы сэкономили!",
+            "$writeOffOwnNeedsProject",
+            modifierCard,
+            modifierText,
+            modifierHeading
+        )
+
+        CardNewYear(
+            "Потеря потерь!",
+            "Ваши потери",
+            "$writeOffScrapProject",
+            modifierCard,
+            modifierText,
+            modifierHeading
+        )
+
+        CardNewYear(
+            "Итого!",
+            "Вы супер, продолжайте в том же духе!",
+            "${saleProject + writeOffOwnNeedsProject - expensesProject - writeOffScrapProject}",
+            modifierCard,
+            modifierText,
+            modifierHeading
+        )
+
     }
 }
 
 @Composable
-fun <T> PullOutCard(
+fun CardNewYear(
+    nomination: String,
+    note: String,
+    value: String,
+    modifierCard: Modifier,
+    modifierText: Modifier,
+    modifierHeading: Modifier
+) {
+    Card(
+        modifier = modifierCard
+    ) {
+        Text(
+            text = nomination, modifier = modifierHeading,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp
+        )
+        Text(
+            text = note,
+            modifier = modifierText,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = value,
+            modifier = modifierText,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+
+@Composable
+fun <T> PullOutCardNewYear(
+    nomination: String,
+    note: String,
+    list: List<T>,
+    itemToString: (T) -> String,
     modifierCard: Modifier,
     modifierHeading: Modifier,
     modifierText: Modifier,
-    name: String,
-    list: List<T>,
-    itemToString: (T) -> String
 ) {
     var expanded by remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
@@ -308,15 +383,24 @@ fun <T> PullOutCard(
         ) {
             Column {
                 Text(
-                    text = "$name:", modifier = modifierHeading,
+                    text = "$nomination:", modifier = modifierHeading,
                     fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
                     fontSize = 16.sp
                 )
+                Text(
+                    text = "$note:", modifier = modifierHeading,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp
+                )
+
                 if (list.isNotEmpty()) {
                     for (i in list.indices) {
                         Text(
                             text = "${i + 1}) ${itemToString(list[i])}",
-                            modifier = modifierText.fillMaxWidth(0.8f)
+                            modifier = modifierText.fillMaxWidth(0.8f),
+                            textAlign = TextAlign.Center,
                         )
                         if (i == 2 && !expanded)
                             break

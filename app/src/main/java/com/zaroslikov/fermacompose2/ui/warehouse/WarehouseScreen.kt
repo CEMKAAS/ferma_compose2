@@ -90,6 +90,7 @@ fun WarehouseScreen(
     navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
+    navigationToNewYaer: (Pair<Boolean, Int>) -> Unit,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -154,7 +155,8 @@ fun WarehouseScreen(
                             ), it.second
                         )
                     }
-                }
+                },
+                navigationToNewYaer = { navigationToNewYaer(Pair(true, idProject)) }
             )
         }
     }
@@ -168,7 +170,8 @@ private fun WarehouseBody(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     navigationToAnalysis: (String) -> Unit,
-    writeOffButton: (Pair<WriteOffTableInsert, ExpensesTable>) -> Unit
+    writeOffButton: (Pair<WriteOffTableInsert, ExpensesTable>) -> Unit,
+    navigationToNewYaer: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -216,7 +219,8 @@ private fun WarehouseBody(
                     horizontal = dimensionResource(id = R.dimen.padding_small)
                 ),
                 navigationToAnalysis = navigationToAnalysis,
-                writeOffButton = writeOffButton
+                writeOffButton = writeOffButton,
+                navigationToNewYaer = navigationToNewYaer
             )
         }
 
@@ -231,6 +235,7 @@ private fun WarehouseInventoryList(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     navigationToAnalysis: (String) -> Unit,
+    navigationToNewYaer: () -> Unit,
     writeOffButton: (Pair<WriteOffTableInsert, ExpensesTable>) -> Unit
 ) {
     var productBoolean by rememberSaveable { mutableStateOf(true) }
@@ -243,7 +248,7 @@ private fun WarehouseInventoryList(
     ) {
         item {
             Button(
-                onClick = {},
+                onClick = { navigationToNewYaer() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 15.dp)

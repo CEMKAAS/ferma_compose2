@@ -28,6 +28,7 @@ import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorViewModel
+import com.zaroslikov.fermacompose2.ui.new_year.NewYearViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteEditViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteEntryViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteViewModel
@@ -292,6 +293,13 @@ object AppViewModelProvider {
 
         initializer {
             FinanceArhivViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.itemsRepository
+            )
+        }
+
+        initializer {
+            NewYearViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )

@@ -52,6 +52,8 @@ import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreenDestination
+import com.zaroslikov.fermacompose2.ui.new_year.NewYearAnalysis
+import com.zaroslikov.fermacompose2.ui.new_year.NewYearDestination
 import com.zaroslikov.fermacompose2.ui.note.NoteDestination
 import com.zaroslikov.fermacompose2.ui.note.NoteEditDestination
 import com.zaroslikov.fermacompose2.ui.note.NoteEditProduct
@@ -207,9 +209,27 @@ fun InventoryNavHost(
                 navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
                 navigateToEdit = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
+                navigationToNewYaer = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
                 drawerState = drawerState
             )
         }
+
+        composable(
+            route = NewYearDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(NewYearDestination.itemIdArg) {
+                    type = NavType.BoolType
+                },
+                navArgument(NewYearDestination.itemIdArgTwo) {
+                    type = NavType.IntType
+                },
+            )
+        ) {
+            NewYearAnalysis(
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+
 
         composable(
             route = WarehouseEditDestination.routeWithArgs,
@@ -615,10 +635,12 @@ fun InventoryNavHost(
                 onNavigateUp = { navController.navigateUp() })
         }
 
-        composable(route = NoteEditDestination.routeWithArgs,
+        composable(
+            route = NoteEditDestination.routeWithArgs,
             arguments = listOf(navArgument(NoteEditDestination.itemIdArg) {
                 type = NavType.IntType
-            })) {
+            })
+        ) {
             NoteEditProduct(navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() })
         }

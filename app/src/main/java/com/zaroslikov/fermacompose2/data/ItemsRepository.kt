@@ -342,4 +342,133 @@ interface ItemsRepository {
     suspend fun insertNote(item: NoteTable)
     suspend fun updateNote(item: NoteTable)
     suspend fun deleteNote(item: NoteTable)
+
+    // NewYear Project
+    fun getAnalysisSaleNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisExpensesNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffOwnNeedsNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffScrapNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisCountAnimalNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisSaleBuyerNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    fun getAnalysisAddProductNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    fun getAnalysisSaleProductNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    fun getAnalysisExpensesProductNewYearProject(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+
+    // NewYear
+    fun getAnalysisSaleNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisExpensesNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffOwnNeedsNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffScrapNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisSaleBuyerNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    fun getAnalysisAddProductNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    fun getAnalysisSaleProductNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+    fun getAnalysisExpensesProductNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>>
+
+
+    fun getAnalysisCountAnimalNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getIncubatorCountNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int>
+
+    fun getEggInIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int>
+
+    fun getChikenInIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int>
+
+    fun getTypeIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<String>
+
+    fun getBestProjectNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Fin>
+
 }
