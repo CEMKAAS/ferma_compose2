@@ -164,7 +164,7 @@ fun FinanceAnalysisContainer(
     analysisAddAverageValueAllTime: FinUiState,
     analysisAddAnimalAllTimeState: List<AnimalTitSuff>,
     analysisSaleBuyerAllTimeState: List<AnalysisSaleBuyerAllTime>,
-    analysisCostPriceAllTimeState: List<AnimalTitSuff>
+    analysisCostPriceAllTimeState: List<Fin>
 ) {
 
     var openAlertDialog by remember { mutableStateOf(false) }
@@ -335,7 +335,7 @@ fun FinanceAnalysisContainer(
                 formatter(
                     analysisCostPriceAllTimeState.priceAll
                 )
-            } ${analysisCostPriceAllTimeState.suffix}"
+            } ₽"
         }
     }
 }

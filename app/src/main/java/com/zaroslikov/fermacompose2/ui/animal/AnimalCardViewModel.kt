@@ -147,7 +147,7 @@ data class AnimalVaccinationCardUiStateLimit(val itemList: List<AnimalVaccinatio
 data class AnimalProductCardUiStateLimit(val itemList: List<AnimalTitSuff> = listOf())
 
 data class AnimalTitSuff(
-    val title: String,
+    val title: String?,
     val priceAll: Double,
     val suffix: String
 )

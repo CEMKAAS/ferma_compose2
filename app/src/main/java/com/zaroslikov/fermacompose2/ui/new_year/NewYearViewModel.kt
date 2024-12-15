@@ -55,7 +55,7 @@ class NewYearViewModel(
         private set
     var writeOffScrapProject by mutableDoubleStateOf(0.0)
         private set
-    var countAnimalProject by mutableDoubleStateOf(0.00)
+    var countAnimalProject by mutableIntStateOf(0)
         private set
 
     var countIncubator by mutableIntStateOf(0)
@@ -106,7 +106,7 @@ class NewYearViewModel(
                         dateEnd
                     )
                         .filterNotNull()
-                        .first().toDouble()
+                        .first().toInt()
             } else {
                 expensesProject =
                     itemsRepository.getAnalysisExpensesNewYear(dateBegin, dateEnd)
@@ -133,7 +133,7 @@ class NewYearViewModel(
                     itemsRepository.getAnalysisCountAnimalNewYear(
                         dateBegin,
                         dateEnd
-                    ).filterNotNull().first().toDouble()
+                    ).filterNotNull().first().toInt()
 
                 countIncubator =
                     itemsRepository.getIncubatorCountNewYear(dateBegin, dateEnd).filterNotNull()

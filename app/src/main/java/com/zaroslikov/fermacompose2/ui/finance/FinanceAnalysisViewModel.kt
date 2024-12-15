@@ -124,13 +124,13 @@ class FinanceAnalysisViewModel(
                 initialValue = AnalysisSaleBuyerAllTimeUiState()
             )
 
-    var analysisCostPriceTimeState: StateFlow<AnalysisAddAnimalAllTimeUiState> =
+    var analysisCostPriceTimeState: StateFlow<AnalysisAddAnimalAllTimeUiState2> =
         itemsRepository.getAnalysisCostPriceAllTime(itemId, name)
-            .map { AnalysisAddAnimalAllTimeUiState(it) }
+            .map { AnalysisAddAnimalAllTimeUiState2(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnalysisAddAnimalAllTimeUiState()
+                initialValue = AnalysisAddAnimalAllTimeUiState2()
             )
 
     companion object {
@@ -209,11 +209,11 @@ class FinanceAnalysisViewModel(
 
         analysisCostPriceTimeState =
             itemsRepository.getAnalysisCostPriceAllTimeRange(itemId, name, begin, end)
-                .map { AnalysisAddAnimalAllTimeUiState(it) }
+                .map { AnalysisAddAnimalAllTimeUiState2(it) }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = AnalysisAddAnimalAllTimeUiState()
+                    initialValue = AnalysisAddAnimalAllTimeUiState2()
                 )
 
     }
@@ -221,6 +221,8 @@ class FinanceAnalysisViewModel(
 
 
 data class AnalysisAddAnimalAllTimeUiState(val itemList: List<AnimalTitSuff> = listOf())
+
+data class AnalysisAddAnimalAllTimeUiState2(val itemList: List<Fin> = listOf())
 data class AnalysisSaleBuyerAllTimeUiState(val itemList: List<AnalysisSaleBuyerAllTime> = listOf())
 
 fun Fin.toFinUiState(

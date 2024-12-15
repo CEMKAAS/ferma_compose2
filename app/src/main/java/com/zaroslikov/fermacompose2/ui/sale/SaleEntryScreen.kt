@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
@@ -234,7 +235,11 @@ fun SaleEntryContainerProduct(
                         .fillMaxWidth()
                         .padding(bottom = 10.dp),
                     isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -243,8 +248,10 @@ fun SaleEntryContainerProduct(
                     )
                 )
 
+
                 val filteredOptions =
                     titleList.filter { it.contains(title, ignoreCase = true) }
+
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -274,7 +281,8 @@ fun SaleEntryContainerProduct(
                     validateCount(count)
                 },
                 label = { Text("Количество") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 10.dp),
                 supportingText = {
                     if (isErrorCount) {
@@ -334,7 +342,9 @@ fun SaleEntryContainerProduct(
                 validatePrice(priceAll)
             },
             label = { Text("Стоимость") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
             supportingText = {
                 if (isErrorPrice) {
                     Text(
@@ -377,11 +387,16 @@ fun SaleEntryContainerProduct(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor().padding(bottom = 10.dp),
+                        .menuAnchor()
+                        .padding(bottom = 10.dp),
                     supportingText = {
                         Text("Укажите или выберите категорию в которую хотите отнести товар")
                     },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -459,8 +474,13 @@ fun SaleEntryContainerProduct(
                     },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth().padding(bottom = 10.dp),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Text, capitalization = KeyboardCapitalization.Sentences),
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
                     keyboardActions = KeyboardActions(onNext = {
                         focusManager.moveFocus(
                             FocusDirection.Down
@@ -523,13 +543,15 @@ fun SaleEntryContainerProduct(
                             SaleTableInsert(
                                 id = 0,
                                 title = title,
-                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                    .toDouble(),
                                 formattedDateList[0].toInt(),
                                 formattedDateList[1].toInt(),
                                 formattedDateList[2].toInt(),
                                 suffix = suffix,
                                 category = category,
-                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                    .toDouble(),
                                 buyer = buyer,
                                 note = note
                             )

@@ -205,6 +205,8 @@ fun ExpensesEntryContainerProduct(
             isErrorCount = true
             showFoodUI = false
             showAnimalsUI = false
+            dailyExpensesFoodTotal = 0.0
+            countAnimal = 0
         }
     }
 
@@ -212,6 +214,7 @@ fun ExpensesEntryContainerProduct(
         if (text == "") {
             isErrorPrice = true
             showAnimalsUI = false
+
         }
     }
 
@@ -227,8 +230,12 @@ fun ExpensesEntryContainerProduct(
         isErrorTitle = title == ""
         isErrorCount = count == ""
         isErrorPrice = priceAll == ""
+        isErrorDailyExpensesFood = dailyExpensesFoodUI == ""
+        isErrorСountAnimalUI = countAnimalUI == ""
 
-        return !(isErrorTitle || isErrorCount || isErrorPrice)
+        return if (setDailyExpensesFoodAndCountUI){
+            !(isErrorTitle || isErrorCount || isErrorPrice || isErrorСountAnimalUI || isErrorDailyExpensesFood)
+        } else !(isErrorTitle || isErrorCount || isErrorPrice)
     }
 
     //Календарь
@@ -633,7 +640,7 @@ fun ExpensesEntryContainerProduct(
                             false
                         } else true
                     )
-                    Text(text = "Распределить расходы")
+                    Text(text = "Распределить расходы по животным")
                 }
             }
 
@@ -807,7 +814,6 @@ fun ExpensesEntryContainerProduct(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 14.dp)
-                            .padding(top = 5.dp)
                     ) {
                         if (animalList.isNotEmpty()) {
                             animalList.forEach { animal ->
@@ -833,7 +839,8 @@ fun ExpensesEntryContainerProduct(
                                             )
                                         }
                                     } else null,
-                                    modifier = Modifier.padding(4.dp)
+                                    modifier = Modifier
+                                        .padding(horizontal = 10.dp)
                                 )
                             }
                         } else {
@@ -847,14 +854,21 @@ fun ExpensesEntryContainerProduct(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 14.dp)
-                                .padding(top = 10.dp)
+                                .padding(top = 5.dp)
                         ) {
 
                             Text(
-                                text = "${animal.key}: ${formatter(animal.value * count.toDouble() / 100.0)} $suffix /" +
+                                text = "${animalList.find { it.id.toLong() == animal.key }?.name}: ${
+                                    formatter(
+                                        animal.value * count.toDouble() / 100.0
+                                    )
+                                } $suffix /" +
                                         " ${formatter(animal.value * priceAll.toDouble() / 100.0)} ₽" +
                                         " -  ${formatter(animal.value)}%",
-                                fontSize = 20.sp
+                                fontSize = 18.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp)
                             )
 
                             Slider(
@@ -869,11 +883,13 @@ fun ExpensesEntryContainerProduct(
                                         if (otherAnimal.key != animal.key) {
                                             selectedFilters2[otherAnimal.key] =
                                                 (remainingFood / otherAnimalsCount).toDouble()
-
                                         }
                                     }
                                 },
-                                valueRange = 0f..totalFood
+                                valueRange = 0f..totalFood,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 5.dp, vertical = 2.5.dp)
                             )
                         }
                     }
@@ -916,6 +932,10 @@ fun ExpensesEntryContainerProduct(
                     eventParameters["Кол-во"] = "$title $count $suffix $priceAll₽"
                     eventParameters["Категория"] = category
                     eventParameters["Примечание"] = note
+                    eventParameters["Корм"] = showFoodUI
+                    eventParameters["Склад"] = showWarehouseUI
+                    eventParameters["Распределение"] = showAnimalsUI
+
                     AppMetrica.reportEvent("Expenses Products", eventParameters)
                 }
             },

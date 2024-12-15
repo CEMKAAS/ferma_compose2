@@ -110,7 +110,7 @@ fun NewYearAnalysisContainer(
     expensesProject: Double,
     writeOffOwnNeedsProject: Double,
     writeOffScrapProject: Double,
-    countAnimalProject: Double,
+    countAnimalProject: Int,
     bestSale: List<AnalysisSaleBuyerAllTime>,
     bestBuyer: List<AnalysisSaleBuyerAllTime>,
     bestExpenses: List<AnalysisSaleBuyerAllTime>,
@@ -136,6 +136,8 @@ fun NewYearAnalysisContainer(
         .fillMaxWidth()
         .padding(vertical = 3.dp, horizontal = 6.dp)
 
+    val total = saleProject + writeOffOwnNeedsProject - expensesProject - writeOffScrapProject
+
     Column(modifier = modifier) {
 
 
@@ -145,12 +147,12 @@ fun NewYearAnalysisContainer(
             Text(
                 text = "С Наступающим Новым Годом!", modifier = modifierHeading,
                 fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
                 fontSize = 16.sp
             )
             Text(
-                text = "Догорой друг! Мы благодарны Вам за то, что провели этот год вместе с нами. Ваша поддержка и доверие вдохновляют нашу команду на новые свершения.\n" +
-                        "Желаем Вам в новом году здоровья, счастья и процветания! Пусть Ваше хозяйство приносит радость и доход! \n" +
-                        // составили не большой топ!
+                text = "Догорой друг!\nМы благодарны Вам за то, что провели этот год вместе с нами. Ваша поддержка и доверие вдохновляют нашу команду на новые свершения.\n" +
+                        "Желаем Вам в новом году здоровья, счастья и процветания! Пусть Ваше хозяйство приносит радость и доход!\n" +
                         "Вступайте в нашу группу ВКонтакте, чтобы быть в курсе всех новостей и полезных советов!",
                 modifier = modifierText
             )
@@ -159,9 +161,7 @@ fun NewYearAnalysisContainer(
                     AppMetrica.reportEvent("Переход в группу из Нового года")
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/myfermaapp"))
                     context.startActivity(intent)
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Вступить в группу VK!")
             }
@@ -174,34 +174,47 @@ fun NewYearAnalysisContainer(
             )
         }
 
-        CardNewYear(
-            "Небольшая ферма",
-            "На ферме находятся",
-            "$countAnimalProject",
-            modifierCard,
-            modifierText,
-            modifierHeading
-        )
+        Card(
+            modifier = modifierCard
+        ) {
+            Text(
+                text = if (boolean) "Представляем Вам небольшую подборку ключевых событий и достижений,  связанных с Вашим проектом, за прошедший год!"
+                else "Представляем Вам небольшую подборку ключевых событий и достижений,  связанных со всеми Вашими проектами, за прошедший год!",
+                textAlign = TextAlign.Center,
+                modifier = modifierText
+            )
+        }
+
+        if (countAnimalProject!=0) {
+            CardNewYear(
+                "Небольшая ферма",
+                "Животных на Вашей ферме",
+                "$countAnimalProject",
+                modifierCard,
+                modifierText,
+                modifierHeading
+            )
+        }
 
         PullOutCardNewYear(
             modifierCard = modifierCard,
-            modifierHeading = modifierHeading,
+            modifierHeading = modifierText,
             modifierText = modifierText,
-            nomination = "Прям как на заводе!",
-            note = "Больше всего продукции вы получили",
+            nomination = "Прям как на заводе!", //Это точно ферма??
+            note = "Больше всего продукции произведено",
             list = bestAdd,
             itemToString = {
                 "${if (it.buyer == "") "Не указано " else it.buyer} " +
-                        "${formatter(it.resultCount)} ${it.suffix}"
+                        "${formatter(it.resultPrice)} ${it.suffix}"
             }
         )
 
         PullOutCardNewYear(
             modifierCard = modifierCard,
-            modifierHeading = modifierHeading,
+            modifierHeading = modifierText,
             modifierText = modifierText,
             nomination = "Без этого никак!",
-            note = "Эти товары вы покупали чаще всего",
+            note = "Эти товары покупали чаще всего",
             list = bestExpenses,
             itemToString = {
                 "${if (it.buyer == "") "Не указано " else it.buyer} " +
@@ -211,10 +224,10 @@ fun NewYearAnalysisContainer(
 
         PullOutCardNewYear(
             modifierCard = modifierCard,
-            modifierHeading = modifierHeading,
+            modifierHeading = modifierText,
             modifierText = modifierText,
             nomination = "Лучший клиент",
-            note = "Это ваши преданные клиенты, берегите их!",
+            note = "Преданные клиенты, берегите их!",
             list = bestBuyer,
             itemToString = {
                 "${if (it.buyer == "") "Не указано " else it.buyer} " +
@@ -224,10 +237,10 @@ fun NewYearAnalysisContainer(
 
         PullOutCardNewYear(
             modifierCard = modifierCard,
-            modifierHeading = modifierHeading,
+            modifierHeading = modifierText,
             modifierText = modifierText,
             nomination = "Хит Продаж!",
-            note = "Это Ваш самымый популярный товар!",
+            note = "Самые популярные товары!",
             list = bestSale,
             itemToString = {
                 "${if (it.buyer == "") "Не указано " else it.buyer} " +
@@ -236,56 +249,62 @@ fun NewYearAnalysisContainer(
         )
 
         if (!boolean) {
-            CardNewYear(
-                "Инкубатор!",
-                "Вы запутили столько инкубаторов",
-                "$countIncubator",
-                modifierCard,
-                modifierText,
-                modifierHeading
-            )
+            if (countIncubator != 0) {
+                CardNewYear(
+                    "Инкубатор!",
+                    "Вы запутили столько инкубаторов",
+                    "$countIncubator шт.",
+                    modifierCard,
+                    modifierText,
+                    modifierHeading
+                )
+            }
 
-            CardNewYear(
-                "Вкладываю в инкубатор, а в не крипту!",
-                "Вы вложили в инкубатор",
-                "$eggInIncubator яйц",
-                modifierCard,
-                modifierText,
-                modifierHeading
-            )
-
-            CardNewYear(
-                "Мать-наседка!",
-                "Вы выростели",
-                "$chikenInIncubator птенцов - это ${chikenInIncubator * 100 / eggInIncubator}%!",
-                modifierCard,
-                modifierText,
-                modifierHeading
-            )
-
-            CardNewYear(
-                "Итого!",
-                "Чаще всего вы инкубировали яйца",
-                "$typeIncubator",
-                modifierCard,
-                modifierText,
-                modifierHeading
-            )
+            if (eggInIncubator != 0) {
+                CardNewYear(
+                    "Вкладываю в инкубатор, а не в крипту!",
+                    "Вы вложили в инкубатор",
+                    "$eggInIncubator яйц",
+                    modifierCard,
+                    modifierText,
+                    modifierHeading
+                )
+            }
+            if (chikenInIncubator != 0) {
+                CardNewYear(
+                    "Мать-наседка!",
+                    "У Вас вылупилось ",
+                    "$chikenInIncubator птенцов- это ${chikenInIncubator * 100 / eggInIncubator}%",
+                    modifierCard,
+                    modifierText,
+                    modifierHeading
+                )
+            }
+            if (typeIncubator == "") {
+                CardNewYear(
+                    "Итого!",
+                    "Чаще всего вы инкубировали яйца",
+                    typeIncubator,
+                    modifierCard,
+                    modifierText,
+                    modifierHeading
+                )
+            }
         }
 
         CardNewYear(
             "Вот это прибыль!",
-            "Ваша прибыль",
-            "$saleProject",
+            "Вы заработали",
+            "${formatter(saleProject)} ₽",
             modifierCard,
             modifierText,
             modifierHeading
         )
 
         CardNewYear(
-            "Расходы это не плохо",
-            "Ваши расходы",
-            "$expensesProject",
+            "Расходы это не плохо!",
+            "Ваши расходы ",
+            "${formatter(expensesProject)} ₽",
             modifierCard,
             modifierText,
             modifierHeading
@@ -294,7 +313,7 @@ fun NewYearAnalysisContainer(
         CardNewYear(
             "Экономия превыше всего!",
             "Вы сэкономили!",
-            "$writeOffOwnNeedsProject",
+            "${formatter(writeOffOwnNeedsProject)} ₽",
             modifierCard,
             modifierText,
             modifierHeading
@@ -302,8 +321,8 @@ fun NewYearAnalysisContainer(
 
         CardNewYear(
             "Потеря потерь!",
-            "Ваши потери",
-            "$writeOffScrapProject",
+            "Ваши потери ",
+            "${formatter(writeOffScrapProject)} ₽",
             modifierCard,
             modifierText,
             modifierHeading
@@ -311,12 +330,21 @@ fun NewYearAnalysisContainer(
 
         CardNewYear(
             "Итого!",
-            "Вы супер, продолжайте в том же духе!",
-            "${saleProject + writeOffOwnNeedsProject - expensesProject - writeOffScrapProject}",
+            "${formatter(total)} ₽",
+            if (total > 0) "Вы супер, продолжайте в том же духе!" else "Деньги это не главное!",
             modifierCard,
             modifierText,
             modifierHeading
         )
+
+//        CardNewYear(
+//            "Лучший Проект!",
+//            "${bestProject.title} - ${formatter(bestProject.priceAll)}₽",
+//            "Лучше и быть не может!",
+//            modifierCard,
+//            modifierText,
+//            modifierHeading
+//        )
 
     }
 }
@@ -363,61 +391,33 @@ fun <T> PullOutCardNewYear(
     modifierHeading: Modifier,
     modifierText: Modifier,
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (expanded) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-
-    Card(
-        modifier = modifierCard.padding(bottom = extraPadding.coerceAtLeast(0.dp))
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
+    if (list.isNotEmpty()) {
+        Card(
+            modifier = modifierCard
         ) {
             Column {
                 Text(
-                    text = "$nomination:", modifier = modifierHeading,
+                    text = nomination, modifier = modifierHeading,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp
                 )
                 Text(
-                    text = "$note:", modifier = modifierHeading,
+                    text = note, modifier = modifierHeading,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp
                 )
 
-                if (list.isNotEmpty()) {
-                    for (i in list.indices) {
-                        Text(
-                            text = "${i + 1}) ${itemToString(list[i])}",
-                            modifier = modifierText.fillMaxWidth(0.8f),
-                            textAlign = TextAlign.Center,
-                        )
-                        if (i == 2 && !expanded)
-                            break
-                    }
-                } else {
-                    Text(text = "Пока ничего нет :(", modifier = modifierText)
-                }
-            }
-
-            if (list.size > 3) {
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(
-                        if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Показать меню"
+                list.forEachIndexed { index, it ->
+                    Text(
+                        text = "${index + 1}. ${itemToString(it)}",
+                        modifier = modifierText.fillMaxWidth(0.8f),
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
         }
     }
 }
+

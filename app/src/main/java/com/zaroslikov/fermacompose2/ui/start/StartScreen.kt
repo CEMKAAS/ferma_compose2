@@ -73,6 +73,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart2
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -80,6 +81,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
+import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
 import io.appmetrica.analytics.AppMetrica
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -100,6 +102,7 @@ fun StartScreen(
     navigateToItemIncubator: (Int) -> Unit,
     navigateToItemProjectArh: (Int) -> Unit,
     navigateToItemIncubatorArh: (Int) -> Unit,
+    navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -143,7 +146,8 @@ fun StartScreen(
             projectListAct = projectListAct.projectList,
             navigateToItemIncubator = navigateToItemIncubator,
             navigateToItemProjectArh = navigateToItemProjectArh,
-            navigateToItemIncubatorArh = navigateToItemIncubatorArh
+            navigateToItemIncubatorArh = navigateToItemIncubatorArh,
+            navigationToNewYear ={ navigationToNewYear(Pair(false,0)) }
         )
 
         if (infoBottomSheet) {
@@ -176,7 +180,8 @@ fun StartScreenContainer(
     navigateToItemProjectArh: (Int) -> Unit,
     navigateToItemIncubatorArh: (Int) -> Unit,
     projectListArh: List<ProjectTable>,
-    projectListAct: List<ProjectTable>
+    projectListAct: List<ProjectTable>,
+    navigationToNewYear: () -> Unit,
 ) {
     var state by remember { mutableStateOf(0) }
     val titles = listOf("Действующие", "Архив")
@@ -222,7 +227,14 @@ fun StartScreenContainer(
                 state = pagerState.currentPage
             }
             Column {
-
+                Button(
+                    onClick = { navigationToNewYear() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp, horizontal = 15.dp)
+                ) {
+                    Text(text = "Итоги года!")
+                }
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
                         Tab(
@@ -246,11 +258,11 @@ fun StartScreenContainer(
                         .weight(1f)
                 ) {
 
+
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         contentPadding = PaddingValues(16.dp)
                     ) {
-
                         when (state) {
                             0 -> {
                                 items(items = projectListAct, key = { it.id }) {

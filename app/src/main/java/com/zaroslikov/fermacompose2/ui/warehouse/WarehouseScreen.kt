@@ -90,7 +90,7 @@ fun WarehouseScreen(
     navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    navigationToNewYaer: (Pair<Boolean, Int>) -> Unit,
+    navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -156,7 +156,7 @@ fun WarehouseScreen(
                         )
                     }
                 },
-                navigationToNewYaer = { navigationToNewYaer(Pair(true, idProject)) }
+                navigationToNewYaer = { navigationToNewYear(Pair(true, idProject)) }
             )
         }
     }
@@ -220,7 +220,7 @@ private fun WarehouseBody(
                 ),
                 navigationToAnalysis = navigationToAnalysis,
                 writeOffButton = writeOffButton,
-                navigationToNewYaer = navigationToNewYaer
+                navigationToNewYear = navigationToNewYaer
             )
         }
 
@@ -235,7 +235,7 @@ private fun WarehouseInventoryList(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     navigationToAnalysis: (String) -> Unit,
-    navigationToNewYaer: () -> Unit,
+    navigationToNewYear: () -> Unit,
     writeOffButton: (Pair<WriteOffTableInsert, ExpensesTable>) -> Unit
 ) {
     var productBoolean by rememberSaveable { mutableStateOf(true) }
@@ -248,12 +248,12 @@ private fun WarehouseInventoryList(
     ) {
         item {
             Button(
-                onClick = { navigationToNewYaer() },
+                onClick = { navigationToNewYear() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 15.dp)
             ) {
-                Text(text = "Посмотреть итоги года!")
+                Text(text = "Итоги года по проекту!")
             }
         }
         if (itemList.isNotEmpty()) {

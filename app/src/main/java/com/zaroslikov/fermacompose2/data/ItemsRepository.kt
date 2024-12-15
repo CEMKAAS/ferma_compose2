@@ -206,7 +206,7 @@ interface ItemsRepository {
     fun getAnalysisAddAverageValueAllTime(id: Int, name: String): Flow<Fin>
     fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
     fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
-    fun getAnalysisCostPriceAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>>
+    fun getAnalysisCostPriceAllTime(id: Int, name: String): Flow<List<Fin>>
 
     //AnalisisRange
     fun getAnalysisAddAllTimeRange(
@@ -290,7 +290,7 @@ interface ItemsRepository {
         id: Int, name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<AnimalTitSuff>>
+    ): Flow<List<Fin>>
 
 
     suspend fun insertIncubator(item: Incubator)
@@ -372,7 +372,7 @@ interface ItemsRepository {
         id: Int,
         dateBegin: String,
         dateEnd: String
-    ): Flow<Double>
+    ): Flow<Int>
 
     fun getAnalysisSaleBuyerNewYearProject(
         id: Int,
@@ -444,7 +444,7 @@ interface ItemsRepository {
     fun getAnalysisCountAnimalNewYear(
         dateBegin: String,
         dateEnd: String
-    ): Flow<Double>
+    ): Flow<Int>
 
     fun getIncubatorCountNewYear(
         dateBegin: String,

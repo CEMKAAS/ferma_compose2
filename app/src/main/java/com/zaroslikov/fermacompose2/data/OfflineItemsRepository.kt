@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.data
 
+import android.view.InputQueue
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -22,6 +23,7 @@ import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
+import io.appmetrica.analytics.impl.Fi
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
@@ -271,7 +273,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         name: String
     ): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTime(id, name)
 
-    override fun getAnalysisCostPriceAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>> =
+    override fun getAnalysisCostPriceAllTime(id: Int, name: String): Flow<List<Fin>> =
         itemDao.getAnalysisCostPriceAllTime(id, name)
 
     //analysis Range
@@ -361,7 +363,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<AnimalTitSuff>> =
+    ): Flow<List<Fin>> =
         itemDao.getAnalysisCostPriceAllTimeRange(id, name, dateBegin, dateEnd)
 
     override suspend fun insertIncubator(item: Incubator) =
@@ -455,7 +457,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         id: Int,
         dateBegin: String,
         dateEnd: String
-    ): Flow<Double> = itemDao.getAnalysisExpensesNewYearProject(id, dateBegin, dateEnd)
+    ): Flow<Double> = itemDao.getAnalysisSaleNewYearProject(id, dateBegin, dateEnd)
 
     override fun getAnalysisExpensesNewYearProject(
         id: Int,
@@ -479,7 +481,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         id: Int,
         dateBegin: String,
         dateEnd: String
-    ): Flow<Double> = itemDao.getAnalysisCountAnimalNewYearProject(id, dateBegin, dateEnd)
+    ): Flow<Int> = itemDao.getAnalysisCountAnimalNewYearProject(id, dateBegin, dateEnd)
 
     override fun getAnalysisSaleBuyerNewYearProject(
         id: Int,
@@ -547,7 +549,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     ): Flow<List<AnalysisSaleBuyerAllTime>> =
         itemDao.getAnalysisExpensesProductNewYear(dateBegin, dateEnd)
 
-    override fun getAnalysisCountAnimalNewYear(dateBegin: String, dateEnd: String): Flow<Double> =
+    override fun getAnalysisCountAnimalNewYear(dateBegin: String, dateEnd: String): Flow<Int> =
         itemDao.getAnalysisCountAnimalNewYear(dateBegin, dateEnd)
 
     override fun getIncubatorCountNewYear(dateBegin: String, dateEnd: String): Flow<Int> =

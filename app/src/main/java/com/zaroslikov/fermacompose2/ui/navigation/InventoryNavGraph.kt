@@ -112,6 +112,7 @@ fun InventoryNavHost(
                 navigateToItemProjectArh = {
                     navController.navigate("${FinanceArhivDestination.route}/${it}")
                 },
+                navigationToNewYear = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
                 modifier = modifier
             )
 
@@ -209,7 +210,7 @@ fun InventoryNavHost(
                 navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
                 navigateToEdit = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
-                navigationToNewYaer = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
+                navigationToNewYear = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
                 drawerState = drawerState
             )
         }
