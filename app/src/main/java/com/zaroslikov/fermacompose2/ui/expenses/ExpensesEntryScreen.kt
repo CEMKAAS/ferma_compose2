@@ -140,6 +140,7 @@ fun ExpensesEntryProduct(
                             showFood = it.first.showFood,
                             showWarehouse = it.first.showWarehouse,
                             showAnimals = it.first.showAnimals,
+                            dailyExpensesFoodAndCount = it.first.showAnimals,
                             dailyExpensesFood = it.first.dailyExpensesFood,
                             countAnimal = it.first.countAnimal,
                             foodDesignedDay = it.first.foodDesignedDay,
@@ -919,6 +920,7 @@ fun ExpensesEntryContainerProduct(
                                 showFood = showFoodUI,
                                 showWarehouse = showWarehouseUI,
                                 showAnimals = showAnimalsUI,
+                                dailyExpensesFoodAndCount = setDailyExpensesFoodAndCountUI,
                                 dailyExpensesFood = if (setDailyExpensesFoodAndCountUI) dailyExpensesFoodUI.toDouble() else dailyExpensesFoodTotal,
                                 countAnimal = if (setDailyExpensesFoodAndCountUI) countAnimalUI.toInt() else countAnimal,
                                 foodDesignedDay = foodDesignedDayUI.first,
@@ -996,6 +998,7 @@ data class ExpensesTableInsert(
     val showFood: Boolean, // Показывать на складе иду
     val showWarehouse: Boolean, // Показывать на складе
     val showAnimals: Boolean, // Связывает животных
+    val dailyExpensesFoodAndCount: Boolean, // указать вручную
     val dailyExpensesFood: Double, // Ежедневный расход еды
     val countAnimal: Int, // Кол-во животных
     val foodDesignedDay: Int, // Кол-во дней

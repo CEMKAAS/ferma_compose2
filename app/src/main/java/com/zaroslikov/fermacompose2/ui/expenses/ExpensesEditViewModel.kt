@@ -74,25 +74,10 @@ class ExpensesEditViewModel(
             )
 
 
-//    val animalUiState2: StateFlow<AnimalExpensesUiState2> =
-//        itemsRepository.getItemsAnimalExpensesList2(itemId, itemIdPT).map { AnimalExpensesUiState2(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = AnimalExpensesUiState2()
-//            )
-
-    fun itemlist2() {
-        viewModelScope.launch {
-
-        }
-    }
-
     fun updateUiState(itemDetails: ExpensesTableUiState) {
         itemUiState =
             itemDetails
     }
-
 
     suspend fun saveItem() {
         itemsRepository.updateExpenses(itemUiState.toExpensesTable())
@@ -122,6 +107,7 @@ data class ExpensesTableUiState(
     val showFood: Boolean = false, // Показывать на складе иду
     val showWarehouse: Boolean = false, // Показывать на складе
     val showAnimals: Boolean = false, // Связывает животных
+    val dailyExpensesFoodAndCount: Boolean = false, // указать вручную
     val dailyExpensesFood: Double = 0.0, // Ежедневный расход еды
     val countAnimal: Int = 0, // Кол-во животных
     val foodDesignedDay: Int = 0, // Кол-во дней
@@ -143,6 +129,7 @@ fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTable
     showFood,
     showWarehouse,
     showAnimals,
+    dailyExpensesFoodAndCount,
     dailyExpensesFood,
     countAnimal,
     foodDesignedDay,
@@ -164,6 +151,7 @@ fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
     showFood,
     showWarehouse,
     showAnimals,
+    dailyExpensesFoodAndCount,
     dailyExpensesFood,
     countAnimal,
     foodDesignedDay,

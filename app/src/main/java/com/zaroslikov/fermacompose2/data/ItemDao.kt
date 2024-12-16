@@ -211,7 +211,7 @@ interface ItemDao {
 //    )
 
     @Query(
-        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal, case when e.idAnimal NOT NULL  Then 1 else 0 end as ps" +
+        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal, case when e.idAnimal NOT NULL  Then 1 else 0 end as ps, e.percentExpenses" +
                 " from AnimalTable a JOIN (" +
                 "    SELECT idAnimal, count" +
                 "    FROM animalcounttable" +

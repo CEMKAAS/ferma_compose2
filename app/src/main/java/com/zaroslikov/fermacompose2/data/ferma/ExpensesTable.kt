@@ -37,6 +37,7 @@ data class ExpensesTable(
     val showFood: Boolean, // Показывать на складе иду
     val showWarehouse: Boolean, // Показывать на складе
     val showAnimals:Boolean, // Связывает животных
+    val dailyExpensesFoodAndCount: Boolean, // указать вручную
     val dailyExpensesFood: Double, // Ежедневный расход еды
     val countAnimal: Int, // Кол-во животных
     val foodDesignedDay: Int, // Кол-во дней
