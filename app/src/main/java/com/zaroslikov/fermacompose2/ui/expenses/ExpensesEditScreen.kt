@@ -530,11 +530,11 @@ fun ExpensesEditContainerProduct(
                             if (showFoodUI) showAnimalsUI = false
                             selectedFilters2.clear()
                         },
-                        enabled = count != ""
+                        enabled = expensesTable.count!= ""
                     )
                     Text(text = "Корм")
 
-                    if (expensesTable.showFood && (count != "")) {
+                    if (expensesTable.showFood && ( expensesTable.count != "")) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
@@ -565,7 +565,7 @@ fun ExpensesEditContainerProduct(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = showWarehouseUI,
+                        checked = expensesTable.showWarehouse,
                         onCheckedChange = { showWarehouseUI = it },
                         enabled = if (count == "") {
                             false
@@ -577,7 +577,7 @@ fun ExpensesEditContainerProduct(
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = showAnimalsUI,
+                        checked = expensesTable.showAnimals,
                         onCheckedChange = {
                             showAnimalsUI = it
                             selectedFilters2.clear()
@@ -594,7 +594,7 @@ fun ExpensesEditContainerProduct(
 
 
             // КОРМА
-            if (showFoodUI && (count != "")) {
+            if (expensesTable.showFood && (expensesTable.count != "")) {
                 Text(
                     text = "${if (title == "") "Корма" else title} хватит на ${if (foodDesignedDayUI.first >= 1000) "более" else ""} ${foodDesignedDayUI.first} суток до ${foodDesignedDayUI.second}\n" +
                             "Ежедневный расход составляет - ${if (setDailyExpensesFoodAndCountUI) dailyExpensesFoodUI else dailyExpensesFoodTotal} $suffix\n" +
@@ -754,7 +754,7 @@ fun ExpensesEditContainerProduct(
             }
 
             //РАСПРЕДЕЛЕНИЕ РАСХОДОВ
-            if (showAnimalsUI) {
+            if (expensesTable.showAnimals) {
                 val totalFood by remember { mutableFloatStateOf(100f) }
 
                 Column {
