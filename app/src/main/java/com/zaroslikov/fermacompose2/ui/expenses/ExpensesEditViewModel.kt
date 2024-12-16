@@ -108,8 +108,8 @@ data class ExpensesTableUiState(
     val showWarehouse: Boolean = false, // Показывать на складе
     val showAnimals: Boolean = false, // Связывает животных
     val dailyExpensesFoodAndCount: Boolean = false, // указать вручную
-    val dailyExpensesFood: Double = 0.0, // Ежедневный расход еды
-    val countAnimal: Int = 0, // Кол-во животных
+    val dailyExpensesFood: String = "0", // Ежедневный расход еды
+    val countAnimal:String = "0", // Кол-во животных
     val foodDesignedDay: Int = 0, // Кол-во дней
     val lastDayFood: String = "", //Последний день еды
     val idPT: Int = 0
@@ -130,8 +130,8 @@ fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTable
     showWarehouse,
     showAnimals,
     dailyExpensesFoodAndCount,
-    dailyExpensesFood,
-    countAnimal,
+    dailyExpensesFood.toString(),
+    countAnimal.toString(),
     foodDesignedDay,
     lastDayFood,
     idPT
@@ -152,8 +152,8 @@ fun ExpensesTableUiState.toExpensesTable(): ExpensesTable = ExpensesTable(
     showWarehouse,
     showAnimals,
     dailyExpensesFoodAndCount,
-    dailyExpensesFood,
-    countAnimal,
+    dailyExpensesFood.toDouble(),
+    countAnimal.toInt(),
     foodDesignedDay,
     lastDayFood,
     idPT = idPT,

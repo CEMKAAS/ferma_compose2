@@ -157,13 +157,41 @@ fun ExpensesEditContainerProduct(
     // Для расчета
 
     var countAnimal by remember { mutableIntStateOf(0) } //кол-во животных
-    var foodDesignedDay by remember { mutableDoubleStateOf(expensesTable.dailyExpensesFood) }
+    var foodDesignedDay by remember { mutableDoubleStateOf(0.0) }
 
     var foodDesignedDayUI by remember { mutableStateOf(Pair<Int, String>(0, "")) }
     var dailyExpensesFoodTotal by remember { mutableDoubleStateOf(0.0) } // Общий ежедневный расход
 
-    countAnimal = expensesTable.countAnimal
-    dailyExpensesFoodTotal = expensesTable.dailyExpensesFood
+
+
+    var formattedDate = String.format(
+        "%02d.%02d.%d",
+        expensesTable.day,
+        expensesTable.mount,
+        expensesTable.year
+    )
+
+    //TODO
+    if (expensesTable.count != "") {
+        countAnimal = expensesTable.countAnimal.toInt()
+        dailyExpensesFoodTotal = expensesTable.dailyExpensesFood.toDouble()
+
+        foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
+            settingDay(
+                formattedDate,
+                expensesTable.count.toDouble(),
+                expensesTable.dailyExpensesFood.toDouble(),
+                expensesTable.countAnimal.toInt()
+            )
+        } else {
+            settingDay(
+                formattedDate,
+                expensesTable.count.toDouble(),
+                dailyExpensesFoodTotal
+            )
+        }
+    }
+
 
     // Ошибки
     var expanded by remember { mutableStateOf(false) }
@@ -193,8 +221,8 @@ fun ExpensesEditContainerProduct(
                     showFood = false,
                     showAnimals = false,
                     dailyExpensesFoodAndCount = false,
-                    dailyExpensesFood = 0.0,
-                    countAnimal = 0
+                    dailyExpensesFood = "0",
+                    countAnimal = "0"
                 )
             )
         }
@@ -470,13 +498,6 @@ fun ExpensesEditContainerProduct(
             }
         }
 
-        var formattedDate = String.format(
-            "%02d.%02d.%d",
-            expensesTable.day,
-            expensesTable.mount,
-            expensesTable.year
-        )
-
         if (openDialog) {
             val datePickerState = rememberDatePickerState(
                 selectableDates = PastOrPresentSelectableDates,
@@ -599,8 +620,8 @@ fun ExpensesEditContainerProduct(
                                     foodDesignedDayUI = settingDay(
                                         formattedDate,
                                         expensesTable.count.toDouble(),
-                                        expensesTable.dailyExpensesFood,
-                                        expensesTable.countAnimal
+                                        expensesTable.dailyExpensesFood.toDouble(),
+                                        expensesTable.countAnimal.toInt()
 //                                        if (expensesTable.dailyExpensesFood == "") 0.0 else dailyExpensesFoodUI.toDouble(),
 //                                        if (expensesTable.countAnimal == "") 0 else countAnimalUI.toInt()
                                     )
@@ -680,7 +701,8 @@ fun ExpensesEditContainerProduct(
                                         if (selected) {
                                             countAnimal += it.countAnimal
                                             dailyExpensesFoodTotal += (it.foodDay * it.countAnimal)
-                                            it.presentException = (it.foodDay/dailyExpensesFoodTotal) * 100.0
+                                            it.presentException =
+                                                (it.foodDay / dailyExpensesFoodTotal) * 100.0
                                         } else {
                                             countAnimal -= it.countAnimal
                                             dailyExpensesFoodTotal -= (it.foodDay * it.countAnimal)
@@ -725,16 +747,13 @@ fun ExpensesEditContainerProduct(
                         OutlinedTextField(
                             value = expensesTable.dailyExpensesFood.toString(),
                             onValueChange = {
-                                onValueChange(expensesTable.copy(dailyExpensesFood = it.toDouble()))
-//                                dailyExpensesFoodUI = it.replace(Regex("[^\\d.]"), "")
+                                onValueChange(expensesTable.copy(dailyExpensesFood = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
                                 validateDailyExpensesFood(it)
                                 foodDesignedDayUI = settingDay(
                                     formattedDate,
                                     expensesTable.count.toDouble(),
-                                    expensesTable.dailyExpensesFood,
-                                    expensesTable.countAnimal
-//                                    if (expensesTable.dailyExpensesFood == "") 0.0 else dailyExpensesFoodUI.toDouble(),
-//                                    if (expensesTable.countAnimal == "") 0 else countAnimalUI.toInt()
+                                    if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
+                                    if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
                                 )
 
                             },
@@ -766,18 +785,14 @@ fun ExpensesEditContainerProduct(
                         OutlinedTextField(
                             value = expensesTable.countAnimal.toString(),
                             onValueChange = {
-                                onValueChange(expensesTable.copy(countAnimal = it.toInt()))
-//                                countAnimalUI = it.replace(Regex("[^\\d.]"), "")
+                                onValueChange(expensesTable.copy(countAnimal = it.replace(Regex("[^\\d.]"), "")))
                                 validateСountAnimalUI(it)
                                 foodDesignedDayUI = settingDay(
                                     formattedDate,
                                     expensesTable.count.toDouble(),
-                                    expensesTable.dailyExpensesFood,
-                                    expensesTable.countAnimal
+                                    if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
+                                    if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
                                 )
-//                                    if (expensesTable.dailyExpensesFood == "") 0.0 else dailyExpensesFoodUI.toDouble(),
-//                                    if (expensesTable.countAnimal == "") 0 else countAnimalUI.toInt()
-//                                )
                             },
                             isError = isErrorСountAnimalUI,
                             supportingText = {
@@ -904,191 +919,6 @@ fun ExpensesEditContainerProduct(
                 }
             }
         }
-
-
-        //ПОВТОР
-//        Card {
-//            Column(
-//                Modifier
-//                    .selectableGroup()
-//                    .fillMaxWidth()
-//                    .padding(10.dp),
-//            ) {
-//                Text(
-//                    text = "Доп. настройки",
-//                    fontWeight = FontWeight.SemiBold,
-//                    fontSize = 16.sp,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 14.dp)
-//                        .padding(top = 10.dp)
-//                )
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Checkbox(
-//                        checked = expensesTable.showFood,
-//                        onCheckedChange = {
-//                            onValueChange(
-//                                expensesTable.copy(
-//                                    showFood = it,
-//                                    showWarehouse = it
-//                                )
-//                            )
-//                        },
-//                        enabled = expensesTable.count != ""
-//                    )
-//                    Text(text = "Корм")
-//                }
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Checkbox(
-//                        checked = expensesTable.showWarehouse,
-//                        onCheckedChange = { onValueChange(expensesTable.copy(showWarehouse = it)) },
-//                        enabled = if (expensesTable.count == "") {
-//                            false
-//                        } else if (expensesTable.showFood) {
-//                            false
-//                        } else true
-//                    )
-//                    Text(text = "Отображать на складе")
-//                }
-//            }
-//
-//            if (expensesTable.showFood && (expensesTable.count != "")) {
-
-//                Text(
-//                    text = "${if (expensesTable.title == "") "Корма" else expensesTable.title} хватит на $day",
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 14.dp)
-//                        .padding(top = 5.dp)
-//                )
-
-
-//                Text(
-//                    text = "Выбрать животных для рассчета ежедневного расхода",
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 14.dp)
-//                        .padding(top = 5.dp)
-//                )
-//                FlowRow(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 14.dp)
-//                        .padding(top = 5.dp)
-//                ) {
-//                    val itemList = remember { mutableStateListOf(list.toTypedArray()) }
-
-
-//                    if (itemList.isNotEmpty()) {
-
-//                    list.forEachIndexed { index, it ->
-//                        if (list.isNotEmpty()) {
-//                            selected = list.contains(it.id.toLong())
-//                        }
-//                        var sp by rememberSaveable { mutableStateOf(it.ps) }
-//                        FilterChip(
-//                            onClick = {
-//                                sp = !sp
-//                                if (selected) {
-//                                    foodDay2 += it.foodDay
-//                                    countAnimal2 += it.countAnimal
-//                                } else {
-//                                    foodDay2 -= it.foodDay
-//                                    countAnimal2 -= it.countAnimal
-//                                    if (foodDay2 < 0) foodDay2 = 0
-//                                    if (countAnimal2 < 0) countAnimal2 = 0
-//                                }
-//                                foodDay = foodDay2.toString()
-//                                countAnimal = countAnimal2.toString()
-//                                day = settingDay(date1, count.toDouble(), foodDay2, countAnimal2).second
-//                            },
-//                            label = {
-//                                Text(it.name)
-//                            },
-//                            selected = sp,
-//                            leadingIcon = if (sp) {
-//                                {
-//                                    Icon(
-//                                        imageVector = Icons.Filled.Done,
-//                                        contentDescription = "Done icon",
-//                                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-//                                    )
-//                                }
-//                            } else null,
-//                            modifier = Modifier.padding(4.dp)
-//
-//                        )
-//                    }
-//                }
-//            }
-//
-//            Text(
-//                text = "Указать ежедневный расход в ручную",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 14.dp)
-//                    .padding(top = 5.dp)
-//            )
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                    OutlinedTextField(
-//                        value = foodDay,
-//                        onValueChange = {
-//                            foodDay = it.replace(Regex("[^\\d.]"), "")
-//                            foodDay2 = 0
-//                            countAnimal2 = 0
-//                            foodDay2 = if (foodDay == "") 0 else foodDay.toInt()
-//                            countAnimal2 = if (countAnimal == "") 0 else countAnimal.toInt()
-//                            day = settingDay(date1, count.toDouble(), foodDay2, countAnimal2).second
-//                        },
-//                        label = { Text("Расход") },
-//                        modifier = Modifier
-//                            .fillMaxWidth(0.5f)
-//                            .padding(4.dp),
-//                        suffix = { Text(text = suffix) },
-//                        keyboardOptions = KeyboardOptions(
-//                            keyboardType = KeyboardType.Number,
-//                            imeAction = ImeAction.Next
-//                        ),
-//                        keyboardActions = KeyboardActions(onNext = {
-//                            focusManager.moveFocus(
-//                                FocusDirection.Down
-//                            )
-//                        }
-//                        )
-//                    )
-
-//                    OutlinedTextField(
-//                        value = countAnimal,
-//                        onValueChange = {
-//                            countAnimal = it.replace(Regex("[^\\d.]"), "")
-//                            countAnimal2 = 0
-//                            foodDay2 = 0
-//                            foodDay2 = if (foodDay == "") 0 else foodDay.toInt()
-//                            countAnimal2 = if (countAnimal == "") 0 else countAnimal.toInt()
-//                            day = settingDay(date1, count.toDouble(), foodDay2, countAnimal2).second
-//                        },
-//                        label = { Text("Кол-во голов") },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(4.dp)
-//                            .padding(bottom = 10.dp),
-//                        suffix = { Text(text = "Шт.") },
-//                        keyboardOptions = KeyboardOptions(
-//                            keyboardType = KeyboardType.Number,
-//                            imeAction = ImeAction.Next
-//                        ),
-//                        keyboardActions = KeyboardActions(onNext = {
-//                            focusManager.moveFocus(
-//                                FocusDirection.Down
-//                            )
-//                        }
-//                        )
-//                    )
-//            }
-//        }
 
 
         Button(
