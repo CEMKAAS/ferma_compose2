@@ -81,6 +81,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
+import com.zaroslikov.fermacompose2.ui.warehouse.newYearBoolean
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
 import io.appmetrica.analytics.AppMetrica
 import java.text.SimpleDateFormat
@@ -227,13 +228,15 @@ fun StartScreenContainer(
                 state = pagerState.currentPage
             }
             Column {
-                Button(
-                    onClick = { navigationToNewYear() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp, horizontal = 15.dp)
-                ) {
-                    Text(text = "Итоги года!")
+                if(newYearBoolean()){
+                    Button(
+                        onClick = { navigationToNewYear() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 5.dp, horizontal = 15.dp)
+                    ) {
+                        Text(text = "Итоги года!")
+                    }
                 }
                 TabRow(selectedTabIndex = state) {
                     titles.forEachIndexed { index, title ->
@@ -391,7 +394,9 @@ fun InfoBottomSheet(
                         uriHandler.openUri(uri)
                     }
                 },
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 15.dp),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 15.dp),
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,

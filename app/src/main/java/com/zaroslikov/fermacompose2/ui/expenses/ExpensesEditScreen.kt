@@ -163,7 +163,6 @@ fun ExpensesEditContainerProduct(
     var dailyExpensesFoodTotal by remember { mutableDoubleStateOf(0.0) } // Общий ежедневный расход
 
 
-
     var formattedDate = String.format(
         "%02d.%02d.%d",
         expensesTable.day,
@@ -171,26 +170,26 @@ fun ExpensesEditContainerProduct(
         expensesTable.year
     )
 
-    //TODO
-    if (expensesTable.count != "") {
-        countAnimal = expensesTable.countAnimal.toInt()
-        dailyExpensesFoodTotal = expensesTable.dailyExpensesFood.toDouble()
-
-        foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
-            settingDay(
-                formattedDate,
-                expensesTable.count.toDouble(),
-                expensesTable.dailyExpensesFood.toDouble(),
-                expensesTable.countAnimal.toInt()
-            )
-        } else {
-            settingDay(
-                formattedDate,
-                expensesTable.count.toDouble(),
-                dailyExpensesFoodTotal
-            )
-        }
-    }
+//    //TODO
+//    if (expensesTable.count != "") {
+//        countAnimal = expensesTable.countAnimal.toInt()
+//        dailyExpensesFoodTotal = expensesTable.dailyExpensesFood.toDouble()
+//
+//        foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
+//            settingDay(
+//                formattedDate,
+//                expensesTable.count.toDouble(),
+//                expensesTable.dailyExpensesFood.toDouble(),
+//                expensesTable.countAnimal.toInt()
+//            )
+//        } else {
+//            settingDay(
+//                formattedDate,
+//                expensesTable.count.toDouble(),
+//                dailyExpensesFoodTotal
+//            )
+//        }
+//    }
 
 
     // Ошибки
@@ -614,17 +613,22 @@ fun ExpensesEditContainerProduct(
                             Checkbox(
                                 checked = expensesTable.dailyExpensesFoodAndCount,
                                 onCheckedChange = {
-                                    onValueChange(expensesTable.copy(dailyExpensesFoodAndCount = it))
-//                                    dailyExpensesFoodTotal = 0.0
-//                                    countAnimal = 0
-                                    foodDesignedDayUI = settingDay(
-                                        formattedDate,
-                                        expensesTable.count.toDouble(),
-                                        expensesTable.dailyExpensesFood.toDouble(),
-                                        expensesTable.countAnimal.toInt()
-//                                        if (expensesTable.dailyExpensesFood == "") 0.0 else dailyExpensesFoodUI.toDouble(),
-//                                        if (expensesTable.countAnimal == "") 0 else countAnimalUI.toInt()
+                                    onValueChange(
+                                        expensesTable.copy(
+                                            dailyExpensesFoodAndCount = it,
+                                            dailyExpensesFood = "",
+                                            countAnimal = ""
+                                        )
                                     )
+//
+//                                    expensesTable.dailyExpensesFood = ""
+//                                    expensesTable.countAnimal = ""
+//                                    foodDesignedDayUI = settingDay(
+//                                        formattedDate,
+//                                        expensesTable.count.toDouble(),
+//                                        if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
+//                                        if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
+//                                    )
 
                                 }
                             )
@@ -665,12 +669,35 @@ fun ExpensesEditContainerProduct(
 
             // КОРМА
             if (expensesTable.showFood && (expensesTable.count != "")) {
+
+
+                // Первый расчет при загрузки
+                countAnimal = expensesTable.countAnimal.toInt()
+                dailyExpensesFoodTotal = expensesTable.dailyExpensesFood.toDouble()
+
+                foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
+                    settingDay(
+                        formattedDate,
+                        expensesTable.count.toDouble(),
+                        expensesTable.dailyExpensesFood.toDouble(),
+                        expensesTable.countAnimal.toInt()
+                    )
+                } else {
+                    settingDay(
+                        formattedDate,
+                        expensesTable.count.toDouble(),
+                        dailyExpensesFoodTotal
+                    )
+                }
+
                 Text(
                     text = "${if (expensesTable.title == "") "Корма" else expensesTable.title} хватит на ${if (foodDesignedDayUI.first >= 1000) "более" else ""} ${foodDesignedDayUI.first} суток до ${foodDesignedDayUI.second}\n" +
 //                            "Ежедневный расход составляет - ${if (expensesTable.dailyExpensesFoodAndCount) dailyExpensesFoodUI else dailyExpensesFoodTotal} ${expensesTable.suffix}\n" +
 //                            "Кол-во голов -  ${if (expensesTable.dailyExpensesFoodAndCount) countAnimalUI else countAnimal} шт. ",
-                            "Ежедневный расход составляет - ${if (expensesTable.dailyExpensesFoodAndCount) expensesTable.dailyExpensesFood else dailyExpensesFoodTotal} ${expensesTable.suffix}\n" +
-                            "Кол-во голов -  ${if (expensesTable.dailyExpensesFoodAndCount) expensesTable.countAnimal else countAnimal} шт. ",
+//                            "Ежедневный расход составляет - ${if (expensesTable.dailyExpensesFoodAndCount) expensesTable.dailyExpensesFood else dailyExpensesFoodTotal} ${expensesTable.suffix}\n" +
+//                            "Кол-во голов -  ${if (expensesTable.dailyExpensesFoodAndCount) expensesTable.countAnimal else countAnimal} шт. ",
+                            "Ежедневный расход составляет - ${expensesTable.dailyExpensesFood} ${expensesTable.suffix}\n" +
+                            "Кол-во голов -  ${expensesTable.countAnimal} шт. ",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 14.dp)
@@ -693,8 +720,8 @@ fun ExpensesEditContainerProduct(
                     ) {
                         if (animalList.isNotEmpty()) {
                             animalList.forEach {
-                                var selected by remember { mutableStateOf(it.ps) }
 
+                                var selected by remember { mutableStateOf(it.ps) }
                                 FilterChip(
                                     onClick = {
                                         selected = !selected
@@ -712,6 +739,12 @@ fun ExpensesEditContainerProduct(
                                             formattedDate,
                                             expensesTable.count.toDouble(),
                                             dailyExpensesFoodTotal
+                                        )
+                                        onValueChange(
+                                            expensesTable.copy(
+                                                countAnimal = countAnimal.toString(),
+                                                dailyExpensesFood = dailyExpensesFoodTotal.toString()
+                                            )
                                         )
                                     },
                                     label = { Text(it.name) },
@@ -745,9 +778,16 @@ fun ExpensesEditContainerProduct(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         OutlinedTextField(
-                            value = expensesTable.dailyExpensesFood.toString(),
+                            value = expensesTable.dailyExpensesFood,
                             onValueChange = {
-                                onValueChange(expensesTable.copy(dailyExpensesFood = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                                onValueChange(
+                                    expensesTable.copy(
+                                        dailyExpensesFood = it.replace(
+                                            Regex("[^\\d.]"),
+                                            ""
+                                        ).replace(",", ".")
+                                    )
+                                )
                                 validateDailyExpensesFood(it)
                                 foodDesignedDayUI = settingDay(
                                     formattedDate,
@@ -783,9 +823,16 @@ fun ExpensesEditContainerProduct(
                         )
 
                         OutlinedTextField(
-                            value = expensesTable.countAnimal.toString(),
+                            value = expensesTable.countAnimal,
                             onValueChange = {
-                                onValueChange(expensesTable.copy(countAnimal = it.replace(Regex("[^\\d.]"), "")))
+                                onValueChange(
+                                    expensesTable.copy(
+                                        countAnimal = it.replace(
+                                            Regex("[^\\d.]"),
+                                            ""
+                                        )
+                                    )
+                                )
                                 validateСountAnimalUI(it)
                                 foodDesignedDayUI = settingDay(
                                     formattedDate,

@@ -185,9 +185,9 @@ fun NewYearAnalysisContainer(
             )
         }
 
-        if (countAnimalProject!=0) {
+        if (countAnimalProject != 0) {
             CardNewYear(
-                "Небольшая ферма",
+                if (countAnimalProject > 10) "Звериный магнат" else "Ферма в миниатюре",
                 "Животных на Вашей ферме",
                 "$countAnimalProject",
                 modifierCard,
@@ -200,8 +200,8 @@ fun NewYearAnalysisContainer(
             modifierCard = modifierCard,
             modifierHeading = modifierText,
             modifierText = modifierText,
-            nomination = "Прям как на заводе!", //Это точно ферма??
-            note = "Больше всего продукции произведено",
+            nomination = "Сельскохозяйственный гигант",
+            note = "Было произведено",
             list = bestAdd,
             itemToString = {
                 "${if (it.buyer == "") "Не указано " else it.buyer} " +
@@ -213,8 +213,8 @@ fun NewYearAnalysisContainer(
             modifierCard = modifierCard,
             modifierHeading = modifierText,
             modifierText = modifierText,
-            nomination = "Без этого никак!",
-            note = "Эти товары покупали чаще всего",
+            nomination = "Грандиозный вклад",
+            note = "Значительные финансовые вклады в развитие своего ЛПХ",
             list = bestExpenses,
             itemToString = {
                 "${if (it.buyer == "") "Не указано " else it.buyer} " +
@@ -240,7 +240,7 @@ fun NewYearAnalysisContainer(
             modifierHeading = modifierText,
             modifierText = modifierText,
             nomination = "Хит Продаж!",
-            note = "Самые популярные товары!",
+            note = "Самые продаваемые товары!",
             list = bestSale,
             itemToString = {
                 "${if (it.buyer == "") "Не указано " else it.buyer} " +
@@ -251,8 +251,8 @@ fun NewYearAnalysisContainer(
         if (!boolean) {
             if (countIncubator != 0) {
                 CardNewYear(
-                    "Инкубатор!",
-                    "Вы запутили столько инкубаторов",
+                    if (countIncubator > 3) "Инкубаторный гуру " else "Птичий старт-ап",
+                    "Вы запустили столько инкубаторов:",
                     "$countIncubator шт.",
                     modifierCard,
                     modifierText,
@@ -263,7 +263,7 @@ fun NewYearAnalysisContainer(
             if (eggInIncubator != 0) {
                 CardNewYear(
                     "Вкладываю в инкубатор, а не в крипту!",
-                    "Вы вложили в инкубатор",
+                    "Вы вложили в инкубатор:",
                     "$eggInIncubator яйц",
                     modifierCard,
                     modifierText,
@@ -273,7 +273,7 @@ fun NewYearAnalysisContainer(
             if (chikenInIncubator != 0) {
                 CardNewYear(
                     "Мать-наседка!",
-                    "У Вас вылупилось ",
+                    "У Вас вылупилось:",
                     "$chikenInIncubator птенцов- это ${chikenInIncubator * 100 / eggInIncubator}%",
                     modifierCard,
                     modifierText,
@@ -282,8 +282,8 @@ fun NewYearAnalysisContainer(
             }
             if (typeIncubator == "") {
                 CardNewYear(
-                    "Итого!",
-                    "Чаще всего вы инкубировали яйца",
+                    "Мастер узкого профиля",
+                    "Вы специализируетесь на определенном типе птиц:",
                     typeIncubator,
                     modifierCard,
                     modifierText,
@@ -294,7 +294,7 @@ fun NewYearAnalysisContainer(
 
         CardNewYear(
             "Вот это прибыль!",
-            "Вы заработали",
+            "Вы заработали:",
             "${formatter(saleProject)} ₽",
             modifierCard,
             modifierText,
@@ -303,7 +303,7 @@ fun NewYearAnalysisContainer(
 
         CardNewYear(
             "Расходы это не плохо!",
-            "Ваши расходы ",
+            "Ваши расходы составили:",
             "${formatter(expensesProject)} ₽",
             modifierCard,
             modifierText,
@@ -312,7 +312,7 @@ fun NewYearAnalysisContainer(
 
         CardNewYear(
             "Экономия превыше всего!",
-            "Вы сэкономили!",
+            "Вы сэкономили:",
             "${formatter(writeOffOwnNeedsProject)} ₽",
             modifierCard,
             modifierText,
@@ -321,7 +321,7 @@ fun NewYearAnalysisContainer(
 
         CardNewYear(
             "Потеря потерь!",
-            "Ваши потери ",
+            "Ваши потери составили:",
             "${formatter(writeOffScrapProject)} ₽",
             modifierCard,
             modifierText,
@@ -329,9 +329,10 @@ fun NewYearAnalysisContainer(
         )
 
         CardNewYear(
-            "Итого!",
+            if (total > 0) "Агропредприниматель года!" else "На пути к успеху",
+            if (total > 0) "Вы супер, продолжайте в том же духе! Ваша рентабельность соcтавила:"
+            else "Не все сезоны бывают удачными, но важно видеть возможности для роста и улучшения! Ваша рентабельность составила:",
             "${formatter(total)} ₽",
-            if (total > 0) "Вы супер, продолжайте в том же духе!" else "Деньги это не главное!",
             modifierCard,
             modifierText,
             modifierHeading

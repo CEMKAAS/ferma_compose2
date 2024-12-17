@@ -69,10 +69,12 @@ import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
+import java.util.TimeZone
 
 object WarehouseDestination : NavigationDestination {
     override val route = "warehouse"
@@ -246,16 +248,21 @@ private fun WarehouseInventoryList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        item {
-            Button(
-                onClick = { navigationToNewYear() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-            ) {
-                Text(text = "Итоги года по проекту!")
+
+        if (newYearBoolean()) {
+            item {
+                Button(
+                    onClick = { navigationToNewYear() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp)
+                ) {
+                    Text(text = "Итоги года по проекту!")
+                }
             }
         }
+
+
         if (itemList.isNotEmpty()) {
             item {
                 TextButtonWarehouse(
@@ -530,6 +537,13 @@ fun TextButtonWarehouse(
     }
 }
 
+fun newYearBoolean():Boolean{
+    val format = SimpleDateFormat("dd.MM.yyyy")
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val formattedDate: String = format.format(calendar.timeInMillis)
+    val year = calendar.get(Calendar.YEAR)
+    return formattedDate == "30.12.$year" || formattedDate == "31.12.$year"
+}
 
 data class WarehouseData(
     val Title: String,
