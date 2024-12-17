@@ -616,10 +616,11 @@ fun ExpensesEditContainerProduct(
                                     onValueChange(
                                         expensesTable.copy(
                                             dailyExpensesFoodAndCount = it,
-                                            dailyExpensesFood = "",
-                                            countAnimal = ""
+                                            dailyExpensesFood = "0",
+                                            countAnimal = "0"
                                         )
                                     )
+                                    animalListClean(animalList)
 //
 //                                    expensesTable.dailyExpensesFood = ""
 //                                    expensesTable.countAnimal = ""
@@ -672,8 +673,8 @@ fun ExpensesEditContainerProduct(
 
 
                 // Первый расчет при загрузки
-                countAnimal = expensesTable.countAnimal.toInt()
-                dailyExpensesFoodTotal = expensesTable.dailyExpensesFood.toDouble()
+                countAnimal = if(expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
+                dailyExpensesFoodTotal = if (expensesTable.dailyExpensesFood =="") 0.0 else expensesTable.dailyExpensesFood.toDouble()
 
                 foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
                     settingDay(
