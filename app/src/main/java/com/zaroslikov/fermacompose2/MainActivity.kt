@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
 //                    }
 //                    loadInterstitialAd()
                 }
-                InventoryApp(modifier = Modifier)
+                InventoryApp(modifier = Modifier, isFirstStart = isFirstLaunch(this) )
 
             }
 

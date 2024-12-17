@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
 
 object ChoiseProjectDestination : NavigationDestination {
     override val route = "ChoiseProject"
@@ -43,7 +46,24 @@ object ChoiseProjectDestination : NavigationDestination {
 fun ChoiseProject(
     navigateBack: () -> Unit,
     navigateProject: (String) -> Unit,
+    isFirstStart :Boolean = false
 ) {
+
+    if(isFirstStart){
+        AlertDialogExample(
+            onDismissRequest = { isFirstStart =  false },
+            onConfirmation = {
+                isFirstStart  = false
+                    println("Confirmation registered") // Add logic here to handle confirmation.
+                },
+                dialogTitle = "Добро пожаловать!",
+                dialogText = "Для начала работы выберите тип проекта Инкубатор, если вы хотите заняться инкубированием, Мое Хозяйства для работы с финасовой частью проекта",
+                icon = Icons.Default.Info
+            )
+    }
+
+
+
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Выбор проекта", navigateUp = navigateBack)

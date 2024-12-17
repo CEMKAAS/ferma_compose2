@@ -58,7 +58,8 @@ import kotlinx.coroutines.launch
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFirstStart: Boolean
 ) {
     Scaffold(bottomBar = {
         Banner(
@@ -71,7 +72,8 @@ fun InventoryApp(
         InventoryNavHost(
             navController = navController,
             drawerState = drawerState,
-            modifier = modifier.padding(innerPadding)
+            modifier = modifier.padding(innerPadding),
+            isFirstStart = isFirstStart
         )
     }
 

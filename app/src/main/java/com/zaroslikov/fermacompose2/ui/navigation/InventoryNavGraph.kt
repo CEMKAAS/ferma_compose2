@@ -90,10 +90,11 @@ fun InventoryNavHost(
     navController: NavHostController,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
+    isFirstStart: Boolean
 ) {
     NavHost(
         navController = navController,
-        startDestination = StartDestination.route,
+        startDestination = if (isFirstStart) StartDestination.route else ChoiseProjectDestination.route,
         modifier = modifier
     ) {
 
@@ -120,7 +121,9 @@ fun InventoryNavHost(
 
         composable(route = ChoiseProjectDestination.route) {
             ChoiseProject(navigateBack = { navController.popBackStack() },
-                navigateProject = { navController.navigate(it) })
+                navigateProject = { navController.navigate(it) },
+                isFirstStart = isFirstStart  )
+
         }
 
 

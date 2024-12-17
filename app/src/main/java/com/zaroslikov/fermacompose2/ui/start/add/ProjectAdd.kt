@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -44,6 +46,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -61,8 +64,19 @@ object ProjectAddDestination : NavigationDestination {
 fun AddProject(
     navigateBack: () -> Unit,
     navigateToStart: () -> Unit,
+    isFirstStart :Boolean = false,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+
+    if(isFirstStart){
+        AlertDialogExample(
+            onDismissRequest = { isFirstStart =  false },
+            onConfirmation = { isFirstStart  = false },
+            dialogTitle = "Установка проекта",
+            dialogText = "Придумайте оригинальное название для своего проекта к примеру: Козоводство или Кролиководство, не забудьте указать дату начала вашего проекта",
+            icon = Icons.Default.Info
+        )
+    }
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
