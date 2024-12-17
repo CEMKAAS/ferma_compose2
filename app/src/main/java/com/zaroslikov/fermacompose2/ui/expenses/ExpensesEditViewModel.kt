@@ -8,6 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
@@ -79,6 +80,47 @@ class ExpensesEditViewModel(
             itemDetails
     }
 
+    suspend fun saveExpensesAnimal(animalExpensesList2: List<AnimalExpensesList2>) {
+        animalExpensesList2.forEach {
+            if (it.ps) {
+                itemsRepository.updateExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = it.idExpensesAnimal,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
+                )
+            } else {
+                itemsRepository.deleteExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = it.idExpensesAnimal,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
+                )
+            }
+        }
+    }
+
+    suspend fun deleteExpensesAnimal(animalExpensesList2: List<AnimalExpensesList2>) {
+        animalExpensesList2.forEach {
+            itemsRepository.deleteExpensesAnimal(
+                ExpensesAnimalTable(
+                    id = it.idExpensesAnimal,
+                    idExpenses = itemId.toLong(),
+                    idAnimal = it.id.toLong(),
+                    percentExpenses = it.presentException,
+                    idPT = itemIdPT.toLong()
+                )
+            )
+        }
+    }
+
+
     suspend fun saveItem() {
         itemsRepository.updateExpenses(itemUiState.toExpensesTable())
     }
@@ -109,7 +151,7 @@ data class ExpensesTableUiState(
     val showAnimals: Boolean = false, // Связывает животных
     val dailyExpensesFoodAndCount: Boolean = false, // указать вручную
     var dailyExpensesFood: String = "0", // Ежедневный расход еды
-    var countAnimal:String = "0", // Кол-во животных
+    var countAnimal: String = "0", // Кол-во животных
     val foodDesignedDay: Int = 0, // Кол-во дней
     val lastDayFood: String = "", //Последний день еды
     val idPT: Int = 0

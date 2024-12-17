@@ -44,6 +44,7 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -213,25 +214,27 @@ fun ExpensesEditContainerProduct(
     }
 
     fun validateCount(text: String) {
-        if (text == "") {
-            isErrorCount = true
-            onValueChange(
-                expensesTable.copy(
-                    showFood = false,
-                    showAnimals = false,
-                    dailyExpensesFoodAndCount = false,
-                    dailyExpensesFood = "0",
-                    countAnimal = "0"
-                )
-            )
-        }
+//        if (text == "") {
+//            isErrorCount = true
+//            onValueChange(
+//                expensesTable.copy(
+//                    showFood = false,
+//                    showAnimals = false,
+//                    dailyExpensesFoodAndCount = false,
+//                    dailyExpensesFood = "0",
+//                    countAnimal = "0"
+//                )
+//            )
+//        }
+        isErrorCount = text == ""
     }
 
     fun validatePrice(text: String) {
-        if (text == "") {
-            isErrorPrice = true
-            onValueChange(expensesTable.copy(showAnimals = false))
-        }
+//        if (text == "") {
+//            isErrorPrice = true
+//            onValueChange(expensesTable.copy(showAnimals = false))
+//        }
+        isErrorPrice = text ==""
     }
 
     fun validateDailyExpensesFood(text: String) {
@@ -325,7 +328,7 @@ fun ExpensesEditContainerProduct(
                 onValueChange = {
                     onValueChange(
                         expensesTable.copy(
-                            count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                            count = it
                         )
                     )
                     validateCount(it)
@@ -413,7 +416,7 @@ fun ExpensesEditContainerProduct(
             onValueChange = {
                 onValueChange(
                     expensesTable.copy(
-                        priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                        priceAll = it
                     )
                 )
                 validatePrice(expensesTable.priceAll)
@@ -680,9 +683,8 @@ fun ExpensesEditContainerProduct(
                     settingDay(
                         formattedDate,
                         expensesTable.count.toDouble(),
-                        expensesTable.dailyExpensesFood.toDouble(),
-                        expensesTable.countAnimal.toInt()
-                    )
+                        if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
+                        if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()                    )
                 } else {
                     settingDay(
                         formattedDate,
@@ -871,8 +873,10 @@ fun ExpensesEditContainerProduct(
                 }
             }
 
+
             //РАСПРЕДЕЛЕНИЕ РАСХОДОВ
             if (expensesTable.showAnimals) {
+//                var  animalList2 by remember { mutableStateOf(animalList) }
                 val totalFood by remember { mutableFloatStateOf(100f) }
 
                 Column {
@@ -885,17 +889,19 @@ fun ExpensesEditContainerProduct(
 
                             animalList.forEachIndexed { index, animal ->
                                 var selected by remember { mutableStateOf(animal.ps) }
+
                                 FilterChip(
                                     selected = selected,
                                     onClick = {
                                         selected = !selected
 
-//                                        if (selected) animal.ps = true
-//                                        else animal.ps = false
+                                        if (selected) animal.ps = true
+                                        else animal.ps = false
                                         animalList.forEach {
                                             animalList[index].presentException =
                                                 (totalFood / animalList.size).toDouble()
                                         }
+
                                     },
                                     label = { Text(animal.name) },
                                     leadingIcon = if (selected) {
@@ -916,53 +922,57 @@ fun ExpensesEditContainerProduct(
                         }
                     }
 
+
+
                     // Отображаем слайдеры для каждого выбранного животного
                     animalList.forEachIndexed { index, animal ->
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 14.dp)
-                                .padding(top = 5.dp)
-                        ) {
 
-                            Text(
-                                text = "" +
-//                                        "${animalList.find { it.id.toLong() == animal.key }?.name}: " +
-                                        "${
-                                            formatter(
-                                                (animal.presentException ?: 1.0) * expensesTable.count.toDouble() / 100.0
-                                            )
-                                        } " +
-//                                        "$suffix /" +
-                                        " ${formatter((animal.presentException ?: 1.0) * expensesTable.priceAll.toDouble() / 100.0)} ₽" +
-                                        " -  ${formatter(animal.presentException ?: 1.0)}%",
-                                fontSize = 18.sp,
+                        if (animal.ps){
+                            var  presentException2 by remember { mutableDoubleStateOf(0.0) }
+                            presentException2 = animal.presentException
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 14.dp)
-                            )
+                                    .padding(top = 5.dp)
+                            ) {
+                                Text(
+                                    text = animal.name +
+                                            " ${formatter(animal.presentException * expensesTable.count.toDouble() / 100.0)
+                                            } " +
+                                        "${expensesTable.suffix} /" +
+                                            " ${formatter(animal.presentException * expensesTable.priceAll.toDouble() / 100.0)} ₽" +
+                                            " -  ${formatter(animal.presentException)}%",
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp)
+                                )
 
-                            Slider(
-                                value = (animal.presentException ?: 0).toFloat(),
-                                onValueChange = {
-                                    animal.presentException = it.toDouble()
-                                    // Пересчитываем значения для остальных животных
-                                    val remainingFood = totalFood - it
-                                    val otherAnimalsCount = animalList.size - 1
+                                Slider(
+                                    value = presentException2.toFloat(),
+                                    onValueChange = {
+                                        presentException2 = it.toDouble()
+                                        animal.presentException = presentException2
+                                        // Пересчитываем значения для остальных животных
+                                        val remainingFood = totalFood - it
+                                        val otherAnimalsCount = animalList.size - 1
 
-                                    animalList.forEachIndexed { indexA, otherAnimal ->
-                                        if (indexA != index) {
-                                            animalList[indexA].presentException =
+                                        animalList.forEachIndexed { indexA, otherAnimal ->
+                                            if (indexA != index) {
+                                                animalList[indexA].presentException =
                                                 (remainingFood / otherAnimalsCount).toDouble()
+                                            }
                                         }
-                                    }
-                                },
-                                valueRange = 0f..totalFood,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 5.dp, vertical = 2.5.dp)
-                            )
+                                    },
+                                    valueRange = 0f..totalFood,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 5.dp, vertical = 2.5.dp)
+                                )
+                            }
                         }
+
                     }
                 }
             }

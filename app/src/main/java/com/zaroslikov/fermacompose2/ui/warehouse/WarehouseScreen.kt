@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -65,6 +66,7 @@ import com.zaroslikov.fermacompose2.ui.home.AddTableInsert
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
 import io.appmetrica.analytics.AppMetrica
@@ -93,8 +95,21 @@ fun WarehouseScreen(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
+    isFirstStart:Boolean = false,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
+
+    if(isFirstStart){
+        AlertDialogExample(
+            onDismissRequest = { openFirstDialog =  false },
+            onConfirmation = { openFirstDialog  = false },
+            dialogTitle = "Склад",
+            dialogText = "На складе отображаются вся Ваша произведенная продукция и пожеланию купленная продукция, также можно отслеживать корма.",
+            icon = Icons.Default.Info
+        )
+    }
+
     val homeUiState by viewModel.homeUiState.collectAsState()
     val homeFoodUiState by viewModel.homeFoodUiState.collectAsState()
     val homeExpensesUiState by viewModel.homeExpensesUiState.collectAsState()

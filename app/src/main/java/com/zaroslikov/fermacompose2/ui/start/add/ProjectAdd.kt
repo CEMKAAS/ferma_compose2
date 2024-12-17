@@ -67,16 +67,18 @@ fun AddProject(
     isFirstStart :Boolean = false,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
 
-    if(isFirstStart){
+        if(isFirstStart){
         AlertDialogExample(
-            onDismissRequest = { isFirstStart =  false },
-            onConfirmation = { isFirstStart  = false },
+            onDismissRequest = { openFirstDialog =  false },
+            onConfirmation = { openFirstDialog  = false },
             dialogTitle = "Установка проекта",
             dialogText = "Придумайте оригинальное название для своего проекта к примеру: Козоводство или Кролиководство, не забудьте указать дату начала вашего проекта",
             icon = Icons.Default.Info
         )
     }
+
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {

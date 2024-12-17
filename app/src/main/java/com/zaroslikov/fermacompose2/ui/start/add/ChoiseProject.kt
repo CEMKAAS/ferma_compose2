@@ -23,6 +23,10 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -48,12 +52,13 @@ fun ChoiseProject(
     navigateProject: (String) -> Unit,
     isFirstStart :Boolean = false
 ) {
+    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
 
     if(isFirstStart){
         AlertDialogExample(
-            onDismissRequest = { isFirstStart =  false },
+            onDismissRequest = { openFirstDialog  =  false },
             onConfirmation = {
-                isFirstStart  = false
+                openFirstDialog   = false
                     println("Confirmation registered") // Add logic here to handle confirmation.
                 },
                 dialogTitle = "Добро пожаловать!",

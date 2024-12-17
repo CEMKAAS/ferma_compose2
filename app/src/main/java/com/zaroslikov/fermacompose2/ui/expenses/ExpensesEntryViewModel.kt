@@ -99,6 +99,7 @@ data class AnimalExpensesList2(
     val name: String,
     val foodDay: Double,
     val countAnimal: Int,
-    var presentException: Double?,
-    var ps:Boolean
+    val idExpensesAnimal:Long,
+    var ps:Boolean,
+    var presentException: Double,
 )

@@ -90,11 +90,11 @@ fun InventoryNavHost(
     navController: NavHostController,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    isFirstStart: Boolean
+    isFirstStart: Boolean = false
 ) {
     NavHost(
         navController = navController,
-        startDestination = if (isFirstStart) StartDestination.route else ChoiseProjectDestination.route,
+        startDestination = if (isFirstStart) ChoiseProjectDestination.route else StartDestination.route,
         modifier = modifier
     ) {
 

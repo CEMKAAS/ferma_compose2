@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,6 +49,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,6 +82,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
+import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
 import com.zaroslikov.fermacompose2.ui.warehouse.newYearBoolean
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
@@ -105,6 +108,7 @@ fun StartScreen(
     navigateToItemIncubatorArh: (Int) -> Unit,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
     modifier: Modifier = Modifier,
+    isFirstStart : Boolean = false,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
@@ -122,6 +126,18 @@ fun StartScreen(
             viewModel.onUpdate(time1 = it)
             showDialogTime = false
         })
+    }
+
+    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
+
+    if(isFirstStart){
+        AlertDialogExample(
+            onDismissRequest = { openFirstDialog =  false },
+            onConfirmation = { openFirstDialog  = false },
+            dialogTitle = "Главное меню",
+            dialogText = "Здесь находятся все Ваши действующие проекты проекты. Давайте перейдем в проект, который был создан",
+            icon = Icons.Default.Info
+        )
     }
 
     Scaffold(
