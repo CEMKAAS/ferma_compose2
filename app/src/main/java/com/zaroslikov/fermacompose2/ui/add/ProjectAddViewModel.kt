@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.start.add
+package com.zaroslikov.fermacompose2.ui.add
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf

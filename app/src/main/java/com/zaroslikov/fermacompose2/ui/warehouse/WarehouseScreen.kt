@@ -66,7 +66,7 @@ import com.zaroslikov.fermacompose2.ui.home.AddTableInsert
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
 import io.appmetrica.analytics.AppMetrica

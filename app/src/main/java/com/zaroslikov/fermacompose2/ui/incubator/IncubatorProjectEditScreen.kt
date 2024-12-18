@@ -55,10 +55,10 @@ import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimeOutlinedTextField
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
+import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.incubator.TimeOutlinedTextField
+import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch

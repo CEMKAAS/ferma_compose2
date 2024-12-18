@@ -81,9 +81,9 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.ChoiseProjectDestination
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.TimePicker
+import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
+import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
 import com.zaroslikov.fermacompose2.ui.warehouse.newYearBoolean
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
 import io.appmetrica.analytics.AppMetrica

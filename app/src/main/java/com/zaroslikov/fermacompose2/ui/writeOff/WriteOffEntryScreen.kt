@@ -60,8 +60,8 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat

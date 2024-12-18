@@ -67,8 +67,8 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import kotlinx.coroutines.launch
@@ -92,7 +92,6 @@ fun ExpensesEditProduct(
 
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
-//    val animalUiState2 by viewModel.animalUiState2.collectAsState()
     val animalList = mutableListOf<AnimalExpensesList2>()
     val projectList = viewModel.items.value
     animalList.addAll(projectList)
@@ -112,12 +111,12 @@ fun ExpensesEditProduct(
             expensesTable = viewModel.itemUiState,
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
-//            animalList = animalUiState2.animalList,
             animalList = animalList,
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {
                 if (it) {
                     coroutineScope.launch {
+                        viewModel.saveExpensesAnimal(animalList)
                         viewModel.saveItem()
                         Toast.makeText(
                             context,
@@ -130,11 +129,11 @@ fun ExpensesEditProduct(
             },
             deleteAdd = {
                 coroutineScope.launch {
+                    viewModel.deleteExpensesAnimal(projectList)
                     viewModel.deleteItem()
                     onNavigateUp()
                 }
-            },
-            sd = viewModel::updateUiState2
+            }
         )
     }
 }
@@ -147,19 +146,14 @@ fun ExpensesEditContainerProduct(
     expensesTable: ExpensesTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
-//    animalList: List<AnimalExpensesList2>,
     animalList: MutableList<AnimalExpensesList2>,
     onValueChange: (ExpensesTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
-    deleteAdd: () -> Unit,
-    sd: (AnimalExpensesList2) -> Unit = {},
+    deleteAdd: () -> Unit
 ) {
 
     // Для расчета
-
     var countAnimal by remember { mutableIntStateOf(0) } //кол-во животных
-    var foodDesignedDay by remember { mutableDoubleStateOf(0.0) }
-
     var foodDesignedDayUI by remember { mutableStateOf(Pair<Int, String>(0, "")) }
     var dailyExpensesFoodTotal by remember { mutableDoubleStateOf(0.0) } // Общий ежедневный расход
 
@@ -170,28 +164,6 @@ fun ExpensesEditContainerProduct(
         expensesTable.mount,
         expensesTable.year
     )
-
-//    //TODO
-//    if (expensesTable.count != "") {
-//        countAnimal = expensesTable.countAnimal.toInt()
-//        dailyExpensesFoodTotal = expensesTable.dailyExpensesFood.toDouble()
-//
-//        foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
-//            settingDay(
-//                formattedDate,
-//                expensesTable.count.toDouble(),
-//                expensesTable.dailyExpensesFood.toDouble(),
-//                expensesTable.countAnimal.toInt()
-//            )
-//        } else {
-//            settingDay(
-//                formattedDate,
-//                expensesTable.count.toDouble(),
-//                dailyExpensesFoodTotal
-//            )
-//        }
-//    }
-
 
     // Ошибки
     var expanded by remember { mutableStateOf(false) }
@@ -214,26 +186,10 @@ fun ExpensesEditContainerProduct(
     }
 
     fun validateCount(text: String) {
-//        if (text == "") {
-//            isErrorCount = true
-//            onValueChange(
-//                expensesTable.copy(
-//                    showFood = false,
-//                    showAnimals = false,
-//                    dailyExpensesFoodAndCount = false,
-//                    dailyExpensesFood = "0",
-//                    countAnimal = "0"
-//                )
-//            )
-//        }
         isErrorCount = text == ""
     }
 
     fun validatePrice(text: String) {
-//        if (text == "") {
-//            isErrorPrice = true
-//            onValueChange(expensesTable.copy(showAnimals = false))
-//        }
         isErrorPrice = text ==""
     }
 
@@ -249,8 +205,8 @@ fun ExpensesEditContainerProduct(
         isErrorTitle = expensesTable.title == ""
         isErrorCount = expensesTable.count == ""
         isErrorPrice = expensesTable.priceAll == ""
-        isErrorDailyExpensesFood = expensesTable.dailyExpensesFood.toString() == ""
-        isErrorСountAnimalUI = expensesTable.countAnimal.toString() == ""
+        isErrorDailyExpensesFood = expensesTable.dailyExpensesFood == ""
+        isErrorСountAnimalUI = expensesTable.countAnimal == ""
 
         return if (expensesTable.dailyExpensesFoodAndCount) {
             !(isErrorTitle || isErrorCount || isErrorPrice || isErrorСountAnimalUI || isErrorDailyExpensesFood)
@@ -326,12 +282,17 @@ fun ExpensesEditContainerProduct(
             OutlinedTextField(
                 value = expensesTable.count,
                 onValueChange = {
+                    validateCount(it)
                     onValueChange(
                         expensesTable.copy(
-                            count = it
+                            count = it, showAnimals = if (it =="") false else expensesTable.showAnimals
                         )
                     )
-                    validateCount(it)
+//                    showFood = false,
+//                    showAnimals = false,
+//                    dailyExpensesFoodAndCount = false,
+//                    dailyExpensesFood = "0",
+//                    countAnimal = "0"
                 },
                 label = { Text("Количество") },
                 modifier = Modifier
@@ -419,6 +380,7 @@ fun ExpensesEditContainerProduct(
                         priceAll = it
                     )
                 )
+//                onValueChange(expensesTable.copy(showAnimals = false))
                 validatePrice(expensesTable.priceAll)
             },
             label = { Text("Стоимость") },
@@ -979,8 +941,21 @@ fun ExpensesEditContainerProduct(
         }
 
 
+
         Button(
-            onClick = { saveInRoomAdd(errorBoolean()) },
+            onClick = {
+                if (errorBoolean()){
+                    onValueChange(
+                        expensesTable.copy(
+                            dailyExpensesFood = if(expensesTable.dailyExpensesFoodAndCount)expensesTable.dailyExpensesFood else dailyExpensesFoodTotal.toString(),
+                            countAnimal = if(expensesTable.dailyExpensesFoodAndCount) expensesTable.countAnimal else dailyExpensesFoodTotal.toString(),
+                            lastDayFood = foodDesignedDayUI.second,
+                            foodDesignedDay = foodDesignedDayUI.first,
+                            )
+                    )
+                }
+
+                saveInRoomAdd(errorBoolean()) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 15.dp)

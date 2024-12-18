@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.start.add
+package com.zaroslikov.fermacompose2.ui.add
 
 import android.app.Activity
 import androidx.compose.foundation.clickable
@@ -46,7 +46,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat

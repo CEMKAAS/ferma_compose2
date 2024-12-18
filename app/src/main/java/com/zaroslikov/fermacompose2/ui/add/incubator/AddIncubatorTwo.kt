@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.start.add.incubator
+package com.zaroslikov.fermacompose2.ui.add.incubator
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

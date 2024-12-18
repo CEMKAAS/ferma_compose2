@@ -68,9 +68,9 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSampleNoLimit
-import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSampleNoLimit
+import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import io.appmetrica.analytics.AppMetrica

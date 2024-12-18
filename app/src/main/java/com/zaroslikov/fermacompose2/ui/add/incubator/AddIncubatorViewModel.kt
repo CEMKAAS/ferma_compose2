@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.start.add.incubator
+package com.zaroslikov.fermacompose2.ui.add.incubator
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue

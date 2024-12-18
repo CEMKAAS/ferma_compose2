@@ -51,8 +51,8 @@ import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.FinUiState
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import io.appmetrica.analytics.AppMetrica
 import java.text.SimpleDateFormat

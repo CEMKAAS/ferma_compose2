@@ -72,8 +72,8 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.start.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import io.appmetrica.analytics.AppMetrica
@@ -215,7 +215,6 @@ fun ExpensesEntryContainerProduct(
         if (text == "") {
             isErrorPrice = true
             showAnimalsUI = false
-
         }
     }
 

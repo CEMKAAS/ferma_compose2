@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.start.add
+package com.zaroslikov.fermacompose2.ui.add
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -38,8 +38,8 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AddIncubatorDestination
-import com.zaroslikov.fermacompose2.ui.start.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorDestination
+import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 
 object ChoiseProjectDestination : NavigationDestination {
     override val route = "ChoiseProject"

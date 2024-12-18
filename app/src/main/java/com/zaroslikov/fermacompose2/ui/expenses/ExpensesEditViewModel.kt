@@ -80,7 +80,7 @@ class ExpensesEditViewModel(
             itemDetails
     }
 
-    suspend fun saveExpensesAnimal(animalExpensesList2: List<AnimalExpensesList2>) {
+    suspend fun saveExpensesAnimal(animalExpensesList2: MutableList<AnimalExpensesList2>) {
         animalExpensesList2.forEach {
             if (it.ps) {
                 itemsRepository.updateExpensesAnimal(
