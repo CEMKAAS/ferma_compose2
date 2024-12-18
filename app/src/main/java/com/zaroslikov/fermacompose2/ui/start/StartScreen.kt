@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
@@ -108,7 +109,8 @@ fun StartScreen(
     navigateToItemIncubatorArh: (Int) -> Unit,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
     modifier: Modifier = Modifier,
-    isFirstStart : Boolean = false,
+    isFirstStart : Boolean,
+    isFirstEnd:() -> Unit,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
@@ -128,17 +130,12 @@ fun StartScreen(
         })
     }
 
-    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
-
-    if(isFirstStart){
-        AlertDialogExample(
-            onDismissRequest = { openFirstDialog =  false },
-            onConfirmation = { openFirstDialog  = false },
-            dialogTitle = "Главное меню",
-            dialogText = "Здесь находятся все Ваши действующие проекты проекты. Давайте перейдем в проект, который был создан",
-            icon = Icons.Default.Info
-        )
-    }
+    AlterDialigStart(
+        isFirstStart = isFirstStart,
+        dialogTitle = "Главный экран",
+        dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.",
+        isFirstEnd = isFirstEnd
+    )
 
     Scaffold(
         topBar = {

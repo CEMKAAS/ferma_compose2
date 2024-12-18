@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
@@ -35,6 +36,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -51,6 +54,7 @@ import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
@@ -72,6 +76,7 @@ fun AnimalScreen(
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
+    isFirstStart:Boolean,
     viewModel: AnimalViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val animalUiState by viewModel.animalUiState.collectAsState()
@@ -82,6 +87,21 @@ fun AnimalScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val showBottomSheetFilter = remember { mutableStateOf(false) }
+
+    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
+
+    if(openFirstDialog){
+        AlertDialogExample(
+            onDismissRequest = { openFirstDialog =  false },
+            onConfirmation = { openFirstDialog  = false },
+            dialogTitle = "Мои Животные",
+            dialogText = "В этом разделе отображаются Ваши животные. Для добавления нажмите на знак «+» в правом нижнем углу. Рекомендуем начать с добавления животных для корректной работы приложения. После перейдите  в раздел Моя Продукция",
+            icon = Icons.Default.Info
+        )
+    }
+
+
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,

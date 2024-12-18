@@ -90,7 +90,8 @@ fun InventoryNavHost(
     navController: NavHostController,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    isFirstStart: Boolean = false
+    isFirstStart: Boolean,
+    isFirstEnd: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -114,15 +115,20 @@ fun InventoryNavHost(
                     navController.navigate("${FinanceArhivDestination.route}/${it}")
                 },
                 navigationToNewYear = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
-                modifier = modifier
+                modifier = modifier,
+                isFirstStart = isFirstStart,
+                isFirstEnd = isFirstEnd
             )
 
         }
 
         composable(route = ChoiseProjectDestination.route) {
-            ChoiseProject(navigateBack = { navController.popBackStack() },
+            ChoiseProject(
+                navigateBack = { navController.popBackStack() },
                 navigateProject = { navController.navigate(it) },
-                isFirstStart = isFirstStart  )
+                isFirstStart = isFirstStart,
+                isFirstEnd = isFirstEnd
+            )
 
         }
 
@@ -130,7 +136,9 @@ fun InventoryNavHost(
         composable(route = ProjectAddDestination.route) {
             AddProject(
                 navigateBack = { navController.popBackStack() },
-                navigateToStart = { navController.navigate(StartDestination.route) }
+                navigateToStart = { navController.navigate(StartDestination.route) },
+                isFirstStart = isFirstStart,
+                isFirstEnd = isFirstEnd
             )
         }
 
@@ -214,7 +222,8 @@ fun InventoryNavHost(
                 navigateToEdit = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
                 navigationToNewYear = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
-                drawerState = drawerState
+                drawerState = drawerState,
+                isFirstStart = isFirstStart
             )
         }
 
@@ -354,7 +363,9 @@ fun InventoryNavHost(
                 navController.navigate(
                     "${AddEditDestination.route}/${it.id}/${it.idPT}"
                 )
-            })
+            },
+                isFirstStart = isFirstStart,
+            )
         }
         composable(
             route = AddEntryDestination.routeWithArgs,
@@ -526,7 +537,8 @@ fun InventoryNavHost(
                 navController.navigate(
                     "${AnimalCardDestination.route}/${it}"
                 )
-            })
+            }, isFirstStart = isFirstStart
+            )
         }
 
         composable(

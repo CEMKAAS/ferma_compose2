@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
@@ -64,20 +65,16 @@ object ProjectAddDestination : NavigationDestination {
 fun AddProject(
     navigateBack: () -> Unit,
     navigateToStart: () -> Unit,
-    isFirstStart :Boolean = false,
+    isFirstStart: Boolean,
+    isFirstEnd: () -> Unit,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
-
-        if(isFirstStart){
-        AlertDialogExample(
-            onDismissRequest = { openFirstDialog =  false },
-            onConfirmation = { openFirstDialog  = false },
-            dialogTitle = "Установка проекта",
-            dialogText = "Придумайте оригинальное название для своего проекта к примеру: Козоводство или Кролиководство, не забудьте указать дату начала вашего проекта",
-            icon = Icons.Default.Info
-        )
-    }
+    AlterDialigStart(
+        isFirstStart = isFirstStart,
+        dialogTitle = "Установка проекта",
+        dialogText = "Придумайте оригинальное название для вашего проекта, например: \"Козоводство\" или \"Кролиководство\". Укажите дату начала проекта и нажмите \"Начать\".",
+        isFirstEnd = isFirstEnd
+    )
 
     val coroutineScope = rememberCoroutineScope()
     Scaffold(

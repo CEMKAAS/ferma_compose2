@@ -887,6 +887,7 @@ fun ExpensesEntryContainerProduct(
                                     }
                                 },
                                 valueRange = 0f..totalFood,
+                                steps = 99,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 5.dp, vertical = 2.5.dp)

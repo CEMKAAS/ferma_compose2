@@ -9,7 +9,19 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.yandex.mobile.ads.appopenad.AppOpenAd
@@ -25,6 +37,7 @@ import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
+import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
 
 
@@ -43,9 +56,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (isFirstLaunch(this)) {
+
+
+        var startBoolean = isFirstLaunch(this)
+
+        if (startBoolean) {
             WorkManagerWaterRepository(this).setupDailyReminder()
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
         }
 
 
@@ -77,7 +94,8 @@ class MainActivity : ComponentActivity() {
 //                    }
 //                    loadInterstitialAd()
                 }
-                InventoryApp(modifier = Modifier, isFirstStart = isFirstLaunch(this) )
+                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean)}
+                InventoryApp(modifier = Modifier, isFirstStart = openFirstDialog, isFirstEnd = {openFirstDialog= false})
 
             }
 
@@ -98,9 +116,15 @@ class MainActivity : ComponentActivity() {
                         arrayOf(
                             Manifest.permission.ACCESS_NOTIFICATION_POLICY,
                             Manifest.permission.POST_NOTIFICATIONS
-                        ), REQUEST_CODE_NOTIFICATION_PERMISSIONS) }
-                else -> Log.d(TAG, "Notification Permissions : previously granted successfully") }
-        } catch (e: Exception) { e.printStackTrace() }
+                        ), REQUEST_CODE_NOTIFICATION_PERMISSIONS
+                    )
+                }
+
+                else -> Log.d(TAG, "Notification Permissions : previously granted successfully")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -120,6 +144,7 @@ class MainActivity : ComponentActivity() {
                     !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
                         getNotificationPermissions()
                     }
+
                     else -> {
                         Log.d(TAG, "Notification Permissions : Granted successfully")
                     }
@@ -143,10 +168,12 @@ class MainActivity : ComponentActivity() {
                     destroyInterstitialAd()
                     loadInterstitialAd()
                 }
+
                 override fun onAdDismissed() {
                     destroyInterstitialAd()
                     loadInterstitialAd()
                 }
+
                 override fun onAdClicked() {}
                 override fun onAdImpression(impressionData: ImpressionData?) {}
             })
@@ -179,10 +206,12 @@ class MainActivity : ComponentActivity() {
             clearAppOpenAd()
             loadAppOpenAd()
         }
+
         override fun onAdDismissed() {
             clearAppOpenAd()
             loadAppOpenAd()
         }
+
         override fun onAdClicked() {}
         override fun onAdImpression(impressionData: ImpressionData?) {}
     }
@@ -204,6 +233,7 @@ class MainActivity : ComponentActivity() {
                     isAdShownOnColdStart = true
                 }
             }
+
             override fun onAdFailedToLoad(adRequestError: AdRequestError) {}
         }
         appOpenAdLoader.setAdLoadListener(appOpenAdLoadListener)
@@ -215,9 +245,11 @@ class MainActivity : ComponentActivity() {
     }
 
 }
+
 // Функция для проверки первого запуска приложения
- fun isFirstLaunch(context: Context): Boolean {
-    val sharedPreferences: SharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+fun isFirstLaunch(context: Context): Boolean {
+    val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", true)
 
 
@@ -228,3 +260,42 @@ class MainActivity : ComponentActivity() {
 
     return isFirstLaunch
 }
+
+@Composable
+fun AlterDialigStart(
+    isFirstStart: Boolean,
+    dialogTitle: String,
+    dialogText: String,
+    isFirstEnd: () -> Unit
+) {
+    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
+
+    if (openFirstDialog) {
+        AlertDialog(
+            icon = {
+                Icon(Icons.Default.Info, contentDescription = "Example Icon")
+            },
+            title = {
+                Text(text = dialogTitle)
+            },
+            text = {
+                Text(text = dialogText, textAlign = TextAlign.Justify)
+            },
+            onDismissRequest = {
+                openFirstDialog = false
+            },
+            confirmButton = {
+                TextButton(onClick = { openFirstDialog = false }) { Text("Отлично!") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        openFirstDialog = false
+                        isFirstEnd() }
+                ) { Text("Завершить обучение") }
+            }
+        )
+
+    }
+}
+

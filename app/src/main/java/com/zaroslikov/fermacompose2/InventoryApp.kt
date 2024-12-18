@@ -59,7 +59,8 @@ fun InventoryApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     modifier: Modifier = Modifier,
-    isFirstStart: Boolean
+    isFirstStart: Boolean,
+    isFirstEnd:()->Unit
 ) {
     Scaffold(bottomBar = {
         Banner(
@@ -73,7 +74,8 @@ fun InventoryApp(
             navController = navController,
             drawerState = drawerState,
             modifier = modifier.padding(innerPadding),
-            isFirstStart = isFirstStart
+            isFirstStart = isFirstStart,
+            isFirstEnd = isFirstEnd
         )
     }
 

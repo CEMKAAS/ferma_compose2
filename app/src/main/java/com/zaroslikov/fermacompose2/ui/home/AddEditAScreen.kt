@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -365,7 +366,12 @@ fun AddEditContainerProduct(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(text = "Животное") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
+                    leadingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
+                    trailingIcon = {
+                        IconButton(onClick = { onValueChange(addTable.copy(animal = "")) }) {
+                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
+                        }
+                    },
                     supportingText = {
                         Text("Выберите животное, которое принесло товар")
                     },

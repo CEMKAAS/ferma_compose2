@@ -501,7 +501,7 @@ fun AddEntryContainerProduct(
                                 formattedDateList[2].toInt(),
                                 suffix = suffix,
                                 category = category,
-                                anaimal = if (animalList.isNotEmpty()) animalList[selectedItemIndex].name else "",
+                                anaimal = animal,
                                 priceAll = 0.0,
                                 note = note
                             )

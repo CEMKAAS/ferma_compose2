@@ -82,7 +82,17 @@ class ExpensesEditViewModel(
 
     suspend fun saveExpensesAnimal(animalExpensesList2: MutableList<AnimalExpensesList2>) {
         animalExpensesList2.forEach {
-            if (it.ps) {
+            if (it.ps && (it.idExpensesAnimal == 0.toLong())) {
+                itemsRepository.insertExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = 0,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
+                )
+            } else if(it.ps){
                 itemsRepository.updateExpensesAnimal(
                     ExpensesAnimalTable(
                         id = it.idExpensesAnimal,
@@ -108,15 +118,17 @@ class ExpensesEditViewModel(
 
     suspend fun deleteExpensesAnimal(animalExpensesList2: List<AnimalExpensesList2>) {
         animalExpensesList2.forEach {
-            itemsRepository.deleteExpensesAnimal(
-                ExpensesAnimalTable(
-                    id = it.idExpensesAnimal,
-                    idExpenses = itemId.toLong(),
-                    idAnimal = it.id.toLong(),
-                    percentExpenses = it.presentException,
-                    idPT = itemIdPT.toLong()
+            if (it.idExpensesAnimal != 0.toLong()) {
+                itemsRepository.deleteExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = it.idExpensesAnimal,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
                 )
-            )
+            }
         }
     }
 

@@ -95,17 +95,17 @@ fun WarehouseScreen(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
-    isFirstStart:Boolean = false,
+    isFirstStart:Boolean,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
 
-    if(isFirstStart){
+    if(openFirstDialog ){
         AlertDialogExample(
             onDismissRequest = { openFirstDialog =  false },
             onConfirmation = { openFirstDialog  = false },
             dialogTitle = "Склад",
-            dialogText = "На складе отображаются вся Ваша произведенная продукция и пожеланию купленная продукция, также можно отслеживать корма.",
+            dialogText = "Склад — ключевой элемент проекта, где хранится произведенная и приобретенная продукция. Здесь можно получить детальную информацию о каждом продукте. Слева расположены дополнительные разделы. Перейдем в раздел \"Мои животные\". ",
             icon = Icons.Default.Info
         )
     }

@@ -380,7 +380,6 @@ fun ExpensesEditContainerProduct(
                         priceAll = it
                     )
                 )
-//                onValueChange(expensesTable.copy(showAnimals = false))
                 validatePrice(expensesTable.priceAll)
             },
             label = { Text("Стоимость") },
@@ -393,9 +392,7 @@ fun ExpensesEditContainerProduct(
                         text = "Не указана стоимость за товар!",
                         color = MaterialTheme.colorScheme.error
                     )
-                } else {
-                    Text("Укажите стоимость за купленный товар")
-                }
+                } else Text("Укажите стоимость за купленный товар")
             },
             suffix = { Text(text = "₽") },
             keyboardOptions = KeyboardOptions(
@@ -646,7 +643,8 @@ fun ExpensesEditContainerProduct(
                         formattedDate,
                         expensesTable.count.toDouble(),
                         if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
-                        if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()                    )
+                        if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
+                    )
                 } else {
                     settingDay(
                         formattedDate,
@@ -657,10 +655,6 @@ fun ExpensesEditContainerProduct(
 
                 Text(
                     text = "${if (expensesTable.title == "") "Корма" else expensesTable.title} хватит на ${if (foodDesignedDayUI.first >= 1000) "более" else ""} ${foodDesignedDayUI.first} суток до ${foodDesignedDayUI.second}\n" +
-//                            "Ежедневный расход составляет - ${if (expensesTable.dailyExpensesFoodAndCount) dailyExpensesFoodUI else dailyExpensesFoodTotal} ${expensesTable.suffix}\n" +
-//                            "Кол-во голов -  ${if (expensesTable.dailyExpensesFoodAndCount) countAnimalUI else countAnimal} шт. ",
-//                            "Ежедневный расход составляет - ${if (expensesTable.dailyExpensesFoodAndCount) expensesTable.dailyExpensesFood else dailyExpensesFoodTotal} ${expensesTable.suffix}\n" +
-//                            "Кол-во голов -  ${if (expensesTable.dailyExpensesFoodAndCount) expensesTable.countAnimal else countAnimal} шт. ",
                             "Ежедневный расход составляет - ${expensesTable.dailyExpensesFood} ${expensesTable.suffix}\n" +
                             "Кол-во голов -  ${expensesTable.countAnimal} шт. ",
                     modifier = Modifier
@@ -794,7 +788,7 @@ fun ExpensesEditContainerProduct(
                                     expensesTable.copy(
                                         countAnimal = it.replace(
                                             Regex("[^\\d.]"),
-                                            ""
+                                            "".replace(".", "").replace(",", "")
                                         )
                                     )
                                 )
@@ -838,7 +832,7 @@ fun ExpensesEditContainerProduct(
 
             //РАСПРЕДЕЛЕНИЕ РАСХОДОВ
             if (expensesTable.showAnimals) {
-//                var  animalList2 by remember { mutableStateOf(animalList) }
+
                 val totalFood by remember { mutableFloatStateOf(100f) }
 
                 Column {
@@ -848,7 +842,6 @@ fun ExpensesEditContainerProduct(
                             .padding(horizontal = 14.dp)
                     ) {
                         if (animalList.isNotEmpty()) {
-
                             animalList.forEachIndexed { index, animal ->
                                 var selected by remember { mutableStateOf(animal.ps) }
 
@@ -856,14 +849,16 @@ fun ExpensesEditContainerProduct(
                                     selected = selected,
                                     onClick = {
                                         selected = !selected
-
                                         if (selected) animal.ps = true
                                         else animal.ps = false
-                                        animalList.forEach {
-                                            animalList[index].presentException =
-                                                (totalFood / animalList.size).toDouble()
-                                        }
 
+                                        var i = 0
+                                        animalList.forEach{ if (it.ps) i++ }
+
+                                        animalList.forEach {
+                                            it.presentException =
+                                                (totalFood / i).toDouble()
+                                        }
                                     },
                                     label = { Text(animal.name) },
                                     leadingIcon = if (selected) {
@@ -879,12 +874,8 @@ fun ExpensesEditContainerProduct(
                                         .padding(horizontal = 10.dp)
                                 )
                             }
-                        } else {
-                            Text(text = "Нет животных")
-                        }
+                        } else Text(text = "Нет животных")
                     }
-
-
 
                     // Отображаем слайдеры для каждого выбранного животного
                     animalList.forEachIndexed { index, animal ->
@@ -928,13 +919,13 @@ fun ExpensesEditContainerProduct(
                                         }
                                     },
                                     valueRange = 0f..totalFood,
+                                    steps = 99,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 5.dp, vertical = 2.5.dp)
                                 )
                             }
                         }
-
                     }
                 }
             }
@@ -948,7 +939,7 @@ fun ExpensesEditContainerProduct(
                     onValueChange(
                         expensesTable.copy(
                             dailyExpensesFood = if(expensesTable.dailyExpensesFoodAndCount)expensesTable.dailyExpensesFood else dailyExpensesFoodTotal.toString(),
-                            countAnimal = if(expensesTable.dailyExpensesFoodAndCount) expensesTable.countAnimal else dailyExpensesFoodTotal.toString(),
+                            countAnimal = if(expensesTable.dailyExpensesFoodAndCount) expensesTable.countAnimal else countAnimal.toString(),
                             lastDayFood = foodDesignedDayUI.second,
                             foodDesignedDay = foodDesignedDayUI.first,
                             )

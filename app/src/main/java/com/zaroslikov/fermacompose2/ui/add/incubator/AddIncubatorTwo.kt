@@ -1859,6 +1859,15 @@ fun AlertDialogExample(
             ) {
                 Text("Отлично!")
             }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+
+                }
+            ) {
+                Text("Завершить обучение!")
+            }
         }
     )
 }

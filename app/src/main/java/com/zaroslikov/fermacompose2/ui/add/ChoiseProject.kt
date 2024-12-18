@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.Banner
@@ -50,24 +51,15 @@ object ChoiseProjectDestination : NavigationDestination {
 fun ChoiseProject(
     navigateBack: () -> Unit,
     navigateProject: (String) -> Unit,
-    isFirstStart :Boolean = false
+    isFirstStart :Boolean,
+    isFirstEnd:()->Unit
 ) {
-    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
-
-    if(isFirstStart){
-        AlertDialogExample(
-            onDismissRequest = { openFirstDialog  =  false },
-            onConfirmation = {
-                openFirstDialog   = false
-                    println("Confirmation registered") // Add logic here to handle confirmation.
-                },
-                dialogTitle = "Добро пожаловать!",
-                dialogText = "Для начала работы выберите тип проекта Инкубатор, если вы хотите заняться инкубированием, Мое Хозяйства для работы с финасовой частью проекта",
-                icon = Icons.Default.Info
-            )
-    }
-
-
+    AlterDialigStart(
+        isFirstStart = isFirstStart,
+        dialogTitle = "Добро пожаловать!",
+        dialogText = "Для начала работы пройдем короткое обучение. При выходе из приложения во время обучения обучение завершается автоматически. После нажатия кнопки \"Завершить обучение\" подсказки в других разделах перестанут отображаться.\nВыберите тип проекта: Инкубатор для инкубирования, Хозяйство для контроля подсобного хозяйства",
+        isFirstEnd = isFirstEnd
+    )
 
     Scaffold(
         topBar = {

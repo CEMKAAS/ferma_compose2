@@ -57,6 +57,7 @@ fun WarehouseEditScreen(
     navigateToStart: () -> Unit,
     viewModel: WarehouseEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
