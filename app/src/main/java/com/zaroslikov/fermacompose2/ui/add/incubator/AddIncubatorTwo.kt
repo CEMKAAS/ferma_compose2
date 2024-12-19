@@ -52,6 +52,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
@@ -63,8 +64,18 @@ fun AddIncubatorContainerTwo(
     name: String,
     navigateBack: () -> Unit,
     navigateContinue: (MutableList<Incubator>) -> Unit,
-    list: MutableList<Incubator>
+    list: MutableList<Incubator>,
+    isFirstStart :Boolean,
+    isFirstEnd:()->Unit
 ) {
+    AlterDialigStart(
+        isFirstStart = isFirstStart,
+        dialogTitle = "Справка",
+        dialogText = "Если показания вашего инкубатора отклоняются от нормы, вы можете настроить температуру вручную или использовать рекомендованные параметры, которые можно корректировать в процессе работы." +
+                " Обязательно ведите ежедневный журнал и аккуратно записывайте все данные, чтобы потом можно было легко найти их в архиве.",
+        isFirstEnd = isFirstEnd
+    )
+
     Scaffold(
         topBar = {
             TopAppBarEdit(title = name, navigateUp = navigateBack)

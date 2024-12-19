@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
@@ -92,13 +93,25 @@ fun IncubatorScreen(
     navigateProjectEdit: (Int) -> Unit,
     navigateOvos: (Pair<Int, String>) -> Unit,
     navigateStart: () -> Unit,
-    viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    isFirstStart :Boolean,
+    isFirstEnd:()->Unit
 ) {
+
     val incubator by viewModel.incubatorUiState.collectAsState()
     val projectState by viewModel.homeUiState.collectAsState()
     val project = viewModel.itemUiState
     val projectList by viewModel.projectListAct.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
+    AlterDialigStart(
+        isFirstStart = isFirstStart,
+        dialogTitle = "Инкубатор",
+        dialogText = "Давайте настроим Ваш первый инкубатор!\n" +
+                "Для начала укажите его название, вид птицы, количество. После этого сможете перейти в меню для детальной настройки каждого дня.\n" +
+                "Удачи!",
+        isFirstEnd = isFirstEnd
+    )
 
     // В приниципе все только доделать переход
     Scaffold(

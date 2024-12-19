@@ -65,6 +65,7 @@ import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import java.util.Calendar
 import java.util.TimeZone
 import androidx.compose.ui.window.Dialog
+import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.ui.start.formatterTime
 import io.appmetrica.analytics.AppMetrica
 
@@ -79,7 +80,9 @@ object AddIncubatorDestination : NavigationDestination {
 fun AddIncubator(
     navigateBack: () -> Unit,
     viewModel: AddIncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    navigateContinue: () -> Unit
+    navigateContinue: () -> Unit,
+    isFirstStart :Boolean,
+    isFirstEnd:()->Unit
 ) {
     var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
     var openEndDialog by rememberSaveable { mutableStateOf(false) }
@@ -127,7 +130,8 @@ fun AddIncubator(
             },
             incubator = incubator,
             onUpdate = viewModel::updateUiState,
-            countTime = countTime
+            countTime = countTime,
+            isFirstStart, isFirstEnd
         )
     else AddIncubatorContainerTwo(
         name = incubator.titleProject,
@@ -149,7 +153,8 @@ fun AddIncubator(
             AppMetrica.reportEvent("Incubator", eventParameters);
             navigateContinue()
         },
-        list = if (listBoolean) list2 else list
+        list = if (listBoolean) list2 else list,
+        isFirstStart, isFirstEnd
     )
 }
 
@@ -159,8 +164,18 @@ fun AddIncubatorContainerOne(
     navigateContinue: () -> Unit,
     incubator: IncubatorProjectEditState,
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
-    countTime: MutableIntState
+    countTime: MutableIntState,
+    isFirstStart :Boolean,
+    isFirstEnd:()->Unit
 ) {
+    AlterDialigStart(
+        isFirstStart = isFirstStart,
+        dialogTitle = "Установка проекта",
+        dialogText = "Давайте настроим Ваш первый инкубатор!\n" +
+                "Для начала укажите его название, вид птицы, количество. После этого сможете перейти в меню для детальной настройки каждого дня.\n" +
+                "Удачи!",
+        isFirstEnd = isFirstEnd
+    )
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Инкубатор", navigateUp = navigateBack)
