@@ -126,8 +126,7 @@ fun InventoryNavHost(
             ChoiseProject(
                 navigateBack = { navController.popBackStack() },
                 navigateProject = { navController.navigate(it) },
-                isFirstStart = isFirstStart,
-                isFirstEnd = isFirstEnd
+                isFirstStart = isFirstStart
             )
 
         }
@@ -137,15 +136,15 @@ fun InventoryNavHost(
             AddProject(
                 navigateBack = { navController.popBackStack() },
                 navigateToStart = { navController.navigate(StartDestination.route) },
-                isFirstStart = isFirstStart,
-                isFirstEnd = isFirstEnd
+                isFirstStart = isFirstStart
             )
         }
 
         composable(route = AddIncubatorDestination.route) {
             AddIncubator(
                 navigateBack = { navController.popBackStack() },
-                navigateContinue = { navController.navigate(StartDestination.route) }
+                navigateContinue = { navController.navigate(StartDestination.route) },
+                isFirstStart = isFirstStart
             )
         }
 
@@ -169,7 +168,9 @@ fun InventoryNavHost(
                 )
             }, navigateStart = {
                 navController.navigate(StartDestination.route)
-            })
+            },
+//                isFirstStart = isFirstStart, isFirstEnd = isFirstEnd
+            )
         }
 
         composable(
@@ -223,7 +224,8 @@ fun InventoryNavHost(
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
                 navigationToNewYear = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
                 drawerState = drawerState,
-                isFirstStart = isFirstStart
+//                isFirstStart = isFirstStart,
+//                isFirstEnd = isFirstEnd
             )
         }
 

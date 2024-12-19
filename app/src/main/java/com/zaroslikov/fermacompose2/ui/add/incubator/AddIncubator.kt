@@ -82,7 +82,6 @@ fun AddIncubator(
     viewModel: AddIncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navigateContinue: () -> Unit,
     isFirstStart :Boolean,
-    isFirstEnd:()->Unit
 ) {
     var shouldShowTwo by rememberSaveable { mutableStateOf(true) }
     var openEndDialog by rememberSaveable { mutableStateOf(false) }
@@ -131,7 +130,7 @@ fun AddIncubator(
             incubator = incubator,
             onUpdate = viewModel::updateUiState,
             countTime = countTime,
-            isFirstStart, isFirstEnd
+            isFirstStart
         )
     else AddIncubatorContainerTwo(
         name = incubator.titleProject,
@@ -154,7 +153,7 @@ fun AddIncubator(
             navigateContinue()
         },
         list = if (listBoolean) list2 else list,
-        isFirstStart, isFirstEnd
+        isFirstStart
     )
 }
 
@@ -166,15 +165,13 @@ fun AddIncubatorContainerOne(
     onUpdate: (IncubatorProjectEditState) -> Unit = {},
     countTime: MutableIntState,
     isFirstStart :Boolean,
-    isFirstEnd:()->Unit
 ) {
     AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Установка проекта",
         dialogText = "Давайте настроим Ваш первый инкубатор!\n" +
                 "Для начала укажите его название, вид птицы, количество. После этого сможете перейти в меню для детальной настройки каждого дня.\n" +
-                "Удачи!",
-        isFirstEnd = isFirstEnd
+                "Удачи!"
     )
     Scaffold(
         topBar = {

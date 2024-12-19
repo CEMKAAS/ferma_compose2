@@ -94,8 +94,8 @@ fun IncubatorScreen(
     navigateOvos: (Pair<Int, String>) -> Unit,
     navigateStart: () -> Unit,
     viewModel: IncubatorViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    isFirstStart :Boolean,
-    isFirstEnd:()->Unit
+//    isFirstStart: Boolean,
+//    isFirstEnd: () -> Unit
 ) {
 
     val incubator by viewModel.incubatorUiState.collectAsState()
@@ -104,14 +104,12 @@ fun IncubatorScreen(
     val projectList by viewModel.projectListAct.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    AlterDialigStart(
-        isFirstStart = isFirstStart,
-        dialogTitle = "Инкубатор",
-        dialogText = "Давайте настроим Ваш первый инкубатор!\n" +
-                "Для начала укажите его название, вид птицы, количество. После этого сможете перейти в меню для детальной настройки каждого дня.\n" +
-                "Удачи!",
-        isFirstEnd = isFirstEnd
-    )
+//    AlterDialigStart(
+//        isFirstStart = isFirstStart,
+//        dialogTitle = "Инкубатор",
+//        dialogText = "Текущий день выделен черной рамкой. Нажав на него, можно скорректировать значения или добавить примечание. Для дней овоскопирования предусмотрен специальный значок, переход по которому открывает овоскопирование яйца.\nУдачной инкубации!",
+//        isFirstEndConfig = isFirstEnd
+//    )
 
     // В приниципе все только доделать переход
     Scaffold(
@@ -240,7 +238,7 @@ fun IncubatorContainer(
                 incubator[it],
                 modifier = Modifier
                     .padding(6.dp)
-                    .clickable { navigateDayEdit(Pair(projectTable.id, it+1)) },
+                    .clickable { navigateDayEdit(Pair(projectTable.id, it + 1)) },
                 borderStroke = borderStroke,
                 typeBird = projectTable.type,
                 navigateOvos = { navigateOvos(Pair(it + 1, projectTable.type)) }
@@ -463,7 +461,7 @@ fun EndIncubator(
                                             onClick = { onOptionSelected(text) },
                                             role = Role.RadioButton
                                         )
-                                        .padding(horizontal = 8.dp,  vertical = 4.dp),
+                                        .padding(horizontal = 8.dp, vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
@@ -522,7 +520,7 @@ fun EndIncubator(
                                                     idPT = idProject,
                                                     foodDay = 0.0,
                                                     price = 0.0
-                                                ),projectTable.eggAllEND
+                                                ), projectTable.eggAllEND
                                             )
                                         )
                                         //Яндекс статистика
@@ -672,6 +670,7 @@ fun setOvoskop(typeBird: String, day: Int): Boolean {
                 else -> false
             }
         }
+
         else -> false
     }
 }

@@ -57,8 +57,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-
-        var startBoolean = isFirstLaunch(this)
+        val startBoolean = isFirstLaunch(this)
 
         if (startBoolean) {
             WorkManagerWaterRepository(this).setupDailyReminder()
@@ -94,8 +93,12 @@ class MainActivity : ComponentActivity() {
 //                    }
 //                    loadInterstitialAd()
                 }
-                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean)}
-                InventoryApp(modifier = Modifier, isFirstStart = openFirstDialog, isFirstEnd = {openFirstDialog= false})
+                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
+
+                InventoryApp(
+                    modifier = Modifier,
+                    isFirstStart = openFirstDialog,
+                    isFirstEnd = { openFirstDialog = false })
 
             }
 
@@ -266,7 +269,7 @@ fun AlterDialigStart(
     isFirstStart: Boolean,
     dialogTitle: String,
     dialogText: String,
-    isFirstEnd: () -> Unit
+    isFirstEndConfig: () -> Unit ={},
 ) {
     var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
 
@@ -285,17 +288,12 @@ fun AlterDialigStart(
                 openFirstDialog = false
             },
             confirmButton = {
-                TextButton(onClick = { openFirstDialog = false }) { Text("Отлично!") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        openFirstDialog = false
-                        isFirstEnd() }
-                ) { Text("Завершить обучение") }
+                TextButton(onClick = {
+                    isFirstEndConfig()
+                    openFirstDialog = false
+                }) { Text("Отлично!") }
             }
         )
-
     }
 }
 

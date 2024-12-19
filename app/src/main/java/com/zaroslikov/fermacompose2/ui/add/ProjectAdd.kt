@@ -66,14 +66,12 @@ fun AddProject(
     navigateBack: () -> Unit,
     navigateToStart: () -> Unit,
     isFirstStart: Boolean,
-    isFirstEnd: () -> Unit,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Установка проекта",
         dialogText = "Придумайте оригинальное название для вашего проекта, например: \"Козоводство\" или \"Кролиководство\". Укажите дату начала проекта и нажмите \"Начать\".",
-        isFirstEnd = isFirstEnd
     )
 
     val coroutineScope = rememberCoroutineScope()

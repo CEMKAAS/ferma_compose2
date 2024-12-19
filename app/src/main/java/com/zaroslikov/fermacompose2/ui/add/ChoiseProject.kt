@@ -52,13 +52,11 @@ fun ChoiseProject(
     navigateBack: () -> Unit,
     navigateProject: (String) -> Unit,
     isFirstStart :Boolean,
-    isFirstEnd:()->Unit
 ) {
     AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Добро пожаловать!",
         dialogText = "Для начала работы пройдем короткое обучение. При выходе из приложения во время обучения обучение завершается автоматически. После нажатия кнопки \"Завершить обучение\" подсказки в других разделах перестанут отображаться.\nВыберите тип проекта: Инкубатор для инкубирования, Хозяйство для контроля подсобного хозяйства",
-        isFirstEnd = isFirstEnd
     )
 
     Scaffold(

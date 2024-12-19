@@ -66,14 +66,12 @@ fun AddIncubatorContainerTwo(
     navigateContinue: (MutableList<Incubator>) -> Unit,
     list: MutableList<Incubator>,
     isFirstStart :Boolean,
-    isFirstEnd:()->Unit
 ) {
     AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Справка",
         dialogText = "Если показания вашего инкубатора отклоняются от нормы, вы можете настроить температуру вручную или использовать рекомендованные параметры, которые можно корректировать в процессе работы." +
-                " Обязательно ведите ежедневный журнал и аккуратно записывайте все данные, чтобы потом можно было легко найти их в архиве.",
-        isFirstEnd = isFirstEnd
+                " Обязательно ведите ежедневный журнал и аккуратно записывайте все данные, чтобы потом можно было легко найти их в архиве."
     )
 
     Scaffold(

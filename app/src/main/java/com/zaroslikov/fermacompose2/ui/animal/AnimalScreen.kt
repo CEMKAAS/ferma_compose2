@@ -88,17 +88,17 @@ fun AnimalScreen(
 
     val showBottomSheetFilter = remember { mutableStateOf(false) }
 
-    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
-
-    if(openFirstDialog){
-        AlertDialogExample(
-            onDismissRequest = { openFirstDialog =  false },
-            onConfirmation = { openFirstDialog  = false },
-            dialogTitle = "Мои Животные",
-            dialogText = "В этом разделе отображаются Ваши животные. Для добавления нажмите на знак «+» в правом нижнем углу. Рекомендуем начать с добавления животных для корректной работы приложения. После перейдите  в раздел Моя Продукция",
-            icon = Icons.Default.Info
-        )
-    }
+//    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
+//
+//    if(openFirstDialog){
+//        AlertDialogExample(
+//            onDismissRequest = { openFirstDialog =  false },
+//            onConfirmation = { openFirstDialog  = false },
+//            dialogTitle = "Мои Животные",
+//            dialogText = "В этом разделе отображаются Ваши животные. Для добавления нажмите на знак «+» в правом нижнем углу. Рекомендуем начать с добавления животных для корректной работы приложения. После перейдите в раздел Моя Продукция",
+//            icon = Icons.Default.Info
+//        )
+//    }
 
 
 

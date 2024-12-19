@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.monetization.ads.base.tracker.interaction.model.FalseClick
+import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFermaWarehouse
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
@@ -95,20 +96,20 @@ fun WarehouseScreen(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
-    isFirstStart:Boolean,
+//    isFirstStart:Boolean,
+//    isFirstEnd: () -> Unit,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
 
-    if(openFirstDialog ){
-        AlertDialogExample(
-            onDismissRequest = { openFirstDialog =  false },
-            onConfirmation = { openFirstDialog  = false },
-            dialogTitle = "Склад",
-            dialogText = "Склад — ключевой элемент проекта, где хранится произведенная и приобретенная продукция. Здесь можно получить детальную информацию о каждом продукте. Слева расположены дополнительные разделы. Перейдем в раздел \"Мои животные\". ",
-            icon = Icons.Default.Info
-        )
-    }
+//    AlterDialigStart(
+//        isFirstStart = isFirstStart,
+//        dialogTitle = "Хозяйство",
+//        dialogText = "Склад — ключевой элемент проекта, где хранится произведенная и приобретенная продукция. Здесь можно получить детальную информацию о каждом продукте." +
+//                " Слева расположены меню проекта. Рекомендуем начать с добавления животных в разделе «Мои Животные» для корректной работы расчетов, затем добавлять свою продукцию на склад в разделе \"Моя Продукция\"." +
+//                "\nДополнительная информация доступна в нашей группе ВКонтакте." +
+//                "\nУдачи.",
+////        isFirstEndConfig = isFirstEnd
+//    )
 
     val homeUiState by viewModel.homeUiState.collectAsState()
     val homeFoodUiState by viewModel.homeFoodUiState.collectAsState()
@@ -124,7 +125,9 @@ fun WarehouseScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navigateToStart = navigateToStart,
+                navigateToStart = {
+//                    isFirstEnd()
+                    navigateToStart() },
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
                 1,

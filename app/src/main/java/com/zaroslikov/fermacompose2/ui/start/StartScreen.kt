@@ -109,8 +109,8 @@ fun StartScreen(
     navigateToItemIncubatorArh: (Int) -> Unit,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
     modifier: Modifier = Modifier,
-    isFirstStart : Boolean,
-    isFirstEnd:() -> Unit,
+    isFirstStart: Boolean,
+    isFirstEnd: () -> Unit,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
@@ -133,16 +133,18 @@ fun StartScreen(
     AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Главный экран",
-        dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.",
-        isFirstEnd = isFirstEnd
+        dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.\nДля получения дополнительной информации обращайтесь в нашу группу ВКонтакте.\n" +
+                "\nУдачи.",
+        isFirstEndConfig = isFirstEnd
     )
 
     Scaffold(
         topBar = {
             TopAppBarStart2(
                 title = "Мое Хозяйство",
-                infoBottomSheet = { infoBottomSheet = true
-                AppMetrica.reportEvent("Информация")
+                infoBottomSheet = {
+                    infoBottomSheet = true
+                    AppMetrica.reportEvent("Информация")
                 }
             )
         }, floatingActionButton = {
@@ -161,7 +163,7 @@ fun StartScreen(
             navigateToItemIncubator = navigateToItemIncubator,
             navigateToItemProjectArh = navigateToItemProjectArh,
             navigateToItemIncubatorArh = navigateToItemIncubatorArh,
-            navigationToNewYear ={ navigationToNewYear(Pair(false,0)) }
+            navigationToNewYear = { navigationToNewYear(Pair(false, 0)) }
         )
 
         if (infoBottomSheet) {
@@ -175,7 +177,8 @@ fun StartScreen(
                 sheetState = sheetState,
                 time = viewModel.time,
                 showDialogTime = { showDialogTime = true },
-                clearTime = { viewModel.onUpdate("")
+                clearTime = {
+                    viewModel.onUpdate("")
                     AppMetrica.reportEvent("УведОбщ - нет")
                 }
             )
@@ -241,7 +244,7 @@ fun StartScreenContainer(
                 state = pagerState.currentPage
             }
             Column {
-                if(newYearBoolean()){
+                if (newYearBoolean()) {
                     Button(
                         onClick = { navigationToNewYear() },
                         modifier = Modifier
