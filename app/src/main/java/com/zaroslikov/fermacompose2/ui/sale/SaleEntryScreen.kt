@@ -127,6 +127,10 @@ fun SaleEntryProduct(
                     onNavigateUp()
                 }
             },
+            countWarehouse = viewModel.itemUiState,
+            updateCountWarehouse = {
+                viewModel.updateUiState(it)
+            }
         )
     }
 }
@@ -138,7 +142,9 @@ fun SaleEntryContainerProduct(
     titleList: List<String>,
     categoryList: List<String>,
     buyerList: List<String>,
-    saveInRoomSale: (SaleTableInsert) -> Unit
+    saveInRoomSale: (SaleTableInsert) -> Unit,
+    countWarehouse: Double,
+    updateCountWarehouse: (String) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
@@ -206,6 +212,8 @@ fun SaleEntryContainerProduct(
 
 
     Column(modifier = modifier) {
+        Text(text = "Сейчас на сладе: $countWarehouse $suffix   ")
+
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,

@@ -238,6 +238,9 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentExpensesWarehouse(id: Int): Flow<List<WarehouseData>> =
         itemDao.getCurrentExpensesWarehouse(id)
 
+    override fun getCurrentBalanceProduct(name: String): Flow<Double> = itemDao.getCurrentBalanceProduct(name)
+    override fun getCurrentExpensesProduct(name: String): Flow<Double> = itemDao.getCurrentExpensesProduct(name)
+
     override fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin> =
         itemDao.getAnalysisAddAllTime(id, name)
 

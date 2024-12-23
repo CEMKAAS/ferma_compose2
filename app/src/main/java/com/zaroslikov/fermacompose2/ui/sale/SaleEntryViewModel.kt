@@ -1,5 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.sale
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,8 +15,11 @@ import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 class SaleEntryViewModel(
@@ -48,6 +54,18 @@ class SaleEntryViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue =  BuyerUiState()
             )
+
+    var itemUiState by mutableStateOf(0.0)
+        private set
+
+    fun updateUiState(name: String) {
+        viewModelScope.launch {
+            itemUiState = itemsRepository.getCurrentBalanceProduct(name)
+                .filterNotNull()
+                .first()
+                .toDouble()
+        }
+    }
 
     suspend fun saveItem(saleTable: SaleTable) {
         itemsRepository.insertSale(saleTable)

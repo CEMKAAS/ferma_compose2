@@ -20,6 +20,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -42,9 +44,29 @@ abstract class InventoryDatabase : RoomDatabase() {
 
     abstract fun itemDao(): ItemDao
 
+
+
+
     companion object {
         @Volatile
         private var Instance: InventoryDatabase? = null
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS NoteFerma (_id INTEGER PRIMARY KEY NOT NULL, title TEXT, note TEXT, date TEXT, idPT INTEGER, FOREIGN KEY (idPT) REFERENCES МyINCUBATOR (_id) ON DELETE CASCADE)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS ExpensesAnimalTable (_id INTEGER PRIMARY KEY NOT NULL, idExpenses INTEGER, idAnimal INTEGER,  percentExpenses INTEGER, idPT INTEGER, FOREIGN KEY (idPT) REFERENCES МyINCUBATOR (_id) ON DELETE CASCADE)")
+                db.execSQL("ALTER TABLE AnimalTable ADD COLUMN price REAL")
+                db.execSQL("ALTER TABLE AnimalTable ADD COLUMN showFood REAL")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN showFood INTEGER")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN showWarehouse INTEGER")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN showAnimals INTEGER")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN dailyExpensesFoodAndCount INTEGER")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN dailyExpensesFood REAL")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN countAnimal INTEGER")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN foodDesignedDay INTEGER")
+                db.execSQL("ALTER TABLE ExpensesTable ADD COLUMN lastDayFood TEXT") }
+                //update
+        }
 
         fun getDatabase(context: Context): InventoryDatabase {
             // if the Instance is not null, return it, otherwise create a new database instance.
@@ -56,6 +78,7 @@ abstract class InventoryDatabase : RoomDatabase() {
                      * attempts to perform a migration with no defined migration path.
                      */
                     .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_1_2)
                     .build()
                     .also { Instance = it }
             }

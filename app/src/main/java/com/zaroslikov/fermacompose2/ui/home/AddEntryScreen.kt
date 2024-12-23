@@ -125,6 +125,10 @@ fun AddEntryProduct(
                     onNavigateUp()
                 }
             },
+            countWarehouse = viewModel.itemUiState,
+            updateCountWarehouse = {
+                viewModel.updateUiState(it)
+            }
         )
     }
 }
@@ -136,7 +140,9 @@ fun AddEntryContainerProduct(
     titleList: List<String>,
     categoryList: List<String>,
     animalList: List<PairString>,
-    saveInRoomAdd: (AddTableInsert) -> Unit
+    saveInRoomAdd: (AddTableInsert) -> Unit,
+    countWarehouse: Double,
+    updateCountWarehouse: (String) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
@@ -160,7 +166,13 @@ fun AddEntryContainerProduct(
 
 
     fun validateTitle(text: String) {
-        isErrorTitle = text == ""
+        isErrorTitle = if (text == "") {
+            true
+        } else {
+            updateCountWarehouse(title)
+            false
+        }
+
         isErrorSlash = text.contains("/")
     }
 
@@ -198,6 +210,8 @@ fun AddEntryContainerProduct(
     }
 
     Column(modifier = modifier) {
+        Text(text = "Сейчас на сладе: $countWarehouse $suffix")
+
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,

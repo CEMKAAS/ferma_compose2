@@ -193,6 +193,8 @@ interface ItemsRepository {
 
     fun getCurrentExpensesWarehouse(id: Int): Flow<List<WarehouseData>>
 
+    fun getCurrentBalanceProduct(name: String): Flow<Double>
+    fun getCurrentExpensesProduct(name: String): Flow<Double>
 
     // Analysis
     fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin>

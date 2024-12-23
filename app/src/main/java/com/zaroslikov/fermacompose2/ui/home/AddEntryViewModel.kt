@@ -1,5 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.home
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,8 +10,11 @@ import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 class AddEntryViewModel(
@@ -26,7 +32,6 @@ class AddEntryViewModel(
                 initialValue = TitleUiState()
             )
 
-
     val categoryUiState: StateFlow<CategoryUiState> =
         itemsRepository.getItemsCategoryAddList(itemId).map { CategoryUiState(it) }
             .stateIn(
@@ -42,6 +47,21 @@ class AddEntryViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = AnimalUiState()
             )
+
+
+    var itemUiState by mutableStateOf(0.0)
+        private set
+
+
+    fun updateUiState(name: String) {
+        viewModelScope.launch {
+            itemUiState = itemsRepository.getCurrentBalanceProduct(name)
+                .filterNotNull()
+                .first()
+                .toDouble()
+        }
+    }
+
 
     suspend fun saveItem(addTable: AddTable) {
         itemsRepository.insertItem(addTable)
