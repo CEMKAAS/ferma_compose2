@@ -212,7 +212,7 @@ fun SaleEntryContainerProduct(
 
 
     Column(modifier = modifier) {
-        Text(text = "Сейчас на сладе: $countWarehouse $suffix   ")
+        Text(text = "Сейчас на сладе: $countWarehouse $suffix")
 
         Box {
             ExposedDropdownMenuBox(
@@ -273,6 +273,7 @@ fun SaleEntryContainerProduct(
                                 onClick = {
                                     title = item
                                     expanded = false
+                                    updateCountWarehouse(title)
                                 }
                             )
                         }

@@ -529,7 +529,7 @@ fun TextButtonWarehouse(
         ) {
             HorizontalDivider(
                 thickness = 1.dp, modifier = Modifier
-                    .fillMaxWidth(0.32f)
+                    .fillMaxWidth(0.26f)
             )
             Icon(
                 if (boolean) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
@@ -545,7 +545,7 @@ fun TextButtonWarehouse(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier
                     .padding(end = 4.dp)
-                    .fillMaxWidth(0.4f)
+                    .fillMaxWidth(0.5f)
             )
             HorizontalDivider(
                 thickness = 1.dp, modifier = Modifier

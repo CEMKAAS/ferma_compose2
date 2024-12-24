@@ -120,7 +120,7 @@ interface ItemDao {
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
 
     @Query(
-        "SELECT Title as name, 'Продукция' as type from MyFerma Where idPT=:id group by MyFerma.Title  " +
+        "SELECT Title as name, 'Моя Продукция' as type from MyFerma Where idPT=:id group by MyFerma.Title  " +
                 " UNION ALL" +
                 " SELECT titleEXPENSES as name, 'Купленый товар' as type from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 group by titleEXPENSES "
     )
@@ -449,43 +449,39 @@ interface ItemDao {
 
 
     @Query(
-        "SELECT Title, suffix, " +
-                "       SUM(AddCount) - COALESCE(SUM(SaleCount), 0) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
+        "SELECT SUM(AddCount) - COALESCE(SUM(SaleCount), 0) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
                 " FROM (" +
-                "    SELECT Title,suffix, SUM(disc) AS AddCount, 0 AS SaleCount, 0 AS WriteOffCount" +
+                "    SELECT SUM(disc) AS AddCount, 0 AS SaleCount, 0 AS WriteOffCount" +
                 "    FROM MyFerma" +
                 "    WHERE Title = :name" +
                 "    GROUP BY Title" +
                 "    UNION ALL" +
-                "    SELECT titleSale, suffix, 0 AS AddCount, SUM(discSale) AS SaleCount, 0 AS WriteOffCount" +
+                "    SELECT 0 AS AddCount, SUM(discSale) AS SaleCount, 0 AS WriteOffCount" +
                 "    FROM MyFermaSale" +
                 "    WHERE titleSale = :name" +
                 "    GROUP BY titleSale" +
                 "    UNION ALL" +
-                "    SELECT titleWRITEOFF, suffix, 0 AS AddCount, 0 AS SaleCount, SUM(discWRITEOFF) AS WriteOffCount" +
+                "    SELECT 0 AS AddCount, 0 AS SaleCount, SUM(discWRITEOFF) AS WriteOffCount" +
                 "    FROM MyFermaWRITEOFF" +
                 "    WHERE titleWRITEOFF = :name" +
                 "    GROUP BY titleWRITEOFF" +
-                ")" +
-                "  GROUP BY Title HAVING ResultCount > 0 ORDER BY ResultCount DESC "
+                ")"
     )
     fun getCurrentBalanceProduct(name: String): Flow<Double>
 
     @Query(
-        "SELECT titleEXPENSES as Title, suffix, " +
-                "      SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
+        "SELECT SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
                 " FROM (" +
-                "    SELECT titleEXPENSES,suffix, SUM(countEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
+                "    SELECT SUM(countEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
                 "    FROM MyFermaEXPENSES" +
                 "    WHERE idPT = :name and showWarehouse = 1 and showFood != 1" +
                 "    GROUP BY titleEXPENSES" +
                 "    UNION ALL" +
-                "    SELECT titleWRITEOFF, suffix, 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount" +
+                "    SELECT 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount" +
                 "    FROM MyFermaWRITEOFF" +
                 "    WHERE idPT = :name" +
                 "    GROUP BY titleWRITEOFF" +
-                ")" +
-                " GROUP BY titleEXPENSES HAVING ResultCount > 0 ORDER BY ResultCount DESC"
+                ")"
     )
     fun getCurrentExpensesProduct(name: String): Flow<Double>
 

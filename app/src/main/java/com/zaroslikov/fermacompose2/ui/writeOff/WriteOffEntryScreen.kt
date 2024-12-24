@@ -125,6 +125,10 @@ fun WriteOffEntryProduct(
                     onNavigateUp()
                 }
             },
+            countWarehouse = viewModel.itemUiState,
+            updateCountWarehouse = {
+                viewModel.updateUiState(it)
+            }
         )
     }
 }
@@ -134,7 +138,9 @@ fun WriteOffEntryProduct(
 fun WriteOffEntryContainerProduct(
     modifier: Modifier,
     titleList: List<PairString>,
-    saveInRoomSale: (WriteOffTableInsert) -> Unit
+    saveInRoomSale: (WriteOffTableInsert) -> Unit,
+    countWarehouse: Double,
+    updateCountWarehouse: (Pair<String, Boolean>) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("0") }
@@ -190,6 +196,7 @@ fun WriteOffEntryContainerProduct(
     }
 
     Column(modifier = modifier) {
+        Text(text = "Сейчас на сладе: $countWarehouse $suffix")
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -226,6 +233,7 @@ fun WriteOffEntryContainerProduct(
                                 selectedItemIndex = index
                                 expanded = false
                                 title = titleList[selectedItemIndex].name
+                                updateCountWarehouse(Pair(title, if(titleList[selectedItemIndex].type=="Моя Продукция") true else false))
                             }
                         )
                     }

@@ -270,6 +270,7 @@ fun AddEntryContainerProduct(
                                 onClick = {
                                     title = item
                                     expanded = false
+                                    updateCountWarehouse(title)
                                 }
                             )
                         }
