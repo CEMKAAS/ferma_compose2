@@ -39,6 +39,7 @@ import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
 import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
+import io.appmetrica.analytics.AppMetrica
 
 
 class MainActivity : ComponentActivity() {
@@ -269,27 +270,23 @@ fun AlterDialigStart(
     isFirstStart: Boolean,
     dialogTitle: String,
     dialogText: String,
+    textAppMetrica: String,
     isFirstEndConfig: () -> Unit ={},
 ) {
     var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
 
     if (openFirstDialog) {
         AlertDialog(
-            icon = {
-                Icon(Icons.Default.Info, contentDescription = "Example Icon")
-            },
-            title = {
-                Text(text = dialogTitle)
-            },
-            text = {
-                Text(text = dialogText, textAlign = TextAlign.Justify)
-            },
-            onDismissRequest = {
-                openFirstDialog = false
-            },
+            icon = { Icon(Icons.Default.Info, contentDescription = "Example Icon") },
+            title = { Text(text = dialogTitle) },
+            text = { Text(text = dialogText, textAlign = TextAlign.Justify) },
+            onDismissRequest = { openFirstDialog = false
+                AppMetrica.reportEvent("-"+textAppMetrica)
+                               },
             confirmButton = {
                 TextButton(onClick = {
                     isFirstEndConfig()
+                    AppMetrica.reportEvent(textAppMetrica)
                     openFirstDialog = false
                 }) { Text("Отлично!") }
             }

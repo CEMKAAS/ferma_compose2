@@ -135,6 +135,7 @@ fun StartScreen(
         dialogTitle = "Главный экран",
         dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.\nДля получения дополнительной информации обращайтесь в нашу группу ВКонтакте.\n" +
                 "\nУдачи.",
+        textAppMetrica = "Окончание обучения",
         isFirstEndConfig = isFirstEnd
     )
 
@@ -246,7 +247,9 @@ fun StartScreenContainer(
             Column {
                 if (newYearBoolean()) {
                     Button(
-                        onClick = { navigationToNewYear() },
+                        onClick = { navigationToNewYear()
+                            AppMetrica.reportEvent("Итоги года общий")
+                                  },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 5.dp, horizontal = 15.dp)

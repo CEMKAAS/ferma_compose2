@@ -270,7 +270,9 @@ private fun WarehouseInventoryList(
         if (newYearBoolean()) {
             item {
                 Button(
-                    onClick = { navigationToNewYear() },
+                    onClick = { navigationToNewYear()
+                        AppMetrica.reportEvent("Итоги года по проекту")
+                              },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 15.dp)
@@ -406,9 +408,7 @@ fun WarehouseFoodCard(
         val currentDate = LocalDate.now()
 
 
-        if (currentDate >= endDate) {
-            println("Конечная дата уже наступила.")
-        }
+        if (currentDate >= endDate) println("Конечная дата уже наступила.")
 
         val totalDays = ChronoUnit.DAYS.between(startDate, endDate)
         val remainingDays = ChronoUnit.DAYS.between(currentDate, endDate)

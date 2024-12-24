@@ -72,6 +72,7 @@ fun AddProject(
         isFirstStart = isFirstStart,
         dialogTitle = "Установка проекта",
         dialogText = "Придумайте оригинальное название для вашего проекта, например: \"Козоводство\" или \"Кролиководство\". Укажите дату начала проекта и нажмите \"Начать\".",
+        textAppMetrica = "Установка проекта"
     )
 
     val coroutineScope = rememberCoroutineScope()

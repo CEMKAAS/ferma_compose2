@@ -169,7 +169,6 @@ fun NoteEntryContainer(
                     )
                     val eventParameters: MutableMap<String, Any> = HashMap()
                     eventParameters["Заголовок"] = title
-                    eventParameters["Заметка"] = note
                     AppMetrica.reportEvent("Заметки", eventParameters);
                 }
             },

@@ -937,7 +937,6 @@ fun ExpensesEntryContainerProduct(
                     eventParameters["Корм"] = showFoodUI
                     eventParameters["Склад"] = showWarehouseUI
                     eventParameters["Распределение"] = showAnimalsUI
-
                     AppMetrica.reportEvent("Expenses Products", eventParameters)
                 }
             },
