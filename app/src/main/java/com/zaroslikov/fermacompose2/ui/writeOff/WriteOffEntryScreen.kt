@@ -196,7 +196,6 @@ fun WriteOffEntryContainerProduct(
     }
 
     Column(modifier = modifier) {
-        Text(text = "Сейчас на сладе: $countWarehouse $suffix")
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -241,6 +240,8 @@ fun WriteOffEntryContainerProduct(
             }
         }
 
+        Text(text = "Сейчас на складе: $countWarehouse $suffix", modifier = Modifier.padding(2.dp))
+        
         Box {
             OutlinedTextField(
                 value = count,

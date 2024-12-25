@@ -212,8 +212,6 @@ fun SaleEntryContainerProduct(
 
 
     Column(modifier = modifier) {
-        Text(text = "Сейчас на сладе: $countWarehouse $suffix")
-
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -281,6 +279,8 @@ fun SaleEntryContainerProduct(
                 }
             }
         }
+
+        Text(text = "Сейчас на складе: $countWarehouse $suffix", modifier = Modifier.padding(2.dp))
 
         Box {
             OutlinedTextField(

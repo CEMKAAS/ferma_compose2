@@ -55,5 +55,6 @@ data class AddTable(
     var animal: String,
     val note : String,
     @ColumnInfo(name = "idPT")
-    val idPT: Int
+    val idPT: Int,
+    var idAnimal : Long
 )

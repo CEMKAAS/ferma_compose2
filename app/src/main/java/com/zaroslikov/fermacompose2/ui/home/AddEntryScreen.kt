@@ -111,6 +111,7 @@ fun AddEntryProduct(
                             priceAll = it.priceAll,
                             suffix = it.suffix,
                             category = it.category,
+                            idAnimal = 0,
                             animal = it.anaimal,
                             idPT = idProject,
                             note = it.note
@@ -210,7 +211,6 @@ fun AddEntryContainerProduct(
     }
 
     Column(modifier = modifier) {
-        Text(text = "Сейчас на сладе: $countWarehouse $suffix")
 
         Box {
             ExposedDropdownMenuBox(
@@ -278,6 +278,8 @@ fun AddEntryContainerProduct(
                 }
             }
         }
+
+        Text(text = "Сейчас на складе: $countWarehouse $suffix", modifier = Modifier.padding(2.dp))
 
         Box {
             OutlinedTextField(
