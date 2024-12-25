@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.start
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -41,6 +43,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,6 +61,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -133,7 +137,7 @@ fun StartScreen(
     AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Главный экран",
-        dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.\nДля получения дополнительной информации обращайтесь в нашу группу ВКонтакте.\n" +
+        dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.\nДля получения дополнительной информации по использованию приложения обращайтесь в нашу группу ВКонтакте.\n" +
                 "\nУдачи.",
         textAppMetrica = "Окончание обучения",
         isFirstEndConfig = isFirstEnd
@@ -164,7 +168,8 @@ fun StartScreen(
             navigateToItemIncubator = navigateToItemIncubator,
             navigateToItemProjectArh = navigateToItemProjectArh,
             navigateToItemIncubatorArh = navigateToItemIncubatorArh,
-            navigationToNewYear = { navigationToNewYear(Pair(false, 0)) }
+            navigationToNewYear = { navigationToNewYear(Pair(false, 0)) },
+            navController =  navController
         )
 
         if (infoBottomSheet) {
@@ -181,7 +186,8 @@ fun StartScreen(
                 clearTime = {
                     viewModel.onUpdate("")
                     AppMetrica.reportEvent("УведОбщ - нет")
-                }
+                },
+
             )
         }
 
@@ -200,6 +206,7 @@ fun StartScreenContainer(
     projectListArh: List<ProjectTable>,
     projectListAct: List<ProjectTable>,
     navigationToNewYear: () -> Unit,
+    navController: NavController
 ) {
     var state by remember { mutableStateOf(0) }
     val titles = listOf("Действующие", "Архив")
@@ -228,12 +235,19 @@ fun StartScreenContainer(
                 fontSize = 20.sp,
             )
             Text(
-                text = "Сейчас нет проектов:(\nНажмите + чтобы добавить",
+                text = "Сейчас нет проектов:(\nНажмите + чтобы добавить\nили ",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 20.sp,
             )
+            Button(
+                onClick = { navController.navigate(ChoiseProjectDestination.route) }, modifier = Modifier
+                    .padding(bottom = 20.dp)
+
+            ) {
+                Text(text = "Добавить проект!")
+            }
         }
     } else {
         Column(modifier = modifier) {
@@ -247,9 +261,10 @@ fun StartScreenContainer(
             Column {
                 if (newYearBoolean()) {
                     Button(
-                        onClick = { navigationToNewYear()
+                        onClick = {
+                            navigationToNewYear()
                             AppMetrica.reportEvent("Итоги года общий")
-                                  },
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 5.dp, horizontal = 15.dp)
@@ -355,18 +370,20 @@ fun InfoBottomSheet(
     saveBottomSheet: () -> Unit,
     clearTime: () -> Unit
 ) {
-    val anonotatedString = buildAnnotatedString {
-        pushStringAnnotation(tag = "URL", annotation = "https://vk.com/myfermaapp")
-        withStyle(
-            style = SpanStyle(
-                color = Color.Blue,
-                fontSize = 20.sp
-            )
-        ) {
-            append("Присоединиться!")
-        }
-        pop()
-    }
+
+
+//    val anonotatedString = buildAnnotatedString {
+//        pushStringAnnotation(tag = "URL", annotation = "https://vk.com/myfermaapp")
+//        withStyle(
+//            style = SpanStyle(
+//                color = Color.Blue,
+//                fontSize = 20.sp
+//            )
+//        ) {
+//            append("Присоединиться!")
+//        }
+//        pop()
+//    }
 
     ModalBottomSheet(
         onDismissRequest = infoBottomSheet,
@@ -374,7 +391,7 @@ fun InfoBottomSheet(
     ) {
         Column(modifier = Modifier.padding(15.dp)) {
             Text(
-                text = "Мое Хозяйство v2.12a",
+                text = "Мое Хозяйство v2.15",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(6.dp),
@@ -397,58 +414,65 @@ fun InfoBottomSheet(
                 fontSize = 15.sp,
                 textAlign = TextAlign.Justify
             )
-            val uriHandler = LocalUriHandler.current
-            ClickableText(
-                text = anonotatedString,
-                style = TextStyle(
-                    textAlign = TextAlign.Justify
-                ),
-                onClick = { offset ->
-                    val uri = anonotatedString.getStringAnnotations(
-                        tag = "URL",
-                        start = offset,
-                        end = offset
-                    ).firstOrNull()?.item
-                    if (uri != null) {
-                        uriHandler.openUri(uri)
+//            val uriHandler = LocalUriHandler.current
+//            ClickableText(
+//                text = anonotatedString,
+//                style = TextStyle(
+//                    textAlign = TextAlign.Justify
+//                ),
+//                onClick = { offset ->
+//                    val uri = anonotatedString.getStringAnnotations(
+//                        tag = "URL",
+//                        start = offset,
+//                        end = offset
+//                    ).firstOrNull()?.item
+//                    if (uri != null) {
+//                        uriHandler.openUri(uri)
+//                    }
+//                },
+//                modifier = Modifier
+//                    .align(Alignment.CenterHorizontally)
+//                    .padding(vertical = 15.dp),
+//            )
+            val context = LocalContext.current
+            TextButton(
+                onClick = {
+                    AppMetrica.reportEvent("Переход в группу из инфо")
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/myfermaapp"))
+                    context.startActivity(intent)
+                }, modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Присоединиться!", fontSize = 20.sp)
+            }
+
+            OutlinedTextField(
+                value = time,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Уведомление") },
+                supportingText = {
+                    Text("Чтобы отключить ежедневные уведомления, нажмите на \"Х\" и \"Спасибо!\"")
+                },
+                leadingIcon = {
+                    IconButton(onClick = showDialogTime) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_access_time_24),
+                            contentDescription = "Показать меню"
+                        )
+                    }
+                },
+                trailingIcon = {
+                    IconButton(onClick = clearTime, modifier = Modifier.padding(bottom = 13.dp)) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "Удалить")
                     }
                 },
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 15.dp),
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp)
-            ) {
-                OutlinedTextField(
-                    value = time,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Уведомление") },
-                    supportingText = {
-                        Text("Чтобы отключить ежедневные уведомления, нажмите на \"Х\" и \"Спасибо!\"")
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = showDialogTime) {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_access_time_24),
-                                contentDescription = "Показать меню"
-                            )
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .clickable { showDialogTime() }
-                        .padding(bottom = 2.dp)
-                )
-                IconButton(onClick = clearTime, modifier = Modifier.padding(bottom = 13.dp)) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Удалить")
-                }
-            }
+                    .clickable { showDialogTime() }
+                    .padding(vertical = 5.dp)
+            )
+
+
             Button(
                 onClick = saveBottomSheet, modifier = Modifier
                     .fillMaxWidth()

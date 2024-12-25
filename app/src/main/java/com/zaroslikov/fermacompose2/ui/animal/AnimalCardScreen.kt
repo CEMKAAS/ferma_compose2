@@ -237,7 +237,7 @@ fun AnimalCardContainer(
                             modifier = modifierText.fillMaxWidth(0.6f)
                         )
                         Text(
-                            text = it.date,
+                            text = "${it.date} - ${it.nextVaccination}",
                             modifier = Modifier.padding(vertical = 3.dp, horizontal = 15.dp),
                             textAlign = TextAlign.End
                         )

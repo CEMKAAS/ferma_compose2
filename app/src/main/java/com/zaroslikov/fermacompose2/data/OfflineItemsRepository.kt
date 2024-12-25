@@ -21,6 +21,7 @@ import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.home.AnimalString
 import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import io.appmetrica.analytics.impl.Fi
@@ -61,7 +62,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getItemsCategoryAddList(id: Int): Flow<List<String>> =
         itemDao.getItemsCategoryAddList(id)
 
-    override fun getItemsAnimalAddList(id: Int): Flow<List<PairString>> =
+    override fun getItemsAnimalAddList(id: Int): Flow<List<AnimalString>> =
         itemDao.getItemsAnimalAddList(id)
 
     override suspend fun insertProject(projectTable: ProjectTable) =

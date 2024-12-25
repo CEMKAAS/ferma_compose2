@@ -19,8 +19,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
@@ -126,7 +129,8 @@ fun NoteScreen(
                 itemList = homeUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding
+                contentPadding = innerPadding,
+                navigateToItemAdd = {navigateToItemAdd(idProject)}
             )
         }
     }
@@ -138,6 +142,7 @@ private fun NoteBody(
     onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    navigateToItemAdd:()-> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -147,8 +152,7 @@ private fun NoteBody(
             Column(
                 modifier = modifier
                     .padding(contentPadding)
-                    .padding(15.dp)
-            ) {
+                    .padding(15.dp).verticalScroll(rememberScrollState())) {
                 Text(
                     text = "Добро пожаловать в раздел \"Мои Заметки!\"",
                     textAlign = TextAlign.Center,
@@ -168,12 +172,19 @@ private fun NoteBody(
                     fontSize = 20.sp,
                 )
                 Text(
-                    text = "Сейчас нет заметок:(\nНажмите + чтобы добавить.",
+                    text = "Сейчас нет заметок:(\nНажмите + чтобы добавить\nили",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 20.sp,
                 )
+                Button(
+                    onClick = navigateToItemAdd, modifier = Modifier
+                        .padding(bottom = 20.dp)
+
+                ) {
+                    Text(text = "Добавить Списания!")
+                }
             }
         } else {
             InventoryList(

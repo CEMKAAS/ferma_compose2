@@ -17,8 +17,11 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
@@ -140,7 +143,7 @@ fun WriteOffScreen(
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter
+                navigateToItemAdd = {navigateToItem(idProject)}
             )
         }
     }
@@ -155,7 +158,7 @@ private fun WriteOffBody(
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>
+    navigateToItemAdd:()-> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -164,7 +167,9 @@ private fun WriteOffBody(
 
         if (itemList.isEmpty()) {
             if(!writeOffBoolean) {
-                Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+                Column(modifier = modifier.padding(contentPadding).padding(15.dp).verticalScroll(
+                    rememberScrollState()
+                )) {
                     Text(
                         text = "Добро пожаловать в раздел \"Мои Списания!\"",
                         textAlign = TextAlign.Center,
@@ -173,7 +178,7 @@ private fun WriteOffBody(
                         fontSize = 20.sp,
                     )
                     Text(
-                        text = "В этом разделе вы можете оформить списание товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
+                        text = "В этом разделе вы можете оформить списание продукции или товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
                         textAlign = TextAlign.Justify,
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.fillMaxWidth().padding(5.dp),
@@ -197,19 +202,26 @@ private fun WriteOffBody(
                         fontSize = 20.sp,
                     )
                     Text(
-                        text = "В этом разделе вы можете оформить списание товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
+                        text = "В этом разделе вы можете оформить списание продукции или товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
                         textAlign = TextAlign.Justify,
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.fillMaxWidth().padding(5.dp),
                         fontSize = 20.sp,
                     )
                     Text(
-                        text = "Нет списаний:(\nНажмите + чтобы добавить.",
+                        text = "Нет списаний:(\nНажмите + чтобы добавить\nили",
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.fillMaxWidth(),
                         fontSize = 20.sp,
                     )
+                    Button(
+                        onClick = navigateToItemAdd, modifier = Modifier
+                            .padding(bottom = 20.dp)
+
+                    ) {
+                        Text(text = "Добавить Списания!")
+                    }
                 }
             }
 
@@ -222,13 +234,6 @@ private fun WriteOffBody(
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
         }
-
-        if (showBottomFilter.value) {
-//            FilterProductSheet(
-//                showBottom = showBottomFilter
-//            )
-        }
-
     }
 }
 

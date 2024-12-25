@@ -49,12 +49,11 @@ data class AddTable(
     val year: Int, // время
     @ColumnInfo(name = "PRICE")
     val priceAll: Double,
-
     var suffix: String,
     var category: String,
+    var idAnimal : Long,
     var animal: String,
     val note : String,
     @ColumnInfo(name = "idPT")
     val idPT: Int,
-    var idAnimal : Long
 )

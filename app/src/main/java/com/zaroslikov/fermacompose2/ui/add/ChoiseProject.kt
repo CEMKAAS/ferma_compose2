@@ -52,12 +52,15 @@ fun ChoiseProject(
     navigateBack: () -> Unit,
     navigateProject: (String) -> Unit,
     isFirstStart :Boolean,
+    isFirstEnd: () -> Unit,
 ) {
     AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Добро пожаловать!",
-        dialogText = "Для начала работы пройдем короткое обучение. При выходе из приложения во время обучения обучение завершается автоматически. После нажатия кнопки \"Завершить обучение\" подсказки в других разделах перестанут отображаться.\nВыберите тип проекта: Инкубатор для инкубирования, Хозяйство для контроля подсобного хозяйства",
-        textAppMetrica = "Выбор проекта"
+        dialogText = "Для начала работы пройдем короткое обучение. При выходе из приложения во время обучения обучение завершается автоматически.\nВыберите тип проекта: Инкубатор для инкубирования, Хозяйство для контроля подсобного хозяйства\nЕсли Вы опытный пользователь нажмите \"Завершить обучение\", чтобы выйти из режима обучения.",
+        textAppMetrica = "Выбор проекта",
+        boolean = true,
+        isFirstEndConfig = isFirstEnd
     )
 
     Scaffold(
@@ -87,7 +90,7 @@ fun ChooiseProjectContainer(
         ),
         DrawerItems(
             R.drawable.livestock, "Хозяйство", ProjectAddDestination.route
-        ),
+        )
     )
 
     Column(
@@ -96,7 +99,7 @@ fun ChooiseProjectContainer(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = " Выберите интересующий Вас проект",
+            text = "Выберите интересующий Вас проект",
             fontSize = 24.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(8.dp)
@@ -113,7 +116,7 @@ fun ChooiseProjectContainer(
                         .padding(8.dp)
                         .clickable {
                             navigateProject(drawerItems[it].route)
-                        },
+                        }
                 )
             }
         }
@@ -142,7 +145,6 @@ fun AddIncubatorCard(drawerItems: DrawerItems, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Text(
                 text = drawerItems.text,
                 fontSize = 20.sp,
@@ -151,6 +153,5 @@ fun AddIncubatorCard(drawerItems: DrawerItems, modifier: Modifier = Modifier) {
                     .padding(vertical = 5.dp, horizontal = 5.dp)
             )
         }
-
     }
 }

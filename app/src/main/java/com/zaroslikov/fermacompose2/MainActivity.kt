@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageInfo
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -254,15 +255,28 @@ class MainActivity : ComponentActivity() {
 fun isFirstLaunch(context: Context): Boolean {
     val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-    val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", true)
+//    val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", true)
+
+    val savedVersion = sharedPreferences.getString("app_version", null)
+    val currentVersion = getCurrentAppVersion(context)
+
+    val isFirstLaunch = savedVersion == null || savedVersion != currentVersion
 
 
     if (isFirstLaunch) {
-        sharedPreferences.edit().putBoolean("is_first_launch", false).apply()
+        sharedPreferences.edit().putString("app_version", currentVersion).apply()
         sharedPreferences.edit().putString("app_notifications", "20:00").apply()
     }
 
     return isFirstLaunch
+}
+private fun getCurrentAppVersion(context: Context): String {
+    return try {
+        val packageInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        packageInfo.versionName
+    } catch (e: PackageManager.NameNotFoundException) {
+        "unknown"
+    }
 }
 
 @Composable
@@ -271,6 +285,7 @@ fun AlterDialigStart(
     dialogTitle: String,
     dialogText: String,
     textAppMetrica: String,
+    boolean: Boolean = false,
     isFirstEndConfig: () -> Unit ={},
 ) {
     var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
@@ -285,11 +300,24 @@ fun AlterDialigStart(
                                },
             confirmButton = {
                 TextButton(onClick = {
-                    isFirstEndConfig()
+                    if (!boolean) isFirstEndConfig()
                     AppMetrica.reportEvent(textAppMetrica)
                     openFirstDialog = false
-                }) { Text("Отлично!") }
+                })
+                { Text("Отлично!") }
+            },
+            dismissButton = {
+                if (boolean) {
+                    TextButton(onClick = {
+                        isFirstEndConfig()
+                        AppMetrica.reportEvent("Завершить обучение")
+                        openFirstDialog = false
+                    })
+                    { Text("Завершить обучение") }
+                }
+
             }
+
         )
     }
 }

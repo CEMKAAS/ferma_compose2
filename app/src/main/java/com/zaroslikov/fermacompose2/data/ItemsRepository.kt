@@ -42,6 +42,7 @@ import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.home.AnimalString
 import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
@@ -83,7 +84,7 @@ interface ItemsRepository {
     fun getItemsWriteoffList(id: Int): Flow<List<PairString>>
 
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
-    fun getItemsAnimalAddList(id: Int): Flow<List<PairString>>
+    fun getItemsAnimalAddList(id: Int): Flow<List<AnimalString>>
 
     suspend fun insertProject(projectTable: ProjectTable)
     suspend fun insertProjectLong(projectTable: ProjectTable): Long

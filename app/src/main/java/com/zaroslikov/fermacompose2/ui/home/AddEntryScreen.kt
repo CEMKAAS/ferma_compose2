@@ -111,12 +111,11 @@ fun AddEntryProduct(
                             priceAll = it.priceAll,
                             suffix = it.suffix,
                             category = it.category,
-                            idAnimal = 0,
-                            animal = it.anaimal,
+                            idAnimal = it.idAnimal,
+                            animal = it.animal,
                             idPT = idProject,
                             note = it.note
                         )
-
                     )
                     Toast.makeText(
                         context,
@@ -140,7 +139,7 @@ fun AddEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<PairString>,
+    animalList: List<AnimalString>,
     saveInRoomAdd: (AddTableInsert) -> Unit,
     countWarehouse: Double,
     updateCountWarehouse: (String) -> Unit
@@ -419,7 +418,6 @@ fun AddEntryContainerProduct(
 
 
         if (animalList.isNotEmpty()) {
-            animal = "${animalList[selectedItemIndex].name} - ${animalList[selectedItemIndex].type}"
             ExposedDropdownMenuBox(
                 expanded = expandedAni,
                 onExpandedChange = { expandedAni = !expandedAni },
@@ -436,7 +434,7 @@ fun AddEntryContainerProduct(
                         }
                     },
                     supportingText = {
-                        Text("Выберите животное, которое принесло товар")
+                        Text("Выберите животное, которое принесло продукцию")
                     },
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next,
@@ -469,8 +467,7 @@ fun AddEntryContainerProduct(
                             onClick = {
                                 selectedItemIndex = index
                                 expandedAni = false
-                                animal =
-                                    "${animalList[selectedItemIndex].name} - ${animalList[selectedItemIndex].type}"
+                                animal = animalList[selectedItemIndex].name
                             }
                         )
                     }
@@ -518,7 +515,8 @@ fun AddEntryContainerProduct(
                                 formattedDateList[2].toInt(),
                                 suffix = suffix,
                                 category = category,
-                                anaimal = animal,
+                                idAnimal = if (animal != "") animalList[selectedItemIndex].id else 0,
+                                animal = animal,
                                 priceAll = 0.0,
                                 note = note
                             )
@@ -554,7 +552,8 @@ data class AddTableInsert(
     var priceAll: Double,
     var suffix: String,
     var category: String,
-    var anaimal: String,
+    val idAnimal:Long,
+    var animal: String,
     var note: String
 )
 

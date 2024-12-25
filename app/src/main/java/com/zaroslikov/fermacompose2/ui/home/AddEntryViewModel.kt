@@ -40,12 +40,12 @@ class AddEntryViewModel(
                 initialValue = CategoryUiState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalAddList(itemId).map { AnimalUiState(it) }
+    val animalUiState: StateFlow<AnimalUiState2> =
+        itemsRepository.getItemsAnimalAddList(itemId).map { AnimalUiState2(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
+                initialValue = AnimalUiState2()
             )
 
 
@@ -81,4 +81,8 @@ data class TitleUiState(val titleList: List<String> = listOf())
 data class CategoryUiState(val categoryList: List<String> = listOf())
 data class AnimalUiState(val animalList: List<PairString> = listOf())
 
+data class AnimalUiState2(val animalList: List<AnimalString> = listOf())
+
 data class PairString(val name: String, val type:String)
+
+data class AnimalString(val id:Long, val name: String, val type:String)

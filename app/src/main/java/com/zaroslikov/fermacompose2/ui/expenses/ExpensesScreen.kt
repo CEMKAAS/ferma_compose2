@@ -16,8 +16,11 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
@@ -133,49 +136,62 @@ fun ExpensesScreen(
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter
+                showBottomFilter = showBottomSheetFilter,
+                navigateToItemAdd = { navigateToItem(idProject) }
             )
         }
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExpensesBody(
     itemList: List<ExpensesTable>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>
+    showBottomFilter: MutableState<Boolean>,
+    navigateToItemAdd:() ->Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+            Column(modifier = modifier
+                .padding(contentPadding)
+                .padding(15.dp).verticalScroll(rememberScrollState())) {
                 Text(
                     text = "Добро пожаловать в раздел \"Мои Покупки!\"",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
                     text = "В этом разделе Вы можете добавлять покупки, которые покупаете для Вашей фермы и не только! Каждой покупки можно назначить кол-во, цену и категорию.",
                     textAlign = TextAlign.Justify,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
-                    text = "Сейчас нет покупок:(\nНажмите + чтобы добавить.",
+                    text = "Сейчас нет покупок:(\nНажмите + чтобы добавить\nили",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 20.sp,
                 )
+                Button(
+                    onClick = navigateToItemAdd, modifier = Modifier
+                        .padding(bottom = 20.dp)
+
+                ) {
+                    Text(text = "Добавить Покупку!")
+                }
             }
         } else {
             ExpensesList(
@@ -185,13 +201,6 @@ private fun ExpensesBody(
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
         }
-
-        if (showBottomFilter.value) {
-//            FilterProductSheet(
-//                showBottom = showBottomFilter
-//            )
-        }
-
     }
 }
 

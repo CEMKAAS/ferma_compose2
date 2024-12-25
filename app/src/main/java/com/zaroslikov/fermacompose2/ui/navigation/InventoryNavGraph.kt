@@ -119,16 +119,15 @@ fun InventoryNavHost(
                 isFirstStart = isFirstStart,
                 isFirstEnd = isFirstEnd
             )
-
         }
 
         composable(route = ChoiseProjectDestination.route) {
             ChoiseProject(
                 navigateBack = { navController.popBackStack() },
                 navigateProject = { navController.navigate(it) },
-                isFirstStart = isFirstStart
+                isFirstStart = isFirstStart,
+                isFirstEnd = isFirstEnd
             )
-
         }
 
 

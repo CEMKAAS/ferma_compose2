@@ -375,12 +375,13 @@ fun ExpensesEditContainerProduct(
         OutlinedTextField(
             value = expensesTable.priceAll,
             onValueChange = {
+                validatePrice(expensesTable.priceAll)
                 onValueChange(
                     expensesTable.copy(
-                        priceAll = it
+                        priceAll = it, showAnimals = if (it =="") false else expensesTable.showAnimals
                     )
                 )
-                validatePrice(expensesTable.priceAll)
+
             },
             label = { Text("Стоимость") },
             modifier = Modifier

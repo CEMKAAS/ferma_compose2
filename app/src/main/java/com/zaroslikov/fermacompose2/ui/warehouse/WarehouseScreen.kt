@@ -197,7 +197,7 @@ private fun WarehouseBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        if (itemList.isEmpty()) {
+        if (itemList.isEmpty() && itemFoodList.isEmpty() && itemExpensesList.isEmpty()) {
             Column(
                 modifier = modifier
                     .padding(contentPadding)
@@ -222,7 +222,7 @@ private fun WarehouseBody(
                     fontSize = 20.sp,
                 )
                 Text(
-                    text = "Сейчас склад пустой:(\nДобавьте товар в разделе \"Мои Товары\"",
+                    text = "Сейчас склад пустой:(\nДобавьте товар на склад в разделе \"Моя Продукция\" или \"Мои Покупки\"",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.fillMaxWidth(),
@@ -275,7 +275,7 @@ private fun WarehouseInventoryList(
                               },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 15.dp)
+                        .padding(vertical = 5.dp, horizontal = 15.dp)
                 ) {
                     Text(text = "Итоги года по проекту!")
                 }

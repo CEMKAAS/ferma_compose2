@@ -44,6 +44,7 @@ import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
+import com.zaroslikov.fermacompose2.ui.home.AnimalString
 import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
@@ -129,8 +130,8 @@ interface ItemDao {
     @Query("SELECT MyFerma.category from MyFerma Where idPT=:id group by MyFerma.category ")
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
 
-    @Query("SELECT name, type from AnimalTable Where idPT=:id")
-    fun getItemsAnimalAddList(id: Int): Flow<List<PairString>>
+    @Query("SELECT id, name, type from AnimalTable Where idPT=:id")
+    fun getItemsAnimalAddList(id: Int): Flow<List<AnimalString>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: AddTable)
@@ -474,12 +475,12 @@ interface ItemDao {
                 " FROM (" +
                 "    SELECT SUM(countEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
                 "    FROM MyFermaEXPENSES" +
-                "    WHERE idPT = :name and showWarehouse = 1 and showFood != 1" +
+                "    WHERE titleEXPENSES = :name and showWarehouse = 1 and showFood = 0" +
                 "    GROUP BY titleEXPENSES" +
                 "    UNION ALL" +
                 "    SELECT 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount" +
                 "    FROM MyFermaWRITEOFF" +
-                "    WHERE idPT = :name" +
+                "    WHERE titleWRITEOFF = :name" +
                 "    GROUP BY titleWRITEOFF" +
                 ")"
     )
@@ -521,7 +522,7 @@ interface ItemDao {
     fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
 
     @Query(
-        "SELECT at.name As title, COALESCE((SUM((e.countEXPENSES*ea.percentExpenses)/100)/SUM(a.disc)),0) AS priceAll from MyFerma a" +
+        "SELECT at.name As title, COALESCE((SUM(a.disc)/SUM((e.countEXPENSES*ea.percentExpenses)/100)),0) AS priceAll from MyFerma a" +
                 " left Join AnimalTable at On at.name = a.animal" +
                 " left Join ExpensesAnimalTable ea On ea.idAnimal = at.id" +
                 " left Join MyFermaEXPENSES e on ea.idExpenses = e._id" +
@@ -619,7 +620,7 @@ interface ItemDao {
     ): Flow<List<AnalysisSaleBuyerAllTime>>
 
     @Query(
-        "SELECT at.name As title, COALESCE((SUM((e.countEXPENSES*ea.percentExpenses)/100)/SUM(a.disc)),0) AS priceAll, '₽' AS suffix from MyFerma a" +
+        "SELECT at.name As title, COALESCE((SUM(a.disc)/SUM((e.countEXPENSES*ea.percentExpenses)/100)),0) AS priceAll, '₽' AS suffix from MyFerma a" +
                 " left Join AnimalTable at On at.name = a.animal" +
                 " left Join ExpensesAnimalTable ea On ea.idAnimal = at.id" +
                 " left Join MyFermaEXPENSES e on ea.idExpenses = e._id" +

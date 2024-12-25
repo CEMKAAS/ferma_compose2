@@ -36,9 +36,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 
-/**
- * Database class with a singleton Instance object.
- */
+
 @Database(entities = [AddTable::class, SaleTable::class, ExpensesTable::class, WriteOffTable::class, ProjectTable::class, Incubator::class, AnimalTable::class, AnimalCountTable::class, AnimalSizeTable::class, AnimalVaccinationTable::class, AnimalWeightTable::class, NoteTable::class, ExpensesAnimalTable::class], version = 2, exportSchema = false)
 abstract class InventoryDatabase : RoomDatabase() {
 
@@ -66,11 +64,6 @@ abstract class InventoryDatabase : RoomDatabase() {
                 //update
         }
 
-//        val MIGRATION_2_3 = object : Migration(1, 3) {
-//            override fun migrate(db: SupportSQLiteDatabase) {
-//
-//            //update
-//        }
 
         fun getDatabase(context: Context): InventoryDatabase {
             // if the Instance is not null, return it, otherwise create a new database instance.

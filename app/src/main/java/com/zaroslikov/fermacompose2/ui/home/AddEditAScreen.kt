@@ -129,7 +129,7 @@ fun AddEditContainerProduct(
     addTable: AddTableUiState,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<PairString>,
+    animalList: List<AnimalString>,
     onValueChange: (AddTableUiState) -> Unit = {},
     saveInRoomAdd: (Boolean) -> Unit,
     deleteAdd: () -> Unit
@@ -368,12 +368,12 @@ fun AddEditContainerProduct(
                     label = { Text(text = "Животное") },
                     leadingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
                     trailingIcon = {
-                        IconButton(onClick = { onValueChange(addTable.copy(animal = "")) }) {
+                        IconButton(onClick = { onValueChange(addTable.copy(idAnimal =0, animal = "")) }) {
                             Icon(Icons.Default.Clear, contentDescription = "Стереть")
                         }
                     },
                     supportingText = {
-                        Text("Выберите животное, которое принесло товар")
+                        Text("Выберите животное, которое принесло продукцию")
                     },
                     modifier = Modifier
                         .menuAnchor()
@@ -406,7 +406,7 @@ fun AddEditContainerProduct(
                             onClick = {
                                 selectedItemIndex = index
                                 expandedAni = false
-                                onValueChange(addTable.copy(animal = animalList[selectedItemIndex].name))
+                                onValueChange(addTable.copy(idAnimal = animalList[selectedItemIndex].id, animal = animalList[selectedItemIndex].name))
                             }
                         )
                     }

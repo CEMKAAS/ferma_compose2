@@ -32,8 +32,11 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
@@ -141,21 +144,14 @@ fun SaleScreen(
                         contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
                     )
                 }
-            },
-//            bottomBar = {
-//                Banner(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentHeight()
-//                )
-//            }
+            }
         ) { innerPadding ->
             SaleBody(
                 itemList = homeUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter
+                navigateToItemAdd = {navigateToItem(idProject)}
             )
         }
     }
@@ -169,14 +165,16 @@ private fun SaleBody(
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>
+    navigateToItemAdd:() ->Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+            Column(modifier = modifier.padding(contentPadding).padding(15.dp).verticalScroll(
+                rememberScrollState()
+            )) {
                 Text(
                     text = "Добро пожаловать в раздел \"Мои Продажи!\"",
                     textAlign = TextAlign.Center,
@@ -192,12 +190,19 @@ private fun SaleBody(
                     fontSize = 20.sp,
                 )
                 Text(
-                    text = "Сейчас нет продаж:(\nНажмите + чтобы добавить.",
+                    text = "Сейчас нет продаж:(\nНажмите + чтобы добавить\nили",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 20.sp,
                 )
+                Button(
+                    onClick = navigateToItemAdd, modifier = Modifier
+                        .padding(bottom = 20.dp)
+
+                ) {
+                    Text(text = "Добавить Продажу!")
+                }
             }
         } else {
             InventoryList(
@@ -206,12 +211,6 @@ private fun SaleBody(
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
             )
-        }
-
-        if (showBottomFilter.value) {
-//            FilterProductSheet(
-//                showBottom = showBottomFilter
-//            )
         }
 
     }

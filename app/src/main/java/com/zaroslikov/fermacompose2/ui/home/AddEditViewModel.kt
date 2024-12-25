@@ -60,12 +60,12 @@ class AddEditViewModel(
                 initialValue = CategoryUiState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsAnimalAddList(itemIdPT).map { AnimalUiState(it) }
+    val animalUiState: StateFlow<AnimalUiState2> =
+        itemsRepository.getItemsAnimalAddList(itemIdPT).map { AnimalUiState2(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
+                initialValue = AnimalUiState2()
             )
 
     suspend fun saveItem() {
@@ -92,10 +92,10 @@ data class AddTableUiState(
     val priceAll: Double = 0.0,
     var suffix: String = "",
     var category: String = "",
+    var idAnimal: Long = 0,
     var animal: String = "",
     val note: String = "",
     val idPT: Int = 0,
-    var idAnimal: Long = 0,
 )
 
 fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
@@ -108,10 +108,10 @@ fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
     priceAll,
     suffix,
     category,
+    idAnimal,
     animal,
     note,
-    idPT,
-    idAnimal
+    idPT
 )
 
 fun AddTableUiState.toAddTable(): AddTable = AddTable(
@@ -124,8 +124,8 @@ fun AddTableUiState.toAddTable(): AddTable = AddTable(
     priceAll,
     suffix,
     category,
+    idAnimal,
     animal,
     note,
-    idPT,
-    idAnimal,
+    idPT
 )
