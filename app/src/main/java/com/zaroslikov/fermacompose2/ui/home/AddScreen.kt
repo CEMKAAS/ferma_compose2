@@ -193,10 +193,11 @@ private fun AddBody(
                 )
                 Button(
                     onClick = navigateToItemAdd, modifier = Modifier
+                        .fillMaxWidth()
                         .padding(bottom = 20.dp)
 
                 ) {
-                    Text(text = "Добавить продукцию!")
+                    Text(text = "Добавить Продукцию!")
                 }
             }
         } else {

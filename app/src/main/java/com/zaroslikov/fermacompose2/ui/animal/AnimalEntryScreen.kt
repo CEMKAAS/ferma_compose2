@@ -138,6 +138,7 @@ fun AnimalEntryContainer(
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorType by rememberSaveable { mutableStateOf(false) }
     var isErrorPrice by rememberSaveable { mutableStateOf(false) }
+    var isErrorFoodDay by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
@@ -155,11 +156,16 @@ fun AnimalEntryContainer(
         isErrorPrice = text == ""
     }
 
+    fun validateFoodDay(text: String) {
+        isErrorFoodDay = text == ""
+    }
+
     fun errorBoolean(): Boolean {
         isErrorTitle = title == ""
         isErrorType = type == ""
         isErrorPrice = price == ""
-        return !(isErrorTitle || isErrorType || isErrorPrice)
+        isErrorFoodDay = foodDay == ""
+        return !(isErrorTitle || isErrorType || isErrorPrice || isErrorFoodDay)
     }
 
     //Календарь
@@ -507,11 +513,17 @@ fun AnimalEntryContainer(
         OutlinedTextField(
             value = foodDay,
             onValueChange = {
+                validateFoodDay(it)
                 foodDay = it
             },
             label = { Text(text = "Расход корма") },
             supportingText = {
-                Text("Укажите ежедневный расход корма на голову")
+                if (isErrorFoodDay) {
+                    Text(
+                        text = "Не указана ежедневный расход корма на голову, если не знаете укажите 0!",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else { Text("Укажите ежедневный расход корма на голову, если не знаете укажите 0") }
             },
             suffix = { Text(text = "кг.") },
             modifier = Modifier
@@ -570,7 +582,7 @@ fun AnimalEntryContainer(
                                     image = "0",
                                     arhiv = false,
                                     price = price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-                                    foodDay = foodDay.toDouble(),
+                                    foodDay = foodDay.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
                                     idPT = idPT
                                 ),
                                 AnimalCountTable(

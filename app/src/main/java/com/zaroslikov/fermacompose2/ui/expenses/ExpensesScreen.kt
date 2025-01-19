@@ -186,7 +186,7 @@ private fun ExpensesBody(
                     fontSize = 20.sp,
                 )
                 Button(
-                    onClick = navigateToItemAdd, modifier = Modifier
+                    onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
                         .padding(bottom = 20.dp)
 
                 ) {

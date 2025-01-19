@@ -62,6 +62,7 @@ import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.formatter
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -240,7 +241,7 @@ fun WriteOffEntryContainerProduct(
             }
         }
 
-        Text(text = "Сейчас на складе: $countWarehouse $suffix", modifier = Modifier.padding(2.dp))
+        Text(text = "Сейчас на складе: ${formatter(countWarehouse)} $suffix", modifier = Modifier.padding(2.dp))
         
         Box {
             OutlinedTextField(

@@ -226,7 +226,7 @@ fun StartScreenContainer(
                 fontSize = 20.sp,
             )
             Text(
-                text = "Здесь Вы сможете увидеть все Ваши проекты (инкубаторы и хозяйства). Теперь у Вас есть возможность создавать несколько проектов, каждый из которых будет иметь свою уникальную экономику и склад и д.р., что позволит эффективно управлять каждым вашим бизнесом!",
+                text = "Здесь Вы сможете увидеть все Ваши проекты (инкубаторы и хозяйства). У Вас есть возможность создавать несколько проектов, каждый из которых будет иметь свою уникальную экономику и склад и д.р., что позволит эффективно управлять каждым Вашим бизнесом!",
                 textAlign = TextAlign.Justify,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
@@ -242,7 +242,7 @@ fun StartScreenContainer(
                 fontSize = 20.sp,
             )
             Button(
-                onClick = { navController.navigate(ChoiseProjectDestination.route) }, modifier = Modifier
+                onClick = { navController.navigate(ChoiseProjectDestination.route) }, modifier = Modifier.fillMaxWidth()
                     .padding(bottom = 20.dp)
 
             ) {
@@ -462,7 +462,7 @@ fun InfoBottomSheet(
                     }
                 },
                 trailingIcon = {
-                    IconButton(onClick = clearTime, modifier = Modifier.padding(bottom = 13.dp)) {
+                    IconButton(onClick = clearTime) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "Удалить")
                     }
                 },

@@ -196,11 +196,11 @@ private fun AnimalBody(
                     fontSize = 20.sp,
                 )
                 Button(
-                    onClick = navigateToItemAdd, modifier = Modifier
+                    onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
                         .padding(bottom = 20.dp)
 
                 ) {
-                    Text(text = "Добавить Продажу!")
+                    Text(text = "Добавить Животного!")
                 }
             }
         } else {

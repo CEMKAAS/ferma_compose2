@@ -434,7 +434,7 @@ interface ItemDao {
         "SELECT titleEXPENSES as Title, suffix, " +
                 "      SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
                 " FROM (" +
-                "    SELECT titleEXPENSES,suffix, SUM(countEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
+                "    SELECT titleEXPENSES,suffix, SUM(discEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
                 "    FROM MyFermaEXPENSES" +
                 "    WHERE idPT = :id and showWarehouse = 1 and showFood != 1" +
                 "    GROUP BY titleEXPENSES" +
@@ -473,7 +473,7 @@ interface ItemDao {
     @Query(
         "SELECT SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) AS ResultCount" +
                 " FROM (" +
-                "    SELECT SUM(countEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
+                "    SELECT SUM(discEXPENSES) AS ExpensesCount, 0 AS WriteOffCount" +
                 "    FROM MyFermaEXPENSES" +
                 "    WHERE titleEXPENSES = :name and showWarehouse = 1 and showFood = 0" +
                 "    GROUP BY titleEXPENSES" +
@@ -522,7 +522,7 @@ interface ItemDao {
     fun getAnalysisSaleBuyerAllTime(id: Int, name: String): Flow<List<AnalysisSaleBuyerAllTime>>
 
     @Query(
-        "SELECT at.name As title, COALESCE((SUM(a.disc)/SUM((e.countEXPENSES*ea.percentExpenses)/100)),0) AS priceAll from MyFerma a" +
+        "SELECT at.name As title, COALESCE(SUM((e.countEXPENSES*ea.percentExpenses)/100)/(SUM(a.disc)),0) AS priceAll from MyFerma a" +
                 " left Join AnimalTable at On at.name = a.animal" +
                 " left Join ExpensesAnimalTable ea On ea.idAnimal = at.id" +
                 " left Join MyFermaEXPENSES e on ea.idExpenses = e._id" +
@@ -620,7 +620,7 @@ interface ItemDao {
     ): Flow<List<AnalysisSaleBuyerAllTime>>
 
     @Query(
-        "SELECT at.name As title, COALESCE((SUM(a.disc)/SUM((e.countEXPENSES*ea.percentExpenses)/100)),0) AS priceAll, '₽' AS suffix from MyFerma a" +
+        "SELECT at.name As title, COALESCE(SUM((e.countEXPENSES*ea.percentExpenses)/100)/(SUM(a.disc)),0) AS priceAll, '₽' AS suffix from MyFerma a" +
                 " left Join AnimalTable at On at.name = a.animal" +
                 " left Join ExpensesAnimalTable ea On ea.idAnimal = at.id" +
                 " left Join MyFermaEXPENSES e on ea.idExpenses = e._id" +

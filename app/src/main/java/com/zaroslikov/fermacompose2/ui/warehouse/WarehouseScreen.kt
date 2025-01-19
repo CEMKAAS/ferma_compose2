@@ -275,7 +275,7 @@ private fun WarehouseInventoryList(
                               },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 5.dp, horizontal = 15.dp)
+                        .padding(vertical = 5.dp, horizontal = 8.dp)
                 ) {
                     Text(text = "Итоги года по проекту!")
                 }
@@ -460,7 +460,7 @@ fun WarehouseFoodCard(
                 progress = {
                     (percentageRemaining / 100.0).toFloat()
                 },
-                color = if (percentageRemaining <= 50) MaterialTheme.colorScheme.error else ProgressIndicatorDefaults.linearColor,
+                color = if (percentageRemaining <= 20) MaterialTheme.colorScheme.error else ProgressIndicatorDefaults.linearColor,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(10.dp)

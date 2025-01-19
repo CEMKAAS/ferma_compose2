@@ -130,6 +130,7 @@ fun AnimalEditContainer(
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorType by rememberSaveable { mutableStateOf(false) }
     var isErrorPrice by rememberSaveable { mutableStateOf(false) }
+    var isErrorFoodDay by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
     var selectedItemIndex by remember { mutableStateOf(0) }
@@ -152,11 +153,16 @@ fun AnimalEditContainer(
         isErrorPrice = text == ""
     }
 
+    fun validateFoodDay(text: String) {
+        isErrorFoodDay = text == ""
+    }
+
     fun errorBoolean(): Boolean {
         isErrorTitle = animalEditUiState.name == ""
         isErrorType = animalEditUiState.type == ""
         isErrorPrice = animalEditUiState.price == ""
-        return !(isErrorTitle || isErrorType || isErrorPrice)
+        isErrorFoodDay = animalEditUiState.foodDay == ""
+        return !(isErrorTitle || isErrorType || isErrorPrice || isErrorFoodDay)
     }
 
 
@@ -441,14 +447,12 @@ fun AnimalEditContainer(
                 .fillMaxWidth()
                 .padding(bottom = 10.dp),
             supportingText = {
-                if (isErrorPrice) {
+                if (isErrorFoodDay) {
                     Text(
-                        text = "Не указан ежедневный расход корма на голову",
+                        text = "Не указана ежедневный расход корма на голову, если не знаете укажите 0!",
                         color = MaterialTheme.colorScheme.error
                     )
-                } else {
-                    Text("Укажите ежедневный расход корма на голову")
-                }
+                } else { Text("Укажите ежедневный расход корма на голову, если не знаете укажите 0") }
             },
             suffix = { Text(text = "кг.") },
             keyboardOptions = KeyboardOptions(

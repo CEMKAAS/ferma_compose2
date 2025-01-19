@@ -179,11 +179,11 @@ private fun NoteBody(
                     fontSize = 20.sp,
                 )
                 Button(
-                    onClick = navigateToItemAdd, modifier = Modifier
+                    onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
                         .padding(bottom = 20.dp)
 
                 ) {
-                    Text(text = "Добавить Списания!")
+                    Text(text = "Добавить Заметку")
                 }
             }
         } else {
