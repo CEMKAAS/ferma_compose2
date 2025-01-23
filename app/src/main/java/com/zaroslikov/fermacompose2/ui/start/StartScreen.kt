@@ -391,7 +391,7 @@ fun InfoBottomSheet(
     ) {
         Column(modifier = Modifier.padding(15.dp)) {
             Text(
-                text = "Мое Хозяйство v2.15",
+                text = "Мое Хозяйство v2.15а",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(6.dp),
