@@ -1,24 +1,29 @@
 package com.zaroslikov.fermacompose2.ui.warehouse
 
 import android.graphics.Paint.Align
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
@@ -46,10 +51,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -110,10 +117,11 @@ fun WarehouseScreen(
 //                "\nУдачи.",
 ////        isFirstEndConfig = isFirstEnd
 //    )
-
+    val context = LocalContext.current
     val homeUiState by viewModel.homeUiState.collectAsState()
     val homeFoodUiState by viewModel.homeFoodUiState.collectAsState()
     val homeExpensesUiState by viewModel.homeExpensesUiState.collectAsState()
+    val fastAddUiState by viewModel.fastAddUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -127,7 +135,8 @@ fun WarehouseScreen(
                 scope = coroutineScope,
                 navigateToStart = {
 //                    isFirstEnd()
-                    navigateToStart() },
+                    navigateToStart()
+                },
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
                 1,
@@ -175,8 +184,26 @@ fun WarehouseScreen(
                             ), it.second
                         )
                     }
+                    Toast.makeText(
+                        context,
+                        "Списано: ${it.first.title}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 },
-                navigationToNewYaer = { navigationToNewYear(Pair(true, idProject)) }
+                navigationToNewYaer = { navigationToNewYear(Pair(true, idProject)) },
+                itemFastAddList = fastAddUiState.itemList,
+                fastAddButton = {
+                    coroutineScope.launch {
+                        viewModel.saveFastAddItem(
+                            it
+                        )
+                    }
+                    Toast.makeText(
+                        context,
+                        "Добавлено: ${it.title} ${it.count} ${it.suffix}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             )
         }
     }
@@ -187,11 +214,13 @@ private fun WarehouseBody(
     itemList: List<WarehouseData>,
     itemFoodList: List<ExpensesTable>,
     itemExpensesList: List<WarehouseData>,
+    itemFastAddList: List<FastAdd>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     navigationToAnalysis: (String) -> Unit,
     writeOffButton: (Pair<WriteOffTableInsert, ExpensesTable>) -> Unit,
     navigationToNewYaer: () -> Unit,
+    fastAddButton: (FastAdd) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -240,7 +269,9 @@ private fun WarehouseBody(
                 ),
                 navigationToAnalysis = navigationToAnalysis,
                 writeOffButton = writeOffButton,
-                navigationToNewYear = navigationToNewYaer
+                navigationToNewYear = navigationToNewYaer,
+                itemFastAddList = itemFastAddList,
+                fastAddButton = fastAddButton
             )
         }
 
@@ -252,93 +283,119 @@ private fun WarehouseInventoryList(
     itemList: List<WarehouseData>,
     itemFoodList: List<ExpensesTable>,
     itemExpensesList: List<WarehouseData>,
+    itemFastAddList: List<FastAdd>,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     navigationToAnalysis: (String) -> Unit,
     navigationToNewYear: () -> Unit,
-    writeOffButton: (Pair<WriteOffTableInsert, ExpensesTable>) -> Unit
+    writeOffButton: (Pair<WriteOffTableInsert, ExpensesTable>) -> Unit,
+    fastAddButton: (FastAdd) -> Unit
 ) {
+    var fastAddBoolean by rememberSaveable { mutableStateOf(true) }
     var productBoolean by rememberSaveable { mutableStateOf(true) }
     var foodBoolean by rememberSaveable { mutableStateOf(true) }
     var expensesTable by rememberSaveable { mutableStateOf(true) }
 
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = contentPadding
+    Column(
+        modifier = Modifier.padding(contentPadding)
     ) {
-
-        if (newYearBoolean()) {
-            item {
-                Button(
-                    onClick = { navigationToNewYear()
-                        AppMetrica.reportEvent("Итоги года по проекту")
-                              },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp, horizontal = 8.dp)
-                ) {
-                    Text(text = "Итоги года по проекту!")
-                }
-            }
-        }
-
-
-        if (itemList.isNotEmpty()) {
-            item {
-                TextButtonWarehouse(
-                    boolean = productBoolean,
-                    onClick = { productBoolean = !productBoolean },
-                    title = "Продукция"
-                )
-            }
-            if (productBoolean) {
-                items(items = itemList) { item ->
-                    WarehouseProductCard(
-                        warehouseProduct = item,
+        TextButtonWarehouse(
+            boolean = fastAddBoolean,
+            onClick = { fastAddBoolean = !fastAddBoolean },
+            title = "Быстрое добавление",
+        )
+        LazyRow {
+            if (fastAddBoolean) {
+                items(items = itemFastAddList) { item ->
+                    FastAddCard(
+                        fastAdd = item,
                         modifier = Modifier
-                            .padding(8.dp)
+                            .padding(horizontal = 8.dp)
                             .clickable {
-                                navigationToAnalysis(item.Title.replace("/", "-"))
+                                fastAddButton(item)
                             }
                     )
                 }
             }
         }
 
-        if (itemFoodList.isNotEmpty()) {
-            item {
-                TextButtonWarehouse(
-                    boolean = foodBoolean,
-                    onClick = { foodBoolean = !foodBoolean },
-                    title = "Корм"
-                )
-            }
-            if (foodBoolean) {
-                items(items = itemFoodList) { item ->
-                    WarehouseFoodCard(
-                        warehouseProduct = item,
+        LazyColumn(
+            modifier = modifier
+        ) {
+            if (newYearBoolean()) {
+                item {
+                    Button(
+                        onClick = {
+                            navigationToNewYear()
+                            AppMetrica.reportEvent("Итоги года по проекту")
+                        },
                         modifier = Modifier
-                            .padding(8.dp),
-                        writeOffButton = writeOffButton
-                    )
+                            .fillMaxWidth()
+                            .padding(vertical = 5.dp, horizontal = 8.dp)
+                    ) {
+                        Text(text = "Итоги года по проекту!")
+                    }
                 }
             }
-        }
-        if (itemExpensesList.isNotEmpty()) {
-            item {
-                TextButtonWarehouse(
-                    boolean = expensesTable,
-                    onClick = { expensesTable = !expensesTable },
-                    title = "Купленный товар"
-                )
-            }
-            if (expensesTable) {
-                items(items = itemExpensesList) { item ->
-                    WarehouseExpensesCard(
-                        warehouseProduct = item,
-                        modifier = Modifier
-                            .padding(8.dp)
+
+
+            if (itemList.isNotEmpty()) {
+                item {
+                    TextButtonWarehouse(
+                        boolean = productBoolean,
+                        onClick = { productBoolean = !productBoolean },
+                        title = "Продукция"
                     )
+                }
+                if (productBoolean) {
+                    items(items = itemList) { item ->
+                        WarehouseProductCard(
+                            warehouseProduct = item,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    navigationToAnalysis(item.Title.replace("/", "-"))
+                                }
+                        )
+                    }
+                }
+            }
+
+            if (itemFoodList.isNotEmpty()) {
+                item {
+                    TextButtonWarehouse(
+                        boolean = foodBoolean,
+                        onClick = { foodBoolean = !foodBoolean },
+                        title = "Корм"
+                    )
+                }
+                if (foodBoolean) {
+                    items(items = itemFoodList) { item ->
+                        WarehouseFoodCard(
+                            warehouseProduct = item,
+                            modifier = Modifier
+                                .padding(8.dp),
+                            writeOffButton = writeOffButton
+                        )
+                    }
+                }
+            }
+            if (itemExpensesList.isNotEmpty()) {
+                item {
+                    TextButtonWarehouse(
+                        boolean = expensesTable,
+                        onClick = { expensesTable = !expensesTable },
+                        title = "Купленный товар"
+                    )
+                }
+                if (expensesTable) {
+                    items(items = itemExpensesList) { item ->
+                        WarehouseExpensesCard(
+                            warehouseProduct = item,
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    }
                 }
             }
         }
@@ -517,7 +574,7 @@ fun WarehouseExpensesCard(
 fun TextButtonWarehouse(
     onClick: () -> Unit,
     boolean: Boolean,
-    title: String
+    title: String,
 ) {
     TextButton(
         onClick = onClick
@@ -555,7 +612,64 @@ fun TextButtonWarehouse(
     }
 }
 
-fun newYearBoolean():Boolean{
+
+@Composable
+fun FastAddCard(
+    fastAdd: FastAdd,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .wrapContentHeight(),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+
+        Column(
+            modifier = Modifier.wrapContentWidth()
+        ) {
+            Text(
+                text = "${fastAdd.title} - ${formatter(fastAdd.disc)}",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+        }
+
+        Text(
+            text = "Категория: ${fastAdd.category}",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(6.dp)
+                .fillMaxWidth(),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp
+        )
+
+        Text(
+            text = "Животное: ${fastAdd.animal}",
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(6.dp)
+                .fillMaxWidth(),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp
+        )
+//        }
+    }
+}
+
+
+fun newYearBoolean(): Boolean {
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     val formattedDate: String = format.format(calendar.timeInMillis)
@@ -573,3 +687,11 @@ data class AnalysisNav(
     val idProject: Int,
     val name: String
 )
+
+
+@Preview
+@Composable
+fun FastPrewie() {
+//    FastAddCard(fastAdd = FastAdd("Яйцо", 10.0, "time", 0, "Borya", 5))
+    TextButtonWarehouse(onClick = {},true, "Быстрое добавление")
+}

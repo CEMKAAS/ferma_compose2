@@ -47,14 +47,13 @@ class SaleEditViewModel(
             itemDetails
     }
 
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleSaleList(itemIdPT).map { TitleUiState(it) }
+    val titleUiState: StateFlow<AnimalUiState> =
+        itemsRepository.getItemsTitleSaleList(itemIdPT).map { AnimalUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue = AnimalUiState()
             )
-
 
     val categoryUiState: StateFlow<CategoryUiState> =
         itemsRepository.getItemsCategorySaleList(itemIdPT).map { CategoryUiState(it) }

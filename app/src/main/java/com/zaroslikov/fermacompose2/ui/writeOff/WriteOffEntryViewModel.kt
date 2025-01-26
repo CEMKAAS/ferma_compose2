@@ -45,12 +45,12 @@ class WriteOffEntryViewModel(
     fun updateUiState(pair:Pair<String, Boolean>) {
         viewModelScope.launch {
             itemUiState = if (pair.second) {
-                itemsRepository.getCurrentBalanceProduct(pair.first)
+                itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
                     .filterNotNull()
                     .first()
                     .toDouble()
             } else {
-                itemsRepository.getCurrentExpensesProduct(pair.first)
+                itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
                     .filterNotNull()
                     .first()
                     .toDouble()

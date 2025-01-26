@@ -41,6 +41,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,6 +54,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
 
@@ -89,7 +91,7 @@ fun SaleEditProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            titleList = titleUiState.titleList,
+            titleList = titleUiState.animalList,
             categoryList = categoryUiState.categoryList,
             buyerList = buyerUiState.buyerList,
             saleTable = viewModel.itemUiState,
@@ -122,7 +124,7 @@ fun SaleEditProduct(
 fun SaleEditContainerProduct(
     modifier: Modifier,
     saleTable: SaleTableUiState,
-    titleList: List<String>,
+    titleList: List<PairString>,
     categoryList: List<String>,
     buyerList: List<String>,
     onValueChange: (SaleTableUiState) -> Unit = {},
@@ -209,7 +211,7 @@ fun SaleEditContainerProduct(
                 )
 
                 val filteredOptions =
-                    titleList.filter { it.contains(saleTable.title, ignoreCase = true) }
+                    titleList.filter { it.name.contains(saleTable.title, ignoreCase = true) }
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -217,11 +219,17 @@ fun SaleEditContainerProduct(
 //                            expanded = false
                         }
                     ) {
-                        filteredOptions.forEach { item ->
+                        filteredOptions.forEachIndexed { index, item ->
                             DropdownMenuItem(
-                                text = { Text(text = item) },
+                                text = {
+                                    Text(
+                                        text = "${item.name} - ${item.type}",
+                                        fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                    )
+                                },
                                 onClick = {
-                                    onValueChange(saleTable.copy(title = item))
+                                    selectedItemIndex = index
+                                    onValueChange(saleTable.copy(title = item.name))
                                     expanded = false
                                 }
                             )
@@ -235,7 +243,11 @@ fun SaleEditContainerProduct(
             OutlinedTextField(
                 value = saleTable.count,
                 onValueChange = {
-                    onValueChange(saleTable.copy(count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                    onValueChange(
+                        saleTable.copy(
+                            count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                        )
+                    )
                     validateCount(it)
                 },
                 label = { Text("Количество") },
@@ -295,6 +307,18 @@ fun SaleEditContainerProduct(
                     },
                     text = { Text("Л.") }
                 )
+                DropdownMenuItem(
+                    onClick = { onValueChange(saleTable.copy(suffix = "м3")) },
+                    text = { Text("м3") }
+                )
+                DropdownMenuItem(
+                    onClick = { onValueChange(saleTable.copy(suffix = "Тн.")) },
+                    text = { Text("Тн.") }
+                )
+                DropdownMenuItem(
+                    onClick = { onValueChange(saleTable.copy(suffix =  "М.")) },
+                    text = { Text("М.") }
+                )
             }
 
         }
@@ -302,7 +326,11 @@ fun SaleEditContainerProduct(
         OutlinedTextField(
             value = saleTable.priceAll,
             onValueChange = {
-                onValueChange(saleTable.copy(priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                onValueChange(
+                    saleTable.copy(
+                        priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                    )
+                )
                 validatePrice(saleTable.priceAll)
             },
             label = { Text("Стоимость") },
@@ -388,7 +416,8 @@ fun SaleEditContainerProduct(
             }
         }
 
-        var formattedDate = String.format("%02d.%02d.%d", saleTable.day, saleTable.mount, saleTable.year)
+        var formattedDate =
+            String.format("%02d.%02d.%d", saleTable.day, saleTable.mount, saleTable.year)
 
         if (openDialog) {
             val datePickerState = rememberDatePickerState(

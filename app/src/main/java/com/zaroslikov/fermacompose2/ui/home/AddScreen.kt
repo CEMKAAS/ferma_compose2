@@ -1,4 +1,3 @@
-
 package com.zaroslikov.fermacompose2.ui.home
 
 import androidx.compose.foundation.clickable
@@ -62,10 +61,12 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -86,10 +87,11 @@ fun AddScreen(
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    isFirstStart:Boolean,
+    isFirstStart: Boolean,
     viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
+    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
@@ -137,6 +139,7 @@ fun AddScreen(
         ) { innerPadding ->
             AddBody(
                 itemList = homeUiState.itemList,
+                brieflyList = brieflyUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
@@ -151,6 +154,7 @@ fun AddScreen(
 @Composable
 private fun AddBody(
     itemList: List<AddTable>,
+    brieflyList: List<Fin>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -161,10 +165,11 @@ private fun AddBody(
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Column(modifier = modifier
-                .padding(contentPadding)
-                .padding(15.dp)
-                .verticalScroll(rememberScrollState()),
+            Column(
+                modifier = modifier
+                    .padding(contentPadding)
+                    .padding(15.dp)
+                    .verticalScroll(rememberScrollState()),
             ) {
                 Text(
                     text = "Добро пожаловать в раздел \"Мои Товары!\"",
@@ -203,6 +208,7 @@ private fun AddBody(
         } else {
             InventoryList(
                 itemList = itemList,
+                brieflyList = brieflyList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
@@ -215,19 +221,77 @@ private fun AddBody(
 @Composable
 private fun InventoryList(
     itemList: List<AddTable>,
+    brieflyList: List<Fin>,
     onItemClick: (AddTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    var details by rememberSaveable { mutableStateOf(true) }
+
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = itemList, key = { it.id }) { item ->
-            AddProductCard(addProduct = item,
+        if (details) {
+            item {
+                TextButtonWarehouse(
+                    boolean = details,
+                    onClick = { details = !details },
+                    title = if (details) "Показать кратко" else "Показать подробно"
+                )
+            }
+
+            items(items = itemList, key = { it.id }) { item ->
+                AddProductCard(addProduct = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { onItemClick(item) })
+            }
+        } else {
+            items(items = brieflyList) { item ->
+                AddBrieflyProductCard(addProduct = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { onItemClick(item) })
+            }
+        }
+    }
+}
+
+@Composable
+fun AddBrieflyProductCard(
+    addProduct: Fin,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = addProduct.title.toString(),
                 modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onItemClick(item) })
+                    .fillMaxWidth(0.7f)
+                    .padding(6.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+            Text(
+                text = "${formatter(addProduct.priceAll)} ${addProduct.suffix}",
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(1f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp
+            )
         }
     }
 }

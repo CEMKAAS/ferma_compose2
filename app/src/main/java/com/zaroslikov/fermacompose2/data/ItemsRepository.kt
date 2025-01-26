@@ -44,6 +44,7 @@ import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import com.zaroslikov.fermacompose2.ui.home.AnimalString
 import com.zaroslikov.fermacompose2.ui.home.PairString
+import com.zaroslikov.fermacompose2.ui.warehouse.FastAdd
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
@@ -89,14 +90,19 @@ interface ItemsRepository {
     suspend fun insertProject(projectTable: ProjectTable)
     suspend fun insertProjectLong(projectTable: ProjectTable): Long
 
+    //add
     suspend fun insertItem(item: AddTable)
 
     suspend fun deleteItem(item: AddTable)
     suspend fun updateItem(item: AddTable)
 
+    fun getBrieflyItemAdd(id: Int): Flow<List<Fin>>
+    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<Fin>>
+
+    //sale
     fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
     fun getItemSale(id: Int): Flow<SaleTable>
-    fun getItemsTitleSaleList(id: Int): Flow<List<String>>
+    fun getItemsTitleSaleList(id: Int): Flow<List<PairString>>
     fun getItemsCategorySaleList(id: Int): Flow<List<String>>
     fun getItemsBuyerSaleList(id: Int): Flow<List<String>>
     suspend fun insertSale(item: SaleTable)
@@ -189,13 +195,15 @@ interface ItemsRepository {
         dateEnd: String
     ): Flow<List<Fin>>
 
+    //Warehouse
     fun getCurrentBalanceWarehouse(id: Int): Flow<List<WarehouseData>>
     fun getCurrentFoodWarehouse(id: Int): Flow<List<ExpensesTable>>
 
     fun getCurrentExpensesWarehouse(id: Int): Flow<List<WarehouseData>>
 
-    fun getCurrentBalanceProduct(name: String): Flow<Double>
-    fun getCurrentExpensesProduct(name: String): Flow<Double>
+    fun getCurrentBalanceProduct(name: String, id: Long): Flow<Double>
+    fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
+    fun getFastAddProduct(id: Long): Flow<List<FastAdd>>
 
     // Analysis
     fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin>

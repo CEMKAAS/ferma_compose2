@@ -23,6 +23,7 @@ import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import com.zaroslikov.fermacompose2.ui.home.AnimalString
 import com.zaroslikov.fermacompose2.ui.home.PairString
+import com.zaroslikov.fermacompose2.ui.warehouse.FastAdd
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import io.appmetrica.analytics.impl.Fi
 import kotlinx.coroutines.flow.Flow
@@ -76,13 +77,16 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun deleteItem(item: AddTable) = itemDao.delete(item)
 
     override suspend fun updateItem(item: AddTable) = itemDao.update(item)
+    override fun getBrieflyItemAdd(id: Int): Flow<List<Fin>> = itemDao.getBrieflyItemAdd(id)
+
+    override fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<Fin>> = itemDao.getBrieflyDetailsItemAdd(id, name)
 
     //Sale
     override fun getAllSaleItems(id: Int): Flow<List<SaleTable>> = itemDao.getAllSaleItems(id)
 
     override fun getItemSale(id: Int): Flow<SaleTable> = itemDao.getItemSale(id)
 
-    override fun getItemsTitleSaleList(id: Int): Flow<List<String>> =
+    override fun getItemsTitleSaleList(id: Int): Flow<List<PairString>> =
         itemDao.getItemsTitleSaleList(id)
 
     override fun getItemsCategorySaleList(id: Int): Flow<List<String>> =
@@ -239,8 +243,9 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getCurrentExpensesWarehouse(id: Int): Flow<List<WarehouseData>> =
         itemDao.getCurrentExpensesWarehouse(id)
 
-    override fun getCurrentBalanceProduct(name: String): Flow<Double> = itemDao.getCurrentBalanceProduct(name)
-    override fun getCurrentExpensesProduct(name: String): Flow<Double> = itemDao.getCurrentExpensesProduct(name)
+    override fun getCurrentBalanceProduct(name: String, id: Long): Flow<Double> = itemDao.getCurrentBalanceProduct(name, id)
+    override fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double> = itemDao.getCurrentExpensesProduct(name, id)
+    override fun getFastAddProduct(id: Long): Flow<List<FastAdd>> = itemDao.getFastAddProduct(id)
 
     override fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin> =
         itemDao.getAnalysisAddAllTime(id, name)

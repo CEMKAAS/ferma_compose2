@@ -42,6 +42,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,6 +56,7 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
@@ -98,7 +100,7 @@ fun SaleEntryProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            titleList = titleUiState.titleList,
+            titleList = titleUiState.animalList,
             categoryList = categoryUiState.categoryList,
             buyerList = buyerUiState.buyerList,
             saveInRoomSale = {
@@ -140,12 +142,12 @@ fun SaleEntryProduct(
 @Composable
 fun SaleEntryContainerProduct(
     modifier: Modifier,
-    titleList: List<String>,
+    titleList: List<PairString>,
     categoryList: List<String>,
     buyerList: List<String>,
     saveInRoomSale: (SaleTableInsert) -> Unit,
     countWarehouse: Double,
-    updateCountWarehouse: (String) -> Unit
+    updateCountWarehouse: (Pair<String, String>) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
@@ -168,6 +170,7 @@ fun SaleEntryContainerProduct(
 
     var selectedItemIndex by remember { mutableStateOf(0) }
 
+    var countWarehouseBoolean by rememberSaveable { mutableStateOf(false) }
 
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
@@ -257,7 +260,7 @@ fun SaleEntryContainerProduct(
 
 
                 val filteredOptions =
-                    titleList.filter { it.contains(title, ignoreCase = true) }
+                    titleList.filter { it.name.contains(title, ignoreCase = true) }
 
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
@@ -266,13 +269,22 @@ fun SaleEntryContainerProduct(
 //                            expanded = false
                         }
                     ) {
-                        filteredOptions.forEach { item ->
+                        filteredOptions.forEachIndexed { index, item ->
                             DropdownMenuItem(
-                                text = { Text(text = item) },
+                                text = {
+                                    Text(
+                                        "${item.name} - ${item.type}",
+                                        fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                    )
+                                },
                                 onClick = {
-                                    title = item
+                                    selectedItemIndex = index
+                                    title = item.name
                                     expanded = false
-                                    updateCountWarehouse(title)
+                                    countWarehouseBoolean =
+                                        item.type == "Моя Продукция" || item.type == "Купленный товар"
+                                    updateCountWarehouse(Pair(title, item.type))
+
                                 }
                             )
                         }
@@ -281,7 +293,13 @@ fun SaleEntryContainerProduct(
             }
         }
 
-        Text(text = "Сейчас на складе: ${formatter(countWarehouse)} $suffix", modifier = Modifier.padding(2.dp))
+        if (countWarehouseBoolean) {
+            Text(
+                text = "Сейчас на складе: ${formatter(countWarehouse)} $suffix",
+                modifier = Modifier.padding(2.dp)
+            )
+        }
+
 
         Box {
             OutlinedTextField(
@@ -340,6 +358,18 @@ fun SaleEntryContainerProduct(
                 DropdownMenuItem(
                     onClick = { suffix = "Л." },
                     text = { Text("Л.") }
+                )
+                DropdownMenuItem(
+                    onClick = { suffix = "м3" },
+                    text = { Text("м3") }
+                )
+                DropdownMenuItem(
+                    onClick = { suffix = "Тн." },
+                    text = { Text("Тн.") }
+                )
+                DropdownMenuItem(
+                    onClick = { suffix = "М." },
+                    text = { Text("М.") }
                 )
             }
 

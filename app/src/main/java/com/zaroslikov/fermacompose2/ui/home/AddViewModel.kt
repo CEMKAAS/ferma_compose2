@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.ui.finance.Fin
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -36,7 +37,6 @@ class AddViewModel(
 ) : ViewModel() {
 
 
-
     val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
 
@@ -48,6 +48,25 @@ class AddViewModel(
                 initialValue = HomeUiState()
             )
 
+    val brieflyUiState: StateFlow<BrieflyUiState> =
+        itemsRepository.getBrieflyItemAdd(itemId).map { BrieflyUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = BrieflyUiState()
+            )
+
+
+    fun detailsName(name: String) {
+        val detailsUiState: StateFlow<BrieflyUiState> =
+            itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name).map { BrieflyUiState(it) }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                    initialValue = BrieflyUiState()
+                )
+    }
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -56,7 +75,5 @@ class AddViewModel(
 
 }
 
-/**
- * Ui State for HomeScreen
- */
 data class HomeUiState(val itemList: List<AddTable> = listOf())
+data class BrieflyUiState(val itemList: List<Fin> = listOf())

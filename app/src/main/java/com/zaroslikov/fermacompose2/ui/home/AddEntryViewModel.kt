@@ -55,7 +55,7 @@ class AddEntryViewModel(
 
     fun updateUiState(name: String) {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getCurrentBalanceProduct(name)
+            itemUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
                 .filterNotNull()
                 .first()
                 .toDouble()

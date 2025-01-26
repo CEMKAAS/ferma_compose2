@@ -29,17 +29,17 @@ class SaleEntryViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdArg])
 
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleSaleList(itemId).map { TitleUiState(it) }
+    val titleUiState: StateFlow<AnimalUiState> =
+        itemsRepository.getItemsTitleSaleList(itemId).map { AnimalUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue = AnimalUiState()
             )
 
 
     val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategorySaleList(itemId).map {CategoryUiState(it)}
+        itemsRepository.getItemsCategorySaleList(itemId).map { CategoryUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -48,22 +48,33 @@ class SaleEntryViewModel(
 
 
     val buyerUiState: StateFlow<BuyerUiState> =
-        itemsRepository.getItemsBuyerSaleList(itemId).map {BuyerUiState(it)}
+        itemsRepository.getItemsBuyerSaleList(itemId).map { BuyerUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =  BuyerUiState()
+                initialValue = BuyerUiState()
             )
 
     var itemUiState by mutableStateOf(0.0)
         private set
 
-    fun updateUiState(name: String) {
+    fun updateUiState(pair: Pair<String, String>) {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getCurrentBalanceProduct(name)
-                .filterNotNull()
-                .first()
-                .toDouble()
+            itemUiState = when (pair.second) {
+                "Моя Продукция" -> {
+                    itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
+                        .filterNotNull()
+                        .first()
+                        .toDouble()
+                }
+                "Купленный товар" -> {
+                    itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
+                        .filterNotNull()
+                        .first()
+                        .toDouble()
+                }
+                else -> 0.0
+            }
         }
     }
 
