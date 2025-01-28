@@ -40,6 +40,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -55,13 +57,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.home.BrieflyCountCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object WriteOffDestination : NavigationDestination {
     override val route = "WriteOff"
@@ -86,6 +91,7 @@ fun WriteOffScreen(
 ) {
     val homeUiState by viewModel.writeOffUiState.collectAsState()
     val titleUiState by viewModel.titleUiState.collectAsState()
+    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val writeOffBoolean = titleUiState.titleList.isNotEmpty()
@@ -140,10 +146,11 @@ fun WriteOffScreen(
             WriteOffBody(
                 writeOffBoolean = writeOffBoolean,
                 itemList = homeUiState.itemList,
+                brieflyList = brieflyUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                navigateToItemAdd = {navigateToItem(idProject)}
+                navigateToItemAdd = { navigateToItem(idProject) }
             )
         }
     }
@@ -155,10 +162,11 @@ fun WriteOffScreen(
 private fun WriteOffBody(
     writeOffBoolean: Boolean,
     itemList: List<WriteOffTable>,
+    brieflyList: List<BrieflyItemCount>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    navigateToItemAdd:()-> Unit
+    navigateToItemAdd: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,22 +174,31 @@ private fun WriteOffBody(
     ) {
 
         if (itemList.isEmpty()) {
-            if(!writeOffBoolean) {
-                Column(modifier = modifier.padding(contentPadding).padding(15.dp).verticalScroll(
-                    rememberScrollState()
-                )) {
+            if (!writeOffBoolean) {
+                Column(
+                    modifier = modifier
+                        .padding(contentPadding)
+                        .padding(15.dp)
+                        .verticalScroll(
+                            rememberScrollState()
+                        )
+                ) {
                     Text(
                         text = "Добро пожаловать в раздел \"Мои Списания!\"",
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         fontSize = 20.sp,
                     )
                     Text(
                         text = "В этом разделе вы можете оформить списание продукции или товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
                         textAlign = TextAlign.Justify,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         fontSize = 20.sp,
                     )
                     Text(
@@ -192,20 +209,26 @@ private fun WriteOffBody(
                         fontSize = 20.sp,
                     )
                 }
-            }else{
-                Column(modifier = modifier.padding(contentPadding).padding(15.dp)) {
+            } else {
+                Column(modifier = modifier
+                    .padding(contentPadding)
+                    .padding(15.dp)) {
                     Text(
                         text = "Добро пожаловать в раздел \"Мои Списания!\"",
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         fontSize = 20.sp,
                     )
                     Text(
                         text = "В этом разделе вы можете оформить списание продукции или товара, который был поврежден или который вы решили оставить для личного использования. Для каждого списанного товара можно указать количество, цену и причину списания (для собственных нужд или утилизация).",
                         textAlign = TextAlign.Justify,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth().padding(5.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         fontSize = 20.sp,
                     )
                     Text(
@@ -216,7 +239,8 @@ private fun WriteOffBody(
                         fontSize = 20.sp,
                     )
                     Button(
-                        onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
+                        onClick = navigateToItemAdd, modifier = Modifier
+                            .fillMaxWidth()
                             .padding(bottom = 20.dp)
 
                     ) {
@@ -224,11 +248,10 @@ private fun WriteOffBody(
                     }
                 }
             }
-
-
-        }  else {
+        } else {
             WriteOffInventoryList(
                 itemList = itemList,
+                brieflyList = brieflyList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
@@ -240,19 +263,40 @@ private fun WriteOffBody(
 @Composable
 private fun WriteOffInventoryList(
     itemList: List<WriteOffTable>,
+    brieflyList: List<BrieflyItemCount>,
     onItemClick: (WriteOffTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    var details by rememberSaveable { mutableStateOf(true) }
+
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = itemList, key = { it.id }) { item ->
-            WriteOffProductCard(writeOffTable = item,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onItemClick(item) })
+
+        item {
+            TextButtonWarehouse(
+                boolean = details,
+                onClick = { details = !details },
+                title = if (details) "Показать кратко" else "Показать подробно"
+            )
+        }
+
+        if (details) {
+            items(items = itemList, key = { it.id }) { item ->
+                WriteOffProductCard(writeOffTable = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { onItemClick(item) })
+            }
+        } else {
+            items(items = brieflyList) { item ->
+                BrieflyCountCard(product = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {  })
+            }
         }
     }
 }
@@ -275,9 +319,9 @@ fun WriteOffProductCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            val  image = if(writeOffTable.status == 0) {
+            val image = if (writeOffTable.status == 0) {
                 R.drawable.baseline_cottage_24
-            }else {
+            } else {
                 R.drawable.baseline_delete_24
             }
 

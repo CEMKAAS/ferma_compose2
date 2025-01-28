@@ -17,20 +17,25 @@
 package com.zaroslikov.fermacompose2.ui.home
 
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.Incubator
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
+import com.zaroslikov.fermacompose2.data.water.HomeUiState
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-/**
- * ViewModel to retrieve all items in the Room database.
- */
+
 class AddViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
@@ -57,23 +62,29 @@ class AddViewModel(
             )
 
 
-    fun detailsName(name: String) {
-        val detailsUiState: StateFlow<BrieflyUiState> =
-            itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name).map { BrieflyUiState(it) }
+    fun detailsName(name: String): StateFlow<HomeUiState> {
+        return itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name).map { HomeUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = BrieflyUiState()
+                    initialValue = HomeUiState()
                 )
     }
 
+
+//    private val _items = mutableStateOf<List<AddTable>>(emptyList())
+//    val items: State<List<AddTable>> = _items
+//
+//    fun detailsName (name: String) {
+//        viewModelScope.launch {
+//            _items.value = itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
+//        }
+//    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-
 }
 
-data class HomeUiState(val itemList: List<AddTable> = listOf())
-data class BrieflyUiState(val itemList: List<Fin> = listOf())
+

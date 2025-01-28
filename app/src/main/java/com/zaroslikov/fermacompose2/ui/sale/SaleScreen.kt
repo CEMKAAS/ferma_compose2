@@ -20,6 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,18 +29,20 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -53,12 +57,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object SaleDestination : NavigationDestination {
     override val route = "Sale"
@@ -82,13 +87,13 @@ fun SaleScreen(
     viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.saleUiState.collectAsState()
+    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
 
-    val showBottomSheetFilter = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -132,10 +137,11 @@ fun SaleScreen(
         ) { innerPadding ->
             SaleBody(
                 itemList = homeUiState.itemList,
+                brieflyList = brieflyUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                navigateToItemAdd = {navigateToItem(idProject)}
+                navigateToItemAdd = { navigateToItem(idProject) }
             )
         }
     }
@@ -146,31 +152,41 @@ fun SaleScreen(
 @Composable
 private fun SaleBody(
     itemList: List<SaleTable>,
+    brieflyList: List<BrieflyItemPrice>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    navigateToItemAdd:() ->Unit
+    navigateToItemAdd: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Column(modifier = modifier.padding(contentPadding).padding(15.dp).verticalScroll(
-                rememberScrollState()
-            )) {
+            Column(
+                modifier = modifier
+                    .padding(contentPadding)
+                    .padding(15.dp)
+                    .verticalScroll(
+                        rememberScrollState()
+                    )
+            ) {
                 Text(
                     text = "Добро пожаловать в раздел \"Мои Продажи!\"",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
                     text = "В этом разделе Вы можете добавлять товары, которые продаете с Вашей фермы! Каждому товару можно назначить цену, кол-во, категорию и покупателя.",
                     textAlign = TextAlign.Justify,
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp),
                     fontSize = 20.sp,
                 )
                 Text(
@@ -181,7 +197,8 @@ private fun SaleBody(
                     fontSize = 20.sp,
                 )
                 Button(
-                    onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
+                    onClick = navigateToItemAdd, modifier = Modifier
+                        .fillMaxWidth()
                         .padding(bottom = 20.dp)
                 ) {
                     Text(text = "Добавить Продажу!")
@@ -190,6 +207,7 @@ private fun SaleBody(
         } else {
             InventoryList(
                 itemList = itemList,
+                brieflyList = brieflyList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
@@ -202,22 +220,44 @@ private fun SaleBody(
 @Composable
 private fun InventoryList(
     itemList: List<SaleTable>,
+    brieflyList: List<BrieflyItemPrice>,
     onItemClick: (SaleTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    var details by rememberSaveable { mutableStateOf(true) }
+
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = itemList, key = { it.id }) { item ->
-            SaleProductCard(saleTable = item,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onItemClick(item) })
+        item {
+            TextButtonWarehouse(
+                boolean = details,
+                onClick = { details = !details },
+                title = if (details) "Показать кратко" else "Показать подробно"
+            )
+        }
+        if (details) {
+            items(items = itemList, key = { it.id }) { item ->
+                SaleProductCard(saleTable = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { onItemClick(item) })
+            }
+        } else {
+            items(items = brieflyList) { item ->
+                BrieflyPriceCard(
+                    product = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {  }
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun SaleProductCard(
@@ -248,9 +288,9 @@ fun SaleProductCard(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
-                if (saleTable.category == "Без категории" || saleTable.category == "" ) {
+                if (saleTable.category == "Без категории" || saleTable.category == "") {
 
-                }else{
+                } else {
                     Text(
                         text = "Категория: ${saleTable.category}",
                         modifier = Modifier
@@ -261,7 +301,7 @@ fun SaleProductCard(
 
                 if (saleTable.buyer == "Неизвестный" || saleTable.buyer == "") {
 
-                }else{
+                } else {
                     Text(
                         text = "Покупатель: ${saleTable.buyer}",
                         modifier = Modifier
@@ -294,7 +334,11 @@ fun SaleProductCard(
             }
 
             Text(
-                text = "${formatter(saleTable.count)} ${saleTable.suffix}\n за \n${formatter(saleTable.priceAll)} ₽",
+                text = "${formatter(saleTable.count)} ${saleTable.suffix}\n за \n${
+                    formatter(
+                        saleTable.priceAll
+                    )
+                } ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
@@ -302,6 +346,59 @@ fun SaleProductCard(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
+        }
+    }
+}
+
+@Composable
+fun BrieflyPriceCard(
+    product: BrieflyItemPrice,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            //TODO analys icon
+            Text(
+                text = product.title,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(6.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+            Text(
+                text = "${formatter(product.count)} ${product.suffix}\n за \n${
+                    formatter(
+                        product.price
+                    )
+                } ₽",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(0.3f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp
+            )
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Показать меню",
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                )
+            }
         }
     }
 }

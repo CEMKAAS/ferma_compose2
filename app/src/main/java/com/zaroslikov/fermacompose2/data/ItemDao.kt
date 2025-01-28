@@ -35,6 +35,8 @@ import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
@@ -120,11 +122,11 @@ interface ItemDao {
     @Query("SELECT * from MyFerma Where _id=:id")
     fun getItemAdd(id: Int): Flow<AddTable>
 
-    @Query("SELECT title, SUM(disc) as priceAll from MyFerma Where idPT=:id group by title ORDER BY priceAll DESC")
-    fun getBrieflyItemAdd(id: Int): Flow<List<Fin>>
+    @Query("SELECT title as title, SUM(disc) as count, suffix from MyFerma Where idPT=:id group by title ORDER BY price DESC")
+    fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
 
     @Query("SELECT * from MyFerma Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
-    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<Fin>>
+    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
 
     @Query("SELECT MyFerma.Title from MyFerma Where idPT=:id group by MyFerma.Title ")
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
@@ -157,6 +159,12 @@ interface ItemDao {
 
     @Query("SELECT * from MyFermaSale Where _id=:id")
     fun getItemSale(id: Int): Flow<SaleTable>
+
+    @Query("SELECT titleSale as title, SUM(discSale) as count, SUM(price) as price, suffix from MyFermaSale Where idPT=:id group by title ORDER BY price DESC")
+    fun getBrieflyItemSale(id: Int): Flow<List<BrieflyItemPrice>>
+
+    @Query("SELECT * from MyFermaSale Where idPT=:id and titleSale =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
+    fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<SaleTable>>
 
 //   @Query(
 //        "SELECT title as name, 'Моя Продукция' as type from " +
@@ -203,6 +211,12 @@ interface ItemDao {
 
     @Query("SELECT * from MyFermaEXPENSES Where _id=:id")
     fun getItemExpenses(id: Int): Flow<ExpensesTable>
+
+    @Query("SELECT titleEXPENSES as title, SUM(discEXPENSES) as count, SUM(countEXPENSES) as price, suffix from MyFermaEXPENSES Where idPT=:id group by title ORDER BY price DESC")
+    fun getBrieflyItemExpenses(id: Int): Flow<List<BrieflyItemPrice>>
+
+    @Query("SELECT * from MyFermaEXPENSES Where idPT=:id and titleEXPENSES =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
+    fun getBrieflyDetailsItemExpenses(id: Long, name: String): Flow<List<ExpensesTable>>
 
     @Query("SELECT idAnimal from ExpensesAnimalTable Where idExpenses=:id")
     suspend fun getItemExpensesAnimal(id: Int): List<Long>
@@ -274,6 +288,13 @@ interface ItemDao {
 
     @Query("SELECT * from MyFermaWRITEOFF Where _id=:id")
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
+
+    @Query("SELECT titleWRITEOFF as title, SUM(discWRITEOFF) as count, suffix from MyFermaWRITEOFF Where idPT=:id group by title ORDER BY count DESC")
+    fun getBrieflyItemWriteOff(id: Int): Flow<List<BrieflyItemCount>>
+
+    @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
+    fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
+
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWriteOff(item: WriteOffTable)

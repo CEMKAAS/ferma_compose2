@@ -1,5 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.home
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +24,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +33,7 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -47,15 +53,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
@@ -66,7 +76,9 @@ import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
+import io.appmetrica.analytics.AppMetrica
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -75,9 +87,6 @@ object HomeDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
@@ -85,6 +94,7 @@ fun AddScreen(
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
+    navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     isFirstStart: Boolean,
@@ -96,6 +106,7 @@ fun AddScreen(
     val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
 
+//    val list2 = viewModel.items.value.toMutableList()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -140,25 +151,31 @@ fun AddScreen(
             AddBody(
                 itemList = homeUiState.itemList,
                 brieflyList = brieflyUiState.itemList,
+                viewModel = viewModel,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                navigateToItemAdd = { navigateToItemAdd(idProject) }
+                navigateToItemAdd = { navigateToItemAdd(idProject) },
+                navigationToAnalysis = {
+                    navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
+                    AppMetrica.reportEvent("Анализ через склад")
+                },
             )
         }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddBody(
+    viewModel: AddViewModel,
     itemList: List<AddTable>,
-    brieflyList: List<Fin>,
+    brieflyList: List<BrieflyItemCount>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     navigateToItemAdd: () -> Unit,
+    navigationToAnalysis: (String) -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -209,9 +226,11 @@ private fun AddBody(
             InventoryList(
                 itemList = itemList,
                 brieflyList = brieflyList,
+                viewModel = viewModel,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+                navigationToAnalysis = navigationToAnalysis
             )
         }
     }
@@ -221,10 +240,12 @@ private fun AddBody(
 @Composable
 private fun InventoryList(
     itemList: List<AddTable>,
-    brieflyList: List<Fin>,
+    brieflyList: List<BrieflyItemCount>,
+    viewModel: AddViewModel,
     onItemClick: (AddTable) -> Unit,
     contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigationToAnalysis: (String) -> Unit,
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
 
@@ -232,15 +253,16 @@ private fun InventoryList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        if (details) {
-            item {
-                TextButtonWarehouse(
-                    boolean = details,
-                    onClick = { details = !details },
-                    title = if (details) "Показать кратко" else "Показать подробно"
-                )
-            }
 
+        item {
+            TextButtonWarehouse(
+                boolean = details,
+                onClick = { details = !details },
+                title = if (details) "Показать кратко" else "Показать подробно"
+            )
+        }
+
+        if (details) {
             items(items = itemList, key = { it.id }) { item ->
                 AddProductCard(addProduct = item,
                     modifier = Modifier
@@ -248,21 +270,35 @@ private fun InventoryList(
                         .clickable { onItemClick(item) })
             }
         } else {
+
             items(items = brieflyList) { item ->
-                AddBrieflyProductCard(addProduct = item,
+                BrieflyCountCard(
+                    product = item,
                     modifier = Modifier
-                        .padding(8.dp)
-                        .clickable { onItemClick(item) })
+                        .padding(8.dp),
+                    viewModel = viewModel,
+                    contentPadding = contentPadding,
+                    onItemClick = onItemClick,
+                    navigationToAnalysis = navigationToAnalysis
+                )
             }
         }
     }
 }
 
 @Composable
-fun AddBrieflyProductCard(
-    addProduct: Fin,
-    modifier: Modifier = Modifier
+fun BrieflyCountCard(
+    viewModel: AddViewModel,
+    product: BrieflyItemCount,
+    onItemClick: (AddTable) -> Unit,
+    navigationToAnalysis: (String) -> Unit ={},
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues,
 ) {
+
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val itemList = viewModel.detailsName(product.title).collectAsState()
+
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
@@ -275,26 +311,55 @@ fun AddBrieflyProductCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(onClick = { navigationToAnalysis(product.title)}) {
+                Icon(
+                    painterResource(id = R.drawable.baseline_analytics_24),
+                    contentDescription = "Анализ",
+                    modifier = Modifier.fillMaxWidth(0.1f)
+                )
+            }
             Text(
-                text = addProduct.title.toString(),
+                text = product.title,
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
+                    .fillMaxWidth(0.5f)
                     .padding(6.dp),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp
             )
             Text(
-                text = "${formatter(addProduct.priceAll)} ${addProduct.suffix}",
+                text = "${formatter(product.count)} ${product.suffix}",
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .padding(6.dp)
-                    .fillMaxWidth(1f),
+                    .fillMaxWidth(0.2f),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Показать меню",
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                )
+            }
+        }
+    }
+    if (expanded) {
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = contentPadding
+        ) {
+            items(items = itemList.value.itemList, key = { it.id }) { item ->
+                AddProductCard(addProduct = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { onItemClick(item) })
+            }
         }
     }
 }
+
 
 @Composable
 fun AddProductCard(

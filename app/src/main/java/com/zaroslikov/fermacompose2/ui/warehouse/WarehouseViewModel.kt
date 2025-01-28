@@ -7,9 +7,7 @@ import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesUiState
-import com.zaroslikov.fermacompose2.ui.expenses.toExpensesTable
-import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.data.water.ExpensesUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map

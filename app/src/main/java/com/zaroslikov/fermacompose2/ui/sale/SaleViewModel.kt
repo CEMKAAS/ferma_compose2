@@ -21,6 +21,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyPriceUiState
+import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
+import com.zaroslikov.fermacompose2.data.water.SaleUiState
+import com.zaroslikov.fermacompose2.ui.home.AddViewModel
+import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -47,13 +52,34 @@ class SaleViewModel(
                 initialValue = SaleUiState()
             )
 
+
+    val brieflyUiState: StateFlow<BrieflyPriceUiState> =
+        itemsRepository.getBrieflyItemSale(itemId).map { BrieflyPriceUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = BrieflyPriceUiState()
+            )
+
+
+    fun detailsName(name: String) {
+        val detailsUiState: StateFlow<SaleUiState> =
+            itemsRepository.getBrieflyDetailsItemSale(itemId.toLong(), name).map {SaleUiState(it) }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                    initialValue = SaleUiState()
+                )
+    }
+
+
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
+
+
+
 }
 
-/**
- * Ui State for HomeScreen
- */
-data class SaleUiState(val itemList: List<SaleTable> = listOf())

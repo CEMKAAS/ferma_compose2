@@ -352,20 +352,19 @@ fun InventoryNavHost(
                 type = NavType.IntType
             })
         ) {
-            AddScreen(drawerState = drawerState, navigateToStart = {
-                navController.navigate(StartDestination.route)
-            }, navigateToModalSheet = {
-                navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-            }, navigateToItemAdd = {
+            AddScreen(drawerState = drawerState,
+                navigateToStart = {
+                navController.navigate(StartDestination.route) },
+                navigateToModalSheet = {
+                navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
+                navigateToItemAdd = {
                 navController.navigate(
                     "${AddEntryDestination.route}/${it}"
-                )
-            }, navigateToItemUpdate = {
-                navController.navigate(
-                    "${AddEditDestination.route}/${it.id}/${it.idPT}"
-                )
-            },
+                ) },
+                navigateToItemUpdate = {
+                navController.navigate("${AddEditDestination.route}/${it.id}/${it.idPT}") },
                 isFirstStart = isFirstStart,
+                navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
             )
         }
         composable(

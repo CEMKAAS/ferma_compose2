@@ -34,6 +34,8 @@ import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
@@ -96,32 +98,34 @@ interface ItemsRepository {
     suspend fun deleteItem(item: AddTable)
     suspend fun updateItem(item: AddTable)
 
-    fun getBrieflyItemAdd(id: Int): Flow<List<Fin>>
-    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<Fin>>
+    fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
+    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
 
     //sale
     fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
     fun getItemSale(id: Int): Flow<SaleTable>
+    fun getBrieflyItemSale(id: Int): Flow<List<BrieflyItemPrice>>
+    fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<SaleTable>>
     fun getItemsTitleSaleList(id: Int): Flow<List<PairString>>
     fun getItemsCategorySaleList(id: Int): Flow<List<String>>
     fun getItemsBuyerSaleList(id: Int): Flow<List<String>>
+
     suspend fun insertSale(item: SaleTable)
     suspend fun updateSale(item: SaleTable)
     suspend fun deleteSale(item: SaleTable)
 
     //Expenses
     fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>>
-
     fun getItemExpenses(id: Int): Flow<ExpensesTable>
-    suspend fun getItemExpensesAnimal(id: Int): List<Long>
+    fun getBrieflyItemExpenses(id: Int): Flow<List<BrieflyItemPrice>>
+    fun getBrieflyDetailsItemExpenses(id: Long, name: String): Flow<List<ExpensesTable>>
+
     fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
-
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
-
     fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
 
+    suspend fun getItemExpensesAnimal(id: Int): List<Long>
     suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses: Long): List<AnimalExpensesList2>
-
     suspend fun insertExpenses(item: ExpensesTable): Long
     suspend fun updateExpenses(item: ExpensesTable)
     suspend fun deleteExpenses(item: ExpensesTable)
@@ -134,6 +138,8 @@ interface ItemsRepository {
     //WriteOff
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
+    fun getBrieflyItemWriteOff(id: Int): Flow<List<BrieflyItemCount>>
+    fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
 
     suspend fun insertWriteOff(item: WriteOffTable)
     suspend fun updateWriteOff(item: WriteOffTable)

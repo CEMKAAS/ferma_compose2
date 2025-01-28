@@ -6,6 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
+import com.zaroslikov.fermacompose2.data.water.HomeUiState
+import com.zaroslikov.fermacompose2.data.water.WriteOffUiState
+import com.zaroslikov.fermacompose2.ui.home.AddViewModel
+import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,8 +41,28 @@ class WriteOffViewModel(
                 initialValue = TitleUiState()
             )
 
+
+    val brieflyUiState: StateFlow<BrieflyUiState> =
+        itemsRepository.getBrieflyItemWriteOff(itemId).map { BrieflyUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = BrieflyUiState()
+            )
+
+
+    fun detailsName(name: String) {
+        val detailsUiState: StateFlow<WriteOffUiState> =
+            itemsRepository.getBrieflyDetailsItemWriteOff(itemId.toLong(), name).map { WriteOffUiState(it) }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                    initialValue = WriteOffUiState()
+                )
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 }
-data class WriteOffUiState(val itemList: List<WriteOffTable> = listOf())
+

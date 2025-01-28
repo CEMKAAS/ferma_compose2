@@ -39,6 +39,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -53,13 +55,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.home.BrieflyCountCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.sale.BrieflyPriceCard
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object ExpensesDestination : NavigationDestination {
     override val route = "expenses"
@@ -83,6 +90,7 @@ fun ExpensesScreen(
     viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
+    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -133,6 +141,7 @@ fun ExpensesScreen(
         ) { innerPadding ->
             ExpensesBody(
                 itemList = homeUiState.itemList,
+                brieflyList = brieflyUiState.itemList,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
@@ -146,20 +155,24 @@ fun ExpensesScreen(
 @Composable
 private fun ExpensesBody(
     itemList: List<ExpensesTable>,
+    brieflyList: List<BrieflyItemPrice>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     showBottomFilter: MutableState<Boolean>,
-    navigateToItemAdd:() ->Unit
+    navigateToItemAdd: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
         if (itemList.isEmpty()) {
-            Column(modifier = modifier
-                .padding(contentPadding)
-                .padding(15.dp).verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = modifier
+                    .padding(contentPadding)
+                    .padding(15.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 Text(
                     text = "Добро пожаловать в раздел \"Мои Покупки!\"",
                     textAlign = TextAlign.Center,
@@ -186,7 +199,8 @@ private fun ExpensesBody(
                     fontSize = 20.sp,
                 )
                 Button(
-                    onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
+                    onClick = navigateToItemAdd, modifier = Modifier
+                        .fillMaxWidth()
                         .padding(bottom = 20.dp)
 
                 ) {
@@ -196,6 +210,7 @@ private fun ExpensesBody(
         } else {
             ExpensesList(
                 itemList = itemList,
+                brieflyList = brieflyList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
@@ -207,19 +222,38 @@ private fun ExpensesBody(
 @Composable
 private fun ExpensesList(
     itemList: List<ExpensesTable>,
+    brieflyList: List<BrieflyItemPrice>,
     onItemClick: (ExpensesTable) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    var details by rememberSaveable { mutableStateOf(true) }
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
-        items(items = itemList, key = { it.id }) { item ->
-            ExpensesCard(expensesTable = item,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onItemClick(item) })
+        item {
+            TextButtonWarehouse(
+                boolean = details,
+                onClick = { details = !details },
+                title = if (details) "Показать кратко" else "Показать подробно"
+            )
+        }
+        if (details) {
+            items(items = itemList, key = { it.id }) { item ->
+                ExpensesCard(expensesTable = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { onItemClick(item) })
+            }
+        } else {
+            items(items = brieflyList) { item ->
+                BrieflyPriceCard(
+                    product = item,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {  })
+            }
         }
     }
 }
@@ -255,7 +289,7 @@ fun ExpensesCard(
                 )
                 if (expensesTable.category == "Без категории" || expensesTable.category == "") {
 
-                } else{
+                } else {
                     Text(
                         text = "Категория: ${expensesTable.category}",
                         modifier = Modifier
@@ -287,7 +321,11 @@ fun ExpensesCard(
                 )
             }
             Text(
-                text = "${formatter(expensesTable.count)} ${expensesTable.suffix}\n за\n${formatter(expensesTable.priceAll)} ₽",
+                text = "${formatter(expensesTable.count)} ${expensesTable.suffix}\n за\n${
+                    formatter(
+                        expensesTable.priceAll
+                    )
+                } ₽",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(6.dp)
