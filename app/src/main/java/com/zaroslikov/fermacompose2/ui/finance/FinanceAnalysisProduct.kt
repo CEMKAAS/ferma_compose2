@@ -221,10 +221,10 @@ fun FinanceAnalysisContainer(
                 text = "Получено: ${formatter(analysisAddAllTime.priceAll)} ${analysisAddAllTime.title}",
                 modifier = modifierText
             )
-            Text(
-                text = "В среднем за текущий год: ${formatter(analysisAddAverageValueAllTime.priceAll)} ${analysisAddAverageValueAllTime.title} за день",
-                modifier = modifierText
-            )
+//            Text(
+//                text = "В среднем за текущий год: ${formatter(analysisAddAverageValueAllTime.priceAll)} ${analysisAddAverageValueAllTime.title} за день",
+//                modifier = modifierText
+//            )
             Text(
                 text = "Проданно: ${formatter(analysisSaleAllTime.priceAll)} ${analysisSaleAllTime.title}",
                 modifier = modifierText

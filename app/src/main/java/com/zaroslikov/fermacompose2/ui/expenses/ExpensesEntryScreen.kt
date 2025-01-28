@@ -62,6 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -659,11 +660,12 @@ fun ExpensesEntryContainerProduct(
 
                 if (!setDailyExpensesFoodAndCountUI) {
                     Text(
-                        text = "Выберите животных для рассчета длительности корма",
+                        text = "Выберите животных для рассчета длительности корма:",
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 14.dp)
-                            .padding(top = 5.dp)
+                            .padding(top = 5.dp),
+                        textDecoration = TextDecoration.Underline
                     )
                     FlowRow(
                         modifier = Modifier
