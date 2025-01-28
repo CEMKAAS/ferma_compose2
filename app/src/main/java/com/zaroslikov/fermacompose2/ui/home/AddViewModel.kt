@@ -62,24 +62,24 @@ class AddViewModel(
             )
 
 
-    fun detailsName(name: String): StateFlow<HomeUiState> {
-        return itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name).map { HomeUiState(it) }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = HomeUiState()
-                )
-    }
-
-
-//    private val _items = mutableStateOf<List<AddTable>>(emptyList())
-//    val items: State<List<AddTable>> = _items
-//
-//    fun detailsName (name: String) {
-//        viewModelScope.launch {
-//            _items.value = itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
-//        }
+//    fun detailsName(name: String): StateFlow<HomeUiState> {
+//        return itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name).map { HomeUiState(it) }
+//                .stateIn(
+//                    scope = viewModelScope,
+//                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                    initialValue = HomeUiState()
+//                )
 //    }
+
+
+    private val _items = mutableStateOf<List<AddTable>>(emptyList())
+    val items: State<List<AddTable>> = _items
+
+    fun detailsName (name: String) {
+        viewModelScope.launch {
+            _items.value = itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
+        }
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

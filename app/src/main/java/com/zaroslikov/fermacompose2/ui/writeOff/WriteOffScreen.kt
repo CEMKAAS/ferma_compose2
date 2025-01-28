@@ -291,12 +291,12 @@ private fun WriteOffInventoryList(
                         .clickable { onItemClick(item) })
             }
         } else {
-            items(items = brieflyList) { item ->
-                BrieflyCountCard(product = item,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {  })
-            }
+//            items(items = brieflyList) { item ->
+//                BrieflyCountCard(product = item,
+//                    modifier = Modifier
+//                        .padding(8.dp)
+//                        .clickable {  })
+//            }
         }
     }
 }

@@ -81,7 +81,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateItem(item: AddTable) = itemDao.update(item)
     override fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>> = itemDao.getBrieflyItemAdd(id)
 
-    override fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>> = itemDao.getBrieflyDetailsItemAdd(id, name)
+    override suspend fun getBrieflyDetailsItemAdd(id: Long, name: String): List<AddTable> = itemDao.getBrieflyDetailsItemAdd(id, name)
 
     //Sale
     override fun getAllSaleItems(id: Int): Flow<List<SaleTable>> = itemDao.getAllSaleItems(id)

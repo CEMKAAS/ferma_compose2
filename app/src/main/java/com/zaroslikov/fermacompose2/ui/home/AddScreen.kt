@@ -41,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -105,8 +106,6 @@ fun AddScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
-
-//    val list2 = viewModel.items.value.toMutableList()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -270,7 +269,6 @@ private fun InventoryList(
                         .clickable { onItemClick(item) })
             }
         } else {
-
             items(items = brieflyList) { item ->
                 BrieflyCountCard(
                     product = item,
@@ -291,13 +289,11 @@ fun BrieflyCountCard(
     viewModel: AddViewModel,
     product: BrieflyItemCount,
     onItemClick: (AddTable) -> Unit,
-    navigationToAnalysis: (String) -> Unit ={},
+    navigationToAnalysis: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues,
 ) {
-
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val itemList = viewModel.detailsName(product.title).collectAsState()
 
     Card(
         modifier = modifier,
@@ -311,7 +307,7 @@ fun BrieflyCountCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { navigationToAnalysis(product.title)}) {
+            IconButton(onClick = { navigationToAnalysis(product.title) }) {
                 Icon(
                     painterResource(id = R.drawable.baseline_analytics_24),
                     contentDescription = "Анализ",
@@ -346,16 +342,17 @@ fun BrieflyCountCard(
         }
     }
     if (expanded) {
-        LazyColumn(
-            modifier = modifier,
-            contentPadding = contentPadding
-        ) {
-            items(items = itemList.value.itemList, key = { it.id }) { item ->
-                AddProductCard(addProduct = item,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable { onItemClick(item) })
-            }
+//        val itemList = viewModel.items.value.toMutableList()
+//        viewModel.detailsName(product.title)
+
+
+
+
+        itemList.forEach {
+            AddProductCard(addProduct = it,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { onItemClick(it) })
         }
     }
 }

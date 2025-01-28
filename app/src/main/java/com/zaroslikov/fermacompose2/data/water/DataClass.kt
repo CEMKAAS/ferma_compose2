@@ -25,3 +25,4 @@ data class HomeUiState(val itemList: List<AddTable> = listOf())
 data class SaleUiState(val itemList: List<SaleTable> = listOf())
 data class ExpensesUiState(val itemList: List<ExpensesTable> = listOf())
 data class WriteOffUiState(val itemList: List<WriteOffTable> = listOf())
+

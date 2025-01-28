@@ -99,7 +99,7 @@ interface ItemsRepository {
     suspend fun updateItem(item: AddTable)
 
     fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
-    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
+    suspend fun getBrieflyDetailsItemAdd(id: Long, name: String): List<AddTable>
 
     //sale
     fun getAllSaleItems(id: Int): Flow<List<SaleTable>>

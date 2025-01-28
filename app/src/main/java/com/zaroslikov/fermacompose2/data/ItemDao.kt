@@ -126,7 +126,7 @@ interface ItemDao {
     fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
 
     @Query("SELECT * from MyFerma Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
-    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
+    suspend fun getBrieflyDetailsItemAdd(id: Long, name: String): List<AddTable>
 
     @Query("SELECT MyFerma.Title from MyFerma Where idPT=:id group by MyFerma.Title ")
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
