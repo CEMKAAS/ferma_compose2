@@ -72,14 +72,22 @@ class AddViewModel(
 //    }
 
 
-    private val _items = mutableStateOf<List<AddTable>>(emptyList())
+//    suspend fun detailsName(name: String): State<List<AddTable>> {
+//        val _items = mutableStateOf<List<AddTable>>(emptyList())
+//        val items: State<List<AddTable>> = _items
+//        _items.value = itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
+//        return items
+//    }
+
+    val _items = mutableStateOf<List<AddTable>>(emptyList())
     val items: State<List<AddTable>> = _items
 
-    fun detailsName (name: String) {
+    fun detailsName(name: String) {
         viewModelScope.launch {
             _items.value = itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
         }
     }
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

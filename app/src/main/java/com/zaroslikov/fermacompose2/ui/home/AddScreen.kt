@@ -294,6 +294,11 @@ fun BrieflyCountCard(
     contentPadding: PaddingValues,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    val itemList2 = mutableListOf<AddTable>()
+
+
+
+
 
     Card(
         modifier = modifier,
@@ -345,10 +350,11 @@ fun BrieflyCountCard(
 //        val itemList = viewModel.items.value.toMutableList()
 //        viewModel.detailsName(product.title)
 
+        val itemList = viewModel.items.value.toMutableList()
+        viewModel.detailsName(product.title)
+        itemList2.addAll(itemList)
 
-
-
-        itemList.forEach {
+        itemList2.forEach {
             AddProductCard(addProduct = it,
                 modifier = Modifier
                     .padding(8.dp)
