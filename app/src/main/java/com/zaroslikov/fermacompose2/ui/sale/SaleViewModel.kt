@@ -20,12 +20,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyPriceUiState
 import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
 import com.zaroslikov.fermacompose2.data.water.SaleUiState
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -61,15 +63,8 @@ class SaleViewModel(
                 initialValue = BrieflyPriceUiState()
             )
 
-
-    fun detailsName(name: String) {
-        val detailsUiState: StateFlow<SaleUiState> =
-            itemsRepository.getBrieflyDetailsItemSale(itemId.toLong(), name).map {SaleUiState(it) }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = SaleUiState()
-                )
+    fun getDetailsName(name: String): Flow<List<SaleTable>> {
+        return itemsRepository.getBrieflyDetailsItemSale(itemId.toLong(), name)
     }
 
 

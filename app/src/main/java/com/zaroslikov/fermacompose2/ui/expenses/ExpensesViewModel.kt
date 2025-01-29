@@ -13,6 +13,7 @@ import com.zaroslikov.fermacompose2.data.water.ExpensesUiState
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -43,15 +44,8 @@ class ExpensesViewModel(
                 initialValue = BrieflyPriceUiState()
             )
 
-
-    fun detailsName(name: String) {
-        val detailsUiState: StateFlow<ExpensesUiState> =
-            itemsRepository.getBrieflyDetailsItemExpenses(itemId.toLong(), name).map {ExpensesUiState(it) }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = ExpensesUiState()
-                )
+    fun getDetailsName(name: String): Flow<List<ExpensesTable>> {
+        return itemsRepository.getBrieflyDetailsItemExpenses(itemId.toLong(), name)
     }
 
 

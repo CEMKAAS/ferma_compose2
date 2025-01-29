@@ -20,6 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,6 +29,7 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -55,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -62,6 +66,8 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.home.BrieflyCountCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.BrieflyPriceCard
+import com.zaroslikov.fermacompose2.ui.sale.SaleProductCard
+import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
@@ -75,9 +81,6 @@ object ExpensesDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreen(
@@ -94,10 +97,7 @@ fun ExpensesScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
-
     val coroutineScope = rememberCoroutineScope()
-
-    val showBottomSheetFilter = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -142,10 +142,10 @@ fun ExpensesScreen(
             ExpensesBody(
                 itemList = homeUiState.itemList,
                 brieflyList = brieflyUiState.itemList,
+                viewModel = viewModel,
                 onItemClick = navigateToItemUpdate,
                 modifier = modifier.fillMaxSize(),
                 contentPadding = innerPadding,
-                showBottomFilter = showBottomSheetFilter,
                 navigateToItemAdd = { navigateToItem(idProject) }
             )
         }
@@ -154,12 +154,12 @@ fun ExpensesScreen(
 
 @Composable
 private fun ExpensesBody(
+    viewModel: ExpensesViewModel,
     itemList: List<ExpensesTable>,
     brieflyList: List<BrieflyItemPrice>,
     onItemClick: (navigateId) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    showBottomFilter: MutableState<Boolean>,
     navigateToItemAdd: () -> Unit
 ) {
     Column(
@@ -209,6 +209,7 @@ private fun ExpensesBody(
             }
         } else {
             ExpensesList(
+                viewModel = viewModel,
                 itemList = itemList,
                 brieflyList = brieflyList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
@@ -221,6 +222,7 @@ private fun ExpensesBody(
 
 @Composable
 private fun ExpensesList(
+    viewModel: ExpensesViewModel,
     itemList: List<ExpensesTable>,
     brieflyList: List<BrieflyItemPrice>,
     onItemClick: (ExpensesTable) -> Unit,
@@ -236,7 +238,7 @@ private fun ExpensesList(
             TextButtonWarehouse(
                 boolean = details,
                 onClick = { details = !details },
-                title = if (details) "Показать кратко" else "Показать подробно"
+                title = if (details) "Кратко" else "Подробно"
             )
         }
         if (details) {
@@ -249,14 +251,82 @@ private fun ExpensesList(
         } else {
             items(items = brieflyList) { item ->
                 BrieflyPriceCard(
+                    viewModel = viewModel,
                     product = item,
+                    onItemClick = onItemClick,
                     modifier = Modifier
                         .padding(8.dp)
-                        .clickable {  })
+
+                )
             }
         }
     }
 }
+
+@Composable
+fun BrieflyPriceCard(
+    viewModel: ExpensesViewModel,
+    product: BrieflyItemPrice,
+    onItemClick: (ExpensesTable) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = product.title,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(6.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+            Text(
+                text = "${formatter(product.count)} ${product.suffix}\n за \n${
+                    formatter(
+                        product.price
+                    )
+                } ₽",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(0.3f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp
+            )
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Показать меню",
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                )
+            }
+        }
+    }
+    if (expanded) {
+        val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
+        products.value.forEach {
+            ExpensesCard(expensesTable = it,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { onItemClick(it) })
+        }
+    }
+}
+
 
 @Composable
 fun ExpensesCard(
@@ -336,31 +406,3 @@ fun ExpensesCard(
         }
     }
 }
-
-
-//@Preview()
-//@Composable
-//fun Card() {
-//    AddProductCard(
-//        addProduct = AddTable(
-//            0,
-//            "Мясо Коровы",
-//            150.50,
-//            25,
-//            12,
-//            2025,
-//            "0",
-//            1,
-//            "кг",
-//            "Животноводство",
-//            "Борька"
-//        )
-//    )
-//}
-
-//
-//data class navigateId(
-//    val id: Int,
-//    val idPT: Int
-//
-//)

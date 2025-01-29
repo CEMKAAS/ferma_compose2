@@ -56,10 +56,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.home.AddProductCard
+import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
@@ -136,6 +139,7 @@ fun SaleScreen(
             }
         ) { innerPadding ->
             SaleBody(
+                viewModel = viewModel,
                 itemList = homeUiState.itemList,
                 brieflyList = brieflyUiState.itemList,
                 onItemClick = navigateToItemUpdate,
@@ -151,6 +155,7 @@ fun SaleScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SaleBody(
+    viewModel: SaleViewModel,
     itemList: List<SaleTable>,
     brieflyList: List<BrieflyItemPrice>,
     onItemClick: (navigateId) -> Unit,
@@ -210,15 +215,16 @@ private fun SaleBody(
                 brieflyList = brieflyList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
                 contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
+                viewModel = viewModel
             )
         }
-
     }
 }
 
 @Composable
 private fun InventoryList(
+    viewModel: SaleViewModel,
     itemList: List<SaleTable>,
     brieflyList: List<BrieflyItemPrice>,
     onItemClick: (SaleTable) -> Unit,
@@ -235,7 +241,7 @@ private fun InventoryList(
             TextButtonWarehouse(
                 boolean = details,
                 onClick = { details = !details },
-                title = if (details) "Показать кратко" else "Показать подробно"
+                title = if (details) "Кратко" else "Подробно"
             )
         }
         if (details) {
@@ -250,13 +256,79 @@ private fun InventoryList(
                 BrieflyPriceCard(
                     product = item,
                     modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {  }
+                        .padding(8.dp),
+                    viewModel = viewModel,
+                    onItemClick = onItemClick
                 )
             }
         }
     }
 }
+
+@Composable
+fun BrieflyPriceCard(
+    viewModel: SaleViewModel,
+    product: BrieflyItemPrice,
+    onItemClick: (SaleTable) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = product.title,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(6.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+            Text(
+                text = "${formatter(product.count)} ${product.suffix}\n за \n${
+                    formatter(
+                        product.price
+                    )
+                } ₽",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(0.3f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp
+            )
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Показать меню",
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                )
+            }
+        }
+    }
+    if (expanded) {
+        val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
+        products.value.forEach {
+            SaleProductCard(saleTable = it,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { onItemClick(it) })
+        }
+    }
+}
+
 
 
 @Composable
@@ -350,58 +422,7 @@ fun SaleProductCard(
     }
 }
 
-@Composable
-fun BrieflyPriceCard(
-    product: BrieflyItemPrice,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            //TODO analys icon
-            Text(
-                text = product.title,
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = "${formatter(product.count)} ${product.suffix}\n за \n${
-                    formatter(
-                        product.price
-                    )
-                } ₽",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(0.3f),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Показать меню",
-                    modifier = Modifier
-                        .fillMaxWidth(1f)
-                )
-            }
-        }
-    }
-}
 
 data class navigateId(
     val id: Int,

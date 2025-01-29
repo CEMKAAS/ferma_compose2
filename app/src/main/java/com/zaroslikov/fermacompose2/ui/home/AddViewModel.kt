@@ -29,6 +29,7 @@ import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
 import com.zaroslikov.fermacompose2.data.water.HomeUiState
 import com.zaroslikov.fermacompose2.ui.finance.Fin
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -61,33 +62,9 @@ class AddViewModel(
                 initialValue = BrieflyUiState()
             )
 
-
-//    fun detailsName(name: String): StateFlow<HomeUiState> {
-//        return itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name).map { HomeUiState(it) }
-//                .stateIn(
-//                    scope = viewModelScope,
-//                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                    initialValue = HomeUiState()
-//                )
-//    }
-
-
-//    suspend fun detailsName(name: String): State<List<AddTable>> {
-//        val _items = mutableStateOf<List<AddTable>>(emptyList())
-//        val items: State<List<AddTable>> = _items
-//        _items.value = itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
-//        return items
-//    }
-
-    val _items = mutableStateOf<List<AddTable>>(emptyList())
-    val items: State<List<AddTable>> = _items
-
-    fun detailsName(name: String) {
-        viewModelScope.launch {
-            _items.value = itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
-        }
+    fun getDetailsName(name: String): Flow<List<AddTable>> {
+        return itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
     }
-
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

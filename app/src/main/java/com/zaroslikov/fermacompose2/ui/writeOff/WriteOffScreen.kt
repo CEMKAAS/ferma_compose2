@@ -21,6 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,6 +30,7 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -56,10 +59,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.home.AddProductCard
+import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.home.BrieflyCountCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
@@ -98,8 +104,6 @@ fun WriteOffScreen(
     val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
-
-    val showBottomSheetFilter = remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -144,6 +148,7 @@ fun WriteOffScreen(
             }
         ) { innerPadding ->
             WriteOffBody(
+                viewModel = viewModel,
                 writeOffBoolean = writeOffBoolean,
                 itemList = homeUiState.itemList,
                 brieflyList = brieflyUiState.itemList,
@@ -156,10 +161,9 @@ fun WriteOffScreen(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WriteOffBody(
+    viewModel: WriteOffViewModel,
     writeOffBoolean: Boolean,
     itemList: List<WriteOffTable>,
     brieflyList: List<BrieflyItemCount>,
@@ -250,6 +254,7 @@ private fun WriteOffBody(
             }
         } else {
             WriteOffInventoryList(
+                viewModel = viewModel,
                 itemList = itemList,
                 brieflyList = brieflyList,
                 onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
@@ -262,6 +267,7 @@ private fun WriteOffBody(
 
 @Composable
 private fun WriteOffInventoryList(
+    viewModel: WriteOffViewModel,
     itemList: List<WriteOffTable>,
     brieflyList: List<BrieflyItemCount>,
     onItemClick: (WriteOffTable) -> Unit,
@@ -279,7 +285,7 @@ private fun WriteOffInventoryList(
             TextButtonWarehouse(
                 boolean = details,
                 onClick = { details = !details },
-                title = if (details) "Показать кратко" else "Показать подробно"
+                title = if (details) "Кратко" else "Подробно"
             )
         }
 
@@ -291,15 +297,82 @@ private fun WriteOffInventoryList(
                         .clickable { onItemClick(item) })
             }
         } else {
-//            items(items = brieflyList) { item ->
-//                BrieflyCountCard(product = item,
-//                    modifier = Modifier
-//                        .padding(8.dp)
-//                        .clickable {  })
-//            }
+            items(items = brieflyList) { item ->
+                BrieflyCountCard(
+                    viewModel = viewModel,
+                    product = item,
+                    modifier = Modifier
+                        .padding(8.dp),
+                    onItemClick = onItemClick)
+            }
         }
     }
 }
+
+
+@Composable
+fun BrieflyCountCard(
+    viewModel: WriteOffViewModel,
+    product: BrieflyItemCount,
+    onItemClick: (WriteOffTable) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = product.title,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(6.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
+            Text(
+                text = "${formatter(product.count)} ${product.suffix}",
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .fillMaxWidth(0.3f),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp
+            )
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Показать меню",
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                )
+            }
+        }
+    }
+    if (expanded) {
+        val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
+        products.value.forEach {
+            WriteOffProductCard(writeOffTable = it,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { onItemClick(it) })
+        }
+    }
+}
+
+
+
+
+
 
 @Composable
 fun WriteOffProductCard(

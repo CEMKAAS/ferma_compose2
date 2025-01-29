@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
@@ -13,6 +14,7 @@ import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -41,7 +43,6 @@ class WriteOffViewModel(
                 initialValue = TitleUiState()
             )
 
-
     val brieflyUiState: StateFlow<BrieflyUiState> =
         itemsRepository.getBrieflyItemWriteOff(itemId).map { BrieflyUiState(it) }
             .stateIn(
@@ -50,15 +51,8 @@ class WriteOffViewModel(
                 initialValue = BrieflyUiState()
             )
 
-
-    fun detailsName(name: String) {
-        val detailsUiState: StateFlow<WriteOffUiState> =
-            itemsRepository.getBrieflyDetailsItemWriteOff(itemId.toLong(), name).map { WriteOffUiState(it) }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = WriteOffUiState()
-                )
+    fun getDetailsName(name: String): Flow<List<WriteOffTable>> {
+        return itemsRepository.getBrieflyDetailsItemWriteOff(itemId.toLong(), name)
     }
 
     companion object {

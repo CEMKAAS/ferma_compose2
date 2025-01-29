@@ -1,8 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.home
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -40,15 +36,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -60,8 +56,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
@@ -69,10 +63,6 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
-import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
-import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
-import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
@@ -157,7 +147,7 @@ fun AddScreen(
                 navigateToItemAdd = { navigateToItemAdd(idProject) },
                 navigationToAnalysis = {
                     navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
-                    AppMetrica.reportEvent("Анализ через склад")
+                    AppMetrica.reportEvent("Анализ через Продукцию")
                 },
             )
         }
@@ -257,7 +247,7 @@ private fun InventoryList(
             TextButtonWarehouse(
                 boolean = details,
                 onClick = { details = !details },
-                title = if (details) "Показать кратко" else "Показать подробно"
+                title = if (details) "Кратко" else "Подробно"
             )
         }
 
@@ -275,9 +265,8 @@ private fun InventoryList(
                     modifier = Modifier
                         .padding(8.dp),
                     viewModel = viewModel,
-                    contentPadding = contentPadding,
                     onItemClick = onItemClick,
-                    navigationToAnalysis = navigationToAnalysis
+                    navigationToAnalysis = navigationToAnalysis,
                 )
             }
         }
@@ -290,15 +279,9 @@ fun BrieflyCountCard(
     product: BrieflyItemCount,
     onItemClick: (AddTable) -> Unit,
     navigationToAnalysis: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    val itemList2 = mutableListOf<AddTable>()
-
-
-
-
 
     Card(
         modifier = modifier,
@@ -347,14 +330,8 @@ fun BrieflyCountCard(
         }
     }
     if (expanded) {
-//        val itemList = viewModel.items.value.toMutableList()
-//        viewModel.detailsName(product.title)
-
-        val itemList = viewModel.items.value.toMutableList()
-        viewModel.detailsName(product.title)
-        itemList2.addAll(itemList)
-
-        itemList2.forEach {
+        val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
+        products.value.forEach {
             AddProductCard(addProduct = it,
                 modifier = Modifier
                     .padding(8.dp)
