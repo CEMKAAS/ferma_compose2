@@ -46,14 +46,14 @@ data class ProjectTable(
     var arhive: String,  //не архив = 0, Архив = 1
     @ColumnInfo(name = "DATAEND")
     val dateEnd: String,  // Конец проекта
-//    val picture: ByteArray, // Изображение
     @ColumnInfo(name = "TIMEPUSH1")
     var time1: String,
     @ColumnInfo(name = "TIMEPUSH2")
     var time2: String,
     @ColumnInfo(name = "TIMEPUSH3")
     var time3: String,
-    val mode: Int //Инкубатор = 0, Хозяйство = 1
+    val mode: Int, //Инкубатор = 0, Хозяйство = 1
+    val imageData: ByteArray, // Изображение
 )
 
 
