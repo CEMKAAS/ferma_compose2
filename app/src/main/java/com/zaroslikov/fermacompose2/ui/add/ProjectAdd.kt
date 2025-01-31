@@ -51,8 +51,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -142,6 +142,7 @@ fun AddProjectContainer(
 
     //Текст
     var name by remember { mutableStateOf("") }
+    val bitmap by remember { mutableStateOf<ByteArray?>(null) }
 
     var date1 by remember { mutableStateOf(formattedDate) }
     if (openDialog) {
@@ -159,14 +160,17 @@ fun AddProjectContainer(
         R.drawable.baseline_cruelty_free_24,
         R.drawable.chicken,
         R.drawable.livestock,
-        R.drawable.baseline_warehouse_24
-
+        R.drawable.baseline_warehouse_24,
+        R.drawable.ic_ovos2
     ).map { painterResource(it) }.toMutableList()
 
-    imageResources.add(null)
 
-
-
+    //Картинка
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            imageUri = uri
+        }
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
         Text(
@@ -181,11 +185,13 @@ fun AddProjectContainer(
         ImageLazyRow(
             images = imageResources,
             onImageSelected = { index ->
-                viewModel.selectImage(index)
+//                viewModel.selectImage(index)
             },
             onAddImageClicked = {
                 // Логика для открытия галереи и выбора изображения
-                viewModel.openGallery()
+                launcher.launch("image/*")
+
+                imageResources.add( imageUri)
             }
         )
 
@@ -200,48 +206,49 @@ fun AddProjectContainer(
 //            }
 //        }
 
-        //Картинка
-        var imageUri by remember { mutableStateOf<Uri?>(null) }
-        val launcher =
-            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-                imageUri = uri
-            }
+//        //Картинка
+//        var imageUri by remember { mutableStateOf<Uri?>(null) }
+//        val launcher =
+//            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+//                imageUri = uri
+//            }
+//
+//        val context = LocalContext.current
+//        val bitmap = remember { mutableStateOf<Bitmap?>(null) }
+//        Row(verticalAlignment = Alignment.CenterVertically) {
+//            imageUri?.let {
+//                if (Build.VERSION.SDK_INT < 28) {
+//                    bitmap.value = MediaStore.Images
+//                        .Media.getBitmap(context.contentResolver, it)
+//                } else {
+//                    val source = ImageDecoder.createSource(context.contentResolver, it)
+//                    bitmap.value = ImageDecoder.decodeBitmap(source)
+//                }
+//            }
+//
+//            if (imageUri == null) {
+//                Image(
+//                    painter = painterResource(R.drawable.baseline_add_photo_alternate_24),
+//                    contentDescription = null,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .size(125.dp)
+//                        .clickable { launcher.launch("image/*") }
+//                )
+//            } else {
+//                bitmap.value?.let { btm ->
+//                    Image(
+//                        bitmap = btm.asImageBitmap(),
+//                        contentDescription = null,
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .size(125.dp)
+//                            .clickable { launcher.launch("image/*") }
+//                    )
+//                }
+//            }
+//        }
 
-        val context = LocalContext.current
-        val bitmap = remember { mutableStateOf<Bitmap?>(null) }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            imageUri?.let {
-                if (Build.VERSION.SDK_INT < 28) {
-                    bitmap.value = MediaStore.Images
-                        .Media.getBitmap(context.contentResolver, it)
-                } else {
-                    val source = ImageDecoder.createSource(context.contentResolver, it)
-                    bitmap.value = ImageDecoder.decodeBitmap(source)
-                }
-            }
-
-            if (imageUri == null) {
-                Image(
-                    painter = painterResource(R.drawable.baseline_add_photo_alternate_24),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(125.dp)
-                        .clickable { launcher.launch("image/*") }
-                )
-            } else {
-                bitmap.value?.let { btm ->
-                    Image(
-                        bitmap = btm.asImageBitmap(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(125.dp)
-                            .clickable { launcher.launch("image/*") }
-                    )
-                }
-            }
-        }
 
         OutlinedTextField(
             value = name,
@@ -314,7 +321,7 @@ fun AddProjectContainer(
                             time2 = "",
                             time3 = "",
                             mode = 1,
-                            imageData =
+//                            imageData = bitmap
                         )
                     )
                     val eventParameters: MutableMap<String, Any> = HashMap()
@@ -331,6 +338,79 @@ fun AddProjectContainer(
         }
     }
 }
+
+
+@Composable
+fun ImageLazyRow(
+    images: MutableList<Painter>,
+    onImageSelected: (Int?) -> Unit = {},
+    onAddImageClicked: () -> Unit
+) {
+    val selectedImageIndex by remember { mutableStateOf<Int?>(null) }
+
+    LazyRow(modifier = Modifier.padding(16.dp)) {
+        items(images.size) { index ->
+            val image = images[index]
+            SelectableImageWithIcon(
+                image = image,
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_cruelty_free_24),
+                        contentDescription = "Selected",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(4.dp)
+                    )
+                },
+                isSelected = selectedImageIndex == index
+            ) {
+                if (index == images.size - 1) {
+//                    selectedImageIndex = index
+                    onAddImageClicked()
+                } else {
+//                    selectedImageIndex = index
+//                    onImageSelected(index)
+                }
+            }
+
+
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
+
+@Composable
+fun SelectableImageWithIcon(
+    image: Painter,
+    icon: @Composable () -> Unit,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(100.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        Image(
+            painter = image,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(CircleShape)
+                .border(
+                    width = if (isSelected) 2.dp else 0.dp,
+                    color = if (isSelected) Color.Green else Color.Transparent,
+                    shape = CircleShape
+                )
+        )
+        if (isSelected) {
+            icon() // Отображаем значок, если элемент выбран
+        }
+    }
+}
+
 
 @Composable
 fun ImageCircle(
@@ -369,87 +449,6 @@ fun ImageCircle(
         }
     }
 }
-
-@Composable
-fun ImageLazyRow(images: List<ImageBitmap?>, onImageSelected: (Int?) -> Unit, onAddImageClicked: () -> Unit) {
-    var selectedImageIndex by remember { mutableStateOf<Int?>(null) }
-
-    LazyRow(modifier = Modifier.padding(16.dp)) {
-        items(images.size) { index ->
-            val image = images[index]
-            SelectableImageWithIcon(
-                image = image,
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_cruelty_free_24), // Замените на ваш ресурс
-                        contentDescription = "Selected",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .padding(4.dp)
-                    )
-                },
-                isSelected = selectedImageIndex == index
-            ) {
-                if (index == images.size - 1 && image == null) {
-                    onAddImageClicked() // Если это последний элемент и он пустой, открываем галерею
-                } else {
-                    selectedImageIndex = index // Обновляем выбранный индекс при нажатии
-                    onImageSelected(index)
-                }
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-        }
-    }
-}
-
-@Composable
-fun SelectableImageWithIcon(
-    image: ImageBitmap?,
-    icon: @Composable () -> Unit,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(100.dp)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        if (image != null) {
-            Image(
-                bitmap = image,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape)
-                    .border(
-                        width = if (isSelected) 2.dp else 0.dp,
-                        color = if (isSelected) Color.Green else Color.Transparent,
-                        shape = CircleShape
-                    )
-            )
-        } else {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_add_photo_alternate_24), // Замените на ваш ресурс плюсика
-                contentDescription = "Add Image",
-                tint = Color.Gray,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .border(
-                        width = if (isSelected) 2.dp else 0.dp,
-                        color = if (isSelected) Color.Green else Color.Transparent,
-                        shape = CircleShape
-                    )
-            )
-        }
-        if (isSelected) {
-            icon() // Отображаем значок, если элемент выбран
-        }
-    }
-}
-
 
 
 //@OptIn(ExperimentalMaterial3Api::class)
