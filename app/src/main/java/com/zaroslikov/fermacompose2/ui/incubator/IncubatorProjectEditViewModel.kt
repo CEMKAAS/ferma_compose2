@@ -74,7 +74,8 @@ fun IncubatorProjectEditState.toProjectTable(): ProjectTable = ProjectTable(
     time1,
     time2,
     time3,
-    mode
+    mode,
+    byteArrayOf()
 )
 
 fun ProjectTable.toIncubatorProjectState(): IncubatorProjectEditState = IncubatorProjectEditState(
@@ -91,7 +92,7 @@ fun ProjectTable.toIncubatorProjectState(): IncubatorProjectEditState = Incubato
     time1,
     time2,
     time3,
-    mode
+    mode,
 )
 
 

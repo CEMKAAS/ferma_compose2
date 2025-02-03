@@ -80,6 +80,11 @@ dependencies {
     implementation (libs.mobileads)
 
 
+    //Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+
     // AppMetrica SDK.
     implementation("io.appmetrica.analytics:analytics:7.2.2")
 

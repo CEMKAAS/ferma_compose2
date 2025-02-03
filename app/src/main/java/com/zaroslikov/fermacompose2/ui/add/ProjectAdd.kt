@@ -1,11 +1,10 @@
 package com.zaroslikov.fermacompose2.ui.add
 
 
+import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -13,7 +12,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,7 +39,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,7 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -62,6 +61,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
@@ -70,6 +70,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Calendar
@@ -143,6 +144,7 @@ fun AddProjectContainer(
     //Текст
     var name by remember { mutableStateOf("") }
     val bitmap by remember { mutableStateOf<ByteArray?>(null) }
+    val context = LocalContext.current
 
     var date1 by remember { mutableStateOf(formattedDate) }
     if (openDialog) {
@@ -162,14 +164,15 @@ fun AddProjectContainer(
         R.drawable.livestock,
         R.drawable.baseline_warehouse_24,
         R.drawable.ic_ovos2
-    ).map { painterResource(it) }.toMutableList()
-
+    )
 
     //Картинка
+    var byteArray by remember { mutableStateOf(byteArrayOf()) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             imageUri = uri
+            byteArray = (uriToByteArray(context,imageUri)?:getByteArrayFromDrawable(context, R.drawable.livestock))
         }
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
@@ -184,29 +187,16 @@ fun AddProjectContainer(
 
         ImageLazyRow(
             images = imageResources,
-            onImageSelected = { index ->
-//                viewModel.selectImage(index)
+            imageUri = imageUri,
+            onImageSelected = {
+                byteArray = getByteArrayFromDrawable(context, imageResources[it])
             },
             onAddImageClicked = {
-                // Логика для открытия галереи и выбора изображения
                 launcher.launch("image/*")
-
-                imageResources.add( imageUri)
             }
         )
 
-
-//        LazyRow {
-//            items(imageResource.size) { index ->
-//                val image = imageResource[index]
-//                ImageCircle(image, isSelected = selectedImageIndex == index) {
-//                    selectedImageIndex = index
-//                }
-//                Spacer(modifier = Modifier.width(8.dp))
-//            }
-//        }
-
-//        //Картинка
+        //        //Картинка
 //        var imageUri by remember { mutableStateOf<Uri?>(null) }
 //        val launcher =
 //            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -248,7 +238,6 @@ fun AddProjectContainer(
 //                }
 //            }
 //        }
-
 
         OutlinedTextField(
             value = name,
@@ -321,7 +310,7 @@ fun AddProjectContainer(
                             time2 = "",
                             time3 = "",
                             mode = 1,
-//                            imageData = bitmap
+                            imageData = byteArray
                         )
                     )
                     val eventParameters: MutableMap<String, Any> = HashMap()
@@ -342,22 +331,27 @@ fun AddProjectContainer(
 
 @Composable
 fun ImageLazyRow(
-    images: MutableList<Painter>,
-    onImageSelected: (Int?) -> Unit = {},
-    onAddImageClicked: () -> Unit
+    images: List<Int>,
+    onImageSelected: (Int) -> Unit,
+    onAddImageClicked: () -> Unit,
+    imageUri: Uri?
 ) {
-    val selectedImageIndex by remember { mutableStateOf<Int?>(null) }
+    var selectedImageIndex by remember { mutableIntStateOf(0) }
+
+    val painter = rememberAsyncImagePainter(model = imageUri)
 
     LazyRow(modifier = Modifier.padding(16.dp)) {
         items(images.size) { index ->
             val image = images[index]
             SelectableImageWithIcon(
-                image = image,
+                image = if (index == images.size - 1 && imageUri == null) painterResource(image) else if (index == images.size - 1 && imageUri != null) painter else painterResource(
+                    image
+                ),
                 icon = {
                     Icon(
-                        painter = painterResource(id = R.drawable.baseline_cruelty_free_24),
+                        Icons.Default.CheckCircle,
                         contentDescription = "Selected",
-                        tint = Color.White,
+                        tint = Color.Green,
                         modifier = Modifier
                             .size(24.dp)
                             .padding(4.dp)
@@ -365,17 +359,11 @@ fun ImageLazyRow(
                 },
                 isSelected = selectedImageIndex == index
             ) {
-                if (index == images.size - 1) {
-//                    selectedImageIndex = index
-                    onAddImageClicked()
-                } else {
-//                    selectedImageIndex = index
-//                    onImageSelected(index)
-                }
+                selectedImageIndex = index
+                if (index == images.size - 1) onAddImageClicked() else onImageSelected(index)
             }
-
-
             Spacer(modifier = Modifier.width(8.dp))
+
         }
     }
 }
@@ -400,8 +388,8 @@ fun SelectableImageWithIcon(
                 .fillMaxSize()
                 .clip(CircleShape)
                 .border(
-                    width = if (isSelected) 2.dp else 0.dp,
-                    color = if (isSelected) Color.Green else Color.Transparent,
+                    width = if (isSelected) 2.dp else 1.dp,
+                    color = if (isSelected) Color.Green else Color.Black,
                     shape = CircleShape
                 )
         )
@@ -410,80 +398,6 @@ fun SelectableImageWithIcon(
         }
     }
 }
-
-
-@Composable
-fun ImageCircle(
-    icon: Int,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(100.dp)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .clip(shape = CircleShape)
-                .border(
-                    width = if (isSelected) 2.dp else 1.dp,
-                    color = if (isSelected) Color.Green else Color.Black,
-                    shape = CircleShape
-                )
-                .padding(end = 5.dp)
-        )
-        if (isSelected) {
-            Icon(
-                Icons.Default.CheckCircle,
-                contentDescription = "Показать меню",
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(4.dp),
-                tint = Color.Green
-            )
-        }
-    }
-}
-
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun DatePickerDialogSample(
-//    datePickerState: DatePickerState,
-//    dateToday: String,
-//    onDateSelected: (String) -> Unit
-//) {
-//    DatePickerDialog(
-//        onDismissRequest = {
-//            onDateSelected(dateToday)
-//        },
-//        confirmButton = {
-//            TextButton(
-//                onClick = {
-//                    val format = SimpleDateFormat("dd.MM.yyyy")
-//                    val formattedDate: String =
-//                        format.format(datePickerState.selectedDateMillis)
-//                    onDateSelected(formattedDate)
-//                },
-//            ) { Text("Выбрать") }
-//        },
-//        dismissButton = {
-//            TextButton(
-//                onClick = {
-//                    onDateSelected(dateToday)
-//                }
-//            ) { Text("Назад") }
-//        }
-//    ) {
-//        DatePicker(state = datePickerState)
-//    }
-//}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -553,16 +467,6 @@ fun DatePickerDialogSampleNoLimit(
 }
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun AddProjectPrewie() {
-//    AddProjectContainer(
-//        modifier = Modifier.fillMaxSize(),
-//        navController = rememberNavController(),
-//        scope = rememberCoroutineScope()
-//    )
-//}
-
 @OptIn(ExperimentalMaterial3Api::class)
 object PastOrPresentSelectableDates : SelectableDates {
     override fun isSelectableDate(utcTimeMillis: Long): Boolean {
@@ -572,4 +476,27 @@ object PastOrPresentSelectableDates : SelectableDates {
     override fun isSelectableYear(year: Int): Boolean {
         return year <= LocalDate.now().year
     }
+}
+
+fun getByteArrayFromDrawable(context: Context, drawableResId: Int): ByteArray {
+    // Загружаем ресурс как Bitmap
+    val bitmap = BitmapFactory.decodeResource(context.resources, drawableResId)
+
+    // Конвертируем Bitmap в ByteArray
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    return stream.toByteArray()
+}
+
+fun uriToByteArray(context: Context, uri: Uri?): ByteArray? {
+    if (uri == null) return null
+
+    // Загружаем Bitmap из URI
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val bitmap = BitmapFactory.decodeStream(inputStream)
+
+    // Преобразуем Bitmap в ByteArray
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    bitmap?.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+    return byteArrayOutputStream.toByteArray()
 }

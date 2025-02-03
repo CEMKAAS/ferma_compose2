@@ -595,5 +595,6 @@ data class AddIncubatorList(
     val time2: String,
     val time3: String,
     val checkedStateAiring: Boolean,
-    val checkedStateOver: Boolean
+    val checkedStateOver: Boolean,
+    val imageDate : ByteArray
 )

@@ -130,7 +130,7 @@ data class IncubatorProjectListUiState(val itemList: List<ProjectTable> = listOf
 data class IncubatorListUiState(val itemList: List<Incubator> = listOf())
 
 data class IncubatorProjectState(
-    val project: ProjectTable = ProjectTable(0, "", "", "", "", "", "", "", "", "", "", "", "", 0)
+    val project: ProjectTable = ProjectTable(0, "", "", "", "", "", "", "", "", "", "", "", "", 0,byteArrayOf())
 )
 
 
