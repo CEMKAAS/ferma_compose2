@@ -75,7 +75,7 @@ fun IncubatorProjectEditState.toProjectTable(): ProjectTable = ProjectTable(
     time2,
     time3,
     mode,
-    byteArrayOf()
+    imageData
 )
 
 fun ProjectTable.toIncubatorProjectState(): IncubatorProjectEditState = IncubatorProjectEditState(
@@ -93,6 +93,7 @@ fun ProjectTable.toIncubatorProjectState(): IncubatorProjectEditState = Incubato
     time2,
     time3,
     mode,
+    imageData
 )
 
 
@@ -110,5 +111,6 @@ data class IncubatorProjectEditState(
     val time1: String = "",
     val time2: String = "",
     val time3: String = "",
-    val mode: Int = 0
+    val mode: Int = 0,
+    val imageData: ByteArray = byteArrayOf()
 )

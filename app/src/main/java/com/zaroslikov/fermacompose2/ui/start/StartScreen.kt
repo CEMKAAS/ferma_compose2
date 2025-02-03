@@ -96,15 +96,13 @@ fun StartScreen(
     isFirstEnd: () -> Unit,
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-
     val projectListArh by viewModel.getAllProjectArh.collectAsState()
     val projectListAct by viewModel.getAllProjectAct.collectAsState()
     var infoBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
-
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showDialogTime by remember { mutableStateOf(false) }
+    var arhivBoolean by remember { mutableStateOf(false) }
+
 
     if (showDialogTime) {
         TimePicker(time = if (viewModel.time == "") "20:00" else viewModel.time, showDialog = {
@@ -129,7 +127,11 @@ fun StartScreen(
                 infoBottomSheet = {
                     infoBottomSheet = true
                     AppMetrica.reportEvent("Информация")
-                }
+                },
+                archiveButton = {
+                    arhivBoolean = !arhivBoolean
+                },
+                boolean = arhivBoolean
             )
         }, floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -141,14 +143,15 @@ fun StartScreen(
     ) { innerPadding ->
         StartScreenContainer(
             modifier = Modifier.padding(innerPadding),
-            onItemClick = navigateToItemProject,
             projectListArh = projectListArh.projectList,
             projectListAct = projectListAct,
+            navigateToItemProject = navigateToItemProject,
             navigateToItemIncubator = navigateToItemIncubator,
             navigateToItemProjectArh = navigateToItemProjectArh,
             navigateToItemIncubatorArh = navigateToItemIncubatorArh,
             navigationToNewYear = { navigationToNewYear(Pair(false, 0)) },
-            navController =  navController
+            navController = navController,
+            arhivBoolean = arhivBoolean
         )
 
         if (infoBottomSheet) {
@@ -166,10 +169,8 @@ fun StartScreen(
                     viewModel.onUpdate("")
                     AppMetrica.reportEvent("УведОбщ - нет")
                 },
-
             )
         }
-
     }
 }
 
@@ -178,20 +179,20 @@ fun StartScreen(
 @Composable
 fun StartScreenContainer(
     modifier: Modifier,
-    onItemClick: (Int) -> Unit,
+    navigateToItemProject: (Int) -> Unit,
     navigateToItemIncubator: (Int) -> Unit,
     navigateToItemProjectArh: (Int) -> Unit,
     navigateToItemIncubatorArh: (Int) -> Unit,
     projectListArh: List<ProjectTable>,
     projectListAct: List<ProjectTable2>,
     navigationToNewYear: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    arhivBoolean: Boolean
 ) {
-    var state by remember { mutableStateOf(0) }
-    val titles = listOf("Действующие", "Архив")
-    val pagerState = rememberPagerState {
-        titles.size
-    }
+
+//    LaunchedEffect(unit) {
+//        pagerState.animateScrollToPage(state)
+//    }
 
     if (projectListAct.isEmpty() && projectListArh.isEmpty()) {
         Column(modifier = modifier.padding(10.dp)) {
@@ -221,7 +222,9 @@ fun StartScreenContainer(
                 fontSize = 20.sp,
             )
             Button(
-                onClick = { navController.navigate(ChoiseProjectDestination.route) }, modifier = Modifier.fillMaxWidth()
+                onClick = { navController.navigate(ChoiseProjectDestination.route) },
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 20.dp)
 
             ) {
@@ -231,111 +234,82 @@ fun StartScreenContainer(
     } else {
         Column(modifier = modifier) {
 
-            LaunchedEffect(key1 = state) {
-                pagerState.animateScrollToPage(state)
-            }
-            LaunchedEffect(key1 = pagerState.currentPage) {
-                state = pagerState.currentPage
-            }
-            Column {
-                if (newYearBoolean()) {
-                    Button(
-                        onClick = {
-                            navigationToNewYear()
-                            AppMetrica.reportEvent("Итоги года общий")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 5.dp, horizontal = 15.dp)
-                    ) {
-                        Text(text = "Итоги года!")
-                    }
+            if (newYearBoolean()) {
+                Button(
+                    onClick = {
+                        navigationToNewYear()
+                        AppMetrica.reportEvent("Итоги года общий")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp, horizontal = 15.dp)
+                ) {
+                    Text(text = "Итоги года!")
                 }
-                TabRow(selectedTabIndex = state) {
-                    titles.forEachIndexed { index, title ->
-                        Tab(
-                            selected = state == index,
-                            onClick = { state = index },
-                            text = {
-                                Text(
-                                    text = title,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                items(items = projectListAct, key = { it.mode == 0 }) {
+                    if (arhivBoolean && it.arhive == "1"  || !arhivBoolean && it.arhive == "0") {
+                        CardFerma(
+                            projectTable = it, modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    when (it.arhive) {
+                                        "1" -> {
+                                            if (it.mode == 0) navigateToItemIncubatorArh(it.id)
+                                            else navigateToItemProjectArh(it.id)
+                                        }
+                                        "0" -> {
+                                            if (it.mode == 0) navigateToItemIncubator(it.id)
+                                            else navigateToItemProject(it.id)
+                                        }
+                                    }
+                                }
                         )
                     }
                 }
-                HorizontalPager(
-                    state = pagerState,
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) {
-
-
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(16.dp)
-                    ) {
-                        when (state) {
-                            0 -> {
-                                items(items = projectListAct, key = { it.id }) {
-                                    if (it.mode == 0) {
-//                                        CardIncubator(
-//                                            projectTable = it, modifier = Modifier
-//                                                .padding(8.dp)
-//                                                .clickable {
-//                                                    navigateToItemIncubator(it.id)
-//                                                    AppMetrica.reportEvent("Переход на инкуб")
-//                                                },
-//                                            colorFilter = null
-//                                        )
-                                    } else {
-                                        CardFerma(
-                                            projectTable = it, modifier = Modifier
-                                                .padding(8.dp)
-                                                .clickable {
-                                                    onItemClick(it.id)
-                                                },
-                                            colorFilter = null
-                                        )
-                                    }
-                                }
-                            }
-
-                            1 -> {
-                                items(items = projectListArh, key = { it.id }) {
-                                    if (it.mode == 0) {
-                                        CardIncubator(
-                                            projectTable = it, modifier = Modifier
-                                                .padding(8.dp)
-                                                .clickable {
-                                                    navigateToItemIncubatorArh(it.id)
-                                                    AppMetrica.reportEvent("Переход Архив Инкуб")
-                                                },
-                                            colorFilter = ColorFilter.tint(Color.Gray)
-                                        )
-                                    } else {
-//                                        CardFerma(
-//                                            projectTable = it, modifier = Modifier
-//                                                .padding(8.dp)
-//                                                .clickable {
-//                                                    navigateToItemProjectArh(it.id)
-//                                                    AppMetrica.reportEvent("Переход Архив Хоз")
-//                                                },
-//                                            colorFilter = ColorFilter.tint(Color.Gray)
-//                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
-
         }
+    }
+}
+
+@Composable
+fun CardFerma(
+    projectTable: ProjectTable2, modifier: Modifier = Modifier,
+) {
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(10.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Image(
+            bitmap = projectTable.imageData,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(194.dp),
+            colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(Color.Gray)
+        )
+        Text(
+            text = projectTable.titleProject,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp, horizontal = 5.dp)
+        )
+        Text(
+            text = if (projectTable.arhive == "0") projectTable.data else "Завершен"
+            , fontSize = 15.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 5.dp)
+                .padding(bottom = 10.dp)
+        )
     }
 }
 
@@ -349,7 +323,6 @@ fun InfoBottomSheet(
     saveBottomSheet: () -> Unit,
     clearTime: () -> Unit
 ) {
-
 
 //    val anonotatedString = buildAnnotatedString {
 //        pushStringAnnotation(tag = "URL", annotation = "https://vk.com/myfermaapp")
@@ -393,6 +366,7 @@ fun InfoBottomSheet(
                 fontSize = 15.sp,
                 textAlign = TextAlign.Justify
             )
+
 //            val uriHandler = LocalUriHandler.current
 //            ClickableText(
 //                text = anonotatedString,
@@ -465,26 +439,56 @@ fun InfoBottomSheet(
 }
 
 
-@Composable
-fun CardIncubator(
-    projectTable: ProjectTable, modifier: Modifier = Modifier,
-    colorFilter: ColorFilter?
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-        val imcubCard = setImageIncubatorCard(projectTable)
+//fun setImageIncubatorCard(projectTable: ProjectTable): IncubatorCardImage {
+//    var day = "Идет 0 день "
+//    var image = R.drawable.chicken
+//    when (projectTable.type) {
+//        "Курицы" -> image = R.drawable.chicken
+//        "Гуси" -> image = R.drawable.external_goose_birds_icongeek26_outline_icongeek26
+//        "Перепела" -> image = R.drawable.quail
+//        "Утки" -> image = R.drawable.duck
+//        "Индюки" -> image = R.drawable.turkeycock
+//    }
+//    if (projectTable.arhive == "0") {
+//        var diff: Long = 0
+//        val calendar: Calendar = Calendar.getInstance()
+//        val dateBefore22: String = projectTable.data
+//        val dateBefore222: String =
+//            (calendar.get(Calendar.DAY_OF_MONTH)).toString() + "." + (calendar.get(
+//                Calendar.MONTH
+//            ) + 1) + "." + calendar.get(Calendar.YEAR)
+//        val myFormat: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
+//        val date1: Date = myFormat.parse(dateBefore22)
+//        val date2: Date = myFormat.parse(dateBefore222)
+//        diff = date2.time - date1.time
+//        day = "Идет ${TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1} день"
+//    } else {
+//        day = "Завершён"
+//    }
+//
+//    return IncubatorCardImage(image, day)
+//}
 
-
-        Image(
-            painter = painterResource(imcubCard.image),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(194.dp),
-            colorFilter = colorFilter
-        )
+//@Composable
+//fun CardIncubator(
+//    projectTable: ProjectTable, modifier: Modifier = Modifier,
+//    colorFilter: ColorFilter?
+//) {
+//    val imcubCard = setImageIncubatorCard(projectTable)
+//
+//    Card(
+//        modifier = modifier,
+//        elevation = CardDefaults.cardElevation(10.dp),
+//        colors = CardDefaults.cardColors()
+//    ) {
+//
+//        Image(
+//            painter = painterResource(imcubCard.image),
+//            contentDescription = null,
+//            contentScale = ContentScale.Fit,
+//            modifier = Modifier.size(194.dp),
+//            colorFilter = colorFilter
+//        )
 //        Image(
 //            painter = painterResource(id = imcubCard.image),
 //            contentDescription = null,
@@ -492,98 +496,20 @@ fun CardIncubator(
 //            modifier = Modifier.size(194.dp),
 //            colorFilter = colorFilter
 //        )
-        Text(
-            text = projectTable.titleProject,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp, horizontal = 5.dp)
-        )
-        Text(
-            text = imcubCard.day, fontSize = 15.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 5.dp)
-                .padding(bottom = 10.dp)
-        )
-    }
-}
-
-fun setImageIncubatorCard(projectTable: ProjectTable): IncubatorCardImage {
-    var day = "Идет 0 день "
-    var image = R.drawable.chicken
-    when (projectTable.type) {
-        "Курицы" -> image = R.drawable.chicken
-        "Гуси" -> image = R.drawable.external_goose_birds_icongeek26_outline_icongeek26
-        "Перепела" -> image = R.drawable.quail
-        "Утки" -> image = R.drawable.duck
-        "Индюки" -> image = R.drawable.turkeycock
-    }
-    if (projectTable.arhive == "0") {
-        var diff: Long = 0
-        val calendar: Calendar = Calendar.getInstance()
-        val dateBefore22: String = projectTable.data
-        val dateBefore222: String =
-            (calendar.get(Calendar.DAY_OF_MONTH)).toString() + "." + (calendar.get(
-                Calendar.MONTH
-            ) + 1) + "." + calendar.get(Calendar.YEAR)
-        val myFormat: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy")
-        val date1: Date = myFormat.parse(dateBefore22)
-        val date2: Date = myFormat.parse(dateBefore222)
-        diff = date2.time - date1.time
-        day = "Идет ${TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1} день"
-    } else {
-        day = "Завершён"
-    }
-
-    return IncubatorCardImage(image, day)
-}
-
-data class IncubatorCardImage(
-    val image: Int,
-    val day: String
-)
-
-
-@Composable
-fun CardFerma(
-    projectTable: ProjectTable2, modifier: Modifier = Modifier,
-    colorFilter: ColorFilter?
-) {
-    val date = if (colorFilter == null) projectTable.data else "Завершен"
-
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-        Image(
-            bitmap = projectTable.imageData,
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(194.dp),
-            colorFilter = colorFilter
-        )
-        Text(
-            text = projectTable.titleProject,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp, horizontal = 5.dp)
-        )
-        Text(
-            text = date, fontSize = 15.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 5.dp)
-                .padding(bottom = 10.dp)
-        )
-    }
-}
-
-fun convertByteArrayToBitmap(imageData: ByteArray): ImageBitmap {
-   val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-    return bitmap.asImageBitmap()
-}
+//        Text(
+//            text = projectTable.titleProject,
+//            fontSize = 16.sp,
+//            fontWeight = FontWeight.Bold,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(vertical = 5.dp, horizontal = 5.dp)
+//        )
+//        Text(
+//            text = imcubCard.day, fontSize = 15.sp,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(horizontal = 5.dp)
+//                .padding(bottom = 10.dp)
+//        )
+//    }
+//}

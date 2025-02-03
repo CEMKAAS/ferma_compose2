@@ -39,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -103,7 +101,6 @@ fun AddProject(
         }
     ) { innerPadding ->
         AddProjectContainer(
-            number = viewModel.countProject(),
             modifier = Modifier.padding(innerPadding),
             navigateToStart = {
                 coroutineScope.launch {
@@ -118,11 +115,9 @@ fun AddProject(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProjectContainer(
-    number: Int,
     modifier: Modifier,
     navigateToStart: (ProjectTable) -> Unit,
 ) {
-
     //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
@@ -143,7 +138,6 @@ fun AddProjectContainer(
 
     //Текст
     var name by remember { mutableStateOf("") }
-    val bitmap by remember { mutableStateOf<ByteArray?>(null) }
     val context = LocalContext.current
 
     var date1 by remember { mutableStateOf(formattedDate) }

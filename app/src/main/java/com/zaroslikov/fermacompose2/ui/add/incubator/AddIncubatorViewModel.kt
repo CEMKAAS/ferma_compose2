@@ -4,14 +4,17 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.Alarm.AlarmRepository
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.water.Reminder
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
+import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
 import kotlinx.coroutines.launch
@@ -43,7 +46,8 @@ class AddIncubatorViewModel(
             time1 = "08:00",
             time2 = "12:00",
             time3 = "18:00",
-            mode = 0
+            mode = 0,
+            imageData = byteArrayOf()
         )
     )
         private set
@@ -57,11 +61,13 @@ class AddIncubatorViewModel(
     fun saveProject(list: MutableList<Incubator>, count: Int) {
         viewModelScope.launch {
 
-            incubatorUiState =  when (count) {
+            incubatorUiState = when (count) {
                 0 -> incubatorUiState.copy(time1 = "", time2 = "", time3 = "")
                 1 -> incubatorUiState.copy(time2 = "", time3 = "")
                 2 -> incubatorUiState.copy(time3 = "")
-                else -> {incubatorUiState}
+                else -> {
+                    incubatorUiState
+                }
             }
 
             val idPT = itemsRepository.insertProjectLong(incubatorUiState.toProjectTable())
@@ -97,4 +103,18 @@ class AddIncubatorViewModel(
             _items2.value = itemsRepository.getIncubatorListArh6(type)
         }
     }
+
+//    suspend fun getByteArray(type: String): ByteArray {
+//        return when (type) {
+//            "Курицы" -> getByteArrayFromDrawable(R.drawable.chicken)
+//            "Гуси" -> getByteArrayFromDrawable(R.drawable.external_goose_birds_icongeek26_outline_icongeek26)
+//            "Перепела" -> getByteArrayFromDrawable(R.drawable.quail)
+//            "Утки" -> getByteArrayFromDrawable(R.drawable.duck)
+//            "Индюки" -> getByteArrayFromDrawable(R.drawable.turkeycock)
+//            else -> {
+//                getByteArrayFromDrawable(R.drawable.chicken)
+//            }
+//        }
+//    }
+
 }

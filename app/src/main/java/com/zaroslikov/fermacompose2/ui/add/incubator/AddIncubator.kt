@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.add.incubator
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,6 +68,7 @@ import java.util.Calendar
 import java.util.TimeZone
 import androidx.compose.ui.window.Dialog
 import com.zaroslikov.fermacompose2.AlterDialigStart
+import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
 import com.zaroslikov.fermacompose2.ui.start.formatterTime
 import io.appmetrica.analytics.AppMetrica
 
@@ -100,7 +103,6 @@ fun AddIncubator(
         incubator.over
     )
     val list2 = viewModel.items.value.toMutableList()
-
 
     if (openEndDialog) {
         ArhivIncubatorChoice(
@@ -205,7 +207,7 @@ fun AddIncubatorContainer(
 
     //Календарь
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-
+    val context = LocalContext.current
 
     var expandedTypeBirds by remember { mutableStateOf(false) }
 
@@ -342,7 +344,7 @@ fun AddIncubatorContainer(
                             onClick = {
                                 selectedItemIndex = index
                                 expandedTypeBirds = false
-                                onUpdate(incubator.copy(type = typeBirdsList[selectedItemIndex]))
+                                onUpdate(incubator.copy(type = typeBirdsList[selectedItemIndex], imageData = getByteArray(context, typeBirdsList[selectedItemIndex])))
                             }
                         )
                     }
@@ -586,15 +588,15 @@ fun TimePicker(time: String, showDialog: (String) -> Unit) {
     }
 }
 
-data class AddIncubatorList(
-    val title: String,
-    val typeBirds: String,
-    val count: String,
-    val date1: String,
-    val time1: String,
-    val time2: String,
-    val time3: String,
-    val checkedStateAiring: Boolean,
-    val checkedStateOver: Boolean,
-    val imageDate : ByteArray
-)
+fun getByteArray(context : Context, type: String): ByteArray {
+    return when (type) {
+        "Курицы" -> getByteArrayFromDrawable(context, R.drawable.chicken)
+        "Гуси" -> getByteArrayFromDrawable(context, R.drawable.external_goose_birds_icongeek26_outline_icongeek26)
+        "Перепела" -> getByteArrayFromDrawable(context, R.drawable.quail)
+        "Утки" -> getByteArrayFromDrawable(context, R.drawable.duck)
+        "Индюки" -> getByteArrayFromDrawable(context, R.drawable.turkeycock)
+        else -> {
+            getByteArrayFromDrawable(context, R.drawable.chicken)
+        }
+    }
+}

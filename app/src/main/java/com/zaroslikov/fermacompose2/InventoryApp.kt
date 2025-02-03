@@ -283,7 +283,9 @@ fun TopAppBarStart(
 @Composable
 fun TopAppBarStart2(
     title: String,
-    infoBottomSheet: () -> Unit
+    infoBottomSheet: () -> Unit,
+    archiveButton: () -> Unit,
+    boolean: Boolean
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -293,6 +295,12 @@ fun TopAppBarStart2(
             Text(text = title)
         },
         actions = {
+            IconButton(onClick = archiveButton) {
+                Icon(
+                    painter = painterResource(id = if (boolean) R.drawable.baseline_unarchive_24 else R.drawable.baseline_archive_24),
+                    contentDescription = "Localized description",
+                )
+            }
             IconButton(onClick = infoBottomSheet) {
                 Icon(
                     imageVector = Icons.Filled.Info,
