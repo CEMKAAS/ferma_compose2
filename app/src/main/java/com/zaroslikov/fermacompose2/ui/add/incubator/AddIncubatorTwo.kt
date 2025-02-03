@@ -1779,24 +1779,6 @@ fun setIncubator(typeIncubator: String): MutableList<Incubator> {
     }
 }
 
-//fun AddIncubatorList.toIncubatorData(): ProjectTable = ProjectTable(
-//    id = 0,
-//    titleProject = title,
-//    type = typeBirds,
-//    data = date1,
-//    eggAll = count,
-//    eggAllEND = count,
-//    airing = checkedStateAiring.toString(), //todo че было раньше
-//    over = checkedStateOver.toString(),
-//    arhive = "0",
-//    dateEnd = "0",
-//    time1 = time1,
-//    time2 = time2,
-//    time3 = time3,
-//    mode = 0,
-//    imageData =
-//)
-
 fun setIdPT(list: MutableList<Incubator>, idPT: Long): MutableList<Incubator> {
     list.forEach {
         it.id = 0

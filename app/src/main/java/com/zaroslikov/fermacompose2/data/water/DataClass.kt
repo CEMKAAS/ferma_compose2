@@ -30,7 +30,7 @@ data class SaleUiState(val itemList: List<SaleTable> = listOf())
 data class ExpensesUiState(val itemList: List<ExpensesTable> = listOf())
 data class WriteOffUiState(val itemList: List<WriteOffTable> = listOf())
 
-data class ProjectTable2(
+data class ProjectTableStartScreen(
     val id: Int = 0,
     val titleProject: String, // название
     val data: String,  // Дата начала проекта

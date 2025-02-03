@@ -16,11 +16,6 @@
 
 package com.zaroslikov.fermacompose2.data
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -42,7 +37,6 @@ import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
-import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import com.zaroslikov.fermacompose2.ui.home.AnimalString
 import com.zaroslikov.fermacompose2.ui.home.PairString
@@ -50,9 +44,7 @@ import com.zaroslikov.fermacompose2.ui.warehouse.FastAdd
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Repository that provides insert, update, delete, and retrieve of [Item] from a given data source.
- */
+
 interface ItemsRepository {
     fun getAllItemsStream(id: Int): Flow<List<AddTable>>
     fun getItemStream(id: Int): Flow<AddTable?>
@@ -61,9 +53,7 @@ interface ItemsRepository {
     suspend fun getIncubatorListArh6(type: String): List<ProjectTable>
 
     fun getAllProject(): Flow<List<ProjectTable>>
-    fun getAllProjectArh(): Flow<List<ProjectTable>>
 
-    fun getAllProjectAct(): Flow<List<ProjectTable>>
     fun getProject(id: Int): Flow<ProjectTable>
     suspend fun updateProject(item: ProjectTable)
     suspend fun deleteProject(item: ProjectTable)

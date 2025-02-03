@@ -59,12 +59,6 @@ interface ItemDao {
     @Query("SELECT * from МyINCUBATOR")
     fun getAllProject(): Flow<List<ProjectTable>>
 
-    @Query("SELECT * from МyINCUBATOR Where ARHIVE = 1")
-    fun getAllProjectArh(): Flow<List<ProjectTable>>
-
-    @Query("SELECT * from МyINCUBATOR Where ARHIVE = 0")
-    fun getAllProjectAct(): Flow<List<ProjectTable>>
-
     @Query("SELECT * from МyINCUBATOR Where _id=:id")
     fun getProject(id: Int): Flow<ProjectTable>
 

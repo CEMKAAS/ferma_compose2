@@ -4,27 +4,20 @@ import android.graphics.BitmapFactory
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.water.ProjectTable2
+import com.zaroslikov.fermacompose2.data.water.ProjectTableStartScreen
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
-import com.zaroslikov.fermacompose2.ui.home.AddTableUiState
-import com.zaroslikov.fermacompose2.ui.home.toAddTableUiState
-import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -57,16 +50,8 @@ class StartScreenViewModel(
         }
     }
 
-    val getAllProjectArh: StateFlow<StartUiState> =
-        fermaRepository.getAllProjectArh().map { StartUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = StartUiState()
-            )
-
-    val getAllProjectAct: StateFlow<List<ProjectTable2>> =
-        fermaRepository.getAllProjectAct().map { projectList ->
+    val getAllProject: StateFlow<List<ProjectTableStartScreen>> =
+        fermaRepository.getAllProject().map { projectList ->
             projectList.map { project ->
                 project.toProjectWithImage()
             }
@@ -80,7 +65,7 @@ class StartScreenViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    private suspend fun ProjectTable.toProjectWithImage(): ProjectTable2 =
+    private suspend fun ProjectTable.toProjectWithImage(): ProjectTableStartScreen =
         withContext(Dispatchers.IO) {
             
             val imageBitmap = imageData.let {
@@ -101,7 +86,7 @@ class StartScreenViewModel(
                 "Идет ${TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1} день"
             } else data
 
-            ProjectTable2(
+            ProjectTableStartScreen(
                 id,
                 titleProject,
                 data,
@@ -112,5 +97,3 @@ class StartScreenViewModel(
             )
         }
 }
-
-data class StartUiState(val projectList: List<ProjectTable> = listOf())
