@@ -234,7 +234,7 @@ fun StartScreenContainer(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                items(items = projectList, key = { it.mode == 0 }) {
+                items(items = projectList, key = { it.id }) {
                     if (arhivBoolean && it.arhive == "1"  || !arhivBoolean && it.arhive == "0") {
                         CardFerma(
                             projectTable = it, modifier = Modifier

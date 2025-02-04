@@ -1,5 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.warehouse
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,10 +27,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
@@ -36,7 +42,10 @@ import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.add.ImageLazyRow
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
+import com.zaroslikov.fermacompose2.ui.add.uriToByteArray
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -103,11 +112,9 @@ fun WarehouseEditContainer(
     deleteInRoom: () -> Unit,
     onValueChange: (IncubatorProjectEditState) -> Unit = {},
 ) {
-
-
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     val datePickerState = rememberDatePickerState(
         selectableDates = PastOrPresentSelectableDates,
         initialSelectedDateMillis = dateLong(project.data)
@@ -126,7 +133,54 @@ fun WarehouseEditContainer(
         }
     }
 
+    val imageResources = listOf(
+        R.drawable.livestock,
+        R.drawable.icons_chicken_s,
+        R.drawable.icons_goat,
+        R.drawable.icons_cow,
+        R.drawable.icons_pig,
+        R.drawable.icons_sheep,
+        R.drawable.icons_hourse,
+        R.drawable.icons_rabbit,
+        R.drawable.icons_farming_pets,
+        R.drawable.icons_pets,
+        R.drawable.icons_plant,
+        R.drawable.icons_farming_1,
+        R.drawable.icons_farming_2,
+        R.drawable.baseline_add_photo_alternate_24
+    )
+
+    //Картинка
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            imageUri = uri
+            onValueChange(project.copy(imageData = uriToByteArray(context,imageUri)
+                ?: getByteArrayFromDrawable(context, R.drawable.livestock)))
+        }
+
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
+
+            Text(
+                text = "Выберите фото проекта:",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 10.sp
+            )
+
+            ImageLazyRow(
+                images = imageResources,
+                imageUri = imageUri,
+                onImageSelected = {
+                    onValueChange(project.copy(imageData = uriToByteArray(context,imageUri)
+                        ?: getByteArrayFromDrawable(context, R.drawable.livestock)))
+                },
+                onAddImageClicked = {
+                    launcher.launch("image/*")
+                }
+            )
 
         OutlinedTextField(
             value = project.titleProject,

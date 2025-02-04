@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -49,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -153,21 +155,36 @@ fun AddProjectContainer(
     }
 
     val imageResources = listOf(
-        R.drawable.baseline_cruelty_free_24,
-        R.drawable.chicken,
         R.drawable.livestock,
-        R.drawable.baseline_warehouse_24,
-        R.drawable.ic_ovos2
+        R.drawable.icons_chicken_s,
+        R.drawable.icons_goat,
+        R.drawable.icons_cow,
+        R.drawable.icons_pig,
+        R.drawable.icons_sheep,
+        R.drawable.icons_hourse,
+        R.drawable.icons_rabbit,
+        R.drawable.icons_farming_pets,
+        R.drawable.icons_pets,
+        R.drawable.icons_plant,
+        R.drawable.icons_farming_1,
+        R.drawable.icons_farming_2,
+        R.drawable.baseline_add_photo_alternate_24
     )
 
     //Картинка
     var byteArray by remember { mutableStateOf(byteArrayOf()) }
+
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             imageUri = uri
-            byteArray = (uriToByteArray(context,imageUri)?:getByteArrayFromDrawable(context, R.drawable.livestock))
+            byteArray = (uriToByteArray(context, imageUri) ?: getByteArrayFromDrawable(
+                context,
+                imageResources[0]
+            ))
         }
+
+
 
     Column(modifier = modifier.padding(5.dp, 5.dp)) {
         Text(
@@ -189,49 +206,6 @@ fun AddProjectContainer(
                 launcher.launch("image/*")
             }
         )
-
-        //        //Картинка
-//        var imageUri by remember { mutableStateOf<Uri?>(null) }
-//        val launcher =
-//            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-//                imageUri = uri
-//            }
-//
-//        val context = LocalContext.current
-//        val bitmap = remember { mutableStateOf<Bitmap?>(null) }
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//            imageUri?.let {
-//                if (Build.VERSION.SDK_INT < 28) {
-//                    bitmap.value = MediaStore.Images
-//                        .Media.getBitmap(context.contentResolver, it)
-//                } else {
-//                    val source = ImageDecoder.createSource(context.contentResolver, it)
-//                    bitmap.value = ImageDecoder.decodeBitmap(source)
-//                }
-//            }
-//
-//            if (imageUri == null) {
-//                Image(
-//                    painter = painterResource(R.drawable.baseline_add_photo_alternate_24),
-//                    contentDescription = null,
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier
-//                        .size(125.dp)
-//                        .clickable { launcher.launch("image/*") }
-//                )
-//            } else {
-//                bitmap.value?.let { btm ->
-//                    Image(
-//                        bitmap = btm.asImageBitmap(),
-//                        contentDescription = null,
-//                        contentScale = ContentScale.Crop,
-//                        modifier = Modifier
-//                            .size(125.dp)
-//                            .clickable { launcher.launch("image/*") }
-//                    )
-//                }
-//            }
-//        }
 
         OutlinedTextField(
             value = name,
@@ -304,7 +278,9 @@ fun AddProjectContainer(
                             time2 = "",
                             time3 = "",
                             mode = 1,
-                            imageData = byteArray
+                            imageData = if (byteArray.contentEquals(byteArrayOf()))
+                                getByteArrayFromDrawable(context, imageResources[0])
+                            else byteArray
                         )
                     )
                     val eventParameters: MutableMap<String, Any> = HashMap()
@@ -335,19 +311,20 @@ fun ImageLazyRow(
     val painter = rememberAsyncImagePainter(model = imageUri)
 
     LazyRow(modifier = Modifier.padding(16.dp)) {
+
         items(images.size) { index ->
             val image = images[index]
             SelectableImageWithIcon(
-                image = if (index == images.size - 1 && imageUri == null) painterResource(image) else if (index == images.size - 1 && imageUri != null) painter else painterResource(
-                    image
-                ),
+                image = if (index == images.size - 1 && imageUri == null) painterResource(image)
+                else if (index == images.size - 1 && imageUri != null) painter
+                else painterResource(image),
                 icon = {
                     Icon(
                         Icons.Default.CheckCircle,
                         contentDescription = "Selected",
-                        tint = Color.Green,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(36.dp)
                             .padding(4.dp)
                     )
                 },
@@ -372,20 +349,24 @@ fun SelectableImageWithIcon(
     Box(
         modifier = Modifier
             .size(100.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .clip(CircleShape)
+            .border(
+                width = if (isSelected) 3.dp else 2.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                shape = CircleShape
+            )
+        ,
         contentAlignment = Alignment.BottomEnd
     ) {
+       
         Image(
             painter = image,
             contentDescription = null,
             modifier = Modifier
-                .fillMaxSize()
-                .clip(CircleShape)
-                .border(
-                    width = if (isSelected) 2.dp else 1.dp,
-                    color = if (isSelected) Color.Green else Color.Black,
-                    shape = CircleShape
-                )
+                .fillMaxSize(0.8f)
+//                .align(Alignment.Center)
+
         )
         if (isSelected) {
             icon() // Отображаем значок, если элемент выбран
@@ -491,6 +472,6 @@ fun uriToByteArray(context: Context, uri: Uri?): ByteArray? {
 
     // Преобразуем Bitmap в ByteArray
     val byteArrayOutputStream = ByteArrayOutputStream()
-    bitmap?.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 30, byteArrayOutputStream)
     return byteArrayOutputStream.toByteArray()
 }
