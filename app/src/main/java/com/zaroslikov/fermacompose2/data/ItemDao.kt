@@ -56,7 +56,7 @@ import java.time.YearMonth
 @Dao
 interface ItemDao {
 
-    @Query("SELECT * from МyINCUBATOR")
+    @Query("SELECT * from МyINCUBATOR ORDER BY ARHIVE ASC")
     fun getAllProject(): Flow<List<ProjectTable>>
 
     @Query("SELECT * from МyINCUBATOR Where _id=:id")

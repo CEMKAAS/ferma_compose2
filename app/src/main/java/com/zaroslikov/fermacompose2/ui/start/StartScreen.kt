@@ -5,8 +5,10 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,11 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -59,7 +64,6 @@ import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
 import com.zaroslikov.fermacompose2.ui.warehouse.newYearBoolean
 import io.appmetrica.analytics.AppMetrica
-
 
 
 object StartDestination : NavigationDestination {
@@ -86,6 +90,9 @@ fun StartScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showDialogTime by remember { mutableStateOf(false) }
     var arhivBoolean by remember { mutableStateOf(false) }
+
+    val isLoading by viewModel.isLoading.collectAsState()
+
 
 
     if (showDialogTime) {
@@ -125,17 +132,28 @@ fun StartScreen(
             )
         }
     ) { innerPadding ->
-        StartScreenContainer(
-            modifier = Modifier.padding(innerPadding),
-            projectList = projectList,
-            navigateToItemProject = navigateToItemProject,
-            navigateToItemIncubator = navigateToItemIncubator,
-            navigateToItemProjectArh = navigateToItemProjectArh,
-            navigateToItemIncubatorArh = navigateToItemIncubatorArh,
-            navigationToNewYear = { navigationToNewYear(Pair(false, 0)) },
-            navController = navController,
-            arhivBoolean = arhivBoolean
-        )
+        if (isLoading) {
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            StartScreenContainer(
+                modifier = Modifier.padding(innerPadding),
+                projectList = projectList,
+                navigateToItemProject = navigateToItemProject,
+                navigateToItemIncubator = navigateToItemIncubator,
+                navigateToItemProjectArh = navigateToItemProjectArh,
+                navigateToItemIncubatorArh = navigateToItemIncubatorArh,
+                navigationToNewYear = { navigationToNewYear(Pair(false, 0)) },
+                navController = navController,
+                arhivBoolean = arhivBoolean
+            )
+        }
 
         if (infoBottomSheet) {
             InfoBottomSheet(
@@ -158,7 +176,6 @@ fun StartScreen(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StartScreenContainer(
     modifier: Modifier,
@@ -172,11 +189,51 @@ fun StartScreenContainer(
     arhivBoolean: Boolean
 ) {
 
-//    LaunchedEffect(unit) {
-//        pagerState.animateScrollToPage(state)
-//    }
+    if (projectList.isNotEmpty()) {
+        Column(modifier = modifier) {
 
-    if (projectList.isEmpty()) {
+            if (newYearBoolean()) {
+                Button(
+                    onClick = {
+                        navigationToNewYear()
+                        AppMetrica.reportEvent("Итоги года общий")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp, horizontal = 15.dp)
+                ) {
+                    Text(text = "Итоги года!")
+                }
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                items(items = projectList, key = { it.id }) {
+                    if (arhivBoolean && it.arhive == "1" || !arhivBoolean && it.arhive == "0") {
+                        CardFerma(
+                            projectTable = it, modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    when (it.arhive) {
+                                        "1" -> {
+                                            if (it.mode == 0) navigateToItemIncubatorArh(it.id)
+                                            else navigateToItemProjectArh(it.id)
+                                        }
+
+                                        "0" -> {
+                                            if (it.mode == 0) navigateToItemIncubator(it.id)
+                                            else navigateToItemProject(it.id)
+                                        }
+                                    }
+                                }
+                        )
+                    }
+                }
+            }
+        }
+    } else {
         Column(modifier = modifier.padding(10.dp)) {
             Text(
                 text = "Добро пожаловать!\nМое Хозяйство 2",
@@ -213,49 +270,6 @@ fun StartScreenContainer(
                 Text(text = "Добавить проект!")
             }
         }
-    } else {
-        Column(modifier = modifier) {
-
-            if (newYearBoolean()) {
-                Button(
-                    onClick = {
-                        navigationToNewYear()
-                        AppMetrica.reportEvent("Итоги года общий")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp, horizontal = 15.dp)
-                ) {
-                    Text(text = "Итоги года!")
-                }
-            }
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                items(items = projectList, key = { it.id }) {
-                    if (arhivBoolean && it.arhive == "1"  || !arhivBoolean && it.arhive == "0") {
-                        CardFerma(
-                            projectTable = it, modifier = Modifier
-                                .padding(8.dp)
-                                .clickable {
-                                    when (it.arhive) {
-                                        "1" -> {
-                                            if (it.mode == 0) navigateToItemIncubatorArh(it.id)
-                                            else navigateToItemProjectArh(it.id)
-                                        }
-                                        "0" -> {
-                                            if (it.mode == 0) navigateToItemIncubator(it.id)
-                                            else navigateToItemProject(it.id)
-                                        }
-                                    }
-                                }
-                        )
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -285,8 +299,8 @@ fun CardFerma(
                 .padding(vertical = 5.dp, horizontal = 5.dp)
         )
         Text(
-            text = if (projectTable.arhive == "0") projectTable.data else "Завершен"
-            , fontSize = 15.sp,
+            text = if (projectTable.arhive == "0") projectTable.data else "Завершен",
+            fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 5.dp)

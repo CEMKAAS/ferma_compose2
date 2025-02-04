@@ -12,9 +12,12 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.water.ProjectTableStartScreen
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,6 +30,9 @@ class StartScreenViewModel(
     private val fermaRepository: ItemsRepository,
     private val waterRepository: WaterRepository
 ) : ViewModel() {
+
+    private var _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     var time by mutableStateOf("")
 
@@ -55,7 +61,14 @@ class StartScreenViewModel(
             projectList.map { project ->
                 project.toProjectWithImage()
             }
-        }.stateIn(
+        }.onStart {
+            // Устанавливаем состояние загрузки перед началом загрузки данных
+            _isLoading.value = true
+        }.onEach {
+            // Отключаем состояние загрузки после завершения загрузки данных
+            _isLoading.value = false
+        }
+            .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = emptyList()

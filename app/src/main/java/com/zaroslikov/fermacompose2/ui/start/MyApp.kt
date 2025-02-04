@@ -18,7 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
@@ -88,14 +90,14 @@ fun DrawerSheet(
     ModalDrawerSheet {
         drawerItems.forEach {
             NavigationDrawerItem(
-                label = { Text(text = it.text) },
+                label = { Text(text = it.text, fontSize = if (it.icon == R.drawable.baseline_arrow_back_24) 20.sp
+                else TextUnit.Unspecified )},
                 selected = it == selectedItem,
                 icon = {
                     Image(painter = painterResource(id = it.icon), contentDescription = it.text)
                 },
                 onClick = {
                     selectedItem = it
-
                     scope.launch {
                         if (it.route == StartDestination.route) {
                             navigateToStart()

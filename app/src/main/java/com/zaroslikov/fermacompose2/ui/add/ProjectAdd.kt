@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -310,7 +311,7 @@ fun ImageLazyRow(
 
     val painter = rememberAsyncImagePainter(model = imageUri)
 
-    LazyRow(modifier = Modifier.padding(16.dp)) {
+    LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
 
         items(images.size) { index ->
             val image = images[index]
@@ -346,28 +347,32 @@ fun SelectableImageWithIcon(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+
     Box(
         modifier = Modifier
+            .wrapContentSize()
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        Box(modifier = Modifier
             .size(100.dp)
-            .clickable(onClick = onClick)
             .clip(CircleShape)
             .border(
                 width = if (isSelected) 3.dp else 2.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = 0.5f
+                ),
                 shape = CircleShape
             )
-        ,
-        contentAlignment = Alignment.BottomEnd
-    ) {
-       
-        Image(
-            painter = image,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize(0.8f)
-//                .align(Alignment.Center)
-
-        )
+        ) {
+            Image(
+                painter = image,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize(0.75f)
+                    .align(Alignment.Center)
+            )
+        }
         if (isSelected) {
             icon() // Отображаем значок, если элемент выбран
         }
