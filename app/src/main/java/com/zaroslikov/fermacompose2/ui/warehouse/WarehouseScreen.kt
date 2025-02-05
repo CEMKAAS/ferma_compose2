@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -18,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -25,6 +30,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -36,9 +43,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -64,6 +73,7 @@ import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffTableInsert
 import io.appmetrica.analytics.AppMetrica
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -289,16 +299,12 @@ private fun WarehouseInventoryList(
             onClick = { fastAddBoolean = !fastAddBoolean },
             title = "Быстрое добавление",
         )
-        LazyRow {
+        LazyRow (verticalAlignment = Alignment.CenterVertically) {
             if (fastAddBoolean) {
                 items(items = itemFastAddList) { item ->
                     FastAddCard(
                         fastAdd = item,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .clickable {
-                                fastAddButton(item)
-                            }
+                        onClick = { fastAddButton(item) },
                     )
                 }
             }
@@ -562,7 +568,8 @@ fun TextButtonWarehouse(
     title: String,
 ) {
     TextButton(
-        onClick = onClick
+        onClick = onClick,
+        modifier = Modifier.wrapContentHeight()
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -578,7 +585,7 @@ fun TextButtonWarehouse(
                 contentDescription = "Показать меню",
                 modifier = Modifier
                     .padding(start = 3.dp)
-                    .fillMaxSize(0.1f)
+                    .fillMaxWidth(0.1f)
             )
             Text(
                 text = title,
@@ -601,56 +608,60 @@ fun TextButtonWarehouse(
 @Composable
 fun FastAddCard(
     fastAdd: FastAdd,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit = {}
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .wrapContentHeight(),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-
-        Column(
-            modifier = Modifier.wrapContentWidth()
-        ) {
-            Text(
-                text = "${fastAdd.title} - ${formatter(fastAdd.disc)}",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
+    var selected by rememberSaveable { mutableStateOf(false) }
+    if (selected) {
+        LaunchedEffect(Unit) {
+            delay(2000) // Задержка в 2000 миллисекунд (2 секунды)
+            selected = false 
         }
-
-        Text(
-            text = "Категория: ${fastAdd.category}",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(6.dp)
-                .fillMaxWidth(),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp
-        )
-
-        Text(
-            text = "Животное: ${fastAdd.animal}",
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(6.dp)
-                .fillMaxWidth(),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp
-        )
-//        }
     }
+    Spacer(modifier = Modifier.width(8.dp))
+    FilterChip(
+        selected = selected,
+        label = {
+            Column(
+                modifier = Modifier.padding(3.dp)
+            ) {
+                Text(
+                    text = fastAdd.title,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "${formatter(fastAdd.disc)} ${fastAdd.suffix}",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp
+                )
+                if (fastAdd.category == "" || fastAdd.category == "Без категории")
+                    else Text(
+                        text = fastAdd.category,
+                        modifier = Modifier
+                            .padding(top = 2.dp),
+                        fontSize = 10.sp
+                    )
+                
+                if (fastAdd.animal != "") {
+                    Text(
+                        text = fastAdd.animal,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = if (selected) Icons.Filled.Done else Icons.Filled.Add,
+                contentDescription = "Done icon",
+                modifier = Modifier.size(FilterChipDefaults.IconSize)
+            )
+        },
+        onClick = {
+            onClick()
+            selected = true
+        }
+    )
 }
 
 
@@ -677,6 +688,6 @@ data class AnalysisNav(
 @Preview
 @Composable
 fun FastPrewie() {
-//    FastAddCard(fastAdd = FastAdd("Яйцо", 10.0, "time", 0, "Borya", 5))
+//    FastAddCard(fastAdd = FastAdd("Молоко", 10.0, "Шт.", "Без категории", 0, "Несушка", 5))
     TextButtonWarehouse(onClick = {},true, "Быстрое добавление")
 }

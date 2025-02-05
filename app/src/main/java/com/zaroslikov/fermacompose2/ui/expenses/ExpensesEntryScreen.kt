@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
@@ -832,15 +833,11 @@ fun ExpensesEntryContainerProduct(
                                         }
                                     },
                                     label = { Text(animal.name) },
-                                    leadingIcon = if (selected) {
-                                        {
+                                    leadingIcon ={
                                             Icon(
-                                                imageVector = Icons.Filled.Done,
+                                                imageVector = if(selected) Icons.Filled.Done else Icons.Filled.Add,
                                                 contentDescription = "Done icon",
-                                                modifier = Modifier.size(FilterChipDefaults.IconSize)
-                                            )
-                                        }
-                                    } else null,
+                                                modifier = Modifier.size(FilterChipDefaults.IconSize)) },
                                     modifier = Modifier
                                         .padding(horizontal = 10.dp)
                                 )

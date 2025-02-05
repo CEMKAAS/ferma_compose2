@@ -93,8 +93,6 @@ fun StartScreen(
 
     val isLoading by viewModel.isLoading.collectAsState()
 
-
-
     if (showDialogTime) {
         TimePicker(time = if (viewModel.time == "") "20:00" else viewModel.time, showDialog = {
             viewModel.onUpdate(time1 = it)

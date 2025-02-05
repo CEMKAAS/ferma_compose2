@@ -273,45 +273,44 @@ fun BrieflyPriceCard(
     var expanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable {
+            expanded = !expanded
+        },
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .padding(6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Text(
-                text = product.title,
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = "${formatter(product.count)} ${product.suffix}\n за \n${
-                    formatter(
-                        product.price
-                    )
-                } ₽",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(0.3f),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
+                    .fillMaxWidth(0.8f)
+            ) {
+                Text(
+                    text = product.title,
+                    modifier = Modifier
+                        .padding(6.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp
+                )
+                Text(
+                    text = "${formatter(product.count)} ${product.suffix} " +
+                            "за ${formatter(product.price)} ₽",
+                    modifier = Modifier
+                        .padding(6.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp
+                )
+            }
             IconButton(onClick = { expanded = !expanded }) {
                 Icon(
                     if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Показать меню",
-                    modifier = Modifier
-                        .fillMaxWidth(1f)
+                    contentDescription = "Показать меню"
                 )
             }
         }
