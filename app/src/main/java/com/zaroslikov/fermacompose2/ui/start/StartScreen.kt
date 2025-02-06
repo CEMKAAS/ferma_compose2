@@ -2,7 +2,6 @@ package com.zaroslikov.fermacompose2.ui.start
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,12 +84,13 @@ fun StartScreen(
     viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val projectList by viewModel.getAllProject.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     var infoBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showDialogTime by remember { mutableStateOf(false) }
     var arhivBoolean by remember { mutableStateOf(false) }
 
-    val isLoading by viewModel.isLoading.collectAsState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     if (showDialogTime) {
         TimePicker(time = if (viewModel.time == "") "20:00" else viewModel.time, showDialog = {

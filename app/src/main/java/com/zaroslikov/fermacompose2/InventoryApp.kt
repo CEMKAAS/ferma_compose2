@@ -36,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
@@ -51,9 +52,6 @@ import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-/**
- * Top level composable that represents screens for the application.
- */
 @Composable
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
@@ -285,15 +283,17 @@ fun TopAppBarStart2(
     title: String,
     infoBottomSheet: () -> Unit,
     archiveButton: () -> Unit,
-    boolean: Boolean
+    boolean: Boolean,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    CenterAlignedTopAppBar(
+    TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
             Text(text = title)
         },
+        scrollBehavior = scrollBehavior,
         actions = {
             IconButton(onClick = archiveButton) {
                 Icon(

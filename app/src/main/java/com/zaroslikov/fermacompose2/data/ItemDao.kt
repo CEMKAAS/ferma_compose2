@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.data
 
 import androidx.room.Dao
@@ -116,21 +100,15 @@ interface ItemDao {
     @Query("SELECT * from MyFerma Where _id=:id")
     fun getItemAdd(id: Int): Flow<AddTable>
 
-    @Query("SELECT title as title, SUM(disc) as count, suffix from MyFerma Where idPT=:id group by title ORDER BY price DESC")
+    @Query("SELECT title as title, SUM(disc) as count, suffix from MyFerma Where idPT=:id group by title ORDER BY count DESC")
     fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
 
     @Query("SELECT * from MyFerma Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
     fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
 
-    @Query("SELECT MyFerma.Title from MyFerma Where idPT=:id group by MyFerma.Title ")
+    @Query("SELECT MyFerma.Title from MyFerma Where idPT=:id group by MyFerma.Title ORDER BY MAX(MyFerma._id) DESC")
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
 
-    @Query(
-        "SELECT Title as name, 'Моя Продукция' as type from MyFerma Where idPT=:id group by MyFerma.Title  " +
-                " UNION ALL" +
-                " SELECT titleEXPENSES as name, 'Купленый товар' as type from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 group by titleEXPENSES "
-    )
-    fun getItemsWriteoffList(id: Int): Flow<List<PairString>>
 
     @Query("SELECT MyFerma.category from MyFerma Where idPT=:id group by MyFerma.category ")
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
@@ -215,7 +193,7 @@ interface ItemDao {
     @Query("SELECT idAnimal from ExpensesAnimalTable Where idExpenses=:id")
     suspend fun getItemExpensesAnimal(id: Int): List<Long>
 
-    @Query("SELECT MyFermaEXPENSES.titleEXPENSES from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.titleEXPENSES")
+    @Query("SELECT MyFermaEXPENSES.titleEXPENSES from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.titleEXPENSES ORDER BY MAX(MyFermaEXPENSES._id) DESC")
     fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
 
     @Query("SELECT MyFermaEXPENSES.category from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.category")
@@ -280,7 +258,7 @@ interface ItemDao {
     @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day) ) DESC")
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
 
-    @Query("SELECT * from MyFermaWRITEOFF Where _id=:id")
+    @Query("SELECT * from MyFermaWRITEOFF Where _id=:id ")
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
 
     @Query("SELECT titleWRITEOFF as title, SUM(discWRITEOFF) as count, suffix from MyFermaWRITEOFF Where idPT=:id group by title ORDER BY count DESC")
@@ -288,6 +266,13 @@ interface ItemDao {
 
     @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
+
+    @Query(
+        "SELECT Title as name, 'Моя Продукция' as type from MyFerma Where idPT=:id group by MyFerma.Title" +
+                " UNION ALL" +
+                " SELECT titleEXPENSES as name, 'Купленый товар' as type from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 group by titleEXPENSES "
+    )
+    fun getItemsWriteoffList(id: Int): Flow<List<PairString>>
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
