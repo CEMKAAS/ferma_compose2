@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.warehouse
 
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,6 +55,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -294,18 +297,20 @@ private fun WarehouseInventoryList(
     Column(
         modifier = Modifier.padding(contentPadding)
     ) {
-        TextButtonWarehouse(
-            boolean = fastAddBoolean,
-            onClick = { fastAddBoolean = !fastAddBoolean },
-            title = "Быстрое добавление",
-        )
-        LazyRow (verticalAlignment = Alignment.CenterVertically) {
-            if (fastAddBoolean) {
-                items(items = itemFastAddList) { item ->
-                    FastAddCard(
-                        fastAdd = item,
-                        onClick = { fastAddButton(item) },
-                    )
+        if (itemFastAddList.isNotEmpty()) {
+            TextButtonWarehouse(
+                boolean = fastAddBoolean,
+                onClick = { fastAddBoolean = !fastAddBoolean },
+                title = "Быстрое добавление",
+            )
+            LazyRow(verticalAlignment = Alignment.CenterVertically) {
+                if (fastAddBoolean) {
+                    items(items = itemFastAddList) { item ->
+                        FastAddCard(
+                            fastAdd = item,
+                            onClick = { fastAddButton(item) },
+                        )
+                    }
                 }
             }
         }
@@ -523,7 +528,21 @@ fun WarehouseExpensesCard(
     warehouseProduct: WarehouseData,
     modifier: Modifier = Modifier
 ) {
-    Card(
+//    Card(
+//        modifier = modifier,
+//        elevation = CardDefaults.cardElevation(2.dp),
+//        colors = CardDefaults.cardColors()
+//    )
+
+//    OutlinedCard(
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colorScheme.surface,
+//        ),
+//        border = BorderStroke(2.dp, CardDefaults.cardColors().containerColor),
+//        modifier = modifier
+//    )
+
+        Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
@@ -685,9 +704,9 @@ data class AnalysisNav(
 )
 
 
-@Preview
-@Composable
-fun FastPrewie() {
-//    FastAddCard(fastAdd = FastAdd("Молоко", 10.0, "Шт.", "Без категории", 0, "Несушка", 5))
-    TextButtonWarehouse(onClick = {},true, "Быстрое добавление")
-}
+//@Preview
+//@Composable
+//fun FastPrewie() {
+////    FastAddCard(fastAdd = FastAdd("Молоко", 10.0, "Шт.", "Без категории", 0, "Несушка", 5))
+//    TextButtonWarehouse(onClick = {},true, "Быстрое добавление")
+//}

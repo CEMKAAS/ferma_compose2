@@ -191,7 +191,6 @@ fun SaleEntryContainerProduct(
         return !(isErrorTitle || isErrorCount || isErrorPrice)
     }
 
-
     //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
@@ -213,7 +212,6 @@ fun SaleEntryContainerProduct(
             openDialog = false
         }
     }
-
 
     Column(modifier = modifier) {
         Box {
@@ -258,16 +256,13 @@ fun SaleEntryContainerProduct(
                     )
                 )
 
-
                 val filteredOptions =
                     titleList.filter { it.name.contains(title, ignoreCase = true) }
 
                 if (filteredOptions.isNotEmpty()) {
                     ExposedDropdownMenu(
                         expanded = expanded,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
+                        onDismissRequest = {}
                     ) {
                         filteredOptions.forEachIndexed { index, item ->
                             DropdownMenuItem(
@@ -280,11 +275,10 @@ fun SaleEntryContainerProduct(
                                 onClick = {
                                     selectedItemIndex = index
                                     title = item.name
+                                    validateTitle(title)
                                     expanded = false
-                                    countWarehouseBoolean =
-                                        item.type == "Моя Продукция" || item.type == "Купленный товар"
+                                    countWarehouseBoolean = item.type == "Моя Продукция" || item.type == "Купленный товар"
                                     updateCountWarehouse(Pair(title, item.type))
-
                                 }
                             )
                         }
@@ -299,7 +293,6 @@ fun SaleEntryContainerProduct(
                 modifier = Modifier.padding(2.dp)
             )
         }
-
 
         Box {
             OutlinedTextField(

@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -76,6 +77,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.start.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import io.appmetrica.analytics.AppMetrica
@@ -235,10 +237,11 @@ fun ExpensesEntryContainerProduct(
         isErrorDailyExpensesFood = dailyExpensesFoodUI == ""
         isErrorСountAnimalUI = countAnimalUI == ""
 
-        return if (setDailyExpensesFoodAndCountUI){
+        return if (setDailyExpensesFoodAndCountUI) {
             !(isErrorTitle || isErrorCount || isErrorPrice || isErrorСountAnimalUI || isErrorDailyExpensesFood)
         } else !(isErrorTitle || isErrorCount || isErrorPrice)
     }
+
 
     //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
@@ -269,6 +272,24 @@ fun ExpensesEntryContainerProduct(
     }
     var selectedFilters2 = remember { mutableStateMapOf<Long, Double>() }
     val focusManager = LocalFocusManager.current
+
+    //Подсказки
+    var openAlertFood by remember { mutableStateOf(false) }
+    var openAlertWarehouse by remember { mutableStateOf(false) }
+    var openAlertAnimal by remember { mutableStateOf(false) }
+
+    if (openAlertFood) {
+        AlertDialogInfo(onConfirmation = { openAlertFood = false }, dialogTitle = "Корм", dialogText ="")
+    }
+
+    if (openAlertWarehouse) {
+        AlertDialogInfo(onConfirmation = { openAlertWarehouse = false }, dialogTitle = "Склад", dialogText ="")
+    }
+
+    if (openAlertAnimal) {
+        AlertDialogInfo(onConfirmation = { openAlertAnimal = false }, dialogTitle = "Животные", dialogText ="")
+    }
+
 
     // Начало дизайна
     Column(modifier = modifier) {
@@ -588,6 +609,13 @@ fun ExpensesEntryContainerProduct(
                     )
                     Text(text = "Корм")
 
+                    IconButton(onClick = { openAlertFood = !openAlertFood }) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Показать меню"
+                        )
+                    }
+
                     if (showFoodUI && (count != "")) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -627,7 +655,16 @@ fun ExpensesEntryContainerProduct(
                             false
                         } else true
                     )
+
                     Text(text = "Отображать на складе")
+
+                    IconButton(onClick = { openAlertWarehouse = !openAlertWarehouse }) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Показать меню"
+                        )
+                    }
+
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -643,6 +680,13 @@ fun ExpensesEntryContainerProduct(
                         } else true
                     )
                     Text(text = "Распределить расходы по животным")
+
+                    IconButton(onClick = { openAlertAnimal = !openAlertAnimal }) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Показать меню"
+                        )
+                    }
                 }
             }
 
@@ -833,11 +877,13 @@ fun ExpensesEntryContainerProduct(
                                         }
                                     },
                                     label = { Text(animal.name) },
-                                    leadingIcon ={
-                                            Icon(
-                                                imageVector = if(selected) Icons.Filled.Done else Icons.Filled.Add,
-                                                contentDescription = "Done icon",
-                                                modifier = Modifier.size(FilterChipDefaults.IconSize)) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = if (selected) Icons.Filled.Done else Icons.Filled.Add,
+                                            contentDescription = "Done icon",
+                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                        )
+                                    },
                                     modifier = Modifier
                                         .padding(horizontal = 10.dp)
                                 )
