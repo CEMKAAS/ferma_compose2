@@ -67,9 +67,6 @@ object FinanceDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinanceScreen(
@@ -459,7 +456,7 @@ fun CardFinace(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        border = BorderStroke(2.dp, Color(0xFFE0E3D4)),
+        border = BorderStroke(2.dp, CardDefaults.cardColors().containerColor),
         modifier = Modifier
             .padding(2.dp)
             .fillMaxWidth(float)

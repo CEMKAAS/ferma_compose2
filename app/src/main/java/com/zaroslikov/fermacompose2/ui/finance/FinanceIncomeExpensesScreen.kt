@@ -188,7 +188,6 @@ private fun FinanceIncomeExpensesInventoryList(
             }
         }
 
-
         if (!boolean) {
             if (animalList.isNotEmpty()) {
                 item {
@@ -208,8 +207,6 @@ private fun FinanceIncomeExpensesInventoryList(
                 }
             }
         }
-
-
     }
 }
 

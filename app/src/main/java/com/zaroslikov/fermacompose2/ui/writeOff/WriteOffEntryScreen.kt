@@ -143,22 +143,22 @@ fun WriteOffEntryContainerProduct(
     countWarehouse: Double,
     updateCountWarehouse: (Pair<String, Boolean>) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var count by rememberSaveable { mutableStateOf("0") }
-    var state by remember { mutableStateOf(true) }
-    var suffix by remember { mutableStateOf("Шт.") }
-    var priceAll by remember { mutableStateOf("0") }
-    var note by remember { mutableStateOf("") }
+    var title by rememberSaveable { mutableStateOf("") }
+    var count by rememberSaveable { mutableStateOf("") }
+    var state by rememberSaveable { mutableStateOf(true) }
+    var suffix by rememberSaveable { mutableStateOf("Шт.") }
+    var priceAll by rememberSaveable { mutableStateOf("") }
+    var note by rememberSaveable { mutableStateOf("") }
 
-    var expanded by remember { mutableStateOf(false) }
-    var expandedSuf by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var expandedSuf by rememberSaveable { mutableStateOf(false) }
 
     var isErrorPrice by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
 
-    var selectedItemIndex by remember { mutableIntStateOf(0) }
+    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     fun validatePrice(text: String) {
         isErrorPrice = text == ""

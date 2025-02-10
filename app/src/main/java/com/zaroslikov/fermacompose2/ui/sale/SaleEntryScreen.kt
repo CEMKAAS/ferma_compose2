@@ -149,19 +149,20 @@ fun SaleEntryContainerProduct(
     countWarehouse: Double,
     updateCountWarehouse: (Pair<String, String>) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
+    var title by rememberSaveable { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
-    var category by remember { mutableStateOf("Без категории") }
-    var suffix by remember { mutableStateOf("Шт.") }
-    var priceAll by remember { mutableStateOf("") }
-    var buyer by remember { mutableStateOf("Неизвестный") }
-    var note by remember { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf("Без категории") }
+    var suffix by rememberSaveable { mutableStateOf("Шт.") }
+    var priceAll by rememberSaveable { mutableStateOf("") }
+    var buyer by rememberSaveable { mutableStateOf("Неизвестный") }
+    var note by rememberSaveable { mutableStateOf("") }
 
-    var expanded by remember { mutableStateOf(false) }
-    var expandedSuf by remember { mutableStateOf(false) }
-    var expandedCat by remember { mutableStateOf(false) }
-    var expandedBuy by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var expandedSuf by rememberSaveable { mutableStateOf(false) }
+    var expandedCat by rememberSaveable { mutableStateOf(false) }
+    var expandedBuy by rememberSaveable { mutableStateOf(false) }
 
+    // Ошибки
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
     var isErrorPrice by rememberSaveable { mutableStateOf(false) }

@@ -75,6 +75,7 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.start.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import io.appmetrica.analytics.AppMetrica
 import java.text.SimpleDateFormat
@@ -171,28 +172,18 @@ fun FinanceAnalysisContainer(
     var openAlertDialogScrap by remember { mutableStateOf(false) }
 
     if (openAlertDialog) {
-        AlertDialogExample(
-            onDismissRequest = { openAlertDialog = false },
-            onConfirmation = {
-                openAlertDialog = false
-                println("Confirmation registered") // Add logic here to handle confirmation.
-            },
+        AlertDialogInfo(
+            onConfirmation = { openAlertDialog = false },
             dialogTitle = "Сэкономлено",
-            dialogText = "Сэкономлено - это сумма, которую вы сберегли, используя свой товар для личных нужд, вместо того чтобы покупать его в магазине.",
-            icon = Icons.Default.Info
+            dialogText = "Сэкономлено - это сумма, которую вы сберегли, используя свой товар для личных нужд, вместо того чтобы покупать его в магазине. Указывается в разделе \"Мои Списания\" -> \"На собственные нужды\"",
         )
     }
 
     if (openAlertDialogScrap) {
-        AlertDialogExample(
-            onDismissRequest = { openAlertDialogScrap = false },
-            onConfirmation = {
-                openAlertDialogScrap = false
-                println("Confirmation registered") // Add logic here to handle confirmation.
-            },
+        AlertDialogInfo(
+            onConfirmation = { openAlertDialogScrap = false },
             dialogTitle = "Потеряно",
-            dialogText = "Потеряно - это сумма денег за товар, которую вы потеряли, по каким либо причинам.",
-            icon = Icons.Default.Info
+            dialogText = "Потеряно - это сумма денег за товар, которую вы потеряли, по каким либо причинам. Указывается в разделе \"Мои Списания\" -> \"На утилизацию\"",
         )
     }
 
@@ -300,8 +291,10 @@ fun FinanceAnalysisContainer(
             modifierCard = modifierCard,
             modifierHeading = modifierHeading,
             modifierText = modifierText,
-            name = "Животные",
-            list = analysisAddAnimalAllTimeState
+            name = "Продукция от животных",
+            list = analysisAddAnimalAllTimeState,
+            dialogTitle = "Продукция от животных",
+            dialogText = ""
         ) { analysisAddAnimalAllTimeState ->
             "${if (analysisAddAnimalAllTimeState.title == "") "Не указано " else analysisAddAnimalAllTimeState.title} ${
                 formatter(
@@ -315,7 +308,9 @@ fun FinanceAnalysisContainer(
             modifierHeading = modifierHeading,
             modifierText = modifierText,
             name = "Покупатели",
-            list = analysisSaleBuyerAllTimeState
+            list = analysisSaleBuyerAllTimeState,
+            dialogTitle = "Покупатели",
+            dialogText = ""
         ) { analysisSaleBuyerAllTimeState ->
             "${if (analysisSaleBuyerAllTimeState.buyer == "") "Не указано " else analysisSaleBuyerAllTimeState.buyer} ${
                 formatter(
@@ -329,7 +324,9 @@ fun FinanceAnalysisContainer(
             modifierHeading = modifierHeading,
             modifierText = modifierText,
             name = "Себестоимость в расчете за 1 единицу",
-            list = analysisCostPriceAllTimeState
+            list = analysisCostPriceAllTimeState,
+            dialogTitle = "Себестоимость в расчете за 1 единицу",
+            dialogText = ""
         ) { analysisCostPriceAllTimeState ->
             "${if (analysisCostPriceAllTimeState.title == "") "Не указано " else "От ${analysisCostPriceAllTimeState.title}"} ${
                 formatter(
@@ -346,6 +343,8 @@ fun <T> PullOutCard(
     modifierHeading: Modifier,
     modifierText: Modifier,
     name: String,
+    dialogTitle:String,
+    dialogText:String,
     list: List<T>,
     itemToString: (T) -> String
 ) {
@@ -357,6 +356,15 @@ fun <T> PullOutCard(
             stiffness = Spring.StiffnessLow
         ), label = ""
     )
+    var openAlertDialog by remember { mutableStateOf(false) }
+
+    if (openAlertDialog) {
+        AlertDialogInfo(
+            onConfirmation = { openAlertDialog = false },
+            dialogTitle = dialogTitle,
+            dialogText = dialogText
+        )
+    }
 
     Card(
         modifier = modifierCard.padding(bottom = extraPadding.coerceAtLeast(0.dp))
@@ -368,11 +376,19 @@ fun <T> PullOutCard(
                 .fillMaxWidth()
         ) {
             Column {
+                Row (verticalAlignment = Alignment.CenterVertically){
+                    IconButton(onClick = { openAlertDialog =! openAlertDialog }) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Показать меню"
+                        )
+                    }
                 Text(
                     text = "$name:", modifier = modifierHeading,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
+            }
                 if (list.isNotEmpty()) {
                     for (i in list.indices) {
                         Text(

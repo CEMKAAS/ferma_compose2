@@ -528,17 +528,13 @@ fun WarehouseExpensesCard(
     warehouseProduct: WarehouseData,
     modifier: Modifier = Modifier
 ) {
-//    Card(
-//        modifier = modifier,
-//        elevation = CardDefaults.cardElevation(2.dp),
-//        colors = CardDefaults.cardColors()
-//    )
+
 
 //    OutlinedCard(
 //        colors = CardDefaults.cardColors(
 //            containerColor = MaterialTheme.colorScheme.surface,
 //        ),
-//        border = BorderStroke(2.dp, CardDefaults.cardColors().containerColor),
+//        border = BorderStroke(4.dp, CardDefaults.cardColors().containerColor),
 //        modifier = modifier
 //    )
 
@@ -546,7 +542,8 @@ fun WarehouseExpensesCard(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
-    ) {
+    )
+        {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

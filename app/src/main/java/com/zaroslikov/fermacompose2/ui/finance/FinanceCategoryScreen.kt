@@ -50,9 +50,6 @@ object FinanceCategoryDestination : NavigationDestination {
         "${FinanceCategoryDestination.route}/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgThree}/{$itemIdArgFour}/{$itemIdArgFive}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinanceCategoryScreen(

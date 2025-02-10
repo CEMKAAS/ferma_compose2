@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -132,21 +135,44 @@ fun AnimalCardContainer(
                     AppMetrica.reportEvent("Животные Вес")
                 }
             ) {
-                var i = 1
-                Text(
-                    text = "Вес", modifier = modifierHeading,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-                if (animalWeightTable.isNotEmpty()) {
-                    animalWeightTable.forEach {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.fillMaxWidth(0.85f)) {
+                        var i = 1
                         Text(
-                            text = "${i++}) ${it.weight} кг. на ${it.date}",
-                            modifier = modifierText
+                            text = "Вес", modifier = modifierHeading,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                        if (animalWeightTable.isNotEmpty()) {
+                            animalWeightTable.forEach {
+                                Text(
+                                    text = "${i++}) ${it.weight} кг. на ${it.date}",
+                                    modifier = modifierText
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = "Данных нет! Нажмите, чтобы добавить",
+                                modifier = modifierText
+                            )
+                        }
+                    }
+                    IconButton(
+                        onClick = {
+                            onNavigateIndicators(
+                                AnimalIndicators(
+                                    id = animalTable.id,
+                                    table = "Вес"
+                                )
+                            )
+                            AppMetrica.reportEvent("Животные Вес")
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_output_24),
+                            contentDescription = "Показать меню"
                         )
                     }
-                } else {
-                    Text(text = "Данных нет! Нажмите, чтобы добавить", modifier = modifierText)
                 }
             }
 
@@ -161,20 +187,48 @@ fun AnimalCardContainer(
                     AppMetrica.reportEvent("Животные Размер")
                 }
             ) {
-                var i = 1
-                Text(
-                    text = "Размер", modifier = modifierHeading,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-                if (animalSizeTable.isNotEmpty()) {
-                    animalSizeTable.forEach {
-                        Text(text = "${i++}) ${it.size} м. на ${it.date}", modifier = modifierText)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.fillMaxWidth(0.85f)) {
+                        var i = 1
+                        Text(
+                            text = "Размер", modifier = modifierHeading,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                        if (animalSizeTable.isNotEmpty()) {
+                            animalSizeTable.forEach {
+                                Text(
+                                    text = "${i++}) ${it.size} м. на ${it.date}",
+                                    modifier = modifierText
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = "Данных нет! Нажмите, чтобы добавить",
+                                modifier = modifierText
+                            )
+                        }
                     }
-                } else {
-                    Text(text = "Данных нет! Нажмите, чтобы добавить", modifier = modifierText)
+
+                    IconButton(
+                        onClick = {
+                            onNavigateIndicators(
+                                AnimalIndicators(
+                                    id = animalTable.id,
+                                    table = "Количество"
+                                )
+                            )
+                            AppMetrica.reportEvent("Животные Ко-во")
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_output_24),
+                            contentDescription = "Показать меню"
+                        )
+                    }
                 }
             }
+
         } else {
 
             Card(
@@ -182,27 +236,54 @@ fun AnimalCardContainer(
                     onNavigateIndicators(
                         AnimalIndicators(
                             id = animalTable.id,
-                            table = "Количество"
+                            table = "Размер"
                         )
                     )
-                    AppMetrica.reportEvent("Животные Ко-во")
+                    AppMetrica.reportEvent("Животные Размер")
                 }
             ) {
-                var i = 1
-                Text(
-                    text = "Количество", modifier = modifierHeading,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-                if (animalCountTable.isNotEmpty()) {
-                    animalCountTable.forEach {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.fillMaxWidth(0.85f)) {
+
+                        var i = 1
                         Text(
-                            text = "${i++}) ${formatter(it.count.toDouble())} шт. на ${it.date}",
-                            modifier = modifierText
+                            text = "Количество", modifier = modifierHeading,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+
+                        if (animalCountTable.isNotEmpty()) {
+                            animalCountTable.forEach {
+                                Text(
+                                    text = "${i++}) ${formatter(it.count.toDouble())} шт. на ${it.date}",
+                                    modifier = modifierText
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = "Данных нет! Нажмите, чтобы добавить",
+                                modifier = modifierText
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = {
+                            onNavigateIndicators(
+                                AnimalIndicators(
+                                    id = animalTable.id,
+                                    table = "Количество"
+                                )
+                            )
+                            AppMetrica.reportEvent("Животные Ко-во")
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_output_24),
+                            contentDescription = "Показать меню"
                         )
                     }
-                } else {
-                    Text(text = "Данных нет! Нажмите, чтобы добавить", modifier = modifierText)
+
                 }
             }
         }
@@ -218,36 +299,58 @@ fun AnimalCardContainer(
                 AppMetrica.reportEvent("Животные Прививки")
             }
         ) {
-            var i = 1
-            Text(
-                text = "Прививки:", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            if (animalVaccinationTable.isNotEmpty()) {
-                animalVaccinationTable.forEach {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "${i++}) ${it.vaccination}",
-                            modifier = modifierText.fillMaxWidth(0.6f)
-                        )
-                        Text(
-                            text = "${it.date} - ${it.nextVaccination}",
-                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 15.dp),
-                            textAlign = TextAlign.End
-                        )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.fillMaxWidth(0.85f)) {
+                    var i = 1
+                    Text(
+                        text = "Прививки:", modifier = modifierHeading,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
+                    )
+                    if (animalVaccinationTable.isNotEmpty()) {
+                        animalVaccinationTable.forEach {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "${i++}) ${it.vaccination}",
+                                    modifier = modifierText.fillMaxWidth(0.6f)
+                                )
+                                Text(
+                                    text = "${it.date} - ${it.nextVaccination}",
+                                    modifier = Modifier.padding(
+                                        vertical = 3.dp,
+                                        horizontal = 15.dp
+                                    ),
+                                    textAlign = TextAlign.End
+                                )
+                            }
+                        }
+                    } else {
+                        Text(text = "Нет добавленных прививок", modifier = modifierText)
                     }
                 }
-            } else {
-                Text(text = "Нет добавленных прививок", modifier = modifierText)
+                IconButton(
+                    onClick = {
+                        onNavigateIndicators(
+                            AnimalIndicators(
+                                id = animalTable.id,
+                                table = "Прививки"
+                            )
+                        )
+                        AppMetrica.reportEvent("Животные Прививки")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_output_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
             }
         }
-
 
         Card(
             modifier = modifierCard
@@ -302,6 +405,7 @@ fun AnimalCardContainer(
     }
 
 }
+
 
 data class AnimalIndicators(
     val id: Int,
