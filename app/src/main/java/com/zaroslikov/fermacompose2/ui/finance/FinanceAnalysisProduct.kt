@@ -174,7 +174,7 @@ fun FinanceAnalysisContainer(
     if (openAlertDialog) {
         AlertDialogInfo(
             onConfirmation = { openAlertDialog = false },
-            dialogTitle = "Сэкономлено",
+            dialogTitle = "Что такое \"Сэкономлено\"?",
             dialogText = "Сэкономлено - это сумма, которую вы сберегли, используя свой товар для личных нужд, вместо того чтобы покупать его в магазине. Указывается в разделе \"Мои Списания\" -> \"На собственные нужды\"",
         )
     }
@@ -182,7 +182,7 @@ fun FinanceAnalysisContainer(
     if (openAlertDialogScrap) {
         AlertDialogInfo(
             onConfirmation = { openAlertDialogScrap = false },
-            dialogTitle = "Потеряно",
+            dialogTitle = "Что такое \"Потеряно\"?",
             dialogText = "Потеряно - это сумма денег за товар, которую вы потеряли, по каким либо причинам. Указывается в разделе \"Мои Списания\" -> \"На утилизацию\"",
         )
     }
@@ -293,8 +293,8 @@ fun FinanceAnalysisContainer(
             modifierText = modifierText,
             name = "Продукция от животных",
             list = analysisAddAnimalAllTimeState,
-            dialogTitle = "Продукция от животных",
-            dialogText = ""
+            dialogTitle = "Что такое \"Продукция от животных\"?",
+            dialogText = "Этот блок показывает, сколько продукции произвело каждое животное. Данные появляются при добавлении животного при внесении продукции в \"Моя Продукция\"."
         ) { analysisAddAnimalAllTimeState ->
             "${if (analysisAddAnimalAllTimeState.title == "") "Не указано " else analysisAddAnimalAllTimeState.title} ${
                 formatter(
@@ -309,8 +309,8 @@ fun FinanceAnalysisContainer(
             modifierText = modifierText,
             name = "Покупатели",
             list = analysisSaleBuyerAllTimeState,
-            dialogTitle = "Покупатели",
-            dialogText = ""
+            dialogTitle = "Что такое \"Покупатели\"?",
+            dialogText = "Этот блок отображает, кто купил вашу продукцию, сколько было приобретено и на какую сумму за выбранный период. Данные появляются, если в разделе \"Мои Продажи\" выбрать данный товар и указать покупателя. "
         ) { analysisSaleBuyerAllTimeState ->
             "${if (analysisSaleBuyerAllTimeState.buyer == "") "Не указано " else analysisSaleBuyerAllTimeState.buyer} ${
                 formatter(
@@ -325,8 +325,8 @@ fun FinanceAnalysisContainer(
             modifierText = modifierText,
             name = "Себестоимость в расчете за 1 единицу",
             list = analysisCostPriceAllTimeState,
-            dialogTitle = "Себестоимость в расчете за 1 единицу",
-            dialogText = ""
+            dialogTitle = "Что такое \"Себестоимость в расчете за 1 единицу\"?",
+            dialogText = "Этот блок показывает, сколько затрат было произведено для получения 1 единицы товара. Расчет выполняется через животное: в разделе \"Мои Покупки\" укажите товар, выберите \"Корм\" или \"Распределить расходы по животным\" и назначьте животное, которое принесет данный товар. Затем в разделе \"Моя Продукция\" укажите данный товар и выберите это животное, чтобы в дальнейшем увидеть себестоимость продукции с учетом затрат."
         ) { analysisCostPriceAllTimeState ->
             "${if (analysisCostPriceAllTimeState.title == "") "Не указано " else "От ${analysisCostPriceAllTimeState.title}"} ${
                 formatter(

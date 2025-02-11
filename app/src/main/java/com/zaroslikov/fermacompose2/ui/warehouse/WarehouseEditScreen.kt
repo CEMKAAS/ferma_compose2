@@ -174,8 +174,7 @@ fun WarehouseEditContainer(
                 images = imageResources,
                 imageUri = imageUri,
                 onImageSelected = {
-                    onValueChange(project.copy(imageData = uriToByteArray(context,imageUri)
-                        ?: getByteArrayFromDrawable(context, R.drawable.livestock)))
+                    onValueChange(project.copy(imageData = getByteArrayFromDrawable(context, imageResources[it])))
                 },
                 onAddImageClicked = {
                     launcher.launch("image/*")
@@ -231,11 +230,7 @@ fun WarehouseEditContainer(
                 })
 
         Button(
-            onClick = {
-
-                saveInRoom(isErrorTitle)
-
-            }, modifier = Modifier
+            onClick = { saveInRoom(isErrorTitle) }, modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 15.dp)
         ) {

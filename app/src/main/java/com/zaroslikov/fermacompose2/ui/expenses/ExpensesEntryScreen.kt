@@ -279,15 +279,27 @@ fun ExpensesEntryContainerProduct(
     var openAlertAnimal by remember { mutableStateOf(false) }
 
     if (openAlertFood) {
-        AlertDialogInfo(onConfirmation = { openAlertFood = false }, dialogTitle = "Корм", dialogText ="")
+        AlertDialogInfo(
+            onConfirmation = { openAlertFood = false }, dialogTitle = "Что такое \"Корм\"?",
+            dialogText = "Выберите животное или укажите количество корма и его ежедневный расход, чтобы рассчитать запас на складе. Стоимость корма влияет на себестоимость продукции от животного (за 1 единицу)." +
+                    " Данные о запасе отображаются на складе для удобства контроля."
+        )
     }
 
     if (openAlertWarehouse) {
-        AlertDialogInfo(onConfirmation = { openAlertWarehouse = false }, dialogTitle = "Склад", dialogText ="")
+        AlertDialogInfo(
+            onConfirmation = { openAlertWarehouse = false },
+            dialogTitle = "Что такое \"Отображать на складе\"?",
+            dialogText = "При выборе этого пункта товар будет отображаться на складе. Его можно списать в \"Мои Списания\" или продать в \"Мои Продажи\", кроме товаров, отмеченных как \"Корм\" — их продажа недоступна."
+        )
     }
 
     if (openAlertAnimal) {
-        AlertDialogInfo(onConfirmation = { openAlertAnimal = false }, dialogTitle = "Животные", dialogText ="")
+        AlertDialogInfo(
+            onConfirmation = { openAlertAnimal = false },
+            dialogTitle = "Что такое \"Распределить расходы по животным\"?",
+            dialogText = "Вам нужно выбрать животное или несколько животных, а затем с помощью ползунков распределить сумму купленного товара. Распределенная сумма напрямую влияет на себестоимость произведенного товара (молока, яиц, мяса и т.д.) от этого животного в расчете за 1 единицу."
+        )
     }
 
 
