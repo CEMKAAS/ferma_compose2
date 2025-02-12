@@ -63,6 +63,11 @@ abstract class InventoryDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE MyFerma ADD COLUMN idAnimal INTEGER NOT NULL DEFAULT 0") }
                 //update
         }
+        
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE МyINCUBATOR ADD COLUMN imageData BLOG null") }
+        }
 
 
         fun getDatabase(context: Context): InventoryDatabase {
@@ -76,6 +81,7 @@ abstract class InventoryDatabase : RoomDatabase() {
                      */
                     .fallbackToDestructiveMigration()
                     .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_2_3)
                     .build()
                     .also { Instance = it }
             }

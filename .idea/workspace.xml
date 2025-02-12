@@ -10,11 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="35cfaaea-37a9-4a28-bf38-7617cc438d50" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/expenses/ExpensesEntryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/expenses/ExpensesEntryScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/FinanceAnalysisProduct.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/FinanceAnalysisProduct.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/WarehouseEditScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/WarehouseEditScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/InventoryDatabase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/InventoryDatabase.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/ferma/ProjectTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/ferma/ProjectTable.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +22,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[84JNW19225044044]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
