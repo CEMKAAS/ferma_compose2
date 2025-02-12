@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,19 +35,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.ImageLazyRow
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
 import com.zaroslikov.fermacompose2.ui.add.uriToByteArray
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.start.dateLong
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 
 object WarehouseEditDestination : NavigationDestination {
@@ -167,7 +164,7 @@ fun WarehouseEditContainer(
                     .fillMaxWidth()
                     .padding(vertical = 10.dp),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 10.sp
+                fontSize = 16.sp
             )
 
             ImageLazyRow(

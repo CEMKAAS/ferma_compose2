@@ -33,9 +33,10 @@ data class WriteOffUiState(val itemList: List<WriteOffTable> = listOf())
 data class ProjectTableStartScreen(
     val id: Int = 0,
     val titleProject: String, // название
+    val type:String,
     val data: String,  // Дата начала проекта
     var arhive: String,  //не архив = 0, Архив = 1
     val dateEnd: String,  // Конец проекта
     val mode: Int, //Инкубатор = 0, Хозяйство = 1
-    val imageData: ImageBitmap, // Изображение
+    val imageData: ImageBitmap?, // Изображение
 )

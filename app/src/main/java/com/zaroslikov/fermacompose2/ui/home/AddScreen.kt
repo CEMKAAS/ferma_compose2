@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -38,13 +40,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -54,7 +53,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +60,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
@@ -94,6 +92,8 @@ fun AddScreen(
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
@@ -138,19 +138,30 @@ fun AddScreen(
                 }
             },
         ) { innerPadding ->
-            AddBody(
-                itemList = homeUiState.itemList,
-                brieflyList = brieflyUiState.itemList,
-                viewModel = viewModel,
-                onItemClick = navigateToItemUpdate,
-                modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                navigateToItemAdd = { navigateToItemAdd(idProject) },
-                navigationToAnalysis = {
-                    navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
-                    AppMetrica.reportEvent("Анализ через Продукцию")
-                },
-            )
+            if (isLoading) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                AddBody(
+                    itemList = homeUiState.itemList,
+                    brieflyList = brieflyUiState.itemList,
+                    viewModel = viewModel,
+                    onItemClick = navigateToItemUpdate,
+                    modifier = modifier.fillMaxSize(),
+                    contentPadding = innerPadding,
+                    navigateToItemAdd = { navigateToItemAdd(idProject) },
+                    navigationToAnalysis = {
+                        navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
+                        AppMetrica.reportEvent("Анализ через Продукцию")
+                    }
+                )
+            }
         }
     }
 }

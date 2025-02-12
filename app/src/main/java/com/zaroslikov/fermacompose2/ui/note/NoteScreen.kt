@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.note
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,12 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -54,10 +53,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.NoteTable
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.sale.navigateId
-import com.zaroslikov.fermacompose2.ui.sale.navigateId2
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
@@ -81,6 +78,8 @@ fun NoteScreen(
     viewModel: NoteViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.noteUiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
@@ -125,13 +124,24 @@ fun NoteScreen(
                 }
             },
         ) { innerPadding ->
-            NoteBody(
-                itemList = homeUiState.itemList,
-                onItemClick = navigateToItemUpdate,
-                modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                navigateToItemAdd = {navigateToItemAdd(idProject)}
-            )
+            if (isLoading) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                NoteBody(
+                    itemList = homeUiState.itemList,
+                    onItemClick = navigateToItemUpdate,
+                    modifier = modifier.fillMaxSize(),
+                    contentPadding = innerPadding,
+                    navigateToItemAdd = { navigateToItemAdd(idProject) }
+                )
+            }
         }
     }
 }

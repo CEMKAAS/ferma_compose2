@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.sale
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -48,7 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,13 +58,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.home.AddProductCard
-import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatter
@@ -76,9 +74,6 @@ object SaleDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaleScreen(
@@ -92,6 +87,7 @@ fun SaleScreen(
 ) {
     val homeUiState by viewModel.saleUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -139,15 +135,26 @@ fun SaleScreen(
                 }
             }
         ) { innerPadding ->
-            SaleBody(
-                viewModel = viewModel,
-                itemList = homeUiState.itemList,
-                brieflyList = brieflyUiState.itemList,
-                onItemClick = navigateToItemUpdate,
-                modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                navigateToItemAdd = { navigateToItem(idProject) }
-            )
+            if (isLoading) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                SaleBody(
+                    viewModel = viewModel,
+                    itemList = homeUiState.itemList,
+                    brieflyList = brieflyUiState.itemList,
+                    onItemClick = navigateToItemUpdate,
+                    modifier = modifier.fillMaxSize(),
+                    contentPadding = innerPadding,
+                    navigateToItemAdd = { navigateToItem(idProject) }
+                )
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.animal
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,10 +21,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -39,8 +40,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -56,9 +55,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
-import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
@@ -83,6 +80,7 @@ fun AnimalScreen(
     viewModel: AnimalViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val animalUiState by viewModel.animalUiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -102,8 +100,6 @@ fun AnimalScreen(
 //            icon = Icons.Default.Info
 //        )
 //    }
-
-
 
 
     ModalNavigationDrawer(
@@ -146,13 +142,24 @@ fun AnimalScreen(
                 }
             }
         ) { innerPadding ->
-            AnimalBody(
-                itemList = animalUiState.itemList,
-                onItemClick = navigateToItemCard,
-                modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                navigateToItemAdd = {navigateToItemAdd(idProject)}
-            )
+            if (isLoading) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                AnimalBody(
+                    itemList = animalUiState.itemList,
+                    onItemClick = navigateToItemCard,
+                    modifier = modifier.fillMaxSize(),
+                    contentPadding = innerPadding,
+                    navigateToItemAdd = { navigateToItemAdd(idProject) }
+                )
+            }
         }
     }
 }

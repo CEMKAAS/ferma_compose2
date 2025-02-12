@@ -20,12 +20,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -42,7 +41,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,11 +49,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -65,10 +63,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonCustom
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextFieldCustom
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarEdit
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -90,18 +90,24 @@ fun AddProject(
     isFirstStart: Boolean,
     viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    AlterDialigStart(
-        isFirstStart = isFirstStart,
-        dialogTitle = "Установка проекта",
-        dialogText = "Придумайте оригинальное название для вашего проекта, например: \"Козоводство\" или \"Кролиководство\". Укажите дату начала проекта и нажмите \"Начать\".",
-        textAppMetrica = "Установка проекта"
-    )
 
     val coroutineScope = rememberCoroutineScope()
+
+    AlterDialigStart(
+        isFirstStart = isFirstStart,
+        dialogTitle = stringResource(R.string.project_add_screen_install_project),
+        dialogText = stringResource(R.string.project_add_screen_info),
+        textAppMetrica = stringResource(R.string.project_add_screen_install_project)
+    )
+
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Проект", navigateUp = navigateBack)
+            TopAppBarEdit(
+                title = stringResource(R.string.project_add_screen_create_project),
+                navigateUp = navigateBack
+            )
         }
+
     ) { innerPadding ->
         AddProjectContainer(
             modifier = Modifier.padding(innerPadding),
@@ -133,26 +139,23 @@ fun AddProjectContainer(
         selectableDates = PastOrPresentSelectableDates,
         initialSelectedDateMillis = calendar.timeInMillis
     )
+    var name by rememberSaveable{ mutableStateOf("") }
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
+
     fun validateTitle(text: String) {
         isErrorTitle = text == ""
     }
 
     //Текст
-    var name by remember { mutableStateOf("") }
+
     val context = LocalContext.current
 
     var date1 by remember { mutableStateOf(formattedDate) }
-    if (openDialog) {
-        DatePickerDialogSample(state, date1) { date ->
-            date1 = date
-            openDialog = false
-        }
-    }
+
     fun errorBoolean(): Boolean {
         isErrorTitle = name == ""
-        return !(isErrorTitle)
+        return (!isErrorTitle)
     }
 
     val imageResources = listOf(
@@ -194,7 +197,7 @@ fun AddProjectContainer(
                 .fillMaxWidth()
                 .padding(vertical = 10.dp),
             fontWeight = FontWeight.SemiBold,
-            fontSize = 10.sp
+            fontSize = 16.sp
         )
 
         ImageLazyRow(
@@ -205,27 +208,73 @@ fun AddProjectContainer(
             },
             onAddImageClicked = {
                 launcher.launch("image/*")
-            }
+            },
+            selectedImage = 0
         )
 
         OutlinedTextField(
             value = name,
             onValueChange = {
                 name = it
-                validateTitle(it)
+                validateTitle(name)
             },
-            label = { Text("Название") },
+            label = { Text(text = "Товар") },
             supportingText = {
                 if (isErrorTitle) {
                     Text(
-                        text = "Не указано название проекта",
+                        text = "Не указано имя товара",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else Text("Введите или выберите товар")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            isError = isErrorTitle,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                capitalization = KeyboardCapitalization.Sentences
+            )
+        )
+
+
+//
+//        OutlinedTextFieldCustom(
+//            value = name,
+//            onValueChange = {
+//                name = it
+//                validateTitle(name)
+//            },
+//            label = stringResource(R.string.project_add_screen_name_project),
+//            supportingText = stringResource(R.string.project_add_screen_name_project),
+//            isError = isErrorTitle,
+//            errorText = stringResource(R.string.project_add_screen_error_name_project),
+//            modifier = Modifier
+//                .padding(bottom = 2.dp),
+//            keyboardOptions = KeyboardOptions(
+//                imeAction = ImeAction.Next,
+//                capitalization = KeyboardCapitalization.Sentences
+//            )
+//        )
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = {
+                name = it
+                validateTitle(name)
+            },
+            label = { Text(stringResource(R.string.project_add_screen_name_project)) },
+            supportingText = {
+                if (isErrorTitle) {
+                    Text(
+                        text = stringResource(R.string.project_add_screen_error_name_project),
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text("Укажите название проекта")
+                    Text(stringResource(R.string.project_add_screen_name_project))
                 }
             },
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(bottom = 2.dp),
             isError = isErrorTitle,
@@ -235,14 +284,12 @@ fun AddProjectContainer(
             )
         )
 
-        OutlinedTextField(
+
+        OutlinedTextFieldCustom(
             value = date1,
-            onValueChange = {},
+            label = stringResource(R.string.project_add_screen_date),
+            supportingText = stringResource(R.string.project_add_screen_project_creation_date),
             readOnly = true,
-            label = { Text("Дата") },
-            supportingText = {
-                Text("Выберите дату начала проекта")
-            },
             trailingIcon = {
                 IconButton(onClick = { openDialog = true }) {
                     Icon(
@@ -252,49 +299,48 @@ fun AddProjectContainer(
                 }
             },
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(bottom = 2.dp)
                 .clickable {
                     openDialog = true
                 }
         )
 
-        Button(
+        ButtonCustom(
+            modifier = Modifier,
+            intStringRes = R.string.button_begin,
+            isError = errorBoolean(),
             onClick = {
-                if (errorBoolean()) {
-
-                    navigateToStart(
-                        ProjectTable(
-                            id = 0,
-                            titleProject = name,
-                            type = "",
-                            data = date1,
-                            eggAll = "",
-                            eggAllEND = "",
-                            airing = "",
-                            over = "",
-                            arhive = "0",
-                            dateEnd = date1,
-                            time1 = "",
-                            time2 = "",
-                            time3 = "",
-                            mode = 1,
-                            imageData = if (byteArray.contentEquals(byteArrayOf()))
-                                getByteArrayFromDrawable(context, imageResources[0])
-                            else byteArray
-                        )
+                navigateToStart(
+                    ProjectTable(
+                        titleProject = name,
+                        type = "",
+                        data = date1,
+                        eggAll = "",
+                        eggAllEND = "",
+                        airing = "",
+                        over = "",
+                        arhive = "0",
+                        dateEnd = date1,
+                        time1 = "",
+                        time2 = "",
+                        time3 = "",
+                        mode = 1,
+                        imageData = if (byteArray.contentEquals(byteArrayOf()))
+                            getByteArrayFromDrawable(context, imageResources[0])
+                        else byteArray
                     )
-                    val eventParameters: MutableMap<String, Any> = HashMap()
-                    eventParameters["Имя"] = name
-                    AppMetrica.reportEvent("Project", eventParameters);
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp)
+                )
+                val eventParameters: MutableMap<String, Any> = HashMap()
+                eventParameters["Имя"] = name
+                AppMetrica.reportEvent("Project", eventParameters);
+            }
         )
-        {
-            Text(text = "Начать")
+
+    }
+    if (openDialog) {
+        DatePickerDialogSample(state, date1) { date ->
+            date1 = date
+            openDialog = false
         }
     }
 }
@@ -305,9 +351,10 @@ fun ImageLazyRow(
     images: List<Int>,
     onImageSelected: (Int) -> Unit,
     onAddImageClicked: () -> Unit,
-    imageUri: Uri?
+    imageUri: Uri?,
+    selectedImage: Int = -1
 ) {
-    var selectedImageIndex by remember { mutableIntStateOf(0) }
+    var selectedImageIndex by remember { mutableStateOf(selectedImage) }
 
     val painter = rememberAsyncImagePainter(model = imageUri)
 
@@ -335,7 +382,6 @@ fun ImageLazyRow(
                 if (index == images.size - 1) onAddImageClicked() else onImageSelected(index)
             }
             Spacer(modifier = Modifier.width(8.dp))
-
         }
     }
 }
@@ -354,16 +400,17 @@ fun SelectableImageWithIcon(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.BottomEnd
     ) {
-        Box(modifier = Modifier
-            .size(100.dp)
-            .clip(CircleShape)
-            .border(
-                width = if (isSelected) 3.dp else 2.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = 0.5f
-                ),
-                shape = CircleShape
-            )
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .border(
+                    width = if (isSelected) 3.dp else 2.dp,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = 0.5f
+                    ),
+                    shape = CircleShape
+                )
         ) {
             Image(
                 painter = image,
@@ -464,7 +511,7 @@ fun getByteArrayFromDrawable(context: Context, drawableResId: Int): ByteArray {
 
     // Конвертируем Bitmap в ByteArray
     val stream = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    bitmap.compress(Bitmap.CompressFormat.PNG, 15, stream)
     return stream.toByteArray()
 }
 
@@ -477,6 +524,6 @@ fun uriToByteArray(context: Context, uri: Uri?): ByteArray? {
 
     // Преобразуем Bitmap в ByteArray
     val byteArrayOutputStream = ByteArrayOutputStream()
-    bitmap?.compress(Bitmap.CompressFormat.JPEG, 30, byteArrayOutputStream)
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream)
     return byteArrayOutputStream.toByteArray()
 }

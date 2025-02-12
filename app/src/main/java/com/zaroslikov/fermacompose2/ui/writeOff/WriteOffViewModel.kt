@@ -15,9 +15,12 @@ import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
 import com.zaroslikov.fermacompose2.ui.home.TitleUiState
 import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
 class WriteOffViewModel(
@@ -27,8 +30,17 @@ class WriteOffViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[WriteOffDestination.itemIdArg])
 
+    private var _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     val writeOffUiState: StateFlow<WriteOffUiState> =
-        itemsRepository.getAllWriteOffItems(itemId).map { WriteOffUiState(it) }
+        itemsRepository.getAllWriteOffItems(itemId).map { WriteOffUiState(it) }.onStart {
+            // Устанавливаем состояние загрузки перед началом загрузки данных
+            _isLoading.value = true
+        }.onEach {
+            // Отключаем состояние загрузки после завершения загрузки данных
+            _isLoading.value = false
+        }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

@@ -14,9 +14,12 @@ import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
 import com.zaroslikov.fermacompose2.ui.home.HomeDestination
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
 class ExpensesViewModel(
@@ -27,9 +30,17 @@ class ExpensesViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[ExpensesDestination.itemIdArg])
 
+    private var _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     val homeUiState: StateFlow<ExpensesUiState> =
-        itemsRepository.getAllExpensesItems(itemId).map { ExpensesUiState(it) }
+        itemsRepository.getAllExpensesItems(itemId).map { ExpensesUiState(it) }.onStart {
+            // Устанавливаем состояние загрузки перед началом загрузки данных
+            _isLoading.value = true
+        }.onEach {
+            // Отключаем состояние загрузки после завершения загрузки данных
+            _isLoading.value = false
+        }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -40,14 +38,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,26 +64,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.start.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.start.formatter
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Date
 import java.util.TimeZone
-import java.util.concurrent.TimeUnit
 
 object ExpensesEntryDestination : NavigationDestination {
     override val route = "ExpensesEntry"
@@ -609,6 +599,9 @@ fun ExpensesEntryContainerProduct(
                         .padding(top = 10.dp)
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
+
+
+
                     Checkbox(
                         checked = showFoodUI,
                         onCheckedChange = {
@@ -619,6 +612,7 @@ fun ExpensesEntryContainerProduct(
                         },
                         enabled = count != ""
                     )
+
                     Text(text = "Корм")
 
                     IconButton(onClick = { openAlertFood = !openAlertFood }) {
@@ -658,6 +652,8 @@ fun ExpensesEntryContainerProduct(
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+
+
                     Checkbox(
                         checked = showWarehouseUI,
                         onCheckedChange = { showWarehouseUI = it },
@@ -667,9 +663,7 @@ fun ExpensesEntryContainerProduct(
                             false
                         } else true
                     )
-
                     Text(text = "Отображать на складе")
-
                     IconButton(onClick = { openAlertWarehouse = !openAlertWarehouse }) {
                         Icon(
                             Icons.Default.Info,
@@ -678,7 +672,8 @@ fun ExpensesEntryContainerProduct(
                     }
 
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+
                     Checkbox(
                         checked = showAnimalsUI,
                         onCheckedChange = {
@@ -691,9 +686,8 @@ fun ExpensesEntryContainerProduct(
                             false
                         } else true
                     )
-                    Text(text = "Распределить расходы по животным")
-
-                    IconButton(onClick = { openAlertAnimal = !openAlertAnimal }) {
+                    Text(text = "Распределить расходы по животным", modifier = Modifier.fillMaxWidth(0.85f))
+                    IconButton(onClick = { openAlertAnimal = !openAlertAnimal}) {
                         Icon(
                             Icons.Default.Info,
                             contentDescription = "Показать меню"

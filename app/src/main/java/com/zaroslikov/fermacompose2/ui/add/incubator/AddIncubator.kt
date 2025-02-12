@@ -58,10 +58,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import java.util.Calendar
@@ -69,6 +68,7 @@ import java.util.TimeZone
 import androidx.compose.ui.window.Dialog
 import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.start.formatterTime
 import io.appmetrica.analytics.AppMetrica
 
@@ -92,6 +92,7 @@ fun AddIncubator(
     val countTime = rememberSaveable { mutableIntStateOf(0) }
 
     val incubator = viewModel.incubatorUiState
+    val context = LocalContext.current
 
 //   Доставка из ахива
     viewModel.incubatorFromArchive5(incubator.type)
@@ -141,6 +142,7 @@ fun AddIncubator(
             shouldShowTwo = true
         },
         navigateContinue = {
+            viewModel.updateUiState(incubator.copy(imageData = getByteArray(context,viewModel.incubatorUiState.type)))
             viewModel.saveProject(it, countTime.intValue)
             val eventParameters: MutableMap<String, Any> = HashMap()
             eventParameters["Имя"] = incubator.titleProject
@@ -344,7 +346,7 @@ fun AddIncubatorContainer(
                             onClick = {
                                 selectedItemIndex = index
                                 expandedTypeBirds = false
-                                onUpdate(incubator.copy(type = typeBirdsList[selectedItemIndex], imageData = getByteArray(context, typeBirdsList[selectedItemIndex])))
+                                onUpdate(incubator.copy(type = typeBirdsList[selectedItemIndex]))
                             }
                         )
                     }

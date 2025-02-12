@@ -112,5 +112,5 @@ data class IncubatorProjectEditState(
     val time2: String = "",
     val time3: String = "",
     val mode: Int = 0,
-    val imageData: ByteArray = byteArrayOf()
+    val imageData: ByteArray? = byteArrayOf()
 )

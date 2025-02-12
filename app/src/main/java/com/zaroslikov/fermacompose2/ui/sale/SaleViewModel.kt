@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.ui.sale
 
 import androidx.lifecycle.SavedStateHandle
@@ -28,26 +12,33 @@ import com.zaroslikov.fermacompose2.data.water.SaleUiState
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
-/**
- * ViewModel to retrieve all items in the Room database.
- */
 class SaleViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-
-
     val itemId: Int = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
+
+    private var _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
 
     val saleUiState: StateFlow<SaleUiState> =
-        itemsRepository.getAllSaleItems(itemId).map { SaleUiState(it) }
+        itemsRepository.getAllSaleItems(itemId).map { SaleUiState(it) }.onStart {
+            // Устанавливаем состояние загрузки перед началом загрузки данных
+            _isLoading.value = true
+        }.onEach {
+            // Отключаем состояние загрузки после завершения загрузки данных
+            _isLoading.value = false
+        }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -68,12 +59,9 @@ class SaleViewModel(
     }
 
 
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
-
 
 
 }

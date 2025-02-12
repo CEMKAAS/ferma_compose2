@@ -31,7 +31,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.navigate.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import io.appmetrica.analytics.AppMetrica
 
@@ -236,7 +236,7 @@ fun AnimalCardContainer(
                     onNavigateIndicators(
                         AnimalIndicators(
                             id = animalTable.id,
-                            table = "Размер"
+                            table = "Количество"
                         )
                     )
                     AppMetrica.reportEvent("Животные Размер")

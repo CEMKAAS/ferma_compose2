@@ -48,7 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.Banner
-import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
+import com.zaroslikov.fermacompose2.navigate.InventoryNavHost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -58,7 +58,7 @@ fun InventoryApp(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     modifier: Modifier = Modifier,
     isFirstStart: Boolean,
-    isFirstEnd:()->Unit
+    isFirstEnd: () -> Unit
 ) {
     Scaffold(bottomBar = {
         Banner(
@@ -290,9 +290,7 @@ fun TopAppBarStart2(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
-        title = {
-            Text(text = title)
-        },
+        title = { Text(text = title) },
         scrollBehavior = scrollBehavior,
         actions = {
             IconButton(onClick = archiveButton) {
@@ -348,23 +346,3 @@ fun TopAppBarCalendar(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBarEdit(title: String, navigateUp: () -> Unit = {}) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Text(text = title)
-        },
-        navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Назад"
-                )
-            }
-        }
-    )
-}
