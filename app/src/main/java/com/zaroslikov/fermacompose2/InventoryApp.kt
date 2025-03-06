@@ -17,8 +17,10 @@
 package com.zaroslikov.fermacompose2
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
@@ -42,9 +44,13 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.Banner
@@ -58,7 +64,7 @@ fun InventoryApp(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     modifier: Modifier = Modifier,
     isFirstStart: Boolean,
-    isFirstEnd:()->Unit
+    isFirstEnd: () -> Unit
 ) {
     Scaffold(bottomBar = {
         Banner(
@@ -290,9 +296,7 @@ fun TopAppBarStart2(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
-        title = {
-            Text(text = title)
-        },
+        title = { Text(text = title) },
         scrollBehavior = scrollBehavior,
         actions = {
             IconButton(onClick = archiveButton) {

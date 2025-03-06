@@ -264,11 +264,10 @@ fun InventoryNavHost(
                 type = NavType.IntType
             })
         ) {
-            FinanceScreen(drawerState = drawerState, navigateToStart = {
-                navController.navigate(StartDestination.route)
-            }, navigateToModalSheet = {
-                navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-            }, navigateToIncomeExpenses = {
+            FinanceScreen(
+                drawerState = drawerState,
+                navigateToStart = { navController.navigate(StartDestination.route) },
+                navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") }, navigateToIncomeExpenses = {
                 navController.navigate(
                     "${FinanceIncomeExpensesDestination.route}/${it.idPT}/${it.incomeBoolean}"
                 )

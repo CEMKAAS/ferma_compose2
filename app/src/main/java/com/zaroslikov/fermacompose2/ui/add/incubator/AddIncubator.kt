@@ -92,6 +92,7 @@ fun AddIncubator(
     val countTime = rememberSaveable { mutableIntStateOf(0) }
 
     val incubator = viewModel.incubatorUiState
+    val context = LocalContext.current
 
 //   Доставка из ахива
     viewModel.incubatorFromArchive5(incubator.type)
@@ -141,6 +142,7 @@ fun AddIncubator(
             shouldShowTwo = true
         },
         navigateContinue = {
+            viewModel.updateUiState(incubator.copy(imageData = getByteArray(context,viewModel.incubatorUiState.type)))
             viewModel.saveProject(it, countTime.intValue)
             val eventParameters: MutableMap<String, Any> = HashMap()
             eventParameters["Имя"] = incubator.titleProject
@@ -344,7 +346,7 @@ fun AddIncubatorContainer(
                             onClick = {
                                 selectedItemIndex = index
                                 expandedTypeBirds = false
-                                onUpdate(incubator.copy(type = typeBirdsList[selectedItemIndex], imageData = getByteArray(context, typeBirdsList[selectedItemIndex])))
+                                onUpdate(incubator.copy(type = typeBirdsList[selectedItemIndex]))
                             }
                         )
                     }

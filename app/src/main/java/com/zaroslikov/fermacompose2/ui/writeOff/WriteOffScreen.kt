@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.writeOff
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -81,9 +83,6 @@ object WriteOffDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
-/**
- * Entry route for Home screen
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WriteOffScreen(
@@ -98,6 +97,8 @@ fun WriteOffScreen(
     val homeUiState by viewModel.writeOffUiState.collectAsState()
     val titleUiState by viewModel.titleUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val writeOffBoolean = titleUiState.titleList.isNotEmpty()
@@ -147,16 +148,27 @@ fun WriteOffScreen(
                 }
             }
         ) { innerPadding ->
-            WriteOffBody(
-                viewModel = viewModel,
-                writeOffBoolean = writeOffBoolean,
-                itemList = homeUiState.itemList,
-                brieflyList = brieflyUiState.itemList,
-                onItemClick = navigateToItemUpdate,
-                modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                navigateToItemAdd = { navigateToItem(idProject) }
-            )
+            if (isLoading) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                WriteOffBody(
+                    viewModel = viewModel,
+                    writeOffBoolean = writeOffBoolean,
+                    itemList = homeUiState.itemList,
+                    brieflyList = brieflyUiState.itemList,
+                    onItemClick = navigateToItemUpdate,
+                    modifier = modifier.fillMaxSize(),
+                    contentPadding = innerPadding,
+                    navigateToItemAdd = { navigateToItem(idProject) }
+                )
+            }
         }
     }
 }

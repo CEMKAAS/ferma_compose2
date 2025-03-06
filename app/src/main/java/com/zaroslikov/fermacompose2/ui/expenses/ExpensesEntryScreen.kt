@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -609,6 +610,9 @@ fun ExpensesEntryContainerProduct(
                         .padding(top = 10.dp)
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
+
+
+
                     Checkbox(
                         checked = showFoodUI,
                         onCheckedChange = {
@@ -619,6 +623,7 @@ fun ExpensesEntryContainerProduct(
                         },
                         enabled = count != ""
                     )
+
                     Text(text = "Корм")
 
                     IconButton(onClick = { openAlertFood = !openAlertFood }) {
@@ -658,6 +663,8 @@ fun ExpensesEntryContainerProduct(
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+
+
                     Checkbox(
                         checked = showWarehouseUI,
                         onCheckedChange = { showWarehouseUI = it },
@@ -667,9 +674,7 @@ fun ExpensesEntryContainerProduct(
                             false
                         } else true
                     )
-
                     Text(text = "Отображать на складе")
-
                     IconButton(onClick = { openAlertWarehouse = !openAlertWarehouse }) {
                         Icon(
                             Icons.Default.Info,
@@ -678,7 +683,8 @@ fun ExpensesEntryContainerProduct(
                     }
 
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+
                     Checkbox(
                         checked = showAnimalsUI,
                         onCheckedChange = {
@@ -691,9 +697,8 @@ fun ExpensesEntryContainerProduct(
                             false
                         } else true
                     )
-                    Text(text = "Распределить расходы по животным")
-
-                    IconButton(onClick = { openAlertAnimal = !openAlertAnimal }) {
+                    Text(text = "Распределить расходы по животным", modifier = Modifier.fillMaxWidth(0.85f))
+                    IconButton(onClick = { openAlertAnimal = !openAlertAnimal}) {
                         Icon(
                             Icons.Default.Info,
                             contentDescription = "Показать меню"

@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.expenses
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -94,6 +96,8 @@ fun ExpensesScreen(
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val idProject = viewModel.itemId
@@ -139,15 +143,26 @@ fun ExpensesScreen(
                 }
             }
         ) { innerPadding ->
-            ExpensesBody(
-                itemList = homeUiState.itemList,
-                brieflyList = brieflyUiState.itemList,
-                viewModel = viewModel,
-                onItemClick = navigateToItemUpdate,
-                modifier = modifier.fillMaxSize(),
-                contentPadding = innerPadding,
-                navigateToItemAdd = { navigateToItem(idProject) }
-            )
+            if (isLoading) {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                ExpensesBody(
+                    itemList = homeUiState.itemList,
+                    brieflyList = brieflyUiState.itemList,
+                    viewModel = viewModel,
+                    onItemClick = navigateToItemUpdate,
+                    modifier = modifier.fillMaxSize(),
+                    contentPadding = innerPadding,
+                    navigateToItemAdd = { navigateToItem(idProject) }
+                )
+            }
         }
     }
 }

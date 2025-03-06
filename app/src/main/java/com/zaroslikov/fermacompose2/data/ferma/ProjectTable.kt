@@ -34,7 +34,7 @@ data class ProjectTable(
     @ColumnInfo(name = "TIMEPUSH3")
     var time3: String,
     val mode: Int, //Инкубатор = 0, Хозяйство = 1
-    val imageData: ByteArray, // Изображение
+    val imageData: ByteArray? // Изображение
 )
 
 

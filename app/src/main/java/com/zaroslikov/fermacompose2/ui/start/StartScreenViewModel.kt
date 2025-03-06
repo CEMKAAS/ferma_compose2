@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.water.ProjectTableStartScreen
@@ -69,10 +70,10 @@ class StartScreenViewModel(
             _isLoading.value = false
         }
             .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = emptyList()
-        )
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = emptyList()
+            )
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -80,10 +81,11 @@ class StartScreenViewModel(
 
     private suspend fun ProjectTable.toProjectWithImage(): ProjectTableStartScreen =
         withContext(Dispatchers.IO) {
-            
-            val imageBitmap = imageData.let {
-                BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
-            }
+
+            val imageBitmap = imageData?.let {
+                        BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+                    }
+
 
             val data = if (mode == 0) {
                 val calendar: Calendar = Calendar.getInstance()
@@ -102,6 +104,7 @@ class StartScreenViewModel(
             ProjectTableStartScreen(
                 id,
                 titleProject,
+                type,
                 data,
                 arhive,
                 dateEnd,

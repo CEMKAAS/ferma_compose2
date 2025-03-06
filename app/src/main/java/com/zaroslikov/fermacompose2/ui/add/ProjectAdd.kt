@@ -100,7 +100,7 @@ fun AddProject(
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Проект", navigateUp = navigateBack)
+            TopAppBarEdit(title = "Создание проекта", navigateUp = navigateBack)
         }
     ) { innerPadding ->
         AddProjectContainer(
@@ -194,7 +194,7 @@ fun AddProjectContainer(
                 .fillMaxWidth()
                 .padding(vertical = 10.dp),
             fontWeight = FontWeight.SemiBold,
-            fontSize = 10.sp
+            fontSize = 16.sp
         )
 
         ImageLazyRow(
@@ -205,7 +205,8 @@ fun AddProjectContainer(
             },
             onAddImageClicked = {
                 launcher.launch("image/*")
-            }
+            },
+            selectedImage = 0
         )
 
         OutlinedTextField(
@@ -305,9 +306,10 @@ fun ImageLazyRow(
     images: List<Int>,
     onImageSelected: (Int) -> Unit,
     onAddImageClicked: () -> Unit,
-    imageUri: Uri?
+    imageUri: Uri?,
+    selectedImage : Int = -1
 ) {
-    var selectedImageIndex by remember { mutableIntStateOf(0) }
+    var selectedImageIndex by remember { mutableStateOf(selectedImage) }
 
     val painter = rememberAsyncImagePainter(model = imageUri)
 
@@ -335,7 +337,6 @@ fun ImageLazyRow(
                 if (index == images.size - 1) onAddImageClicked() else onImageSelected(index)
             }
             Spacer(modifier = Modifier.width(8.dp))
-
         }
     }
 }
@@ -464,7 +465,7 @@ fun getByteArrayFromDrawable(context: Context, drawableResId: Int): ByteArray {
 
     // Конвертируем Bitmap в ByteArray
     val stream = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    bitmap.compress(Bitmap.CompressFormat.PNG, 15, stream)
     return stream.toByteArray()
 }
 
@@ -477,6 +478,6 @@ fun uriToByteArray(context: Context, uri: Uri?): ByteArray? {
 
     // Преобразуем Bitmap в ByteArray
     val byteArrayOutputStream = ByteArrayOutputStream()
-    bitmap?.compress(Bitmap.CompressFormat.JPEG, 30, byteArrayOutputStream)
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream)
     return byteArrayOutputStream.toByteArray()
 }

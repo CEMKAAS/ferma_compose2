@@ -108,7 +108,7 @@ private fun FinanceIncomeExpensesBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        if (productList.isEmpty()) {
+        if (productList.isEmpty() && itemList.isEmpty() && (boolean || animalList.isEmpty())) {
             Text(
                 text = stringResource(R.string.no_item_finance_edit),
                 textAlign = TextAlign.Center,

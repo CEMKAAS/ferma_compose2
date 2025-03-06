@@ -236,7 +236,7 @@ fun AnimalCardContainer(
                     onNavigateIndicators(
                         AnimalIndicators(
                             id = animalTable.id,
-                            table = "Размер"
+                            table = "Количество"
                         )
                     )
                     AppMetrica.reportEvent("Животные Размер")

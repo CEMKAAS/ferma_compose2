@@ -167,7 +167,7 @@ fun WarehouseEditContainer(
                     .fillMaxWidth()
                     .padding(vertical = 10.dp),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 10.sp
+                fontSize = 16.sp
             )
 
             ImageLazyRow(

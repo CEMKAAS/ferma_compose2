@@ -8,9 +8,12 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.ExpensesUiState
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 import java.util.TimeZone
@@ -22,8 +25,17 @@ class WarehouseViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[WarehouseDestination.itemIdArg])
 
+    private var _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     val homeUiState: StateFlow<WarehouseUiState> =
-        itemsRepository.getCurrentBalanceWarehouse(itemId).map { WarehouseUiState(it) }
+        itemsRepository.getCurrentBalanceWarehouse(itemId).map { WarehouseUiState(it) }.onStart {
+            // Устанавливаем состояние загрузки перед началом загрузки данных
+            _isLoading.value = true
+        }.onEach {
+            // Отключаем состояние загрузки после завершения загрузки данных
+            _isLoading.value = false
+        }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

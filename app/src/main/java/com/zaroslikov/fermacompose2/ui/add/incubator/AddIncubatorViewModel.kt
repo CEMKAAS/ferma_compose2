@@ -4,17 +4,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.Alarm.AlarmRepository
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.Incubator
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.water.Reminder
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
-import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
 import kotlinx.coroutines.launch
@@ -47,7 +42,7 @@ class AddIncubatorViewModel(
             time2 = "12:00",
             time3 = "18:00",
             mode = 0,
-            imageData = byteArrayOf()
+            imageData = null
         )
     )
         private set
