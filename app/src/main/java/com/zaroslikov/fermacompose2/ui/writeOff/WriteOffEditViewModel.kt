@@ -94,7 +94,7 @@ fun WriteOffTableUiState.toWriteOffTable(): WriteOffTable = WriteOffTable(
     day = day,
     mount = mount,
     year = year,
-    priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+    priceAll = if (priceAll == "") 0.0 else priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
     suffix = suffix,
     status = status,
     idPT = idPT,

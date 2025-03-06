@@ -15,8 +15,8 @@ android {
         applicationId = "com.zaroslikov.fermacompose2"
         minSdk = 26
         targetSdk = 34
-        versionCode = 10
-        versionName = "v1.17aG"
+        versionCode = 12
+        versionName = "v1.17bG"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -26,8 +26,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            isShrinkResources = true
-            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

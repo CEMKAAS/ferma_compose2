@@ -435,7 +435,7 @@ fun WriteOffEntryContainerProduct(
                                 formattedDateList[1].toInt(),
                                 formattedDateList[2].toInt(),
                                 suffix = suffix,
-                                priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                                priceAll = if (priceAll == "") 0.0 else priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".")
                                     .toDouble(),
                                 status = status,
                                 note = note
