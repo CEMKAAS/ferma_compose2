@@ -362,7 +362,6 @@ fun InventoryNavHost(
                 ) },
                 navigateToItemUpdate = {
                 navController.navigate("${AddEditDestination.route}/${it.id}/${it.idPT}") },
-                isFirstStart = isFirstStart,
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
             )
         }
@@ -381,9 +380,8 @@ fun InventoryNavHost(
                 type = NavType.IntType
             }, navArgument(AddEditDestination.itemIdArgTwo) {
                 type = NavType.IntType
-            }
-
-            )) {
+            })
+        ) {
             AddEditProduct(navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() })
         }

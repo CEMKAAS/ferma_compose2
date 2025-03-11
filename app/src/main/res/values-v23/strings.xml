@@ -1,4 +1,16 @@
 <resources>
+
+    //Add Screen
+    <string name="add_screen_title">Моя Продукция</string>
+
+
+    // Cadrs
+    <string name="card_category">Категория:</string>
+    <string name="card_animal">Животное:</string>
+    <string name="card_note">Примечание:</string>
+    <string name="card_date">Дата:</string>
+
+
     <string name="app_name">Мое Хозяйство 2</string>
     <string name="attention">Attention</string>
     <string name="back_button">Back</string>

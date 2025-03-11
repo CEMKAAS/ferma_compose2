@@ -98,8 +98,13 @@ fun DrawerSheet(
     ModalDrawerSheet {
         drawerItems.forEach {
             NavigationDrawerItem(
-                label = { Text(text = it.text, fontSize = if (it.icon == R.drawable.baseline_arrow_back_24) 20.sp
-                else TextUnit.Unspecified )},
+                label = {
+                    Text(
+                        text = it.text,
+                        fontSize = if (it.icon == R.drawable.baseline_arrow_back_24) 20.sp
+                        else TextUnit.Unspecified
+                    )
+                },
                 selected = it == selectedItem,
                 icon = {
                     Image(painter = painterResource(id = it.icon), contentDescription = it.text)
@@ -145,6 +150,17 @@ fun formatter(number: Double): String {
     numberFormat.minimumFractionDigits = 0
     numberFormat.maximumFractionDigits = 2
     return numberFormat.format(number).toString()
+}
+
+fun Double.formatNumber(): String {
+    val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
+    numberFormat.minimumFractionDigits = 0
+    numberFormat.maximumFractionDigits = 2
+    return numberFormat.format(this).toString()
+}
+
+fun dateBuilder(day: Int, month: Int, year: Int): String {
+    return "%02d.%02d.%04d".format(day, month, year)
 }
 
 fun formatterTime(hour: Int, minute: Int): String {
@@ -194,8 +210,6 @@ fun AlertDialogInfo(
         }
     )
 }
-
-
 
 
 data class DrawerItems(

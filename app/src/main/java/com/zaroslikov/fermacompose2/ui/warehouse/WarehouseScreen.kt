@@ -105,20 +105,9 @@ fun WarehouseScreen(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
-//    isFirstStart:Boolean,
-//    isFirstEnd: () -> Unit,
     viewModel: WarehouseViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
-//    AlterDialigStart(
-//        isFirstStart = isFirstStart,
-//        dialogTitle = "Хозяйство",
-//        dialogText = "Склад — ключевой элемент проекта, где хранится произведенная и приобретенная продукция. Здесь можно получить детальную информацию о каждом продукте." +
-//                " Слева расположены меню проекта. Рекомендуем начать с добавления животных в разделе «Мои Животные» для корректной работы расчетов, затем добавлять свою продукцию на склад в разделе \"Моя Продукция\"." +
-//                "\nДополнительная информация доступна в нашей группе ВКонтакте." +
-//                "\nУдачи.",
-////        isFirstEndConfig = isFirstEnd
-//    )
     val context = LocalContext.current
     val homeUiState by viewModel.homeUiState.collectAsState()
     val homeFoodUiState by viewModel.homeFoodUiState.collectAsState()
@@ -136,10 +125,7 @@ fun WarehouseScreen(
         drawerContent = {
             DrawerSheet(
                 scope = coroutineScope,
-                navigateToStart = {
-//                    isFirstEnd()
-                    navigateToStart()
-                },
+                navigateToStart = { navigateToStart() },
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
                 1,
