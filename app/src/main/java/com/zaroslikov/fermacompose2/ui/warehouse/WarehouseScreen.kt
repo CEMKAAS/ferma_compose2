@@ -1,7 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.warehouse
 
 
+import android.provider.ContactsContract.CommonDataKinds.Im
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -585,6 +587,7 @@ fun TextButtonWarehouse(
     onClick: () -> Unit,
     boolean: Boolean,
     title: String,
+    @StringRes intRes: Int = R.string.widget_detail
 ) {
     TextButton(
         onClick = onClick,

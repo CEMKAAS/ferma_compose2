@@ -4,12 +4,17 @@
     <string name="add_screen_title">Моя Продукция</string>
 
 
+
     // Cadrs
     <string name="card_category">Категория:</string>
     <string name="card_animal">Животное:</string>
     <string name="card_note">Примечание:</string>
     <string name="card_date">Дата:</string>
 
+
+    //widget
+    <string name="widget_briefly">Кратко</string>
+    <string name="widget_detail">Кратко</string>
 
     <string name="app_name">Мое Хозяйство 2</string>
     <string name="attention">Attention</string>

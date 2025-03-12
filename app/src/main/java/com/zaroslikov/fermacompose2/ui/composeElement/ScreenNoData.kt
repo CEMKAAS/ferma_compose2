@@ -22,12 +22,11 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun CircularProgress(
     modifier: Modifier = Modifier,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(paddingValues),
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
@@ -37,13 +36,12 @@ fun CircularProgress(
 @Composable
 fun MessageNoData(
     modifier: Modifier = Modifier,
-    paddingValues: PaddingValues = PaddingValues(16.dp),
     onClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
-            .padding(paddingValues)
-            .padding(15.dp)
+            .fillMaxSize()
+            .padding(16.dp)
             .verticalScroll(rememberScrollState()),
     ) {
         Text(
