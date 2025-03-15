@@ -16,6 +16,7 @@
 
 package com.zaroslikov.fermacompose2
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -354,7 +355,9 @@ fun TopAppBarCalendar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarEdit(title: String, navigateUp: () -> Unit = {}) {
+fun TopAppBarEdit(
+    title: String, navigateUp: () -> Unit = {}
+) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             titleContentColor = MaterialTheme.colorScheme.primary,

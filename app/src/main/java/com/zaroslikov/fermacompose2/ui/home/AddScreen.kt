@@ -73,13 +73,13 @@ object HomeDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
+    modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (navigateId) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
-    modifier: Modifier = Modifier,
     viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -196,7 +196,6 @@ fun InventoryList(
             TextButtonWarehouse(
                 boolean = details,
                 onClick = { details = !details },
-                title = if (details) "Кратко" else "Подробно",
                 intRes = if (details) R.string.widget_briefly else R.string.widget_detail
             )
         }
@@ -223,11 +222,12 @@ fun InventoryList(
 
 @Composable
 fun BrieflyCountCard(
+    modifier: Modifier = Modifier,
     viewModel: AddViewModel,
     product: BrieflyItemCount,
     onItemClick: (AddTable) -> Unit,
     navigationToAnalysis: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 

@@ -22,7 +22,6 @@ class AddViewModel(
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-
     val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
     private var _isLoading = MutableStateFlow(true)

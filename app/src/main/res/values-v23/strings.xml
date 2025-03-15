@@ -4,6 +4,9 @@
     <string name="add_screen_title">Моя Продукция</string>
 
 
+    //Add Entry Screen
+
+
 
     // Cadrs
     <string name="card_category">Категория:</string>
@@ -15,6 +18,12 @@
     //widget
     <string name="widget_briefly">Кратко</string>
     <string name="widget_detail">Кратко</string>
+
+
+
+
+
+
 
     <string name="app_name">Мое Хозяйство 2</string>
     <string name="attention">Attention</string>

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -54,6 +56,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
@@ -87,14 +90,18 @@ fun AddEntryProduct(
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Моя Продукция", navigateUp = navigateBack)
+            TopAppBarBack(intRes = R.string.add_screen_title, navigateUp = navigateBack)
         }
     ) { innerPadding ->
 
         AddEntryContainerProduct(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding)
-                .padding(5.dp)
+                .padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_medium),
+                    vertical = dimensionResource(R.dimen.padding_small)
+                )
                 .verticalScroll(rememberScrollState()),
             titleList = titleUiState.titleList,
             categoryList = categoryUiState.categoryList,
@@ -145,6 +152,7 @@ fun AddEntryContainerProduct(
     countWarehouse: Double,
     updateCountWarehouse: (String) -> Unit
 ) {
+    //values
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
     var category by remember { mutableStateOf("Без категории") }
@@ -157,6 +165,7 @@ fun AddEntryContainerProduct(
     var expandedCat by remember { mutableStateOf(false) }
     var expandedAni by remember { mutableStateOf(false) }
 
+    //Error
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorSlash by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
@@ -279,7 +288,10 @@ fun AddEntryContainerProduct(
             }
         }
 
-        Text(text = "Сейчас на складе: ${formatter(countWarehouse)} $suffix", modifier = Modifier.padding(2.dp))
+        Text(
+            text = "Сейчас на складе: ${formatter(countWarehouse)} $suffix",
+            modifier = Modifier.padding(2.dp)
+        )
 
         Box {
             OutlinedTextField(
@@ -553,7 +565,7 @@ data class AddTableInsert(
     var priceAll: Double,
     var suffix: String,
     var category: String,
-    val idAnimal:Long,
+    val idAnimal: Long,
     var animal: String,
     var note: String
 )

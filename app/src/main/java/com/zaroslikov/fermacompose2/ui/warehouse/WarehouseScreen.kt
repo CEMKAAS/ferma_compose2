@@ -65,6 +65,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -543,12 +544,12 @@ fun WarehouseExpensesCard(
 //        modifier = modifier
 //    )
 
-        Card(
+    Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
     )
-        {
+    {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -586,7 +587,7 @@ fun WarehouseExpensesCard(
 fun TextButtonWarehouse(
     onClick: () -> Unit,
     boolean: Boolean,
-    title: String,
+    title: String = "",
     @StringRes intRes: Int = R.string.widget_detail
 ) {
     TextButton(
@@ -610,7 +611,7 @@ fun TextButtonWarehouse(
                     .fillMaxWidth(0.1f)
             )
             Text(
-                text = title,
+                text = stringResource(intRes),
                 textAlign = TextAlign.Center,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -636,7 +637,7 @@ fun FastAddCard(
     if (selected) {
         LaunchedEffect(Unit) {
             delay(2000) // Задержка в 2000 миллисекунд (2 секунды)
-            selected = false 
+            selected = false
         }
     }
     Spacer(modifier = Modifier.width(8.dp))
@@ -657,13 +658,13 @@ fun FastAddCard(
                     fontSize = 12.sp
                 )
                 if (fastAdd.category == "" || fastAdd.category == "Без категории")
-                    else Text(
-                        text = fastAdd.category,
-                        modifier = Modifier
-                            .padding(top = 2.dp),
-                        fontSize = 10.sp
-                    )
-                
+                else Text(
+                    text = fastAdd.category,
+                    modifier = Modifier
+                        .padding(top = 2.dp),
+                    fontSize = 10.sp
+                )
+
                 if (fastAdd.animal != "") {
                     Text(
                         text = fastAdd.animal,
