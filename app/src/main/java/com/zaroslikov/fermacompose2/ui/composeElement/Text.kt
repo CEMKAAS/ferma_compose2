@@ -67,7 +67,7 @@ fun IconAndText(
 @Composable
 fun TextLine(
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = textBold_18,
+    textStyle: TextStyle = textBold_20,
     valueString: String
 ) {
     Text(

@@ -1,68 +1,53 @@
 package com.zaroslikov.fermacompose2.ui.home
 
-import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+
+
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.supportFun.TripleData
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.isError
+import com.zaroslikov.fermacompose2.supportFun.isErrorAdd
+import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
+import com.zaroslikov.fermacompose2.supportFun.metricaAdd
+import com.zaroslikov.fermacompose2.supportFun.toConvertDb
+import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.start.formatter
-import io.appmetrica.analytics.AppMetrica
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.toButton
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.TimeZone
+import java.time.Instant
 
 
 object AddEntryDestination : NavigationDestination {
@@ -79,12 +64,9 @@ fun AddEntryProduct(
     onNavigateUp: () -> Unit,
     viewModel: AddEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val context = LocalContext.current
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
     val animalUiState by viewModel.animalUiState.collectAsState()
-
-    val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -96,44 +78,19 @@ fun AddEntryProduct(
 
         AddEntryContainerProduct(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(
-                    horizontal = dimensionResource(id = R.dimen.padding_medium),
-                    vertical = dimensionResource(R.dimen.padding_small)
-                )
+                .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
-            titleList = titleUiState.titleList,
-            categoryList = categoryUiState.categoryList,
+            titleList = titleUiState.list,
+            categoryList = categoryUiState.list,
             animalList = animalUiState.animalList,
             saveInRoomAdd = {
                 coroutineScope.launch {
-                    viewModel.saveItem(
-                        AddTable(
-                            id = it.id,
-                            title = it.title,
-                            count = it.count,
-                            day = it.day,
-                            mount = it.mount,
-                            year = it.year,
-                            priceAll = it.priceAll,
-                            suffix = it.suffix,
-                            category = it.category,
-                            idAnimal = it.idAnimal,
-                            animal = it.animal,
-                            idPT = idProject,
-                            note = it.note
-                        )
-                    )
-                    Toast.makeText(
-                        context,
-                        "Добавлено: ${it.title} ${it.count} ${it.suffix}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    onNavigateUp()
+                    viewModel.saveItem(it)
                 }
+                onNavigateUp()
             },
             countWarehouse = viewModel.itemUiState,
+            idProject = viewModel.itemId,
             updateCountWarehouse = {
                 viewModel.updateUiState(it)
             }
@@ -147,426 +104,147 @@ fun AddEntryContainerProduct(
     modifier: Modifier,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<AnimalString>,
-    saveInRoomAdd: (AddTableInsert) -> Unit,
+    animalList: List<TripleData>,
+    saveInRoomAdd: (AddTable) -> Unit,
+    idProject: Int, // TODO convet to Long
     countWarehouse: Double,
     updateCountWarehouse: (String) -> Unit
 ) {
-    //values
+
+    val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+    //Values
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
+    var date by remember { mutableStateOf(dateToday()) }
+    var openDialog by remember { mutableStateOf(false) }
     var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Шт.") }
     var animal by remember { mutableStateOf("") }
+    var selectedAnimalIndex by remember { mutableIntStateOf(0) }
     var note by remember { mutableStateOf("") }
-
-    var expanded by remember { mutableStateOf(false) }
-    var expandedSuf by remember { mutableStateOf(false) }
-    var expandedCat by remember { mutableStateOf(false) }
-    var expandedAni by remember { mutableStateOf(false) }
 
     //Error
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorSlash by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
-    val focusManager = LocalFocusManager.current
+    val toastText = stringResource(R.string.toast_add_s, "$title $count $suffix")
 
-    var selectedItemIndex by remember { mutableStateOf(0) }
-
-
-    fun validateTitle(text: String) {
-        isErrorTitle = if (text == "") {
-            true
-        } else {
-            updateCountWarehouse(title)
-            false
-        }
-
-        isErrorSlash = text.contains("/")
-    }
-
-    fun validateCount(text: String) {
-        isErrorCount = text == ""
-    }
-
-    fun errorBoolean(): Boolean {
-        isErrorSlash = title.contains("/")
-        isErrorTitle = title == ""
-        isErrorCount = count == ""
-        return !(isErrorTitle || isErrorCount || isErrorSlash)
-    }
-
-    //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val formattedDate: String = format.format(calendar.timeInMillis)
-
-    //Дата
-    var openDialog by remember { mutableStateOf(false) }
-
+    //Date
     val state = rememberDatePickerState(
         selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = calendar.timeInMillis
+        initialSelectedDateMillis = Instant.now().toEpochMilli()
     )
 
-    var date1 by remember { mutableStateOf(formattedDate) }
-
     if (openDialog) {
-        DatePickerDialogSample(state, date1) { date ->
-            date1 = date
-            openDialog = false
+        DatePickerDialogSample(state, date) {
+            date = it
+            openDialog = !openDialog
         }
     }
 
     Column(modifier = modifier) {
 
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                }
-            ) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = {
-                        title = it
-                        validateTitle(title)
-                    },
-                    label = { Text(text = "Товар") },
-                    supportingText = {
-                        if (isErrorTitle) {
-                            Text(
-                                text = "Не указано имя товара",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else if (isErrorSlash) {
-                            Text(
-                                text = "В имени товара указан /",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else Text("Введите или выберите товар")
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp),
-                    isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    })
-                )
-
-                val filteredOptions =
-                    titleList.filter { it.contains(title, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    title = item
-                                    expanded = false
-                                    updateCountWarehouse(title)
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Text(
-            text = "Сейчас на складе: ${formatter(countWarehouse)} $suffix",
-            modifier = Modifier.padding(2.dp)
+        OutlinedTextTitleAdd(
+            value = title,
+            onValueChange = {
+                title = it.trim()
+                isErrorTitle = it.isError()
+                isErrorSlash = it.isErrorSlash()
+                updateCountWarehouse(title)
+            },
+            titleList = titleList,
+            isErrorTitle = isErrorTitle,
+            isErrorSlash = isErrorSlash,
+            focusManager = focusManager
         )
 
-        Box {
-            OutlinedTextField(
-                value = count,
-                onValueChange = {
-                    count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
-                    validateCount(count)
-                },
-                label = { Text("Количество") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                supportingText = {
-                    if (isErrorCount) {
-                        Text(
-                            text = "Не указано кол-во товара",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    } else {
-                        Text("Укажите кол-во товара, которое хотите сохранить на склад")
-                    }
-                },
-                trailingIcon = {
-                    IconButton(onClick = { expandedSuf = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
-                    }
-                },
-                suffix = {
-                    Text(text = suffix)
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = isErrorCount
-            )
-            DropdownMenu(
-                expanded = expandedSuf,
-                onDismissRequest = { expandedSuf = false },
-                //todo чтобы был слева
-            ) {
-                DropdownMenuItem(
-                    onClick = { suffix = "Шт." },
-                    text = { Text("Шт.") }
-                )
-                DropdownMenuItem(
-                    onClick = { suffix = "Кг." },
-                    text = { Text("Кг.") }
-                )
-                DropdownMenuItem(
-                    onClick = { suffix = "Л." },
-                    text = { Text("Л.") }
-                )
-            }
-
-        }
-
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedCat,
-                onExpandedChange = {
-                    expandedCat = !expandedCat
-                }
-            ) {
-                OutlinedTextField(
-                    value = category,
-                    onValueChange = { category = it },
-                    label = { Text("Категория") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                        .padding(bottom = 10.dp),
-                    supportingText = {
-                        Text("Укажите или выберите категорию в которую хотите отнести товар")
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { category = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    })
-                )
-
-                val filteredOptions =
-                    categoryList.filter { it.contains(category, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expandedCat,
-                        onDismissRequest = {
-//                            expandedCat = false
-                            // We shouldn't hide the menu when the user enters/removes any character
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    category = item
-                                    expandedCat = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        OutlinedTextField(
-            value = date1,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Дата") },
-            supportingText = {
-                Text("Выберите дату")
+        OutlinedTextCount(
+            value = count,
+            onValueChange = {
+                count = it.toConvertDb()
+                isErrorCount = it.isError()
             },
-            trailingIcon = {
-                IconButton(onClick = { openDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
-                        contentDescription = "Показать меню"
+            onClick = { suffix = it },
+            isError = isErrorCount,
+            suffix = suffix,
+            countWarehouse = countWarehouse,
+            focusManager = focusManager
+        )
+
+        OutlinedTextCategory(
+            value = category,
+            onValueChange = { category = it },
+            titleList = categoryList,
+            focusManager = focusManager
+        )
+
+        OutlinedTextDate(
+            value = date,
+            onValueChange = { openDialog = !openDialog }
+        )
+
+        if (animalList.isNotEmpty()) {
+            OutlinedTextAnimal(
+                value = animal,
+                onValueChange = {
+                    selectedAnimalIndex = it.first
+                    animal = animalList[selectedAnimalIndex].second
+                },
+                selectedAnimalIndex = selectedAnimalIndex,
+                onClickClear = { animal = it },
+                animalList = animalList,
+                focusManager = focusManager
+            )
+        }
+
+        OutlinedTextNote(
+            value = note,
+            onValueChange = { note = it },
+            focusManager = focusManager
+        )
+
+        ButtonStandart(
+            intRes = R.string.button_add,
+            onClick = {
+                if (isErrorAdd(title = title, count = count,
+                        isErrorTitle = { isErrorTitle = it },
+                        isErrorCount = { isErrorCount = it },
+                        isErrorSlash = { isErrorSlash = it })
+                ) {
+                    focusManager.clearFocus()
+                    val formattedDateList = date.split(".")
+                    saveInRoomAdd(
+                        AddTable(
+                            title = title,
+                            count = count.toDouble(),
+                            day = formattedDateList[0].toInt(),
+                            mount = formattedDateList[1].toInt(),
+                            year = formattedDateList[2].toInt(),
+                            suffix = suffix,
+                            category = category,
+                            idAnimal = if (animal != "") animalList[selectedAnimalIndex].first else 0,
+                            animal = animal,
+                            note = note,
+                            priceAll = 0.0,
+                            idPT = idProject
+                        )
+                    )
+                    toastShort(
+                        context = context,
+                        text = toastText
+                    )
+                    metricaAdd(
+                        title, count, category, animal, note
                     )
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 2.dp)
-                .clickable {
-                    openDialog = true
-                }
+            modifier = Modifier.toButton()
         )
-
-
-        if (animalList.isNotEmpty()) {
-            ExposedDropdownMenuBox(
-                expanded = expandedAni,
-                onExpandedChange = { expandedAni = !expandedAni },
-            ) {
-                OutlinedTextField(
-                    value = animal,
-                    onValueChange = {},
-                    label = { Text("Животное") },
-                    readOnly = true,
-                    leadingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAni) },
-                    trailingIcon = {
-                        IconButton(onClick = { animal = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Стереть")
-                        }
-                    },
-                    supportingText = {
-                        Text("Выберите животное, которое принесло продукцию")
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }),
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp)
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expandedAni,
-                    onDismissRequest = { expandedAni = false }
-                ) {
-                    animalList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = "${item.name} - ${item.type}",
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                selectedItemIndex = index
-                                expandedAni = false
-                                animal = animalList[selectedItemIndex].name
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-
-        OutlinedTextField(
-            value = note,
-            onValueChange = {
-                note = it
-            },
-            label = { Text("Примечание") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            supportingText = {
-                Text("Здесь может быть важная информация")
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences
-            )
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Button(
-                onClick = {
-                    if (errorBoolean()) {
-                        val formattedDateList = date1.split(".")
-                        saveInRoomAdd(
-                            AddTableInsert(
-                                id = 0,
-                                title = title,
-                                count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
-                                    .toDouble(),
-                                formattedDateList[0].toInt(),
-                                formattedDateList[1].toInt(),
-                                formattedDateList[2].toInt(),
-                                suffix = suffix,
-                                category = category,
-                                idAnimal = if (animal != "") animalList[selectedItemIndex].id else 0,
-                                animal = animal,
-                                priceAll = 0.0,
-                                note = note
-                            )
-                        )
-                        val eventParameters: MutableMap<String, Any> = HashMap()
-                        eventParameters["Имя"] = title
-                        eventParameters["Кол-во"] = "$title $count"
-                        eventParameters["Категория"] = category
-                        eventParameters["Животное"] =
-                            if (animalList.isNotEmpty()) animalList[selectedItemIndex].type else ""
-                        eventParameters["Примечание"] = note
-                        AppMetrica.reportEvent("Add Products", eventParameters);
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-            ) {
-                Text(text = "Добавить")
-            }
-        }
     }
 }
 
 
-data class AddTableInsert(
-    var id: Int,
-    var title: String,
-    var count: Double,
-    var day: Int,
-    var mount: Int,
-    var year: Int,
-    var priceAll: Double,
-    var suffix: String,
-    var category: String,
-    val idAnimal: Long,
-    var animal: String,
-    var note: String
-)
 

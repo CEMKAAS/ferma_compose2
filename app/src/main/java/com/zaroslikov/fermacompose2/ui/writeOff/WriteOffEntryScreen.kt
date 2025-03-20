@@ -56,9 +56,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
-import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
@@ -138,7 +137,7 @@ fun WriteOffEntryProduct(
 @Composable
 fun WriteOffEntryContainerProduct(
     modifier: Modifier,
-    titleList: List<PairString>,
+    titleList: List<PairData>,
     saveInRoomSale: (WriteOffTableInsert) -> Unit,
     countWarehouse: Double,
     updateCountWarehouse: (Pair<String, Boolean>) -> Unit
@@ -225,15 +224,15 @@ fun WriteOffEntryContainerProduct(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "${item.name} - ${item.type}",
+                                    text = "${item.first} - ${item.second}",
                                     fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
                                 selectedItemIndex = index
                                 expanded = false
-                                title = titleList[selectedItemIndex].name
-                                updateCountWarehouse(Pair(title, if(titleList[selectedItemIndex].type=="Моя Продукция") true else false))
+                                title = titleList[selectedItemIndex].first
+                                updateCountWarehouse(Pair(title, if(titleList[selectedItemIndex].second =="Моя Продукция") true else false))
                             }
                         )
                     }

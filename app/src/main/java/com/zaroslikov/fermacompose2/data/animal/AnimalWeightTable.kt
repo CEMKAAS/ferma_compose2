@@ -14,7 +14,6 @@ import androidx.room.PrimaryKey
         onDelete = ForeignKey.CASCADE
     )]
 )
-
 data class AnimalWeightTable(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,

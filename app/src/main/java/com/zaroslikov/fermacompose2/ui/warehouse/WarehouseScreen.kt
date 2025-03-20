@@ -588,7 +588,7 @@ fun TextButtonWarehouse(
     onClick: () -> Unit,
     boolean: Boolean,
     title: String = "",
-    @StringRes intRes: Int = R.string.widget_detail
+    @StringRes intRes: Int = R.string.support_text_count_warehouse_s
 ) {
     TextButton(
         onClick = onClick,

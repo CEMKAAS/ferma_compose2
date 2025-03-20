@@ -31,6 +31,8 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
+import com.zaroslikov.fermacompose2.supportFun.PairData
+import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
@@ -38,8 +40,6 @@ import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
-import com.zaroslikov.fermacompose2.ui.home.AnimalString
-import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.warehouse.FastAdd
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
@@ -74,10 +74,10 @@ interface ItemsRepository {
 
     fun getItemsTitleAddList(id: Int): Flow<List<String>>
 
-    fun getItemsWriteoffList(id: Int): Flow<List<PairString>>
+    fun getItemsWriteoffList(id: Int): Flow<List<PairData>>
 
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
-    fun getItemsAnimalAddList(id: Int): Flow<List<AnimalString>>
+    fun getItemsAnimalAddList(id: Int): Flow<List<TripleData>>
 
     suspend fun insertProject(projectTable: ProjectTable)
     suspend fun insertProjectLong(projectTable: ProjectTable): Long
@@ -96,7 +96,7 @@ interface ItemsRepository {
     fun getItemSale(id: Int): Flow<SaleTable>
     fun getBrieflyItemSale(id: Int): Flow<List<BrieflyItemPrice>>
     fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<SaleTable>>
-    fun getItemsTitleSaleList(id: Int): Flow<List<PairString>>
+    fun getItemsTitleSaleList(id: Int): Flow<List<PairData>>
     fun getItemsCategorySaleList(id: Int): Flow<List<String>>
     fun getItemsBuyerSaleList(id: Int): Flow<List<String>>
 

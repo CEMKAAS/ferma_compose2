@@ -21,21 +21,18 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
+import com.zaroslikov.fermacompose2.supportFun.PairData
+import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
-
 import com.zaroslikov.fermacompose2.ui.finance.Fin
-import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
-import com.zaroslikov.fermacompose2.ui.home.AnimalString
-import com.zaroslikov.fermacompose2.ui.home.PairString
 import com.zaroslikov.fermacompose2.ui.warehouse.FastAdd
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
-import java.time.YearMonth
 
 @Dao
 interface ItemDao {
@@ -113,8 +110,8 @@ interface ItemDao {
     @Query("SELECT MyFerma.category from MyFerma Where idPT=:id group by MyFerma.category ")
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
 
-    @Query("SELECT id, name, type from AnimalTable Where idPT=:id")
-    fun getItemsAnimalAddList(id: Int): Flow<List<AnimalString>>
+    @Query("SELECT id as first, name as second, type as third from AnimalTable Where idPT=:id")
+    fun getItemsAnimalAddList(id: Int): Flow<List<TripleData>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: AddTable)
@@ -150,16 +147,16 @@ interface ItemDao {
 //    fun getItemsTitleSaleList(id: Int): Flow<List<PairString>>
 
     @Query(
-        "SELECT title as name, 'Моя Продукция' as type from MyFerma Where idPT=:id" +
+        "SELECT title as first, 'Моя Продукция' as second from MyFerma Where idPT=:id" +
                 " UNION " +
-                " SELECT titleEXPENSES as name, 'Купленный товар' as type from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 and showFood != 1 group by titleEXPENSES" +
+                " SELECT titleEXPENSES as first, 'Купленный товар' as second from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 and showFood != 1 group by titleEXPENSES" +
                 " UNION " +
-                " SELECT MyFermaSale.titleSale as name, 'Проданый товар' as type  From MyFermaSale Where idPT=:id and name" +
+                " SELECT MyFermaSale.titleSale as first, 'Проданый товар' as second  From MyFermaSale Where idPT=:id and first" +
                 " NOT IN (SELECT title from MyFerma Where idPT=:id" +
                 " UNION " +
                 " SELECT titleEXPENSES from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 and showFood != 1 group by titleEXPENSES)"
     )
-    fun getItemsTitleSaleList(id: Int): Flow<List<PairString>>
+    fun getItemsTitleSaleList(id: Int): Flow<List<PairData>>
 
 
     @Query("SELECT MyFermaSale.category from MyFermaSale Where idPT=:id group by MyFermaSale.category")
@@ -268,11 +265,11 @@ interface ItemDao {
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
 
     @Query(
-        "SELECT Title as name, 'Моя Продукция' as type from MyFerma Where idPT=:id group by MyFerma.Title" +
+        "SELECT Title as first, 'Моя Продукция' as second from MyFerma Where idPT=:id group by MyFerma.Title" +
                 " UNION ALL" +
-                " SELECT titleEXPENSES as name, 'Купленый товар' as type from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 group by titleEXPENSES "
+                " SELECT titleEXPENSES as first, 'Купленый товар' as second from MyFermaEXPENSES Where idPT=:id and showWarehouse = 1 group by titleEXPENSES "
     )
-    fun getItemsWriteoffList(id: Int): Flow<List<PairString>>
+    fun getItemsWriteoffList(id: Int): Flow<List<PairData>>
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

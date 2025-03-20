@@ -92,7 +92,7 @@ fun AnimalEditProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            typeList = typeEditUiState.value.titleList,
+            typeList = typeEditUiState.value.list,
             onValueChange = viewModel::updateUiState,
             saveInRoomSale = {
                 if (it) {
@@ -149,6 +149,7 @@ fun AnimalEditContainer(
     fun validateType(text: String) {
         isErrorType = text == ""
     }
+
     fun validatePrice(text: String) {
         isErrorPrice = text == ""
     }
@@ -270,7 +271,11 @@ fun AnimalEditContainer(
         OutlinedTextField(
             value = animalEditUiState.price,
             onValueChange = {
-                onValueChange(animalEditUiState.copy(price = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                onValueChange(
+                    animalEditUiState.copy(
+                        price = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                    )
+                )
                 validatePrice(it)
             },
             label = { Text("Стоимость") },
@@ -439,7 +444,11 @@ fun AnimalEditContainer(
         OutlinedTextField(
             value = animalEditUiState.foodDay,
             onValueChange = {
-                onValueChange(animalEditUiState.copy(foodDay = it.replace(Regex("[^\\d.]"), "").replace(",", ".")))
+                onValueChange(
+                    animalEditUiState.copy(
+                        foodDay = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
+                    )
+                )
                 validatePrice(it)
             },
             label = { Text("Расход кормов") },
@@ -452,7 +461,9 @@ fun AnimalEditContainer(
                         text = "Не указана ежедневный расход корма на голову, если не знаете укажите 0!",
                         color = MaterialTheme.colorScheme.error
                     )
-                } else { Text("Укажите ежедневный расход корма на голову, если не знаете укажите 0") }
+                } else {
+                    Text("Укажите ежедневный расход корма на голову, если не знаете укажите 0")
+                }
             },
             suffix = { Text(text = "кг.") },
             keyboardOptions = KeyboardOptions(
@@ -493,7 +504,7 @@ fun AnimalEditContainer(
         )
 
         Button(
-            onClick = { saveInRoomSale(errorBoolean())},
+            onClick = { saveInRoomSale(errorBoolean()) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 15.dp)

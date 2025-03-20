@@ -101,7 +101,7 @@ fun WriteOffScreen(
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    val writeOffBoolean = titleUiState.titleList.isNotEmpty()
+    val writeOffBoolean = titleUiState.list.isNotEmpty()
     val idProject = viewModel.itemId
 
     val coroutineScope = rememberCoroutineScope()

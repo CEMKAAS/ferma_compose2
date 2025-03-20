@@ -361,7 +361,7 @@ fun InventoryNavHost(
                     "${AddEntryDestination.route}/${it}"
                 ) },
                 navigateToItemUpdate = {
-                navController.navigate("${AddEditDestination.route}/${it.id}/${it.idPT}") },
+                navController.navigate("${AddEditDestination.route}/${it.first}/${it.second}") },
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
             )
         }
@@ -397,13 +397,13 @@ fun InventoryNavHost(
                 navController.navigate(StartDestination.route)
             }, navigateToModalSheet = {
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-            }, navigateToItem = {
+            }, navigateToItemAdd = {
                 navController.navigate(
                     "${SaleEntryDestination.route}/${it}"
                 )
             }, navigateToItemUpdate = {
                 navController.navigate(
-                    "${SaleEditDestination.route}/${it.id}/${it.idPT}"
+                    "${SaleEditDestination.route}/${it.first}/${it.second}"
                 )
             })
         }
@@ -441,13 +441,13 @@ fun InventoryNavHost(
                 navController.navigate(StartDestination.route)
             }, navigateToModalSheet = {
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-            }, navigateToItem = {
+            }, navigateToItemAdd = {
                 navController.navigate(
                     "${ExpensesEntryDestination.route}/${it}"
                 )
             }, navigateToItemUpdate = {
                 navController.navigate(
-                    "${ExpensesEditDestination.route}/${it.id}/${it.idPT}"
+                    "${ExpensesEditDestination.route}/${it.first}/${it.second}"
                 )
             })
         }

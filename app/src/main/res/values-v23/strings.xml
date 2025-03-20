@@ -1,23 +1,119 @@
 <resources>
 
-    //Add Screen
+    //Title
     <string name="add_screen_title">Моя Продукция</string>
+    <string name="sale_screen_title">Мои Продажи</string>
+    <string name="expenses_screen_title">Мои Покупки</string>
 
 
-    //Add Entry Screen
+    //Outlined Text Field
+    <string name="outlined_text_product">Товар</string>
+    <string name="outlined_text_field_quantity">Количество</string>
+    <string name="outlined_text_field_category">Категория</string>
+    <string name="outlined_text_date">Дата</string>
+    <string name="outlined_text_animals">Животное</string>
+    <string name="outlined_text_note">Примечание</string>
+    <string name="outlined_text_price">Стоимость</string>
+    <string name="outlined_text_buyer">Покупатель</string>
 
 
-
-    // Cadrs
+    //Cadrs
     <string name="card_category">Категория:</string>
     <string name="card_animal">Животное:</string>
     <string name="card_note">Примечание:</string>
     <string name="card_date">Дата:</string>
+    <string name="card_count_s">%s\n за \n%s %s</string>
 
+
+    //Button
+    <string name="button_add">Добавить</string>
+    <string name="button_sale">Продать</string>
+    <string name="button_expenses">Купить</string>
+    <string name="button_refresh">Обновить</string>
+    <string name="button_delete">Удалить</string>
+    <string name="button_add_message_no_data">Добавить Продукцию!</string>
+    <string name="button_sale_message_no_data">Добавить Продажу!</string>
+    <string name="button_expenses_message_no_data">Добавить Покупку!</string>
+
+    //Button
+    <string name="button_text_great">Отлично!</string>
 
     //widget
     <string name="widget_briefly">Кратко</string>
-    <string name="widget_detail">Кратко</string>
+    <string name="widget_detail">Подробно</string>
+
+    //Suffix
+    <string name="suffix_pieces">шт.</string>
+    <string name="suffix_kilogram">кг.</string>
+    <string name="suffix_tons">тн.</string>
+    <string name="suffix_liters">л.</string>
+    <string name="suffix_cubic_meters">м3.</string>
+    <string name="suffix_meters">м.</string>
+
+
+    //ContentDescription
+    <string name="content_description_show_menu">Показать меню</string>
+    <string name="content_description_show_calendary">Показать календарь</string>
+    <string name="content_description_clear">Стереть</string>
+
+
+    //SupportText
+    <string name="support_text_count_product">Укажите количество товара для сохранения на складе</string>
+    <string name="support_text_count_product_sale">Укажите количество товара для продажи</string>
+    <string name="support_text_count_sale">Укажите стоимость за проданный товар</string>
+    <string name="support_text_product">Введите или выберите товар"</string>
+    <string name="support_text_count_warehouse_s">Сейчас на складе: %s"</string>
+    <string name="support_text_category">Укажите или выберите категорию, к которой относится данный товар</string>
+    <string name="support_text_date">Выберите дату</string>
+    <string name="support_text_animal">Выберите животное, которое дало вам продукцию</string>
+    <string name="support_text_note">Здесь может содержаться важная информация</string>
+    <string name="support_text_buyer">Укажите или выберите имя клиента.</string>
+
+
+    //Error
+    <string name="error_no_count_product">Количество товара не указано!</string>
+    <string name="error_no_count_sale">Стоимость товара не указана!</string>
+    <string name="error_slash">В имени товара указан /</string>
+    <string name="error_no_product">Товар не указан!</string>
+
+
+    //Toast
+    <string name="toast_add_s">Добавлено: %s</string>
+    <string name="toast_refresh_s">Обновлено: %s</string>
+    <string name="toast_sale_s">Продано: %s за %s %s</string>
+    <string name="toast_refresh_s_s">Обновлено: %s за %s %s</string>
+    <string name="toast_expenses_s_s">Куплено: %s за %s %s</string>
+
+    //MessageNoData
+    <string name="message_no_date_title_add">Добро пожаловать в раздел \"Моя Продукция!\"</string>
+    <string name="message_no_date_message_add">В этом разделе Вы можете добавлять товары, которые поступают с вашей фермы! Каждому товару можно назначить кол-во, категорию и животное, если оно занесено в разделе \"Мои Животные\"</string>
+    <string name="message_no_date_support_text_add">Сейчас нет товаров:(\nНажмите + чтобы добавить\nили</string>
+
+    <string name="message_no_date_title_sale">Добро пожаловать в раздел "Мои Продажи!"</string>
+    <string name="message_no_date_message_sale">В этом разделе Вы можете добавлять товары, которые продаете с Вашей фермы! Каждому товару можно назначить цену, кол-во, категорию и покупателя.</string>
+    <string name="message_no_date_support_text_sale">Сейчас нет продаж:(\nНажмите + чтобы добавить\nили</string>
+
+    <string name="message_no_date_title_expenses">Добро пожаловать в раздел "Мои Покупки!"</string>
+    <string name="message_no_date_message_expenses">В этом разделе Вы можете добавлять покупки, которые покупаете для Вашей фермы и не только! Каждой покупки можно назначить кол-во, цену и категорию.</string>
+    <string name="message_no_date_support_text_expenses">Сейчас нет покупок:(\nНажмите + чтобы добавить\nили</string>
+
+
+    //Currency
+    <string name="currency_ruble">₽</string>
+
+    //AlertDialogInfo
+    <string name="alert_dialog_info_title_food">"Что такое \"Корм\"?</string>
+    <string name="alert_dialog_info_text_food">Выберите животное или укажите количество корма и его ежедневный расход, чтобы рассчитать запас на складе. Стоимость корма влияет на себестоимость продукции от животного (за 1 единицу). Данные о запасе отображаются на складе для удобства контроля.</string>
+
+    <string name="alert_dialog_info_title_show_warehouse">Что такое "Отображать на складе"?</string>
+    <string name="alert_dialog_info_text_show_warehouse">При выборе этого пункта товар будет отображаться на складе. Его можно списать в "Мои Списания" или продать в "Мои Продажи", кроме товаров, отмеченных как "Корм" — их продажа недоступна.</string>
+
+    <string name="alert_dialog_info_title_animals_expenses">Что такое "Распределить расходы по животным"?</string>
+    <string name="alert_dialog_info_text_animals_expenses">Вам нужно выбрать животное или несколько животных, а затем с помощью ползунков распределить сумму купленного товара. Распределенная сумма напрямую влияет на себестоимость произведенного товара (молока, яиц, мяса и т.д.) от этого животного в расчете за 1 единицу.</string>
+
+
+
+
 
 
 

@@ -7,12 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.ui.home.TitleUiState
-import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
-import com.zaroslikov.fermacompose2.ui.sale.SaleEditViewModel
-import com.zaroslikov.fermacompose2.ui.sale.SaleTableUiState
-import com.zaroslikov.fermacompose2.ui.sale.toSaleTableUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull

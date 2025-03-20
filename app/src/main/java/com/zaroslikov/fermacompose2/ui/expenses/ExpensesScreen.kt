@@ -1,79 +1,61 @@
 package com.zaroslikov.fermacompose2.ui.expenses
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
-import com.zaroslikov.fermacompose2.ui.home.BrieflyCountCard
+import com.zaroslikov.fermacompose2.ui.composeElement.CardField
+import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
+import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
+import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
+import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
+import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.sale.BrieflyPriceCard
-import com.zaroslikov.fermacompose2.ui.sale.SaleProductCard
-import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
-import com.zaroslikov.fermacompose2.ui.sale.navigateId
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
-import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.start.dateBuilder
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object ExpensesDestination : NavigationDestination {
@@ -86,12 +68,12 @@ object ExpensesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreen(
+    modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (navigateId) -> Unit,
-    navigateToItem: (Int) -> Unit,
+    navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
+    navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
-    modifier: Modifier = Modifier,
     viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiState.collectAsState()
@@ -119,48 +101,30 @@ fun ExpensesScreen(
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBarFerma(
-                    title = "Мои Покупки",
+                TopAppBarNavigation(
+                    title = R.string.expenses_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigateToItem(idProject) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .padding(
-                            end = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateEndPadding(LocalLayoutDirection.current)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
-                    )
-                }
+                FloatButton { navigateToItemAdd(idProject) }
             }
         ) { innerPadding ->
             if (isLoading) {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                CircularProgress(
+                    modifier = modifier.padding(innerPadding),
+                )
             } else {
                 ExpensesBody(
+                    modifier = Modifier
+                        .modifierScreen(innerPadding),
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
                     viewModel = viewModel,
                     onItemClick = navigateToItemUpdate,
-                    modifier = modifier.fillMaxSize(),
-                    contentPadding = innerPadding,
-                    navigateToItemAdd = { navigateToItem(idProject) }
+                    navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
             }
         }
@@ -169,98 +133,56 @@ fun ExpensesScreen(
 
 @Composable
 private fun ExpensesBody(
+    modifier: Modifier = Modifier,
     viewModel: ExpensesViewModel,
     itemList: List<ExpensesTable>,
     brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (navigateId) -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
+    onItemClick: (Pair<Int, Int>) -> Unit,
     navigateToItemAdd: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    if (itemList.isNotEmpty())
+        InventoryList(
+            itemList = itemList,
+            brieflyList = brieflyList,
+            viewModel = viewModel,
+            onItemClick = { onItemClick(Pair(it.id, it.idPT)) },
+            modifier = modifier
+        )
+    else MessageNoData(
         modifier = modifier,
-    ) {
-        if (itemList.isEmpty()) {
-            Column(
-                modifier = modifier
-                    .padding(contentPadding)
-                    .padding(15.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Text(
-                    text = "Добро пожаловать в раздел \"Мои Покупки!\"",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "В этом разделе Вы можете добавлять покупки, которые покупаете для Вашей фермы и не только! Каждой покупки можно назначить кол-во, цену и категорию.",
-                    textAlign = TextAlign.Justify,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "Сейчас нет покупок:(\nНажмите + чтобы добавить\nили",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 20.sp,
-                )
-                Button(
-                    onClick = navigateToItemAdd, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 20.dp)
-
-                ) {
-                    Text(text = "Добавить Покупку!")
-                }
-            }
-        } else {
-            ExpensesList(
-                viewModel = viewModel,
-                itemList = itemList,
-                brieflyList = brieflyList,
-                onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
-                contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-            )
-        }
-    }
+        onClick = navigateToItemAdd,
+        titleRes = R.string.message_no_date_title_sale,
+        messageRes = R.string.message_no_date_message_sale,
+        supportRes = R.string.message_no_date_support_text_sale,
+        buttonRes = R.string.button_sale_message_no_data
+    )
 }
 
 @Composable
-private fun ExpensesList(
+private fun InventoryList(
     viewModel: ExpensesViewModel,
     itemList: List<ExpensesTable>,
     brieflyList: List<BrieflyItemPrice>,
     onItemClick: (ExpensesTable) -> Unit,
-    contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
+
     LazyColumn(
         modifier = modifier,
-        contentPadding = contentPadding
+        verticalArrangement = Arrangement.Top
     ) {
         item {
             TextButtonWarehouse(
                 boolean = details,
                 onClick = { details = !details },
-                title = if (details) "Кратко" else "Подробно"
+                intRes = if (details) R.string.widget_briefly else R.string.widget_detail
             )
         }
         if (details) {
             items(items = itemList, key = { it.id }) { item ->
                 ExpensesCard(expensesTable = item,
                     modifier = Modifier
-                        .padding(8.dp)
                         .clickable { onItemClick(item) })
             }
         } else {
@@ -269,10 +191,9 @@ private fun ExpensesList(
                     viewModel = viewModel,
                     product = item,
                     onItemClick = onItemClick,
-                    modifier = Modifier
-                        .padding(8.dp)
 
-                )
+
+                    )
             }
         }
     }
@@ -285,41 +206,43 @@ fun BrieflyPriceCard(
     onItemClick: (ExpensesTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
-    Card(
-        modifier = modifier.clickable {
-            expanded = !expanded
-        },
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
-    ) {
+    val extraPadding by animateDpAsState(
+        if (expanded) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ), label = ""
+    )
+
+    CardField(modifier = modifier.clickable {
+        expanded = !expanded
+    }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(6.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.8f)
+                    .fillMaxWidth()
+                    .weight(0.7f)
             ) {
-                Text(
-                    text = product.title,
-                    modifier = Modifier
-                        .padding(6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
+                TextLine(
+                    modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
+                    valueString = product.title,
+                    textStyle = textBold_20
                 )
-                Text(
-                    text = "${formatter(product.count)} ${product.suffix} " +
-                            "за ${formatter(product.price)} ₽",
-                    modifier = Modifier
-                        .padding(6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
+
+                IconAndText(
+                    iconRes = R.drawable.baseline_shopping_basket_24,
+                    valueString = stringResource(
+                        R.string.card_count_s,
+                        "${product.count.formatNumber()} ${product.suffix}",
+                        product.price.formatNumber()
+                    ),
                 )
             }
             IconButton(onClick = { expanded = !expanded }) {
@@ -335,8 +258,11 @@ fun BrieflyPriceCard(
         products.value.forEach {
             ExpensesCard(expensesTable = it,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onItemClick(it) })
+                    .graphicsLayer {
+                        scaleX = 0.95f
+                    }
+                    .clickable { onItemClick(it) }
+                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
         }
     }
 }
@@ -347,75 +273,60 @@ fun ExpensesCard(
     expensesTable: ExpensesTable,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
-    ) {
+    CardField(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Column(
-                modifier = Modifier.fillMaxWidth(0.7f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.7f)
             ) {
                 Text(
+                    modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
                     text = expensesTable.title,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
+                    style = textBold_20,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                if (expensesTable.category == "Без категории" || expensesTable.category == "") {
-
-                } else {
-                    Text(
-                        text = "Категория: ${expensesTable.category}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
+                IconAndText(
+                    iconRes = R.drawable.baseline_calendar_month_24,
+                    valueString = dateBuilder(
+                        expensesTable.day,
+                        expensesTable.mount,
+                        expensesTable.year
                     )
-                }
-                if (expensesTable.note != "") {
-                    Text(
-                        text = "Примечание: ${expensesTable.note}",
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                Text(
-                    text = "Дата: ${
-                        String.format(
-                            "%02d.%02d.%d",
-                            expensesTable.day,
-                            expensesTable.mount,
-                            expensesTable.year
+                )
+                expensesTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
+                    ?.let { category ->
+                        IconAndText(
+                            iconRes = R.drawable.baseline_format_list_bulleted_24,
+                            valueString = category
                         )
-                    }",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(vertical = 3.dp, horizontal = 6.dp)
-                )
-            }
-            Text(
-                text = "${formatter(expensesTable.count)} ${expensesTable.suffix}\n за\n${
-                    formatter(
-                        expensesTable.priceAll
+                    }
+                if (expensesTable.note != "")
+                    IconAndText(
+                        iconRes = R.drawable.baseline_sticky_note_2_24,
+                        valueString = expensesTable.note
                     )
-                } ₽",
+
+            }
+
+            Text(
+                text = stringResource(
+                    R.string.card_count_s,
+                    "${expensesTable.count.formatNumber()} ${expensesTable.suffix}",
+                    stringResource(R.string.currency_ruble),
+                    expensesTable.priceAll.formatNumber()
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(1f),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
+                    .fillMaxWidth()
+                    .weight(0.3f),
+                style = textBold_20
             )
         }
     }

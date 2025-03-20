@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.ui.home.TitleUiState
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -40,12 +40,12 @@ class AnimalEditViewModel(
             item
     }
 
-    val typeUiState: StateFlow<TitleUiState> =
-        itemsRepository.getTypeAnimal(itemId).map { TitleUiState(it) }
+    val typeUiState: StateFlow< DataStringListState> =
+        itemsRepository.getTypeAnimal(itemId).map {  DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue =  DataStringListState()
             )
     suspend fun saveItem() {
         itemsRepository.updateAnimalTable(animaEditUiState.toAnimalTable())

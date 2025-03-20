@@ -1,13 +1,15 @@
 package com.zaroslikov.fermacompose2.ui.home
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -24,32 +26,32 @@ class AddEntryViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[AddEntryDestination.itemIdArg])
 
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleAddList(itemId).map { TitleUiState(it) }
+    val titleUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsTitleAddList(itemId).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue = DataStringListState()
             )
 
-    val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategoryAddList(itemId).map { CategoryUiState(it) }
+    val categoryUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsCategoryAddList(itemId).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = CategoryUiState()
+                initialValue = DataStringListState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState2> =
-        itemsRepository.getItemsAnimalAddList(itemId).map { AnimalUiState2(it) }
+    val animalUiState: StateFlow<DataTripleListState> =
+        itemsRepository.getItemsAnimalAddList(itemId).map { DataTripleListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState2()
+                initialValue = DataTripleListState()
             )
 
 
-    var itemUiState by mutableStateOf(0.0)
+    var itemUiState by mutableDoubleStateOf(0.0)
         private set
 
 
@@ -73,16 +75,5 @@ class AddEntryViewModel(
 
 }
 
-/**
- * Ui State for HomeScreen
- */
-data class TitleUiState(val titleList: List<String> = listOf())
 
-data class CategoryUiState(val categoryList: List<String> = listOf())
-data class AnimalUiState(val animalList: List<PairString> = listOf())
 
-data class AnimalUiState2(val animalList: List<AnimalString> = listOf())
-
-data class PairString(val name: String, val type:String)
-
-data class AnimalString(val id:Long, val name: String, val type:String)

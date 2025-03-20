@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,8 +51,8 @@ import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
-import com.zaroslikov.fermacompose2.ui.sale.navigateId
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
@@ -76,18 +74,19 @@ fun AddScreen(
     modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (navigateId) -> Unit,
+    navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
     viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val idProject = viewModel.itemId
+
     val homeUiState by viewModel.homeUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
 
+    val isLoading by viewModel.isLoading.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
 
 
@@ -125,12 +124,7 @@ fun AddScreen(
             else
                 AddContainer(
                     modifier = modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(
-                            horizontal = dimensionResource(id = R.dimen.padding_medium),
-                            vertical = dimensionResource(R.dimen.padding_small)
-                        ),
+                        .modifierScreen(innerPadding),
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
                     viewModel = viewModel,
@@ -153,7 +147,7 @@ fun AddContainer(
     viewModel: AddViewModel,
     itemList: List<AddTable>,
     brieflyList: List<BrieflyItemCount>,
-    onItemClick: (navigateId) -> Unit,
+    onItemClick: (Pair<Int, Int>) -> Unit,
     navigateToItemAdd: () -> Unit,
     navigationToAnalysis: (String) -> Unit,
 ) {
@@ -163,14 +157,18 @@ fun AddContainer(
             itemList = itemList,
             brieflyList = brieflyList,
             viewModel = viewModel,
-            onItemClick = { onItemClick(navigateId(it.id, it.idPT)) },
+            onItemClick = { onItemClick(Pair(it.id, it.idPT)) },
             modifier = modifier,
             navigationToAnalysis = navigationToAnalysis,
 
             )
     else MessageNoData(
         modifier = modifier,
-        onClick = navigateToItemAdd
+        onClick = navigateToItemAdd,
+        titleRes = R.string.message_no_date_title_add,
+        messageRes = R.string.message_no_date_message_add,
+        supportRes = R.string.message_no_date_support_text_add,
+        buttonRes = R.string.button_add_message_no_data
     )
 
 }
@@ -210,7 +208,6 @@ fun InventoryList(
             items(items = brieflyList) { item ->
                 BrieflyCountCard(
                     product = item,
-                    modifier = Modifier,
                     viewModel = viewModel,
                     onItemClick = onItemClick,
                     navigationToAnalysis = navigationToAnalysis,
@@ -257,7 +254,7 @@ fun BrieflyCountCard(
                 TextLine(
                     modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
                     valueString = product.title,
-                    textStyle = textBold_18
+                    textStyle = textBold_20
                 )
 
                 IconAndText(
@@ -322,7 +319,7 @@ fun AddProductCard(
                 Text(
                     modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
                     text = addProduct.title,
-                    style = textBold_18,
+                    style = textBold_20,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -365,7 +362,7 @@ fun AddProductCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.3f),
-                style = textBold_18
+                style = textBold_20
             )
         }
     }

@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.composeElement
 
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,47 +43,32 @@ fun CircularProgress(
 @Composable
 fun MessageNoData(
     modifier: Modifier = Modifier,
+    @StringRes titleRes: Int,
+    @StringRes messageRes: Int,
+    @StringRes supportRes: Int,
+    @StringRes buttonRes: Int,
     onClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
             .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Top
     ) {
         Text(
-            text = "Добро пожаловать в раздел \"Мои Товары!\"",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp),
-            fontSize = 20.sp,
+            text = stringResource(titleRes),
+            style = text_20_center,
+            modifier = Modifier.toOutlinedText()
         )
         Text(
-            text = "В этом разделе Вы можете добавлять товары, которые поступают с вашей фермы! Каждому товару можно назначить кол-во, категорию и животное, если оно занесено в разделе \"Мои Животные\"",
-            textAlign = TextAlign.Justify,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp),
-            fontSize = 20.sp,
-        )
+            text = stringResource(messageRes),
+            style = text_20_justify,
+            modifier = Modifier.toOutlinedText(),
+            )
         Text(
-            text = "Сейчас нет товаров:(\nНажмите + чтобы добавить\nили",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 20.sp,
+            text = stringResource(supportRes),
+            style = text_20_center,
+            modifier = Modifier.toOutlinedText()
         )
-        Button(
-            onClick = onClick, modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 20.dp)
-
-        ) {
-            Text(text = "Добавить Продукцию!")
-        }
+        ButtonStandart(onClick = onClick, intRes = buttonRes)
     }
-
 }

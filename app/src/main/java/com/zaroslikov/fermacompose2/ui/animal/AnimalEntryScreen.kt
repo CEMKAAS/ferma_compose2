@@ -94,7 +94,7 @@ fun AnimalEntryProduct(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
-            typeList = typeList.titleList,
+            typeList = typeList.list,
             saveInRoomSale = {
                 coroutineScope.launch {
                     viewModel.saveItem(

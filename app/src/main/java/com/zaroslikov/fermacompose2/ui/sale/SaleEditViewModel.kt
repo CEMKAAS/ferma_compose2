@@ -1,19 +1,18 @@
 package com.zaroslikov.fermacompose2.ui.sale
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
-import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
-import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
-import com.zaroslikov.fermacompose2.ui.home.TitleUiState
-import com.zaroslikov.fermacompose2.ui.home.toAddTableUiState
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -30,7 +29,7 @@ class SaleEditViewModel(
     private val itemId: Int = checkNotNull(savedStateHandle[SaleEditDestination.itemIdArg])
     private val itemIdPT: Int = checkNotNull(savedStateHandle[SaleEditDestination.itemIdArgTwo])
 
-    var itemUiState by mutableStateOf(SaleTableUiState())
+    var itemUiState by mutableStateOf(DomainSaleTable())
         private set
 
     init {
@@ -38,45 +37,68 @@ class SaleEditViewModel(
             itemUiState = itemsRepository.getItemSale(itemId)
                 .filterNotNull()
                 .first()
-                .toSaleTableUiState()
+                .toDomainMap()
         }
     }
 
-    fun updateUiState(itemDetails: SaleTableUiState) {
+    fun updateUiState(itemDetails: DomainSaleTable) {
         itemUiState =
             itemDetails
     }
 
-    val titleUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsTitleSaleList(itemIdPT).map { AnimalUiState(it) }
+    val titleUiState: StateFlow<DataPairListState> =
+        itemsRepository.getItemsTitleSaleList(itemIdPT).map { DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
+                initialValue = DataPairListState()
             )
 
-    val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategorySaleList(itemIdPT).map { CategoryUiState(it) }
+    val categoryUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsCategorySaleList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = CategoryUiState()
+                initialValue = DataStringListState()
             )
 
-    val buyerUiState: StateFlow<BuyerUiState> =
-        itemsRepository.getItemsBuyerSaleList(itemIdPT).map { BuyerUiState(it) }
+    val buyerUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsBuyerSaleList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = BuyerUiState()
+                initialValue = DataStringListState()
             )
+
+    var countWarehouseUiState by mutableDoubleStateOf(0.0)
+        private set
+
+    fun updateCountWarehouseUiState(pair: Pair<String, String>) {
+        viewModelScope.launch {
+            countWarehouseUiState = when (pair.second) {
+                "Моя Продукция" -> {
+                    itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
+                        .filterNotNull()
+                        .first()
+                        .toDouble()
+                }
+                "Купленный товар" -> {
+                    itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
+                        .filterNotNull()
+                        .first()
+                        .toDouble()
+                }
+                else -> 0.0
+            }
+        }
+    }
 
     suspend fun saveItem() {
-        itemsRepository.updateSale(itemUiState.toSaleTable())
+        itemsRepository.updateSale(itemUiState.toRoomMap())
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteSale(itemUiState.toSaleTable())
+        itemsRepository.deleteSale(itemUiState.toRoomMap())
     }
 
     companion object {
@@ -85,49 +107,3 @@ class SaleEditViewModel(
 
 }
 
-data class SaleTableUiState(
-    val id: Int = 0,
-    val title: String = "", // название
-    val count: String = "", // Кол-во
-    val day: Int = 0,  // день
-    val mount: Int = 0, // месяц
-    val year: Int = 0, // время
-    val priceAll: String = "",
-    val idPT: Int = 0,
-    var suffix: String = "",
-    var category: String = "",
-    var buyer: String = "",
-    var note: String = ""
-)
-
-fun SaleTable.toSaleTableUiState(): SaleTableUiState = SaleTableUiState(
-    id,
-    title,
-    count.toString(),
-    day,
-    mount,
-    year,
-    priceAll.toString(),
-    idPT,
-    suffix,
-    category,
-    buyer,
-    note
-)
-
-fun SaleTableUiState.toSaleTable(): SaleTable = SaleTable(
-    id = id,
-    title = title,
-    count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-    day = day,
-    mount = mount,
-    year = year,
-    priceAll = priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-    suffix = suffix,
-    category = category,
-    buyer = buyer,
-    note = note,
-    idPT = idPT
-)
-
-data class BuyerUiState(val buyerList: List<String> = listOf())

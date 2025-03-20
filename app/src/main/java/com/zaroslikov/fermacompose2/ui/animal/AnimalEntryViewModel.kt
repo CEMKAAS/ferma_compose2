@@ -8,10 +8,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryDestination
-import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
-import com.zaroslikov.fermacompose2.ui.home.TitleUiState
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -24,12 +21,12 @@ class AnimalEntryViewModel (
 
     val itemId: Int = checkNotNull(savedStateHandle[AnimalEntryDestination.itemIdArg])
 
-    val typeUiState: StateFlow<TitleUiState> =
-        itemsRepository.getTypeAnimal(itemId).map {TitleUiState(it) }
+    val typeUiState: StateFlow< DataStringListState> =
+        itemsRepository.getTypeAnimal(itemId).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue =  DataStringListState()
             )
 
 

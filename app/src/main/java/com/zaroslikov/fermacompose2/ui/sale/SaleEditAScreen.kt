@@ -2,60 +2,51 @@
 
 package com.zaroslikov.fermacompose2.ui.sale
 
-import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.supportFun.PairData
+import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
+import com.zaroslikov.fermacompose2.supportFun.formatDateToString
+import com.zaroslikov.fermacompose2.supportFun.isError
+import com.zaroslikov.fermacompose2.supportFun.isErrorSale
+import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
+import com.zaroslikov.fermacompose2.supportFun.toConvertDb
+import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
-import com.zaroslikov.fermacompose2.ui.home.PairString
-import com.zaroslikov.fermacompose2.ui.start.dateLong
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import kotlinx.coroutines.launch
 
 object SaleEditDestination : NavigationDestination {
@@ -73,7 +64,6 @@ fun SaleEditProduct(
     onNavigateUp: () -> Unit,
     viewModel: SaleEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val context = LocalContext.current
 
     val titleUiState by viewModel.titleUiState.collectAsState()
     val categoryUiState by viewModel.categoryUiState.collectAsState()
@@ -82,34 +72,30 @@ fun SaleEditProduct(
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Изменить Продажу", navigateUp = navigateBack)
+            TopAppBarBack(intRes = R.string.sale_screen_title, navigateUp = navigateBack)
         }
     ) { innerPadding ->
 
         SaleEditContainerProduct(
             modifier = Modifier
-                .padding(innerPadding)
-                .padding(5.dp)
+                .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
             titleList = titleUiState.animalList,
-            categoryList = categoryUiState.categoryList,
-            buyerList = buyerUiState.buyerList,
+            categoryList = categoryUiState.list,
+            buyerList = buyerUiState.list,
             saleTable = viewModel.itemUiState,
             onValueChange = viewModel::updateUiState,
-            saveInRoomAdd = {
-                if (it) {
-                    coroutineScope.launch {
-                        viewModel.saveItem()
-                        Toast.makeText(
-                            context,
-                            "Обновлено: ${viewModel.itemUiState.title} ${viewModel.itemUiState.count} ${viewModel.itemUiState.suffix} за ${viewModel.itemUiState.priceAll} ₽",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        onNavigateUp()
-                    }
+            countWarehouse = viewModel.countWarehouseUiState,
+            updateCountWarehouse = {
+                viewModel.updateCountWarehouseUiState(it)
+            },
+            onClickSave = {
+                coroutineScope.launch {
+                    viewModel.saveItem()
+                    onNavigateUp()
                 }
             },
-            deleteAdd = {
+            onClickDelete = {
                 coroutineScope.launch {
                     viewModel.deleteItem()
                     onNavigateUp()
@@ -123,449 +109,149 @@ fun SaleEditProduct(
 @Composable
 fun SaleEditContainerProduct(
     modifier: Modifier,
-    saleTable: SaleTableUiState,
-    titleList: List<PairString>,
+    saleTable: DomainSaleTable,
+    titleList: List<PairData>,
     categoryList: List<String>,
     buyerList: List<String>,
-    onValueChange: (SaleTableUiState) -> Unit = {},
-    saveInRoomAdd: (Boolean) -> Unit,
-    deleteAdd: () -> Unit
+    onValueChange: (DomainSaleTable) -> Unit = {},
+    countWarehouse: Double,
+    updateCountWarehouse: (Pair<String, String>) -> Unit,
+    onClickSave: () -> Unit,
+    onClickDelete: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var expandedSuf by remember { mutableStateOf(false) }
-    var expandedCat by remember { mutableStateOf(false) }
-    var expandedBuy by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
-    var openDialog by remember { mutableStateOf(false) }
+    var selectedItemIndex by remember { mutableIntStateOf(0) }
+    var countWarehouseBoolean by rememberSaveable { mutableStateOf(false) }
 
+    //Error
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
+    var isErrorSlash by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
     var isErrorPrice by rememberSaveable { mutableStateOf(false) }
 
-    val focusManager = LocalFocusManager.current
+    val toastText = stringResource(
+        R.string.toast_refresh_s_s,
+        "${saleTable.title} ${saleTable.count} ${saleTable.suffix}",
+        saleTable.priceAll,
+        stringResource(R.string.currency_ruble)
+    )
 
-    var selectedItemIndex by remember { mutableStateOf(0) }
+    //date
+    var openDialog by remember { mutableStateOf(false) }
+    var date = formatDateToString(saleTable.day, saleTable.mount, saleTable.year)
 
+    if (openDialog) {
+        val datePickerState = rememberDatePickerState(
+            selectableDates = PastOrPresentSelectableDates,
+            initialSelectedDateMillis = formatDateToLong(date)
+        )
+        DatePickerDialogSample(datePickerState, date) {
+            date = it
+            openDialog = !openDialog
 
-    fun validateTitle(text: String) {
-        isErrorTitle = text == ""
+            val dateList = date.split(".")
+            onValueChange(
+                saleTable.copy(
+                    day = dateList[0].toInt(),
+                    mount = dateList[1].toInt(),
+                    year = dateList[2].toInt()
+                )
+            )
+        }
     }
-
-    fun validateCount(text: String) {
-        isErrorCount = text == ""
-    }
-
-    fun validatePrice(text: String) {
-        isErrorCount = text == ""
-    }
-
-    fun errorBoolean(): Boolean {
-        isErrorTitle = saleTable.title == ""
-        isErrorCount = saleTable.count == ""
-        isErrorPrice = saleTable.priceAll == ""
-        return !(isErrorTitle || isErrorCount || isErrorPrice)
-    }
-
 
     Column(modifier = modifier) {
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                }
-            ) {
-                OutlinedTextField(
-                    value = saleTable.title,
-                    onValueChange = {
-                        onValueChange(saleTable.copy(title = it))
-                        validateTitle(it)
-                    },
-                    label = { Text(text = "Товар") },
-                    supportingText = {
-                        if (isErrorTitle) {
-                            Text(
-                                text = "Не указано имя товара",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else {
-                            Text("Введите или выберите товар")
-                        }
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp),
-                    isError = isErrorTitle,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
-                )
 
-                val filteredOptions =
-                    titleList.filter { it.name.contains(saleTable.title, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
-                    ) {
-                        filteredOptions.forEachIndexed { index, item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = "${item.name} - ${item.type}",
-                                        fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                    )
-                                },
-                                onClick = {
-                                    selectedItemIndex = index
-                                    onValueChange(saleTable.copy(title = item.name))
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
 
-        Box {
-            OutlinedTextField(
-                value = saleTable.count,
-                onValueChange = {
-                    onValueChange(
-                        saleTable.copy(
-                            count = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
-                        )
-                    )
-                    validateCount(it)
-                },
-                label = { Text("Количество") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                supportingText = {
-                    if (isErrorCount) {
-                        Text(
-                            text = "Не указано кол-во товара",
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    } else {
-                        Text("Укажите кол-во товара, которое хотите продать со склада")
-                    }
-                },
-                trailingIcon = {
-                    IconButton(onClick = { expandedSuf = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Показать меню")
-                    }
-                },
-                suffix = {
-                    Text(text = saleTable.suffix)
-                },
-                isError = isErrorCount,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
-                    )
-                }
-                )
-            )
-            DropdownMenu(
-                expanded = expandedSuf,
-                onDismissRequest = { expandedSuf = false },
-                //todo чтобы был слева
-            ) {
-                DropdownMenuItem(
-                    onClick = {
-                        onValueChange(saleTable.copy(suffix = "Шт."))
-                    },
-                    text = { Text("Шт.") }
-                )
-                DropdownMenuItem(
-                    onClick = {
-                        onValueChange(saleTable.copy(suffix = "Кг."))
-                    },
-                    text = { Text("Кг.") }
-                )
-                DropdownMenuItem(
-                    onClick = {
-                        onValueChange(saleTable.copy(suffix = "Л."))
-                    },
-                    text = { Text("Л.") }
-                )
-                DropdownMenuItem(
-                    onClick = { onValueChange(saleTable.copy(suffix = "м3")) },
-                    text = { Text("м3") }
-                )
-                DropdownMenuItem(
-                    onClick = { onValueChange(saleTable.copy(suffix = "Тн.")) },
-                    text = { Text("Тн.") }
-                )
-                DropdownMenuItem(
-                    onClick = { onValueChange(saleTable.copy(suffix =  "М.")) },
-                    text = { Text("М.") }
-                )
-            }
+        OutlinedTextTitleSale(
+            value = saleTable.title,
+            onValueChange = {
+                onValueChange(saleTable.copy(title =it.trim()))
+                isErrorTitle = it.isError()
+                isErrorSlash = it.isErrorSlash()
+            },
+            onValueChoice = {
+                selectedItemIndex = it.first
+                onValueChange(saleTable.copy(title = it.second))
+                countWarehouseBoolean = it.third == "Моя Продукция" || it.third == "Купленный товар"
+                updateCountWarehouse(Pair(it.second, it.third))
+            },
+            selectedItemIndex = selectedItemIndex,
+            titleList = titleList,
+            isErrorTitle = isErrorTitle,
+            isErrorSlash = isErrorSlash,
+            focusManager = focusManager
+        )
 
-        }
+        OutlinedTextCount(
+            value = saleTable.count,
+            onValueChange = {
+                onValueChange(saleTable.copy(count = it.toConvertDb()))
+                isErrorCount = it.isError()
+            },
+            onClick = { onValueChange(saleTable.copy(suffix = it)) },
+            isError = isErrorCount,
+            suffix = saleTable.suffix,
+            countWarehouse = countWarehouse,
+            focusManager = focusManager
+        )
 
-        OutlinedTextField(
+        OutlinedTextPrice(
             value = saleTable.priceAll,
             onValueChange = {
-                onValueChange(
-                    saleTable.copy(
-                        priceAll = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
-                    )
-                )
-                validatePrice(saleTable.priceAll)
+                onValueChange(saleTable.copy(priceAll = it.toConvertDb()))
+                isErrorPrice = it.isError()
             },
-            label = { Text("Стоимость") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            supportingText = {
-                if (isErrorPrice) {
-                    Text(
-                        text = "Не указана стоимость за товар!",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else {
-                    Text("Укажите стоимость за проданный товар")
-                }
-            },
-            suffix = { Text(text = "₽") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
-                )
-            }
-            ),
-            isError = isErrorPrice
+            isError = isErrorPrice,
+            focusManager = focusManager
         )
 
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedCat,
-                onExpandedChange = {
-                    expandedCat = !expandedCat
-                }
-            ) {
-                OutlinedTextField(
-                    value = saleTable.category,
-                    onValueChange = { onValueChange(saleTable.copy(category = it)) },
-                    label = { Text("Категория") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                        .padding(bottom = 10.dp),
-                    supportingText = {
-                        Text("Укажите или выберите категорию в которую хотите отнести товар")
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
-                )
-
-                val filteredOptions =
-                    categoryList.filter { it.contains(saleTable.category, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expandedCat,
-                        onDismissRequest = {
-//                            expandedCat = false
-                            // We shouldn't hide the menu when the user enters/removes any character
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    onValueChange(saleTable.copy(category = item))
-                                    expandedCat = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        var formattedDate =
-            String.format("%02d.%02d.%d", saleTable.day, saleTable.mount, saleTable.year)
-
-        if (openDialog) {
-            val datePickerState = rememberDatePickerState(
-                selectableDates = PastOrPresentSelectableDates,
-                initialSelectedDateMillis = dateLong(formattedDate)
-            )
-            DatePickerDialogSample(datePickerState, formattedDate) { date ->
-                formattedDate = date
-                openDialog = false
-                val formattedDateList = formattedDate.split(".")
-                onValueChange(
-                    saleTable.copy(
-                        day = formattedDateList[0].toInt(),
-                        mount = formattedDateList[1].toInt(),
-                        year = formattedDateList[2].toInt()
-                    )
-                )
-            }
-        }
-
-        OutlinedTextField(
-            value = formattedDate,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Дата") },
-            supportingText = {
-                Text("Выберите дату ")
-            },
-            trailingIcon = {
-                IconButton(onClick = { openDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { openDialog = true }
-                .padding(bottom = 10.dp),
+        OutlinedTextCategory(
+            value = saleTable.category,
+            onValueChange = { onValueChange(saleTable.copy(category = it.trim())) },
+            titleList = categoryList,
+            focusManager = focusManager
         )
 
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedBuy,
-                onExpandedChange = {
-                    expandedBuy = !expandedBuy
-                }
-            ) {
-                OutlinedTextField(
-                    value = saleTable.buyer,
-                    onValueChange = {
-                        onValueChange(saleTable.copy(buyer = it))
-                    },
-                    label = { Text(text = "Покупатель") },
-                    supportingText = { Text("Выберите или укажите имя покупателя") },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp),
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    })
-                )
+        OutlinedTextDate(
+            value = date,
+            onValueChange = { openDialog = !openDialog }
+        )
 
-                val filteredOptions =
-                    buyerList.filter { it.contains(saleTable.buyer, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expandedBuy,
-                        onDismissRequest = {
-//                            expanded = false
-                        }
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    saleTable.buyer = item
-                                    expandedBuy = false
-                                    onValueChange(saleTable.copy(buyer = item))
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        OutlinedTextBuyer(
+            value = saleTable.buyer,
+            onValueChange = { onValueChange(saleTable.copy(buyer = it)) },
+            list = buyerList,
+            focusManager = focusManager
+        )
 
-        OutlinedTextField(
+        OutlinedTextNote(
             value = saleTable.note,
             onValueChange = {
-                onValueChange(
-                    saleTable.copy(
-                        note = it
-                    )
-                )
+                onValueChange(saleTable.copy(note = it))
             },
-            label = { Text("Примечание") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            supportingText = {
-                Text("Здесь может быть важная информация")
-
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
-                )
-            }
-            )
+            focusManager = focusManager
         )
 
-        Button(
-            onClick = { saveInRoomAdd(errorBoolean()) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_create_24),
-                contentDescription = " Обновить "
-            )
-            Text(text = " Обновить ")
-        }
 
-        OutlinedButton(
-            onClick = deleteAdd,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_delete_24),
-                contentDescription = "Удалить"
-            )
-            Text(text = " Удалить ")
+        ButtonRefresh {
+            if (isErrorSale(title = saleTable.title, count = saleTable.count,
+                    price = saleTable.count,
+                    isErrorTitle = { isErrorTitle = it },
+                    isErrorCount = { isErrorCount = it },
+                    isErrorSlash = { isErrorSlash = it },
+                    isErrorPrice = { isErrorPrice = it })
+            ) {
+                focusManager.clearFocus()
+                onClickSave()
+                toastShort(
+                    context = context,
+                    text = toastText
+                )
+            }
         }
+        ButtonDelete { onClickDelete() }
     }
 }

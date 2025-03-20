@@ -1,18 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.sale
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
+
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
-import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
-import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
-import com.zaroslikov.fermacompose2.ui.home.TitleUiState
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -29,33 +27,32 @@ class SaleEntryViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdArg])
 
-    val titleUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsTitleSaleList(itemId).map { AnimalUiState(it) }
+    val titleUiState: StateFlow<DataPairListState> =
+        itemsRepository.getItemsTitleSaleList(itemId).map {  DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
+                initialValue =  DataPairListState()
             )
 
-
-    val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategorySaleList(itemId).map { CategoryUiState(it) }
+    val categoryUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsCategorySaleList(itemId).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = CategoryUiState()
+                initialValue = DataStringListState()
             )
 
 
-    val buyerUiState: StateFlow<BuyerUiState> =
-        itemsRepository.getItemsBuyerSaleList(itemId).map { BuyerUiState(it) }
+    val buyerUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsBuyerSaleList(itemId).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = BuyerUiState()
+                initialValue = DataStringListState()
             )
 
-    var itemUiState by mutableStateOf(0.0)
+    var itemUiState by mutableDoubleStateOf(0.0)
         private set
 
     fun updateUiState(pair: Pair<String, String>) {
@@ -85,5 +82,4 @@ class SaleEntryViewModel(
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
 }

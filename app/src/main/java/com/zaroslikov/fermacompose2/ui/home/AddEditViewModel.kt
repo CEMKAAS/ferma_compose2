@@ -1,16 +1,20 @@
 package com.zaroslikov.fermacompose2.ui.home
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -25,7 +29,7 @@ class AddEditViewModel(
     private val itemId: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArg])
     private val itemIdPT: Int = checkNotNull(savedStateHandle[AddEditDestination.itemIdArgTwo])
 
-    var itemUiState by mutableStateOf(AddTableUiState())
+    var itemUiState by mutableStateOf(DomainAddTable())
         private set
 
     init {
@@ -33,47 +37,60 @@ class AddEditViewModel(
             itemUiState = itemsRepository.getItemAdd(itemId)
                 .filterNotNull()
                 .first()
-                .toAddTableUiState()
+                .toDomainMap()
         }
     }
 
-    fun updateUiState(itemDetails: AddTableUiState) {
-        itemUiState =
-            itemDetails
-    }
-
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleAddList(itemIdPT).map { TitleUiState(it) }
+    val titleUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsTitleAddList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue = DataStringListState()
             )
 
 
-    val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategoryAddList(itemIdPT).map { CategoryUiState(it) }
+    val categoryUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsCategoryAddList(itemIdPT).map { DataStringListState(it) }
             .filterNotNull()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = CategoryUiState()
+                initialValue = DataStringListState()
             )
 
-    val animalUiState: StateFlow<AnimalUiState2> =
-        itemsRepository.getItemsAnimalAddList(itemIdPT).map { AnimalUiState2(it) }
+    val animalUiState: StateFlow<DataTripleListState> =
+        itemsRepository.getItemsAnimalAddList(itemIdPT).map { DataTripleListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState2()
+                initialValue = DataTripleListState()
             )
 
+    var countWarehouseUiState by mutableDoubleStateOf(0.0)
+        private set
+
+    fun updatecountWarehouseUiState(name: String) {
+        viewModelScope.launch {
+            countWarehouseUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
+                .filterNotNull()
+                .first()
+                .toDouble()
+        }
+    }
+
+
+    fun updateUiState(itemDetails: DomainAddTable) {
+        itemUiState =
+            itemDetails
+    }
+
     suspend fun saveItem() {
-        itemsRepository.updateItem(itemUiState.toAddTable())
+        itemsRepository.updateItem(itemUiState.toRoomMap())
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteItem(itemUiState.toAddTable())
+        itemsRepository.deleteItem(itemUiState.toRoomMap())
     }
 
     companion object {
@@ -81,51 +98,3 @@ class AddEditViewModel(
     }
 
 }
-
-data class AddTableUiState(
-    val id: Int = 0,
-    val title: String = "", // название
-    val count: String = "", // Кол-во
-    val day: Int = 27,  // день
-    val mount: Int = 6, // месяц
-    val year: Int = 2024, // время
-    val priceAll: Double = 0.0,
-    var suffix: String = "",
-    var category: String = "",
-    var idAnimal: Long = 0,
-    var animal: String = "",
-    val note: String = "",
-    val idPT: Int = 0,
-)
-
-fun AddTable.toAddTableUiState(): AddTableUiState = AddTableUiState(
-    id,
-    title,
-    count.toString(),
-    day,
-    mount,
-    year,
-    priceAll,
-    suffix,
-    category,
-    idAnimal,
-    animal,
-    note,
-    idPT
-)
-
-fun AddTableUiState.toAddTable(): AddTable = AddTable(
-    id,
-    title,
-    count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-    day,
-    mount,
-    year,
-    priceAll,
-    suffix,
-    category,
-    idAnimal,
-    animal,
-    note,
-    idPT
-)

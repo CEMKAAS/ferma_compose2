@@ -10,9 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
-import com.zaroslikov.fermacompose2.ui.home.TitleUiState
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -49,21 +47,21 @@ class ExpensesEditViewModel(
         itemDetails.ps
     }
 
-    val titleUiState: StateFlow<TitleUiState> =
-        itemsRepository.getItemsTitleExpensesList(itemIdPT).map { TitleUiState(it) }
+    val titleUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsTitleExpensesList(itemIdPT).map {  DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = TitleUiState()
+                initialValue =  DataStringListState()
             )
 
 
-    val categoryUiState: StateFlow<CategoryUiState> =
-        itemsRepository.getItemsCategoryExpensesList(itemIdPT).map { CategoryUiState(it) }
+    val categoryUiState: StateFlow< DataStringListState> =
+        itemsRepository.getItemsCategoryExpensesList(itemIdPT).map {  DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = CategoryUiState()
+                initialValue =  DataStringListState()
             )
 
     val animalUiState: StateFlow<AnimalExpensesUiState> =

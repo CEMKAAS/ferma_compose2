@@ -2,15 +2,12 @@ package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.ui.sale.toSaleTable
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -167,15 +164,6 @@ class FinanceMountViewModel(
     }
 
 }
-
-//    suspend fun saveItem() {
-//        itemsRepository.updateSale(itemUiState.toSaleTable())
-//    }
-//
-//    suspend fun deleteItem() {
-//        itemsRepository.deleteSale(itemUiState.toSaleTable())
-//    }
-//
 
 
 

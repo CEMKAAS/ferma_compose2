@@ -109,8 +109,8 @@ fun ExpensesEditProduct(
                 .padding(5.dp)
                 .verticalScroll(rememberScrollState()),
             expensesTable = viewModel.itemUiState,
-            titleList = titleUiState.titleList,
-            categoryList = categoryUiState.categoryList,
+            titleList = titleUiState.list,
+            categoryList = categoryUiState.list,
             animalList = animalList,
             onValueChange = viewModel::updateUiState,
             saveInRoomAdd = {

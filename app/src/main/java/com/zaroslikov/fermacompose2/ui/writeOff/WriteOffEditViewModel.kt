@@ -7,12 +7,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.ui.home.AnimalUiState
-import com.zaroslikov.fermacompose2.ui.home.CategoryUiState
-import com.zaroslikov.fermacompose2.ui.home.TitleUiState
-import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -46,12 +43,12 @@ class WriteOffEditViewModel(
             itemDetails
     }
 
-    val titleUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getItemsWriteoffList(itemIdPT).map { AnimalUiState(it) }
+    val titleUiState: StateFlow<DataPairListState> =
+        itemsRepository.getItemsWriteoffList(itemIdPT).map { DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
+                initialValue = DataPairListState()
             )
 
 
