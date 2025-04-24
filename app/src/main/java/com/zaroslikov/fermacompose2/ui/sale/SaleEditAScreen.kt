@@ -92,14 +92,14 @@ fun SaleEditProduct(
             onClickSave = {
                 coroutineScope.launch {
                     viewModel.saveItem()
-                    onNavigateUp()
                 }
+                onNavigateUp()
             },
             onClickDelete = {
                 coroutineScope.launch {
                     viewModel.deleteItem()
-                    onNavigateUp()
                 }
+                onNavigateUp()
             }
         )
     }
@@ -195,6 +195,7 @@ fun SaleEditContainerProduct(
             isError = isErrorCount,
             suffix = saleTable.suffix,
             countWarehouse = countWarehouse,
+            intResSup = R.string.support_text_count_product_sale,
             focusManager = focusManager
         )
 
@@ -205,6 +206,7 @@ fun SaleEditContainerProduct(
                 isErrorPrice = it.isError()
             },
             isError = isErrorPrice,
+            intSupportText = R.string.support_text_price_sale,
             focusManager = focusManager
         )
 

@@ -2,35 +2,12 @@ package com.zaroslikov.fermacompose2.ui.animal
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,30 +15,23 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
-import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
+import com.zaroslikov.fermacompose2.ui.composeElement.CardField
+import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
+import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
+import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
+import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
@@ -77,35 +47,20 @@ object AnimalDestination : NavigationDestination {
 fun AnimalScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemCard: (Int) -> Unit,
+    navigateToItemCard: (Pair<Int, Int>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    isFirstStart:Boolean,
+    isFirstStart: Boolean,
     viewModel: AnimalViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val idProject = viewModel.itemId
+
     val animalUiState by viewModel.animalUiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    val idProject = viewModel.itemId
-
     val coroutineScope = rememberCoroutineScope()
-
-    val showBottomSheetFilter = remember { mutableStateOf(false) }
-
-//    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart)}
-//
-//    if(openFirstDialog){
-//        AlertDialogExample(
-//            onDismissRequest = { openFirstDialog =  false },
-//            onConfirmation = { openFirstDialog  = false },
-//            dialogTitle = "Мои Животные",
-//            dialogText = "В этом разделе отображаются Ваши животные. Для добавления нажмите на знак «+» в правом нижнем углу. Рекомендуем начать с добавления животных для корректной работы приложения. После перейдите в раздел Моя Продукция",
-//            icon = Icons.Default.Info
-//        )
-//    }
-
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -123,45 +78,27 @@ fun AnimalScreen(
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBarFerma(
-                    title = "Мои Животные",
+                TopAppBarNavigation(
+                    title = R.string.animals_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigateToItemAdd(idProject) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .padding(
-                            end = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateEndPadding(LocalLayoutDirection.current)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.item_entry_title) // TODO Преименовать
-                    )
-                }
+                FloatButton { navigateToItemAdd(idProject) }
             }
         ) { innerPadding ->
             if (isLoading) {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                CircularProgress(
+                    modifier = modifier.padding(innerPadding),
+                )
             } else {
                 AnimalBody(
+                    modifier = Modifier
+                        .modifierScreen(innerPadding),
                     itemList = animalUiState.itemList,
-                    onItemClick = navigateToItemCard,
-                    modifier = modifier.fillMaxSize(),
-                    contentPadding = innerPadding,
+                    onItemClick = { navigateToItemCard(Pair(it, idProject)) },
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
             }
@@ -172,75 +109,39 @@ fun AnimalScreen(
 
 @Composable
 private fun AnimalBody(
+    modifier: Modifier = Modifier,
     itemList: List<AnimalTable>,
     onItemClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    navigateToItemAdd:()-> Unit
+    navigateToItemAdd: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    if (itemList.isNotEmpty())
+        AnimalList(
+            itemList = itemList,
+            onItemClick = onItemClick,
+            modifier = modifier
+        )
+    else MessageNoData(
         modifier = modifier,
-    ) {
-        if (itemList.isEmpty()) {
-            Column(modifier = modifier.padding(contentPadding).padding(15.dp).verticalScroll(
-                rememberScrollState()
-            )) {
-                Text(
-                    text = "Добро пожаловать в раздел \"Мои Животные!\"",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "В этом разделе вы можете регистрировать животных, находящихся на вашей ферме! Каждое животное можно добавить как по отдельности, так и в группе. Для группового добавления укажите количество, а для отдельных животных — их вес и размер. Для всех животных необходимо указать имя, вид, информацию о прививках и дополнительные примечания. При добавлении товара в разделе \"Мои Товары\" внутри карточки животного, если указать конкретное животное, Вы сможете отслеживать объем произведенного им товара.",
-                    textAlign = TextAlign.Justify,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth().padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "Сейчас нет животных:(\nНажмите + чтобы добавить\nили",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 20.sp,
-                )
-                Button(
-                    onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
-                        .padding(bottom = 20.dp)
-
-                ) {
-                    Text(text = "Добавить Животного!")
-                }
-            }
-        } else {
-            AnimalList(
-                itemList = itemList,
-                onItemClick = onItemClick,
-                contentPadding = contentPadding,
-                modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-            )
-        }
-    }
+        onClick = navigateToItemAdd,
+        titleRes = R.string.message_no_date_title_animals,
+        messageRes = R.string.message_no_date_message_animals,
+        supportRes = R.string.message_no_date_support_text_animals,
+        buttonRes = R.string.button_animals_message_no_data
+    )
 }
 
 @Composable
 private fun AnimalList(
+    modifier: Modifier = Modifier,
     itemList: List<AnimalTable>,
-    onItemClick: (Int) -> Unit,
-    contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    onItemClick: (Int) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier,
-        contentPadding = contentPadding
+        modifier = modifier, verticalArrangement = Arrangement.Top
     ) {
         items(items = itemList, key = { it.id }) { item ->
             AnimalCard(animalTable = item,
                 modifier = Modifier
-                    .padding(8.dp)
                     .clickable { onItemClick(item.id) })
         }
     }
@@ -248,51 +149,33 @@ private fun AnimalList(
 
 @Composable
 fun AnimalCard(
-    animalTable: AnimalTable,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    animalTable: AnimalTable
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
+    CardField(
+        modifier = modifier
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-
-            Column(
-                modifier = Modifier.fillMaxWidth(0.7f)
-            ) {
-                Text(
-                    text = animalTable.name,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = "Тип: ${animalTable.type}", modifier = Modifier
-                        .wrapContentSize()
-                        .padding(vertical = 3.dp, horizontal = 6.dp)
-                )
-                if (!animalTable.groop) {
-                    Text(
-                        text = "Пол: ${animalTable.sex}", modifier = Modifier
-                            .wrapContentSize()
-                            .padding(vertical = 3.dp, horizontal = 6.dp)
-                    )
-                }
-                Text(
-                    text = "Дата: ${animalTable.data}", modifier = Modifier
-                        .wrapContentSize()
-                        .padding(vertical = 3.dp, horizontal = 6.dp)
+            Text(
+                text = animalTable.name,
+                style = textBold_16
+            )
+            IconAndText(
+                iconRes = R.drawable.baseline_pets_24,
+                valueString = animalTable.type
+            )
+            if (!animalTable.groop) {
+                IconAndText(
+                    iconRes = if (animalTable.sex == "Мужской") R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
+                    valueString = animalTable.sex
                 )
             }
+            IconAndText(
+                iconRes = R.drawable.baseline_calendar_month_24,
+                valueString = animalTable.data
+            )
         }
     }
 }

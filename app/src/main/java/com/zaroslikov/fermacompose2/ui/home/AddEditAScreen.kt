@@ -185,6 +185,7 @@ fun AddEditContainerProduct(
             isError = isErrorCount,
             suffix = addTable.suffix,
             countWarehouse = addTable.count,
+            intResSup = R.string.support_text_count_product,
             focusManager = focusManager
         )
 

@@ -23,8 +23,6 @@ fun Modifier.toButton(): Modifier {
 }
 
 
-
-
 @Composable
 fun Modifier.modifierScreen(
     innerPadding: PaddingValues
@@ -35,5 +33,18 @@ fun Modifier.modifierScreen(
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
             vertical = dimensionResource(R.dimen.padding_small)
+        )
+}
+
+@Composable
+fun Modifier.modifierBottomSheet(
+): Modifier {
+    return this
+        .padding(
+            horizontal = dimensionResource(id = R.dimen.padding_medium)
+        )
+        .padding(
+            top = dimensionResource(R.dimen.padding_small),
+            bottom = dimensionResource(R.dimen.padding_extra_large)
         )
 }

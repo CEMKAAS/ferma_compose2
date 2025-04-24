@@ -1,9 +1,16 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.composeElement
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -23,6 +30,7 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsGo
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.ui.start.formatter
+
 
 @Composable
 fun OutlinedTextNote(
@@ -98,6 +106,8 @@ fun OutlinedTextAnimal(
 @Composable
 fun OutlinedTextDate(
     value: String,
+    @StringRes intRes: Int = R.string.outlined_text_date,
+    @StringRes intResSup: Int = R.string.support_text_date,
     onValueChange: () -> Unit,
 ) {
     OutlinedTextField(
@@ -106,11 +116,11 @@ fun OutlinedTextDate(
             onValueChange()
         },
         readOnly = true,
-        label = { Text(stringResource(R.string.outlined_text_date)) },
+        label = { Text(stringResource(intRes)) },
         supportingText = {
-            Text(stringResource(R.string.support_text_date))
+            Text(stringResource(intResSup))
         },
-        trailingIcon = {
+        leadingIcon = {
             IconButton(onClick = onValueChange) {
                 Icon(
                     painter = painterResource(R.drawable.baseline_calendar_month_24),
@@ -140,7 +150,7 @@ fun OutlinedTextCategory(
             value = value,
             onValueChange = { text -> onValueChange(text.trim()) },
             label = { Text(stringResource(R.string.outlined_text_field_category)) },
-            modifier = it,
+            modifier = it.first,
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.baseline_format_list_bulleted_24),
@@ -169,22 +179,32 @@ fun OutlinedTextCategory(
 fun OutlinedTextCount(
     value: String,
     onValueChange: (String) -> Unit,
-    onClick: (String) -> Unit,
+    onClick: (String) -> Unit = {},
     isError: Boolean,
     suffix: String,
+    isAnimal: Boolean = false,
+    isWarehouseShow: Boolean = true,
+    isDropMenuShow: Boolean = true,
+    versionDropMenu: Int = 5,
+    drawableRes: Int = R.drawable.baseline_shopping_basket_24,
+    @StringRes intRes: Int = R.string.outlined_text_product,
+    @StringRes intResSup: Int = R.string.support_text_product,
+    @StringRes intResError: Int = R.string.error_no_count_product,
     countWarehouse: Double = 0.0,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
+    keyboardActions: KeyboardActions = keyboardActionsDown(focusManager)
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = {
             onValueChange(it)
         },
-        label = { Text(stringResource(R.string.outlined_text_field_quantity)) },
+        label = { Text(stringResource(intRes)) },
         modifier = Modifier.toOutlinedText(),
         leadingIcon = {
             Icon(
-                painter = painterResource(R.drawable.baseline_shopping_basket_24),
+                painter = painterResource(drawableRes),
                 contentDescription = null,
                 modifier = Modifier.padding(end = 5.dp)
             )
@@ -192,27 +212,86 @@ fun OutlinedTextCount(
         supportingText = {
             ErrorSupportTextSlash(
                 isError = isError,
-                isWarehouse = true,
+                isWarehouse = isWarehouseShow,
+                isAnimal = isAnimal,
                 count = formatter(countWarehouse),
                 suffix = suffix,
-                intRes = R.string.support_text_count_product,
-                intResError = R.string.error_no_count_product
+                intRes = intResSup,
+                intResError = intResError
             )
         },
         trailingIcon = {
-            DropdownMenuIconProductSuffix(setSuffix = { onClick(it) })
+            if (isDropMenuShow)
+                GetDropDownMenu(versionDropMenu) { onClick(it) }
         },
         suffix = {
             Text(text = suffix)
         },
-        keyboardOptions = keyboardOptionsNextNumber(),
-        keyboardActions = keyboardActionsDown(focusManager),
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         isError = isError
     )
 }
 
 @Composable
+fun OutlinedTextCount(
+    value: String,
+    onValueChange: (String) -> Unit,
+    isError: Boolean,
+    isErrorCountMore: Boolean,
+    count: Int = 0,
+    suffix: String,
+    drawableRes: Int = R.drawable.baseline_shopping_basket_24,
+    @StringRes intRes: Int = R.string.outlined_text_product,
+    focusManager: FocusManager,
+    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
+    keyboardActions: KeyboardActions = keyboardActionsDown(focusManager)
+) {
+
+    val errorText = stringResource(R.string.error_no_count_product)
+    val errorCountAllText = stringResource(R.string.error_count_sale_animals)
+    val supportText = stringResource(R.string.support_text_count_sale_animals, count, suffix)
+
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+            onValueChange(it)
+        },
+        label = { Text(stringResource(intRes)) },
+        modifier = Modifier.toOutlinedText(),
+        leadingIcon = {
+            Icon(
+                painter = painterResource(drawableRes),
+                contentDescription = null,
+                modifier = Modifier.padding(end = 5.dp)
+            )
+        },
+        supportingText = {
+            ErrorSupportAnimal(
+                isError = isError,
+                isErrorAnimal = isErrorCountMore,
+                errorText = errorText,
+                errorCountAllText = errorCountAllText,
+                supportText = supportText,
+            )
+        },
+        suffix = {
+            Text(text = suffix)
+        },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        isError = isError || isErrorCountMore
+    )
+}
+
+
+@Composable
 fun OutlinedTextTitleAdd(
+    @StringRes intRes: Int = R.string.outlined_text_product,
+    @StringRes intResSup: Int = R.string.support_text_product,
+    @StringRes intResError: Int = R.string.error_no_product,
+    drawableRes: Int? = null,
     value: String,
     onValueChange: (String) -> Unit,
     titleList: List<String>,
@@ -232,16 +311,23 @@ fun OutlinedTextTitleAdd(
             onValueChange = { text ->
                 onValueChange(text)
             },
-            label = { Text(text = stringResource(R.string.outlined_text_product)) },
+            label = { Text(text = stringResource(intRes)) },
+            leadingIcon = {
+                if (drawableRes != null)
+                    Icon(
+                        painter = painterResource(drawableRes),
+                        contentDescription = null
+                    )
+            },
             supportingText = {
                 ErrorSupportTextSlash(
                     isError = isErrorTitle,
                     isErrorSlash = isErrorSlash,
-                    intRes = R.string.support_text_product,
-                    intResError = R.string.error_no_product,
+                    intRes = intResSup,
+                    intResError = intResError,
                 )
             },
-            modifier = it,
+            modifier = it.first,
             isError = isErrorTitle,
             keyboardOptions = keyboardOptionsNext(),
             keyboardActions = keyboardActionsDown(focusManager)
@@ -253,7 +339,8 @@ fun OutlinedTextTitleAdd(
 fun OutlinedTextPrice(
     value: String,
     onValueChange: (String) -> Unit,
-    isError: Boolean,
+    isError: Boolean = false,
+    @StringRes intSupportText: Int = R.string.support_text_count_product_sale,
     focusManager: FocusManager
 ) {
     OutlinedTextField(
@@ -272,7 +359,7 @@ fun OutlinedTextPrice(
         supportingText = {
             ErrorSupportTextSlash(
                 isError = isError,
-                intRes = R.string.support_text_count_product_sale,
+                intRes = intSupportText,
                 intResError = R.string.error_no_count_sale
             )
         },
@@ -288,12 +375,13 @@ fun OutlinedTextPrice(
 @Composable
 fun OutlinedTextTitleSale(
     value: String,
-    onValueChange: (String) -> Unit,
+    onValueChange: (String) -> Unit = {},
     onValueChoice: (Triple<Int, String, String>) -> Unit,
+    readOnly: Boolean = false,
     selectedItemIndex: Int,
     titleList: List<PairData>,
-    isErrorTitle: Boolean,
-    isErrorSlash: Boolean,
+    isErrorTitle: Boolean = false,
+    isErrorSlash: Boolean = false,
     focusManager: FocusManager
 ) {
 
@@ -319,6 +407,7 @@ fun OutlinedTextTitleSale(
                     intResError = R.string.error_no_product,
                 )
             },
+            readOnly = readOnly,
             modifier = it,
             isError = isErrorTitle,
             keyboardOptions = keyboardOptionsNext(),
@@ -345,7 +434,7 @@ fun OutlinedTextBuyer(
                 onValueChange(text.trim())
             },
             label = { Text(stringResource(R.string.outlined_text_buyer)) },
-            modifier = it,
+            modifier = it.first,
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.baseline_person_24),
@@ -363,6 +452,43 @@ fun OutlinedTextBuyer(
                     )
                 }
             },
+            keyboardOptions = keyboardOptionsNext(),
+            keyboardActions = keyboardActionsDown(focusManager)
+        )
+    }
+}
+
+@Composable
+fun OutlinedTextSex(
+    value: String,
+    selectedItemIndex: Int,
+    onValueChange: (Int) -> Unit,
+    list: List<String>,
+    focusManager: FocusManager
+) {
+    ExposedDropdownMenuSex(
+        title = value,
+        setTitle = { onValueChange(it) },
+        selectedItemIndex = selectedItemIndex,
+        titleList = list,
+        isFilterUsed = false
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(stringResource(R.string.outlined_text_sex)) },
+            modifier = it.first,
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(if (value == list[0]) R.drawable.baseline_male_24 else R.drawable.baseline_female_24),
+                    contentDescription = null
+                )
+            },
+            supportingText = {
+                Text(stringResource(R.string.support_text_sex_animals))
+            },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = it.second) },
             keyboardOptions = keyboardOptionsNext(),
             keyboardActions = keyboardActionsDown(focusManager)
         )

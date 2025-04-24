@@ -56,3 +56,37 @@ fun metricaExpenses(
     eventParameters["Распределение"] = showAnimalsUI
     AppMetrica.reportEvent("Expenses Products", eventParameters)
 }
+
+fun metricaWriteOff(
+    title: String,
+    count: String,
+    suffix: String,
+    price: String,
+    note: String,
+    state: Boolean
+) {
+    val eventParameters: MutableMap<String, Any> = HashMap()
+    eventParameters["Имя"] = title
+    eventParameters["Кол-во"] = "$title $count $suffix $price ₽"
+    eventParameters["Статус"] = if (state) 0 else 1
+    eventParameters["Примечание"] = note
+    AppMetrica.reportEvent("WriteOff Products", eventParameters)
+}
+
+fun metricaNote(
+    title: String,
+) {
+    val eventParameters: MutableMap<String, Any> = HashMap()
+    eventParameters["Заголовок"] = title
+    AppMetrica.reportEvent("Заметки", eventParameters)
+}
+
+fun metricalAnimal(
+    title: String,
+    type:String
+) {
+    val eventParameters: MutableMap<String, Any> = HashMap()
+    eventParameters["Имя"] = title
+    eventParameters["Тип"] = type
+    AppMetrica.reportEvent("Animal", eventParameters);
+}

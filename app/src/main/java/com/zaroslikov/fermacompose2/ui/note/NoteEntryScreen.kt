@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.note
 
 import androidx.compose.foundation.layout.Column
@@ -8,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -22,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,7 +34,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.data.ferma.NoteTable
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.isError
+import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
+import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
+import com.zaroslikov.fermacompose2.supportFun.metricaNote
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.composeElement.ErrorSupportTextSlash
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.toOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
@@ -53,34 +67,21 @@ fun NoteEntryProduct(
     onNavigateUp: () -> Unit,
     viewModel: NoteEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
-
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Мои Заметки", navigateUp = navigateBack)
+            TopAppBarBack(intRes = R.string.note_screen_title, navigateUp = navigateBack)
         }
     ) { innerPadding ->
-
         NoteEntryContainer(
             modifier = Modifier
-                .padding(innerPadding)
-                .padding(5.dp)
+                .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
+            idProject = viewModel.itemId,
             saveInRoomAdd = {
-                coroutineScope.launch {
-                    viewModel.saveItem(
-                        NoteTable(
-                            id = it.id,
-                            title = it.title,
-                            note = it.note,
-                            date = it.date,
-                            idPT = idProject,
-                        )
-                    )
-                    onNavigateUp()
-                }
-            },
+                coroutineScope.launch { viewModel.saveItem(it) }
+                onNavigateUp()
+            }
         )
     }
 }
@@ -88,7 +89,8 @@ fun NoteEntryProduct(
 @Composable
 fun NoteEntryContainer(
     modifier: Modifier,
-    saveInRoomAdd: (NoteTableInsert) -> Unit
+    idProject: Long,
+    saveInRoomAdd: (NoteTable) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
@@ -96,50 +98,26 @@ fun NoteEntryContainer(
 
     val focusManager = LocalFocusManager.current
 
-    fun validateTitle(text: String) {
-        isErrorTitle = text == ""
-    }
-
-    fun errorBoolean(): Boolean {
-        isErrorTitle = title == ""
-        return !(isErrorTitle)
-    }
-
-    //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val date: String = format.format(calendar.timeInMillis)
-
     Column(modifier = modifier) {
 
         OutlinedTextField(
             value = title,
             onValueChange = {
                 title = it
-                validateTitle(title)
+                isErrorTitle = it.isError()
             },
-            label = { Text(text = "Заголовок") },
+            label = { Text(text = stringResource(R.string.outlined_text_title)) },
             supportingText = {
-                if (isErrorTitle) {
-                    Text(
-                        text = "Не указан заголовок",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else Text("Укажите заголовок")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            isError = isErrorTitle,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-                capitalization = KeyboardCapitalization.Sentences
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
+                ErrorSupportTextSlash(
+                    isError = isErrorTitle,
+                    intRes = R.string.support_text_title,
+                    intResError = R.string.error_no_title,
                 )
-            })
+            },
+            modifier = Modifier.toOutlinedText(),
+            isError = isErrorTitle,
+            keyboardOptions = keyboardOptionsNext(),
+            keyboardActions = keyboardActionsDown(focusManager)
         )
 
         OutlinedTextField(
@@ -147,44 +125,30 @@ fun NoteEntryContainer(
             onValueChange = {
                 note = it
             },
-            label = { Text("Заметка") },
+            label = { Text(stringResource(R.string.outlined_text_note_note)) },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
+                .toOutlinedText(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences
             )
         )
 
-        Button(
+        ButtonStandart(
+            intRes = R.string.button_note,
             onClick = {
-                if (errorBoolean()) {
+                if (!isErrorTitle) {
                     saveInRoomAdd(
-                        NoteTableInsert(
+                        NoteTable(
                             title = title,
                             note = note,
-                            date = date
+                            date = dateToday(),
+                            idPT = idProject
                         )
                     )
-                    val eventParameters: MutableMap<String, Any> = HashMap()
-                    eventParameters["Заголовок"] = title
-                    AppMetrica.reportEvent("Заметки", eventParameters);
+                    metricaNote(title)
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp)
-        ) {
-            Text(text = "Добавить")
-        }
+            }
+        )
     }
 }
-
-data class NoteTableInsert(
-    val id: Long = 0,
-    val title: String,
-    val note: String,
-    val date: String
-)
-

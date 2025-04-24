@@ -168,6 +168,21 @@ private fun InventoryList(
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
 
+    val extraPadding by animateDpAsState(
+        if (details) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ), label = ""
+    )
+    val extraPaddingResd by animateDpAsState(
+        if (!details) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ), label = ""
+    )
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
@@ -183,7 +198,9 @@ private fun InventoryList(
             items(items = itemList, key = { it.id }) { item ->
                 ExpensesCard(expensesTable = item,
                     modifier = Modifier
-                        .clickable { onItemClick(item) })
+                        .clickable { onItemClick(item) }
+                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
+                )
             }
         } else {
             items(items = brieflyList) { item ->
@@ -191,9 +208,9 @@ private fun InventoryList(
                     viewModel = viewModel,
                     product = item,
                     onItemClick = onItemClick,
-
-
-                    )
+                    modifier = Modifier
+                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
+                )
             }
         }
     }
@@ -235,13 +252,13 @@ fun BrieflyPriceCard(
                     valueString = product.title,
                     textStyle = textBold_20
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
                     valueString = stringResource(
-                        R.string.card_count_s,
+                        R.string.card_count_briefly_s,
                         "${product.count.formatNumber()} ${product.suffix}",
-                        product.price.formatNumber()
+                        product.price.formatNumber(),
+                        stringResource(R.string.currency_ruble),
                     ),
                 )
             }
@@ -319,8 +336,8 @@ fun ExpensesCard(
                 text = stringResource(
                     R.string.card_count_s,
                     "${expensesTable.count.formatNumber()} ${expensesTable.suffix}",
+                    expensesTable.priceAll.formatNumber(),
                     stringResource(R.string.currency_ruble),
-                    expensesTable.priceAll.formatNumber()
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier

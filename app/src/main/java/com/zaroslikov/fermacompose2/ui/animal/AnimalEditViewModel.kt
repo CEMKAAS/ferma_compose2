@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.decode.BitmapFactoryDecoder
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
@@ -40,13 +41,14 @@ class AnimalEditViewModel(
             item
     }
 
-    val typeUiState: StateFlow< DataStringListState> =
-        itemsRepository.getTypeAnimal(itemId).map {  DataStringListState(it) }
+    val typeUiState: StateFlow<DataStringListState> =
+        itemsRepository.getTypeAnimal(itemId).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =  DataStringListState()
+                initialValue = DataStringListState()
             )
+
     suspend fun saveItem() {
         itemsRepository.updateAnimalTable(animaEditUiState.toAnimalTable())
     }
@@ -65,22 +67,47 @@ data class AnimalEditUiState(
     val name: String = "",
     val type: String = "",
     val data: String = "",
+    val dateFactory: String = "",
     val groop: Boolean = true,
     val sex: String = "",
     val note: String = "",
     val image: String = "",
     val arhiv: Boolean = false,
     val price: String = "",
-    val foodDay:String = "",
+    val foodDay: String = "",
     val idPT: Int = 0,
 )
 
 fun AnimalTable.toAnimaEditUiState(
 ): AnimalEditUiState = AnimalEditUiState(
-    id, name, type, data, groop, sex, note, image, arhiv, price.toString(), foodDay.toString(), idPT
+    id,
+    name,
+    type,
+    data,
+    dateFactory = dateFactory,
+    groop,
+    sex,
+    note,
+    image,
+    arhiv,
+    price.toString(),
+    foodDay.toString(),
+    idPT
 )
 
 fun AnimalEditUiState.toAnimalTable(): AnimalTable = AnimalTable(
-    id, name, type, data, groop, sex, note, image, arhiv, price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(), foodDay.toDouble(), idPT
+    id,
+    name,
+    type,
+    data,
+    dateFactory = dateFactory,
+    groop,
+    sex,
+    note,
+    image,
+    arhiv,
+    price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+    foodDay.toDouble(),
+    idPT
 )
 

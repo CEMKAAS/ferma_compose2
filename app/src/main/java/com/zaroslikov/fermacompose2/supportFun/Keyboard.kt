@@ -9,21 +9,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 
 fun keyboardOptionsNext(): KeyboardOptions {
-//    return KeyboardOptions(
-//        imeAction = ImeAction.Next,
-//        capitalization = KeyboardCapitalization.Sentences // Первая буква будет заглавной
-//    )
-    return KeyboardOptions.Default.copy(
+    return KeyboardOptions(
         imeAction = ImeAction.Next,
-        capitalization = KeyboardCapitalization.Sentences
+        capitalization = KeyboardCapitalization.Sentences // Первая буква будет заглавной
     )
-
 }
 
 fun keyboardOptionsGo(): KeyboardOptions {
     return KeyboardOptions(
         imeAction = ImeAction.Go,
-
         capitalization = KeyboardCapitalization.Sentences // Первая буква будет заглавной
     )
 }
@@ -47,6 +41,17 @@ fun keyboardActionsDown(
         )
     })
 }
+
+fun keyboardActionsRight(
+    focusManager: FocusManager
+): KeyboardActions {
+    return KeyboardActions(onNext = {
+        focusManager.moveFocus(
+            FocusDirection.Right
+        )
+    })
+}
+
 
 fun keyboardActionsClear(
     focusManager: FocusManager

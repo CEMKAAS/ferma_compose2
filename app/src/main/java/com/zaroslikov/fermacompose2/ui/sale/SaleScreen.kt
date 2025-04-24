@@ -167,6 +167,21 @@ private fun InventoryList(
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
 
+    val extraPadding by animateDpAsState(
+        if (details) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+    val extraPaddingResd by animateDpAsState(
+        if (!details) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
@@ -182,14 +197,18 @@ private fun InventoryList(
             items(items = itemList, key = { it.id }) { item ->
                 SaleProductCard(saleTable = item,
                     modifier = Modifier
-                        .clickable { onItemClick(item) })
+                        .clickable { onItemClick(item) }
+                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
+                )
             }
         } else {
             items(items = brieflyList) { item ->
                 BrieflyPriceCard(
                     product = item,
                     viewModel = viewModel,
-                    onItemClick = onItemClick
+                    onItemClick = onItemClick,
+                    modifier = Modifier
+                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
                 )
             }
         }
@@ -224,7 +243,6 @@ fun BrieflyPriceCard(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .weight(0.7f)
             ) {
 
@@ -237,10 +255,11 @@ fun BrieflyPriceCard(
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
                     valueString = stringResource(
-                        R.string.card_count_s,
+                        R.string.card_count_briefly_s,
                         "${product.count.formatNumber()} ${product.suffix}",
-                        product.price.formatNumber()
-                    ),
+                        product.price.formatNumber(),
+                        stringResource(R.string.currency_ruble),
+                    )
                 )
 
             }
@@ -294,7 +313,6 @@ fun SaleProductCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
@@ -303,8 +321,6 @@ fun SaleProductCard(
                         saleTable.year
                     )
                 )
-
-
                 saleTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
                     ?.let { category ->
                         IconAndText(
@@ -312,7 +328,6 @@ fun SaleProductCard(
                             valueString = category
                         )
                     }
-
                 saleTable.buyer.takeUnless { it == "Неизвестный" || it.isEmpty() }
                     ?.let { buyer ->
                         IconAndText(
@@ -320,7 +335,6 @@ fun SaleProductCard(
                             valueString = buyer
                         )
                     }
-
                 if (saleTable.note != "")
                     IconAndText(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
@@ -330,10 +344,10 @@ fun SaleProductCard(
 
             Text(
                 text = stringResource(
-                    R.string.card_count_s,
+                    R.string.card_count_briefly_s,
                     "${saleTable.count.formatNumber()} ${saleTable.suffix}",
-                    stringResource(R.string.currency_ruble),
-                    saleTable.priceAll.formatNumber()
+                    saleTable.priceAll.formatNumber(),
+                    stringResource(R.string.currency_ruble)
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier

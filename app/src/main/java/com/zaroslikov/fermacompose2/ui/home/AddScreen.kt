@@ -185,6 +185,21 @@ fun InventoryList(
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
 
+    val extraPadding by animateDpAsState(
+        if (details) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ), label = ""
+    )
+    val extraPaddingResd by animateDpAsState(
+        if (!details) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ), label = ""
+    )
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
@@ -198,22 +213,24 @@ fun InventoryList(
             )
         }
 
-        if (details) {
+        if (details)
             items(items = itemList, key = { it.id }) { item ->
                 AddProductCard(addProduct = item,
                     modifier = Modifier
-                        .clickable { onItemClick(item) })
+                        .clickable { onItemClick(item) }
+                        .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
             }
-        } else {
+        else
             items(items = brieflyList) { item ->
                 BrieflyCountCard(
                     product = item,
                     viewModel = viewModel,
                     onItemClick = onItemClick,
                     navigationToAnalysis = navigationToAnalysis,
+                    modifier = Modifier
+                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
                 )
             }
-        }
     }
 }
 
@@ -225,7 +242,7 @@ fun BrieflyCountCard(
     onItemClick: (AddTable) -> Unit,
     navigationToAnalysis: (String) -> Unit = {},
 
-) {
+    ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val extraPadding by animateDpAsState(
@@ -235,7 +252,6 @@ fun BrieflyCountCard(
             stiffness = Spring.StiffnessLow
         ), label = ""
     )
-
     CardField(modifier = modifier.clickable {
         expanded = !expanded
     }) {
@@ -250,18 +266,15 @@ fun BrieflyCountCard(
                     .fillMaxWidth()
                     .weight(0.7f)
             ) {
-
                 TextLine(
                     modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
                     valueString = product.title,
                     textStyle = textBold_20
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
                     valueString = "${product.count.formatNumber()} ${product.suffix}",
                 )
-
             }
 
             IconButton(onClick = { navigationToAnalysis(product.title) }) {
@@ -270,7 +283,6 @@ fun BrieflyCountCard(
                     contentDescription = "Анализ",
                 )
             }
-
             IconButton(onClick = {
                 expanded = !expanded
             }) {
@@ -282,7 +294,6 @@ fun BrieflyCountCard(
         }
     }
     if (expanded) {
-
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
             AddProductCard(addProduct = it,
@@ -358,7 +369,7 @@ fun AddProductCard(
 
             Text(
                 text = "${addProduct.count.formatNumber()} ${addProduct.suffix}",
-                textAlign = TextAlign.End,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.3f),

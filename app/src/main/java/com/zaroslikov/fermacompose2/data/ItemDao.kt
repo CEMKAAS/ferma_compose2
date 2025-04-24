@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -23,7 +24,6 @@ import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
@@ -674,7 +674,7 @@ interface ItemDao {
     suspend fun updateIncubator(item: Incubator)
 
     //Animal
-    @Query("SELECT * from AnimalTable Where idPT=:id")
+    @Query("SELECT * from AnimalTable Where idPT=:id and arhiv = 0")
     fun getAllAnimal(id: Int): Flow<List<AnimalTable>>
 
     @Query("SELECT * from AnimalTable Where id=:id")
@@ -686,73 +686,62 @@ interface ItemDao {
 
     @Insert
     suspend fun insertAnimalTable(animalTable: AnimalTable): Long
-
-    @Insert
-    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable)
-
-    @Insert
-    suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
-
-    @Insert
-    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
-
-    @Insert
-    suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
-
     @Update
     suspend fun updateAnimalTable(animalTable: AnimalTable)
-
     @Delete
     suspend fun deleteAnimalTable(animalTable: AnimalTable)
 
+    @Insert
+    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable)
+    @Insert
+    suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+    @Insert
+    suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+    @Insert
+    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+
     @Update
     suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
-
     @Update
     suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable)
-
+    @Update
+    suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable)
     @Update
     suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
 
-    @Update
-    suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable)
-
     @Delete
     suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)
-
     @Delete
     suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
-
+    @Delete
+    suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
     @Delete
     suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
 
-    @Delete
-    suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
 
+    @Query("SELECT * from AnimalCountTable Where idAnimal=:id ORDER BY id DESC")
+    fun getCountAnimalLimit(id: Int): Flow<AnimalCountTable>
 
-    @Query("SELECT * from AnimalCountTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
-    fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>>
-
-    @Query("SELECT * from AnimalSizeTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
-    fun getSizeAnimalLimit(id: Int): Flow<List<AnimalSizeTable>>
-
-    @Query("SELECT * from AnimalVaccinationTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
-    fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>>
-
-    @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC LIMIT 3")
-    fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>>
-
-    @Query("SELECT id, count as weight, date, idAnimal from AnimalCountTable Where idAnimal=:id ORDER BY id DESC")
-    fun getCountAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
-
-    @Query("SELECT id, size as weight, date, idAnimal from AnimalSizeTable Where idAnimal=:id ORDER BY id DESC")
-    fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
+    @Query("SELECT * from AnimalSizeTable Where idAnimal=:id ORDER BY id DESC")
+    fun getSizeAnimalLimit(id: Int): Flow<AnimalSizeTable>
 
     @Query("SELECT * from AnimalVaccinationTable Where idAnimal=:id ORDER BY id DESC")
-    fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
+    fun getVaccinationAnimalLimit(id: Int): Flow<AnimalVaccinationTable>
 
     @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC")
-    fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
+    fun getWeightAnimalLimit(id: Int): Flow<AnimalWeightTable>
+
+    @Query("SELECT id, count as weight, suffix, date, idAnimal from AnimalCountTable Where idAnimal=:id ORDER BY id DESC")
+    fun getCountAnimal(id: Int): Flow<List<DomainIndicatorsVM>>
+
+    @Query("SELECT id, size as weight, suffix, date, idAnimal from AnimalSizeTable Where idAnimal=:id ORDER BY id DESC")
+    fun getSizeAnimal(id: Int): Flow<List<DomainIndicatorsVM>>
+
+    @Query("SELECT * from AnimalVaccinationTable Where idAnimal=:id ORDER BY id DESC")
+    fun getVaccinationAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
+
+    @Query("SELECT * from AnimalWeightTable Where idAnimal=:id ORDER BY id DESC")
+    fun getWeightAnimal(id: Int): Flow<List<DomainIndicatorsVM>>
 
     @Query("SELECT title,COALESCE(SUM(disc), 0.0) AS priceAll, suffix from MyFerma Where animal=:name GROUP BY Title ORDER BY priceAll DESC")
     fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>>

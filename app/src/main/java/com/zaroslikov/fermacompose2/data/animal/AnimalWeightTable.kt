@@ -18,6 +18,7 @@ data class AnimalWeightTable(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val weight: String,
+    val suffix: String,
     val date: String,
     val idAnimal: Int
 )

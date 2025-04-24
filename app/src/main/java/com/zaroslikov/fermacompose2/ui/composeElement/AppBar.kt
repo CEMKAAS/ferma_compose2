@@ -2,9 +2,12 @@
 
 package com.zaroslikov.fermacompose2.ui.composeElement
 
+import android.icu.util.Calendar
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
@@ -56,15 +59,18 @@ fun TopAppBarNavigation(
 
 @Composable
 fun TopAppBarBack(
-    @StringRes intRes: Int,
-   navigateUp: () -> Unit = {},
+    @StringRes intRes: Int? = null,
+    title: String = "",
+    navigateUp: () -> Unit = {},
+    calendarClick: (() -> Unit)? = null,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text(text = stringResource(intRes))
+            Text(text = if (intRes != null) stringResource(intRes) else title)
         },
         navigationIcon = {
             IconButton(onClick = navigateUp) {
@@ -73,6 +79,18 @@ fun TopAppBarBack(
                     contentDescription = "Назад"
                 )
             }
+        },
+        scrollBehavior = scrollBehavior,
+        actions = {
+            if (calendarClick != null) {
+                IconButton(onClick = calendarClick) {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Date Range"
+                    )
+                }
+            }
         }
     )
 }
+

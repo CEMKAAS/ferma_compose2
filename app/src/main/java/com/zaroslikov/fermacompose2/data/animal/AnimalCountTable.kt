@@ -19,6 +19,7 @@ data class AnimalCountTable(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val count: String,
+    val suffix: String,
     val date: String,
     val idAnimal: Int
 )

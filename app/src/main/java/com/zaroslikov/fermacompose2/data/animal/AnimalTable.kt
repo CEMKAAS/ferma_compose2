@@ -22,6 +22,8 @@ data class AnimalTable(
     val name: String,
     val type: String,
     val data: String,
+    @ColumnInfo(name= "date_factory")
+    val dateFactory: String,
     val groop: Boolean,//groop = true, one = false
     val sex: String,
     val note : String,

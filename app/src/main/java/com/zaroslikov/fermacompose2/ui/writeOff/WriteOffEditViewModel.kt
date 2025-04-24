@@ -1,14 +1,17 @@
 package com.zaroslikov.fermacompose2.ui.writeOff
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainWritOffTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +29,7 @@ class WriteOffEditViewModel(
     private val itemId: Int = checkNotNull(savedStateHandle[WriteOffEditDestination.itemIdArg])
     private val itemIdPT: Int = checkNotNull(savedStateHandle[WriteOffEditDestination.itemIdArgTwo])
 
-    var itemUiState by mutableStateOf(WriteOffTableUiState())
+    var itemUiState by mutableStateOf(DomainWritOffTable())
         private set
 
     init {
@@ -34,11 +37,11 @@ class WriteOffEditViewModel(
             itemUiState = itemsRepository.getItemWriteOff(itemId)
                 .filterNotNull()
                 .first()
-                .toWriteOffTableUiState()
+                .toDomainMap()
         }
     }
 
-    fun updateUiState(itemDetails: WriteOffTableUiState) {
+    fun updateUiState(itemDetails: DomainWritOffTable) {
         itemUiState =
             itemDetails
     }
@@ -50,14 +53,32 @@ class WriteOffEditViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = DataPairListState()
             )
+    var countWarehouseUiState by mutableDoubleStateOf(0.0)
+        private set
+
+    fun updateCountWarehouseUiState(pair: Pair<String, Boolean>) {
+        viewModelScope.launch {
+            countWarehouseUiState = if (pair.second) {
+                itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
+                    .filterNotNull()
+                    .first()
+                    .toDouble()
+            } else {
+                itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
+                    .filterNotNull()
+                    .first()
+                    .toDouble()
+            }
+        }
+    }
 
 
     suspend fun saveItem() {
-        itemsRepository.updateWriteOff(itemUiState.toWriteOffTable())
+        itemsRepository.updateWriteOff(itemUiState.toRoomMap())
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteWriteOff(itemUiState.toWriteOffTable())
+        itemsRepository.deleteWriteOff(itemUiState.toRoomMap())
     }
 
     companion object {
@@ -65,36 +86,3 @@ class WriteOffEditViewModel(
     }
 
 }
-
-data class WriteOffTableUiState(
-    val id: Int = 0,
-    val title: String = "", // название
-    val count: String = "", // Кол-во
-    val day: Int = 0,  // день
-    val mount: Int = 0, // месяц
-    val year: Int = 0, // время
-    val priceAll: String = "",
-    val idPT: Int = 0,
-    var suffix: String = "",
-    val status: Int = 0,
-    val note:String = ""
-)
-
-fun WriteOffTable.toWriteOffTableUiState(): WriteOffTableUiState = WriteOffTableUiState(
-    id, title, count.toString(), day, mount, year, priceAll.toString(), idPT, suffix, status, note
-)
-
-fun WriteOffTableUiState.toWriteOffTable(): WriteOffTable = WriteOffTable(
-    id = id,
-    title = title,
-    count = count.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-    day = day,
-    mount = mount,
-    year = year,
-    priceAll = if (priceAll == "") 0.0 else priceAll.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-    suffix = suffix,
-    status = status,
-    idPT = idPT,
-    note= note
-)
-

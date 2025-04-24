@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -17,7 +18,6 @@ import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
@@ -401,44 +401,10 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAllAnimal(id: Int): Flow<List<AnimalTable>> = itemDao.getAllAnimal(id)
     override fun getAnimal(id: Int): Flow<AnimalTable> = itemDao.getAnimal(id)
     override fun getTypeAnimal(id: Int): Flow<List<String>> = itemDao.getTypeAnimal(id)
+
+    /**Animal**/
     override suspend fun insertAnimalTable(animalTable: AnimalTable): Long =
         itemDao.insertAnimalTable(animalTable)
-
-    override suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable) =
-        itemDao.insertAnimalCountTable(animalCountTable)
-
-    override suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
-        itemDao.insertAnimalSizeTable(animalSizeTable)
-
-    override suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
-        itemDao.insertAnimalVaccinationTable(animalVaccinationTable)
-
-    override suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
-        itemDao.insertAnimalWeightTable(animalWeightTable)
-
-    override suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable) =
-        itemDao.updateAnimalCountTable(animalCountTable)
-
-    override suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
-        itemDao.updateAnimalSizeTable(animalSizeTable)
-
-    override suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
-        itemDao.updateAnimalVaccinationTable(animalVaccinationTable)
-
-    override suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
-        itemDao.updateAnimalWeightTable(animalWeightTable)
-
-    override suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable) =
-        itemDao.deleteAnimalCountTable(animalCountTable)
-
-    override suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
-        itemDao.deleteAnimalSizeTable(animalSizeTable)
-
-    override suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
-        itemDao.deleteAnimalVaccinationTable(animalVaccinationTable)
-
-    override suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
-        itemDao.deleteAnimalWeightTable(animalWeightTable)
 
     override suspend fun updateAnimalTable(animalTable: AnimalTable) =
         itemDao.updateAnimalTable(animalTable)
@@ -446,27 +412,63 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun deleteAnimalTable(animalTable: AnimalTable) =
         itemDao.deleteAnimalTable(animalTable)
 
-    override fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>> =
+    override suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable) =
+        itemDao.insertAnimalCountTable(animalCountTable)
+
+    override suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
+        itemDao.insertAnimalSizeTable(animalSizeTable)
+
+    override suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
+        itemDao.insertAnimalWeightTable(animalWeightTable)
+
+    override suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
+        itemDao.insertAnimalVaccinationTable(animalVaccinationTable)
+
+    override suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable) =
+        itemDao.updateAnimalCountTable(animalCountTable)
+
+    override suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
+        itemDao.updateAnimalSizeTable(animalSizeTable)
+
+    override suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
+        itemDao.updateAnimalWeightTable(animalWeightTable)
+
+    override suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
+        itemDao.updateAnimalVaccinationTable(animalVaccinationTable)
+
+    override suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable) =
+        itemDao.deleteAnimalCountTable(animalCountTable)
+
+    override suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
+        itemDao.deleteAnimalSizeTable(animalSizeTable)
+
+    override suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
+        itemDao.deleteAnimalWeightTable(animalWeightTable)
+
+    override suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
+        itemDao.deleteAnimalVaccinationTable(animalVaccinationTable)
+
+    override fun getCountAnimalLimit(id: Int): Flow<AnimalCountTable> =
         itemDao.getCountAnimalLimit(id)
 
-    override fun getSizeAnimalLimit(id: Int): Flow<List<AnimalSizeTable>> =
+    override fun getSizeAnimalLimit(id: Int): Flow<AnimalSizeTable> =
         itemDao.getSizeAnimalLimit(id)
 
-    override fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>> =
-        itemDao.getVaccinationtAnimalLimit(id)
+    override fun getVaccinationAnimalLimit(id: Int): Flow<AnimalVaccinationTable> =
+        itemDao.getVaccinationAnimalLimit(id)
 
-    override fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>> =
+    override fun getWeightAnimalLimit(id: Int): Flow<AnimalWeightTable> =
         itemDao.getWeightAnimalLimit(id)
 
-    override fun getCountAnimal(id: Int): Flow<List<AnimalIndicatorsVM>> =
+    override fun getCountAnimal(id: Int): Flow<List<DomainIndicatorsVM>> =
         itemDao.getCountAnimal(id)
 
-    override fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>> = itemDao.getSizeAnimal(id)
+    override fun getSizeAnimal(id: Int): Flow<List<DomainIndicatorsVM>> = itemDao.getSizeAnimal(id)
 
-    override fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>> =
-        itemDao.getVaccinationtAnimal(id)
+    override fun getVaccinationAnimal(id: Int): Flow<List<AnimalVaccinationTable>> =
+        itemDao.getVaccinationAnimal(id)
 
-    override fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>> =
+    override fun getWeightAnimal(id: Int): Flow<List<DomainIndicatorsVM>> =
         itemDao.getWeightAnimal(id)
 
     override fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>> =

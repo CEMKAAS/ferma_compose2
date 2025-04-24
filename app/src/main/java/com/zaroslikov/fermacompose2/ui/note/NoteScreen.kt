@@ -1,38 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.note
 
-import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,23 +19,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarFerma
 import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.composeElement.CardField
+import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
+import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
+import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
+import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
@@ -103,48 +81,28 @@ fun NoteScreen(
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBarFerma(
-                    title = "Мои Заметки",
+                TopAppBarNavigation(
+                    title = R.string.note_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigateToItemAdd(idProject) },
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .padding(
-                            end = WindowInsets.safeDrawing.asPaddingValues()
-                                .calculateEndPadding(LocalLayoutDirection.current)
-                        )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.item_entry_title)
-                    )
-                }
-            },
+            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } },
         ) { innerPadding ->
-            if (isLoading) {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else {
+            if (isLoading)
+                CircularProgress(
+                    modifier = modifier.padding(innerPadding),
+                )
+            else
                 NoteBody(
+                    modifier = modifier
+                        .modifierScreen(innerPadding),
                     itemList = homeUiState.itemList,
                     onItemClick = navigateToItemUpdate,
-                    modifier = modifier.fillMaxSize(),
-                    contentPadding = innerPadding,
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
-            }
+
         }
     }
 }
@@ -154,80 +112,41 @@ private fun NoteBody(
     itemList: List<NoteTable>,
     onItemClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    navigateToItemAdd:()-> Unit
+    navigateToItemAdd: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
-    ) {
-        if (itemList.isEmpty()) {
-            Column(
-                modifier = modifier
-                    .padding(contentPadding)
-                    .padding(15.dp).verticalScroll(rememberScrollState())) {
-                Text(
-                    text = "Добро пожаловать в раздел \"Мои Заметки!\"",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "В этом разделе Вы можете добавлять заметки, по своему хозяйству",
-                    textAlign = TextAlign.Justify,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "Сейчас нет заметок:(\nНажмите + чтобы добавить\nили",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 20.sp,
-                )
-                Button(
-                    onClick = navigateToItemAdd, modifier = Modifier.fillMaxWidth()
-                        .padding(bottom = 20.dp)
 
-                ) {
-                    Text(text = "Добавить Заметку")
-                }
-            }
-        } else {
-            InventoryList(
-                itemList = itemList,
-                onItemClick = { onItemClick(it.id) },
-                contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small))
-            )
-        }
-    }
+    if (itemList.isNotEmpty())
+       InventoryList(
+            itemList = itemList,
+            onItemClick = { onItemClick(it.id) },
+            modifier = modifier
+        )
+    else MessageNoData(
+        modifier = modifier,
+        onClick = navigateToItemAdd,
+        titleRes = R.string.message_no_date_title_note,
+        messageRes = R.string.message_no_date_message_note,
+        supportRes = R.string.message_no_date_support_text_note,
+        buttonRes = R.string.button_note_message_no_data
+    )
 }
 
 
 @Composable
 private fun InventoryList(
+    modifier: Modifier = Modifier,
     itemList: List<NoteTable>,
     onItemClick: (NoteTable) -> Unit,
-    contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
 ) {
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = contentPadding,
-        verticalArrangement = Arrangement.SpaceEvenly
+        modifier = modifier,
+        verticalArrangement = Arrangement.Top,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(items = itemList, key = { it.id }) { item ->
             NoteCard(noteTable = item,
                 modifier = Modifier
-                    .padding(8.dp)
                     .clickable { onItemClick(item) })
         }
     }
@@ -238,47 +157,26 @@ fun NoteCard(
     noteTable: NoteTable,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-        ) {
-            Text(
-                text = noteTable.title,
-                modifier = Modifier
-                    .padding(vertical = 6.dp),
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                fontSize = 16.sp
-            )
-
-            Text(
-                text = noteTable.note,
-                modifier = Modifier
-                    .padding(vertical = 6.dp),
-                maxLines = 3
-            )
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_edit_calendar_24),
-                    contentDescription = "Дата редактирования"
-                )
-                Text(
-                    text = noteTable.date,
-                    modifier = Modifier
-                        .padding(vertical = 6.dp)
-                        .padding(start = 10.dp)
-                )
-            }
-
-        }
-    }
+  CardField(modifier = modifier) {
+      Column(
+          modifier = Modifier.fillMaxWidth()
+      ) {
+          Text(
+              modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
+              text = noteTable.title,
+              style = textBold_20,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis
+          )
+          IconAndText(
+              iconRes = R.drawable.baseline_sticky_note_2_24,
+              valueString = noteTable.note
+          )
+          IconAndText(
+              iconRes = R.drawable.baseline_calendar_month_24,
+              valueString = noteTable.date
+          )
+      }
+  }
 }
 

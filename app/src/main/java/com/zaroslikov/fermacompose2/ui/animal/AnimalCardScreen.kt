@@ -1,61 +1,66 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
-import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialogKillAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialogSaleAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.composeElement.CardField
+import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
+import com.zaroslikov.fermacompose2.ui.composeElement.IconAndTextMore
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
+import com.zaroslikov.fermacompose2.ui.composeElement.text_16
+import com.zaroslikov.fermacompose2.ui.finance.PullOutCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.formatter
-import io.appmetrica.analytics.AppMetrica
+import kotlinx.coroutines.launch
 
 
 object AnimalCardDestination : NavigationDestination {
     override val route = "animalCard"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+    const val itemIdArgTwo = "itemCategory"
+    val routeWithArgs = "$route/{$itemIdArg}/{$itemIdArgTwo}"
 }
 
 @Composable
 fun AnimalCardProduct(
     navigateBack: () -> Unit,
     onNavigateSetting: (Int) -> Unit,
-    onNavigateIndicators: (AnimalIndicators) -> Unit,
+    onNavigateIndicators: (Pair<Int, Int>) -> Unit,
     viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val animalTable = viewModel.itemUiState
-    val size = viewModel.sizeState.collectAsState()
-    val count = viewModel.countState.collectAsState()
-    val weight = viewModel.weightState.collectAsState()
-    val vaccination = viewModel.vaccinationState.collectAsState()
     val product = viewModel.productState(animalTable.name).collectAsState()
+    val buyerUiState by viewModel.buyerUiState.collectAsState()
+    val titleUiState by viewModel.titleUiState.collectAsState()
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(topBar = {
         TopAppBarStart(
@@ -67,16 +72,35 @@ fun AnimalCardProduct(
     }) { innerPadding ->
         AnimalCardContainer(
             modifier = Modifier
-                .padding(innerPadding)
-                .padding(5.dp)
+                .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
             animalTable = animalTable,
-            animalWeightTable = weight.value.itemList,
-            animalSizeTable = size.value.itemList,
-            animalCountTable = count.value.itemList,
-            animalVaccinationTable = vaccination.value.itemList,
+            animalWeightTable = viewModel.domainWeight,
+            animalSizeTable = viewModel.domainHeight,
+            animalCountTable = viewModel.domainCount,
+            animalVaccinationTable = viewModel.domainVaccination,
+            titleList = titleUiState.list,
+            buyerList = buyerUiState.list,
             animalProductTable = product.value.itemList,
-            onNavigateIndicators = onNavigateIndicators
+            countWarehouse = viewModel.countInWarehouse,
+            onNavigateIndicators = onNavigateIndicators,
+            onSaleClick = {
+                coroutineScope.launch {
+                    viewModel.saveSaleAnimal(
+                        Triple(
+                            it.first,
+                            it.second,
+                            animalTable.toAnimalTable().copy(arhiv = it.third)
+                        )
+                    )
+                    if (it.third) navigateBack()
+                }
+            },
+            onUpdateCountWarehouse = {
+                coroutineScope.launch {
+                    viewModel.updateUiState(it)
+                }
+            }
         )
     }
 }
@@ -85,330 +109,206 @@ fun AnimalCardProduct(
 fun AnimalCardContainer(
     modifier: Modifier,
     animalTable: AnimalEditUiState,
-    animalWeightTable: List<AnimalWeightTable>,
-    animalSizeTable: List<AnimalSizeTable>,
-    animalCountTable: List<AnimalCountTable>,
-    animalVaccinationTable: List<AnimalVaccinationTable>,
+    animalWeightTable: DomainIndicatorsVM,
+    animalSizeTable: DomainIndicatorsVM,
+    animalCountTable: DomainIndicatorsVM,
+    animalVaccinationTable: DomainIndicatorsVM,
+    countWarehouse: Double,
+    titleList: List<String>,
+    buyerList: List<String>,
     animalProductTable: List<AnimalTitSuff>,
-    onNavigateIndicators: (AnimalIndicators) -> Unit,
+    onNavigateIndicators: (Pair<Int, Int>) -> Unit,
+    onUpdateCountWarehouse: (String) -> Unit,
+    onSaleClick: (Triple<SaleTable, AnimalCountTable, Boolean>) -> Unit
 ) {
 
-    val modifierCard = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
-
-    val modifierHeading = Modifier
-        .wrapContentSize()
-        .padding(6.dp)
-
-    val modifierText = Modifier
-        .wrapContentSize()
-        .padding(vertical = 3.dp, horizontal = 6.dp)
+    var openSaleDialog by rememberSaveable { mutableStateOf(false) }
+    var openKillDialog by rememberSaveable { mutableStateOf(false) }
+    val openArchiveDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = modifier) {
-        Card(
-            modifier = modifierCard
+        DataCardOne(animalTable)
+        DataCardTwo(
+            isSoloAnimal = !animalTable.groop,
+            countTable = animalCountTable,
+            weightTable = animalWeightTable,
+            sizeTable = animalSizeTable,
+            vaccinationsTable = animalVaccinationTable,
+            onNavigateIndicators = { onNavigateIndicators(Pair(animalTable.id, it)) }
+
+        )
+        PullOutCard(
+            modifier = Modifier,
+            intRes = R.string.animal_card_screen_animal_card_product,
+            intTitleText = R.string.alert_dialog_info_title_product_add,
+            intText = R.string.alert_dialog_info_text_product_add,
+            list = animalProductTable
+        ) {
+            Pair(it.title, "${it.priceAll} ${it.suffix}")
+        }
+        CardField {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = stringResource(R.string.card_note),
+                    style = textBold_18
+                )
+                Text(
+                    text = if (animalTable.note == "") stringResource(R.string.analysis_screen_no) else animalTable.note,
+                    style = text_16
+                )
+            }
+        }
+        ButtonPanel(
+            onSaleClick = { openSaleDialog = !openSaleDialog },
+            onKillClick = { openKillDialog = !openKillDialog },
+            onArchiveClick = {}
+        )
+        if (openSaleDialog) {
+            AlertDialogSaleAnimal(
+                drawableRes = R.drawable.baseline_add_card_24,
+                buyerList = buyerList,
+                isAnimalGroup = animalTable.groop,
+                title = animalTable.name,
+                countAll = animalCountTable.weight.toInt(),
+                suffix = animalCountTable.suffix,
+                idPT = animalTable.idPT,
+                onSaveClick = { onSaleClick(it) },
+                onConfirmation = { openSaleDialog = !openSaleDialog },
+            )
+        }
+        if (openKillDialog) {
+            AlertDialogKillAnimal(
+                drawableRes = R.drawable.baseline_add_card_24,
+                titleList = titleList,
+                isAnimalGroup = animalTable.groop,
+                title = animalTable.name,
+                countAll = animalCountTable.weight.toInt(),
+                suffix = animalCountTable.suffix,
+                idPT = animalTable.idPT,
+                countWarehouse = countWarehouse,
+                onSaveClick = { },
+                onUpdateCountWarehouse = {onUpdateCountWarehouse(it)},
+                onConfirmation = { openKillDialog = !openKillDialog },
+            )
+        }
+    }
+}
+
+@Composable
+private fun DataCardOne(
+    animalTable: AnimalEditUiState
+) {
+    CardField {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
-                text = "Данные", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+                text = stringResource(R.string.animal_card_screen_animal_card),
+                style = textBold_18
             )
-            Text(text = "Тип: ${animalTable.type}", modifier = modifierText)
+            IconAndText(
+                iconRes = R.drawable.baseline_pets_24,
+                valueString = animalTable.type
+            )
             if (!animalTable.groop) {
-                Text(text = "Пол: ${animalTable.sex}", modifier = modifierText)
+                IconAndText(
+                    iconRes = if (animalTable.sex == "Мужской") R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
+                    valueString = animalTable.sex
+                )
             }
-            Text(text = "Дата добавления: ${animalTable.data}", modifier = modifierText)
-            Text(text = "Стомость: ${animalTable.price} ₽", modifier = modifierText)
-            Text(text = "Потребления корма: ${animalTable.foodDay} кг", modifier = modifierText)
-        }
-
-        if (!animalTable.groop) {
-            Card(
-                modifier = modifierCard.clickable {
-                    onNavigateIndicators(
-                        AnimalIndicators(
-                            id = animalTable.id,
-                            table = "Вес"
-                        )
-                    )
-                    AppMetrica.reportEvent("Животные Вес")
-                }
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.fillMaxWidth(0.85f)) {
-                        var i = 1
-                        Text(
-                            text = "Вес", modifier = modifierHeading,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
-                        )
-                        if (animalWeightTable.isNotEmpty()) {
-                            animalWeightTable.forEach {
-                                Text(
-                                    text = "${i++}) ${it.weight} кг. на ${it.date}",
-                                    modifier = modifierText
-                                )
-                            }
-                        } else {
-                            Text(
-                                text = "Данных нет! Нажмите, чтобы добавить",
-                                modifier = modifierText
-                            )
-                        }
-                    }
-                    IconButton(
-                        onClick = {
-                            onNavigateIndicators(
-                                AnimalIndicators(
-                                    id = animalTable.id,
-                                    table = "Вес"
-                                )
-                            )
-                            AppMetrica.reportEvent("Животные Вес")
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_output_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                }
-            }
-
-            Card(
-                modifier = modifierCard.clickable {
-                    onNavigateIndicators(
-                        AnimalIndicators(
-                            id = animalTable.id,
-                            table = "Размер"
-                        )
-                    )
-                    AppMetrica.reportEvent("Животные Размер")
-                }
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.fillMaxWidth(0.85f)) {
-                        var i = 1
-                        Text(
-                            text = "Размер", modifier = modifierHeading,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
-                        )
-                        if (animalSizeTable.isNotEmpty()) {
-                            animalSizeTable.forEach {
-                                Text(
-                                    text = "${i++}) ${it.size} м. на ${it.date}",
-                                    modifier = modifierText
-                                )
-                            }
-                        } else {
-                            Text(
-                                text = "Данных нет! Нажмите, чтобы добавить",
-                                modifier = modifierText
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = {
-                            onNavigateIndicators(
-                                AnimalIndicators(
-                                    id = animalTable.id,
-                                    table = "Количество"
-                                )
-                            )
-                            AppMetrica.reportEvent("Животные Ко-во")
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_output_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                }
-            }
-
-        } else {
-
-            Card(
-                modifier = modifierCard.clickable {
-                    onNavigateIndicators(
-                        AnimalIndicators(
-                            id = animalTable.id,
-                            table = "Количество"
-                        )
-                    )
-                    AppMetrica.reportEvent("Животные Размер")
-                }
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.fillMaxWidth(0.85f)) {
-
-                        var i = 1
-                        Text(
-                            text = "Количество", modifier = modifierHeading,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
-                        )
-
-                        if (animalCountTable.isNotEmpty()) {
-                            animalCountTable.forEach {
-                                Text(
-                                    text = "${i++}) ${formatter(it.count.toDouble())} шт. на ${it.date}",
-                                    modifier = modifierText
-                                )
-                            }
-                        } else {
-                            Text(
-                                text = "Данных нет! Нажмите, чтобы добавить",
-                                modifier = modifierText
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = {
-                            onNavigateIndicators(
-                                AnimalIndicators(
-                                    id = animalTable.id,
-                                    table = "Количество"
-                                )
-                            )
-                            AppMetrica.reportEvent("Животные Ко-во")
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_output_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-
-                }
-            }
-        }
-
-        Card(
-            modifier = modifierCard.clickable {
-                onNavigateIndicators(
-                    AnimalIndicators(
-                        id = animalTable.id,
-                        table = "Прививки"
+            IconAndText(
+                iconRes = R.drawable.baseline_calendar_month_24,
+                valueString = animalTable.data
+            )
+            IconAndText(
+                iconRes = R.drawable.baseline_calendar_month_24,//дата завода
+                valueString = animalTable.data
+            )
+            if (!animalTable.groop) {
+                IconAndText(
+                    iconRes = R.drawable.baseline_add_card_24,
+                    valueString = stringResource(
+                        R.string.card_ruble_s,
+                        animalTable.price.toFormatNumber()
                     )
                 )
-                AppMetrica.reportEvent("Животные Прививки")
             }
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.fillMaxWidth(0.85f)) {
-                    var i = 1
-                    Text(
-                        text = "Прививки:", modifier = modifierHeading,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
-                    )
-                    if (animalVaccinationTable.isNotEmpty()) {
-                        animalVaccinationTable.forEach {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "${i++}) ${it.vaccination}",
-                                    modifier = modifierText.fillMaxWidth(0.6f)
-                                )
-                                Text(
-                                    text = "${it.date} - ${it.nextVaccination}",
-                                    modifier = Modifier.padding(
-                                        vertical = 3.dp,
-                                        horizontal = 15.dp
-                                    ),
-                                    textAlign = TextAlign.End
-                                )
-                            }
-                        }
-                    } else {
-                        Text(text = "Нет добавленных прививок", modifier = modifierText)
-                    }
-                }
-                IconButton(
-                    onClick = {
-                        onNavigateIndicators(
-                            AnimalIndicators(
-                                id = animalTable.id,
-                                table = "Прививки"
-                            )
-                        )
-                        AppMetrica.reportEvent("Животные Прививки")
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_output_24),
-                        contentDescription = "Показать меню"
-                    )
-                }
-            }
-        }
-
-        Card(
-            modifier = modifierCard
-        ) {
-            Text(
-                text = "Продукции получено:", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+            IconAndText(
+                iconRes = R.drawable.baseline_calendar_month_24,//нужен мешок
+                valueString = "${animalTable.foodDay} кг"
             )
-            var i = 1
-            if (animalProductTable.isNotEmpty()) {
-                animalProductTable.forEach {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "${i++}) ${it.title}",
-                            modifier = modifierText.fillMaxWidth(0.6f)
-                        )
-                        Text(
-                            text = "${formatter(it.priceAll)} ${it.suffix}",
-                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 15.dp),
-                            textAlign = TextAlign.End
-                        )
-                    }
-                }
-            } else {
-                Text(text = "Пока ничего нет :(", modifier = modifierText)
-            }
         }
-
-
-        Card(
-            modifier = modifierCard
-        ) {
-            Text(
-                text = "Примечание:", modifier = modifierHeading,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            if (animalTable.note == "") {
-                Text(text = "Здесь пока пусто:(", modifier = modifierText)
-            } else {
-                Text(text = animalTable.note, modifier = modifierText)
-            }
-
-        }
-
     }
-
 }
 
 
-data class AnimalIndicators(
-    val id: Int,
-    val table: String
-)
+@Composable
+private fun DataCardTwo(
+    isSoloAnimal: Boolean,
+    countTable: DomainIndicatorsVM,
+    weightTable: DomainIndicatorsVM,
+    sizeTable: DomainIndicatorsVM,
+    vaccinationsTable: DomainIndicatorsVM,
+    onNavigateIndicators: (Int) -> Unit
+) {
+    CardField {
+        Column {
+            Text(
+                text = stringResource(R.string.animal_card_screen_animal_card_two),
+                style = textBold_18
+            )
+            if (!isSoloAnimal)
+                IconAndTextMore(
+                    iconRes = R.drawable.baseline_spoke_24,
+                    valueString = stringResource(R.string.card_pieces_s, countTable.weight),
+                    onClick = { onNavigateIndicators(2) }
+                )
+            else {
+                IconAndTextMore(
+                    iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
+                    valueString = if (weightTable.weight == "") stringResource(R.string.animal_card_screen_animal_card_no_weight)
+                    else stringResource(R.string.card_kilogram_s, weightTable.weight),
+                    onClick = { onNavigateIndicators(0) }
+                )
+                IconAndTextMore(
+                    iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
+                    valueString = if (sizeTable.weight == "") stringResource(R.string.animal_card_screen_animal_card_no_height)
+                    else stringResource(R.string.card_size_s, sizeTable.weight),
+                    onClick = { onNavigateIndicators(1) }
+                )
+            }
+            IconAndTextMore(
+                iconRes = R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
+                valueString = if (vaccinationsTable.weight == "") stringResource(R.string.animal_card_screen_animal_card_no_vaccination)
+                else "${vaccinationsTable.weight} ${vaccinationsTable.date}",
+                onClick = { onNavigateIndicators(3) }
+            )
+        }
+    }
+}
 
+@Composable
+fun ButtonPanel(
+    onSaleClick: () -> Unit,
+    onKillClick: () -> Unit,
+    onArchiveClick: () -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        ButtonStandart(
+            modifier = Modifier.weight(1f),
+            onClick = onSaleClick,
+            intRes = R.string.button_sale
+        )
+        ButtonStandart(
+            modifier = Modifier.weight(1f),
+            onClick = onKillClick,
+            intRes = R.string.button_kill
+        )
+    }
+    ButtonStandart(
+        onClick = onArchiveClick,
+        intRes = R.string.button_archive
+    )
+}

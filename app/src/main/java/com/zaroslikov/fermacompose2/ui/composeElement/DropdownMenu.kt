@@ -90,7 +90,145 @@ fun DropdownMenuIconProductSuffix(
                 },
                 text = { Text(text = metersSuffix) }
             )
+        }
+    }
+}
 
+@Composable
+fun DropdownMenuIconWeightSuffix(
+    setSuffix: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val gramSuffix = stringResource(id = R.string.suffix_gram)
+    val kilogramSuffix = stringResource(id = R.string.suffix_kilogram)
+    val tonsSuffix = stringResource(id = R.string.suffix_tons)
+
+    IconButton(onClick = { expanded = !expanded }) {
+        Icon(
+            Icons.Default.MoreVert,
+            contentDescription = stringResource(R.string.content_description_show_menu)
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = !expanded },
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(gramSuffix)
+                    expanded = !expanded
+                },
+                text = {
+                    Text(text = gramSuffix)
+                }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(kilogramSuffix)
+                    expanded = !expanded
+                },
+                text = { Text(text = kilogramSuffix) }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(tonsSuffix)
+                    expanded = !expanded
+                },
+                text = { Text(text = tonsSuffix) }
+            )
+        }
+    }
+}
+
+@Composable
+fun DropdownMenuIconHeightSuffix(
+    setSuffix: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+
+    val millimetersSuffix = stringResource(id = R.string.suffix_millimeters)
+    val centimetersSuffix = stringResource(id = R.string.suffix_centimetre)
+    val metersSuffix = stringResource(id = R.string.suffix_meters)
+
+    IconButton(onClick = { expanded = !expanded }) {
+        Icon(
+            Icons.Default.MoreVert,
+            contentDescription = stringResource(R.string.content_description_show_menu)
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = !expanded },
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(millimetersSuffix)
+                    expanded = !expanded
+                },
+                text = {
+                    Text(text = millimetersSuffix)
+                }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(centimetersSuffix)
+                    expanded = !expanded
+                },
+                text = { Text(text = centimetersSuffix) }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(metersSuffix)
+                    expanded = !expanded
+                },
+                text = { Text(text = metersSuffix) }
+            )
+        }
+    }
+}
+
+@Composable
+fun DropdownMenuIconCountSuffix(
+    setSuffix: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val piecesSuffix = stringResource(id = R.string.suffix_pieces)
+    val headSuffix = stringResource(id = R.string.suffix_head)
+    val unitsSuffix = stringResource(id = R.string.suffix_units)
+
+    IconButton(onClick = { expanded = !expanded }) {
+        Icon(
+            Icons.Default.MoreVert,
+            contentDescription = stringResource(R.string.content_description_show_menu)
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = !expanded },
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(piecesSuffix)
+                    expanded = !expanded
+                },
+                text = {
+                    Text(text = piecesSuffix)
+                }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(headSuffix)
+                    expanded = !expanded
+                },
+                text = { Text(text = headSuffix) }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(unitsSuffix)
+                    expanded = !expanded
+                },
+                text = { Text(text = unitsSuffix) }
+            )
         }
     }
 }
@@ -101,7 +239,7 @@ fun ExposedDropdownMenuProduct(
     title: String,
     setTitle: (String) -> Unit,
     titleList: List<String>,
-    content: @Composable (Modifier) -> Unit,
+    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -113,9 +251,11 @@ fun ExposedDropdownMenuProduct(
             }
         ) {
             content(
-                Modifier
-                    .menuAnchor()
-                    .toOutlinedText()
+                Pair(
+                    Modifier
+                        .menuAnchor()
+                        .toOutlinedText(), expanded
+                )
             )
             val filteredOptions =
                 titleList.filter { it.contains(title, ignoreCase = true) }
@@ -141,6 +281,66 @@ fun ExposedDropdownMenuProduct(
         }
     }
 }
+
+@Composable
+fun ExposedDropdownMenuSex(
+    title: String,
+    setTitle: (Int) -> Unit,
+    selectedItemIndex: Int,
+    titleList: List<String>,
+    isFilterUsed: Boolean = true,
+    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            content(
+                Pair(
+                    Modifier
+                        .menuAnchor()
+                        .toOutlinedText(), expanded
+                )
+            )
+
+            val filteredOptions =
+                if (isFilterUsed) titleList.filter {
+                    it.contains(
+                        title,
+                        ignoreCase = true
+                    )
+                } else titleList
+
+            if (filteredOptions.isNotEmpty()) {
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {}
+                ) {
+                    filteredOptions.forEachIndexed { index, item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = item,
+                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                )
+                            },
+                            onClick = {
+                                setTitle(index)
+                                expanded = !expanded
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun ExposedDropdownMenuAnimals(
@@ -236,5 +436,16 @@ fun ExposedDropdownMenuPair(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun GetDropDownMenu(version: Int, onClick: (String) -> Unit) {
+    return when (version) {
+        0 -> DropdownMenuIconWeightSuffix(setSuffix = { onClick(it) })
+        1 -> DropdownMenuIconHeightSuffix(setSuffix = { onClick(it) })
+        2 -> DropdownMenuIconCountSuffix(setSuffix = { onClick(it) })
+        3 -> {}
+        else -> DropdownMenuIconProductSuffix(setSuffix = { onClick(it) })
     }
 }

@@ -77,23 +77,6 @@ class MainActivity : ComponentActivity() {
                         onProcessCaneForeground = ::showAppOpenAd
                     )
                     ProcessLifecycleOwner.get().lifecycle.addObserver(processLifecycleObserver)
-
-
-                    //Межстра
-//                    interstitialAdLoader = InterstitialAdLoader(this).apply {
-//                        setAdLoadListener(object : InterstitialAdLoadListener {
-//                            override fun onAdLoaded(ad: InterstitialAd) {
-//                                interstitialAd = ad
-//                                // The ad was loaded successfully. Now you can show loaded ad.
-//                            }
-//
-//                            override fun onAdFailedToLoad(adRequestError: AdRequestError) {
-//                                // Ad failed to load with AdRequestError.
-//                                // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
-//                            }
-//                        })
-//                    }
-//                    loadInterstitialAd()
                 }
                 var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
 
@@ -124,7 +107,6 @@ class MainActivity : ComponentActivity() {
                         ), REQUEST_CODE_NOTIFICATION_PERMISSIONS
                     )
                 }
-
                 else -> Log.d(TAG, "Notification Permissions : previously granted successfully")
             }
         } catch (e: Exception) {
@@ -149,7 +131,6 @@ class MainActivity : ComponentActivity() {
                     !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
                         getNotificationPermissions()
                     }
-
                     else -> {
                         Log.d(TAG, "Notification Permissions : Granted successfully")
                     }

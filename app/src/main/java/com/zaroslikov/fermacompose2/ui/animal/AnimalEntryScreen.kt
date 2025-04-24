@@ -1,6 +1,11 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.animal
 
 import android.widget.Toast
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +35,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,8 +44,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -54,14 +62,39 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.isError
+import com.zaroslikov.fermacompose2.supportFun.isErrorAnimal
+import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
+import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
+import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
+import com.zaroslikov.fermacompose2.supportFun.metricalAnimal
+import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.composeElement.CardField
+import com.zaroslikov.fermacompose2.ui.composeElement.CheckboxTextIcon
+import com.zaroslikov.fermacompose2.ui.composeElement.ErrorSupportTextSlash
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextSex
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
+import com.zaroslikov.fermacompose2.ui.composeElement.RadioButtonRow
+import com.zaroslikov.fermacompose2.ui.composeElement.RadioButtonWriteOff
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
+import com.zaroslikov.fermacompose2.ui.composeElement.toOutlinedText
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
@@ -79,21 +112,19 @@ fun AnimalEntryProduct(
     onNavigateUp: () -> Unit,
     viewModel: AnimalEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-
     val typeList by viewModel.typeUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Добавить Животного", navigateUp = navigateBack)
+            TopAppBarBack(intRes = R.string.animals_add_screen_title, navigateUp = navigateBack)
         }
     ) { innerPadding ->
         AnimalEntryContainer(
-            idPT = viewModel.itemId,
             modifier = Modifier
-                .padding(innerPadding)
-                .padding(5.dp)
+                .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
+            idPT = viewModel.itemId,
             typeList = typeList.list,
             saveInRoomSale = {
                 coroutineScope.launch {
@@ -123,501 +154,253 @@ fun AnimalEntryContainer(
     var title by remember { mutableStateOf("") }
     var type by rememberSaveable { mutableStateOf("") }
     var sex by rememberSaveable { mutableStateOf(sexList[0]) }
-    var state by remember { mutableStateOf(true) }//выбор группы
-    var weight by remember { mutableStateOf("10") }
-    var size by remember { mutableStateOf("0") }
+    var isGroupAnimal by remember { mutableStateOf(false)} // true group
     var count by remember { mutableStateOf("1") }
     var note by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
+    var dateBorn by remember { mutableStateOf(dateToday()) }
+    var dateFactory by remember { mutableStateOf(dateBorn) }
     var foodDay by remember { mutableStateOf("") }
-
-
-    var expandedSex by remember { mutableStateOf(false) }
-    var expandedType by remember { mutableStateOf(false) }
+    var isDateFactory by remember { mutableStateOf(true) }
+    var selectedItemIndex by remember { mutableIntStateOf(0) }
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
+    var isErrorCount by rememberSaveable { mutableStateOf(false) }
     var isErrorType by rememberSaveable { mutableStateOf(false) }
-    var isErrorPrice by rememberSaveable { mutableStateOf(false) }
-    var isErrorFoodDay by rememberSaveable { mutableStateOf(false) }
+
 
     val focusManager = LocalFocusManager.current
 
-    var selectedItemIndex by remember { mutableStateOf(0) }
-
-
-    fun validateTitle(text: String) {
-        isErrorTitle = text == ""
-    }
-
-    fun validateType(text: String) {
-        isErrorType = text == ""
-    }
-    fun validatePrice(text: String) {
-        isErrorPrice = text == ""
-    }
-
-    fun validateFoodDay(text: String) {
-        isErrorFoodDay = text == ""
-    }
-
-    fun errorBoolean(): Boolean {
-        isErrorTitle = title == ""
-        isErrorType = type == ""
-        isErrorPrice = price == ""
-        isErrorFoodDay = foodDay == ""
-        return !(isErrorTitle || isErrorType || isErrorPrice || isErrorFoodDay)
-    }
-
-    //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val formattedDate: String = format.format(calendar.timeInMillis)
-
-    var date1 by remember { mutableStateOf(formattedDate) }
+    val factoryPadding by animateDpAsState(
+        if (!isDateFactory) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
 
     //Дата
     var openDialog by remember { mutableStateOf(false) }
-
-    val datePickerState = rememberDatePickerState(
+    val state = rememberDatePickerState(
         selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = calendar.timeInMillis
+        initialSelectedDateMillis = Instant.now().toEpochMilli()
     )
-
     if (openDialog) {
-        DatePickerDialogSample(datePickerState, date1) { date ->
-            date1 = date
+        DatePickerDialogSample(state, dateBorn) {
+            dateBorn = it
             openDialog = false
         }
     }
 
-    Column(modifier = modifier) {
+    var openDialogFactory by remember { mutableStateOf(false) }
+    val stateFactory = rememberDatePickerState(
+        selectableDates = PastOrPresentSelectableDates,
+        initialSelectedDateMillis = Instant.now().toEpochMilli()
+    )
+    if (openDialog) {
+        DatePickerDialogSample(stateFactory, dateFactory) {
+            dateFactory = it
+            openDialogFactory = false
+        }
+    }
 
+    Column(modifier = modifier) {
+        CardField(
+            modifier = Modifier
+                .padding(bottom = 4.dp)
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.animal_entry_screen_info_animal),
+                    style = textBold_16
+                )
+                RadioButtonRow(
+                    state = isGroupAnimal,
+                    onStateSelect = { isGroupAnimal = it },
+                    intResOne = R.string.ration_button_one,
+                    intResTwo = R.string.ration_button_many,
+                    imageOne = R.drawable.baseline_fiber_manual_record_24,
+                    imageTwo = R.drawable.baseline_spoke_24
+                )
+            }
+        }
         OutlinedTextField(
             value = title,
             onValueChange = {
                 title = it
-                validateTitle(title)
+                isErrorTitle = it.isError()
             },
-            label = { Text(text = "Название") },
+            label = { Text(text = stringResource(if (!isGroupAnimal) R.string.outlined_text_name_animal else R.string.outlined_text_name_animals)) },
             supportingText = {
-                if (isErrorTitle) {
-                    Text(
-                        text = "Не указана кличка животного или имя группы",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else {
-                    Text("Укажите кличку животного или группы")
-                }
+                ErrorSupportTextSlash(
+                    isError = isErrorTitle,
+                    intRes = if (!isGroupAnimal) R.string.support_text_name_animal else R.string.support_text_names_animals,
+                    intResError = if (!isGroupAnimal) R.string.error_no_name_animal else R.string.error_no_name_animals,
+                )
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
+            modifier = Modifier.toOutlinedText(),
             isError = isErrorTitle,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
-                )
-            }
-            )
+            keyboardOptions = keyboardOptionsNext(),
+            keyboardActions = keyboardActionsDown(focusManager)
         )
-
-        Box {
-            ExposedDropdownMenuBox(
-                expanded = expandedType,
-                onExpandedChange = {
-                    expandedType = !expandedType
-                }
-            ) {
-
-                OutlinedTextField(
-                    value = type,
-                    onValueChange = {
-                        type = it
-                        validateType(type)
-                    },
-                    label = { Text(text = "Тип") },
-                    supportingText = {
-                        if (isErrorType) {
-                            Text(
-                                text = "Не указан или не выбран тип животного",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        } else {
-                            Text("Укажите или выберите тип животного")
-                        }
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp),
-                    isError = isErrorType,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    }
-                    )
-                )
-                val filteredOptions =
-                    typeList.filter { it.contains(type, ignoreCase = true) }
-                if (filteredOptions.isNotEmpty()) {
-                    ExposedDropdownMenu(
-                        expanded = expandedType,
-                        onDismissRequest = {}
-                    ) {
-                        filteredOptions.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
-                                onClick = {
-                                    type = item
-                                    expandedType = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        OutlinedTextField(
+        OutlinedTextTitleAdd(
+            intRes = R.string.outlined_text_type,
+            intResSup = if (!isGroupAnimal) R.string.support_text_type_animal else R.string.support_text_type_animals,
+            intResError = R.string.error_no_type_animal,
+            value = type,
+            onValueChange = {
+                type = it.trim()
+                isErrorType = it.isError()
+            },
+            drawableRes = R.drawable.baseline_pets_24,
+            titleList = typeList,
+            isErrorTitle = isErrorType,
+            isErrorSlash = false,
+            focusManager = focusManager
+        )
+        if (!isGroupAnimal)
+            OutlinedTextSex(
+                value = sex,
+                selectedItemIndex = selectedItemIndex,
+                onValueChange = {
+                    selectedItemIndex = it
+                    sex = sexList[selectedItemIndex]
+                },
+                list = sexList,
+                focusManager = focusManager
+            )
+        else OutlinedTextCount(
+            value = count,
+            onValueChange = {
+                count = it.toConvertDb()
+                isErrorCount = it.isError()
+            },
+            drawableRes = R.drawable.baseline_spoke_24,
+            isError = isErrorCount,
+            suffix = stringResource(R.string.suffix_pieces),
+            intRes = R.string.outlined_text_field_quantity,
+            intResSup = R.string.support_text_count_animals,
+            isWarehouseShow = false,
+            isDropMenuShow = false,
+            focusManager = focusManager
+        )
+        OutlinedTextPrice(
             value = price,
             onValueChange = {
-                price = it.replace(Regex("[^\\d.]"), "").replace(",", ".")
-                validatePrice(price)
+                price = it.toConvertDb()
             },
-            label = { Text("Стоимость") },
+            intSupportText = if (!isGroupAnimal) R.string.support_text_price_animal else R.string.support_text_price_animals,
+            focusManager = focusManager
+        )
+        OutlinedTextDate(
+            value = dateBorn,
+            intRes = R.string.outlined_text_date_born,
+            intResSup = if (!isGroupAnimal) R.string.outlined_text_date_born else R.string.support_text_date_born_s,
+            onValueChange = { openDialog = !openDialog }
+        )
+        CardField(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            supportingText = {
-                if (isErrorPrice) {
-                    Text(
-                        text = "Не указана стоимость животного!",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else {
-                    Text("Укажите за сколько купили животного")
-                }
-            },
-            suffix = { Text(text = "₽") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
-                )
-            }),
-            isError = isErrorPrice
-        )
-
-        OutlinedTextField(
-            value = date1,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Дата рождения или завода") },
-            supportingText = {
-                Text("Выберите дату")
-            },
-            trailingIcon = {
-                IconButton(onClick = { openDialog = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_calendar_month_24),
-                        contentDescription = "Показать Календарь"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    openDialog = true
-                }
-                .padding(vertical = 10.dp),
-        )
-
-        Text(
-            text = "Вносим данные по группе или одному животному?",
-            modifier = Modifier.padding(start = 6.dp)
-        )
-
-        Row(
-            Modifier
-                .selectableGroup()
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
+                .padding(bottom = 4.dp)
+                .padding(bottom = factoryPadding.coerceAtLeast(0.dp))
         ) {
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = state,
-                    onClick = { state = true },
-                    modifier = Modifier.semantics { contentDescription = "Localized Description" }
+            Column {
+                CheckboxTextIcon(
+                    modifier = if (!isDateFactory) Modifier.toOutlinedText() else Modifier,
+                    checked = isDateFactory,
+                    onCheckedChange = {
+                        isDateFactory = it
+                    },
+                    intTitle = if (!isGroupAnimal) R.string.checkbox_born else R.string.checkbox_born_s,
+                    isTooltipShow = true,
+                    intTooltip = R.string.tooltip_animals_born
                 )
-                Text(text = "Группа")
-            }
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = !state,
-                    onClick = { state = false },
-                    modifier = Modifier.semantics { contentDescription = "Localized Description" },
-                )
-                Text(text = "Один")
+                if (!isDateFactory) {
+                    OutlinedTextDate(
+                        value = dateFactory,
+                        intRes = R.string.outlined_text_date_factory,
+                        intResSup = if (!isGroupAnimal) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
+                        onValueChange = { openDialogFactory = !openDialogFactory }
+                    )
+                }
             }
         }
-
-        if (!state) {
-            Box {
-                ExposedDropdownMenuBox(
-                    expanded = expandedSex,
-                    onExpandedChange = { expandedSex = !expandedSex },
-                ) {
-                    OutlinedTextField(
-                        value = sex,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSex) },
-                        label = { Text(text = "Пол") },
-                        supportingText = {
-                            Text("Выберите пол животного")
-                        },
-                        keyboardActions = KeyboardActions(onNext = {
-                            focusManager.moveFocus(
-                                FocusDirection.Down
-                            )
-                        }),
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                            .padding(bottom = 10.dp)
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = expandedSex,
-                        onDismissRequest = { expandedSex = false }
-                    ) {
-                        sexList.forEachIndexed { index, item ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = item,
-                                        fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                    )
-                                },
-                                onClick = {
-                                    selectedItemIndex = index
-                                    expandedSex = false
-                                    sex = sexList[selectedItemIndex]
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            OutlinedTextField(
-                value = weight,
-                onValueChange = {
-                    weight = it
-                },
-                label = { Text(text = "Вес") },
-                supportingText = {
-                    Text("Укажите вес животного")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Number,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                suffix = { Text(text = "кг.") },
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
-                    )
-                }
-                )
-            )
-
-            OutlinedTextField(
-                value = size,
-                onValueChange = {
-                    size = it
-                },
-                label = { Text(text = "Размер") },
-                supportingText = {
-                    Text("Укажите размер Вашего животного")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                suffix = { Text(text = "м.") },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Number,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
-                    )
-                }
-                )
-            )
-        } else {
-
-            OutlinedTextField(
-                value = count,
-                onValueChange = {
-                    count = it
-                },
-                label = { Text(text = "Колличество") },
-                supportingText = {
-                    Text("Укажите кол-во Вашей группы")
-                },
-                suffix = { Text(text = "шт.") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Number,
-                    capitalization = KeyboardCapitalization.Sentences
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
-                    )
-                }
-                )
-            )
-        }
-
-        OutlinedTextField(
+        OutlinedTextCount(
             value = foodDay,
             onValueChange = {
-                validateFoodDay(it)
-                foodDay = it
+                foodDay = it.toConvertDb()
             },
-            label = { Text(text = "Расход корма") },
-            supportingText = {
-                if (isErrorFoodDay) {
-                    Text(
-                        text = "Не указана ежедневный расход корма на голову, если не знаете укажите 0!",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else { Text("Укажите ежедневный расход корма на голову, если не знаете укажите 0") }
-            },
-            suffix = { Text(text = "кг.") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Number,
-                capitalization = KeyboardCapitalization.Sentences
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
-                )
-            }
-            )
+            isError = false,
+            intRes = R.string.outlined_food_day_animals,
+            intResSup = if (!isGroupAnimal) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
+            suffix = stringResource(R.string.suffix_pieces),
+            isWarehouseShow = false,
+            isDropMenuShow = true,
+            focusManager = focusManager
         )
-
-        OutlinedTextField(
+        OutlinedTextNote(
             value = note,
-            onValueChange = {
-                note = it
-            },
-            label = { Text(text = "Примечание") },
-            supportingText = {
-                Text("Здесь может быть важная информация")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences
-            )
+            onValueChange = { note = it },
+            focusManager = focusManager
         )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Button(
-                onClick = {
-                    if (errorBoolean()) {
-                        saveInRoomSale(
-                            AnimalEntryRoom(
-                                AnimalTable(
-                                    id = 0,
-                                    name = title,
-                                    type = type,
-                                    data = date1,
-                                    groop = state,
-                                    sex = sex,
-                                    note = note,
-                                    image = "0",
-                                    arhiv = false,
-                                    price = price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-                                    foodDay = foodDay.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-                                    idPT = idPT
-                                ),
-                                AnimalCountTable(
-                                    id = 0,
-                                    count = count,
-                                    date = date1,
-                                    idAnimal = idPT
-                                ),
-                                AnimalWeightTable(
-                                    id = 0,
-                                    weight = weight,
-                                    date = date1,
-                                    idAnimal = idPT
-                                ),
-                                AnimalSizeTable(
-                                    id = 0,
-                                    size = size,
-                                    date = date1,
-                                    idAnimal = idPT
-                                )
+        ButtonStandart(
+            intRes = R.string.button_add,
+            onClick = {
+                if (isErrorAnimal(
+                        title = title,
+                        type = type,
+                        count = count,
+                        state = isGroupAnimal,
+                        isErrorTitle = { isErrorTitle = it },
+                        isErrorCount = { isErrorCount = it },
+                        isErrorType = { isErrorType = it }
+                    )
+                ) {
+                    saveInRoomSale(
+                        AnimalEntryRoom(
+                            AnimalTable(
+                                id = 0,
+                                name = title,
+                                type = type,
+                                data = dateBorn,
+                                dateFactory = dateFactory,
+                                groop = isGroupAnimal,
+                                sex = sex,
+                                note = note,
+                                image = "0",
+                                arhiv = false,
+                                price = if (price == "") 0.0 else price.toConvertDb()
+                                    .toDouble(),
+                                foodDay = if (foodDay == "") 0.0 else foodDay.toConvertDb()
+                                    .toDouble(),
+                                idPT = idPT
+                            ),
+                            AnimalCountTable(
+                                id = 0,
+                                count = if (count == "") "0" else count,
+                                suffix = "",//TODO
+                                date = dateBorn,
+                                idAnimal = idPT
+                            ),
+                            AnimalWeightTable(
+                                id = 0,
+                                weight = "0",
+                                suffix = "",//TODO
+                                date = dateBorn,
+                                idAnimal = idPT
+                            ),
+                            AnimalSizeTable(
+                                id = 0,
+                                size = "0",
+                                suffix = "",//TODO
+                                date = dateBorn,
+                                idAnimal = idPT
                             )
                         )
-                        val eventParameters: MutableMap<String, Any> = HashMap()
-                        eventParameters["Имя"] = title
-                        eventParameters["Тип"] = type
-                        AppMetrica.reportEvent("Animal", eventParameters);
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-            ) {
-                Text(text = "Добавить")
+                    )
+                    metricalAnimal(title, type)
+                }
             }
-        }
+        )
     }
 }
 

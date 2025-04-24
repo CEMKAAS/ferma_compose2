@@ -2,13 +2,15 @@ package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQLPair
+import com.zaroslikov.fermacompose2.supportFun.firstDayOfMonth
+import com.zaroslikov.fermacompose2.supportFun.todayOfMonth
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,9 +19,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.TimeZone
 
 class FinanceAnalysisViewModel(
     savedStateHandle: SavedStateHandle,
@@ -28,23 +27,6 @@ class FinanceAnalysisViewModel(
 
     val itemId: Int = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArg])
     val name: String = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArgTwo])
-
-    private fun calBegin(): Long {
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-
-        calendar.set(year, month, 1)
-        return calendar.timeInMillis
-    }
-
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-
-    var dateBegin by mutableLongStateOf(calBegin())
-        private set
-    var dateEnd by mutableLongStateOf(calendar.timeInMillis)
-        private set
-
 
     var analysisAddAllTime by mutableStateOf(FinUiState())
         private set
@@ -65,8 +47,13 @@ class FinanceAnalysisViewModel(
     var analysisAddAverageValueAllTime by mutableStateOf(FinUiState())
         private set
 
-    init {
+    var dateBegin by mutableStateOf(firstDayOfMonth())
+        private set
+    var dateEnd by mutableStateOf(todayOfMonth())
+        private set
 
+
+    init {
         viewModelScope.launch {
             analysisAddAllTime =
                 itemsRepository.getAnalysisAddAllTime(itemId, name)
@@ -138,59 +125,54 @@ class FinanceAnalysisViewModel(
     }
 
     fun updateDateBegin(dateString: Long) {
-        dateBegin = dateString
+        dateBegin = dateLongToStringSQLPair(dateString)
     }
 
     fun updateDateEnd(dateString: Long) {
-        dateEnd = dateString
+        dateEnd = dateLongToStringSQLPair(dateString)
     }
 
     fun upAnalisis() {
-
-        val format = SimpleDateFormat("yyyy-MM-dd")
-        val begin = format.format(dateBegin)
-        val end = format.format(dateEnd)
-
         viewModelScope.launch {
             analysisAddAllTime =
-                itemsRepository.getAnalysisAddAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisAddAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull().first().toFinUiState()
             analysisSaleAllTime =
-                itemsRepository.getAnalysisSaleAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisSaleAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toFinUiState()
             analysisWriteOffAllTime =
-                itemsRepository.getAnalysisWriteOffAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisWriteOffAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toFinUiState()
             analysisWriteOffOwnNeedsAllTime =
-                itemsRepository.getAnalysisWriteOffOwnNeedsAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisWriteOffOwnNeedsAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toFinUiState()
             analysisWriteOffScrapAllTime =
-                itemsRepository.getAnalysisWriteOffScrapAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisWriteOffScrapAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toFinUiState()
             analysisSaleSoldAllTime =
-                itemsRepository.getAnalysisSaleSoldAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisSaleSoldAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toDouble()
             analysisWriteOffOwnNeedsMoneyAllTime =
-                itemsRepository.getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toDouble()
             analysisWriteOffScrapMoneyAllTime =
-                itemsRepository.getAnalysisWriteOffScrapMoneyAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisWriteOffScrapMoneyAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toDouble()
             analysisAddAverageValueAllTime =
-                itemsRepository.getAnalysisAddAverageValueAllTimeRange(itemId, name, begin, end)
+                itemsRepository.getAnalysisAddAverageValueAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                     .filterNotNull()
                     .first().toFinUiState()
         }
 
         analysisAddAnimalAllTimeState =
-            itemsRepository.getAnalysisAddAnimalAllTimeRange(itemId, name, begin, end)
+            itemsRepository.getAnalysisAddAnimalAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                 .map { AnalysisAddAnimalAllTimeUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
@@ -199,7 +181,7 @@ class FinanceAnalysisViewModel(
                 )
 
         analysisSaleBuyerAllTimeState =
-            itemsRepository.getAnalysisSaleBuyerAllTimeRange(itemId, name, begin, end)
+            itemsRepository.getAnalysisSaleBuyerAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                 .map { AnalysisSaleBuyerAllTimeUiState(it) }
                 .stateIn(
                     scope = viewModelScope,
@@ -208,7 +190,7 @@ class FinanceAnalysisViewModel(
                 )
 
         analysisCostPriceTimeState =
-            itemsRepository.getAnalysisCostPriceAllTimeRange(itemId, name, begin, end)
+            itemsRepository.getAnalysisCostPriceAllTimeRange(itemId, name, dateBegin.first, dateEnd.first)
                 .map { AnalysisAddAnimalAllTimeUiState2(it) }
                 .stateIn(
                     scope = viewModelScope,

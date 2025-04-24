@@ -22,7 +22,7 @@ fun isErrorAdd(
     count: String,
     isErrorTitle: (Boolean) -> Unit,
     isErrorCount: (Boolean) -> Unit,
-    isErrorSlash: (Boolean) -> Unit
+    isErrorSlash: (Boolean) -> Unit = {}
 ): Boolean {
     isErrorTitle(title.isError())
     isErrorCount(count.isError())
@@ -77,3 +77,51 @@ fun isErrorExpenses(
     }
 }
 
+
+fun isErrorAnimal(
+    title: String,
+    type: String,
+    count: String,
+    state: Boolean,
+    isErrorTitle: (Boolean) -> Unit,
+    isErrorType: (Boolean) -> Unit,
+    isErrorCount: (Boolean) -> Unit,
+): Boolean {
+    isErrorTitle(title.isError())
+    isErrorType(type.isError())
+    if (!state) isErrorCount(count.isError())
+    return !(title == "" || (count == "" && !state) || type == "")
+}
+
+fun isErrorVersion(
+    title: String,
+    isErrorTitle: (Boolean) -> Unit,
+): Boolean {
+    isErrorTitle(title.isError())
+    return !(title == "")
+}
+
+fun isErrorAnimalSale(
+    title: String,
+    count: String,
+    countAll: Int,
+    isAnimalGroup: Boolean,
+    isErrorTitle: (Boolean) -> Unit,
+    isErrorCount: (Boolean) -> Unit,
+    isErrorCountMore: (Boolean) -> Unit
+): Boolean {
+    isErrorTitle(title.isError())
+
+    if (isAnimalGroup) {
+        isErrorCount(count.isError())
+        isErrorCountMore(countAll < count.toConvertZero())
+    } else {
+        isErrorCount(false)
+        isErrorCountMore(false)
+    }
+    return if (isAnimalGroup) {
+        !(title == "" || count == "" || (countAll < count.toConvertZero()))
+    } else {
+        !(title == "")
+    }
+}

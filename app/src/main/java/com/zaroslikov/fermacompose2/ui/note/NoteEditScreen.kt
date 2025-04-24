@@ -25,16 +25,31 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainNoteTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.isError
+import com.zaroslikov.fermacompose2.supportFun.isErrorSale
+import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
+import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
+import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
+import com.zaroslikov.fermacompose2.ui.composeElement.ErrorSupportTextSlash
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.toOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -59,31 +74,27 @@ fun NoteEditProduct(
 
     Scaffold(
         topBar = {
-            TopAppBarEdit(title = "Мои Заметки", navigateUp = navigateBack)
+            TopAppBarBack(intRes = R.string.note_screen_title, navigateUp = navigateBack)
         }
     ) { innerPadding ->
 
         AddEditContainerProduct(
             modifier = Modifier
-                .padding(innerPadding)
-                .padding(5.dp)
+                .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
             noteTable = viewModel.itemUiState,
             onValueChange = viewModel::updateUiState,
-            saveInRoomAdd = {
-                if (it) {
-                    coroutineScope.launch {
-                        viewModel.saveItem()
-
-                        onNavigateUp()
-                    }
+            onClickSave = {
+                coroutineScope.launch {
+                    viewModel.saveItem()
                 }
+                onNavigateUp()
             },
-            deleteAdd = {
+            onClickDelete = {
                 coroutineScope.launch {
                     viewModel.deleteItem()
-                    onNavigateUp()
                 }
+                onNavigateUp()
             }
         )
     }
@@ -92,115 +103,69 @@ fun NoteEditProduct(
 @Composable
 fun AddEditContainerProduct(
     modifier: Modifier,
-    noteTable: NoteTableUiState,
-    onValueChange: (NoteTableUiState) -> Unit = {},
-    saveInRoomAdd: (Boolean) -> Unit,
-    deleteAdd: () -> Unit
+    noteTable: DomainNoteTable,
+    onValueChange: (DomainNoteTable) -> Unit = {},
+    onClickSave: () -> Unit,
+    onClickDelete: () -> Unit
 ) {
-    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
-    fun validateTitle(text: String) {
-        isErrorTitle = text == ""
-    }
+    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
 
-    fun errorBoolean(): Boolean {
-        isErrorTitle = noteTable.title == ""
-        return !(isErrorTitle)
-    }
-
-    //Календарь
-    val format = SimpleDateFormat("dd.MM.yyyy")
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val date: String = format.format(calendar.timeInMillis)
+    val toastText = stringResource(
+        R.string.toast_refresh_note_s,
+        noteTable.title
+    )
 
     Column(modifier = modifier) {
-
         OutlinedTextField(
             value = noteTable.title,
             onValueChange = {
-                onValueChange(noteTable.copy(title = it, date = date))
-                validateTitle(it)
+                onValueChange(noteTable.copy(title = it, date = dateToday()))
+                isErrorTitle = it.isError()
             },
-            label = { Text(text = "Заголовок") },
+            label = { Text(text = stringResource(R.string.outlined_text_title)) },
             supportingText = {
-                if (isErrorTitle) {
-                    Text(
-                        text = "Не указан заголовок",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                } else Text("Укажите заголовок")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            isError = isErrorTitle,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
+                ErrorSupportTextSlash(
+                    isError = isErrorTitle,
+                    intRes = R.string.support_text_title,
+                    intResError = R.string.error_no_title,
                 )
-            }
-            )
+            },
+            modifier = Modifier.toOutlinedText(),
+            isError = isErrorTitle,
+            keyboardOptions = keyboardOptionsNext(),
+            keyboardActions = keyboardActionsDown(focusManager)
         )
-
-
         OutlinedTextField(
             value = noteTable.note,
             onValueChange = {
                 onValueChange(
                     noteTable.copy(
-                        note = it, date = date
+                        note = it, date = dateToday()
                     )
                 )
             },
-            label = { Text("Примечание") },
+            label = { Text(stringResource(R.string.outlined_text_note_note)) },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp),
-            supportingText = {
-                Text("Здесь может быть важная информация")
-
-            },
+                .toOutlinedText(),
             keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusManager.moveFocus(
-                    FocusDirection.Down
-                )
-            }
             )
         )
 
-        Button(
-            onClick = { saveInRoomAdd(errorBoolean()) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_create_24),
-                contentDescription = " Обновить "
-            )
-            Text(text = " Обновить ")
+        ButtonRefresh {
+            if (!isErrorTitle) {
+                focusManager.clearFocus()
+                onClickSave()
+                toastShort(
+                    context = context,
+                    text = toastText
+                )
+            }
         }
-
-        OutlinedButton(
-            onClick = deleteAdd,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_delete_24),
-                contentDescription = "Удалить"
-            )
-            Text(text = " Удалить ")
-        }
+        ButtonDelete { onClickDelete() }
     }
 }

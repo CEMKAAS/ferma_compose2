@@ -1,21 +1,6 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
@@ -33,7 +18,6 @@ import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsVM
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList2
@@ -306,40 +290,35 @@ interface ItemsRepository {
     fun getAnimal(id: Int): Flow<AnimalTable>
     fun getTypeAnimal(id: Int): Flow<List<String>>
 
-
+    //AnimalScreen
     suspend fun insertAnimalTable(animalTable: AnimalTable): Long
-
-    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable)
-
-    suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
-
-    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
-
-    suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
-
-    suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
-    suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable)
-    suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
-    suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable)
-
-
-    suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)
-    suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
-    suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
-    suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
-
     suspend fun updateAnimalTable(animalTable: AnimalTable)
     suspend fun deleteAnimalTable(animalTable: AnimalTable)
 
-    fun getCountAnimalLimit(id: Int): Flow<List<AnimalCountTable>>
-    fun getSizeAnimalLimit(id: Int): Flow<List<AnimalSizeTable>>
-    fun getVaccinationtAnimalLimit(id: Int): Flow<List<AnimalVaccinationTable>>
-    fun getWeightAnimalLimit(id: Int): Flow<List<AnimalWeightTable>>
+    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable)
+    suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+    suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
 
-    fun getCountAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
-    fun getSizeAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
-    fun getVaccinationtAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
-    fun getWeightAnimal(id: Int): Flow<List<AnimalIndicatorsVM>>
+    suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
+    suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+    suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+    suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+
+    suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)
+    suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
+    suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
+    suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+
+    fun getCountAnimalLimit(id: Int): Flow<AnimalCountTable>
+    fun getSizeAnimalLimit(id: Int): Flow<AnimalSizeTable>
+    fun getVaccinationAnimalLimit(id: Int): Flow<AnimalVaccinationTable>
+    fun getWeightAnimalLimit(id: Int): Flow<AnimalWeightTable>
+
+    fun getCountAnimal(id: Int): Flow<List<DomainIndicatorsVM>>
+    fun getSizeAnimal(id: Int): Flow<List<DomainIndicatorsVM>>
+    fun getVaccinationAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
+    fun getWeightAnimal(id: Int): Flow<List<DomainIndicatorsVM>>
     fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>>
 
 

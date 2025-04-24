@@ -43,6 +43,10 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.composeElement.CardFinance
+import com.zaroslikov.fermacompose2.ui.composeElement.CardFinanceRow
+import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
@@ -62,83 +66,71 @@ object FinanceIncomeExpensesDestination : NavigationDestination {
 fun FinanceIncomeExpensesScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    navigationToAnalysis: (AnalysisNav) -> Unit,
+    navigationToAnalysis: (Pair<Int, String>) -> Unit,
     viewModel: FinanceIncomeExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val titleTopBar = if (viewModel.itemBoolean) "Мои Доходы" else "Мои Расходы"
 
     val financeCategoryState by viewModel.financeCategoryIEState.collectAsState()
-    val financeProduuctState by viewModel.financeProductIEState.collectAsState()
+    val financeProductState by viewModel.financeProductIEState.collectAsState()
     val financeAnimalState by viewModel.aminalExpensesUIState.collectAsState()
 
     Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+//        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBarEdit(title = titleTopBar, navigateUp = navigateBack)
+            TopAppBarBack(
+                intRes = if (viewModel.itemBoolean) R.string.income_screen_title else R.string.expenses_my_screen_title,
+                navigateUp = navigateBack
+            )
         }
     ) { innerPadding ->
         FinanceIncomeExpensesBody(
+            modifier = Modifier
+                .modifierScreen(innerPadding),
+            boolean = viewModel.itemBoolean,
             itemList = financeCategoryState.itemList,
-            productList = financeProduuctState.itemList,
+            productList = financeProductState.itemList,
             animalList = financeAnimalState.itemList,
-            modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding,
             navigationToAnalysis = {
                 navigationToAnalysis(
-                    AnalysisNav(idProject = viewModel.itemId, name = it)
+                    Pair(viewModel.itemId, it)
                 )
-            },
-            boolean = viewModel.itemBoolean
+            }
         )
     }
 }
 
 @Composable
 private fun FinanceIncomeExpensesBody(
+    modifier: Modifier = Modifier,
+    boolean: Boolean,
     itemList: List<Fin>,
     productList: List<Fin>,
     animalList: List<Fin>,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
     navigationToAnalysis: (String) -> Unit,
-    boolean: Boolean
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
-    ) {
-        if (productList.isEmpty() && itemList.isEmpty() && (boolean || animalList.isEmpty())) {
-            Text(
-                text = stringResource(R.string.no_item_finance_edit),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(contentPadding),
-            )
-        } else {
-            FinanceIncomeExpensesInventoryList(
-                itemList = itemList,
-                productList = productList,
-                animalList = animalList,
-                contentPadding = contentPadding,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small)),
-                navigationToAnalysis = navigationToAnalysis,
-                boolean = boolean
-            )
-        }
+    if (productList.isEmpty() && itemList.isEmpty() && (boolean || animalList.isEmpty())) {
+        //TODO Придумать текст или картинку
+    } else {
+        FinanceIncomeExpensesInventoryList(
+            modifier = modifier,
+            itemList = itemList,
+            productList = productList,
+            animalList = animalList,
+            boolean = boolean,
+            navigationToAnalysis = navigationToAnalysis,
+        )
     }
-
 }
 
 @Composable
 private fun FinanceIncomeExpensesInventoryList(
+    modifier: Modifier = Modifier,
+    boolean: Boolean,
     itemList: List<Fin>,
     productList: List<Fin>,
     animalList: List<Fin>,
-    contentPadding: PaddingValues,
-    modifier: Modifier = Modifier,
     navigationToAnalysis: (String) -> Unit,
-    boolean: Boolean
 ) {
     var productBoolean by rememberSaveable { mutableStateOf(true) }
     var animalBoolean by rememberSaveable { mutableStateOf(true) }
@@ -146,152 +138,60 @@ private fun FinanceIncomeExpensesInventoryList(
 
     LazyColumn(
         modifier = modifier,
-        contentPadding = contentPadding
+        verticalArrangement = Arrangement.Top
     ) {
-
         if (productList.isNotEmpty()) {
             item {
                 TextButtonWarehouse(
                     onClick = { categoryTable = !categoryTable },
                     boolean = categoryTable,
-                    title = "Категории"
+                    intRes = R.string.outlined_text_field_category
                 )
             }
-            if (categoryTable) {
-                items(items = itemList) { item ->
-                    FinanceProductCard(
-                        fin = item,
-                        modifier = Modifier.padding(8.dp)
+            if (categoryTable)
+                items(items = itemList) {
+                    CardFinanceRow(
+                        title = it.title ?: "",
+                        value = it.priceAll
                     )
                 }
-            }
         }
-
-
         if (productList.isNotEmpty()) {
             item {
                 TextButtonWarehouse(
                     onClick = { productBoolean = !productBoolean },
                     boolean = productBoolean,
-                    title = "Товар"
+                    intRes = R.string.outlined_text_product
                 )
             }
-            if (productBoolean) {
-                items(items = productList) { item ->
-                    FinanceProductCard(
-                        fin = item,
+            if (productBoolean)
+                items(items = productList) {
+                    CardFinanceRow(
+                        title = it.title ?: "",
+                        value = it.priceAll,
                         modifier = Modifier
-                            .padding(8.dp)
-                            .clickable { if (boolean) navigationToAnalysis(item.title!!) }
+                            .clickable { if (boolean) navigationToAnalysis(it.title ?: "") }
                     )
                 }
-            }
         }
-
         if (!boolean) {
             if (animalList.isNotEmpty()) {
                 item {
                     TextButtonWarehouse(
                         onClick = { animalBoolean = !animalBoolean },
                         boolean = animalBoolean,
-                        title = "Животные"
+                        intRes = R.string.outlined_text_animals
                     )
                 }
-                if (animalBoolean) {
-                    items(items = animalList) { item ->
-                        FinanceProductCard(
-                            fin = item,
-                            modifier = Modifier.padding(8.dp)
+                if (animalBoolean)
+                    items(items = animalList) {
+                        CardFinanceRow(
+                            title = it.title ?: "",
+                            value = it.priceAll
                         )
                     }
-                }
             }
         }
     }
 }
-
-
-@Composable
-fun FinanceProductCard(
-    fin: Fin,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Text(
-                text = fin.title ?: "",
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-
-            Text(
-                text = "${formatter(fin.priceAll)} ₽",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(1f),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
-        }
-    }
-}
-
-//@Composable
-//fun FinanceIncomeExpensesProductCard(
-//    fin: Fin,
-//    modifier: Modifier = Modifier
-//) {
-//    Card(
-//        modifier = modifier,
-//        elevation = CardDefaults.cardElevation(2.dp),
-//        colors = CardDefaults.cardColors()
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .wrapContentHeight(),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//
-//            Column(
-//                modifier = Modifier.fillMaxWidth(0.7f)
-//            ) {
-//                Text(
-//                    text = fin.title ?: "",
-//                    modifier = Modifier
-//                        .wrapContentSize()
-//                        .padding(6.dp),
-//                    fontWeight = FontWeight.SemiBold,
-//                    fontSize = 16.sp
-//                )
-//            }
-//
-//            Text(
-//                text = "${formatter(fin.priceAll)} ₽",
-//                textAlign = TextAlign.Center,
-//                modifier = Modifier
-//                    .padding(6.dp)
-//                    .fillMaxWidth(1f),
-//                fontWeight = FontWeight.SemiBold,
-//                fontSize = 18.sp
-//            )
-//        }
-//    }
-//}
 

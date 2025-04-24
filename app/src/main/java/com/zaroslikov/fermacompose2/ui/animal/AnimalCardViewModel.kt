@@ -1,20 +1,20 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
-import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
-import com.zaroslikov.fermacompose2.ui.incubator.toIncubatorProjectState
-import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -29,41 +29,77 @@ class AnimalCardViewModel(
 ) : ViewModel() {
 
     val itemId: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
+    val itemIdPT: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArgTwo])
 
-    val countState: StateFlow<AnimalCoutUiStateLimit> =
-        itemsRepository.getCountAnimalLimit(itemId).map { AnimalCoutUiStateLimit(it) }
+    var itemUiState by mutableStateOf(AnimalEditUiState())
+        private set
+    var domainWeight by mutableStateOf(DomainIndicatorsVM())
+        private set
+    var domainHeight by mutableStateOf(DomainIndicatorsVM())
+        private set
+    var domainCount by mutableStateOf(DomainIndicatorsVM())
+        private set
+    var domainVaccination by mutableStateOf(DomainIndicatorsVM())
+        private set
+    var countInWarehouse by mutableDoubleStateOf(0.0)
+        private set
+
+
+    init {
+        viewModelScope.launch {
+            itemUiState = itemsRepository.getAnimal(itemId)
+                .filterNotNull()
+                .first()
+                .toAnimaEditUiState()
+
+            domainWeight = itemsRepository.getWeightAnimalLimit(itemId)
+                .filterNotNull()
+                .first()
+                .toDomainMap()
+
+            domainHeight = itemsRepository.getSizeAnimalLimit(itemId)
+                .filterNotNull()
+                .first()
+                .toDomainMap()
+
+            domainCount = itemsRepository.getCountAnimalLimit(itemId)
+                .filterNotNull()
+                .first()
+                .toDomainMap()
+
+            domainVaccination = itemsRepository.getVaccinationAnimalLimit(itemId)
+                .filterNotNull()
+                .first()
+                .toDomainMap()
+        }
+    }
+
+    val titleUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsTitleAddList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalCoutUiStateLimit()
+                initialValue = DataStringListState()
             )
 
-    val sizeState: StateFlow<AnimalSizeCardUiStateLimit> =
-        itemsRepository.getSizeAnimalLimit(itemId).map { AnimalSizeCardUiStateLimit(it) }
+    val buyerUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsBuyerSaleList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalSizeCardUiStateLimit()
+                initialValue = DataStringListState()
             )
 
-    val weightState: StateFlow<AnimalWeightUiStateLimit> =
-        itemsRepository.getWeightAnimalLimit(itemId).map { AnimalWeightUiStateLimit(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalWeightUiStateLimit()
-            )
+    fun updateUiState(name: String) {
+        viewModelScope.launch {
+            countInWarehouse = itemsRepository.getCurrentBalanceProduct(name, itemIdPT.toLong())
+                .filterNotNull()
+                .first()
+                .toDouble()
+        }
+    }
 
-    val vaccinationState: StateFlow<AnimalVaccinationCardUiStateLimit> =
-        itemsRepository.getVaccinationtAnimalLimit(itemId)
-            .map { AnimalVaccinationCardUiStateLimit(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalVaccinationCardUiStateLimit()
-            )
-
-    fun productState(name:String): StateFlow<AnimalProductCardUiStateLimit> {
+    fun productState(name: String): StateFlow<AnimalProductCardUiStateLimit> {
         return itemsRepository.getProductAnimal(name)
             .map { AnimalProductCardUiStateLimit(it) }
             .stateIn(
@@ -73,37 +109,27 @@ class AnimalCardViewModel(
             )
     }
 
-    var itemUiState by mutableStateOf(AnimalEditUiState())
-        private set
-
-    init {
-        viewModelScope.launch {
-            itemUiState = itemsRepository.getAnimal(itemId)
-                .filterNotNull()
-                .first()
-                .toAnimaEditUiState()
-        }
-    }
-
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
+    suspend fun saveSaleAnimal(triple: Triple<SaleTable, AnimalCountTable, AnimalTable>) {
+        itemsRepository.insertSale(triple.first)
+        itemsRepository.insertAnimalCountTable(triple.second)
+        itemsRepository.updateAnimalTable(triple.third)
+    }
+
+    suspend fun saveAddAnimal(addTable: AddTable) {
+        itemsRepository.insertItem(addTable)
+    }
+
 }
 
-data class AnimalCoutUiStateLimit(val itemList: List<AnimalCountTable> = listOf())
-
-data class AnimalSizeCardUiStateLimit(val itemList: List<AnimalSizeTable> = listOf())
-
-data class AnimalWeightUiStateLimit(val itemList: List<AnimalWeightTable> = listOf())
-
-data class AnimalVaccinationCardUiStateLimit(val itemList: List<AnimalVaccinationTable> = listOf())
 
 data class AnimalProductCardUiStateLimit(val itemList: List<AnimalTitSuff> = listOf())
 
 data class AnimalTitSuff(
-    val title: String?,
+    val title: String,
     val priceAll: Double,
     val suffix: String
 )

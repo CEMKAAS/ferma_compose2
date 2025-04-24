@@ -6,57 +6,41 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainNoteTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.NoteTable
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class NoteEditViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository
+    savedStateHandle: SavedStateHandle, private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
     private val itemId: Int = checkNotNull(savedStateHandle[NoteEditDestination.itemIdArg])
 
-    var itemUiState by mutableStateOf(NoteTableUiState())
+    var itemUiState by mutableStateOf(DomainNoteTable())
         private set
 
     init {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getNote(itemId)
-                .filterNotNull()
-                .first()
-                .toNoteTableUiState()
+            itemUiState = itemsRepository.getNote(itemId).filterNotNull().first().toDomainMap()
         }
     }
 
-    fun updateUiState(itemDetails: NoteTableUiState) {
-        itemUiState =
-            itemDetails
+    fun updateUiState(itemDetails: DomainNoteTable) {
+        itemUiState = itemDetails
     }
+
     suspend fun saveItem() {
-        itemsRepository.updateNote(itemUiState.toNoteTable())
+        itemsRepository.updateNote(itemUiState.toRoomMap())
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteNote(itemUiState.toNoteTable())
+        itemsRepository.deleteNote(itemUiState.toRoomMap())
     }
 
 }
 
-data class NoteTableUiState(
-    val id: Long = 0,
-    val title: String = "",
-    val note:String = "",
-    val date: String = "",
-    val idPT: Long = 0
-)
-
-fun NoteTable.toNoteTableUiState(): NoteTableUiState = NoteTableUiState(
-    id, title, note, date, idPT
-)
-
-fun NoteTableUiState.toNoteTable(): NoteTable = NoteTable(
-    id, title,note, date, idPT
-)

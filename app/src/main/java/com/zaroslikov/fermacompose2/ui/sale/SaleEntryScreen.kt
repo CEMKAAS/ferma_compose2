@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.sale
 
 import androidx.compose.foundation.layout.Column
@@ -147,7 +149,7 @@ fun SaleEntryContainerProduct(
     if (openDialog) {
         DatePickerDialogSample(state, date) {
             date = it
-            openDialog = false
+            openDialog = !openDialog
         }
     }
 
@@ -182,10 +184,10 @@ fun SaleEntryContainerProduct(
             onClick = { suffix = it },
             isError = isErrorCount,
             suffix = suffix,
+            intResSup = R.string.support_text_count_product_sale,
             countWarehouse = countWarehouse,
             focusManager = focusManager
         )
-
 
         OutlinedTextPrice(
             value = priceAll,
@@ -194,6 +196,7 @@ fun SaleEntryContainerProduct(
                 isErrorPrice = it.isError()
             },
             isError = isErrorPrice,
+            intSupportText = R.string.support_text_price_sale,
             focusManager = focusManager
         )
 

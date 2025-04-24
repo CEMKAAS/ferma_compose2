@@ -1,6 +1,6 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.home
-
-
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
@@ -45,7 +45,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
-import com.zaroslikov.fermacompose2.ui.composeElement.toButton
 import kotlinx.coroutines.launch
 import java.time.Instant
 
@@ -170,6 +169,7 @@ fun AddEntryContainerProduct(
             onClick = { suffix = it },
             isError = isErrorCount,
             suffix = suffix,
+            intResSup = R.string.support_text_count_product,
             countWarehouse = countWarehouse,
             focusManager = focusManager
         )
@@ -240,8 +240,7 @@ fun AddEntryContainerProduct(
                         title, count, category, animal, note
                     )
                 }
-            },
-            modifier = Modifier.toButton()
+            }
         )
     }
 }
