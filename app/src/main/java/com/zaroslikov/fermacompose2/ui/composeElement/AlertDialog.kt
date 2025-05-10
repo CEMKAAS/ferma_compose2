@@ -6,13 +6,13 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,11 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
@@ -36,6 +36,7 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
+import com.zaroslikov.fermacompose2.supportFun.infoTextKillAnimal
 import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorAnimalSale
 import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
@@ -44,7 +45,6 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 
@@ -77,11 +77,10 @@ fun AlertDialogInfo(
 
 @Composable
 fun AlertDialogSaleAnimal(
-    drawableRes: Int,
     isAnimalGroup: Boolean,
     title: String,
     countAll: Int,
-    suffix: String,
+    countSuffix: String,
     idPT: Int,
     buyerList: List<String>,
     onConfirmation: () -> Unit,
@@ -105,15 +104,18 @@ fun AlertDialogSaleAnimal(
             stiffness = Spring.StiffnessLow
         )
     )
-
-    val animalCategory = stringResource(R.string.support_text_animal)
-
     AlertDialog(
         icon = {
-            Icon(painterResource(drawableRes), contentDescription = "Example Icon")
+            Icon(
+                painterResource(R.drawable.baseline_add_card_24),
+                contentDescription = "Example Icon"
+            )
         },
         title = {
-            Text(text = stringResource(if (isAnimalGroup) R.string.alert_dialog_info_sale_animals else R.string.alert_dialog_info_sale_animal))
+            Text(
+                text = stringResource(if (isAnimalGroup) R.string.alert_dialog_info_sale_animals else R.string.alert_dialog_info_sale_animal),
+                style = textBold_16
+            )
         },
         text = {
             Column {
@@ -130,7 +132,7 @@ fun AlertDialogSaleAnimal(
                         intRes = R.string.outlined_text_field_quantity,
                         drawableRes = R.drawable.baseline_spoke_24,
                         count = countAll,
-                        suffix = suffix,
+                        suffix = countSuffix,
                         focusManager = focusManager
                     )
                 }
@@ -187,6 +189,8 @@ fun AlertDialogSaleAnimal(
             }
         },
         confirmButton = {
+            val note = stringResource(R.string.animal_card_screen_note_sale)
+            val animalCategory = stringResource(R.string.animal_card_screen_category_sale)
             TextButton(
                 onClick = {
                     focusManager.clearFocus()
@@ -203,23 +207,22 @@ fun AlertDialogSaleAnimal(
                         onSaveClick(
                             Triple(
                                 first = SaleTable(
-                                    id = 0,
                                     title = title,
                                     count = if (isAnimalGroup) countSale.toDouble() else 1.0,
                                     priceAll = if (isAutoCalculate) priceAll.toConvertZeroDouble() * countSale.toConvertZero() else priceAll.toConvertDbDouble(),
                                     day = dateTodayArray()[0],
                                     mount = dateTodayArray()[1],
                                     year = dateTodayArray()[2],
-                                    suffix = suffix,
+                                    suffix = countSuffix,
                                     category = animalCategory,
-                                    note = "",
+                                    note = note,
                                     buyer = buyer,
                                     idPT = idPT,
                                 ),
                                 second = AnimalCountTable(
                                     id = 0,
                                     count = if (isAnimalGroup) (countAll - countSale.toInt()).toString() else "0",
-                                    suffix = suffix,
+                                    suffix = countSuffix,
                                     date = dateToday(),
                                     idAnimal = idPT
                                 ),
@@ -238,17 +241,19 @@ fun AlertDialogSaleAnimal(
 
 @Composable
 fun AlertDialogKillAnimal(
-    drawableRes: Int,
     isAnimalGroup: Boolean,
     title: String,
     countAll: Int,
-    suffix: String,
+    countSuffix: String,
+    weight: String,
+    weightSuffix: String,
     idPT: Int,
     countWarehouse: Double,
     titleList: List<String>,
     onConfirmation: () -> Unit,
     onUpdateCountWarehouse: (String) -> Unit,
-    onSaveClick: (Triple<AddTable, AnimalCountTable, Boolean>) -> Unit
+    onSaveProductClick: (AddTable) -> Unit,
+    onSaveCountClick: (Pair<AnimalCountTable, Boolean>) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -256,83 +261,105 @@ fun AlertDialogKillAnimal(
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
     var isErrorCountMore by rememberSaveable { mutableStateOf(false) }
 
-
-    val animalCategory = stringResource(R.string.support_text_animal)
     val textFields =
-        remember { mutableStateListOf(KillTitleList(suffix = suffix)) }
+        remember { mutableStateListOf(KillTitleList(suffix = weightSuffix)) }
 
     AlertDialog(
         icon = {
-            Icon(painterResource(drawableRes), contentDescription = "Example Icon")
+            Icon(
+                painterResource(R.drawable.baseline_pets_24),
+                contentDescription = "Example Icon"
+            ) // TODO Скачать фото мясо
         },
         title = {
-            Text(text = stringResource(if (isAnimalGroup) R.string.alert_dialog_info_sale_animals else R.string.alert_dialog_info_sale_animal))
+            Text(
+                text = stringResource(if (isAnimalGroup) R.string.alert_dialog_info_sale_animals else R.string.alert_dialog_info_sale_animal),
+                style = textBold_16
+            )
         },
         text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-
+            Column {
                 if (textFields.size > 1) {
                     CardField {
                         Column {
-                            Text(text = "Cводка:", textDecoration = TextDecoration.Underline)
+                            TextAndIconRow(
+                                title = stringResource(R.string.animal_card_screen_animal_card_info_kill),
+                                value = "$weight $weightSuffix"
+                            )
+//                            Text(
+//                                text = ,
+//                                textDecoration = TextDecoration.Underline,
+//                                style = text_14
+//                            )
                             textFields.forEachIndexed { index, text ->
                                 TextAndIconRow(
-                                    title = if (text.title == "") stringResource(R.string.support_text_empty) else text.title,
-                                    value = "${
-                                        text.count.toConvertZero().toString().toFormatNumber()
-                                    } ${text.suffix}"
+                                    title = "$index. " + if (text.title == "") stringResource(R.string.support_text_empty) else text.title,
+                                    value = infoTextKillAnimal(
+                                        count = text.count,
+                                        suffix = text.suffix
+                                    )
                                 )
                             }
+                            HorizontalDivider(thickness = 1.dp, color = Color.DarkGray)
+                            TextAndIconRow(
+                                title = stringResource(R.string.analysis_screen_total),
+                                value = textFields.sumOf { it.count.toDouble() }
+                                    .formatNumber() + " $weightSuffix"
+                            )
                         }
                     }
                 }
-
-                if (isAnimalGroup) {
-                    OutlinedTextCount(
-                        value = countSale,
-                        onValueChange = {
-                            countSale = it.toConvertOnlyInt()
-                            isErrorCountMore = it.toConvertOnlyInt().toConvertZero() > countAll
-                            isErrorCount = it.isError()
-                        },
-                        isError = isErrorCount,
-                        isErrorCountMore = isErrorCountMore,
-                        intRes = R.string.outlined_text_field_quantity,
-                        drawableRes = R.drawable.baseline_spoke_24,
-                        count = countAll,
-                        suffix = suffix,
-                        focusManager = focusManager
-                    )
-                }
-
-                textFields.forEachIndexed { index, text ->
-                    OutlinedTextTitleAdd(
-                        value = text.title,
-                        onValueChange = {
-                            textFields[index] = textFields[index].copy(title = it.trim())
-                            textFields[index] = textFields[index].copy(isError = it.isError())
-                            textFields[index] =
-                                textFields[index].copy(isErrorSlash = it.isErrorSlash())
-                            onUpdateCountWarehouse(title)
-                        },
-                        titleList = titleList,
-                        isErrorTitle = text.isError,
-                        isErrorSlash = text.isErrorSlash,
-                        focusManager = focusManager
-                    )
-                    OutlinedTextCount(
-                        value = text.count,
-                        onValueChange = {
-                            textFields[index] = textFields[index].copy(count = it.toConvertDb())
-                            textFields[index] = textFields[index].copy(isErrorCount = it.isError())
-                        },
-                        onClick = { textFields[index] = textFields[index].copy(suffix = it) },
-                        isError = text.isErrorCount,
-                        suffix = text.suffix,
-                        intResSup = R.string.support_text_count_product,
-                        countWarehouse = countWarehouse,
-                        focusManager = focusManager
-                    )
+                LazyColumn {
+                    item {
+                        if (isAnimalGroup) {
+                            OutlinedTextCount(
+                                value = countSale,
+                                onValueChange = {
+                                    countSale = it.toConvertOnlyInt()
+                                    isErrorCountMore =
+                                        it.toConvertOnlyInt().toConvertZero() > countAll
+                                    isErrorCount = it.isError()
+                                },
+                                isError = isErrorCount,
+                                isErrorCountMore = isErrorCountMore,
+                                intRes = R.string.outlined_text_field_quantity,
+                                drawableRes = R.drawable.baseline_spoke_24,
+                                count = countAll,
+                                suffix = countSuffix,
+                                focusManager = focusManager
+                            )
+                        }
+                    }
+                    itemsIndexed(textFields) { index, text ->
+                        OutlinedTextTitleAdd(
+                            value = text.title,
+                            onValueChange = {
+                                textFields[index] = textFields[index].copy(title = it.trim())
+                                textFields[index] = textFields[index].copy(isError = it.isError())
+                                textFields[index] =
+                                    textFields[index].copy(isErrorSlash = it.isErrorSlash())
+                                onUpdateCountWarehouse(title)
+                            },
+                            titleList = titleList,
+                            isErrorTitle = text.isError,
+                            isErrorSlash = text.isErrorSlash,
+                            focusManager = focusManager
+                        )
+                        OutlinedTextCount(
+                            value = text.count,
+                            onValueChange = {
+                                textFields[index] = textFields[index].copy(count = it.toConvertDb())
+                                textFields[index] =
+                                    textFields[index].copy(isErrorCount = it.isError())
+                            },
+                            onClick = { textFields[index] = textFields[index].copy(suffix = it) },
+                            isError = text.isErrorCount,
+                            suffix = text.suffix,
+                            intResSup = R.string.support_text_count_product,
+                            countWarehouse = countWarehouse,
+                            focusManager = focusManager
+                        )
+                    }
                 }
             }
         },
@@ -345,59 +372,50 @@ fun AlertDialogKillAnimal(
             }
         },
         confirmButton = {
+            val note = stringResource(R.string.animal_card_screen_note_kill)
+            val animalCategory = stringResource(R.string.animal_card_screen_category_kill)
             Row {
                 TextButton(
                     onClick = {
                         focusManager.clearFocus()
-                        if (!textFields.any { killTitle ->
-                                killTitle.isError || killTitle.isErrorCount || killTitle.isErrorSlash // добавь все нужные булевы поля
+                        if (!textFields.any { it.isError || it.isErrorCount || it.isErrorSlash }) {
+                            textFields.forEach {
+                                onSaveProductClick(
+                                    AddTable(
+                                        title = it.title,
+                                        count = it.count.toDouble(),
+                                        day = dateTodayArray()[0],
+                                        mount = dateTodayArray()[1],
+                                        year = dateTodayArray()[2],
+                                        suffix = it.suffix,
+                                        category = animalCategory,
+                                        idAnimal = idPT.toLong(),
+                                        animal = title,
+                                        note = note,
+                                        priceAll = 0.0,
+                                        idPT = idPT
+                                    )
+                                )
                             }
-                        ) onConfirmation()
-//                        textFields.forEachIndexed { index, text ->
-//                            if (isErrorAnimalSale(
-//                                    title = "sd",
-//                                    count = countSale,
-//                                    countAll = countAll,
-//                                    isAnimalGroup = isAnimalGroup,
-//                                    isErrorTitle = { },
-//                                    isErrorCount = { isErrorCount = it },
-//                                    isErrorCountMore = { isErrorCountMore = it },
-//                                )
-//                            ) {
-//                                onSaveClick(
-//                                    Triple(
-//                                        first = AddTable(
-//                                            title = title,
-//                                            count = 0.toDouble(),
-//                                            day = dateTodayArray()[0],
-//                                            mount = dateTodayArray()[1],
-//                                            year = dateTodayArray()[2],
-//                                            suffix = suffix,
-//                                            category = "category",
-//                                            idAnimal = idPT.toLong(),
-//                                            animal = animalCategory,
-//                                            note = "",
-//                                            priceAll = 0.0,
-//                                            idPT = idPT
-//                                        ),
-//                                        second = AnimalCountTable(
-//                                            id = 0,
-//                                            count = if (isAnimalGroup) (countAll - countSale.toInt()).toString() else "0",
-//                                            suffix = suffix,
-//                                            date = dateToday(),
-//                                            idAnimal = idPT
-//                                        ),
-//                                        third = if (isAnimalGroup) (countAll - countSale.toInt()) == 0 else true
-//                                    )
-//                                )
-//                            }
-
+                            onSaveCountClick(
+                                Pair(
+                                    first = AnimalCountTable(
+                                        count = if (isAnimalGroup) (countAll - countSale.toInt()).toString() else "0",
+                                        suffix = countSuffix,
+                                        date = dateToday(),
+                                        idAnimal = idPT
+                                    ),
+                                    second = if (isAnimalGroup) (countAll - countSale.toInt()) == 0 else true
+                                )
+                            )
+                            onConfirmation()
+                        }
                     }
                 ) {
                     Text(stringResource(R.string.button_text_add))
                 }
                 TextButton(
-                    onClick = { textFields.add(KillTitleList(suffix = suffix)) }
+                    onClick = { textFields.add(KillTitleList(suffix = weightSuffix)) }
                 ) {
                     Text(stringResource(R.string.button_text_add_title))
                 }
@@ -405,6 +423,51 @@ fun AlertDialogKillAnimal(
         }
     )
 }
+
+// возможно пригодится для запроса на удаление
+@Composable
+fun AlertDialogArchiveAnimal(
+    isAnimalGroup: Boolean,
+    onConfirmation: () -> Unit,
+    onArchiveClick: () -> Unit,
+) {
+    AlertDialog(
+        icon = {
+            Icon(
+                painterResource(R.drawable.baseline_archive_24),
+                contentDescription = "Example Icon"
+            )
+        },
+        title = {
+            Text(text = stringResource(R.string.alert_dialog_info_archive_animal))
+        },
+        text = {
+            Column {
+                Text(text = stringResource(R.string.alert_dialog_info_archive_animal))
+            }
+        },
+        onDismissRequest = onConfirmation,
+        dismissButton = {
+            TextButton(
+                onClick = onConfirmation
+            ) {
+                Text(stringResource(R.string.button_text_cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onArchiveClick()
+                    onConfirmation()
+                }
+            ) {
+                Text(stringResource(R.string.button_archive))
+            }
+        }
+    )
+}
+
+
 
 data class KillTitleList(
     val title: String = "",

@@ -113,14 +113,23 @@ class AnimalCardViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    suspend fun saveSaleAnimal(triple: Triple<SaleTable, AnimalCountTable, AnimalTable>) {
-        itemsRepository.insertSale(triple.first)
-        itemsRepository.insertAnimalCountTable(triple.second)
-        itemsRepository.updateAnimalTable(triple.third)
+    fun saveSaleAnimal(triple: Triple<SaleTable, AnimalCountTable, AnimalTable>) {
+        viewModelScope.launch {
+            itemsRepository.insertSale(triple.first)
+            itemsRepository.insertAnimalCountTable(triple.second)
+            itemsRepository.updateAnimalTable(triple.third)
+        }
     }
 
-    suspend fun saveAddAnimal(addTable: AddTable) {
-        itemsRepository.insertItem(addTable)
+    fun saveAddAnimal(addTable: AddTable) {
+        viewModelScope.launch { itemsRepository.insertItem(addTable) }
+    }
+
+    fun saveCountAnimal(pair: Pair<AnimalCountTable, AnimalTable>) {
+        viewModelScope.launch {
+            itemsRepository.insertAnimalCountTable(pair.first)
+            itemsRepository.updateAnimalTable(pair.second)
+        }
     }
 
 }

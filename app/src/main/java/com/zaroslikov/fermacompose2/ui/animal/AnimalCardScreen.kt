@@ -23,6 +23,7 @@ import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -85,16 +86,26 @@ fun AnimalCardProduct(
             countWarehouse = viewModel.countInWarehouse,
             onNavigateIndicators = onNavigateIndicators,
             onSaleClick = {
-                coroutineScope.launch {
-                    viewModel.saveSaleAnimal(
-                        Triple(
-                            it.first,
-                            it.second,
-                            animalTable.toAnimalTable().copy(arhiv = it.third)
-                        )
+                viewModel.saveSaleAnimal(
+                    Triple(
+                        it.first,
+                        it.second,
+                        animalTable.toAnimalTable().copy(arhiv = it.third)
                     )
-                    if (it.third) navigateBack()
-                }
+                )
+                if (it.third) navigateBack()
+            },
+            onSaleProductClick = {
+                viewModel.saveAddAnimal(it)
+            },
+            onSaleCountClick = {
+                viewModel.saveCountAnimal(
+                    Pair(
+                        it.first,
+                        animalTable.toAnimalTable().copy(arhiv = it.second)
+                    )
+                )
+                if (it.second) navigateBack() // возможно баг(возвращение редактор или вакцину)
             },
             onUpdateCountWarehouse = {
                 coroutineScope.launch {
@@ -119,12 +130,12 @@ fun AnimalCardContainer(
     animalProductTable: List<AnimalTitSuff>,
     onNavigateIndicators: (Pair<Int, Int>) -> Unit,
     onUpdateCountWarehouse: (String) -> Unit,
+    onSaleProductClick: (AddTable) -> Unit,
+    onSaleCountClick: (Pair<AnimalCountTable, Boolean>) -> Unit,
     onSaleClick: (Triple<SaleTable, AnimalCountTable, Boolean>) -> Unit
 ) {
-
     var openSaleDialog by rememberSaveable { mutableStateOf(false) }
     var openKillDialog by rememberSaveable { mutableStateOf(false) }
-    val openArchiveDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = modifier) {
         DataCardOne(animalTable)
@@ -161,36 +172,34 @@ fun AnimalCardContainer(
         ButtonPanel(
             onSaleClick = { openSaleDialog = !openSaleDialog },
             onKillClick = { openKillDialog = !openKillDialog },
-            onArchiveClick = {}
         )
-        if (openSaleDialog) {
+        if (openSaleDialog)
             AlertDialogSaleAnimal(
-                drawableRes = R.drawable.baseline_add_card_24,
                 buyerList = buyerList,
                 isAnimalGroup = animalTable.groop,
                 title = animalTable.name,
                 countAll = animalCountTable.weight.toInt(),
-                suffix = animalCountTable.suffix,
+                countSuffix = animalCountTable.suffix,
                 idPT = animalTable.idPT,
                 onSaveClick = { onSaleClick(it) },
                 onConfirmation = { openSaleDialog = !openSaleDialog },
             )
-        }
-        if (openKillDialog) {
+        if (openKillDialog)
             AlertDialogKillAnimal(
-                drawableRes = R.drawable.baseline_add_card_24,
                 titleList = titleList,
                 isAnimalGroup = animalTable.groop,
                 title = animalTable.name,
                 countAll = animalCountTable.weight.toInt(),
-                suffix = animalCountTable.suffix,
+                countSuffix = animalCountTable.suffix,
+                weight = animalWeightTable.weight,
+                weightSuffix = animalWeightTable.suffix,
                 idPT = animalTable.idPT,
                 countWarehouse = countWarehouse,
-                onSaveClick = { },
-                onUpdateCountWarehouse = {onUpdateCountWarehouse(it)},
+                onSaveProductClick = { onSaleProductClick(it) },
+                onSaveCountClick = { onSaleCountClick(it) },
+                onUpdateCountWarehouse = { onUpdateCountWarehouse(it) },
                 onConfirmation = { openKillDialog = !openKillDialog },
             )
-        }
     }
 }
 
@@ -291,7 +300,6 @@ private fun DataCardTwo(
 fun ButtonPanel(
     onSaleClick: () -> Unit,
     onKillClick: () -> Unit,
-    onArchiveClick: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -307,8 +315,4 @@ fun ButtonPanel(
             intRes = R.string.button_kill
         )
     }
-    ButtonStandart(
-        onClick = onArchiveClick,
-        intRes = R.string.button_archive
-    )
 }

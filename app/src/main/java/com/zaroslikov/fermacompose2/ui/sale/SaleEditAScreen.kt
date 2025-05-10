@@ -33,7 +33,6 @@ import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
@@ -47,6 +46,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
 
 object SaleEditDestination : NavigationDestination {
@@ -58,6 +58,7 @@ object SaleEditDestination : NavigationDestination {
 }
 
 
+@ExperimentalMaterial3Api
 @Composable
 fun SaleEditProduct(
     navigateBack: () -> Unit,

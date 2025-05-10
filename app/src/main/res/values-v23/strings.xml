@@ -11,6 +11,7 @@
     <string name="expenses_my_screen_title">Мои Расходы</string>
     <string name="animals_screen_title">Мои Животные</string>
     <string name="animals_add_screen_title">Добавить Животного</string>
+    <string name="animals_add_screen_edit">Редактировать Животного</string>
     <string name="weight_screen_title">Вес</string>
     <string name="height_screen_title">Размер</string>
     <string name="count_screen_title">Количество</string>
@@ -67,7 +68,7 @@
     <string name="button_sale">Продать</string>
     <string name="button_insert">Внести</string>
     <string name="button_archive">В архив</string>
-    <string name="button_kill">На мясо</string>
+    <string name="button_kill">Забой</string>
     <string name="button_expenses">Купить</string>
     <string name="button_refresh">Обновить</string>
     <string name="button_delete">Удалить</string>
@@ -97,6 +98,7 @@
     <string name="checkbox_born">Дата рождения совпадает с датой завода животного</string>
     <string name="checkbox_born_s">Даты рождения совпадают с датой завода животных</string>
     <string name="checkbox_auto_calculate">Включить авторасчет цены</string>
+    <string name="checkbox_auto_calculate_kill">Включить авторасчет продукции</string>
 
     //ButtonText
     <string name="button_text_great">Отлично!</string>
@@ -229,6 +231,7 @@
     <string name="tooltip_animals_born">Дата рождения является приоритетной для расчета возраста</string>
 
     <string name="tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за всё поголовье, а за одно животное. При этом сохранится общая сумма.</string>
+    <string name="tooltip_auto_calculate_kill">В случае активации этой опции необходимо указать кол-во товара не за всё поголовье, а за одно животное. При этом сохранится общая сумма товара.</string>
 
     //MessageNoData
     <string name="message_no_date_title_add">Добро пожаловать в раздел \"Моя Продукция!\"</string>
@@ -309,6 +312,8 @@
 
     <string name="alert_dialog_info_sale_animal">Продажа животного</string>
     <string name="alert_dialog_info_sale_animals">Продажа животных</string>
+    <string name="alert_dialog_info_archive_animal">Архив</string>
+    <string name="alert_dialog_info_archive_animal_text">Вы уверены, что хотите перенести животное в архив?</string>
 
 
     //AnalysisProductScreen
@@ -346,6 +351,11 @@
     <string name="animal_card_screen_animal_card_no_weight">Вес не указан</string>
     <string name="animal_card_screen_animal_card_no_height">Размер не указан</string>
     <string name="animal_card_screen_animal_card_no_vaccination">Прививка не указана</string>
+    <string name="animal_card_screen_animal_card_info_kill">Cводка:</string>
+    <string name="animal_card_screen_note_kill">Товар был добавлен через "Забой" животного</string>
+    <string name="animal_card_screen_note_sale">Товар был продан через "Продажу" животного</string>
+    <string name="animal_card_screen_category_kill">Забой</string>
+    <string name="animal_card_screen_category_sale">Продажа животных</string>
 
 
     //Ration Button

@@ -34,6 +34,24 @@ fun ButtonRefresh(
 }
 
 @Composable
+fun ButtonArchive(
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.toButton()
+    ) {
+        Icon(
+            modifier = Modifier.padding(end = 3.dp),
+            painter = painterResource(R.drawable.baseline_create_24),
+            contentDescription = stringResource(R.string.button_archive)
+        )
+        Text(text = stringResource(R.string.button_archive))
+    }
+}
+
+
+@Composable
 fun ButtonDelete(
     onClick: () -> Unit
 ) {

@@ -25,7 +25,9 @@ fun String.toConvertOnlyInt(): String {
 fun String.toConvertZero(): Int {
     return if (this == "") 0 else this.toInt()
 }
-
+fun String.toConvertZeroString(): String {
+    return if (this == "") "0" else this
+}
 fun String.toConvertZeroDouble(): Double {
     return if (this == "") 0.0 else this.toDouble()
 }
