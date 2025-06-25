@@ -2,13 +2,16 @@ package com.zaroslikov.fermacompose2.ui.sale
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,11 +31,11 @@ class SaleEntryViewModel(
     val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdArg])
 
     val titleUiState: StateFlow<DataPairListState> =
-        itemsRepository.getItemsTitleSaleList(itemId).map {  DataPairListState(it) }
+        itemsRepository.getItemsTitleSaleList(itemId).map { DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =  DataPairListState()
+                initialValue = DataPairListState()
             )
 
     val categoryUiState: StateFlow<DataStringListState> =
@@ -52,7 +55,7 @@ class SaleEntryViewModel(
                 initialValue = DataStringListState()
             )
 
-    var itemUiState by mutableDoubleStateOf(0.0)
+    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
         private set
 
     fun updateUiState(pair: Pair<String, String>) {
@@ -62,15 +65,16 @@ class SaleEntryViewModel(
                     itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
                         .filterNotNull()
                         .first()
-                        .toDouble()
+                        .toDomainMap()
                 }
-                "Купленный товар" -> {
-                    itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
-                        .filterNotNull()
-                        .first()
-                        .toDouble()
-                }
-                else -> 0.0
+                //todo
+//                "Купленный товар" -> {
+//                    itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
+//                        .filterNotNull()
+//                        .first()
+//                        .toDouble()
+//                }
+                else -> DomainPairDataDoubleSting()
             }
         }
     }

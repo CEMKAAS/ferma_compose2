@@ -166,15 +166,17 @@ fun AnimalCard(
                 iconRes = R.drawable.baseline_pets_24,
                 valueString = animalTable.type
             )
-            if (!animalTable.groop) {
+            if (!animalTable.groop)
                 IconAndText(
                     iconRes = if (animalTable.sex == "Мужской") R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
                     valueString = animalTable.sex
                 )
-            }
+            else
+                IconAndText(iconRes = R.drawable.baseline_spoke_24, valueString = animalTable.note)
+
             IconAndText(
-                iconRes = R.drawable.baseline_calendar_month_24,
-                valueString = animalTable.data
+                iconRes = if (animalTable.dateFactory == "") R.drawable.baseline_calendar_month_24 else R.drawable.baseline_event_24,
+                valueString = if (animalTable.dateFactory == "") animalTable.data else animalTable.dateFactory
             )
         }
     }

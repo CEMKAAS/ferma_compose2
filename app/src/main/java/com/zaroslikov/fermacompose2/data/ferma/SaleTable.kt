@@ -1,29 +1,13 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.data.ferma
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
+import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 
-/**
- * Entity data class represents a single row in the database.
- */
 @Entity(
     tableName = "MyFermaSale",
     foreignKeys = [ForeignKey(
@@ -31,12 +15,24 @@ import androidx.room.PrimaryKey
         parentColumns = arrayOf("_id"),
         childColumns = arrayOf("idPT"),
         onDelete = ForeignKey.CASCADE
-    )]
+    ),
+        ForeignKey(
+            entity = AnimalTable::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("animalId"),
+            onDelete = ForeignKey.CASCADE
+        ), ForeignKey(
+            entity = AnimalCountTable::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("animal_count_id"),
+            onDelete = ForeignKey.CASCADE
+        )],
+    indices = [Index("idPT"), Index("animalId"), Index("animal_count_id")]
 )
 data class SaleTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
-    val id: Int = 0,
+    val id: Long = 0,
     @ColumnInfo(name = "titleSale")
     val title: String, // название
     @ColumnInfo(name = "discSale")
@@ -49,11 +45,14 @@ data class SaleTable(
     val year: Int, // время
     @ColumnInfo(name = "PRICE")
     val priceAll: Double,
-
     var suffix: String,
     var category: String,
-    val buyer : String,
-    val note : String,
+    val buyer: String,
+    val note: String,
     @ColumnInfo(name = "idPT")
-    val idPT: Int
+    val idPT: Long,
+    @ColumnInfo(name = "animalId")
+    val animalId: Long? = null,
+    @ColumnInfo(name = "animal_count_id")
+    val animalCountId: Long? = null
 )

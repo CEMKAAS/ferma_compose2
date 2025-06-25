@@ -24,7 +24,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
@@ -43,6 +45,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextAnimal
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
@@ -114,7 +117,7 @@ fun AddEditContainerProduct(
     titleList: List<String>,
     categoryList: List<String>,
     animalList: List<TripleData>,
-    countWarehouseUiState: Double,
+    countWarehouseUiState: DomainPairDataDoubleSting,
     updateCountWarehouse: (String) -> Unit = {},
     onValueChange: (DomainAddTable) -> Unit = {},
     saveInRoomAdd: () -> Unit,
@@ -136,28 +139,7 @@ fun AddEditContainerProduct(
     val selectedAnimalIndex by remember { mutableIntStateOf(0) }
 
     //date
-    var openDialog by remember { mutableStateOf(false) }
     var date = formatDateToString(addTable.day, addTable.mount, addTable.year)
-
-    if (openDialog) {
-        val datePickerState = rememberDatePickerState(
-            selectableDates = PastOrPresentSelectableDates,
-            initialSelectedDateMillis = formatDateToLong(date)
-        )
-        DatePickerDialogSample(datePickerState, date) {
-            date = it
-            openDialog = !openDialog
-
-            val dateList = date.split(".")
-            onValueChange(
-                addTable.copy(
-                    day = dateList[0].toInt(),
-                    mount = dateList[1].toInt(),
-                    year = dateList[2].toInt()
-                )
-            )
-        }
-    }
 
     Column(modifier = modifier) {
 
@@ -196,9 +178,19 @@ fun AddEditContainerProduct(
             focusManager = focusManager
         )
 
-        OutlinedTextDate(
+        OutlinedTextDateEdit (
             value = date,
-            onValueChange = { openDialog = !openDialog }
+            onValueChange = {
+                date = it
+                val dateList = it.split(".")
+                onValueChange(
+                    addTable.copy(
+                        day = dateList[0].toInt(),
+                        mount = dateList[1].toInt(),
+                        year = dateList[2].toInt()
+                    )
+                )
+            }
         )
 
         if (animalList.isNotEmpty()) {

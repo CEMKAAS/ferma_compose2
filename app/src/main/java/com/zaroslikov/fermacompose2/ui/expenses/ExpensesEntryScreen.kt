@@ -16,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -62,7 +61,7 @@ import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialogInfo
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CheckboxTextIcon
@@ -198,19 +197,6 @@ fun ExpensesEntryContainerProduct(
         isErrorCountAnimalUI = text == ""
     }
 
-    //Дата
-    var openDialog by remember { mutableStateOf(false) }
-    val state = rememberDatePickerState(
-        selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = Instant.now().toEpochMilli()
-    )
-    if (openDialog) {
-        DatePickerDialogSample(state, date) {
-            date = it
-            openDialog = false
-        }
-    }
-
     // Прочее
     if (count == "") {
         showFoodUI = false
@@ -295,36 +281,31 @@ fun ExpensesEntryContainerProduct(
 //        countWarehouse = countWarehouse, TODO
             focusManager = focusManager
         )
-
         OutlinedTextPrice(
             value = priceAll,
             onValueChange = {
-                priceAll = it.toConvertDb()
+                priceAll = it
                 isErrorPrice = it.isError()
             },
             isError = isErrorPrice,
             intSupportText = R.string.support_text_price_expenses,
             focusManager = focusManager
         )
-
         OutlinedTextCategory(
             value = category,
             onValueChange = { category = it.trim() },
             titleList = categoryList,
             focusManager = focusManager
         )
-
         OutlinedTextDate(
             value = date,
-            onValueChange = { openDialog = !openDialog }
+            onValueChange = { date = it}
         )
-
         OutlinedTextNote(
             value = note,
             onValueChange = { note = it },
             focusManager = focusManager
         )
-
         // ВЫКЛЮЧАТЕЛИ
         CardField() {
             Column(
@@ -670,7 +651,7 @@ fun ExpensesEntryContainerProduct(
                                 countAnimal = if (setDailyExpensesFoodAndCountUI) countAnimalUI.toInt() else countAnimal,
                                 foodDesignedDay = foodDesignedDayUI.first,
                                 lastDayFood = foodDesignedDayUI.second,
-                                idPT = idProject
+                                idPT = idProject.toLong()
                             ),
                             selectedFilters2
                         )

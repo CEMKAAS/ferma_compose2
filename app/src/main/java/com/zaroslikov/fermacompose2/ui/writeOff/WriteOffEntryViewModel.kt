@@ -7,8 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -34,21 +36,22 @@ class WriteOffEntryViewModel(
             )
 
 
-    var itemUiState by mutableStateOf(0.0)
+    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
         private set
 
-    fun updateUiState(pair:Pair<String, Boolean>) {
+    fun updateUiState(pair: Pair<String, Boolean>) {
         viewModelScope.launch {
             itemUiState = if (pair.second) {
                 itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
                     .filterNotNull()
                     .first()
-                    .toDouble()
+                    .toDomainMap()
             } else {
-                itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
-                    .filterNotNull()
-                    .first()
-                    .toDouble()
+                DomainPairDataDoubleSting()
+//                itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
+//                    .filterNotNull()
+//                    .first()
+//                    .toDouble()
             }
         }
     }

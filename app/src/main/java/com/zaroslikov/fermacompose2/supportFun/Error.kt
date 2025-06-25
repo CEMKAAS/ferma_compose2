@@ -1,5 +1,10 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import android.util.Log
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.KillTitleList
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
+
 
 //fun <T : Enum<T>> validateCount(
 //    boolean: Boolean,
@@ -82,23 +87,46 @@ fun isErrorAnimal(
     title: String,
     type: String,
     count: String,
-    state: Boolean,
+    isGroupAnimal: Boolean,
     isErrorTitle: (Boolean) -> Unit,
     isErrorType: (Boolean) -> Unit,
     isErrorCount: (Boolean) -> Unit,
 ): Boolean {
     isErrorTitle(title.isError())
     isErrorType(type.isError())
-    if (!state) isErrorCount(count.isError())
-    return !(title == "" || (count == "" && !state) || type == "")
+    if (isGroupAnimal) isErrorCount(count.isError())
+    return !(title == "" || (isGroupAnimal && count == "") || type == "")
 }
 
 fun isErrorVersion(
+    version: Int,
     title: String,
+    countAll: String,
+    isAnimalGroup: Boolean,
     isErrorTitle: (Boolean) -> Unit,
+    isErrorCountAnimal: (Boolean) -> Unit
 ): Boolean {
-    isErrorTitle(title.isError())
-    return !(title == "")
+    println(version)
+    println(title.toConvertZeroDouble() == 0.0)
+    return when {
+        version == 2 && title.toConvertZeroDouble() == 0.0 -> {
+            isErrorTitle(title.isError())
+            println(version)
+            println(title.toConvertZeroDouble() == 0.0)
+            false
+        }
+
+        version != 3 || !isAnimalGroup -> {
+            isErrorTitle(title.isError())
+            title.isNotBlank()
+        }
+
+        else -> {
+            isErrorTitle(title.isError())
+            isErrorCountAnimal(countAll.isError())
+            !(title.isError() || countAll.isError())
+        }
+    }
 }
 
 fun isErrorAnimalSale(
@@ -108,20 +136,141 @@ fun isErrorAnimalSale(
     isAnimalGroup: Boolean,
     isErrorTitle: (Boolean) -> Unit,
     isErrorCount: (Boolean) -> Unit,
-    isErrorCountMore: (Boolean) -> Unit
+    isErrorCountMore: (Boolean) -> Unit,
+    isErrorCountZero: (Boolean) -> Unit
 ): Boolean {
     isErrorTitle(title.isError())
 
     if (isAnimalGroup) {
         isErrorCount(count.isError())
         isErrorCountMore(countAll < count.toConvertZero())
+        isErrorCountZero(isAnimalCountZero(count))
     } else {
         isErrorCount(false)
         isErrorCountMore(false)
     }
     return if (isAnimalGroup) {
-        !(title == "" || count == "" || (countAll < count.toConvertZero()))
+        !(title == "" || count == "" || (countAll < count.toConvertZero()) || isAnimalCountZero(
+            count
+        ))
     } else {
         !(title == "")
     }
+}
+
+fun isErrorAddAnimal(
+    count: String,
+    isErrorCount: (Boolean) -> Unit
+): Boolean {
+    isErrorCount(count.isBlank())
+    return count != ""
+}
+
+fun isErrorWriteOffAnimal(
+    count: String,
+    countAll: String,
+    isErrorCount: (Boolean) -> Unit,
+    isErrorCountAll: (Boolean) -> Unit,
+    isAnimalGroup: Boolean
+): Boolean {
+    if (isAnimalGroup) {
+        if (count.isBlank()) {
+            isErrorCount(true)
+            return false
+        } else {
+            if (count.toInt() > countAll.toInt()) {
+                isErrorCountAll(true)
+                return false
+            } else {
+                isErrorCount(false)
+                return true
+            }
+        }
+    } else {
+        isErrorCount(false)
+        return true
+    }
+}
+
+fun isErrorKillAnimal(
+    countAnimal: String,
+    countAnimalAll: String,
+    isAnimalGroup: Boolean,
+    textFields: SnapshotStateList<KillTitleList>,
+    isErrorCount: (Boolean) -> Unit,
+    isErrorCountMore: (Boolean) -> Unit,
+    isErrorCountZero: (Boolean) -> Unit,
+): Boolean {
+    textFields.forEachIndexed { index, it ->
+        textFields[index] = it.copy(
+            isError = it.title.isError(),
+            isErrorSlash = it.title.isErrorSlash(),
+            isErrorCount = it.count.isError()
+        )
+    }
+
+    val hasFieldError = textFields.any { it.isError || it.isErrorCount || it.isErrorSlash }
+
+    if (isAnimalGroup) {
+        val countError = countAnimal.isError()
+        val countZero = isAnimalCountZero(countAnimal)
+        val countMore = isAnimalCountIncrease(countAnimal, countAnimalAll)
+
+        isErrorCount(countError)
+        isErrorCountZero(countZero)
+        isErrorCountMore(countMore)
+
+        return !(hasFieldError || countError || countZero || countMore)
+    } else {
+        return !hasFieldError
+    }
+}
+
+fun isAnimalCountIncrease(
+    count: String,
+    countAll: String
+): Boolean {
+    return count.toConvertZeroString().toConvertDbOnlyInt() > countAll.toConvertZeroString()
+        .toConvertDbOnlyInt()
+}
+
+fun isAnimalWeightIncrease(
+    count: String,
+    countAll: String
+): Boolean {
+    return count.toConvertZeroString().toConvertDbDouble() > countAll.toConvertZeroString()
+        .toConvertDbDouble()
+}
+
+fun isAnimalCountZero(
+    count: String
+): Boolean {
+    return count.toConvertZeroString().toConvertDbOnlyInt() == 0
+}
+
+fun isAnimalCountZero(
+    count: String,
+    countAll: String
+): Boolean {
+    Log.i("weight", "isAnimalCount:${countAll.toConvertZeroString().toConvertDbOnlyInt()} isAnimalCount: ${count.toConvertZeroString()
+        .toConvertDbOnlyInt()}")
+
+    return (countAll.toConvertZeroString().toConvertDbOnlyInt() - count.toConvertZeroString()
+        .toConvertDbOnlyInt()) == 0
+}
+
+fun isAnimalCountDifference(
+    count: String,
+    countAll: String
+): String {
+    return (countAll.toConvertZeroString().toConvertDbOnlyInt() - count.toConvertZeroString()
+        .toConvertDbOnlyInt()).toString()
+}
+
+fun animalCountWeightComposition(
+    weight: String,
+    countAnimal: String
+): String {
+    return (weight.toConvertZeroString().toConvertDbDouble() * countAnimal.toConvertZeroString()
+        .toConvertDbDouble()).formatNumber()
 }

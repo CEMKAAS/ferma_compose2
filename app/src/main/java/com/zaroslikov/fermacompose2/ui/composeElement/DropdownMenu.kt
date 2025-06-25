@@ -2,7 +2,11 @@
 
 package com.zaroslikov.fermacompose2.ui.composeElement
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -13,13 +17,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
@@ -31,6 +43,7 @@ fun DropdownMenuIconProductSuffix(
     var expanded by remember { mutableStateOf(false) }
 
     val piecesSuffix = stringResource(id = R.string.suffix_pieces)
+    val gramSuffix = stringResource(id = R.string.suffix_gram)
     val kilogramSuffix = stringResource(id = R.string.suffix_kilogram)
     val tonsSuffix = stringResource(id = R.string.suffix_tons)
     val litersSuffix = stringResource(id = R.string.suffix_liters)
@@ -54,6 +67,13 @@ fun DropdownMenuIconProductSuffix(
                 text = {
                     Text(text = piecesSuffix)
                 }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    setSuffix(gramSuffix)
+                    expanded = !expanded
+                },
+                text = { Text(text = kilogramSuffix) }
             )
             DropdownMenuItem(
                 onClick = {
@@ -285,14 +305,14 @@ fun ExposedDropdownMenuProduct(
 @Composable
 fun ExposedDropdownMenuSex(
     title: String,
-    setTitle: (Int) -> Unit,
-    selectedItemIndex: Int,
+    setTitle: (String) -> Unit,
     titleList: List<String>,
+    standardPadding: Boolean = true,
     isFilterUsed: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     Box {
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -304,7 +324,8 @@ fun ExposedDropdownMenuSex(
                 Pair(
                     Modifier
                         .menuAnchor()
-                        .toOutlinedText(), expanded
+                        .then(if (standardPadding) Modifier.toOutlinedText() else Modifier.fillMaxWidth()),
+                    expanded
                 )
             )
 
@@ -330,7 +351,8 @@ fun ExposedDropdownMenuSex(
                                 )
                             },
                             onClick = {
-                                setTitle(index)
+                                setTitle(item)
+                                selectedItemIndex = index
                                 expanded = !expanded
                             }
                         )
@@ -364,7 +386,6 @@ fun ExposedDropdownMenuAnimals(
                     .menuAnchor()
                     .toOutlinedText()
             )
-
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = !expanded }
@@ -410,10 +431,8 @@ fun ExposedDropdownMenuPair(
                     .menuAnchor()
                     .toOutlinedText()
             )
-
             val filteredOptions =
                 list.filter { it.first.contains(title, ignoreCase = true) }
-
             if (filteredOptions.isNotEmpty()) {
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -438,6 +457,60 @@ fun ExposedDropdownMenuPair(
         }
     }
 }
+
+@Composable
+fun ExposedDropdownMenuIcon(
+    selectedItemIndex: Int,
+    setTitle: (Triple<Int, Int, Int>) -> Unit = {},
+    list: List<Triple<Int, String, Int>>,
+    expanded: MutableState<Boolean>,
+    content: @Composable (Modifier) -> Unit,
+) {
+
+    Box {
+        ExposedDropdownMenuBox(
+            expanded = expanded.value,
+            onExpandedChange = {
+                expanded.value
+            }
+        ) {
+            content(
+                Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false }
+            ) {
+                list.forEachIndexed { index, item ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(item.first),
+                                    contentDescription = item.second
+                                )
+                                Text(
+                                    text = item.second,
+                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                )
+                            }
+                        },
+                        onClick = {
+                            setTitle(Triple(index, item.first, item.third))
+                            expanded.value = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun GetDropDownMenu(version: Int, onClick: (String) -> Unit) {

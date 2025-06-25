@@ -71,7 +71,7 @@ fun SaleScreen(
     modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
+    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -136,7 +136,7 @@ fun SaleBody(
     viewModel: SaleViewModel,
     itemList: List<SaleTable>,
     brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (Pair<Int, Int>) -> Unit,
+    onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit
 ) {
     if (itemList.isNotEmpty())

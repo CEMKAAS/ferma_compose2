@@ -8,36 +8,41 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class AnimalEntryViewModel (
+class AnimalEntryViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    val itemId: Int = checkNotNull(savedStateHandle[AnimalEntryDestination.itemIdArg])
+    val itemId: Long = checkNotNull(savedStateHandle[AnimalEntryDestination.itemIdArg])
 
-    val typeUiState: StateFlow< DataStringListState> =
+    val typeUiState: StateFlow<DataStringListState> =
         itemsRepository.getTypeAnimal(itemId).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =  DataStringListState()
+                initialValue = DataStringListState()
             )
 
 
-
-    suspend fun saveItem(animalTable: AnimalTable, animalCountTable: AnimalCountTable, animalWeightTable: AnimalWeightTable, animalSizeTable: AnimalSizeTable) {
-        val id = itemsRepository.insertAnimalTable(animalTable)
-
-        itemsRepository.insertAnimalCountTable(animalCountTable.copy(idAnimal = id.toInt()))
-        itemsRepository.insertAnimalWeightTable(animalWeightTable.copy(idAnimal = id.toInt()))
-        itemsRepository.insertAnimalSizeTable(animalSizeTable.copy(idAnimal = id.toInt()))
-
+  fun saveItem(
+        animalTable: AnimalTable,
+        animalCountTable: AnimalCountTable,
+        expensesTable: ExpensesTable?
+    ) {
+        viewModelScope.launch {
+            val id = itemsRepository.insertAnimalTable(animalTable)
+            itemsRepository.insertAnimalCountTable(animalCountTable.copy(idAnimal = id.toInt()))
+            if (expensesTable != null)
+                itemsRepository.insertExpenses(expensesTable.copy(animalId = id))
+        }
     }
 
     companion object {

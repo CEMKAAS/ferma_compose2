@@ -20,5 +20,6 @@ data class AnimalWeightTable(
     val weight: String,
     val suffix: String,
     val date: String,
-    val idAnimal: Int
+    val idAnimal: Int,
+    val note: String
 )

@@ -1,20 +1,36 @@
 package com.zaroslikov.fermacompose2.ui.composeElement
 
+import android.annotation.SuppressLint
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,24 +43,105 @@ fun CardField(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    content: @Composable () -> Unit
+    row: Boolean = true,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable () -> Unit,
 ) {
     Card(
         modifier = modifier.padding(vertical = 6.dp),
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = horizontalArrangement,
-            verticalAlignment = verticalAlignment
-        ) {
-            content()
+        if (row) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = horizontalArrangement,
+                verticalAlignment = verticalAlignment
+            ) {
+                content()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalAlignment = horizontalAlignment,
+                verticalArrangement = verticalArrangement
+            ) {
+                content()
+            }
         }
     }
 }
+
+//@RequiresApi(Build.VERSION_CODES.S)
+//@Composable
+//fun CardField(
+//    modifier: Modifier = Modifier,
+//    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+//    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
+//    row: Boolean = true,
+//    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+//    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+//    content: @Composable () -> Unit,
+//) {
+//    val blurEffect = RenderEffect.createBlurEffect(
+//        20f, 20f, Shader.TileMode.CLAMP
+//    ).asComposeRenderEffect()
+//
+//    Box(
+//        modifier = modifier
+//            .clip(
+//                RoundedCornerShape(16.dp)
+//            )
+//            .background(Color.Transparent)
+//    ) {
+//        Box(
+////            modifier = Modifier
+////                .graphicsLayer {
+////                    renderEffect = blurEffect
+////                }
+////                .background(Color.White.copy(alpha = 0.75f)) // зелёный с прозрачностью
+//            modifier = Modifier
+//                .matchParentSize()
+//                .clip(RoundedCornerShape(16.dp))
+//                .background(Color.White.copy(alpha = 0.15f))
+//                .blur(radius = 16.dp)
+//        )
+//        Box(
+//            modifier = Modifier
+//
+//                .padding(
+//                    16.dp
+//                )
+//        ) {
+//            if (row) {
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(8.dp),
+//                    horizontalArrangement = horizontalArrangement,
+//                    verticalAlignment = verticalAlignment
+//                ) {
+//                    content()
+//                }
+//            } else {
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(8.dp),
+//                    horizontalAlignment = horizontalAlignment,
+//                    verticalArrangement = verticalArrangement
+//                ) {
+//                    content()
+//                }
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun CardOutlined(
@@ -69,6 +166,7 @@ fun CardOutlined(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun CardFinance(
     modifier: Modifier = Modifier,
@@ -88,6 +186,7 @@ fun CardFinance(
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
 fun CardFinance(
     modifier: Modifier = Modifier,
@@ -148,6 +247,7 @@ fun CardFinanceOutlinedRow(
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
 fun CardFinanceRow(
     modifier: Modifier = Modifier,

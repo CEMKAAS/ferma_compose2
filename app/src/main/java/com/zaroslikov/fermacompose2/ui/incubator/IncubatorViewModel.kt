@@ -85,7 +85,8 @@ class IncubatorViewModel(
                 count = count,
                 date = animalTable.data,
                 suffix = "",//TODO
-                idAnimal = id.toInt()
+                idAnimal = id.toInt(),
+                note = "",
             )
         )
     }
@@ -110,7 +111,8 @@ class IncubatorViewModel(
                 count = count,
                 date = animalTable.data,
                 suffix = "",//TODO
-                idAnimal = id.toInt()
+                idAnimal = id.toInt(),
+                note = "",
             )
         )
     }

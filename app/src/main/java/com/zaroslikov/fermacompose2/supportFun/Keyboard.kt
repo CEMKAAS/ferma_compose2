@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.supportFun
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -18,6 +19,14 @@ fun keyboardOptionsNext(): KeyboardOptions {
 fun keyboardOptionsGo(): KeyboardOptions {
     return KeyboardOptions(
         imeAction = ImeAction.Go,
+        capitalization = KeyboardCapitalization.Sentences // Первая буква будет заглавной
+    )
+}
+
+fun keyboardOptionsEnter(): KeyboardOptions {
+    return KeyboardOptions(
+        keyboardType = KeyboardType.Text,
+        imeAction = ImeAction.Default,
         capitalization = KeyboardCapitalization.Sentences // Первая буква будет заглавной
     )
 }
@@ -52,6 +61,13 @@ fun keyboardActionsRight(
     })
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+fun keyboardActionsEnter(
+): KeyboardActions {
+    return KeyboardActions(
+        onAny = {  }
+    )
+}
 
 fun keyboardActionsClear(
     focusManager: FocusManager

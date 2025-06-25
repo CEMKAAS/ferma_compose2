@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.Domain.models.DomainWritOffTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 
@@ -53,7 +54,7 @@ class WriteOffEditViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = DataPairListState()
             )
-    var countWarehouseUiState by mutableDoubleStateOf(0.0)
+    var countWarehouseUiState by mutableStateOf(DomainPairDataDoubleSting())
         private set
 
     fun updateCountWarehouseUiState(pair: Pair<String, Boolean>) {
@@ -62,12 +63,13 @@ class WriteOffEditViewModel(
                 itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
                     .filterNotNull()
                     .first()
-                    .toDouble()
+                    .toDomainMap()
             } else {
-                itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
-                    .filterNotNull()
-                    .first()
-                    .toDouble()
+                DomainPairDataDoubleSting()
+//                itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
+//                    .filterNotNull()
+//                    .first()
+//                    .toDouble()
             }
         }
     }

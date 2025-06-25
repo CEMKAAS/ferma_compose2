@@ -54,7 +54,7 @@ fun ErrorSupportTextSlash(
         isWarehouse -> Text(
             text = stringResource(
                 R.string.support_text_count_warehouse_s,
-                "${count.toFormatNumber()} $suffix"
+                "$count $suffix"
             ),
             color = if (count.contains("-")) MaterialTheme.colorScheme.error else Color.Unspecified
         )
@@ -71,10 +71,12 @@ fun ErrorSupportTextSlash(
 
 @Composable
 fun ErrorSupportAnimal(
-    isError: Boolean,
+    isError: Boolean = false,
     isErrorAnimal: Boolean = false,
-    errorText: String,
-    errorCountAllText: String,
+    isErrorCountZero: Boolean = false,
+    errorText: String = "",
+    errorCountAllText: String = "",
+    errorCountZeroText: String = "",
     supportText: String
 ) {
     when (true) {
@@ -85,7 +87,12 @@ fun ErrorSupportAnimal(
 
         isErrorAnimal -> Text(
             text = errorCountAllText,
-                    color = MaterialTheme.colorScheme.error
+            color = MaterialTheme.colorScheme.error
+        )
+
+        isErrorCountZero -> Text(
+            text = errorCountZeroText,
+            color = MaterialTheme.colorScheme.error
         )
 
         else -> Text(text = supportText)

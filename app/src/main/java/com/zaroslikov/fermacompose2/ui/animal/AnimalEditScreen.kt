@@ -201,17 +201,16 @@ fun AnimalEditContainer(
             isErrorSlash = false,
             focusManager = focusManager
         )
-        if (!isGroupAnimal)
-            OutlinedTextSex(
-                value = animalEditUiState.sex,
-                selectedItemIndex = selectedItemIndex,
-                onValueChange = {
-                    selectedItemIndex = it
-                    onValueChange(animalEditUiState.copy(sex = sexList[selectedItemIndex]))
-                },
-                list = sexList,
-                focusManager = focusManager
-            )
+//        if (!isGroupAnimal)
+//            OutlinedTextSex(
+//                value = animalEditUiState.sex,
+//                selectedItemIndex = selectedItemIndex,
+//                onValueChange = {
+//                    selectedItemIndex = it
+//                    onValueChange(animalEditUiState.copy(sex = sexList[selectedItemIndex]))
+//                },
+//                focusManager = focusManager
+//            )
 //        TODO подумать, как лучше сделать, привязать к продаже
 //        OutlinedTextPrice(
 //            value = price,
@@ -276,7 +275,7 @@ fun AnimalEditContainer(
 
 
 @Composable
-fun ButtonPanel(
+private fun ButtonPanel(
     onRefreshClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onDeleteClick: () -> Unit

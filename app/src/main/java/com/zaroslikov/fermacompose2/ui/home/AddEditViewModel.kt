@@ -8,11 +8,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
+import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -67,7 +69,7 @@ class AddEditViewModel(
                 initialValue = DataTripleListState()
             )
 
-    var countWarehouseUiState by mutableDoubleStateOf(0.0)
+    var countWarehouseUiState by mutableStateOf(DomainPairDataDoubleSting())
         private set
 
     fun updatecountWarehouseUiState(name: String) {
@@ -75,7 +77,7 @@ class AddEditViewModel(
             countWarehouseUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
                 .filterNotNull()
                 .first()
-                .toDouble()
+                .toDomainMap()
         }
     }
 

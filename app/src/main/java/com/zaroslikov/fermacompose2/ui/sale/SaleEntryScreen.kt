@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.supportFun.PairData
@@ -108,7 +109,7 @@ fun SaleEntryContainerProduct(
     buyerList: List<String>,
     saveInRoomSale: (SaleTable) -> Unit,
     idProject: Int, // TODO convet to Long
-    countWarehouse: Double,
+    countWarehouse: DomainPairDataDoubleSting,
     updateCountWarehouse: (Pair<String, String>) -> Unit
 ) {
 
@@ -124,7 +125,6 @@ fun SaleEntryContainerProduct(
     var selectedItemIndex by remember { mutableIntStateOf(0) }
     var buyer by rememberSaveable { mutableStateOf("Неизвестный") }
     var note by rememberSaveable { mutableStateOf("") }
-    var openDialog by remember { mutableStateOf(false) }
     var countWarehouseBoolean by rememberSaveable { mutableStateOf(false) }
 
     //Error
@@ -140,18 +140,6 @@ fun SaleEntryContainerProduct(
         stringResource(R.string.currency_ruble)
     )
 
-    //Дата
-    val state = rememberDatePickerState(
-        selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = Instant.now().toEpochMilli()
-    )
-
-    if (openDialog) {
-        DatePickerDialogSample(state, date) {
-            date = it
-            openDialog = !openDialog
-        }
-    }
 
     Column(modifier = modifier) {
 
@@ -174,7 +162,6 @@ fun SaleEntryContainerProduct(
             isErrorSlash = isErrorSlash,
             focusManager = focusManager
         )
-
         OutlinedTextCount(
             value = count,
             onValueChange = {
@@ -185,50 +172,44 @@ fun SaleEntryContainerProduct(
             isError = isErrorCount,
             suffix = suffix,
             intResSup = R.string.support_text_count_product_sale,
-            countWarehouse = countWarehouse,
+            countWarehouse = countWarehouse.first,
+            countWarehouseSuffix = countWarehouse.second,
             focusManager = focusManager
         )
-
         OutlinedTextPrice(
             value = priceAll,
             onValueChange = {
-                priceAll = it.toConvertDb()
+                priceAll = it
                 isErrorPrice = it.isError()
             },
             isError = isErrorPrice,
             intSupportText = R.string.support_text_price_sale,
             focusManager = focusManager
         )
-
         OutlinedTextCategory(
             value = category,
             onValueChange = { category = it.trim() },
             titleList = categoryList,
             focusManager = focusManager
         )
-
         OutlinedTextDate(
             value = date,
-            onValueChange = { openDialog = !openDialog }
+            onValueChange = { date = it }
         )
-
         OutlinedTextBuyer(
             value = buyer,
             onValueChange = { buyer = it },
             list = buyerList,
             focusManager = focusManager
         )
-
         OutlinedTextNote(
             value = note,
             onValueChange = { note = it },
             focusManager = focusManager
         )
-
         ButtonStandart(
             intRes = R.string.button_sale,
             onClick = {
-
                 if (isErrorSale(title = title, count = count,
                         price = priceAll,
                         isErrorTitle = { isErrorTitle = it },
@@ -251,7 +232,7 @@ fun SaleEntryContainerProduct(
                             priceAll = priceAll.toDouble(),
                             buyer = buyer,
                             note = note,
-                            idPT = idProject
+                            idPT = idProject.toLong()
                         )
                     )
                     toastShort(

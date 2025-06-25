@@ -16,30 +16,39 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
-import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
+import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialogKillAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialogSaleAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogAddAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogArchiveAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogKillAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogSaleAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogWriteOffAnimal
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonArchive
+import com.zaroslikov.fermacompose2.ui.composeElement.ButtonCustom
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.IconAndTextMore
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNoteWidget
+import com.zaroslikov.fermacompose2.ui.composeElement.TextAndIconRow
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
-import com.zaroslikov.fermacompose2.ui.composeElement.text_16
 import com.zaroslikov.fermacompose2.ui.finance.PullOutCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import kotlinx.coroutines.launch
-
 
 object AnimalCardDestination : NavigationDestination {
     override val route = "animalCard"
@@ -53,15 +62,15 @@ object AnimalCardDestination : NavigationDestination {
 fun AnimalCardProduct(
     navigateBack: () -> Unit,
     onNavigateSetting: (Int) -> Unit,
-    onNavigateIndicators: (Pair<Int, Int>) -> Unit,
+    onNavigateIndicators: (Triple<Int, Int, Long>) -> Unit,
     viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val animalTable = viewModel.itemUiState
+    val animalTable = viewModel.animalTableUiState
     val product = viewModel.productState(animalTable.name).collectAsState()
     val buyerUiState by viewModel.buyerUiState.collectAsState()
     val titleUiState by viewModel.titleUiState.collectAsState()
 
-    val coroutineScope = rememberCoroutineScope()
+    val cor = rememberCoroutineScope()
 
     Scaffold(topBar = {
         TopAppBarStart(
@@ -84,13 +93,21 @@ fun AnimalCardProduct(
             buyerList = buyerUiState.list,
             animalProductTable = product.value.itemList,
             countWarehouse = viewModel.countInWarehouse,
-            onNavigateIndicators = onNavigateIndicators,
-            onSaleClick = {
-                viewModel.saveSaleAnimal(
+            onNavigateIndicators = {
+                onNavigateIndicators(
                     Triple(
                         it.first,
                         it.second,
-                        animalTable.toAnimalTable().copy(arhiv = it.third)
+                        viewModel.itemIdPT.toLong()
+                    )
+                )
+            },
+            onSaleClick = {
+                viewModel.insertSaleAnimal(
+                    Triple(
+                        it.first,
+                        it.second,
+                        it.third
                     )
                 )
                 if (it.third) navigateBack()
@@ -99,18 +116,30 @@ fun AnimalCardProduct(
                 viewModel.saveAddAnimal(it)
             },
             onSaleCountClick = {
-                viewModel.saveCountAnimal(
-                    Pair(
-                        it.first,
-                        animalTable.toAnimalTable().copy(arhiv = it.second)
-                    )
-                )
-                if (it.second) navigateBack() // возможно баг(возвращение редактор или вакцину)
+                viewModel.saveCountAnimal(it)
+                if (it.third) navigateBack() // возможно баг(возвращение редактор или вакцину)
+            },
+            onAddAnimalClick = {
+                cor.launch {
+                    viewModel.insertAddAnimal(it)
+                }
+            },
+            onAddWriteOffClick = {
+                cor.launch {
+                    viewModel.insertWriteOffAnimal(it)
+                    if (it.third) navigateBack()
+                }
             },
             onUpdateCountWarehouse = {
-                coroutineScope.launch {
-                    viewModel.updateUiState(it)
-                }
+                viewModel.updateUiState(it)
+            },
+            onUpdateAnimalGroupClick = viewModel::updateAnimalGroup,
+            updateNote = {
+                viewModel.updateNote(it)
+            },
+            updateArchive = {
+                viewModel.updateArchive()
+                navigateBack()
             }
         )
     }
@@ -120,22 +149,30 @@ fun AnimalCardProduct(
 fun AnimalCardContainer(
     modifier: Modifier,
     animalTable: AnimalEditUiState,
-    animalWeightTable: DomainIndicatorsVM,
-    animalSizeTable: DomainIndicatorsVM,
+    animalWeightTable: DomainIndicatorsVM?,
+    animalSizeTable: DomainIndicatorsVM?,
     animalCountTable: DomainIndicatorsVM,
-    animalVaccinationTable: DomainIndicatorsVM,
+    animalVaccinationTable: DomainIndicatorsVM?,
     countWarehouse: Double,
     titleList: List<String>,
     buyerList: List<String>,
     animalProductTable: List<AnimalTitSuff>,
     onNavigateIndicators: (Pair<Int, Int>) -> Unit,
-    onUpdateCountWarehouse: (String) -> Unit,
+    onUpdateCountWarehouse: suspend (String) -> DomainPairDataDoubleSting,
+    onUpdateAnimalGroupClick: (String) -> Unit,
     onSaleProductClick: (AddTable) -> Unit,
-    onSaleCountClick: (Pair<AnimalCountTable, Boolean>) -> Unit,
-    onSaleClick: (Triple<SaleTable, AnimalCountTable, Boolean>) -> Unit
+    onSaleCountClick: (Triple<DomainIndicatorsVM, WriteOffTable, Boolean>) -> Unit,
+    onSaleClick: (Triple<DomainIndicatorsVM, SaleTable, Boolean>) -> Unit,
+    onAddAnimalClick: (Pair<DomainIndicatorsVM, ExpensesTable?>) -> Unit,
+    onAddWriteOffClick: (Triple<DomainIndicatorsVM, WriteOffTable?, Boolean>) -> Unit,
+    updateNote: (String) -> Unit,
+    updateArchive: () -> Unit
 ) {
     var openSaleDialog by rememberSaveable { mutableStateOf(false) }
     var openKillDialog by rememberSaveable { mutableStateOf(false) }
+    var openAddDialog by rememberSaveable { mutableStateOf(false) }
+    var openWriteOffDialog by rememberSaveable { mutableStateOf(false) }
+    var openArchiveDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = modifier) {
         DataCardOne(animalTable)
@@ -148,6 +185,7 @@ fun AnimalCardContainer(
             onNavigateIndicators = { onNavigateIndicators(Pair(animalTable.id, it)) }
 
         )
+        NoteWidget(animalTable.note) { updateNote(it) }
         PullOutCard(
             modifier = Modifier,
             intRes = R.string.animal_card_screen_animal_card_product,
@@ -157,31 +195,42 @@ fun AnimalCardContainer(
         ) {
             Pair(it.title, "${it.priceAll} ${it.suffix}")
         }
-        CardField {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = stringResource(R.string.card_note),
-                    style = textBold_18
-                )
-                Text(
-                    text = if (animalTable.note == "") stringResource(R.string.analysis_screen_no) else animalTable.note,
-                    style = text_16
-                )
-            }
+        PullOutCard(
+            modifier = Modifier,
+            intRes = R.string.animal_card_screen_animal_card_product_sale,
+            intTitleText = R.string.alert_dialog_info_title_product_sale,
+            intText = R.string.alert_dialog_info_text_product_sale,
+            list = animalProductTable
+        ) {
+            Pair(it.title, "${it.priceAll} ${it.suffix}")
+        }
+        PullOutCard(
+            modifier = Modifier,
+            intRes = R.string.animal_card_screen_animal_card_product_expenses,
+            intTitleText = R.string.alert_dialog_info_title_product_expenses,
+            intText = R.string.alert_dialog_info_text_product_expenses,
+            list = animalProductTable
+        ) {
+            Pair(it.title, "${it.priceAll} ${it.suffix}")
         }
         ButtonPanel(
             onSaleClick = { openSaleDialog = !openSaleDialog },
             onKillClick = { openKillDialog = !openKillDialog },
+            onAddClick = { openAddDialog = !openAddDialog },
+            onWriteOffClick = { openWriteOffDialog = !openWriteOffDialog },
+            onArchiveClick = { openArchiveDialog = !openArchiveDialog }
         )
         if (openSaleDialog)
             AlertDialogSaleAnimal(
                 buyerList = buyerList,
                 isAnimalGroup = animalTable.groop,
                 title = animalTable.name,
-                countAll = animalCountTable.weight.toInt(),
+                countAll = animalCountTable.weight,
                 countSuffix = animalCountTable.suffix,
+                idAnimal = animalTable.id.toLong(),
                 idPT = animalTable.idPT,
-                onSaveClick = { onSaleClick(it) },
+                onSaveClick = onSaleClick,
+                onUpdateAnimalGroupClick = onUpdateAnimalGroupClick,
                 onConfirmation = { openSaleDialog = !openSaleDialog },
             )
         if (openKillDialog)
@@ -189,16 +238,45 @@ fun AnimalCardContainer(
                 titleList = titleList,
                 isAnimalGroup = animalTable.groop,
                 title = animalTable.name,
-                countAll = animalCountTable.weight.toInt(),
+                countAnimalAll = animalCountTable.weight,
                 countSuffix = animalCountTable.suffix,
-                weight = animalWeightTable.weight,
-                weightSuffix = animalWeightTable.suffix,
+                weight = animalWeightTable?.weight,
+                weightSuffix = animalWeightTable?.suffix,
+                idAnimal = animalTable.id.toLong(),
                 idPT = animalTable.idPT,
-                countWarehouse = countWarehouse,
-                onSaveProductClick = { onSaleProductClick(it) },
-                onSaveCountClick = { onSaleCountClick(it) },
-                onUpdateCountWarehouse = { onUpdateCountWarehouse(it) },
+                onSaveProductClick = onSaleProductClick,
+                onSaveCountClick = onSaleCountClick,
+                onUpdateCountWarehouse = onUpdateCountWarehouse,
+                onUpdateAnimalGroupClick = onUpdateAnimalGroupClick,
                 onConfirmation = { openKillDialog = !openKillDialog },
+            )
+        if (openAddDialog)
+            AlertDialogAddAnimal(
+                title = animalTable.name,
+                countAll = animalCountTable.weight,
+                countSuffix = animalCountTable.suffix,
+                idPT = animalTable.id,
+                onConfirmation = { openAddDialog = !openAddDialog },
+                onSaveClick = onAddAnimalClick
+            )
+
+        if (openWriteOffDialog)
+            AlertDialogWriteOffAnimal(
+                isAnimalGroup = animalTable.groop,
+                title = animalTable.name,
+                countAll = animalCountTable.weight,
+                countSuffix = animalCountTable.suffix,
+                idPT = animalTable.idPT,
+                idAnimal = animalTable.id.toLong(),
+                onConfirmation = { openWriteOffDialog = !openWriteOffDialog },
+                onSaveClick = onAddWriteOffClick,
+                onUpdateAnimalGroupClick = onUpdateAnimalGroupClick
+            )
+
+        if (openArchiveDialog)
+            AlertDialogArchiveAnimal(
+                onConfirmation = { openArchiveDialog = !openArchiveDialog },
+                onArchiveClick = updateArchive
             )
     }
 }
@@ -207,6 +285,7 @@ fun AnimalCardContainer(
 private fun DataCardOne(
     animalTable: AnimalEditUiState
 ) {
+    val context = LocalContext.current
     CardField {
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -227,24 +306,34 @@ private fun DataCardOne(
             }
             IconAndText(
                 iconRes = R.drawable.baseline_calendar_month_24,
-                valueString = animalTable.data
+                valueString = if (animalTable.data != "") animalTable.data + " (${
+                    getAgeFromDate(
+                        context,
+                        animalTable.data
+                    )
+                })" else "" //Todo fix construction
             )
-            IconAndText(
-                iconRes = R.drawable.baseline_calendar_month_24,//дата завода
-                valueString = animalTable.data
-            )
-            if (!animalTable.groop) {
+            if (animalTable.dateFactory != "")
+                IconAndText(
+                    iconRes = R.drawable.baseline_event_24,
+                    valueString = animalTable.dateFactory
+                )
+            if (animalTable.groop) {
                 IconAndText(
                     iconRes = R.drawable.baseline_add_card_24,
                     valueString = stringResource(
                         R.string.card_ruble_s,
-                        animalTable.price.toFormatNumber()
+                        animalTable.price.toConvertZeroDouble().formatNumber()
                     )
                 )
             }
             IconAndText(
-                iconRes = R.drawable.baseline_calendar_month_24,//нужен мешок
-                valueString = "${animalTable.foodDay} кг"
+                iconRes = R.drawable.baseline_calendar_month_24,//TODO нужен мешок
+                valueString =
+                if (animalTable.foodDay == "0.0") stringResource(R.string.animal_card_screen_animal_card_no_food_day)
+                else "${
+                    animalTable.foodDay.toConvertZeroDouble().formatNumber()
+                } ${animalTable.suffixFoodDay}"
             )
         }
     }
@@ -255,9 +344,9 @@ private fun DataCardOne(
 private fun DataCardTwo(
     isSoloAnimal: Boolean,
     countTable: DomainIndicatorsVM,
-    weightTable: DomainIndicatorsVM,
-    sizeTable: DomainIndicatorsVM,
-    vaccinationsTable: DomainIndicatorsVM,
+    weightTable: DomainIndicatorsVM?,
+    sizeTable: DomainIndicatorsVM?,
+    vaccinationsTable: DomainIndicatorsVM?,
     onNavigateIndicators: (Int) -> Unit
 ) {
     CardField {
@@ -274,21 +363,21 @@ private fun DataCardTwo(
                 )
             else {
                 IconAndTextMore(
-                    iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
-                    valueString = if (weightTable.weight == "") stringResource(R.string.animal_card_screen_animal_card_no_weight)
-                    else stringResource(R.string.card_kilogram_s, weightTable.weight),
-                    onClick = { onNavigateIndicators(0) }
-                )
-                IconAndTextMore(
                     iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
-                    valueString = if (sizeTable.weight == "") stringResource(R.string.animal_card_screen_animal_card_no_height)
-                    else stringResource(R.string.card_size_s, sizeTable.weight),
+                    valueString = if (sizeTable == null) stringResource(R.string.animal_card_screen_animal_card_no_height)
+                    else "${sizeTable.weight} ${sizeTable.suffix}",
                     onClick = { onNavigateIndicators(1) }
                 )
             }
             IconAndTextMore(
+                iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
+                valueString = if (weightTable == null) stringResource(R.string.animal_card_screen_animal_card_no_weight)
+                else "${weightTable.weight} ${weightTable.suffix}",
+                onClick = { onNavigateIndicators(0) }
+            )
+            IconAndTextMore(
                 iconRes = R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
-                valueString = if (vaccinationsTable.weight == "") stringResource(R.string.animal_card_screen_animal_card_no_vaccination)
+                valueString = if (vaccinationsTable == null) stringResource(R.string.animal_card_screen_animal_card_no_vaccination)
                 else "${vaccinationsTable.weight} ${vaccinationsTable.date}",
                 onClick = { onNavigateIndicators(3) }
             )
@@ -297,22 +386,71 @@ private fun DataCardTwo(
 }
 
 @Composable
-fun ButtonPanel(
-    onSaleClick: () -> Unit,
-    onKillClick: () -> Unit,
+private fun NoteWidget(
+    note: String,
+    updateNote: (String) -> Unit
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    CardField(
+        row = false,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        ButtonStandart(
-            modifier = Modifier.weight(1f),
-            onClick = onSaleClick,
-            intRes = R.string.button_sale
+        TextAndIconRow(
+            intRes = R.string.card_note,
+            titleStyle = textBold_18,
+            isTooltipShow = true,
+            isShowValue = false,
+            intTooltip = R.string.support_text_widget_animal_note_tooltip
+
         )
-        ButtonStandart(
-            modifier = Modifier.weight(1f),
-            onClick = onKillClick,
-            intRes = R.string.button_kill
+        OutlinedTextNoteWidget(
+            value = note,
+            onValueChange = { updateNote(it) },
         )
     }
+}
+
+
+@Composable
+private fun ButtonPanel(
+    onSaleClick: () -> Unit,
+    onKillClick: () -> Unit,
+    onAddClick: () -> Unit,
+    onWriteOffClick: () -> Unit,
+    onArchiveClick: () -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ButtonCustom(
+                modifier = Modifier.weight(1f),
+                onClick = onSaleClick,
+                intRes = R.string.button_sale,
+                drawableRes = R.drawable.baseline_add_card_24
+            )
+            ButtonCustom(
+                modifier = Modifier.weight(1f),
+                onClick = onKillClick,
+                intRes = R.string.button_kill,
+                drawableRes = R.drawable.icons8__meat60
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            ButtonCustom(
+                modifier = Modifier.weight(1f),
+                onClick = onAddClick,
+                intRes = R.string.button_add,
+                drawableRes = R.drawable.baseline_add_circle_outline_24
+            )
+            ButtonCustom(
+                modifier = Modifier.weight(1f),
+                onClick = onWriteOffClick,
+                intRes = R.string.button_write_off,
+                drawableRes = R.drawable.baseline_edit_note_24
+            )
+        }
+        ButtonArchive { onArchiveClick() }
+    }
+
+
 }

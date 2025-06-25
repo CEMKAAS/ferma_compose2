@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.navigation
 
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -85,6 +86,7 @@ import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryProduct
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryNavHost(
     navController: NavHostController,
@@ -446,7 +448,7 @@ fun InventoryNavHost(
         composable(
             route = ExpensesDestination.routeWithArgs,
             arguments = listOf(navArgument(ExpensesDestination.itemIdArg) {
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
             ExpensesScreen(drawerState = drawerState, navigateToStart = {
@@ -553,7 +555,7 @@ fun InventoryNavHost(
         composable(
             route = AnimalEntryDestination.routeWithArgs,
             arguments = listOf(navArgument(AnimalEntryDestination.itemIdArg) {
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
             AnimalEntryProduct(navigateBack = { navController.popBackStack() },
@@ -570,7 +572,7 @@ fun InventoryNavHost(
         ) {
             AnimalCardProduct(navigateBack = { navController.popBackStack() },
                 onNavigateSetting = { navController.navigate("${AnimalEditDestination.route}/${it}") },
-                onNavigateIndicators = { navController.navigate("${AnimalIndicatorsDestination.route}/${it.first}/${it.second}") })
+                onNavigateIndicators = { navController.navigate("${AnimalIndicatorsDestination.route}/${it.first}/${it.second}/${it.third}") })
         }
 
         composable(route = AnimalIndicatorsDestination.routeWithArgs,
@@ -580,11 +582,15 @@ fun InventoryNavHost(
                 },
                 navArgument(AnimalIndicatorsDestination.itemIdArgTwo) {
                     type = NavType.IntType
+                },
+                navArgument(AnimalIndicatorsDestination.itemIdArgTree) {
+                    type = NavType.LongType
                 }
-
             )) {
             AnimalIndicatorsScreen(
-                navigateBack = { navController.popBackStack() })
+                navigateBack = { navController.popBackStack() },
+                navigateSection = {navController.navigate(it)}
+                )
         }
 
         composable(route = AnimalEditDestination.routeWithArgs,

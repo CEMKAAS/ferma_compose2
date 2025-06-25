@@ -146,7 +146,7 @@ class ExpensesEditViewModel(
 }
 
 data class ExpensesTableUiState(
-    val id: Int = 0,
+    val id: Long = 0,
     val title: String = "", // название
     val count: String = "", // Кол-во
     val day: Int = 0,  // день
@@ -164,7 +164,7 @@ data class ExpensesTableUiState(
     var countAnimal: String = "0", // Кол-во животных
     val foodDesignedDay: Int = 0, // Кол-во дней
     val lastDayFood: String = "", //Последний день еды
-    val idPT: Int = 0
+    val idPT: Long = 0
 )
 
 fun ExpensesTable.toExpensesTableUiState(): ExpensesTableUiState = ExpensesTableUiState(

@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.Domain.models.DomainWritOffTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
@@ -40,6 +41,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
@@ -107,7 +109,7 @@ fun WriteOffEditContainerProduct(
     writeOffTable: DomainWritOffTable,
     titleList: List<PairData>,
     onValueChange: (DomainWritOffTable) -> Unit = {},
-    countWarehouse: Double,
+    countWarehouse: DomainPairDataDoubleSting,
     updateCountWarehouse: (Pair<String, Boolean>) -> Unit,
     onClickSave: () -> Unit,
     onClickDelete: () -> Unit
@@ -118,7 +120,6 @@ fun WriteOffEditContainerProduct(
     var selectedItemIndex by remember { mutableIntStateOf(0) }
 
     val state by remember { mutableStateOf(writeOffTable.status == 0) }
-    var openDialog by remember { mutableStateOf(false) }
     var date = formatDateToString(writeOffTable.day, writeOffTable.mount, writeOffTable.year)
 
     //Error
@@ -130,26 +131,6 @@ fun WriteOffEditContainerProduct(
         R.string.toast_refresh_s,
         "${writeOffTable.title} ${writeOffTable.count} ${writeOffTable.suffix}",
     )
-
-    if (openDialog) {
-        val datePickerState = rememberDatePickerState(
-            selectableDates = PastOrPresentSelectableDates,
-            initialSelectedDateMillis = formatDateToLong(date)
-        )
-        DatePickerDialogSample(datePickerState, date) {
-            date = it
-            openDialog = !openDialog
-            val dateList = date.split(".")
-            onValueChange(
-                writeOffTable.copy(
-                    day = dateList[0].toInt(),
-                    mount = dateList[1].toInt(),
-                    year = dateList[2].toInt()
-                )
-            )
-        }
-    }
-
     Column(modifier = modifier) {
         OutlinedTextTitleSale(
             value = writeOffTable.title,
@@ -182,7 +163,8 @@ fun WriteOffEditContainerProduct(
             isError = isErrorCount,
             suffix = writeOffTable.suffix,
             intResSup = R.string.support_text_count_product_write_off,
-            countWarehouse = countWarehouse,
+            countWarehouse = countWarehouse.first,
+            countWarehouseSuffix = countWarehouse.second,
             focusManager = focusManager
         )
         OutlinedTextPrice(
@@ -190,16 +172,26 @@ fun WriteOffEditContainerProduct(
             onValueChange = {
                 onValueChange(
                     writeOffTable.copy(
-                        priceAll = it.toConvertDb()
+                        priceAll = it
                     )
                 )
             },
             intSupportText = R.string.support_text_price_write_off,
             focusManager = focusManager
         )
-        OutlinedTextDate(
+        OutlinedTextDateEdit (
             value = date,
-            onValueChange = { openDialog = !openDialog }
+            onValueChange = {
+                date = it
+                val dateList = it.split(".")
+                onValueChange(
+                    writeOffTable.copy(
+                        day = dateList[0].toInt(),
+                        mount = dateList[1].toInt(),
+                        year = dateList[2].toInt()
+                    )
+                )
+            }
         )
         OutlinedTextNote(
             value = writeOffTable.note,

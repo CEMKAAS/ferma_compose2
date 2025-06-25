@@ -520,7 +520,8 @@ fun EndIncubator(
                                                     arhiv = false,
                                                     idPT = idProject,
                                                     foodDay = 0.0,
-                                                    price = 0.0
+                                                    price = 0.0,
+                                                    suffixFoodDay = ""
                                                 ), projectTable.eggAllEND
                                             )
                                         )
@@ -568,7 +569,8 @@ fun EndIncubator(
                                                 arhiv = false,
                                                 idPT = idProject,
                                                 foodDay = 0.0,
-                                                price = 0.0
+                                                price = 0.0,
+                                                suffixFoodDay = ""
                                             ),
                                             projectTable.eggAllEND
                                         )

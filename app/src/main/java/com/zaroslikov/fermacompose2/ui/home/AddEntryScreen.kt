@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.supportFun.TripleData
@@ -34,8 +34,6 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextAnimal
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
@@ -46,7 +44,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import kotlinx.coroutines.launch
-import java.time.Instant
 
 
 object AddEntryDestination : NavigationDestination {
@@ -106,7 +103,7 @@ fun AddEntryContainerProduct(
     animalList: List<TripleData>,
     saveInRoomAdd: (AddTable) -> Unit,
     idProject: Int, // TODO convet to Long
-    countWarehouse: Double,
+    countWarehouse: DomainPairDataDoubleSting,
     updateCountWarehouse: (String) -> Unit
 ) {
 
@@ -117,7 +114,6 @@ fun AddEntryContainerProduct(
     var title by remember { mutableStateOf("") }
     var count by rememberSaveable { mutableStateOf("") }
     var date by remember { mutableStateOf(dateToday()) }
-    var openDialog by remember { mutableStateOf(false) }
     var category by remember { mutableStateOf("Без категории") }
     var suffix by remember { mutableStateOf("Шт.") }
     var animal by remember { mutableStateOf("") }
@@ -132,17 +128,17 @@ fun AddEntryContainerProduct(
     val toastText = stringResource(R.string.toast_add_s, "$title $count $suffix")
 
     //Date
-    val state = rememberDatePickerState(
-        selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = Instant.now().toEpochMilli()
-    )
-
-    if (openDialog) {
-        DatePickerDialogSample(state, date) {
-            date = it
-            openDialog = !openDialog
-        }
-    }
+//    val state = rememberDatePickerState(
+//        selectableDates = PastOrPresentSelectableDates,
+//        initialSelectedDateMillis = Instant.now().toEpochMilli()
+//    )
+//
+//    if (openDialog) {
+//        DatePickerDialogSample(state, date) {
+//            date = it
+//            openDialog = !openDialog
+//        }
+//    }
 
     Column(modifier = modifier) {
 
@@ -170,7 +166,8 @@ fun AddEntryContainerProduct(
             isError = isErrorCount,
             suffix = suffix,
             intResSup = R.string.support_text_count_product,
-            countWarehouse = countWarehouse,
+            countWarehouse = countWarehouse.first,
+            countWarehouseSuffix = countWarehouse.second,
             focusManager = focusManager
         )
 
@@ -183,7 +180,7 @@ fun AddEntryContainerProduct(
 
         OutlinedTextDate(
             value = date,
-            onValueChange = { openDialog = !openDialog }
+            onValueChange = { date = it }
         )
 
         if (animalList.isNotEmpty()) {

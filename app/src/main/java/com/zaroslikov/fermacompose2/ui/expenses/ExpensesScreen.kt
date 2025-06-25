@@ -71,7 +71,7 @@ fun ExpensesScreen(
     modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
+    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -137,7 +137,7 @@ private fun ExpensesBody(
     viewModel: ExpensesViewModel,
     itemList: List<ExpensesTable>,
     brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (Pair<Int, Int>) -> Unit,
+    onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit
 ) {
     if (itemList.isNotEmpty())

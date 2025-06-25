@@ -1,7 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.composeElement
 
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,15 +37,14 @@ fun ButtonRefresh(
 
 @Composable
 fun ButtonArchive(
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.toButton()
+    OutlinedButton(
+        onClick = onClick, modifier = Modifier.toButton()
     ) {
         Icon(
             modifier = Modifier.padding(end = 3.dp),
-            painter = painterResource(R.drawable.baseline_create_24),
+            painter = painterResource(R.drawable.baseline_archive_24),
             contentDescription = stringResource(R.string.button_archive)
         )
         Text(text = stringResource(R.string.button_archive))
@@ -78,6 +79,27 @@ fun ButtonStandart(
     Button(
         onClick = onClick, modifier = modifier.toButton()
     ) {
+        Text(text = stringResource(intRes))
+    }
+}
+
+@Composable
+fun ButtonCustom(
+    modifier: Modifier = Modifier,
+    @StringRes intRes: Int,
+    drawableRes: Int? = null,
+    onClick: () -> Unit,
+) {
+    Button(
+        onClick = onClick, modifier = modifier.toButton()
+    ) {
+        drawableRes?.let {
+            Icon(
+                modifier = Modifier.padding(end = 3.dp),
+                painter = painterResource(it),
+                contentDescription = stringResource(intRes)
+            )
+        }
         Text(text = stringResource(intRes))
     }
 }

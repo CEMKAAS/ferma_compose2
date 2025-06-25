@@ -2,12 +2,15 @@ package com.zaroslikov.fermacompose2.ui.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
 import kotlinx.coroutines.flow.SharingStarted
@@ -51,7 +54,7 @@ class AddEntryViewModel(
             )
 
 
-    var itemUiState by mutableDoubleStateOf(0.0)
+    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
         private set
 
 
@@ -60,7 +63,8 @@ class AddEntryViewModel(
             itemUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
                 .filterNotNull()
                 .first()
-                .toDouble()
+                .toDomainMap()
+
         }
     }
 

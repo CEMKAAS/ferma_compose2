@@ -17,6 +17,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
+import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.expenses.AnimalExpensesList
@@ -66,7 +67,7 @@ interface ItemsRepository {
     suspend fun insertProject(projectTable: ProjectTable)
     suspend fun insertProjectLong(projectTable: ProjectTable): Long
 
-    //add
+     //==================== Add ====================
     suspend fun insertItem(item: AddTable)
 
     suspend fun deleteItem(item: AddTable)
@@ -75,9 +76,10 @@ interface ItemsRepository {
     fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
     fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
 
-    //sale
+     //==================== Sale ====================
     fun getAllSaleItems(id: Int): Flow<List<SaleTable>>
     fun getItemSale(id: Int): Flow<SaleTable>
+    fun getItemSaleIdCountAnimal(id: Int): Flow<SaleTable>
     fun getBrieflyItemSale(id: Int): Flow<List<BrieflyItemPrice>>
     fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<SaleTable>>
     fun getItemsTitleSaleList(id: Int): Flow<List<PairData>>
@@ -88,9 +90,10 @@ interface ItemsRepository {
     suspend fun updateSale(item: SaleTable)
     suspend fun deleteSale(item: SaleTable)
 
-    //Expenses
+     //==================== Expenses ====================
     fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>>
     fun getItemExpenses(id: Int): Flow<ExpensesTable>
+    fun getItemExpensesIdAnimalCount(id: Int): Flow<ExpensesTable>
     fun getBrieflyItemExpenses(id: Int): Flow<List<BrieflyItemPrice>>
     fun getBrieflyDetailsItemExpenses(id: Long, name: String): Flow<List<ExpensesTable>>
 
@@ -109,9 +112,10 @@ interface ItemsRepository {
     suspend fun updateExpensesAnimal(item: ExpensesAnimalTable)
     suspend fun deleteExpensesAnimal(item: ExpensesAnimalTable)
 
-    //WriteOff
+     //==================== WriteOff ====================
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
+    fun getItemWriteOffIdCountAnimal(id: Int): Flow<WriteOffTable>
     fun getBrieflyItemWriteOff(id: Int): Flow<List<BrieflyItemCount>>
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
 
@@ -119,10 +123,11 @@ interface ItemsRepository {
     suspend fun updateWriteOff(item: WriteOffTable)
     suspend fun deleteWriteOff(item: WriteOffTable)
 
-    //Finance
+     //==================== Finance ====================
     fun getCurrentBalance(id: Int): Flow<Double>
     fun getIncome(id: Int): Flow<Double>
     fun getExpenses(id: Int): Flow<Double>
+    fun getItemExpensesForVaccination(id: Long): Flow<ExpensesTable>
     fun getOwnNeed(id: Int): Flow<Double>
     fun getScrap(id: Int): Flow<Double>
 
@@ -181,7 +186,7 @@ interface ItemsRepository {
 
     fun getCurrentExpensesWarehouse(id: Int): Flow<List<WarehouseData>>
 
-    fun getCurrentBalanceProduct(name: String, id: Long): Flow<Double>
+    fun getCurrentBalanceProduct(name: String, id: Long): Flow<PairDataDoubleSting>
     fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
     fun getFastAddProduct(id: Long): Flow<List<FastAdd>>
 
@@ -288,17 +293,18 @@ interface ItemsRepository {
     suspend fun updateIncubator(item: Incubator)
     fun getAllAnimal(id: Int): Flow<List<AnimalTable>>
     fun getAnimal(id: Int): Flow<AnimalTable>
-    fun getTypeAnimal(id: Int): Flow<List<String>>
+    fun getAnimalCard(id: Int): Flow<AnimalTable>
+    fun getTypeAnimal(id: Long): Flow<List<String>>
 
     //AnimalScreen
     suspend fun insertAnimalTable(animalTable: AnimalTable): Long
     suspend fun updateAnimalTable(animalTable: AnimalTable)
     suspend fun deleteAnimalTable(animalTable: AnimalTable)
 
-    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable)
+    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable): Long
     suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
     suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
-    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
+    suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) : Long
 
     suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
     suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable)

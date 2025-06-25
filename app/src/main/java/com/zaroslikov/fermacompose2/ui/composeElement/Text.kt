@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.composeElement
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,16 +12,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -32,6 +42,9 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.theme.errorLight
+import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -109,19 +122,28 @@ fun IconAndTextMore(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextAndIconRow(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceBetween,
     title: String = "",
     titleStyle: TextStyle = text_16,
+    @StringRes intTooltip: Int = R.string.is_empty,
     @StringRes intRes: Int? = null,
-    value: String,
+    value: String = "",
+    color: Color = Color.Unspecified,
     iconRes: ImageVector = Icons.Default.Info,
     isShowIcon: Boolean = false,
     isShowValue: Boolean = true,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    iconResEnd: ImageVector? = null,
+    onClickIconEnd: () -> Unit = {},
+    isTooltipShow: Boolean = false
 ) {
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = horizontalArrangement,
@@ -141,12 +163,34 @@ fun TextAndIconRow(
                 Icon(
                     imageVector = iconRes, contentDescription = null,
                     modifier =
-                    Modifier
-                        .size(18.dp)
-                        .padding(start = 3.dp)
-                        .clickable { onClick() }
+                        Modifier
+                            .size(18.dp)
+                            .padding(start = 3.dp)
+                            .clickable { onClick() }
                 )
             }
+            if (isTooltipShow)
+                TooltipBox(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .padding(start = 3.dp),
+                    positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                    tooltip = {
+                        RichTooltip {
+                            Text(
+                                text = stringResource(intTooltip),
+                                style = text_14
+                            )
+                        }
+                    },
+                    state = tooltipState
+                ) {
+                    IconButton(onClick = { scope.launch { tooltipState.show() } }) {
+                        Icon(
+                            imageVector = iconRes, contentDescription = null
+                        )
+                    }
+                }
         }
         if (isShowValue) {
             Box(
@@ -156,10 +200,21 @@ fun TextAndIconRow(
                 Text(
                     text = value,
                     style = textBold_16,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = color
                 )
             }
         }
+        if (iconResEnd != null) {
+            Icon(
+                imageVector = iconResEnd, contentDescription = null,
+                modifier =
+                    Modifier
+                        .size(18.dp)
+                        .clickable { onClickIconEnd() }
+            )
+        }
+
     }
 }
 
@@ -276,9 +331,9 @@ fun TextBuildAnnotated(
     priceAll: String,
     count: String
 ) {
+    val amount = (priceAll.toConvertZeroDouble() * count.toConvertZero()).formatNumber()
     Text(
         text = buildAnnotatedString {
-            val amount = (priceAll.toConvertZeroDouble() * count.toConvertZero()).formatNumber()
             val fullText = stringResource(intRes, amount, stringResource(R.string.currency_ruble))
 
             val startIndex = fullText.indexOf(amount)
@@ -293,3 +348,37 @@ fun TextBuildAnnotated(
         }
     )
 }
+
+@Composable
+fun textBuildIndicatorsAnnotated(
+    @StringRes intRes: Int,
+    totalValue: String,
+    suffix: String,
+    price: Double? = null,
+    buyer:String? = null,
+    isPlus: Boolean,
+    note: String
+): AnnotatedString {
+    return buildAnnotatedString {
+        Log.i("Count", "lastValue: $price")
+        val fullText =  when{
+            price != null && buyer != null -> stringResource(intRes).format(totalValue, suffix, price.formatNumber(), buyer)
+            price != null -> stringResource(intRes).format(totalValue, suffix, price.formatNumber())
+            else -> stringResource(intRes).format(totalValue, suffix)
+        } +  note
+
+        val startIndex = fullText.indexOf(totalValue)
+        val endIndex = startIndex + totalValue.length
+
+        append(fullText)
+        addStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                color = if (isPlus) tertiaryLight else errorLight
+            ),
+            start = startIndex,
+            end = endIndex
+        )
+    }
+}
+

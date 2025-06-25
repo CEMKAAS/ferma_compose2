@@ -66,7 +66,6 @@ abstract class InventoryDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE MyFermaEXPENSES ADD COLUMN lastDayFood TEXT NOT NULL DEFAULT '0'")
                 db.execSQL("ALTER TABLE MyFerma ADD COLUMN idAnimal INTEGER NOT NULL DEFAULT 0")
             }
-            //update
         }
 
         private val MIGRATION_2_3 = object : Migration(2, 3) {
@@ -80,20 +79,227 @@ abstract class InventoryDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE AnimalWeightTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'кг.'")
                 db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'ед.'")
                 db.execSQL("ALTER TABLE AnimalSizeTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'м.'")
+
+                db.execSQL("ALTER TABLE AnimalWeightTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE AnimalSizeTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE AnimalVaccinationTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
+
+                db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN version INTEGER")
+
                 db.execSQL("ALTER TABLE AnimalTable ADD COLUMN date_factory TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE AnimalTable ADD COLUMN suffix_food_day TEXT NOT NULL DEFAULT ''")
+
+
+                //==================== Миграция WriteOffTable ====================
+                db.execSQL(
+                    """
+            CREATE TABLE IF NOT EXISTS `MyFermaWRITEOFF_new` (
+                `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `titleWRITEOFF` TEXT NOT NULL,
+                `discWRITEOFF` REAL NOT NULL,
+                `DAY` INTEGER NOT NULL,
+                `MOUNT` INTEGER NOT NULL,
+                `YEAR` INTEGER NOT NULL,
+                `statusWRITEOFF` INTEGER NOT NULL,
+                `priceAll` REAL NOT NULL,
+                `suffix` TEXT NOT NULL,
+                `note` TEXT NOT NULL,
+                `idPT` INTEGER NOT NULL,
+                `animal_count_id` INTEGER,
+                FOREIGN KEY(`idPT`) REFERENCES `ProjectTable`(`_id`) ON DELETE CASCADE,
+                FOREIGN KEY(`animal_count_id`) REFERENCES `AnimalCountTable`(`id`) ON DELETE CASCADE
+            )
+        """.trimIndent()
+                )
+
+                // 2. Копируем данные из старой таблицы
+                db.execSQL(
+                    """
+            INSERT INTO `MyFermaWRITEOFF_new` (
+                `_id`, `titleWRITEOFF`, `discWRITEOFF`, `DAY`, `MOUNT`, `YEAR`,
+                `statusWRITEOFF`, `priceAll`, `suffix`, `note`, `idPT`
+            )
+
+            SELECT `_id`, `titleWRITEOFF`, `discWRITEOFF`, `DAY`, `MOUNT`, `YEAR`,
+                   `statusWRITEOFF`, `priceAll`, `suffix`, `note`, `idPT`
+            FROM `MyFermaWRITEOFF`
+        """.trimIndent()
+                )
+
+                // 3. Удаляем старую таблицу
+                db.execSQL("DROP TABLE `MyFermaWRITEOFF`")
+
+                // 4. Переименовываем новую таблицу в старое имя
+                db.execSQL("ALTER TABLE `MyFermaWRITEOFF_new` RENAME TO `MyFermaWRITEOFF`")
+
+                // 5. Добавляем нужные индексы
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_MyFermaWRITEOFF_idPT` ON `MyFermaWRITEOFF` (`idPT`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_MyFermaWRITEOFF_animal_count_id` ON `MyFermaWRITEOFF` (`animal_count_id`)")
+
+                //==================== Миграция SaleTable ====================
+                db.execSQL(
+                    """
+            CREATE TABLE IF NOT EXISTS MyFermaSale_new (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                titleSale TEXT NOT NULL,
+                discSale REAL NOT NULL,
+                DAY INTEGER NOT NULL,
+                MOUNT INTEGER NOT NULL,
+                YEAR INTEGER NOT NULL,
+                PRICE REAL NOT NULL,
+                suffix TEXT NOT NULL,
+                category TEXT NOT NULL,
+                buyer TEXT NOT NULL,
+                note TEXT NOT NULL,
+                idPT INTEGER NOT NULL,
+                animalId INTEGER,
+                animal_count_id INTEGER,
+                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+                FOREIGN KEY(animalId) REFERENCES AnimalTable(id) ON DELETE CASCADE
+                FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE
+            )
+        """.trimIndent()
+                )
+
+                db.execSQL(
+                    """
+            INSERT INTO MyFermaSale_new (
+                _id, titleSale, discSale, DAY, MOUNT, YEAR, PRICE,
+                suffix, category, buyer, note, idPT, animalId, animal_count_id
+            )
+            SELECT
+                _id, titleSale, discSale, DAY, MOUNT, YEAR, PRICE,
+                suffix, category, buyer, note, idPT, NULL, NULL
+            FROM MyFermaSale
+        """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX index_MyFermaSale_new_idPT ON MyFermaSale_new(idPT)")
+                db.execSQL("CREATE INDEX index_MyFermaSale_new_animalId ON MyFermaSale_new(animalId)")
+                db.execSQL("CREATE INDEX index_MyFermaSale_new_animalId ON MyFermaSale_new(animal_count_id)")
+                db.execSQL("DROP TABLE MyFermaSale")
+                db.execSQL("ALTER TABLE MyFermaSale_new RENAME TO MyFermaSale")
+
+                //==================== Миграция ExpensesTable ====================
+                db.execSQL(
+                    """
+            CREATE TABLE IF NOT EXISTS MyFermaEXPENSES_new (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                titleEXPENSES TEXT NOT NULL,
+                discEXPENSES REAL NOT NULL,
+                DAY INTEGER NOT NULL,
+                MOUNT INTEGER NOT NULL,
+                YEAR INTEGER NOT NULL,
+                countEXPENSES REAL NOT NULL,
+                suffix TEXT NOT NULL,
+                category TEXT NOT NULL,
+                note TEXT NOT NULL,
+                showFood INTEGER NOT NULL,
+                showWarehouse INTEGER NOT NULL,
+                showAnimals INTEGER NOT NULL,
+                dailyExpensesFoodAndCount INTEGER NOT NULL,
+                dailyExpensesFood REAL NOT NULL,
+                countAnimal INTEGER NOT NULL,
+                foodDesignedDay INTEGER NOT NULL,
+                lastDayFood TEXT NOT NULL,
+                idPT INTEGER NOT NULL,
+                animalId INTEGER,
+                animal_vaccination_id INTEGER,
+                animal_count_id INTEGER,
+                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+                FOREIGN KEY(animalId) REFERENCES AnimalTable(id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_vaccination_id) REFERENCES AnimalVaccinationTable(id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE,
+            )
+        """.trimIndent()
+                )
+                db.execSQL(
+                    """
+            INSERT INTO MyFermaEXPENSES_new (
+                _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES,
+                suffix, category, note,
+                showFood, showWarehouse, showAnimals,
+                dailyExpensesFoodAndCount, dailyExpensesFood, countAnimal,
+                foodDesignedDay, lastDayFood, idPT, animalId, animal_vaccination_id, animal_count_id
+            )
+            SELECT
+                _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES,
+                suffix, category, note,
+                showFood, showWarehouse, showAnimals,
+                dailyExpensesFoodAndCount, dailyExpensesFood, countAnimal,
+                foodDesignedDay, lastDayFood, idPT, NULL, NULL, NULL
+            FROM MyFermaEXPENSES
+        """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_idPT ON MyFermaEXPENSES_new(idPT)")
+                db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animalId)")
+                db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animal_vaccination_id)")
+                db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animal_count_id)")
+                db.execSQL("DROP TABLE MyFermaEXPENSES")
+                db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO MyFermaEXPENSES")
+
+                //==================== Перенос данных из AnimalTable в ExpensesTable ====================
+                db.execSQL(
+                    """
+            INSERT INTO MyFermaEXPENSES (
+                titleEXPENSES,
+                discEXPENSES,
+                DAY,
+                MOUNT,
+                YEAR,
+                countEXPENSES,
+                suffix,
+                category,
+                note,
+                showFood,
+                showWarehouse,
+                showAnimals,
+                dailyExpensesFoodAndCount,
+                dailyExpensesFood,
+                countAnimal,
+                foodDesignedDay,
+                lastDayFood,
+                idPT, 
+                animalId
+            )
+            SELECT
+                name AS titleEXPENSES,
+                price AS discEXPENSES,
+                CAST(substr(data, 1, 2) AS INTEGER) AS DAY,
+                CAST(substr(data, 4, 2) AS INTEGER) AS MOUNT,
+                CAST(substr(data, 7, 4) AS INTEGER) AS YEAR,
+                CAST((
+                    SELECT ac.count
+                    FROM AnimalCountTable ac
+                    WHERE ac.idAnimal = a.id
+                    ORDER BY substr(ac.date, 7, 4) || substr(ac.date, 4, 2) || substr(ac.date, 1, 2) DESC
+                    LIMIT 1
+                ) AS REAL) AS countEXPENSES,
+                'шт.' AS suffix,
+                'Покупка животных' AS category,
+                note,
+                0 AS showFood,
+                0 AS showWarehouse,
+                0 AS showAnimals,
+                0 AS dailyExpensesFoodAndCount,
+                0 AS dailyExpensesFood,
+                0 AS countAnimal,
+                0 AS foodDesignedDay,
+                '' AS lastDayFood,
+                idPT,
+               _id AS animalId
+            FROM AnimalTable
+            WHERE LENGTH(data) = 10 AND instr(data, '.') = 3
+        """.trimIndent()
+                )
+
             }
         }
 
 
         fun getDatabase(context: Context): InventoryDatabase {
-            // if the Instance is not null, return it, otherwise create a new database instance.
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, InventoryDatabase::class.java, "item_database")
-                    /**
-                     * Setting this option in your app's database builder means that Room
-                     * permanently deletes all data from the tables in your database when it
-                     * attempts to perform a migration with no defined migration path.
-                     */
                     .fallbackToDestructiveMigration()
                     .addMigrations(MIGRATION_1_2)
                     .addMigrations(MIGRATION_2_3)

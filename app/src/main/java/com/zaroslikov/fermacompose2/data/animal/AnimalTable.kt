@@ -31,6 +31,8 @@ data class AnimalTable(
     val arhiv: Boolean,
     val price: Double,
     val foodDay:Double,
+    @ColumnInfo(name= "suffix_food_day")
+    val suffixFoodDay : String,
     @ColumnInfo(name = "idPT")
     val idPT: Int,
     )

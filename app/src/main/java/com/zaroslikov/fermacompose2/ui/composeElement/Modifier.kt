@@ -1,11 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.composeElement
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
@@ -27,6 +32,7 @@ fun Modifier.toButton(): Modifier {
 fun Modifier.modifierScreen(
     innerPadding: PaddingValues
 ): Modifier {
+    val focusManager = LocalFocusManager.current
     return this
         .fillMaxSize()
         .padding(innerPadding)
@@ -34,11 +40,30 @@ fun Modifier.modifierScreen(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
             vertical = dimensionResource(R.dimen.padding_small)
         )
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus() // Убираем фокус при тапе в любую область
+            })
+        }
+}
+
+@Composable
+fun Modifier.modifierDialogScreen(
+): Modifier {
+    val focusManager = LocalFocusManager.current
+    return this
+        .verticalScroll(rememberScrollState())
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus() // Убираем фокус при тапе в любую область
+            })
+        }
 }
 
 @Composable
 fun Modifier.modifierBottomSheet(
 ): Modifier {
+    val focusManager = LocalFocusManager.current
     return this
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium)
@@ -47,4 +72,10 @@ fun Modifier.modifierBottomSheet(
             top = dimensionResource(R.dimen.padding_small),
             bottom = dimensionResource(R.dimen.padding_extra_large)
         )
+        .verticalScroll(rememberScrollState())
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus() // Убираем фокус при тапе в любую область
+            })
+        }
 }

@@ -21,5 +21,6 @@ data class AnimalVaccinationTable(
     val vaccination: String,
     val date: String,
     val nextVaccination: String,
-    val idAnimal: Int
+    val idAnimal: Int,
+    val note:String
 )

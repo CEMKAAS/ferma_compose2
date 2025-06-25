@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.PairData
@@ -99,7 +100,7 @@ fun WriteOffEntryContainerProduct(
     titleList: List<PairData>,
     saveInRoomSale: (WriteOffTable) -> Unit,
     idProject: Int, // TODO convet to Long
-    countWarehouse: Double,
+    countWarehouse: DomainPairDataDoubleSting,
     updateCountWarehouse: (Pair<String, Boolean>) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -112,25 +113,12 @@ fun WriteOffEntryContainerProduct(
     var priceAll by rememberSaveable { mutableStateOf("") }
     var note by rememberSaveable { mutableStateOf("") }
     var date by remember { mutableStateOf(dateToday()) }
-    var openDialog by remember { mutableStateOf(false) }
 
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     val toastText = stringResource(R.string.toast_write_off_s, "$title $count $suffix")
-
-    //Дата
-    val state = rememberDatePickerState(
-        selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = Instant.now().toEpochMilli()
-    )
-    if (openDialog) {
-        DatePickerDialogSample(state, date) {
-            date = it
-            openDialog = false
-        }
-    }
 
     Column(modifier = modifier) {
 
@@ -162,20 +150,21 @@ fun WriteOffEntryContainerProduct(
             isError = isErrorCount,
             suffix = suffix,
             intResSup = R.string.support_text_count_product_write_off,
-            countWarehouse = countWarehouse,
+            countWarehouse = countWarehouse.first,
+            countWarehouseSuffix = countWarehouse.second,
             focusManager = focusManager
         )
         OutlinedTextPrice(
             value = priceAll,
             onValueChange = {
-                priceAll = it.toConvertDb()
+                priceAll = it
             },
             intSupportText = R.string.support_text_price_write_off,
             focusManager = focusManager
         )
         OutlinedTextDate(
             value = date,
-            onValueChange = { openDialog = !openDialog }
+            onValueChange = { date = it}
         )
         OutlinedTextNote(
             value = note,

@@ -6,10 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil3.decode.BitmapFactoryDecoder
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroString
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -42,7 +43,7 @@ class AnimalEditViewModel(
     }
 
     val typeUiState: StateFlow<DataStringListState> =
-        itemsRepository.getTypeAnimal(itemId).map { DataStringListState(it) }
+        itemsRepository.getTypeAnimal(itemId.toLong()).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -75,6 +76,7 @@ data class AnimalEditUiState(
     val arhiv: Boolean = false,
     val price: String = "",
     val foodDay: String = "",
+    val suffixFoodDay: String = "",
     val idPT: Int = 0,
 )
 
@@ -92,6 +94,7 @@ fun AnimalTable.toAnimaEditUiState(
     arhiv,
     price.toString(),
     foodDay.toString(),
+    suffixFoodDay = suffixFoodDay,
     idPT
 )
 
@@ -106,8 +109,9 @@ fun AnimalEditUiState.toAnimalTable(): AnimalTable = AnimalTable(
     note,
     image,
     arhiv,
-    price.replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
-    foodDay.toDouble(),
+    price.toConvertZeroString().replace(Regex("[^\\d.]"), "").replace(",", ".").toDouble(),
+    foodDay.toConvertZeroString().toDouble(),
+    suffixFoodDay = suffixFoodDay,
     idPT
 )
 

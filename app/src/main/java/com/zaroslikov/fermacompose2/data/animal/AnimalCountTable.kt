@@ -21,5 +21,8 @@ data class AnimalCountTable(
     val count: String,
     val suffix: String,
     val date: String,
-    val idAnimal: Int
+    val idAnimal: Int,
+    val note: String,
+    val version: Int? = null//0-SaleTable 1-ExpensesTable 2-WriteOffSop
+// 3-WriteOffUtil 4-AddTable null - Старые не считаются
 )

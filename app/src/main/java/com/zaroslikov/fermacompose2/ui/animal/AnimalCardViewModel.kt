@@ -8,17 +8,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.mapper.toCountRoomMap
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -31,15 +36,15 @@ class AnimalCardViewModel(
     val itemId: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
     val itemIdPT: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArgTwo])
 
-    var itemUiState by mutableStateOf(AnimalEditUiState())
+    var animalTableUiState by mutableStateOf(AnimalEditUiState())
         private set
-    var domainWeight by mutableStateOf(DomainIndicatorsVM())
+    var domainWeight by mutableStateOf<DomainIndicatorsVM?>(null)
         private set
-    var domainHeight by mutableStateOf(DomainIndicatorsVM())
+    var domainHeight by mutableStateOf<DomainIndicatorsVM?>(null)
         private set
     var domainCount by mutableStateOf(DomainIndicatorsVM())
         private set
-    var domainVaccination by mutableStateOf(DomainIndicatorsVM())
+    var domainVaccination by mutableStateOf<DomainIndicatorsVM?>(null)
         private set
     var countInWarehouse by mutableDoubleStateOf(0.0)
         private set
@@ -47,30 +52,47 @@ class AnimalCardViewModel(
 
     init {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getAnimal(itemId)
-                .filterNotNull()
-                .first()
-                .toAnimaEditUiState()
-
-            domainWeight = itemsRepository.getWeightAnimalLimit(itemId)
-                .filterNotNull()
-                .first()
-                .toDomainMap()
-
-            domainHeight = itemsRepository.getSizeAnimalLimit(itemId)
-                .filterNotNull()
-                .first()
-                .toDomainMap()
-
-            domainCount = itemsRepository.getCountAnimalLimit(itemId)
-                .filterNotNull()
-                .first()
-                .toDomainMap()
-
-            domainVaccination = itemsRepository.getVaccinationAnimalLimit(itemId)
-                .filterNotNull()
-                .first()
-                .toDomainMap()
+            launch {
+                itemsRepository.getAnimalCard(itemId)
+                    .flowOn(Dispatchers.IO)
+                    .collectLatest {
+                        animalTableUiState = it.toAnimaEditUiState()
+                    }
+            }
+            launch {
+                itemsRepository.getWeightAnimalLimit(itemId)
+                    .flowOn(Dispatchers.IO)
+                    .collectLatest {
+                        it?.let {
+                            domainWeight = it.toDomainMap()
+                        }
+                    }
+            }
+            launch {
+                itemsRepository.getSizeAnimalLimit(itemId)
+                    .flowOn(Dispatchers.IO)
+                    .collectLatest {
+                        it?.let {
+                            domainHeight = it.toDomainMap()
+                        }
+                    }
+            }
+            launch {
+                itemsRepository.getCountAnimalLimit(itemId)
+                    .flowOn(Dispatchers.IO)
+                    .collectLatest {
+                        domainCount = it.toDomainMap()
+                    }
+            }
+            launch {
+                itemsRepository.getVaccinationAnimalLimit(itemId)
+                    .flowOn(Dispatchers.IO)
+                    .collectLatest {
+                        it?.let {
+                            domainVaccination = it.toDomainMap()
+                        }
+                    }
+            }
         }
     }
 
@@ -90,13 +112,26 @@ class AnimalCardViewModel(
                 initialValue = DataStringListState()
             )
 
-    fun updateUiState(name: String) {
+
+    fun updateNote(note: String) {
         viewModelScope.launch {
-            countInWarehouse = itemsRepository.getCurrentBalanceProduct(name, itemIdPT.toLong())
-                .filterNotNull()
-                .first()
-                .toDouble()
+            println("___________$note")
+            itemsRepository.updateAnimalTable(animalTableUiState.copy(note = note).toAnimalTable())
         }
+    }
+
+    fun updateArchive() {
+        viewModelScope.launch {
+            itemsRepository.updateAnimalTable(animalTableUiState.copy(arhiv = true).toAnimalTable())
+        }
+    }
+
+    suspend fun updateUiState(name: String): DomainPairDataDoubleSting {
+        return itemsRepository
+            .getCurrentBalanceProduct(name, itemIdPT.toLong())
+            .filterNotNull()
+            .first()
+            .toDomainMap()
     }
 
     fun productState(name: String): StateFlow<AnimalProductCardUiStateLimit> {
@@ -109,29 +144,70 @@ class AnimalCardViewModel(
             )
     }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
-
-    fun saveSaleAnimal(triple: Triple<SaleTable, AnimalCountTable, AnimalTable>) {
-        viewModelScope.launch {
-            itemsRepository.insertSale(triple.first)
-            itemsRepository.insertAnimalCountTable(triple.second)
-            itemsRepository.updateAnimalTable(triple.third)
-        }
-    }
-
     fun saveAddAnimal(addTable: AddTable) {
         viewModelScope.launch { itemsRepository.insertItem(addTable) }
     }
 
-    fun saveCountAnimal(pair: Pair<AnimalCountTable, AnimalTable>) {
+    fun updateAnimalGroup(sex: String) {
         viewModelScope.launch {
-            itemsRepository.insertAnimalCountTable(pair.first)
-            itemsRepository.updateAnimalTable(pair.second)
+            itemsRepository.updateAnimalTable(
+                animalTableUiState.copy(groop = false, sex = sex).toAnimalTable()
+            )
         }
     }
 
+     //==================== Сохранение кол-ва ====================
+    //Продажа
+    fun insertSaleAnimal(triple: Triple<DomainIndicatorsVM, SaleTable, Boolean>) {
+        viewModelScope.launch {
+            val id = itemsRepository.insertAnimalCountTable(triple.first.toCountRoomMap())
+            itemsRepository.insertSale(triple.second.copy(animalCountId = id))
+            itemsRepository.updateAnimalTable(
+                animalTableUiState.copy(arhiv = triple.third).toAnimalTable()
+            )
+        }
+    }
+    //Покупка
+    suspend fun insertAddAnimal(pair: Pair<DomainIndicatorsVM, ExpensesTable?>) {
+        val id = itemsRepository.insertAnimalCountTable(pair.first.toCountRoomMap())
+        itemsRepository.updateAnimalTable(animalTableUiState.copy(groop = true).toAnimalTable())
+        pair.second?.let {
+            itemsRepository.insertExpenses(
+                it.copy(
+                    animalId = itemId.toLong(),
+                    animalCountId = id,
+                    idPT = itemIdPT.toLong()
+                )
+            )
+        }
+    }
+
+    //
+    suspend fun insertWriteOffAnimal(triple: Triple<DomainIndicatorsVM, WriteOffTable?, Boolean>) {
+        val id = itemsRepository.insertAnimalCountTable(triple.first.toCountRoomMap())
+        triple.second?.let {
+            itemsRepository.insertWriteOff(
+                it.copy(animalCountId = id)
+            )
+        }
+        itemsRepository.updateAnimalTable(
+            animalTableUiState.copy(arhiv = triple.third).toAnimalTable()
+        )
+    }
+
+    fun saveCountAnimal(pair: Triple<DomainIndicatorsVM, WriteOffTable, Boolean>) {
+        viewModelScope.launch {
+            val id = itemsRepository.insertAnimalCountTable(pair.first.toCountRoomMap())
+            itemsRepository.insertWriteOff(pair.second.copy(animalCountId = id))
+            itemsRepository.updateAnimalTable(
+                animalTableUiState.copy(arhiv = pair.third).toAnimalTable()
+            )
+        }
+    }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
+    }
 }
 
 

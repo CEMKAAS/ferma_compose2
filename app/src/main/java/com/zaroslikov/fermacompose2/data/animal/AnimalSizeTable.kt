@@ -19,7 +19,8 @@ data class AnimalSizeTable(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val size: String,
-    val suffix:String,
+    val suffix: String,
     val date: String,
-    val idAnimal: Int
+    val idAnimal: Int,
+    val note: String
 )

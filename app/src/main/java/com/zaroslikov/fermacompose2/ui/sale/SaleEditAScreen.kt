@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
@@ -41,6 +42,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
@@ -115,7 +117,7 @@ fun SaleEditContainerProduct(
     categoryList: List<String>,
     buyerList: List<String>,
     onValueChange: (DomainSaleTable) -> Unit = {},
-    countWarehouse: Double,
+    countWarehouse: DomainPairDataDoubleSting,
     updateCountWarehouse: (Pair<String, String>) -> Unit,
     onClickSave: () -> Unit,
     onClickDelete: () -> Unit
@@ -140,36 +142,13 @@ fun SaleEditContainerProduct(
     )
 
     //date
-    var openDialog by remember { mutableStateOf(false) }
     var date = formatDateToString(saleTable.day, saleTable.mount, saleTable.year)
 
-    if (openDialog) {
-        val datePickerState = rememberDatePickerState(
-            selectableDates = PastOrPresentSelectableDates,
-            initialSelectedDateMillis = formatDateToLong(date)
-        )
-        DatePickerDialogSample(datePickerState, date) {
-            date = it
-            openDialog = !openDialog
-
-            val dateList = date.split(".")
-            onValueChange(
-                saleTable.copy(
-                    day = dateList[0].toInt(),
-                    mount = dateList[1].toInt(),
-                    year = dateList[2].toInt()
-                )
-            )
-        }
-    }
-
     Column(modifier = modifier) {
-
-
         OutlinedTextTitleSale(
             value = saleTable.title,
             onValueChange = {
-                onValueChange(saleTable.copy(title =it.trim()))
+                onValueChange(saleTable.copy(title = it.trim()))
                 isErrorTitle = it.isError()
                 isErrorSlash = it.isErrorSlash()
             },
@@ -185,7 +164,6 @@ fun SaleEditContainerProduct(
             isErrorSlash = isErrorSlash,
             focusManager = focusManager
         )
-
         OutlinedTextCount(
             value = saleTable.count,
             onValueChange = {
@@ -195,41 +173,47 @@ fun SaleEditContainerProduct(
             onClick = { onValueChange(saleTable.copy(suffix = it)) },
             isError = isErrorCount,
             suffix = saleTable.suffix,
-            countWarehouse = countWarehouse,
+            countWarehouse = countWarehouse.first,
+            countWarehouseSuffix = countWarehouse.second,
             intResSup = R.string.support_text_count_product_sale,
             focusManager = focusManager
         )
-
         OutlinedTextPrice(
             value = saleTable.priceAll,
             onValueChange = {
-                onValueChange(saleTable.copy(priceAll = it.toConvertDb()))
+                onValueChange(saleTable.copy(priceAll = it))
                 isErrorPrice = it.isError()
             },
             isError = isErrorPrice,
             intSupportText = R.string.support_text_price_sale,
             focusManager = focusManager
         )
-
         OutlinedTextCategory(
             value = saleTable.category,
             onValueChange = { onValueChange(saleTable.copy(category = it.trim())) },
             titleList = categoryList,
             focusManager = focusManager
         )
-
-        OutlinedTextDate(
+        OutlinedTextDateEdit (
             value = date,
-            onValueChange = { openDialog = !openDialog }
+            onValueChange = {
+                date = it
+                val dateList = it.split(".")
+                onValueChange(
+                    saleTable.copy(
+                        day = dateList[0].toInt(),
+                        mount = dateList[1].toInt(),
+                        year = dateList[2].toInt()
+                    )
+                )
+            }
         )
-
         OutlinedTextBuyer(
             value = saleTable.buyer,
             onValueChange = { onValueChange(saleTable.copy(buyer = it)) },
             list = buyerList,
             focusManager = focusManager
         )
-
         OutlinedTextNote(
             value = saleTable.note,
             onValueChange = {
@@ -237,8 +221,6 @@ fun SaleEditContainerProduct(
             },
             focusManager = focusManager
         )
-
-
         ButtonRefresh {
             if (isErrorSale(title = saleTable.title, count = saleTable.count,
                     price = saleTable.count,

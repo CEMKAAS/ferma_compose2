@@ -10,7 +10,8 @@
     <string name="income_screen_title">Мои Доходы</string>
     <string name="expenses_my_screen_title">Мои Расходы</string>
     <string name="animals_screen_title">Мои Животные</string>
-    <string name="animals_add_screen_title">Добавить Животного</string>
+    <string name="animal_add_screen_title">Добавление Животного</string>
+    <string name="animals_add_screen_title">Добавление Животных</string>
     <string name="animals_add_screen_edit">Редактировать Животного</string>
     <string name="weight_screen_title">Вес</string>
     <string name="height_screen_title">Размер</string>
@@ -26,6 +27,7 @@
     <string name="outlined_text_date">Дата</string>
     <string name="outlined_text_animals">Животное</string>
     <string name="outlined_text_note">Примечание</string>
+    <string name="outlined_text_reason">Причина</string>
     <string name="outlined_text_price">Стоимость</string>
     <string name="outlined_text_buyer">Покупатель</string>
     <string name="outlined_text_title">Заголовок</string>
@@ -89,6 +91,9 @@
     <string name="data_picker_ok">Принять</string>
     <string name="data_picker_back">Назад</string>
     <string name="data_picker_choice_period">Выберите период</string>
+    <string name="date_years">лет</string>
+    <string name="date_months">месяцев</string>
+
 
     //Checkbox
     <string name="checkbox_food">Корм</string>
@@ -103,9 +108,12 @@
     //ButtonText
     <string name="button_text_great">Отлично!</string>
     <string name="button_text_sale">Продать!</string>
+    <string name="button_text_expenses">Купить!</string>
     <string name="button_text_add">Добавить!</string>
     <string name="button_text_add_title">Добавить позию!</string>
     <string name="button_text_cancel">Отмена</string>
+    <string name="button_text_edit">Изменить!</string>
+    <string name="button_text_write_off">Списать!</string>
 
     //widget
     <string name="widget_briefly">Кратко</string>
@@ -148,13 +156,14 @@
     <string name="support_text_name_animal">Укажите кличку животного</string>
     <string name="support_text_names_animals">Укажите название группы</string>
     <string name="support_text_data_vaccination">Укажите дату, когда была сделана прививки</string>
+    <string name="support_text_price_vaccination">Укажите стоимость прививки</string>
     <string name="support_text_data_next">Укажите дату следующей прививки</string>
 
     <string name="support_text_type_animal">Укажите тип животного. Например: Корова, свинья и т.д.</string>
     <string name="support_text_type_animals">Укажите тип группы. Например: Кролики, Курицы и т.д.</string>
     <string name="support_text_sex_animals">Выберите пол животного</string>
-    <string name="support_text_food_day_animal">Укажите ежедневный расход корма на животного</string>
-    <string name="support_text_food_day_animals">Укажите ежедневный расход корма на головуо</string>
+    <string name="support_text_food_day_animal">Укажите ежедневный расход корма на животное</string>
+    <string name="support_text_food_day_animals">Укажите ежедневный расход корма на голову</string>
 
     <string name="support_text_date_factory">Укажите дату завода животного</string>
     <string name="support_text_date_born">Укажите рождения животного</string>
@@ -167,7 +176,8 @@
     <string name="support_text_vaccination_animals">Укажите название прививки</string>
 
     <string name="support_text_count_sale_animals">Всего животных: %s %s</string>
-
+    <string name="support_text_add_animal_reason">Укажите причину добавления</string>
+    <string name="support_text_write_off_animal_reason">Укажите причину списания</string>
 
     <string name="support_text_product">Введите или выберите товар</string>
     <string name="support_text_title">Укажите заголовок</string>
@@ -191,6 +201,9 @@
 
     <string name="support_text_animals">Животные</string>
 
+    <string name="support_text_position_s">Позиция %s</string>
+
+
     <string name="support_text_income_category">Доходы по категориям за %s</string>
     <string name="support_text_expenses_category">Расходы по категориям за %s</string>
     <string name="support_text_no_income_category">Доходов за %s не было :(</string>
@@ -198,6 +211,10 @@
     <string name="support_text_data_next_vaccination">Дата следующей прививки</string>
     <string name="support_text_all_price">Общая сумма составить: %s %s</string>
     <string name="support_text_empty">Не указано</string>
+
+    //SupportTextWidget
+    <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
+    <string name="support_text_widget_animal_note_tooltip">Нажмите для ввода текста, введенный текст сохранится автоматически </string>
 
 
     //Error
@@ -217,6 +234,7 @@
     <string name="error_no_vaccination">Прививка не указана!</string>
 
     <string name="error_count_sale_animals">У Вас нет столько животных!</string>
+    <string name="error_count_zero_animals">Нельзя указывать 0</string>
 
     //Toast
     <string name="toast_add_s">Добавлено: %s</string>
@@ -229,9 +247,11 @@
 
     //Tooltip
     <string name="tooltip_animals_born">Дата рождения является приоритетной для расчета возраста</string>
-
     <string name="tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за всё поголовье, а за одно животное. При этом сохранится общая сумма.</string>
     <string name="tooltip_auto_calculate_kill">В случае активации этой опции необходимо указать кол-во товара не за всё поголовье, а за одно животное. При этом сохранится общая сумма товара.</string>
+    <string name="tooltip_weight_big_kill">Предупреждение!\nВес товаров больше, чем вес животного</string>
+    <string name="tooltip_weight_big_average_kill">Предупреждение!\nВес товаров больше, чем средний вес животных</string>
+
 
     //MessageNoData
     <string name="message_no_date_title_add">Добро пожаловать в раздел \"Моя Продукция!\"</string>
@@ -310,10 +330,25 @@
     <string name="alert_dialog_info_title_product_add">Что такое "Продукции получено"?</string>
     <string name="alert_dialog_info_text_product_add">В этом разделе отображается информация о количестве и типе продукции, полученной от конкретного животного или группы животных. Чтобы увидеть эти данные в разделе «Моя продукция», выберите животное или группу животных.</string>
 
+    <string name="alert_dialog_info_title_product_sale">Что такое "Прибыли получено"?</string>
+    <string name="alert_dialog_info_text_product_sale">В этом разделе отображается информация о количестве, типе и стоимости продукции, проданной от конкретного животного или группы животных. Чтобы увидеть эти данные в разделе «Мои продажи», выберите животное или группу животных.</string>
+
+    <string name="alert_dialog_info_title_product_expenses">Что такое "Затрачено"?</string>
+    <string name="alert_dialog_info_text_product_expenses">В этом разделе отображается информация о количестве и типе товара, затраченый на конкретного животного или группы животных. Чтобы увидеть эти данные в разделе «Мои покупки», выберите животное или группу животных.</string>
+
+
     <string name="alert_dialog_info_sale_animal">Продажа животного</string>
     <string name="alert_dialog_info_sale_animals">Продажа животных</string>
+    <string name="alert_dialog_info_kill_animal">Забой животного</string>
+    <string name="alert_dialog_info_kill_animals">Забой животных</string>
+    <string name="alert_dialog_info_add_animals">Добавление животных</string>
+    <string name="alert_dialog_info_write_off_animals">Списание животных</string>
+    <string name="alert_dialog_info_expenses_animals">Покупка животных</string>
     <string name="alert_dialog_info_archive_animal">Архив</string>
-    <string name="alert_dialog_info_archive_animal_text">Вы уверены, что хотите перенести животное в архив?</string>
+    <string name="alert_dialog_title_archive_animal">Добавить в архив?</string>
+    <string name="alert_dialog_info_archive_animal_text">Если животное умерло или не хотите его показывать, добавьте его в архив. В любой момент вы сможете достать его из архива.\nПеренести в архив?</string>
+    <string name="alert_dialog_info_group_to_solo_text">Перевести на индивидуальное содержание?</string>
+    <string name="alert_dialog_group_to_solo_text">У вас одно животное в группе, если хотите перевести животное из группы на индивидуальное содержание, укажите его пол и нажмите кнопку «Изменить». </string>
 
 
     //AnalysisProductScreen
@@ -348,14 +383,60 @@
     <string name="animal_card_screen_animal_card_s">Карточка животных</string>
     <string name="animal_card_screen_animal_card_two">Текущие значения</string>
     <string name="animal_card_screen_animal_card_product">Продукции получено</string>
+    <string name="animal_card_screen_animal_card_product_sale">Прибыли получено</string>
+    <string name="animal_card_screen_animal_card_product_expenses">Затрачено</string>
     <string name="animal_card_screen_animal_card_no_weight">Вес не указан</string>
+    <string name="animal_card_screen_animal_card_no_weight_">-</string>
     <string name="animal_card_screen_animal_card_no_height">Размер не указан</string>
+    <string name="animal_card_screen_animal_card_no_food_day">Расход корма не указан</string>
     <string name="animal_card_screen_animal_card_no_vaccination">Прививка не указана</string>
     <string name="animal_card_screen_animal_card_info_kill">Cводка:</string>
+    <string name="animal_card_screen_animal_card_info_weight_all">Общий вес:</string>
     <string name="animal_card_screen_note_kill">Товар был добавлен через "Забой" животного</string>
     <string name="animal_card_screen_note_sale">Товар был продан через "Продажу" животного</string>
     <string name="animal_card_screen_category_kill">Забой</string>
     <string name="animal_card_screen_category_sale">Продажа животных</string>
+    <string name="animal_card_screen_add_category_expenses">Покупка животных</string>
+    <string name="animal_card_screen_write_off_category_animal">Cписание животных</string>
+
+    <string name="animal_card_screen_add_note_count">Было добавлено животных: %s %s</string>
+    <string name="animal_card_screen_add_note_reason">По причине: %s </string>
+    <string name="animal_card_screen_add_no_note_reason">Без указания причины</string>
+    <string name="animal_card_screen_add_note_expenses">Было куплено животных: %s %s\nОбщая стоимость составила: %s</string>
+<!--    <string name="animal_card_screen_add_note_expenses">Было куплено животных: %s %s</string>-->
+
+    <string name="animal_card_screen_write_off_note_count">Было списано животных: %s %s</string>
+    <string name="animal_card_screen_write_off_note_expenses">Было списано животных: %s %s\nОбщая стоимость составила: %s </string>
+
+    <string name="animal_card_screen_sale_note_expenses">Было продано животных: %s %s\nОбщая стоимость составила: %s \nПокупатель: %s </string>
+    <string name="animal_card_screen_sale_note_no_buyer">Неизвестный</string>
+<!--    <string name="animal_card_screen_sale_note_expenses">Было продано животных: %s %s\</string>-->
+    <string name="animal_card_screen_kill_note">Было забито животных: %s %s\nБыло получено продукции:</string>
+    <string name="animal_card_screen_kill_add_product">Было получено продукции:</string>
+
+    //AnimalIndicatorsScreen
+    <string name="animal_indicators_screen_no_note">Примечание не указано</string>
+    <string name="animal_indicators_screen_expenses_count">Укажите стоимость за купленное кол-во</string>
+    <string name="animal_indicators_screen_sale_count">Укажите стоимость за проданное кол-во</string>
+    <string name="animal_indicators_screen_write_off">Укажите стоимость за списаное кол-во</string>
+    <!--    <string name="support_text_price_expenses">Укажите стоимость за купленный товар</string>-->
+    <string name="animal_indicators_weight_increased_s">Вес увеличился на %s %s</string>
+    <string name="animal_indicators_weight_not_changed_s">Вес не изменился</string>
+    <string name="animal_indicators_weight_decreased_s">Вес уменьшился на %s %s</string>
+    <string name="animal_indicators_size_increased_s">Размер увеличился на %s %s</string>
+    <string name="animal_indicators_size_not_changed_s">Размер не изменился</string>
+    <string name="animal_indicators_size_decreased_s">Размер уменьшился на %s %s</string>
+    <string name="animal_indicators_vaccination_price_s">Стоимость составила %s</string>
+    <string name="animal_indicators_animals_vaccination_price_s">Было привито животных: %s %s\nОбщая стоимость составила: %s</string>
+    <string name="animal_indicators_animals_vaccination_no_price_s">Было привито животных: %s %s</string>
+    <string name="animal_indicators_category_expenses_vaccination">Прививки</string>
+    <string name="animal_indicators_note_expenses_vaccination">Прививка была добавлена для животного: </string>
+
+    <string name="animal_indicators_vaccination_count_animals_s">Укажите количество животных, сейчас их кол-во составляет: %s</string>
+    <string name="animal_indicators_animals_count_add_note">Вы добавили животных: %s %s</string>
+    <string name="animal_indicators_animals_count_increased_note">Вы увеличили кол-во животных на %s %s</string>
+    <string name="animal_indicators_animals_count_reduced_note">Вы уменьшили кол-во животных на %s %s</string>
+    <string name="animal_indicators_animals_count_not_changed_note">Кол-во животных не изменилось</string>
 
 
     //Ration Button

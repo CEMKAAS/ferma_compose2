@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
@@ -70,7 +71,7 @@ class SaleEditViewModel(
                 initialValue = DataStringListState()
             )
 
-    var countWarehouseUiState by mutableDoubleStateOf(0.0)
+    var countWarehouseUiState by mutableStateOf(DomainPairDataDoubleSting())
         private set
 
     fun updateCountWarehouseUiState(pair: Pair<String, String>) {
@@ -80,15 +81,16 @@ class SaleEditViewModel(
                     itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
                         .filterNotNull()
                         .first()
-                        .toDouble()
+                        .toDomainMap()
                 }
-                "Купленный товар" -> {
-                    itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
-                        .filterNotNull()
-                        .first()
-                        .toDouble()
-                }
-                else -> 0.0
+                //Todo
+//                "Купленный товар" -> {
+//                    itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
+//                        .filterNotNull()
+//                        .first()
+//                        .toDouble()
+//                }
+                else -> DomainPairDataDoubleSting()
             }
         }
     }

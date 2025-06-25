@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -8,6 +9,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 
 fun String.toConvertDb(): String {
@@ -18,18 +20,28 @@ fun String.toConvertDbDouble(): Double {
     return this.replace(Regex("[^\\d.]"), "").replace(",", ".").trim().toDouble()
 }
 
+fun String.toConvertDbOnlyInt(): Int {
+    return this.replace(Regex("[^\\d.]"), "").replace(",", "").replace(".", "").trim().toInt()
+}
+
 fun String.toConvertOnlyInt(): String {
     return this.replace(Regex("[^\\d.]"), "").replace(",", "").replace(".", "").trim()
 }
 
 fun String.toConvertZero(): Int {
-    return if (this == "") 0 else this.toInt()
+    return if (this == "") 0 else this.toDouble().roundToInt()
 }
+
 fun String.toConvertZeroString(): String {
     return if (this == "") "0" else this
 }
+
 fun String.toConvertZeroDouble(): Double {
     return if (this == "") 0.0 else this.toDouble()
+}
+
+fun String.toConvertZeroTooOneDouble(): Double {
+    return if (this == "") 1.0 else this.toDouble()
 }
 
 fun String.toFormatNumber(): String {
@@ -48,11 +60,33 @@ fun getImageWriteOff(
         R.drawable.baseline_delete_24
 }
 
+fun getImageAnimalCount(
+    version: Int
+): Int {
+    return when (version) {
+        0 -> R.drawable.baseline_add_card_24
+        1 -> R.drawable.baseline_add_shopping_cart_24
+        2 -> R.drawable.icons8__meat60
+        3 -> R.drawable.baseline_edit_note_24
+        else -> R.drawable.baseline_add_circle_outline_24
+    }
+}
+
+fun calculatePriceAll(price: String, count: String): String {
+    return (price.toConvertZeroString().toConvertDbDouble() * count.toConvertZeroString()
+        .toConvertDbDouble()).formatNumber()
+}
+
 //Date
 //Выдает сегодняшнюю датуVersionToImage в формате dd.MM.yyyy"
 fun dateToday(): String {
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())
     return LocalDate.now().format(formatter)
+}
+
+fun dateTodayNextYear(): String {
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())
+    return LocalDate.now().plusYears(1).format(formatter)
 }
 
 fun dateTodayArray(): List<Int> {

@@ -32,7 +32,7 @@ import com.zaroslikov.fermacompose2.supportFun.dateLongToString
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialogInfo
+import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.composeElement.TextAndIconRow
