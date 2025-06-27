@@ -52,6 +52,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
@@ -116,7 +117,6 @@ fun AddScreen(
             floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
 
         ) { innerPadding ->
-
             if (isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
@@ -124,7 +124,7 @@ fun AddScreen(
             else
                 AddContainer(
                     modifier = modifier
-                        .modifierScreen(innerPadding),
+                        .modifierScreenLazy(innerPadding),
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
                     viewModel = viewModel,
@@ -135,7 +135,6 @@ fun AddScreen(
                         AppMetrica.reportEvent("Анализ через Продукцию")
                     }
                 )
-
         }
     }
 }
@@ -151,13 +150,12 @@ fun AddContainer(
     navigateToItemAdd: () -> Unit,
     navigationToAnalysis: (String) -> Unit,
 ) {
-
     if (itemList.isNotEmpty())
         InventoryList(
             itemList = itemList,
             brieflyList = brieflyList,
             viewModel = viewModel,
-            onItemClick = { onItemClick(Pair(it.id, it.idPT)) },
+            onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
             modifier = modifier,
             navigationToAnalysis = navigationToAnalysis,
 
@@ -170,7 +168,6 @@ fun AddContainer(
         supportRes = R.string.message_no_date_support_text_add,
         buttonRes = R.string.button_add_message_no_data
     )
-
 }
 
 

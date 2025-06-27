@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,8 +34,6 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
@@ -48,7 +45,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import kotlinx.coroutines.launch
-import java.time.Instant
 
 
 object SaleEntryDestination : NavigationDestination {
@@ -82,7 +78,7 @@ fun SaleEntryProduct(
             modifier = Modifier
                 .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
-            titleList = titleUiState.animalList,
+            titleList = titleUiState.list,
             categoryList = categoryUiState.list,
             buyerList = buyerUiState.list,
             saveInRoomSale = {

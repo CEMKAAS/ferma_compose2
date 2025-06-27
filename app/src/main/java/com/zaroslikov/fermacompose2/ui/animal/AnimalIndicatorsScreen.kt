@@ -101,7 +101,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
 import com.zaroslikov.fermacompose2.ui.composeElement.textBuildIndicatorsAnnotated
 import com.zaroslikov.fermacompose2.ui.composeElement.text_16
 import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditDestination
-import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
+//import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
 import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditDestination

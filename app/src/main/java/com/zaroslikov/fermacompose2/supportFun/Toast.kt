@@ -4,7 +4,6 @@ import android.content.Context
 import android.widget.Toast
 
 
-
 fun toastShort(
     context: Context,
     text: String

@@ -216,6 +216,8 @@
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
     <string name="support_text_widget_animal_note_tooltip">Нажмите для ввода текста, введенный текст сохранится автоматически </string>
 
+    //SupportText
+    <string name="support_text_no_category">Без категории</string>
 
     //Error
     <string name="error_no_count_product">Количество не указано!</string>
@@ -237,8 +239,9 @@
     <string name="error_count_zero_animals">Нельзя указывать 0</string>
 
     //Toast
-    <string name="toast_add_s">Добавлено: %s</string>
-    <string name="toast_refresh_s">Обновлено: %s</string>
+    <string name="toast_add_s">Добавлено: %s %s %s</string>
+    <string name="toast_refresh_s">Обновлено: %s %s %s</string>
+    <string name="toast_delete_s">Продукция %s %s %s удалена!</string>
     <string name="toast_sale_s">Продано: %s за %s %s</string>
     <string name="toast_refresh_s_s">Обновлено: %s за %s %s</string>
     <string name="toast_expenses_s_s">Куплено: %s за %s %s</string>
@@ -445,6 +448,10 @@
 
     <string name="ration_button_one">Один</string>
     <string name="ration_button_many">Группа</string>
+
+
+    //SnackBar
+    <string name="snack_bar_delete_item">Продукт удаления</string>
 
 
     <string name="app_name">Мое Хозяйство 2</string>

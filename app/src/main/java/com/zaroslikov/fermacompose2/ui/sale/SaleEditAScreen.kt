@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,7 +25,6 @@ import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
-import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorSale
@@ -34,14 +32,11 @@ import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
@@ -83,7 +78,7 @@ fun SaleEditProduct(
             modifier = Modifier
                 .modifierScreen(innerPadding)
                 .verticalScroll(rememberScrollState()),
-            titleList = titleUiState.animalList,
+            titleList = titleUiState.list,
             categoryList = categoryUiState.list,
             buyerList = buyerUiState.list,
             saleTable = viewModel.itemUiState,

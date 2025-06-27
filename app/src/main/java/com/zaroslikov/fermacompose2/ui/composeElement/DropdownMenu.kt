@@ -274,7 +274,7 @@ fun ExposedDropdownMenuProduct(
                 Pair(
                     Modifier
                         .menuAnchor()
-                        .toOutlinedText(), expanded
+                        .fillMaxWidth(), expanded
                 )
             )
             val filteredOptions =
@@ -384,7 +384,7 @@ fun ExposedDropdownMenuAnimals(
             content(
                 Modifier
                     .menuAnchor()
-                    .toOutlinedText()
+                    .fillMaxWidth()
             )
             ExposedDropdownMenu(
                 expanded = expanded,

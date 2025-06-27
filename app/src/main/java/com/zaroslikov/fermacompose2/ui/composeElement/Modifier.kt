@@ -19,7 +19,7 @@ import com.zaroslikov.fermacompose2.R
 fun Modifier.toOutlinedText(): Modifier {
     return this
         .fillMaxWidth()
-        .padding(bottom = 10.dp)
+        .padding(bottom = 5.dp)
 }
 
 fun Modifier.toButton(): Modifier {
@@ -40,11 +40,31 @@ fun Modifier.modifierScreen(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
             vertical = dimensionResource(R.dimen.padding_small)
         )
+        .verticalScroll(rememberScrollState())
         .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
             })
         }
+}
+
+@Composable
+fun Modifier.modifierScreenLazy(
+    innerPadding: PaddingValues
+): Modifier {
+//    val focusManager = LocalFocusManager.current
+    return this
+        .fillMaxSize()
+        .padding(innerPadding)
+        .padding(
+            horizontal = dimensionResource(id = R.dimen.padding_medium),
+            vertical = dimensionResource(R.dimen.padding_small)
+        )
+//        .pointerInput(Unit) {
+//            detectTapGestures(onTap = {
+//                focusManager.clearFocus() // Убираем фокус при тапе в любую область
+//            })
+//        }
 }
 
 @Composable

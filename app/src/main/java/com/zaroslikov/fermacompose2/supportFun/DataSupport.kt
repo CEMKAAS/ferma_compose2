@@ -23,9 +23,9 @@ data class PairDataDoubleSting(
 
 data class DataStringListState(val list: List<String> = listOf())
 
-data class DataPairListState(val animalList: List<PairData> = listOf())
+data class DataPairListState(val list: List<PairData> = listOf())
 
-data class DataTripleListState(val animalList: List<TripleData> = listOf())
+data class DataTripleListState(val list: List<TripleData> = listOf())
 
 data class DataFourWeight(
     val first: String,

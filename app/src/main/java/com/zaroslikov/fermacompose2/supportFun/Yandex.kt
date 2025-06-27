@@ -1,20 +1,15 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
 import io.appmetrica.analytics.AppMetrica
 
-fun metricaAdd(
-    title: String,
-    count: String,
-    category: String,
-    animal: String? = null,
-    note: String
-) {
+fun metricAdd(domainAddTable: DomainAddTable) {
     val eventParameters: MutableMap<String, Any> = HashMap()
-    eventParameters["Имя"] = title
-    eventParameters["Кол-во"] = "$title $count"
-    eventParameters["Категория"] = category
-    eventParameters["Животное"] = animal.toString()
-    eventParameters["Примечание"] = note
+    eventParameters["Имя"] = domainAddTable.title
+    eventParameters["Кол-во"] = "${domainAddTable.count} ${domainAddTable.suffix}"
+    eventParameters["Категория"] = domainAddTable.category
+    eventParameters["Животное"] = domainAddTable.animal
+    eventParameters["Примечание"] = domainAddTable.note
     AppMetrica.reportEvent("Add Products", eventParameters);
 }
 

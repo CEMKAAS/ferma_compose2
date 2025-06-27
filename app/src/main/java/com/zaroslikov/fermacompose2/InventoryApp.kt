@@ -2,11 +2,17 @@ package com.zaroslikov.fermacompose2
 
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,6 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -29,11 +37,16 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -46,22 +59,63 @@ import kotlinx.coroutines.launch
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    modifier: Modifier = Modifier,
     isFirstStart: Boolean,
     isFirstEnd: () -> Unit
 ) {
-    Scaffold(bottomBar = {
-        Banner(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        )
-    }
-    ) { innerPadding ->
+    val focusManager = LocalFocusManager.current
+    Scaffold(
+        modifier = Modifier.pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        },
+
+        snackbarHost = {
+            SnackbarHost(remember { SnackbarHostState()}) { data ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .padding(12.dp)
+//                        .background(colorPopUp, shape = RoundedCornerShape(5.dp)),
+                    ,
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+//                    val style = workspaceViewModel.snackbarTextStyle.value
+//                        ?: textMedium_14.copy(color = colorOnPrimary)
+//                    Text(
+//                        modifier = Modifier
+//                            .padding(start = 15.dp)
+//                            .weight(1f),
+//                        text = data.message,
+//                        style = style,
+//                    )
+//                    val label = data.actionLabel
+//                    if (label != null) {
+//                        TextButton(
+//                            modifier = Modifier.padding(horizontal = 15.dp),
+//                            textStyle = style.copy(color = colorActive),
+//                            label = label
+//                        ) {
+//                            data.performAction()
+//                        }
+//                    }
+                }
+            }
+        },
+        bottomBar = {
+            Banner(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            )
+        }
+    ) {
         InventoryNavHost(
             navController = navController,
             drawerState = drawerState,
-            modifier = modifier.padding(innerPadding),
+            modifier = Modifier.padding(it),
             isFirstStart = isFirstStart,
             isFirstEnd = isFirstEnd
         )

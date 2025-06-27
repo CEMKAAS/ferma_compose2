@@ -12,20 +12,24 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 
+fun String.toConvertDb1(): String {
+    return this.replace(Regex("[^\\d.]"), "").trim()
+}
+
 fun String.toConvertDb(): String {
-    return this.replace(Regex("[^\\d.]"), "").replace(",", ".").trim()
+    return this.replace(",", ".").replace(Regex("[^\\d.]"), "").trim()
 }
 
 fun String.toConvertDbDouble(): Double {
-    return this.replace(Regex("[^\\d.]"), "").replace(",", ".").trim().toDouble()
+    return this.replace(",", ".").replace(Regex("[^\\d.]"), "").trim().toDouble()
 }
 
 fun String.toConvertDbOnlyInt(): Int {
-    return this.replace(Regex("[^\\d.]"), "").replace(",", "").replace(".", "").trim().toInt()
+    return this.replace(",", "").replace(".", "").replace(Regex("[^\\d.]"), "").trim().toInt()
 }
 
 fun String.toConvertOnlyInt(): String {
-    return this.replace(Regex("[^\\d.]"), "").replace(",", "").replace(".", "").trim()
+    return this.replace(",", "").replace(".", "").replace(Regex("[^\\d.]"), "").trim()
 }
 
 fun String.toConvertZero(): Int {

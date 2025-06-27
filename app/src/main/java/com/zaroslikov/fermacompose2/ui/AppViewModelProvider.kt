@@ -21,7 +21,7 @@ import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceMountViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceViewModel
-import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
+//import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
 import com.zaroslikov.fermacompose2.ui.home.AddViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayViewModel
@@ -162,12 +162,12 @@ object AppViewModelProvider {
             )
         }
 
-        initializer {
-            AddEditViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
+//        initializer {
+//            AddEditViewModel(
+//                this.createSavedStateHandle(),
+//                inventoryApplication().container.itemsRepository
+//            )
+//        }
 
         //Sale
         initializer {

@@ -68,10 +68,8 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-
             FermaCompose2Theme {
                 MobileAds.initialize(this) {
-
                     loadAppOpenAd()
                     val processLifecycleObserver = DefaultProcessLifecycleObserver(
                         onProcessCaneForeground = ::showAppOpenAd
@@ -81,12 +79,10 @@ class MainActivity : ComponentActivity() {
                 var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
 
                 InventoryApp(
-                    modifier = Modifier,
                     isFirstStart = openFirstDialog,
                     isFirstEnd = { openFirstDialog = false })
 
             }
-
         }
     }
 

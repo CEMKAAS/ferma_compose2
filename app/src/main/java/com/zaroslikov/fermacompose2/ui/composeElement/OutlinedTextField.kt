@@ -54,6 +54,7 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsGo
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
+import com.zaroslikov.fermacompose2.supportFun.toConvertDb1
 import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
@@ -73,25 +74,30 @@ fun OutlinedTextNote(
     @StringRes supportingText: Int = R.string.support_text_note,
     focusManager: FocusManager
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            onValueChange(it)
-        },
-        label = { Text(stringResource(label)) },
+    CardField(
         modifier = Modifier.toOutlinedText(),
-        leadingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.baseline_sticky_note_2_24),
-                contentDescription = null
-            )
-        },
-        supportingText = {
-            Text(stringResource(supportingText))
-        },
-        keyboardOptions = keyboardOptionsGo(),
-        keyboardActions = keyboardActionsClear(focusManager)
-    )
+        row = false
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+            },
+            label = { Text(stringResource(label)) },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_sticky_note_2_24),
+                    contentDescription = null
+                )
+            },
+            supportingText = {
+                Text(stringResource(supportingText))
+            },
+            keyboardOptions = keyboardOptionsGo(),
+            keyboardActions = keyboardActionsClear(focusManager)
+        )
+    }
 }
 
 
@@ -145,45 +151,50 @@ fun OutlinedTextAnimal(
     animalList: List<TripleData>,
     focusManager: FocusManager
 ) {
-    ExposedDropdownMenuAnimals(
-        title = value,
-        selectedItemIndex = selectedAnimalIndex,
-        setTitle = {
-            onValueChange(it)
-        },
-        animalList = animalList
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
     ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = {},
-            label = { Text(stringResource(R.string.outlined_text_animals)) },
-            readOnly = true,
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_pets_24),
-                    contentDescription = null
-                )
+        ExposedDropdownMenuAnimals(
+            title = value,
+            selectedItemIndex = selectedAnimalIndex,
+            setTitle = {
+                onValueChange(it)
             },
-            trailingIcon = {
-                IconButton(onClick = { onClickClear("") }) {
+            animalList = animalList
+        ) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = {},
+                label = { Text(stringResource(R.string.outlined_text_animals)) },
+                readOnly = true,
+                leadingIcon = {
                     Icon(
-                        Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.content_description_clear)
+                        painter = painterResource(R.drawable.baseline_pets_24),
+                        contentDescription = null
                     )
-                }
-            },
-            supportingText = {
-                Text(stringResource(R.string.support_text_animal))
-            },
-            modifier = it
-        )
+                },
+                trailingIcon = {
+                    IconButton(onClick = { onClickClear("") }) {
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.content_description_clear)
+                        )
+                    }
+                },
+                supportingText = {
+                    Text(stringResource(R.string.support_text_animal))
+                },
+                modifier = it
+            )
+        }
     }
 }
 
 @Composable
 fun OutlinedTextDate(
     value: String,
-    initialSelectedDateMilli: Long? =  Instant.now().toEpochMilli(),
+    initialSelectedDateMilli: Long? = Instant.now().toEpochMilli(),
     @StringRes intRes: Int = R.string.outlined_text_date,
     @StringRes intResSup: Int = R.string.support_text_date,
     drawableRes: Int = R.drawable.baseline_calendar_month_24,
@@ -252,35 +263,39 @@ fun OutlinedTextDateEdit(
 //            )
         }
     }
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            openDialog = !openDialog
-        },
-        readOnly = true,
-        label = { Text(stringResource(intRes)) },
-        supportingText = {
-            Text(stringResource(intResSup))
-        },
-        leadingIcon = {
-            IconButton(onClick = { openDialog = !openDialog }) {
-                Icon(
-                    painter = painterResource(drawableRes),
-                    contentDescription = stringResource(R.string.content_description_show_calendary)
-                )
-            }
-        },
-        modifier = Modifier
-            .toOutlinedText()
-            .clickable { openDialog = !openDialog }
-    )
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                openDialog = !openDialog
+            },
+            readOnly = true,
+            label = { Text(stringResource(intRes)) },
+            supportingText = {
+                Text(stringResource(intResSup))
+            },
+            leadingIcon = {
+                IconButton(onClick = { openDialog = !openDialog }) {
+                    Icon(
+                        painter = painterResource(drawableRes),
+                        contentDescription = stringResource(R.string.content_description_show_calendary)
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { openDialog = !openDialog }
+        )
+    }
 }
 
 @Composable
 fun OutlinedTextDateNoLimit(
     value: String,
-    initialSelectedDateMilli: Long? =  Instant.now().toEpochMilli(),
+    initialSelectedDateMilli: Long? = Instant.now().toEpochMilli(),
     @StringRes intRes: Int = R.string.outlined_text_date,
     @StringRes intResSup: Int = R.string.support_text_date,
     drawableRes: Int = R.drawable.baseline_calendar_month_24,
@@ -328,37 +343,42 @@ fun OutlinedTextCategory(
     titleList: List<String>,
     focusManager: FocusManager
 ) {
-    ExposedDropdownMenuProduct(
-        title = value,
-        setTitle = { onValueChange(it.trim()) },
-        titleList = titleList
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
     ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { text -> onValueChange(text.trim()) },
-            label = { Text(stringResource(R.string.outlined_text_field_category)) },
-            modifier = it.first,
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_format_list_bulleted_24),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 5.dp)
-                )
-            },
-            supportingText = {
-                Text(stringResource(R.string.support_text_category))
-            },
-            trailingIcon = {
-                IconButton(onClick = { onValueChange("") }) {
+        ExposedDropdownMenuProduct(
+            title = value,
+            setTitle = { onValueChange(it) },
+            titleList = titleList
+        ) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = { text -> onValueChange(text.trim()) },
+                label = { Text(stringResource(R.string.outlined_text_field_category)) },
+                modifier = it.first,
+                leadingIcon = {
                     Icon(
-                        Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.content_description_clear)
+                        painter = painterResource(R.drawable.baseline_format_list_bulleted_24),
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 5.dp)
                     )
-                }
-            },
-            keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = keyboardActionsDown(focusManager)
-        )
+                },
+                supportingText = {
+                    Text(stringResource(R.string.support_text_category))
+                },
+                trailingIcon = {
+                    IconButton(onClick = { onValueChange("") }) {
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.content_description_clear)
+                        )
+                    }
+                },
+                keyboardOptions = keyboardOptionsNext(),
+                keyboardActions = keyboardActionsDown(focusManager)
+            )
+        }
     }
 }
 
@@ -383,42 +403,47 @@ fun OutlinedTextCount(
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     keyboardActions: KeyboardActions = keyboardActionsDown(focusManager)
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            onValueChange(it.toConvertDb())
-        },
-        label = { Text(stringResource(intRes)) },
+    CardField(
         modifier = Modifier.toOutlinedText(),
-        leadingIcon = {
-            Icon(
-                painter = painterResource(drawableRes),
-                contentDescription = null,
-                modifier = Modifier.padding(end = 5.dp)
-            )
-        },
-        supportingText = {
-            ErrorSupportTextSlash(
-                isError = isError,
-                isWarehouse = isWarehouseShow,
-                isAnimal = isAnimal,
-                count = formatter(countWarehouse),
-                suffix = countWarehouseSuffix,
-                intRes = intResSup,
-                intResError = intResError
-            )
-        },
-        trailingIcon = {
-            if (isDropMenuShow)
-                GetDropDownMenu(versionDropMenu) { onClick(it) }
-        },
-        suffix = {
-            Text(text = suffix)
-        },
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        isError = isError
-    )
+        row = false
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it.toConvertDb())
+            },
+            label = { Text(stringResource(intRes)) },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(drawableRes),
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 5.dp)
+                )
+            },
+            supportingText = {
+                ErrorSupportTextSlash(
+                    isError = isError,
+                    isWarehouse = isWarehouseShow,
+                    isAnimal = isAnimal,
+                    count = formatter(countWarehouse),
+                    suffix = countWarehouseSuffix,
+                    intRes = intResSup,
+                    intResError = intResError
+                )
+            },
+            trailingIcon = {
+                if (isDropMenuShow)
+                    GetDropDownMenu(versionDropMenu) { onClick(it) }
+            },
+            suffix = {
+                Text(text = suffix)
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            isError = isError
+        )
+    }
 }
 
 @Composable
@@ -504,33 +529,38 @@ fun OutlinedTextTitleAdd(
             )
         }
     }
-    ExposedDropdownMenuProduct(
-        title = value,
-        setTitle = {
-            onValueChange(it)
-        },
-        titleList = titleList
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
     ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { text ->
-                onValueChange(text)
+        ExposedDropdownMenuProduct(
+            title = value,
+            setTitle = {
+                onValueChange(it)
             },
-            label = { Text(text = stringResource(intRes)) },
-            leadingIcon = leadingIconContent,
-            supportingText = {
-                ErrorSupportTextSlash(
-                    isError = isErrorTitle,
-                    isErrorSlash = isErrorSlash,
-                    intRes = intResSup,
-                    intResError = intResError,
-                )
-            },
-            modifier = it.first,
-            isError = isErrorTitle,
-            keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = keyboardActionsDown(focusManager)
-        )
+            titleList = titleList
+        ) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = { text ->
+                    onValueChange(text)
+                },
+                label = { Text(text = stringResource(intRes)) },
+                leadingIcon = leadingIconContent,
+                supportingText = {
+                    ErrorSupportTextSlash(
+                        isError = isErrorTitle,
+                        isErrorSlash = isErrorSlash,
+                        intRes = intResSup,
+                        intResError = intResError,
+                    )
+                },
+                modifier = it.first,
+                isError = isErrorTitle,
+                keyboardOptions = keyboardOptionsNext(),
+                keyboardActions = keyboardActionsDown(focusManager)
+            )
+        }
     }
 }
 
