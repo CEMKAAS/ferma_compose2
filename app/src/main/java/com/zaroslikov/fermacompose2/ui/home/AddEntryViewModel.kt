@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
@@ -16,6 +17,8 @@ import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
 import com.zaroslikov.fermacompose2.supportFun.metricAdd
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.utils.ResourceProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,17 +28,24 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class AddEntryViewModel(
+@HiltViewModel
+class AddEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository
+    private val itemsRepository: ItemsRepository,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val itemIdPT: Int = checkNotNull(savedStateHandle[AddEntryDestination.itemIdPT])
     private val itemId: Int = checkNotNull(savedStateHandle[AddEntryDestination.itemId])
     val isEntry: Boolean = itemId == -1
-    var addUiState by mutableStateOf(DomainAddTable())
+    var addUiState by mutableStateOf(
+        DomainAddTable().copy(
+            category = resourceProvider.getString(R.string.support_text_no_category),
+            suffix = resourceProvider.getString(R.string.suffix_kilogram)
+        )
+    )
         private set
 
 
@@ -94,29 +104,38 @@ class AddEntryViewModel(
         }
     }
 
-    fun insertItem(textSnackbar:String) {
+    fun insertItem() {
         viewModelScope.launch {
             itemsRepository.insertItem(addUiState.copy(idPT = itemIdPT.toLong()).toRoomMap())
             metricAdd(addUiState)
             _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(textSnackbar)
+            showMessage(
+                resourceProvider.getString(R.string.toast_add_s)
+                    .format(addUiState.title, addUiState.count, addUiState.suffix)
+            )
         }
     }
 
-    fun updateItem(textSnackbar:String) {
+    fun updateItem() {
         viewModelScope.launch {
             Log.i("add", "updateItem: $addUiState")
             itemsRepository.updateItem(addUiState.toRoomMap())
             _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(textSnackbar)
+            showMessage(
+                resourceProvider.getString(R.string.toast_refresh_s)
+                    .format(addUiState.title, addUiState.count, addUiState.suffix)
+            )
         }
     }
 
-    fun deleteItem(textSnackbar:String) {
+    fun deleteItem() {
         viewModelScope.launch {
             itemsRepository.deleteItem(addUiState.toRoomMap())
             _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(textSnackbar)
+            showMessage(
+                resourceProvider.getString(R.string.toast_delete_s)
+                    .format(addUiState.title, addUiState.count, addUiState.suffix)
+            )
         }
     }
 

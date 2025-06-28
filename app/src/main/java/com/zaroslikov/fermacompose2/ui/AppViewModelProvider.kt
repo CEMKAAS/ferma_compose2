@@ -155,12 +155,12 @@ object AppViewModelProvider {
             )
         }
 
-        initializer {
-            AddEntryViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
+//        initializer {
+//            AddEntryViewModel(
+//                this.createSavedStateHandle(),
+//                inventoryApplication().container.itemsRepository
+//            )
+//        }
 
 //        initializer {
 //            AddEditViewModel(

@@ -6,9 +6,11 @@ import androidx.work.Configuration
 import com.yandex.mobile.ads.common.MobileAds
 import com.zaroslikov.fermacompose2.data.AppContainer
 import com.zaroslikov.fermacompose2.data.AppDataContainer
+import dagger.hilt.android.HiltAndroidApp
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 
+@HiltAndroidApp
 class InventoryApplication: Application(), Configuration.Provider  {
 
     lateinit var container: AppContainer

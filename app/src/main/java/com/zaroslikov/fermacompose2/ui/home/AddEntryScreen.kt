@@ -62,7 +62,7 @@ object AddEntryDestination : NavigationDestination {
 fun AddEntryProduct(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: AddEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AddEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
     val snackbarHostState = remember { SnackbarHostState() }
@@ -111,20 +111,20 @@ fun AddEntryContainerProduct(
     countWarehouse: DomainPairDataDoubleSting,
     updateCountWarehouse: (String) -> Unit,
     onValueChange: (DomainAddTable) -> Unit,
-    onClickInsert: (String) -> Unit,
-    onClickUpdate: (String) -> Unit,
-    onClickDelete: (String) -> Unit,
+    onClickInsert: () -> Unit,
+    onClickUpdate: () -> Unit,
+    onClickDelete: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
-    val textSnackbar = (if (isEntry) stringResource(
-        R.string.toast_add_s
-    ) else stringResource(R.string.toast_refresh_s)).format(
-        addTable.title, addTable.count, addTable.suffix
-    )
-    val textSnackbarDelete = stringResource(R.string.toast_delete_s).format(
-        addTable.title, addTable.count, addTable.suffix
-    )
+//    val textSnackbar = (if (isEntry) stringResource(
+//        R.string.toast_add_s
+//    ) else stringResource(R.string.toast_refresh_s)).format(
+//        addTable.title, addTable.count, addTable.suffix
+//    )
+//    val textSnackbarDelete = stringResource(R.string.toast_delete_s).format(
+//        addTable.title, addTable.count, addTable.suffix
+//    )
 
     var date by rememberSaveable {
         mutableStateOf(
@@ -227,9 +227,9 @@ fun AddEntryContainerProduct(
             isErrorTitle = { isErrorTitle = it },
             isErrorCount = { isErrorCount = it },
             isErrorSlash = { isErrorSlash = it },
-            onClickInsert = { onClickInsert(textSnackbar) },
-            onClickUpdate = { onClickUpdate(textSnackbar) },
-            onClickDelete = { onClickDelete(textSnackbarDelete) }
+            onClickInsert = { onClickInsert() },
+            onClickUpdate = { onClickUpdate() },
+            onClickDelete = { onClickDelete() }
         )
     }
 }

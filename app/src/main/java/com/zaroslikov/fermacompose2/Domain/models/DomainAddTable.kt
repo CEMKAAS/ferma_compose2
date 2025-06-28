@@ -10,8 +10,8 @@ data class DomainAddTable(
     val mount: Int = dateTodayArray()[1],
     val year: Int = dateTodayArray()[2],
     val priceAll: String = "",
-    var suffix: String = "кг.", //TODO
-    var category: String = "Без категории",//TODO
+    var suffix: String = "",
+    var category: String = "",
     var idAnimal: Long = 0,
     var animal: String = "",
     val note: String = "",
