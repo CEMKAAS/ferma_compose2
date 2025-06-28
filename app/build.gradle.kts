@@ -89,8 +89,10 @@ dependencies {
     implementation("io.appmetrica.analytics:analytics:7.2.2")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
-    implementation("com.google.dagger:hilt-android:2.56.2")
-    ksp("com.google.dagger:hilt-compiler:2.56.2")
+    
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
 }
 
