@@ -1,9 +1,9 @@
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "1.9.20-1.0.14"
+    id("com.google.devtools.ksp") version "2.1.10-1.0.31"
     id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"  // Добавлено
 }
 
 
@@ -87,8 +87,10 @@ dependencies {
 
     // AppMetrica SDK.
     implementation("io.appmetrica.analytics:analytics:7.2.2")
-
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    ksp("com.google.dagger:hilt-compiler:2.56.2")
 
 }
 
