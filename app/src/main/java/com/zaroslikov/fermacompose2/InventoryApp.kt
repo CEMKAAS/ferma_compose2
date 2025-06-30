@@ -28,16 +28,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
@@ -47,11 +52,17 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.Banner
+import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
+import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
+import com.zaroslikov.fermacompose2.utils.SnackbarController
+import com.zaroslikov.fermacompose2.utils.SnackbarEvent
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -63,44 +74,44 @@ fun InventoryApp(
     isFirstEnd: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    ObserveAsEvents(
+        flow = SnackbarController.events,
+        snackbarHostState
+    ) { event ->
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+
+            val result = snackbarHostState.showSnackbar(
+                message = event.message,
+                actionLabel = event.action?.name,
+                duration = SnackbarDuration.Long
+            )
+
+            if (result == SnackbarResult.ActionPerformed) {
+                event.action?.action?.invoke()
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.pointerInput(Unit) {
             detectTapGestures(onTap = {
                 focusManager.clearFocus()
             })
         },
-
-        snackbarHost = {
-            SnackbarHost(remember { SnackbarHostState()}) { data ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .padding(12.dp)
-//                        .background(colorPopUp, shape = RoundedCornerShape(5.dp)),
-                    ,
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-//                    val style = workspaceViewModel.snackbarTextStyle.value
-//                        ?: textMedium_14.copy(color = colorOnPrimary)
-//                    Text(
-//                        modifier = Modifier
-//                            .padding(start = 15.dp)
-//                            .weight(1f),
-//                        text = data.message,
-//                        style = style,
-//                    )
-//                    val label = data.actionLabel
-//                    if (label != null) {
-//                        TextButton(
-//                            modifier = Modifier.padding(horizontal = 15.dp),
-//                            textStyle = style.copy(color = colorActive),
-//                            label = label
-//                        ) {
-//                            data.performAction()
-//                        }
-//                    }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            FloatButton {
+                scope.launch {
+                    SnackbarController.sendEvent(
+                        event = SnackbarEvent(
+                            message = "Hello world!"
+                        )
+                    )
                 }
             }
         },
@@ -117,12 +128,11 @@ fun InventoryApp(
             drawerState = drawerState,
             modifier = Modifier.padding(it),
             isFirstStart = isFirstStart,
-            isFirstEnd = isFirstEnd
+            isFirstEnd = isFirstEnd,
         )
     }
-
-
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

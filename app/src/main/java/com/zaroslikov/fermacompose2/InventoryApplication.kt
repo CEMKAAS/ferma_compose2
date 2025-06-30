@@ -10,7 +10,7 @@ import dagger.hilt.android.HiltAndroidApp
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 
-
+@HiltAndroidApp
 class InventoryApplication: Application(), Configuration.Provider  {
 
     lateinit var container: AppContainer

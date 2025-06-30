@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import kotlinx.coroutines.launch
 
 
 object AddEntryDestination : NavigationDestination {
@@ -66,20 +68,19 @@ fun AddEntryProduct(
     viewModel: AddEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
-    val snackbarHostState = remember { SnackbarHostState() }
-
+    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
                 is UiEvent.NavigateBack -> navigateBack()
-                is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(event.message)
-                }
+                is UiEvent.ShowSnackbar ->{}
+//                    {
+//                    snackbarHostState.showSnackbar(event.message)
+//                }
             }
         }
     }
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBarBack(intRes = R.string.add_screen_title, navigateUp = navigateBack)
         }
@@ -94,7 +95,10 @@ fun AddEntryProduct(
             onValueChange = viewModel::updateUiState,
             countWarehouse = viewModel.itemUiState,
             onClickInsert = viewModel::insertItem,
-            onClickUpdate = viewModel::updateItem,
+            onClickUpdate = {
+//                scope.launch { snackbarHostState.showSnackbar("dd") }
+                onNavigateUp()
+            },
             onClickDelete = viewModel::deleteItem,
             updateCountWarehouse = viewModel::updateWarehouseUiState
         )

@@ -1,7 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "2.1.10-1.0.31"
+    id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"  // Добавлено
 }
@@ -89,10 +90,9 @@ dependencies {
     implementation("io.appmetrica.analytics:analytics:7.2.2")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
-    
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    ksp("com.google.dagger:hilt-compiler:2.56.2")
 
 }
 

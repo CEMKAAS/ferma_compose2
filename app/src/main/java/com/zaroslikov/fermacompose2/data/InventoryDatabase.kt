@@ -48,9 +48,9 @@ abstract class InventoryDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var Instance: InventoryDatabase? = null
+        var Instance: InventoryDatabase? = null
 
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE IF NOT EXISTS NoteFerma (_id INTEGER PRIMARY KEY NOT NULL, title TEXT NOT NULL, note TEXT NOT NULL, date TEXT NOT NULL, idPT INTEGER NOT NULL, FOREIGN KEY (idPT) REFERENCES МyINCUBATOR (_id) ON DELETE CASCADE)")
                 db.execSQL("CREATE TABLE IF NOT EXISTS ExpensesAnimalTable (_id INTEGER PRIMARY KEY NOT NULL, idExpenses INTEGER NOT NULL, idAnimal INTEGER NOT NULL,  percentExpenses REAL NOT NULL, idPT INTEGER NOT NULL, FOREIGN KEY (idPT) REFERENCES МyINCUBATOR (_id) ON DELETE CASCADE)")
@@ -68,13 +68,13 @@ abstract class InventoryDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_2_3 = object : Migration(2, 3) {
+         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE МyINCUBATOR ADD COLUMN imageData BLOB null")
             }
         }
 
-        private val MIGRATION_3_4 = object : Migration(3, 4) {
+        val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE AnimalWeightTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'кг.'")
                 db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'ед.'")

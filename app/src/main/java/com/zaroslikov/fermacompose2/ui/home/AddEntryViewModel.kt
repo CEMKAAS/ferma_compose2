@@ -1,6 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.home
 
 import android.util.Log
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,7 +36,7 @@ import javax.inject.Inject
 class AddEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
 
     private val itemIdPT: Int = checkNotNull(savedStateHandle[AddEntryDestination.itemIdPT])
@@ -140,9 +142,11 @@ class AddEntryViewModel @Inject constructor(
     }
 
     fun showMessage(message: String) {
-        viewModelScope.launch {
-            _eventFlow.emit(UiEvent.ShowSnackbar(message))
-        }
+//        viewModelScope.launch
+//        {
+//            .snackbarHostState.showSnackbar(message)
+////            _eventFlow.emit(UiEvent.ShowSnackbar(message))
+//        }
     }
 
     companion object {

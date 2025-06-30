@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.navigation
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -93,7 +94,7 @@ fun InventoryNavHost(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     isFirstStart: Boolean,
-    isFirstEnd: () -> Unit
+    isFirstEnd: () -> Unit,
 ) {
     NavHost(
         navController = navController,
@@ -391,9 +392,16 @@ fun InventoryNavHost(
                         )
                     )
                 },
-                navigationToAnalysis = { navController.navigate( nav(FinanceAnalysisDestination.route, it.idProject.toString(), it.name))
+                navigationToAnalysis = {
+                    navController.navigate(
+                        nav(
+                            FinanceAnalysisDestination.route,
+                            it.idProject.toString(),
+                            it.name
+                        )
+                    )
 //                    "${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}")
-                                    },
+                },
             )
         }
         composable(
@@ -409,7 +417,8 @@ fun InventoryNavHost(
         ) {
             AddEntryProduct(
                 navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
+                onNavigateUp = { navController.navigateUp() }
+            )
         }
 
 //        composable(
