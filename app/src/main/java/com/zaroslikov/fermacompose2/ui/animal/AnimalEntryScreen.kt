@@ -97,8 +97,7 @@ fun AnimalEntryProduct(
     ) { innerPadding ->
         AnimalEntryContainer(
             modifier = Modifier
-                .modifierScreen(innerPadding)
-                .verticalScroll(rememberScrollState()),
+                .modifierScreen(innerPadding),
             idPT = viewModel.itemId,
             typeList = typeList.list,
             saveInRoomSale = {

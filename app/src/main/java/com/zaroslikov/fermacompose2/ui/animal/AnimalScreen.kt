@@ -30,6 +30,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
@@ -96,7 +97,7 @@ fun AnimalScreen(
             } else {
                 AnimalBody(
                     modifier = Modifier
-                        .modifierScreen(innerPadding),
+                        .modifierScreenLazy(innerPadding),
                     itemList = animalUiState.itemList,
                     onItemClick = { navigateToItemCard(Pair(it, idProject)) },
                     navigateToItemAdd = { navigateToItemAdd(idProject) }

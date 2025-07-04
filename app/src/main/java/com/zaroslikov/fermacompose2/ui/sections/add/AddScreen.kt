@@ -1,9 +1,8 @@
-package com.zaroslikov.fermacompose2.ui.writeOff
+package com.zaroslikov.fermacompose2.ui.sections.add
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,12 +36,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
-import com.zaroslikov.fermacompose2.supportFun.getImageWriteOff
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
@@ -51,18 +51,18 @@ import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
+import io.appmetrica.analytics.AppMetrica
 
-object WriteOffDestination : NavigationDestination {
-    override val route = "WriteOff"
+object HomeDestination : NavigationDestination {
+    override val route = "home"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -70,26 +70,25 @@ object WriteOffDestination : NavigationDestination {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WriteOffScreen(
+fun AddScreen(
+    modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
+    navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
-    modifier: Modifier = Modifier,
-    viewModel: WriteOffViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.writeOffUiState.collectAsState()
-    val titleUiState by viewModel.titleUiState.collectAsState()
-    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    val writeOffBoolean = titleUiState.list.isNotEmpty()
     val idProject = viewModel.itemId
 
+    val homeUiState by viewModel.homeUiState.collectAsState()
+    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
+
+    val isLoading by viewModel.isLoading.collectAsState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val coroutineScope = rememberCoroutineScope()
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -99,7 +98,7 @@ fun WriteOffScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                6,
+                3,
                 idProject.toString()
             )
         },
@@ -108,71 +107,77 @@ fun WriteOffScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarNavigation(
-                    title = R.string.write_off_screen_title,
+                    title = R.string.add_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
-            floatingActionButton = {
-                if (writeOffBoolean) FloatButton { navigateToItemAdd(idProject) }
-            }
+            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
+
         ) { innerPadding ->
             if (isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
             else
-                WriteOffBody(
-                    modifier = modifier.modifierScreen(innerPadding),
-                    viewModel = viewModel,
+                AddContainer(
+                    modifier = modifier
+                        .modifierScreenLazy(innerPadding),
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
+                    viewModel = viewModel,
                     onItemClick = navigateToItemUpdate,
                     navigateToItemAdd = { navigateToItemAdd(idProject) },
-                    writeOffBoolean = writeOffBoolean,
+                    navigationToAnalysis = {
+                        navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
+                        AppMetrica.reportEvent("Анализ через Продукцию")
+                    }
                 )
-
         }
     }
 }
 
+
 @Composable
-private fun WriteOffBody(
+fun AddContainer(
     modifier: Modifier = Modifier,
-    viewModel: WriteOffViewModel,
-    itemList: List<WriteOffTable>,
+    viewModel: AddViewModel,
+    itemList: List<AddTable>,
     brieflyList: List<BrieflyItemCount>,
     onItemClick: (Pair<Int, Int>) -> Unit,
     navigateToItemAdd: () -> Unit,
-    writeOffBoolean: Boolean,
+    navigationToAnalysis: (String) -> Unit,
 ) {
     if (itemList.isNotEmpty())
         InventoryList(
             itemList = itemList,
             brieflyList = brieflyList,
             viewModel = viewModel,
-            onItemClick = { onItemClick(Pair(it.id, it.idPT)) },
-            modifier = modifier
-        )
-    else
-        MessageNoData(
+            onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
             modifier = modifier,
-            onClick = if (writeOffBoolean) navigateToItemAdd else null,
-            titleRes = R.string.message_no_date_title_write_off,
-            messageRes = R.string.message_no_date_message_write_off,
-            supportRes = if (writeOffBoolean) R.string.message_no_date_support_write_off else R.string.message_no_date_support_no_write_off,
-            buttonRes = R.string.button_sale_message_no_data
-        )
+            navigationToAnalysis = navigationToAnalysis,
+
+            )
+    else MessageNoData(
+        modifier = modifier,
+        onClick = navigateToItemAdd,
+        titleRes = R.string.message_no_date_title_add,
+        messageRes = R.string.message_no_date_message_add,
+        supportRes = R.string.message_no_date_support_text_add,
+        buttonRes = R.string.button_add_message_no_data
+    )
 }
 
+
 @Composable
-private fun InventoryList(
-    viewModel: WriteOffViewModel,
-    itemList: List<WriteOffTable>,
+fun InventoryList(
+    modifier: Modifier = Modifier,
+    viewModel: AddViewModel,
+    itemList: List<AddTable>,
     brieflyList: List<BrieflyItemCount>,
-    onItemClick: (WriteOffTable) -> Unit,
-    modifier: Modifier = Modifier
+    onItemClick: (AddTable) -> Unit,
+    navigationToAnalysis: (String) -> Unit,
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
 
@@ -181,20 +186,21 @@ private fun InventoryList(
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        )
+        ), label = ""
     )
     val extraPaddingResd by animateDpAsState(
         if (!details) 2.dp else 0.dp,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        )
+        ), label = ""
     )
 
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
     ) {
+
         item {
             TextButtonWarehouse(
                 boolean = details,
@@ -205,33 +211,34 @@ private fun InventoryList(
 
         if (details)
             items(items = itemList, key = { it.id }) { item ->
-                WriteOffProductCard(writeOffTable = item,
+                AddProductCard(addProduct = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
-                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
-                )
+                        .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
             }
         else
             items(items = brieflyList) { item ->
                 BrieflyCountCard(
-                    viewModel = viewModel,
                     product = item,
+                    viewModel = viewModel,
                     onItemClick = onItemClick,
+                    navigationToAnalysis = navigationToAnalysis,
                     modifier = Modifier
-                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp)),
+                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
                 )
             }
     }
 }
 
-
 @Composable
 fun BrieflyCountCard(
-    viewModel: WriteOffViewModel,
+    modifier: Modifier = Modifier,
+    viewModel: AddViewModel,
     product: BrieflyItemCount,
-    onItemClick: (WriteOffTable) -> Unit,
-    modifier: Modifier = Modifier
-) {
+    onItemClick: (AddTable) -> Unit,
+    navigationToAnalysis: (String) -> Unit = {},
+
+    ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val extraPadding by animateDpAsState(
@@ -239,13 +246,11 @@ fun BrieflyCountCard(
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        )
+        ), label = ""
     )
-
     CardField(modifier = modifier.clickable {
         expanded = !expanded
-    }
-    ) {
+    }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -254,6 +259,7 @@ fun BrieflyCountCard(
         ) {
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .weight(0.7f)
             ) {
                 TextLine(
@@ -266,7 +272,16 @@ fun BrieflyCountCard(
                     valueString = "${product.count.formatNumber()} ${product.suffix}",
                 )
             }
-            IconButton(onClick = { expanded = !expanded }) {
+
+            IconButton(onClick = { navigationToAnalysis(product.title) }) {
+                Icon(
+                    painterResource(id = R.drawable.baseline_analytics_24),
+                    contentDescription = "Анализ",
+                )
+            }
+            IconButton(onClick = {
+                expanded = !expanded
+            }) {
                 Icon(
                     if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "Показать меню"
@@ -277,21 +292,22 @@ fun BrieflyCountCard(
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            WriteOffProductCard(writeOffTable = it,
+            AddProductCard(addProduct = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f
                     }
                     .clickable { onItemClick(it) }
-                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
+                    .padding(bottom = extraPadding.coerceAtLeast(0.dp))
+            )
         }
     }
 }
 
 
 @Composable
-fun WriteOffProductCard(
-    writeOffTable: WriteOffTable,
+fun AddProductCard(
+    addProduct: AddTable,
     modifier: Modifier = Modifier
 ) {
     CardField(modifier = modifier) {
@@ -302,46 +318,81 @@ fun WriteOffProductCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(0.6f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.7f)
             ) {
+
                 Text(
                     modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    text = writeOffTable.title,
+                    text = addProduct.title,
                     style = textBold_20,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
                 IconAndText(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
-                        writeOffTable.day,
-                        writeOffTable.mount,
-                        writeOffTable.year
+                        addProduct.day,
+                        addProduct.mount,
+                        addProduct.year
                     )
                 )
-                if (writeOffTable.note != "") {
+
+                addProduct.category.takeUnless { it == "Без категории" || it.isEmpty() }
+                    ?.let { category ->
+                        IconAndText(
+                            iconRes = R.drawable.baseline_format_list_bulleted_24,
+                            valueString = category
+                        )
+                    }
+
+                if (addProduct.animal != "")
+                    IconAndText(
+                        iconRes = R.drawable.baseline_pets_24,
+                        valueString = addProduct.animal
+                    )
+
+
+                if (addProduct.note != "")
                     IconAndText(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = writeOffTable.note
+                        valueString = addProduct.note
                     )
-                }
+
             }
-            Row(
-                modifier = Modifier.weight(0.4f),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = getImageWriteOff(writeOffTable.status)),
-                    contentDescription = "delete"
-                )
-                Text(
-                    text = "${formatter(writeOffTable.count)} ${writeOffTable.suffix}",
-                    textAlign = TextAlign.Center,
-                    style = textBold_20
-                )
-            }
+
+            Text(
+                text = "${addProduct.count.formatNumber()} ${addProduct.suffix}",
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.3f),
+                style = textBold_20
+            )
         }
     }
 }
 
+@Preview
+@Composable
+fun AddCard() {
+    AddProductCard(
+        addProduct = AddTable(
+            0,
+            "Яйцоbvcbbvcbbvcbcbvcbbcvbcvbc",
+            320.0,
+            1,
+            2,
+            3,
+            234.0,
+            "шт.",
+            "2321",
+            1,
+            "Боря",
+            "231",
+            1
+        ), modifier = Modifier
+    )
+}

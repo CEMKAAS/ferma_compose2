@@ -30,47 +30,49 @@ fun RadioButtonWriteOff(
     @StringRes intResOne: Int = R.string.ration_button_own_needs,
     @StringRes intResTwo: Int = R.string.ration_button_disposal,
 ) {
-    Column(
-        Modifier
-            .selectableGroup()
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+    CardField {
+        Column(
+            Modifier
+                .selectableGroup()
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
         ) {
-            RadioButton(
-                selected = state,
-                onClick = { onStateSelect(!state) },
-                modifier = Modifier.semantics { contentDescription = "Localized Description" }
-            )
-            Image(
-                painter = painterResource(id = imageOne),
-                contentDescription = "delete"
-            )
-            Text(
-                text = stringResource(intResOne),
-                style = text_14
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(
-                selected = !state,
-                onClick = { onStateSelect(!state) },
-                modifier = Modifier.semantics { contentDescription = "Localized Description" },
-            )
-            Image(
-                painter = painterResource(id = imageTwo),
-                contentDescription = "delete"
-            )
-            Text(
-                text = stringResource(intResTwo),
-                style = text_14
-            )
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = state,
+                    onClick = { onStateSelect(!state) },
+                    modifier = Modifier.semantics { contentDescription = "Localized Description" }
+                )
+                Image(
+                    painter = painterResource(id = imageOne),
+                    contentDescription = "delete"
+                )
+                Text(
+                    text = stringResource(intResOne),
+                    style = text_14
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = !state,
+                    onClick = { onStateSelect(!state) },
+                    modifier = Modifier.semantics { contentDescription = "Localized Description" },
+                )
+                Image(
+                    painter = painterResource(id = imageTwo),
+                    contentDescription = "delete"
+                )
+                Text(
+                    text = stringResource(intResTwo),
+                    style = text_14
+                )
+            }
         }
     }
 }

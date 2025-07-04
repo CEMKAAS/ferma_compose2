@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
+import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import io.appmetrica.analytics.AppMetrica
 
 fun metricAdd(domainAddTable: DomainAddTable) {
@@ -14,19 +15,14 @@ fun metricAdd(domainAddTable: DomainAddTable) {
 }
 
 fun metricaSale(
-    title: String,
-    count: String,
-    price: String,
-    category: String,
-    buyer: String,
-    note: String
+    domainSaleTable: DomainSaleTable
 ) {
     val eventParameters: MutableMap<String, Any> = HashMap()
-    eventParameters["Имя"] = title
-    eventParameters["Кол-во"] = "$title $count $price₽"
-    eventParameters["Категория"] = category
-    eventParameters["Покупатель"] = buyer
-    eventParameters["Примечание"] = note
+    eventParameters["Имя"] = domainSaleTable.title
+    eventParameters["Кол-во"] = "${domainSaleTable.title} ${domainSaleTable.count} ${domainSaleTable.priceAll}"
+    eventParameters["Категория"] = domainSaleTable.category
+    eventParameters["Покупатель"] = domainSaleTable.buyer
+    eventParameters["Примечание"] = domainSaleTable.note
     AppMetrica.reportEvent("Sale Products", eventParameters)
 }
 

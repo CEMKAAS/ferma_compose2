@@ -1,59 +1,47 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.home
+package com.zaroslikov.fermacompose2.ui.sections.writeOff
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
+import com.zaroslikov.fermacompose2.Domain.models.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorAdd
-import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
-import com.zaroslikov.fermacompose2.supportFun.toastShort
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
+import com.zaroslikov.fermacompose2.ui.composeElement.RadioButtonWriteOff
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import kotlinx.coroutines.launch
 
 
-object AddEntryDestination : NavigationDestination {
-    override val route = "AddEntry"
+object WriteOffEntryDestination : NavigationDestination {
+    override val route = "WriteOffEntry"
     override val titleRes = R.string.app_name
     const val itemIdPT = "itemIdPT"
     const val itemId = "itemId"
@@ -62,123 +50,118 @@ object AddEntryDestination : NavigationDestination {
 
 
 @Composable
-fun AddEntryProduct(
+fun WriteOffEntryProduct(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: AddEntryViewModel = hiltViewModel()
+    viewModel: WriteOffEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
-    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
                 is UiEvent.NavigateBack -> navigateBack()
-                is UiEvent.ShowSnackbar ->{}
-//                    {
-//                    snackbarHostState.showSnackbar(event.message)
-//                }
             }
         }
     }
     Scaffold(
         topBar = {
-            TopAppBarBack(intRes = R.string.add_screen_title, navigateUp = navigateBack)
+            TopAppBarBack(intRes = R.string.write_off_screen_title, navigateUp = navigateBack)
         }
     ) { innerPadding ->
-        AddEntryContainerProduct(
-            modifier = Modifier.modifierScreen(innerPadding),
-            addTable = viewModel.addUiState,
-            isEntry = viewModel.isEntry,
+        WriteOffEntryContainerProduct(
+            modifier = Modifier
+                .modifierScreen(innerPadding),
             titleList = viewModel.titleUiState.collectAsState().value.list,
-            categoryList = viewModel.categoryUiState.collectAsState().value.list,
-            animalList = viewModel.animalUiState.collectAsState().value.list,
+            domainWriteOffTable = viewModel.writeOffUiState,
+            isEntry = viewModel.isEntry,
+            isIndicationValue = viewModel.isIndicatorsValue,
+            isAutoCalculate = viewModel.isAutoCalculate,
             onValueChange = viewModel::updateUiState,
-            countWarehouse = viewModel.itemUiState,
             onClickInsert = viewModel::insertItem,
-            onClickUpdate = {
-//                scope.launch { snackbarHostState.showSnackbar("dd") }
-                onNavigateUp()
-            },
+            onClickUpdate = viewModel::updateItem,
             onClickDelete = viewModel::deleteItem,
+            countWarehouse = viewModel.itemUiState,
             updateCountWarehouse = viewModel::updateWarehouseUiState
         )
     }
 }
 
+
 @Composable
-fun AddEntryContainerProduct(
+fun WriteOffEntryContainerProduct(
     modifier: Modifier,
-    addTable: DomainAddTable,
+    domainWriteOffTable: DomainWriteOffTable,
     isEntry: Boolean,
-    titleList: List<String>,
-    categoryList: List<String>,
-    animalList: List<TripleData>,
+    isIndicationValue: Boolean,
+    isAutoCalculate: MutableState<Boolean>,
+    titleList: List<PairData>,
     countWarehouse: DomainPairDataDoubleSting,
-    updateCountWarehouse: (String) -> Unit,
-    onValueChange: (DomainAddTable) -> Unit,
+    updateCountWarehouse: (Pair<String, Boolean>) -> Unit,
+    onValueChange: (DomainWriteOffTable) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
-//    val textSnackbar = (if (isEntry) stringResource(
-//        R.string.toast_add_s
-//    ) else stringResource(R.string.toast_refresh_s)).format(
-//        addTable.title, addTable.count, addTable.suffix
-//    )
-//    val textSnackbarDelete = stringResource(R.string.toast_delete_s).format(
-//        addTable.title, addTable.count, addTable.suffix
-//    )
-
     var date by rememberSaveable {
         mutableStateOf(
             formatDateToString(
-                addTable.day,
-                addTable.mount,
-                addTable.year
+                domainWriteOffTable.day,
+                domainWriteOffTable.mount,
+                domainWriteOffTable.year
             )
         )
     }
-    val selectedAnimalIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    //Error
     var isErrorTitle by rememberSaveable { mutableStateOf(false) }
-    var isErrorSlash by rememberSaveable { mutableStateOf(false) }
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
+    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
+
     Column(modifier = modifier) {
-        OutlinedTextTitleAdd(
-            value = addTable.title,
-            onValueChange = {
-                onValueChange(addTable.copy(title = it))
-                isErrorTitle = it.isError()
-                isErrorSlash = it.isErrorSlash()
-                updateCountWarehouse(it)
+        OutlinedTextTitleSale(
+            value = domainWriteOffTable.title,
+            onValueChoice = {
+                selectedItemIndex = it.first
+                onValueChange(domainWriteOffTable.copy(title = it.second))
+                updateCountWarehouse(
+                    Pair(
+                        it.second,
+                        titleList[selectedItemIndex].second == "Моя Продукция"
+                    )
+                )
             },
+            selectedItemIndex = selectedItemIndex,
             titleList = titleList,
-            isErrorTitle = isErrorTitle,
-            isErrorSlash = isErrorSlash,
+            enable = !isIndicationValue,
+            readOnly = isIndicationValue,
             focusManager = focusManager
         )
         OutlinedTextCount(
-            value = addTable.count,
+            value = domainWriteOffTable.count,
             onValueChange = {
-                onValueChange(addTable.copy(count = it))
+                onValueChange(domainWriteOffTable.copy(count = it))
                 isErrorCount = it.isError()
             },
-            onClick = { onValueChange(addTable.copy(suffix = it)) },
+            onClick = { onValueChange(domainWriteOffTable.copy(suffix = it)) },
             isError = isErrorCount,
-            suffix = addTable.suffix,
-            intResSup = R.string.support_text_count_product,
+            suffix = domainWriteOffTable.suffix,
+            intResSup = R.string.support_text_count_product_write_off,
             countWarehouse = countWarehouse.first,
             countWarehouseSuffix = countWarehouse.second,
             focusManager = focusManager
         )
-        OutlinedTextCategory(
-            value = addTable.category,
-            onValueChange = { onValueChange(addTable.copy(category = it)) },
-            titleList = categoryList,
+        OutlinedPriceInput(
+            price = domainWriteOffTable.priceAll,
+            onPriceChange = {
+                onValueChange(domainWriteOffTable.copy(priceAll = it))
+            },
+            count = domainWriteOffTable.count,
+            supportTextRes = R.string.support_text_price_write_off,
+            isAutoCalculate = isAutoCalculate.value,
+            onAutoCalculate = { isAutoCalculate.value = it },
+            isManyCount = true,
             focusManager = focusManager
         )
         OutlinedTextDateEdit(
@@ -187,7 +170,7 @@ fun AddEntryContainerProduct(
                 date = it
                 val dateList = it.split(".")
                 onValueChange(
-                    addTable.copy(
+                    domainWriteOffTable.copy(
                         day = dateList[0].toInt(),
                         mount = dateList[1].toInt(),
                         year = dateList[2].toInt()
@@ -195,43 +178,22 @@ fun AddEntryContainerProduct(
                 )
             }
         )
-        if (animalList.isNotEmpty()) {
-            OutlinedTextAnimal(
-                value = addTable.animal,
-                onValueChange = {
-                    onValueChange(
-                        addTable.copy(
-                            idAnimal = it.first.toLong(),
-                            animal = animalList[selectedAnimalIndex].second
-                        )
-                    )
-                },
-                selectedAnimalIndex = selectedAnimalIndex,
-                onClickClear = {
-                    onValueChange(
-                        addTable.copy(
-                            idAnimal = 0,
-                            animal = it
-                        )
-                    )
-                },
-                animalList = animalList,
-                focusManager = focusManager
-            )
-        }
         OutlinedTextNote(
-            value = addTable.note,
-            onValueChange = { onValueChange(addTable.copy(note = it)) },
+            value = domainWriteOffTable.note,
+            onValueChange = { onValueChange(domainWriteOffTable.copy(note = it)) },
             focusManager = focusManager
         )
+        RadioButtonWriteOff(
+            state = domainWriteOffTable.status,
+            onStateSelect = { onValueChange(domainWriteOffTable.copy(status = it)) }
+        )
         ButtonPanel(
-            title = addTable.title,
-            count = addTable.count,
+            title = domainWriteOffTable.title,
+            count = domainWriteOffTable.count,
             isEntry = isEntry,
             focusManager = focusManager,
             isErrorTitle = { isErrorTitle = it },
             isErrorCount = { isErrorCount = it },
-            isErrorSlash = { isErrorSlash = it },
             onClickInsert = { onClickInsert() },
             onClickUpdate = { onClickUpdate() },
             onClickDelete = { onClickDelete() }
@@ -247,13 +209,10 @@ private fun ButtonPanel(
     focusManager: FocusManager,
     isErrorTitle: (Boolean) -> Unit,
     isErrorCount: (Boolean) -> Unit,
-    isErrorSlash: (Boolean) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
 ) {
-    val context = LocalContext.current
-
     if (isEntry)
         ButtonStandart(
             intRes = R.string.button_add,
@@ -264,7 +223,6 @@ private fun ButtonPanel(
                     focusManager = focusManager,
                     isErrorTitle = isErrorTitle,
                     isErrorCount = isErrorCount,
-                    isErrorSlash = isErrorSlash,
                     onClick = onClickInsert
                 )
             }
@@ -277,7 +235,6 @@ private fun ButtonPanel(
                 focusManager = focusManager,
                 isErrorTitle = isErrorTitle,
                 isErrorCount = isErrorCount,
-                isErrorSlash = isErrorSlash,
                 onClick = onClickUpdate
             )
         }
@@ -291,16 +248,59 @@ private fun onClickButton(
     focusManager: FocusManager,
     isErrorTitle: (Boolean) -> Unit,
     isErrorCount: (Boolean) -> Unit,
-    isErrorSlash: (Boolean) -> Unit,
     onClick: () -> Unit
 ) {
     if (isErrorAdd(
             title = title, count = count,
             isErrorTitle = { isErrorTitle(it) },
-            isErrorCount = { isErrorCount(it) },
-            isErrorSlash = { isErrorSlash(it) })
+            isErrorCount = { isErrorCount(it) })
     ) {
         focusManager.clearFocus()
         onClick()
     }
+
 }
+//        ButtonStandart(
+//            intRes = R.string.button_write_off,
+//            onClick = {
+//                if (isErrorAdd(
+//                        title = title, count = count,
+//                        isErrorTitle = { isErrorTitle = it },
+//                        isErrorCount = { isErrorCount = it })
+//                ) {
+//                    focusManager.clearFocus()
+//                    val formattedDateList = date.split(".")
+//                    saveInRoomSale(
+//                        WriteOffTable(
+//                            id = 0,
+//                            title = title,
+//                            count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
+//                                .toDouble(),
+//                            day = formattedDateList[0].toInt(),
+//                            mount = formattedDateList[1].toInt(),
+//                            year = formattedDateList[2].toInt(),
+//                            suffix = suffix,
+//                            priceAll = if (priceAll == "") 0.0 else priceAll.replace(
+//                                Regex("[^\\d.]"),
+//                                ""
+//                            ).replace(",", ".")
+//                                .toDouble(),
+//                            status = if (state1) 0 else 1,
+//                            note = note,
+//                            idPT = idProject
+//                        )
+//                    )
+//                    toastShort(
+//                        context = context,
+//                        text = toastText
+//                    )
+//                    metricaWriteOff(
+//                        title, count, suffix, priceAll, note, state1
+//                    )
+//                }
+//            }
+//        )
+//    }
+//}
+
+

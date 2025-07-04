@@ -44,6 +44,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.IconAndTextMore
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNoteWidget
 import com.zaroslikov.fermacompose2.ui.composeElement.TextAndIconRow
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
 import com.zaroslikov.fermacompose2.ui.finance.PullOutCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -82,8 +83,7 @@ fun AnimalCardProduct(
     }) { innerPadding ->
         AnimalCardContainer(
             modifier = Modifier
-                .modifierScreen(innerPadding)
-                .verticalScroll(rememberScrollState()),
+                .modifierScreenLazy(innerPadding),
             animalTable = animalTable,
             animalWeightTable = viewModel.domainWeight,
             animalSizeTable = viewModel.domainHeight,

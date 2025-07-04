@@ -56,9 +56,9 @@ fun String.toFormatNumber(): String {
 }
 
 fun getImageWriteOff(
-    status: Int
+    status: Boolean
 ): Int {
-    return if (status == 0)
+    return if (status)
         R.drawable.baseline_cottage_24
     else
         R.drawable.baseline_delete_24

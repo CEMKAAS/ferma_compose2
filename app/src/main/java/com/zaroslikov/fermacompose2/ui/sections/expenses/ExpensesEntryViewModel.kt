@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.expenses
+package com.zaroslikov.fermacompose2.ui.sections.expenses
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

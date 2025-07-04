@@ -1,8 +1,9 @@
-package com.zaroslikov.fermacompose2.ui.sale
+package com.zaroslikov.fermacompose2.ui.sections.writeOff
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,15 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.fermacompose2.supportFun.getImageWriteOff
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
@@ -50,16 +51,18 @@ import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
-object SaleDestination : NavigationDestination {
-    override val route = "Sale"
+object WriteOffDestination : NavigationDestination {
+    override val route = "WriteOff"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -67,23 +70,26 @@ object SaleDestination : NavigationDestination {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SaleScreen(
-    modifier: Modifier = Modifier,
+fun WriteOffScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
+    navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
-    viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    modifier: Modifier = Modifier,
+    viewModel: WriteOffViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.saleUiState.collectAsState()
+    val homeUiState by viewModel.writeOffUiState.collectAsState()
+    val titleUiState by viewModel.titleUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val coroutineScope = rememberCoroutineScope()
 
+    val writeOffBoolean = titleUiState.list.isNotEmpty()
     val idProject = viewModel.itemId
+
+    val coroutineScope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -93,7 +99,7 @@ fun SaleScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                4,
+                6,
                 idProject.toString()
             )
         },
@@ -102,67 +108,70 @@ fun SaleScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarNavigation(
-                    title = R.string.sale_screen_title,
+                    title = R.string.write_off_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
-            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
+            floatingActionButton = {
+                if (writeOffBoolean) FloatButton { navigateToItemAdd(idProject) }
+            }
         ) { innerPadding ->
-            if (isLoading) {
+            if (isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
-            } else {
-                SaleBody(
-                    modifier = Modifier
-                        .modifierScreen(innerPadding),
+            else
+                WriteOffBody(
+                    modifier = modifier.modifierScreenLazy(innerPadding),
                     viewModel = viewModel,
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
                     onItemClick = navigateToItemUpdate,
-                    navigateToItemAdd = { navigateToItemAdd(idProject) }
+                    navigateToItemAdd = { navigateToItemAdd(idProject) },
+                    writeOffBoolean = writeOffBoolean,
                 )
-            }
+
         }
     }
 }
 
-
 @Composable
-fun SaleBody(
+private fun WriteOffBody(
     modifier: Modifier = Modifier,
-    viewModel: SaleViewModel,
-    itemList: List<SaleTable>,
-    brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: () -> Unit
+    viewModel: WriteOffViewModel,
+    itemList: List<WriteOffTable>,
+    brieflyList: List<BrieflyItemCount>,
+    onItemClick: (Pair<Int, Int>) -> Unit,
+    navigateToItemAdd: () -> Unit,
+    writeOffBoolean: Boolean,
 ) {
     if (itemList.isNotEmpty())
         InventoryList(
             itemList = itemList,
             brieflyList = brieflyList,
             viewModel = viewModel,
-            onItemClick = { onItemClick(Pair(it.id, it.idPT)) },
+            onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
             modifier = modifier
         )
-    else MessageNoData(
-        modifier = modifier,
-        onClick = navigateToItemAdd,
-        titleRes = R.string.message_no_date_title_sale,
-        messageRes = R.string.message_no_date_message_sale,
-        supportRes = R.string.message_no_date_support_text_sale,
-        buttonRes = R.string.button_sale_message_no_data
-    )
+    else
+        MessageNoData(
+            modifier = modifier,
+            onClick = if (writeOffBoolean) navigateToItemAdd else null,
+            titleRes = R.string.message_no_date_title_write_off,
+            messageRes = R.string.message_no_date_message_write_off,
+            supportRes = if (writeOffBoolean) R.string.message_no_date_support_write_off else R.string.message_no_date_support_no_write_off,
+            buttonRes = R.string.button_sale_message_no_data
+        )
 }
 
 @Composable
 private fun InventoryList(
-    viewModel: SaleViewModel,
-    itemList: List<SaleTable>,
-    brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (SaleTable) -> Unit,
+    viewModel: WriteOffViewModel,
+    itemList: List<WriteOffTable>,
+    brieflyList: List<BrieflyItemCount>,
+    onItemClick: (WriteOffTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
@@ -193,33 +202,35 @@ private fun InventoryList(
                 intRes = if (details) R.string.widget_briefly else R.string.widget_detail
             )
         }
-        if (details) {
+
+        if (details)
             items(items = itemList, key = { it.id }) { item ->
-                SaleProductCard(saleTable = item,
+                WriteOffProductCard(
+                    writeOffTable = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
                         .padding(bottom = extraPadding.coerceAtLeast(0.dp))
                 )
             }
-        } else {
+        else
             items(items = brieflyList) { item ->
-                BrieflyPriceCard(
-                    product = item,
+                BrieflyCountCard(
                     viewModel = viewModel,
+                    product = item,
                     onItemClick = onItemClick,
                     modifier = Modifier
-                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
+                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp)),
                 )
             }
-        }
     }
 }
 
+
 @Composable
-fun BrieflyPriceCard(
-    viewModel: SaleViewModel,
-    product: BrieflyItemPrice,
-    onItemClick: (SaleTable) -> Unit,
+fun BrieflyCountCard(
+    viewModel: WriteOffViewModel,
+    product: BrieflyItemCount,
+    onItemClick: (WriteOffTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -229,12 +240,13 @@ fun BrieflyPriceCard(
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        ), label = ""
+        )
     )
 
     CardField(modifier = modifier.clickable {
         expanded = !expanded
-    }) {
+    }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -245,27 +257,17 @@ fun BrieflyPriceCard(
                 modifier = Modifier
                     .weight(0.7f)
             ) {
-
                 TextLine(
                     modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
                     valueString = product.title,
                     textStyle = textBold_20
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
-                    valueString = stringResource(
-                        R.string.card_count_briefly_s,
-                        "${product.count.formatNumber()} ${product.suffix}",
-                        product.price.formatNumber(),
-                        stringResource(R.string.currency_ruble),
-                    )
+                    valueString = "${product.count.formatNumber()} ${product.suffix}",
                 )
-
             }
-            IconButton(onClick = {
-                expanded = !expanded
-            }) {
+            IconButton(onClick = { expanded = !expanded }) {
                 Icon(
                     if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "Показать меню"
@@ -273,11 +275,11 @@ fun BrieflyPriceCard(
             }
         }
     }
-
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            SaleProductCard(saleTable = it,
+            WriteOffProductCard(
+                writeOffTable = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f
@@ -290,8 +292,8 @@ fun BrieflyPriceCard(
 
 
 @Composable
-fun SaleProductCard(
-    saleTable: SaleTable,
+fun WriteOffProductCard(
+    writeOffTable: WriteOffTable,
     modifier: Modifier = Modifier
 ) {
     CardField(modifier = modifier) {
@@ -302,13 +304,11 @@ fun SaleProductCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f)
+                modifier = Modifier.fillMaxWidth(0.6f)
             ) {
                 Text(
                     modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    text = saleTable.title,
+                    text = writeOffTable.title,
                     style = textBold_20,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -316,51 +316,34 @@ fun SaleProductCard(
                 IconAndText(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
-                        saleTable.day,
-                        saleTable.mount,
-                        saleTable.year
+                        writeOffTable.day,
+                        writeOffTable.mount,
+                        writeOffTable.year
                     )
                 )
-                saleTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
-                    ?.let { category ->
-                        IconAndText(
-                            iconRes = R.drawable.baseline_format_list_bulleted_24,
-                            valueString = category
-                        )
-                    }
-                saleTable.buyer.takeUnless { it == "Неизвестный" || it.isEmpty() }
-                    ?.let { buyer ->
-                        IconAndText(
-                            iconRes = R.drawable.baseline_person_24,
-                            valueString = buyer
-                        )
-                    }
-                if (saleTable.note != "")
+                if (writeOffTable.note != "") {
                     IconAndText(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = saleTable.note
+                        valueString = writeOffTable.note
                     )
+                }
             }
-
-            Text(
-                text = stringResource(
-                    R.string.card_count_briefly_s,
-                    "${saleTable.count.formatNumber()} ${saleTable.suffix}",
-                    saleTable.priceAll.formatNumber(),
-                    stringResource(R.string.currency_ruble)
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.3f),
-                style = textBold_20
-            )
+            Row(
+                modifier = Modifier.weight(0.4f),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = getImageWriteOff(writeOffTable.status)),
+                    contentDescription = "delete"
+                )
+                Text(
+                    text = "${formatter(writeOffTable.count)} ${writeOffTable.suffix}",
+                    textAlign = TextAlign.Center,
+                    style = textBold_20
+                )
+            }
         }
     }
 }
 
-
-data class navigateId(
-    val id: Int,
-    val idPT: Int
-)

@@ -2,7 +2,6 @@ package com.zaroslikov.fermacompose2.ui.navigation
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -24,12 +23,12 @@ import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivDestination
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivScreen
 import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivDestination
 import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivScreen
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesDestination
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditDestination
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditProduct
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryDestination
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryProduct
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesScreen
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesDestination
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditDestination
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditProduct
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryProduct
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisProduct
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryDestination
@@ -40,12 +39,10 @@ import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceMountDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceMountScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
-//import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
-//import com.zaroslikov.fermacompose2.ui.home.AddEditProduct
-import com.zaroslikov.fermacompose2.ui.home.AddEntryDestination
-import com.zaroslikov.fermacompose2.ui.home.AddEntryProduct
-import com.zaroslikov.fermacompose2.ui.home.AddScreen
-import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.ui.sections.add.AddEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.add.AddEntryProduct
+import com.zaroslikov.fermacompose2.ui.sections.add.AddScreen
+import com.zaroslikov.fermacompose2.ui.sections.add.HomeDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreen
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreenDestination
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopDestination
@@ -62,12 +59,10 @@ import com.zaroslikov.fermacompose2.ui.note.NoteEditProduct
 import com.zaroslikov.fermacompose2.ui.note.NoteEntryDestination
 import com.zaroslikov.fermacompose2.ui.note.NoteEntryProduct
 import com.zaroslikov.fermacompose2.ui.note.NoteScreen
-import com.zaroslikov.fermacompose2.ui.sale.SaleDestination
-import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
-import com.zaroslikov.fermacompose2.ui.sale.SaleEditProduct
-import com.zaroslikov.fermacompose2.ui.sale.SaleEntryDestination
-import com.zaroslikov.fermacompose2.ui.sale.SaleEntryProduct
-import com.zaroslikov.fermacompose2.ui.sale.SaleScreen
+import com.zaroslikov.fermacompose2.ui.sections.sale.SaleDestination
+import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryProduct
+import com.zaroslikov.fermacompose2.ui.sections.sale.SaleScreen
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import com.zaroslikov.fermacompose2.ui.start.StartScreen
 import com.zaroslikov.fermacompose2.ui.add.AddProject
@@ -80,12 +75,10 @@ import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseScreen
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffDestination
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditDestination
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditProduct
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryDestination
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryProduct
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffScreen
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffDestination
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffEntryProduct
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -377,11 +370,9 @@ fun InventoryNavHost(
                             AddEntryDestination.itemIdPT,
                             it.toString()
                         )
-//                        "${AddEntryDestination.route}?${AddEntryDestination.itemIdPT}=$it"
                     )
                 },
                 navigateToItemUpdate = {
-//                    navController.navigate("${AddEntryDestination.route}/${it.first}/${it.second}")
                     navController.navigate(
                         navNull(
                             AddEntryDestination.route,
@@ -415,24 +406,8 @@ fun InventoryNavHost(
                     defaultValue = -1
                 })
         ) {
-            AddEntryProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() }
-            )
+            AddEntryProduct(navigateBack = { navController.popBackStack() })
         }
-
-//        composable(
-//            route = AddEditDestination.routeWithArgs,
-//            arguments = listOf(navArgument(AddEditDestination.itemIdArg) {
-//                type = NavType.IntType
-//            }, navArgument(AddEditDestination.itemIdArgTwo) {
-//                type = NavType.IntType
-//            })
-//        ) {
-//            AddEditProduct(
-//                navigateBack = { navController.popBackStack() },
-//                onNavigateUp = { navController.navigateUp() })
-//        }
 
         //Sale
         composable(
@@ -447,39 +422,36 @@ fun InventoryNavHost(
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
             }, navigateToItemAdd = {
                 navController.navigate(
-                    "${SaleEntryDestination.route}/${it}"
+                    navNull(
+                        route = SaleEntryDestination.route,
+                        itemOne = it.toString()
+                    )
                 )
             }, navigateToItemUpdate = {
                 navController.navigate(
-                    "${SaleEditDestination.route}/${it.first}/${it.second}"
+                    navNull(
+                        route = SaleEntryDestination.route,
+                        itemOne = it.first.toString(),
+                        itemTwo = it.second.toString()
+                    )
                 )
             })
         }
         composable(
             route = SaleEntryDestination.routeWithArgs,
-            arguments = listOf(navArgument(SaleEntryDestination.itemIdArg) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(SaleEntryDestination.itemIdPT) {
+                    type = NavType.IntType
+                },
+                navArgument(SaleEntryDestination.itemId) {
+                    type = NavType.IntType
+                    defaultValue = -1
+                })
         ) {
             SaleEntryProduct(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() })
         }
-
-        composable(
-            route = SaleEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(SaleEditDestination.itemIdArg) {
-                type = NavType.IntType
-            }, navArgument(SaleEditDestination.itemIdArgTwo) {
-                type = NavType.IntType
-            }
-
-            )) {
-            SaleEditProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
-        }
-
 
         //Expenses
         composable(
@@ -540,38 +512,39 @@ fun InventoryNavHost(
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
             }, navigateToItemAdd = {
                 navController.navigate(
-                    "${WriteOffEntryDestination.route}/${it}"
+                    navNull(
+                        WriteOffEntryDestination.route,
+                        WriteOffEntryDestination.itemIdPT,
+                        it.toString()
+                    )
                 )
             }, navigateToItemUpdate = {
                 navController.navigate(
-                    "${WriteOffEditDestination.route}/${it.first}/${it.second}"
+                    navNull(
+                        WriteOffEntryDestination.route,
+                        WriteOffEntryDestination.itemIdPT,
+                        it.first.toString(),
+                        WriteOffEntryDestination.itemId,
+                        it.second.toString()
+                    )
                 )
             })
         }
         composable(
             route = WriteOffEntryDestination.routeWithArgs,
-            arguments = listOf(navArgument(WriteOffEntryDestination.itemIdArg) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(WriteOffEntryDestination.itemIdPT) {
+                    type = NavType.IntType
+                },
+                navArgument(WriteOffEntryDestination.itemId) {
+                    type = NavType.IntType
+                    defaultValue = -1
+                })
         ) {
             WriteOffEntryProduct(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() })
         }
-
-        composable(
-            route = WriteOffEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(WriteOffEditDestination.itemIdArg) {
-                type = NavType.IntType
-            }, navArgument(WriteOffEditDestination.itemIdArgTwo) {
-                type = NavType.IntType
-            })
-        ) {
-            WriteOffEditProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
-        }
-
         composable(
             route = AnimalDestination.routeWithArgs,
             arguments = listOf(navArgument(AnimalDestination.itemIdArg) {

@@ -1,12 +1,12 @@
-package com.zaroslikov.fermacompose2.ui.sale
+package com.zaroslikov.fermacompose2.ui.sections.expenses
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyPriceUiState
-import com.zaroslikov.fermacompose2.data.water.SaleUiState
+import com.zaroslikov.fermacompose2.data.water.ExpensesUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,19 +16,19 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
-class SaleViewModel(
+class ExpensesViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    val itemId: Int = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
+
+    val itemId: Int = checkNotNull(savedStateHandle[ExpensesDestination.itemIdArg])
 
     private var _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-
-    val saleUiState: StateFlow<SaleUiState> =
-        itemsRepository.getAllSaleItems(itemId).map { SaleUiState(it) }.onStart {
+    val homeUiState: StateFlow<ExpensesUiState> =
+        itemsRepository.getAllExpensesItems(itemId).map { ExpensesUiState(it) }.onStart {
             // Устанавливаем состояние загрузки перед началом загрузки данных
             _isLoading.value = true
         }.onEach {
@@ -38,27 +38,25 @@ class SaleViewModel(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = SaleUiState()
+                initialValue = ExpensesUiState()
             )
 
-
     val brieflyUiState: StateFlow<BrieflyPriceUiState> =
-        itemsRepository.getBrieflyItemSale(itemId).map { BrieflyPriceUiState(it) }
+        itemsRepository.getBrieflyItemExpenses(itemId).map { BrieflyPriceUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = BrieflyPriceUiState()
             )
 
-    fun getDetailsName(name: String): Flow<List<SaleTable>> {
-        return itemsRepository.getBrieflyDetailsItemSale(itemId.toLong(), name)
+    fun getDetailsName(name: String): Flow<List<ExpensesTable>> {
+        return itemsRepository.getBrieflyDetailsItemExpenses(itemId.toLong(), name)
     }
 
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
 
 }
 

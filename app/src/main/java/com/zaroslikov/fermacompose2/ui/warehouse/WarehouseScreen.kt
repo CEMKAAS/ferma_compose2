@@ -497,7 +497,7 @@ fun WarehouseFoodCard(
                                 day = calendar.get(Calendar.DAY_OF_MONTH),
                                 mount = calendar.get(Calendar.MONTH),
                                 year = calendar.get(Calendar.YEAR),
-                                status = 0,
+                                status = false,
                                 priceAll = 0.0,
                                 suffix = warehouseProduct.suffix,
                                 note = "",

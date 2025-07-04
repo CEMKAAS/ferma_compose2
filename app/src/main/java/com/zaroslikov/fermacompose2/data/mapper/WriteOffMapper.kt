@@ -1,34 +1,36 @@
 package com.zaroslikov.fermacompose2.data.mapper
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainWritOffTable
+import com.zaroslikov.fermacompose2.Domain.models.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.supportFun.toConvertDb
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
-fun WriteOffTable.toDomainMap(): DomainWritOffTable = DomainWritOffTable(
+fun DomainWriteOffTable.toRoomMap(): WriteOffTable = WriteOffTable(
     id = id,
-    title = title,
-    count = count.toString(),
+    title = title.trim(),
+    count = count.toConvertDbDouble(),
     day = day,
     mount = mount,
     year = year,
-    priceAll = priceAll.toString(),
-    idPT = idPT,
+    priceAll = priceAll.toConvertDbDouble(),
     suffix = suffix,
     status = status,
-    note = note
+    note = note.trim(),
+    idPT = idPT.toInt(),
+    animalCountId = animalCountId
 )
 
-
-fun DomainWritOffTable.toRoomMap(): WriteOffTable = WriteOffTable(
+fun WriteOffTable.toDomainMap(): DomainWriteOffTable = DomainWriteOffTable(
     id = id,
     title = title,
-    count = count.toConvertDb().toDouble(),
+    count = count.formatNumber(),
     day = day,
     mount = mount,
     year = year,
-    priceAll = priceAll.toConvertDb().toDouble(),
-    idPT = idPT,
+    priceAll = priceAll.formatNumber(),
     suffix = suffix,
     status = status,
-    note = note
+    note = note,
+    idPT = idPT.toLong(),
+    animalCountId = animalCountId
 )

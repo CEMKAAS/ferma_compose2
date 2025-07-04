@@ -88,7 +88,7 @@ fun InventoryApp(
             val result = snackbarHostState.showSnackbar(
                 message = event.message,
                 actionLabel = event.action?.name,
-                duration = SnackbarDuration.Long
+                duration = SnackbarDuration.Short
             )
 
             if (result == SnackbarResult.ActionPerformed) {
@@ -104,17 +104,6 @@ fun InventoryApp(
             })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            FloatButton {
-                scope.launch {
-                    SnackbarController.sendEvent(
-                        event = SnackbarEvent(
-                            message = "Hello world!"
-                        )
-                    )
-                }
-            }
-        },
         bottomBar = {
             Banner(
                 modifier = Modifier

@@ -212,28 +212,33 @@ fun OutlinedTextDate(
         }
     }
 
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            openDialog = !openDialog
-        },
-        readOnly = true,
-        label = { Text(stringResource(intRes)) },
-        supportingText = {
-            Text(stringResource(intResSup))
-        },
-        leadingIcon = {
-            IconButton(onClick = { openDialog = !openDialog }) {
-                Icon(
-                    painter = painterResource(drawableRes),
-                    contentDescription = stringResource(R.string.content_description_show_calendary)
-                )
-            }
-        },
-        modifier = Modifier
-            .toOutlinedText()
-            .clickable { openDialog = !openDialog }
-    )
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                openDialog = !openDialog
+            },
+            readOnly = true,
+            label = { Text(stringResource(intRes)) },
+            supportingText = {
+                Text(stringResource(intResSup))
+            },
+            leadingIcon = {
+                IconButton(onClick = { openDialog = !openDialog }) {
+                    Icon(
+                        painter = painterResource(drawableRes),
+                        contentDescription = stringResource(R.string.content_description_show_calendary)
+                    )
+                }
+            },
+            modifier = Modifier
+                .toOutlinedText()
+                .clickable { openDialog = !openDialog }
+        )
+    }
 }
 
 @Composable
@@ -625,7 +630,6 @@ fun OutlinedPriceInput(
         isManyCount -> 2.dp
         else -> 0.dp
     }
-
     val animatedPadding by animateDpAsState(
         targetValue = target,
         animationSpec = spring(
@@ -633,10 +637,7 @@ fun OutlinedPriceInput(
             stiffness = Spring.StiffnessLow
         )
     )
-
     val supportText = if (isAutoCalculate) supportTextRes else supportTextResAutoCal
-
-
     CardField(
         modifier = Modifier.toOutlinedText(),
         row = false
@@ -644,7 +645,7 @@ fun OutlinedPriceInput(
         OutlinedTextField(
             value = price,
             onValueChange = {
-                onPriceChange(it.toConvertDb())
+                onPriceChange(it)
             },
             label = { Text(stringResource(R.string.outlined_text_price)) },
             modifier = Modifier
@@ -771,41 +772,47 @@ fun OutlinedTextTitleSale(
     onValueChange: (String) -> Unit = {},
     onValueChoice: (Triple<Int, String, String>) -> Unit,
     readOnly: Boolean = false,
+    enable : Boolean = true,
     selectedItemIndex: Int,
     titleList: List<PairData>,
     isErrorTitle: Boolean = false,
     isErrorSlash: Boolean = false,
     focusManager: FocusManager
 ) {
-
-    ExposedDropdownMenuPair(
-        title = value,
-        selectedItemIndex = selectedItemIndex,
-        setTitle = {
-            onValueChoice(it)
-        },
-        list = titleList
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
     ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { text ->
-                onValueChange(text)
+        ExposedDropdownMenuPair(
+            title = value,
+            selectedItemIndex = selectedItemIndex,
+            setTitle = {
+                onValueChoice(it)
             },
-            label = { Text(text = stringResource(R.string.outlined_text_product)) },
-            supportingText = {
-                ErrorSupportTextSlash(
-                    isError = isErrorTitle,
-                    isErrorSlash = isErrorSlash,
-                    intRes = R.string.support_text_product,
-                    intResError = R.string.error_no_product,
-                )
-            },
-            readOnly = readOnly,
-            modifier = it,
-            isError = isErrorTitle,
-            keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = keyboardActionsDown(focusManager)
-        )
+            list = titleList
+        ) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = { text ->
+                    onValueChange(text)
+                },
+                label = { Text(text = stringResource(R.string.outlined_text_product)) },
+                supportingText = {
+                    ErrorSupportTextSlash(
+                        isError = isErrorTitle,
+                        isErrorSlash = isErrorSlash,
+                        intRes = R.string.support_text_product,
+                        intResError = R.string.error_no_product,
+                    )
+                },
+                readOnly = readOnly,
+                modifier = it,
+                enabled = enable,
+                isError = isErrorTitle,
+                keyboardOptions = keyboardOptionsNext(),
+                keyboardActions = keyboardActionsDown(focusManager)
+            )
+        }
     }
 }
 
@@ -816,38 +823,43 @@ fun OutlinedTextBuyer(
     list: List<String>,
     focusManager: FocusManager
 ) {
-    ExposedDropdownMenuProduct(
-        title = value,
-        setTitle = { onValueChange(it.trim()) },
-        titleList = list
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
     ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { text ->
-                onValueChange(text.trim())
-            },
-            label = { Text(stringResource(R.string.outlined_text_buyer)) },
-            modifier = it.first,
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_person_24),
-                    contentDescription = null
-                )
-            },
-            supportingText = {
-                Text(stringResource(R.string.support_text_buyer))
-            },
-            trailingIcon = {
-                IconButton(onClick = { onValueChange("") }) {
+        ExposedDropdownMenuProduct(
+            title = value,
+            setTitle = { onValueChange(it) },
+            titleList = list
+        ) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = { text ->
+                    onValueChange(text)
+                },
+                label = { Text(stringResource(R.string.outlined_text_buyer)) },
+                modifier = it.first,
+                leadingIcon = {
                     Icon(
-                        Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.content_description_clear)
+                        painter = painterResource(R.drawable.baseline_person_24),
+                        contentDescription = null
                     )
-                }
-            },
-            keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = keyboardActionsDown(focusManager)
-        )
+                },
+                supportingText = {
+                    Text(stringResource(R.string.support_text_buyer))
+                },
+                trailingIcon = {
+                    IconButton(onClick = { onValueChange("") }) {
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.content_description_clear)
+                        )
+                    }
+                },
+                keyboardOptions = keyboardOptionsNext(),
+                keyboardActions = keyboardActionsDown(focusManager)
+            )
+        }
     }
 }
 

@@ -1,8 +1,5 @@
-package com.zaroslikov.fermacompose2.ui.home
+package com.zaroslikov.fermacompose2.ui.sections.add
 
-import android.util.Log
-import androidx.compose.material3.BottomSheetScaffoldState
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,6 +17,8 @@ import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
 import com.zaroslikov.fermacompose2.supportFun.metricAdd
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
+import com.zaroslikov.fermacompose2.utils.SnackbarController
+import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,10 +41,11 @@ class AddEntryViewModel @Inject constructor(
     private val itemIdPT: Int = checkNotNull(savedStateHandle[AddEntryDestination.itemIdPT])
     private val itemId: Int = checkNotNull(savedStateHandle[AddEntryDestination.itemId])
     val isEntry: Boolean = itemId == -1
+
     var addUiState by mutableStateOf(
         DomainAddTable().copy(
             category = resourceProvider.getString(R.string.support_text_no_category),
-            suffix = resourceProvider.getString(R.string.suffix_kilogram)
+            suffix = resourceProvider.getString(R.string.suffix_pieces)
         )
     )
         private set
@@ -70,7 +70,7 @@ class AddEntryViewModel @Inject constructor(
     }
 
     val titleUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsTitleAddList(itemId).map { DataStringListState(it) }
+        itemsRepository.getItemsTitleAddList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -78,7 +78,7 @@ class AddEntryViewModel @Inject constructor(
             )
 
     val categoryUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsCategoryAddList(itemId).map { DataStringListState(it) }
+        itemsRepository.getItemsCategoryAddList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -86,7 +86,7 @@ class AddEntryViewModel @Inject constructor(
             )
 
     val animalUiState: StateFlow<DataTripleListState> =
-        itemsRepository.getItemsAnimalAddList(itemId).map { DataTripleListState(it) }
+        itemsRepository.getItemsAnimalAddList(itemIdPT).map { DataTripleListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -120,7 +120,6 @@ class AddEntryViewModel @Inject constructor(
 
     fun updateItem() {
         viewModelScope.launch {
-            Log.i("add", "updateItem: $addUiState")
             itemsRepository.updateItem(addUiState.toRoomMap())
             _eventFlow.emit(UiEvent.NavigateBack)
             showMessage(
@@ -142,11 +141,13 @@ class AddEntryViewModel @Inject constructor(
     }
 
     fun showMessage(message: String) {
-//        viewModelScope.launch
-//        {
-//            .snackbarHostState.showSnackbar(message)
-////            _eventFlow.emit(UiEvent.ShowSnackbar(message))
-//        }
+        viewModelScope.launch {
+            SnackbarController.sendEvent(
+                event = SnackbarEvent(
+                    message = message
+                )
+            )
+        }
     }
 
     companion object {

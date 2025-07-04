@@ -1,18 +1,13 @@
-package com.zaroslikov.fermacompose2.ui.expenses
+package com.zaroslikov.fermacompose2.ui.sections.writeOff
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
-import com.zaroslikov.fermacompose2.data.water.BrieflyPriceUiState
+import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
-import com.zaroslikov.fermacompose2.data.water.ExpensesUiState
-import com.zaroslikov.fermacompose2.ui.home.AddViewModel
-import com.zaroslikov.fermacompose2.ui.home.AddViewModel.Companion
-import com.zaroslikov.fermacompose2.ui.home.HomeDestination
+import com.zaroslikov.fermacompose2.data.water.WriteOffUiState
+import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,19 +17,18 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
-class ExpensesViewModel(
+class WriteOffViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-
-    val itemId: Int = checkNotNull(savedStateHandle[ExpensesDestination.itemIdArg])
+    val itemId: Int = checkNotNull(savedStateHandle[WriteOffDestination.itemIdArg])
 
     private var _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    val homeUiState: StateFlow<ExpensesUiState> =
-        itemsRepository.getAllExpensesItems(itemId).map { ExpensesUiState(it) }.onStart {
+    val writeOffUiState: StateFlow<WriteOffUiState> =
+        itemsRepository.getAllWriteOffItems(itemId).map { WriteOffUiState(it) }.onStart {
             // Устанавливаем состояние загрузки перед началом загрузки данных
             _isLoading.value = true
         }.onEach {
@@ -44,25 +38,31 @@ class ExpensesViewModel(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = ExpensesUiState()
+                initialValue = WriteOffUiState()
             )
 
-    val brieflyUiState: StateFlow<BrieflyPriceUiState> =
-        itemsRepository.getBrieflyItemExpenses(itemId).map { BrieflyPriceUiState(it) }
+    val titleUiState: StateFlow<DataStringListState> =
+        itemsRepository.getItemsTitleAddList(itemId).map {  DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = BrieflyPriceUiState()
+                initialValue =  DataStringListState()
             )
 
-    fun getDetailsName(name: String): Flow<List<ExpensesTable>> {
-        return itemsRepository.getBrieflyDetailsItemExpenses(itemId.toLong(), name)
-    }
+    val brieflyUiState: StateFlow<BrieflyUiState> =
+        itemsRepository.getBrieflyItemWriteOff(itemId).map { BrieflyUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = BrieflyUiState()
+            )
 
+    fun getDetailsName(name: String): Flow<List<WriteOffTable>> {
+        return itemsRepository.getBrieflyDetailsItemWriteOff(itemId.toLong(), name)
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
 }
 

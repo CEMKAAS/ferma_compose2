@@ -75,8 +75,7 @@ fun NoteEntryProduct(
     ) { innerPadding ->
         NoteEntryContainer(
             modifier = Modifier
-                .modifierScreen(innerPadding)
-                .verticalScroll(rememberScrollState()),
+                .modifierScreen(innerPadding),
             idProject = viewModel.itemId,
             saveInRoomAdd = {
                 coroutineScope.launch { viewModel.saveItem(it) }

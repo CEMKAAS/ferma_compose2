@@ -50,7 +50,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.supportFun.animalCountWeightComposition
 import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
 import com.zaroslikov.fermacompose2.supportFun.convertSize
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
@@ -96,15 +95,16 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
 import com.zaroslikov.fermacompose2.ui.composeElement.textBuildIndicatorsAnnotated
 import com.zaroslikov.fermacompose2.ui.composeElement.text_16
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditDestination
-//import com.zaroslikov.fermacompose2.ui.home.AddEditDestination
-import com.zaroslikov.fermacompose2.ui.sale.SaleEditDestination
+import com.zaroslikov.fermacompose2.ui.navigation.navNull
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditDestination
+import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditDestination
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -156,7 +156,7 @@ fun AnimalIndicatorsScreen(
         } else {
             AnimalIndicatorsBody(
                 modifier = Modifier
-                    .modifierScreen(innerPadding),
+                    .modifierScreenLazy(innerPadding),
                 idAnimal = viewModel.itemId.toLong(),
                 version = viewModel.indicators,
                 itemList = indicatorsList.value.itemList,
@@ -184,7 +184,7 @@ fun AnimalIndicatorsScreen(
                 },
                 onValueChange = {
                     if (it.version != null) {
-                        navigateSection(navigate(it.version, it._id, it.idPT))
+                        navigateSection(navigate(it.version, it._id.toString(), it.idPT.toString()))
                     } else {
                         coroutineScope.launch {
                             viewModel.updateUiState(it)
@@ -197,11 +197,25 @@ fun AnimalIndicatorsScreen(
     }
 }
 
-private fun navigate(version: Int, _id: Long?, idPT: Long?): String {
+private fun navigate(version: Int, id: String, idPT: String): String {
     return when (version) {
-        0 -> "${SaleEditDestination.route}/${_id}/${idPT}"
-        1 -> "${ExpensesEditDestination.route}/${_id}/${idPT}"
-        else -> "${WriteOffEditDestination.route}/${_id}/${idPT}"
+        0 -> navNull(
+            route = SaleEntryDestination.route,
+            itemOne = idPT,
+            itemTwo = id
+        )
+
+        1 -> navNull(
+            route = ExpensesEditDestination.route,
+            itemOne = idPT,
+            itemTwo = id
+        )
+
+        else -> navNull(
+            route = WriteOffEntryDestination.route,
+            itemOne = idPT,
+            itemTwo = id
+        )
     }
 }
 

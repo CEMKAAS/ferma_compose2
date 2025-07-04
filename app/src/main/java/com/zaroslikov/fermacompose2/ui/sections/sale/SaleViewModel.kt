@@ -1,13 +1,12 @@
-package com.zaroslikov.fermacompose2.ui.writeOff
+package com.zaroslikov.fermacompose2.ui.sections.sale
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
-import com.zaroslikov.fermacompose2.data.water.WriteOffUiState
-import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyPriceUiState
+import com.zaroslikov.fermacompose2.data.water.SaleUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,18 +16,19 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
-class WriteOffViewModel(
+class SaleViewModel(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    val itemId: Int = checkNotNull(savedStateHandle[WriteOffDestination.itemIdArg])
+    val itemId: Int = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
 
     private var _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    val writeOffUiState: StateFlow<WriteOffUiState> =
-        itemsRepository.getAllWriteOffItems(itemId).map { WriteOffUiState(it) }.onStart {
+
+    val saleUiState: StateFlow<SaleUiState> =
+        itemsRepository.getAllSaleItems(itemId).map { SaleUiState(it) }.onStart {
             // Устанавливаем состояние загрузки перед началом загрузки данных
             _isLoading.value = true
         }.onEach {
@@ -38,31 +38,27 @@ class WriteOffViewModel(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = WriteOffUiState()
+                initialValue = SaleUiState()
             )
 
-    val titleUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsTitleAddList(itemId).map {  DataStringListState(it) }
+
+    val brieflyUiState: StateFlow<BrieflyPriceUiState> =
+        itemsRepository.getBrieflyItemSale(itemId).map { BrieflyPriceUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =  DataStringListState()
+                initialValue = BrieflyPriceUiState()
             )
 
-    val brieflyUiState: StateFlow<BrieflyUiState> =
-        itemsRepository.getBrieflyItemWriteOff(itemId).map { BrieflyUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = BrieflyUiState()
-            )
-
-    fun getDetailsName(name: String): Flow<List<WriteOffTable>> {
-        return itemsRepository.getBrieflyDetailsItemWriteOff(itemId.toLong(), name)
+    fun getDetailsName(name: String): Flow<List<SaleTable>> {
+        return itemsRepository.getBrieflyDetailsItemSale(itemId.toLong(), name)
     }
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
+
+
 }
 

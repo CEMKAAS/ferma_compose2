@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui
 
-import android.app.Application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -13,17 +12,16 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEditViewModel
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesEntryViewModel
-import com.zaroslikov.fermacompose2.ui.expenses.ExpensesViewModel
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditViewModel
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryViewModel
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceMountViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceViewModel
 //import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
-import com.zaroslikov.fermacompose2.ui.home.AddEntryViewModel
-import com.zaroslikov.fermacompose2.ui.home.AddViewModel
+import com.zaroslikov.fermacompose2.ui.sections.add.AddViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditViewModel
@@ -32,17 +30,13 @@ import com.zaroslikov.fermacompose2.ui.new_year.NewYearViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteEditViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteEntryViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteViewModel
-import com.zaroslikov.fermacompose2.ui.sale.SaleEditViewModel
-import com.zaroslikov.fermacompose2.ui.sale.SaleEntryViewModel
-import com.zaroslikov.fermacompose2.ui.sale.SaleViewModel
+import com.zaroslikov.fermacompose2.ui.sections.sale.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
 import com.zaroslikov.fermacompose2.ui.add.ProjectAddViewModel
 import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEditViewModel
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffEntryViewModel
-import com.zaroslikov.fermacompose2.ui.writeOff.WriteOffViewModel
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffViewModel
 
 
 object AppViewModelProvider {
@@ -155,37 +149,9 @@ object AppViewModelProvider {
             )
         }
 
-//        initializer {
-//            AddEntryViewModel(
-//                this.createSavedStateHandle(),
-//                inventoryApplication().container.itemsRepository
-//            )
-//        }
-
-//        initializer {
-//            AddEditViewModel(
-//                this.createSavedStateHandle(),
-//                inventoryApplication().container.itemsRepository
-//            )
-//        }
-
         //Sale
         initializer {
             SaleViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
-
-        initializer {
-            SaleEntryViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
-
-        initializer {
-            SaleEditViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )
@@ -217,20 +183,6 @@ object AppViewModelProvider {
         // WriteOff
         initializer {
             WriteOffViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
-
-        initializer {
-            WriteOffEntryViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
-
-        initializer {
-            WriteOffEditViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )

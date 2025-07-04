@@ -429,7 +429,7 @@ fun ExposedDropdownMenuPair(
             content(
                 Modifier
                     .menuAnchor()
-                    .toOutlinedText()
+                    .fillMaxWidth()
             )
             val filteredOptions =
                 list.filter { it.first.contains(title, ignoreCase = true) }

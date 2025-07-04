@@ -165,7 +165,7 @@ fun AlertDialogWriteOffAnimal(
                                         day = dateTodayArray()[0],
                                         mount = dateTodayArray()[1],
                                         year = dateTodayArray()[2],
-                                        status = 1,
+                                        status = true,
                                         priceAll = priceInDB.toConvertDbDouble(),
                                         suffix = countSuffix,
                                         note = reasonNote,

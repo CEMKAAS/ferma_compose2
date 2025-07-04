@@ -285,7 +285,7 @@ fun AlertDialogKillAnimal(
                                         day = dateTodayArray()[0],
                                         mount = dateTodayArray()[1],
                                         year = dateTodayArray()[2],
-                                        status = 0,
+                                        status = false,
                                         priceAll = 0.0,
                                         suffix = countSuffix,
                                         note = reasonNote + resultText,
