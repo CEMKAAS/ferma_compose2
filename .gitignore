@@ -15,6 +15,11 @@ keystore.properties
 
 # Builds
 app/release/
+app/standard/
+app/master/
+
+# C++
+data/.cxx/
 
 # Room
 data/schemas/
