@@ -1,11 +1,24 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -17,10 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
@@ -34,14 +51,18 @@ import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogInf
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.composeElement.CardField
+import com.zaroslikov.fermacompose2.ui.composeElement.CheckboxTextIcon
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
+import com.zaroslikov.fermacompose2.ui.composeElement.TextFoodExpenses
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -59,14 +80,8 @@ object ExpensesEntryDestination : NavigationDestination {
 @Composable
 fun ExpensesEntryProduct(
     navigateBack: () -> Unit,
-    onNavigateUp: () -> Unit,
     viewModel: ExpensesEntryViewModel = hiltViewModel()
 ) {
-    val titleUiState by viewModel.titleUiState.collectAsState()
-    val categoryUiState by viewModel.categoryUiState.collectAsState()
-    val animalUiState by viewModel.animalUiState.collectAsState()
-
-    val coroutineScope = rememberCoroutineScope()
     val eventFlow = viewModel.eventFlow
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
@@ -75,7 +90,6 @@ fun ExpensesEntryProduct(
             }
         }
     }
-
     Scaffold(
         topBar = {
             TopAppBarBack(intRes = R.string.expenses_screen_title, navigateUp = navigateBack)
@@ -88,9 +102,9 @@ fun ExpensesEntryProduct(
             isEntry = viewModel.isEntry,
             isIndicationValue = viewModel.isIndicatorsValue,
             isAutoCalculate = viewModel.isAutoCalculate,
-            titleList = titleUiState.list,
-            categoryList = categoryUiState.list,
-            animalList = animalUiState.animalList,
+            titleList = viewModel.titleUiState.collectAsState().value.list,
+            categoryList = viewModel.categoryUiState.collectAsState().value.list,
+            animalList = viewModel.animalUiState.collectAsState().value.animalList,
             countWarehouse = viewModel.itemUiState,
             updateCountWarehouse = viewModel::updateWarehouseUiState,
             onValueChange = viewModel::updateUiState,
@@ -120,7 +134,6 @@ fun ExpensesEntryContainerProduct(
     onClickDelete: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
 
     var date by rememberSaveable {
         mutableStateOf(
@@ -197,54 +210,21 @@ fun ExpensesEntryContainerProduct(
 //        showWarehouseUI = false
 //    }
 
-    var selectedFilters2 = remember { mutableStateMapOf<Long, Double>() }
-
-
-    //Подсказки
-    var openAlertFood by remember { mutableStateOf(false) }
-    var openAlertWarehouse by remember { mutableStateOf(false) }
-    var openAlertAnimal by remember { mutableStateOf(false) }
-
-    if (openAlertFood) {
-        AlertDialogInfo(
-            onConfirmation = { openAlertFood = false },
-            intText = R.string.alert_dialog_info_title_food,
-            intTitleText = R.string.alert_dialog_info_text_food
-        )
-    }
-
-    if (openAlertWarehouse) {
-        AlertDialogInfo(
-            onConfirmation = { openAlertWarehouse = false },
-            intText = R.string.alert_dialog_info_text_show_warehouse,
-            intTitleText = R.string.alert_dialog_info_title_show_warehouse
-        )
-    }
-
-    if (openAlertAnimal) {
-        AlertDialogInfo(
-            onConfirmation = { openAlertAnimal = false },
-            intText = R.string.alert_dialog_info_text_animals_expenses,
-            intTitleText = R.string.alert_dialog_info_title_animals_expenses
-        )
-    }
 
     Column(modifier = modifier) {
-        // Начало дизайна
         OutlinedTextTitleAdd(
             value = domainExpensesTable.title,
             onValueChange = {
                 onValueChange(domainExpensesTable.copy(title = it))
                 isErrorTitle = it.isError()
                 isErrorSlash = it.isErrorSlash()
-//            updateCountWarehouse(title) TODO
+                updateCountWarehouse(it)
             },
             titleList = titleList,
             isErrorTitle = isErrorTitle,
             isErrorSlash = isErrorSlash,
             focusManager = focusManager
         )
-
         OutlinedTextCount(
             value = domainExpensesTable.count,
             onValueChange = {
@@ -272,7 +252,7 @@ fun ExpensesEntryContainerProduct(
             isError = isErrorCount,
             suffix = domainExpensesTable.suffix,
             intResSup = R.string.support_text_count_product_expenses,
-//        countWarehouse = countWarehouse, TODO
+            countWarehouse = countWarehouse.first,
             focusManager = focusManager
         )
         OutlinedTextPrice(
@@ -310,6 +290,10 @@ fun ExpensesEntryContainerProduct(
             onValueChange = { onValueChange(domainExpensesTable.copy(note = it)) },
             focusManager = focusManager
         )
+        Switch(
+            domainExpensesTable,
+            onValueChange
+        )
         ButtonPanel(
             title = domainExpensesTable.title,
             count = domainExpensesTable.count,
@@ -317,7 +301,7 @@ fun ExpensesEntryContainerProduct(
             isEntry = isEntry,
             dailyExpensesFoodUI = domainExpensesTable.dailyExpensesFood,
             countAnimalUI = domainExpensesTable.countAnimal,
-            setDailyExpensesFoodAndCountUI = true, //todo
+            setDailyExpensesFoodAndCountUI = false, //todo
             focusManager = focusManager,
             isErrorTitle = { isErrorTitle = it },
             isErrorCount = { isErrorCount = it },
@@ -355,7 +339,7 @@ private fun ButtonPanel(
 ) {
     if (isEntry)
         ButtonStandart(
-            intRes = R.string.button_sale,
+            intRes = R.string.button_expenses,
             onClick = {
                 onClickButton(
                     title = title,
@@ -500,44 +484,86 @@ private fun onClickButton(
 
 
 @Composable
-fun Switch() {
+fun Switch(
+    domainExpensesTable: DomainExpensesTable,
+    onValueChange: (DomainExpensesTable) -> Unit,
+) {
+
+    var selectedFilters2 = remember { mutableStateMapOf<Long, Double>() }
+
+    var setDailyExpensesFoodAndCountUI by remember { mutableStateOf(false) } // Уставновить ежедневный расход
+
+    //Подсказки
+    var openAlertFood by remember { mutableStateOf(false) }
+    var openAlertWarehouse by remember { mutableStateOf(false) }
+    var openAlertAnimal by remember { mutableStateOf(false) }
+
+    if (openAlertFood) {
+        AlertDialogInfo(
+            onConfirmation = { openAlertFood = false },
+            intText = R.string.alert_dialog_info_title_food,
+            intTitleText = R.string.alert_dialog_info_text_food
+        )
+    }
+
+    if (openAlertWarehouse) {
+        AlertDialogInfo(
+            onConfirmation = { openAlertWarehouse = false },
+            intText = R.string.alert_dialog_info_text_show_warehouse,
+            intTitleText = R.string.alert_dialog_info_title_show_warehouse
+        )
+    }
+
+    if (openAlertAnimal) {
+        AlertDialogInfo(
+            onConfirmation = { openAlertAnimal = false },
+            intText = R.string.alert_dialog_info_text_animals_expenses,
+            intTitleText = R.string.alert_dialog_info_title_animals_expenses
+        )
+    }
+
     // ВЫКЛЮЧАТЕЛИ
-//    CardField() {
-//        Column(
-//            modifier = Modifier
-//                .selectableGroup()
-//                .fillMaxWidth()
-//                .padding(10.dp),
-//        ) {
-//            Text(
-//                text = stringResource(R.string.card_extra_set),
-//                style = textBold_20
-//            )
-//
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                CheckboxTextIcon(
-//                    checked = showFoodUI,
-//                    onCheckedChange = {
-//                        showFoodUI = it
-//                        showWarehouseUI = it
-//                        if (showFoodUI) showAnimalsUI = false
-//                        selectedFilters2.clear()
-//                    },
-//                    enabled = count != "",
-//                    intTitle = R.string.checkbox_food,
-//                    onClick = {
-//                        openAlertFood = !openAlertFood
-//                    }
-//                )
-//                if (showFoodUI && (count != "")) {
-//                    CheckboxTextIcon(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 14.dp)
-//                            .padding(top = 5.dp),
-//                        checked = setDailyExpensesFoodAndCountUI,
-//                        onCheckedChange = {
-//                            setDailyExpensesFoodAndCountUI = !setDailyExpensesFoodAndCountUI
+    CardField() {
+        Column(
+            modifier = Modifier
+                .selectableGroup()
+                .fillMaxWidth()
+                .padding(10.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.card_extra_set),
+                style = textBold_20
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CheckboxTextIcon(
+                    checked = domainExpensesTable.showFood,
+                    onCheckedChange = {
+                        onValueChange(
+                            domainExpensesTable.copy(
+                                showFood = it,
+                                showWarehouse = it,
+                                showAnimals = if (it) false else domainExpensesTable.showAnimals
+                            )
+                        )
+                        selectedFilters2.clear()
+                    },
+                    enabled = domainExpensesTable.count != "",
+                    intTitle = R.string.checkbox_food,
+                    onClick = {
+                        openAlertFood = !openAlertFood
+                    }
+                )
+                if (domainExpensesTable.showFood && (domainExpensesTable.count != "")) {
+                    CheckboxTextIcon(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp)
+                            .padding(top = 5.dp),
+                        checked = true //todo
+//                            setDailyExpensesFoodAndCountUI
+                        ,
+                        onCheckedChange = {
+                            setDailyExpensesFoodAndCountUI = !setDailyExpensesFoodAndCountUI
 //                            dailyExpensesFoodTotal = 0.0
 //                            countAnimal = 0
 //                            foodDesignedDayUI = settingDay(
@@ -546,44 +572,44 @@ fun Switch() {
 //                                if (dailyExpensesFoodUI == "") 0.0 else dailyExpensesFoodUI.toDouble(),
 //                                if (countAnimalUI == "") 0 else countAnimalUI.toInt()
 //                            )
-//                            selectedFilters2.clear()
-//                        },
-//                        intTitle = R.string.checkbox_food
-//                    )
-//                }
-//            }
-//
-//            CheckboxTextIcon(
-//                checked = showWarehouseUI,
-//                onCheckedChange = { showWarehouseUI = it },
+                            selectedFilters2.clear()
+                        },
+                        intTitle = R.string.checkbox_food
+                    )
+                }
+            }
+
+            CheckboxTextIcon(
+                checked = domainExpensesTable.showWarehouse,
+                onCheckedChange = { onValueChange(domainExpensesTable.copy(showWarehouse = it)) },
 //                enabled = enableCheckBoxExpenses(
 //                    value = count,
 //                    boolean = showFoodUI
 //                ),
-//                intTitle = R.string.checkbox_show_warehouse,
-//                onClick = { openAlertWarehouse = !openAlertWarehouse }
-//            )
-//
-//            CheckboxTextIcon(
-//                checked = showAnimalsUI,
-//                onCheckedChange = {
-//                    showAnimalsUI = it
-//                    selectedFilters2.clear()
-//                },
+                intTitle = R.string.checkbox_show_warehouse,
+                onClick = { openAlertWarehouse = !openAlertWarehouse }
+            )
+
+            CheckboxTextIcon(
+                checked = domainExpensesTable.showAnimals,
+                onCheckedChange = {
+                    onValueChange(domainExpensesTable.copy(showAnimals = it))
+                    selectedFilters2.clear()
+                },
 //                enabled = enableCheckBoxExpenses(
 //                    value = count,
 //                    valueTwo = priceAll,
 //                    boolean = showFoodUI
 //                ),
-//                intTitle = R.string.checkbox_animals_expenses,
-//                onClick = { openAlertAnimal = !openAlertAnimal }
-//            )
-//
-//            // КОРМА
-//            if (showFoodUI && (count != "")) {
-//
+                intTitle = R.string.checkbox_animals_expenses,
+                onClick = { openAlertAnimal = !openAlertAnimal }
+            )
+
+            // КОРМА
+            if (domainExpensesTable.showFood && (domainExpensesTable.count != "")) {
+
 //                TextFoodExpenses(
-//                    title = title,
+//                    title = domainExpensesTable.title,
 //                    foodDesignedDayUI = foodDesignedDayUI,
 //                    setDailyExpensesFoodAndCountUI = setDailyExpensesFoodAndCountUI,
 //                    dailyExpensesFoodUI = dailyExpensesFoodUI,
@@ -592,7 +618,7 @@ fun Switch() {
 //                    countAnimalUI = countAnimalUI,
 //                    countAnimal = countAnimal
 //                )
-//
+
 //                if (!setDailyExpensesFoodAndCountUI) {
 //                    Text(
 //                        text = stringResource(R.string.support_text_choice_animal),
@@ -801,9 +827,9 @@ fun Switch() {
 //                        }
 //                    }
 //                }
-//            }
-//        }
-//    }
+            }
+        }
+    }
 }
 
 

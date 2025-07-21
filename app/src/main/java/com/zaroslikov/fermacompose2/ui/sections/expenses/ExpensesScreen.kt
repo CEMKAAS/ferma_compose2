@@ -50,6 +50,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
@@ -119,7 +120,7 @@ fun ExpensesScreen(
             } else {
                 ExpensesBody(
                     modifier = Modifier
-                        .modifierScreen(innerPadding),
+                        .modifierScreenLazy(innerPadding),
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
                     viewModel = viewModel,
@@ -145,7 +146,7 @@ private fun ExpensesBody(
             itemList = itemList,
             brieflyList = brieflyList,
             viewModel = viewModel,
-            onItemClick = { onItemClick(Pair(it.id, it.idPT)) },
+            onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
             modifier = modifier
         )
     else MessageNoData(
@@ -196,7 +197,8 @@ private fun InventoryList(
         }
         if (details) {
             items(items = itemList, key = { it.id }) { item ->
-                ExpensesCard(expensesTable = item,
+                ExpensesCard(
+                    expensesTable = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
                         .padding(bottom = extraPadding.coerceAtLeast(0.dp))
@@ -273,7 +275,8 @@ fun BrieflyPriceCard(
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            ExpensesCard(expensesTable = it,
+            ExpensesCard(
+                expensesTable = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f

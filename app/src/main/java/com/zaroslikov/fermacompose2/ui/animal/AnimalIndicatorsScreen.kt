@@ -101,7 +101,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
 import com.zaroslikov.fermacompose2.ui.composeElement.textBuildIndicatorsAnnotated
 import com.zaroslikov.fermacompose2.ui.composeElement.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.navNull
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditDestination
+import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
@@ -206,7 +206,7 @@ private fun navigate(version: Int, id: String, idPT: String): String {
         )
 
         1 -> navNull(
-            route = ExpensesEditDestination.route,
+            route = ExpensesEntryDestination.route,
             itemOne = idPT,
             itemTwo = id
         )

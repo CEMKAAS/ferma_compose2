@@ -4,6 +4,8 @@ import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbOnlyInt
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroString
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 fun DomainExpensesTable.toRoomMap(): ExpensesTable = ExpensesTable(
@@ -21,9 +23,9 @@ fun DomainExpensesTable.toRoomMap(): ExpensesTable = ExpensesTable(
     showWarehouse = showWarehouse,
     showAnimals = showAnimals,
     dailyExpensesFoodAndCount = dailyExpensesFoodAndCount,
-    dailyExpensesFood = dailyExpensesFood.toConvertDbDouble(),
-    countAnimal = countAnimal.toConvertDbOnlyInt(),
-    foodDesignedDay = foodDesignedDay.toConvertDbOnlyInt(),
+    dailyExpensesFood = dailyExpensesFood.toConvertZeroString().toConvertDbDouble(),
+    countAnimal = countAnimal.toConvertZeroString().toConvertDbOnlyInt(),
+    foodDesignedDay = foodDesignedDay.toConvertZeroString().toConvertDbOnlyInt(),
     lastDayFood = lastDayFood,
     idPT = idPT,
     animalId = animalId,

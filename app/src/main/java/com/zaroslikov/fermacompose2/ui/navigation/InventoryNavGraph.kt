@@ -24,8 +24,6 @@ import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivScreen
 import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivDestination
 import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivScreen
 import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesDestination
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditDestination
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditProduct
 import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryProduct
 import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesScreen
@@ -466,38 +464,39 @@ fun InventoryNavHost(
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
             }, navigateToItemAdd = {
                 navController.navigate(
-                    "${ExpensesEntryDestination.route}/${it}"
+                    navNull(
+                        route = ExpensesEntryDestination.route,
+                        itemOne = it.toString()
+                    )
                 )
-            }, navigateToItemUpdate = {
-                navController.navigate(
-                    "${ExpensesEditDestination.route}/${it.first}/${it.second}"
-                )
-            })
+            },
+                navigateToItemUpdate = {
+                    navController.navigate(
+                        navNull(
+                            route = ExpensesEntryDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                }
+            )
         }
+
         composable(
             route = ExpensesEntryDestination.routeWithArgs,
-            arguments = listOf(navArgument(ExpensesEntryDestination.itemIdArg) {
-                type = NavType.IntType
-            })
+            arguments = listOf(
+                navArgument(ExpensesEntryDestination.itemIdPT) {
+                    type = NavType.IntType
+                },
+                navArgument(ExpensesEntryDestination.itemId) {
+                    type = NavType.IntType
+                    defaultValue = -1
+                })
         ) {
             ExpensesEntryProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
+                navigateBack = { navController.popBackStack() })
         }
 
-        composable(
-            route = ExpensesEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(ExpensesEditDestination.itemIdArg) {
-                type = NavType.IntType
-            }, navArgument(ExpensesEditDestination.itemIdArgTwo) {
-                type = NavType.IntType
-            }
-
-            )) {
-            ExpensesEditProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
-        }
 
         //WriteOff
         composable(

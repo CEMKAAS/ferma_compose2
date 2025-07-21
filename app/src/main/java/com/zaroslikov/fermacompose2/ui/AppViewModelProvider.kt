@@ -12,15 +12,12 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEditViewModel
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryViewModel
 import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceMountViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceViewModel
-//import com.zaroslikov.fermacompose2.ui.home.AddEditViewModel
 import com.zaroslikov.fermacompose2.ui.sections.add.AddViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopViewModel
@@ -165,19 +162,19 @@ object AppViewModelProvider {
             )
         }
 
-        initializer {
-            ExpensesEntryViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
-
-        initializer {
-            ExpensesEditViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
+//        initializer {
+//            ExpensesEntryViewModel(
+//                this.createSavedStateHandle(),
+//                inventoryApplication().container.itemsRepository
+//            )
+//        }
+//
+//        initializer {
+//            ExpensesEditViewModel(
+//                this.createSavedStateHandle(),
+//                inventoryApplication().container.itemsRepository
+//            )
+//        }
 
 
         // WriteOff

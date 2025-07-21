@@ -20,6 +20,7 @@ import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class ExpensesEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository,
@@ -71,16 +73,15 @@ class ExpensesEntryViewModel @Inject constructor(
     }
 
     val titleUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsTitleExpensesList(itemId).map { DataStringListState(it) }
+        itemsRepository.getItemsTitleExpensesList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = DataStringListState()
             )
 
-
     val categoryUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsCategoryExpensesList(itemId).map { DataStringListState(it) }
+        itemsRepository.getItemsCategoryExpensesList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -88,7 +89,7 @@ class ExpensesEntryViewModel @Inject constructor(
             )
 
     val animalUiState: StateFlow<AnimalExpensesUiState> =
-        itemsRepository.getItemsAnimalExpensesList(itemId).map { AnimalExpensesUiState(it) }
+        itemsRepository.getItemsAnimalExpensesList(itemIdPT).map { AnimalExpensesUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -118,14 +119,12 @@ class ExpensesEntryViewModel @Inject constructor(
 
     }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
-
     fun insertItem() {
         viewModelScope.launch {
             itemsRepository.insertExpenses(
-                expensesUiState.toRoomMap()
+                expensesUiState.copy(
+                    idPT = itemIdPT.toLong()
+                ).toRoomMap()
             )
 //            metricaSale(saleUiState.copy(priceAll = autoCalculate()))
             _eventFlow.emit(UiEvent.NavigateBack)
@@ -143,7 +142,9 @@ class ExpensesEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
 //            autoCalculate()
-            itemsRepository.updateExpenses(expensesUiState.toRoomMap())
+            itemsRepository.updateExpenses(
+                expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
+            )
             _eventFlow.emit(UiEvent.NavigateBack)
 //            showMessage(
 //                resourceProvider.getString(R.string.toast_refresh_s_s)
@@ -158,7 +159,9 @@ class ExpensesEntryViewModel @Inject constructor(
 
     fun deleteItem() {
         viewModelScope.launch {
-            itemsRepository.deleteExpenses(expensesUiState.toRoomMap())
+            itemsRepository.deleteExpenses(
+                expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
+            )
             _eventFlow.emit(UiEvent.NavigateBack)
 //            showMessage(
 //                resourceProvider.getString(R.string.toast_delete_s)
@@ -181,6 +184,9 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
+    }
 
 }
 
