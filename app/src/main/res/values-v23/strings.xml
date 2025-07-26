@@ -20,7 +20,7 @@
 
     <string name="is_empty"></string>
 
-    //Outlined Text Field
+    //OutlinedTextField
     <string name="outlined_text_product">Товар</string>
     <string name="outlined_text_field_quantity">Количество</string>
     <string name="outlined_text_field_category">Категория</string>
@@ -164,6 +164,7 @@
     <string name="support_text_sex_animals">Выберите пол животного</string>
     <string name="support_text_food_day_animal">Укажите ежедневный расход корма на животное</string>
     <string name="support_text_food_day_animals">Укажите ежедневный расход корма на голову</string>
+    <string name="support_text_food_day">Укажите ежедневный расход корма</string>
 
     <string name="support_text_date_factory">Укажите дату завода животного</string>
     <string name="support_text_date_born">Укажите рождения животного</string>

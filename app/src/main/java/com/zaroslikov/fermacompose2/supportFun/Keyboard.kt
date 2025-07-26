@@ -72,7 +72,7 @@ fun keyboardActionsEnter(
 fun keyboardActionsClear(
     focusManager: FocusManager
 ): KeyboardActions {
-    return KeyboardActions(onGo = {
+    return KeyboardActions(onNext = {
         focusManager.clearFocus()
     })
 }

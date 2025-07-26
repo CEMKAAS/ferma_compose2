@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -57,6 +58,10 @@ class ExpensesEntryViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private val _items = mutableStateOf<List<AnimalExpensesList2>>(emptyList())
+    val items: State<List<AnimalExpensesList2>> = _items
+
+
     init {
         if (!isEntry)
             viewModelScope.launch {
@@ -64,6 +69,8 @@ class ExpensesEntryViewModel @Inject constructor(
                     .filterNotNull()
                     .first()
                     .toDomainMap()
+
+                _items.value = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
             }
     }
 

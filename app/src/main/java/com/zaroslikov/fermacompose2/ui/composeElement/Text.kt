@@ -258,34 +258,6 @@ fun TextLine(
 }
 
 @Composable
-fun TextFoodExpenses(
-    title: String,
-    foodDesignedDayUI: Pair<Int, String>,
-    setDailyExpensesFoodAndCountUI: Boolean,
-    dailyExpensesFoodUI: String,
-    dailyExpensesFoodTotal: Double,
-    suffix: String,
-    countAnimalUI: String,
-    countAnimal: Int
-) {
-    Log.i("Title", title)
-    Text(
-        text = stringResource(
-            R.string.support_text_food_expenses_info
-        ).format(
-            if (title == "") stringResource(R.string.support_text_food) else title,
-            if (foodDesignedDayUI.first >= 1000) stringResource(R.string.support_text_more) else "",
-            foodDesignedDayUI.first,
-            foodDesignedDayUI.second,
-            if (setDailyExpensesFoodAndCountUI) dailyExpensesFoodUI else dailyExpensesFoodTotal,
-            suffix,
-            if (setDailyExpensesFoodAndCountUI) countAnimalUI else countAnimal,
-            R.string.suffix_pieces
-        )
-    )
-}
-
-@Composable
 fun TextColumn(
     @StringRes titleRes: Int,
     value: Double
