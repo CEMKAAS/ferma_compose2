@@ -451,6 +451,7 @@ fun OutlinedTextCount(
     }
 }
 
+
 @Composable
 fun OutlinedTextCount(
     value: String,
@@ -772,7 +773,7 @@ fun OutlinedTextTitleSale(
     onValueChange: (String) -> Unit = {},
     onValueChoice: (Triple<Int, String, String>) -> Unit,
     readOnly: Boolean = false,
-    enable : Boolean = true,
+    enable: Boolean = true,
     selectedItemIndex: Int,
     titleList: List<PairData>,
     isErrorTitle: Boolean = false,
@@ -899,4 +900,63 @@ fun OutlinedTextSex(
             keyboardActions = keyboardActionsDown(focusManager)
         )
     }
+}
+
+@Composable
+fun OutlinedTextCountNoCard(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onClick: (String) -> Unit = {},
+    isError: Boolean,
+    suffix: String,
+    isAnimal: Boolean = false,
+    isWarehouseShow: Boolean = true,
+    isDropMenuShow: Boolean = true,
+    versionDropMenu: Int = 5,
+    drawableRes: Int = R.drawable.baseline_shopping_basket_24,
+    @StringRes intRes: Int = R.string.outlined_text_field_quantity,
+    @StringRes intResSup: Int = R.string.support_text_product,
+    @StringRes intResError: Int = R.string.error_no_count_product,
+    countWarehouse: Double = 0.0,
+    countWarehouseSuffix: String = "",
+    focusManager: FocusManager,
+    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
+    keyboardActions: KeyboardActions = keyboardActionsDown(focusManager)
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+            onValueChange(it)
+        },
+        label = { Text(stringResource(intRes)) },
+        modifier = Modifier.fillMaxWidth(),
+        leadingIcon = {
+            Icon(
+                painter = painterResource(drawableRes),
+                contentDescription = null,
+                modifier = Modifier.padding(end = 5.dp)
+            )
+        },
+        supportingText = {
+            ErrorSupportTextSlash(
+                isError = isError,
+                isWarehouse = isWarehouseShow,
+                isAnimal = isAnimal,
+                count = formatter(countWarehouse),
+                suffix = countWarehouseSuffix,
+                intRes = intResSup,
+                intResError = intResError
+            )
+        },
+        trailingIcon = {
+            if (isDropMenuShow)
+                GetDropDownMenu(versionDropMenu) { onClick(it) }
+        },
+        suffix = {
+            Text(text = suffix)
+        },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        isError = isError
+    )
 }

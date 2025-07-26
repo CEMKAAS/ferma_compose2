@@ -41,7 +41,9 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.theme.errorLight
 import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
 import kotlinx.coroutines.launch
@@ -266,11 +268,13 @@ fun TextFoodExpenses(
     countAnimalUI: String,
     countAnimal: Int
 ) {
+    Log.i("Title", title)
     Text(
         text = stringResource(
-            R.string.support_text_food_expenses_info,
-            if (title == "") R.string.support_text_food else title,
-            if (foodDesignedDayUI.first >= 1000) R.string.support_text_more else "",
+            R.string.support_text_food_expenses_info
+        ).format(
+            if (title == "") stringResource(R.string.support_text_food) else title,
+            if (foodDesignedDayUI.first >= 1000) stringResource(R.string.support_text_more) else "",
             foodDesignedDayUI.first,
             foodDesignedDayUI.second,
             if (setDailyExpensesFoodAndCountUI) dailyExpensesFoodUI else dailyExpensesFoodTotal,
@@ -355,17 +359,23 @@ fun textBuildIndicatorsAnnotated(
     totalValue: String,
     suffix: String,
     price: Double? = null,
-    buyer:String? = null,
+    buyer: String? = null,
     isPlus: Boolean,
     note: String
 ): AnnotatedString {
     return buildAnnotatedString {
         Log.i("Count", "lastValue: $price")
-        val fullText =  when{
-            price != null && buyer != null -> stringResource(intRes).format(totalValue, suffix, price.formatNumber(), buyer)
+        val fullText = when {
+            price != null && buyer != null -> stringResource(intRes).format(
+                totalValue,
+                suffix,
+                price.formatNumber(),
+                buyer
+            )
+
             price != null -> stringResource(intRes).format(totalValue, suffix, price.formatNumber())
             else -> stringResource(intRes).format(totalValue, suffix)
-        } +  note
+        } + note
 
         val startIndex = fullText.indexOf(totalValue)
         val endIndex = startIndex + totalValue.length
