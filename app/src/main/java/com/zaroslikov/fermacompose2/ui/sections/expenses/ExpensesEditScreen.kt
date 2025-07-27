@@ -637,20 +637,20 @@ fun ExpensesEditContainerProduct(
                 countAnimal = if(expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
                 dailyExpensesFoodTotal = if (expensesTable.dailyExpensesFood =="") 0.0 else expensesTable.dailyExpensesFood.toDouble()
 
-                foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
-                    settingDay(
-                        formattedDate,
-                        expensesTable.count.toDouble(),
-                        if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
-                        if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
-                    )
-                } else {
-                    settingDay(
-                        formattedDate,
-                        expensesTable.count.toDouble(),
-                        dailyExpensesFoodTotal
-                    )
-                }
+//                foodDesignedDayUI = if (expensesTable.dailyExpensesFoodAndCount) {
+//                    settingDay(
+//                        formattedDate,
+//                        expensesTable.count.toDouble(),
+//                        if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
+//                        if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
+//                    )
+//                } else {
+//                    settingDay(
+//                        formattedDate,
+//                        expensesTable.count.toDouble(),
+//                        dailyExpensesFoodTotal
+//                    )
+//                }
 
                 Text(
                     text = "${if (expensesTable.title == "") "Корма" else expensesTable.title} хватит на ${if (foodDesignedDayUI.first >= 1000) "более" else ""} ${foodDesignedDayUI.first} суток до ${foodDesignedDayUI.second}\n" +
@@ -693,11 +693,11 @@ fun ExpensesEditContainerProduct(
                                             dailyExpensesFoodTotal -= (it.foodDay * it.countAnimal)
                                         }
                                         it.ps = selected
-                                        foodDesignedDayUI = settingDay(
-                                            formattedDate,
-                                            expensesTable.count.toDouble(),
-                                            dailyExpensesFoodTotal
-                                        )
+//                                        foodDesignedDayUI = settingDay(
+//                                            formattedDate,
+//                                            expensesTable.count.toDouble(),
+//                                            dailyExpensesFoodTotal
+//                                        )
                                         onValueChange(
                                             expensesTable.copy(
                                                 countAnimal = countAnimal.toString(),
@@ -747,12 +747,12 @@ fun ExpensesEditContainerProduct(
                                     )
                                 )
                                 validateDailyExpensesFood(it)
-                                foodDesignedDayUI = settingDay(
-                                    formattedDate,
-                                    expensesTable.count.toDouble(),
-                                    if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
-                                    if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
-                                )
+//                                foodDesignedDayUI = settingDay(
+//                                    formattedDate,
+//                                    expensesTable.count.toDouble(),
+//                                    if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
+//                                    if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
+//                                )
 
                             },
                             isError = isErrorDailyExpensesFood,
@@ -792,12 +792,12 @@ fun ExpensesEditContainerProduct(
                                     )
                                 )
                                 validateСountAnimalUI(it)
-                                foodDesignedDayUI = settingDay(
-                                    formattedDate,
-                                    expensesTable.count.toDouble(),
-                                    if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
-                                    if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
-                                )
+//                                foodDesignedDayUI = settingDay(
+//                                    formattedDate,
+//                                    expensesTable.count.toDouble(),
+//                                    if (expensesTable.dailyExpensesFood == "") 0.0 else expensesTable.dailyExpensesFood.toDouble(),
+//                                    if (expensesTable.countAnimal == "") 0 else expensesTable.countAnimal.toInt()
+//                                )
                             },
                             isError = isErrorСountAnimalUI,
                             supportingText = {

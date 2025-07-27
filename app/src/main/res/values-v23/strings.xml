@@ -192,7 +192,6 @@
     <string name="support_text_no_animal">Нет животных</string>
     <string name="support_text_count_animals">Укажите количество животных</string>
     <string name="support_text_daily_expenses">Укажите ежедневный расход</string>
-    <string name="support_text_food_expenses_info">%s хватит на %s %s суток до %s\nЕжедневный расход составляет - %s %s\nКол-во голов - %s %s</string>
     <string name="support_text_food">Корма</string>
     <string name="support_text_more">более </string>
     <string name="support_text_transactions_now_month">Транзакции в текущем месяце</string>
@@ -441,6 +440,14 @@
     <string name="animal_indicators_animals_count_increased_note">Вы увеличили кол-во животных на %s %s</string>
     <string name="animal_indicators_animals_count_reduced_note">Вы уменьшили кол-во животных на %s %s</string>
     <string name="animal_indicators_animals_count_not_changed_note">Кол-во животных не изменилось</string>
+
+
+    //ExpensesEntryScreen
+    <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма</string>
+    <string name="expenses_entry_screen_no_animal_auto_food">У вас нет животных для авторасчета кормов</string>
+    <string name="expenses_entry_screen_food_day">%s хватит на %s %s суток до %s</string>
+    <string name="expenses_entry_screen_every_day">Ежедневный расход составляет - %s %s</string>
+    <string name="expenses_entry_screen_animal_count">Количество голов - %s %s</string>
 
 
     //Ration Button

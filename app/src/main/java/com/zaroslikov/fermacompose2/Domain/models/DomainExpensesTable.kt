@@ -24,5 +24,31 @@ data class DomainExpensesTable(
     val idPT: Long = 0,
     val animalId: Long? = null,
     val animalVaccinationId: Long? = null,
-    val animalCountId: Long? = null
-)
+    val animalCountId: Long? = null,
+    val error: Error = Error()
+){
+    data class Error(
+        val isErrorTitle : Boolean = false,
+        val isErrorSlash : Boolean = false,
+        val isErrorCount : Boolean = false,
+        val isErrorPrice : Boolean = false,
+        val isErrorDailyExpensesFood: Boolean = false,
+        val isErrorCountAnimal: Boolean = false,
+    ){
+        val hasAnyError: Boolean
+            get() = isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorDailyExpensesFood || isErrorCountAnimal
+    }
+
+    fun validate(): DomainExpensesTable {
+        val error = Error(
+            isErrorTitle = title.isBlank(),
+            isErrorSlash = title.contains("/"),
+            isErrorCount = count.isBlank(),
+            isErrorPrice = priceAll.isBlank(),
+            isErrorDailyExpensesFood = dailyExpensesFood.isBlank(),
+            isErrorCountAnimal = countAnimal.isBlank(),
+        )
+        return this.copy(error = error)
+    }
+
+}
