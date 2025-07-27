@@ -16,6 +16,9 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import com.zaroslikov.fermacompose2.supportFun.isError
+import com.zaroslikov.fermacompose2.supportFun.isErrorExpenses
+import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -70,7 +73,8 @@ class ExpensesEntryViewModel @Inject constructor(
                     .first()
                     .toDomainMap()
 
-                _items.value = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
+                _items.value =
+                    itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
             }
     }
 
@@ -119,7 +123,6 @@ class ExpensesEntryViewModel @Inject constructor(
     suspend fun saveItem(expensesTable: ExpensesTable, set: MutableMap<Long, Double>) {
         val id = itemsRepository.insertExpenses(expensesTable)
 
-
         setExpensesAnimal(set, id, itemId).forEach {
             itemsRepository.insertExpensesAnimal(it)
         }
@@ -128,56 +131,62 @@ class ExpensesEntryViewModel @Inject constructor(
 
     fun insertItem() {
         viewModelScope.launch {
-            itemsRepository.insertExpenses(
-                expensesUiState.copy(
-                    idPT = itemIdPT.toLong()
-                ).toRoomMap()
-            )
+            if (isError()) {
+                itemsRepository.insertExpenses(
+                    expensesUiState.copy(
+                        idPT = itemIdPT.toLong()
+                    ).toRoomMap()
+                )
 //            metricaSale(saleUiState.copy(priceAll = autoCalculate()))
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_sale_s)
-                    .format(
-                        expensesUiState.title,
-                        expensesUiState.count,
-                        expensesUiState.suffix
-                    ) //Todo Обновить название
-            )
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_expenses_s_s)
+                        .format(
+                            expensesUiState.title,
+                            expensesUiState.count,
+                            expensesUiState.suffix
+                        )
+                )
+            }
         }
     }
 
     fun updateItem() {
         viewModelScope.launch {
 //            autoCalculate()
-            itemsRepository.updateExpenses(
-                expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
-            )
-            _eventFlow.emit(UiEvent.NavigateBack)
-//            showMessage(
-//                resourceProvider.getString(R.string.toast_refresh_s_s)
-//                    .format(
-//                        saleUiState.title,
-//                        saleUiState.count,
-//                        saleUiState.suffix
-//                    ) //Todo Обновить название
-//            )
+            if (isError()) {
+                itemsRepository.updateExpenses(
+                    expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
+                )
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_refresh_s_s)
+                        .format(
+                            expensesUiState.title,
+                            expensesUiState.count,
+                            expensesUiState.suffix
+                        )
+                )
+            }
         }
     }
 
     fun deleteItem() {
         viewModelScope.launch {
-            itemsRepository.deleteExpenses(
-                expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
-            )
-            _eventFlow.emit(UiEvent.NavigateBack)
-//            showMessage(
-//                resourceProvider.getString(R.string.toast_delete_s)
-//                    .format(
-//                        saleUiState.title,
-//                        saleUiState.count,
-//                        saleUiState.suffix
-//                    ) //Todo Обновить название
-//            )
+            if (isError()) {
+                itemsRepository.deleteExpenses(
+                    expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
+                )
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_delete_s)
+                        .format(
+                            expensesUiState.title,
+                            expensesUiState.count,
+                            expensesUiState.suffix
+                        )
+                )
+            }
         }
     }
 
@@ -191,10 +200,11 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
+    private fun isError(): Boolean = expensesUiState.validate().error.hasAnyError
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
 }
 
 fun setExpensesAnimal(

@@ -39,7 +39,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
-
 object AddEntryDestination : NavigationDestination {
     override val route = "AddEntry"
     override val titleRes = R.string.app_name
@@ -47,7 +46,6 @@ object AddEntryDestination : NavigationDestination {
     const val itemId = "itemId"
     val routeWithArgs = "$route?$itemIdPT={$itemIdPT}&$itemId={$itemId}"
 }
-
 
 @Composable
 fun AddEntryProduct(
@@ -111,35 +109,28 @@ fun AddEntryContainerProduct(
             )
         )
     }
-    val selectedAnimalIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    //Error
-    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
-    var isErrorSlash by rememberSaveable { mutableStateOf(false) }
-    var isErrorCount by rememberSaveable { mutableStateOf(false) }
+    val selectedAnimalIndex by rememberSaveable { mutableIntStateOf(0) }
 
     Column(modifier = modifier) {
         OutlinedTextTitleAdd(
             value = addTable.title,
             onValueChange = {
-                onValueChange(addTable.copy(title = it))
-                isErrorTitle = it.isError()
-                isErrorSlash = it.isErrorSlash()
+                onValueChange(addTable.copy(title = it).validateTitle())
                 updateCountWarehouse(it)
             },
             titleList = titleList,
-            isErrorTitle = isErrorTitle,
-            isErrorSlash = isErrorSlash,
+            isErrorTitle = addTable.error.isErrorTitle,
+            isErrorSlash = addTable.error.isErrorSlash,
             focusManager = focusManager
         )
         OutlinedTextCount(
             value = addTable.count,
             onValueChange = {
-                onValueChange(addTable.copy(count = it))
-                isErrorCount = it.isError()
+                onValueChange(addTable.copy(count = it).validateCount())
             },
             onClick = { onValueChange(addTable.copy(suffix = it)) },
-            isError = isErrorCount,
+            isError = addTable.error.isErrorCount,
             suffix = addTable.suffix,
             intResSup = R.string.support_text_count_product,
             countWarehouse = countWarehouse.first,
@@ -196,13 +187,8 @@ fun AddEntryContainerProduct(
             focusManager = focusManager
         )
         ButtonPanel(
-            title = addTable.title,
-            count = addTable.count,
             isEntry = isEntry,
             focusManager = focusManager,
-            isErrorTitle = { isErrorTitle = it },
-            isErrorCount = { isErrorCount = it },
-            isErrorSlash = { isErrorSlash = it },
             onClickInsert = { onClickInsert() },
             onClickUpdate = { onClickUpdate() },
             onClickDelete = { onClickDelete() }
@@ -212,13 +198,8 @@ fun AddEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    title: String,
-    count: String,
     isEntry: Boolean,
     focusManager: FocusManager,
-    isErrorTitle: (Boolean) -> Unit,
-    isErrorCount: (Boolean) -> Unit,
-    isErrorSlash: (Boolean) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
@@ -227,49 +208,15 @@ private fun ButtonPanel(
         ButtonStandart(
             intRes = R.string.button_add,
             onClick = {
-                onClickButton(
-                    title = title,
-                    count = count,
-                    focusManager = focusManager,
-                    isErrorTitle = isErrorTitle,
-                    isErrorCount = isErrorCount,
-                    isErrorSlash = isErrorSlash,
-                    onClick = onClickInsert
-                )
+                focusManager.clearFocus()
+                onClickInsert()
             }
         )
     else {
         ButtonRefresh {
-            onClickButton(
-                title = title,
-                count = count,
-                focusManager = focusManager,
-                isErrorTitle = isErrorTitle,
-                isErrorCount = isErrorCount,
-                isErrorSlash = isErrorSlash,
-                onClick = onClickUpdate
-            )
+            focusManager.clearFocus()
+            onClickUpdate()
         }
         ButtonDelete { onClickDelete() }
-    }
-}
-
-private fun onClickButton(
-    title: String,
-    count: String,
-    focusManager: FocusManager,
-    isErrorTitle: (Boolean) -> Unit,
-    isErrorCount: (Boolean) -> Unit,
-    isErrorSlash: (Boolean) -> Unit,
-    onClick: () -> Unit
-) {
-    if (isErrorAdd(
-            title = title, count = count,
-            isErrorTitle = { isErrorTitle(it) },
-            isErrorCount = { isErrorCount(it) },
-            isErrorSlash = { isErrorSlash(it) })
-    ) {
-        focusManager.clearFocus()
-        onClick()
     }
 }

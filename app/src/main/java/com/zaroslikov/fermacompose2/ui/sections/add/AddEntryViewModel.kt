@@ -108,24 +108,28 @@ class AddEntryViewModel @Inject constructor(
 
     fun insertItem() {
         viewModelScope.launch {
-            itemsRepository.insertItem(addUiState.copy(idPT = itemIdPT.toLong()).toRoomMap())
-            metricAdd(addUiState)
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_add_s)
-                    .format(addUiState.title, addUiState.count, addUiState.suffix)
-            )
+            if (isError()) {
+                itemsRepository.insertItem(addUiState.copy(idPT = itemIdPT.toLong()).toRoomMap())
+                metricAdd(addUiState)
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_add_s)
+                        .format(addUiState.title, addUiState.count, addUiState.suffix)
+                )
+            }
         }
     }
 
     fun updateItem() {
         viewModelScope.launch {
-            itemsRepository.updateItem(addUiState.toRoomMap())
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s)
-                    .format(addUiState.title, addUiState.count, addUiState.suffix)
-            )
+            if (isError()) {
+                itemsRepository.updateItem(addUiState.toRoomMap())
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_refresh_s)
+                        .format(addUiState.title, addUiState.count, addUiState.suffix)
+                )
+            }
         }
     }
 
@@ -149,6 +153,7 @@ class AddEntryViewModel @Inject constructor(
             )
         }
     }
+    private fun isError(): Boolean = addUiState.validate().error.hasAnyError
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

@@ -45,9 +45,6 @@ import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
-import com.zaroslikov.fermacompose2.supportFun.isError
-import com.zaroslikov.fermacompose2.supportFun.isErrorExpenses
-import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsClear
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
@@ -128,7 +125,6 @@ fun ExpensesEntryProduct(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ExpensesEntryContainerProduct(
     modifier: Modifier,
@@ -212,7 +208,7 @@ fun ExpensesEntryContainerProduct(
             value = domainExpensesTable.title,
             onValueChange = {
                 onValueChange(
-                    domainExpensesTable.copy(title = it).validate()
+                    domainExpensesTable.copy(title = it).validateTitle()
                 )
                 updateCountWarehouse(it)
             },
@@ -225,7 +221,7 @@ fun ExpensesEntryContainerProduct(
             value = domainExpensesTable.count,
             onValueChange = {
                 onValueChange(
-                    domainExpensesTable.copy(count = it).validate()
+                    domainExpensesTable.copy(count = it).validateCount()
                 )
 //                if (showFoodUI && !setDailyExpensesFoodAndCountUI) {
 //                    foodDesignedDayUI = settingDay(
@@ -255,7 +251,7 @@ fun ExpensesEntryContainerProduct(
             value = domainExpensesTable.priceAll,
             onValueChange = {
                 onValueChange(
-                    domainExpensesTable.copy(priceAll = it).validate()
+                    domainExpensesTable.copy(priceAll = it).validatePrice()
                 )
             },
             isError = domainExpensesTable.error.isErrorPrice,
@@ -293,21 +289,8 @@ fun ExpensesEntryContainerProduct(
             animalList2 = animalList2
         )
         ButtonPanel(
-            title = domainExpensesTable.title,
-            count = domainExpensesTable.count,
-            priceAll = domainExpensesTable.priceAll,
             isEntry = isEntry,
-            dailyExpensesFoodUI = domainExpensesTable.dailyExpensesFood,
-            countAnimalUI = domainExpensesTable.countAnimal,
-            setDailyExpensesFoodAndCountUI = false, //todo
-
             focusManager = focusManager,
-//            isErrorTitle = { isErrorTitle = it },
-//            isErrorCount = { isErrorCount = it },
-//            isErrorSlash = { isErrorSlash = it },
-//            isErrorPrice = { isErrorPrice = it },
-//            isErrorDailyExpensesFood = { isErrorDailyExpensesFood = it },
-//            isErrorCountAnimalUI = { isErrorCountAnimalUI = it },
             onClickInsert = { onClickInsert() },
             onClickUpdate = { onClickUpdate() },
             onClickDelete = { onClickDelete() }
@@ -318,20 +301,8 @@ fun ExpensesEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    title: String,
-    count: String,
-    priceAll: String,
     isEntry: Boolean,
-    dailyExpensesFoodUI: String,
-    countAnimalUI: String,
-    setDailyExpensesFoodAndCountUI: Boolean,
     focusManager: FocusManager,
-//    isErrorTitle: (Boolean) -> Unit,
-//    isErrorCount: (Boolean) -> Unit,
-//    isErrorSlash: (Boolean) -> Unit,
-//    isErrorPrice: (Boolean) -> Unit,
-//    isErrorDailyExpensesFood: (Boolean) -> Unit,
-//    isErrorCountAnimalUI: (Boolean) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
@@ -340,81 +311,17 @@ private fun ButtonPanel(
         ButtonStandart(
             intRes = R.string.button_expenses,
             onClick = {
-                onClickButton(
-                    title = title,
-                    count = count,
-                    priceAll = priceAll,
-                    focusManager = focusManager,
-//                    isErrorTitle = isErrorTitle,
-//                    isErrorCount = isErrorCount,
-//                    isErrorSlash = isErrorSlash,
-//                    isErrorPrice = isErrorPrice,
-                    onClick = onClickInsert,
-                    dailyExpensesFoodUI = dailyExpensesFoodUI,
-                    countAnimalUI = countAnimalUI,
-                    setDailyExpensesFoodAndCountUI = setDailyExpensesFoodAndCountUI,
-//                    isErrorDailyExpensesFood = isErrorDailyExpensesFood,
-//                    isErrorCountAnimalUI = isErrorCountAnimalUI
-                )
+                focusManager.clearFocus()
+                onClickInsert()
             }
         )
     else {
         ButtonRefresh {
-            onClickButton(
-                title = title,
-                count = count,
-                priceAll = priceAll,
-                focusManager = focusManager,
-//                isErrorTitle = isErrorTitle,
-//                isErrorCount = isErrorCount,
-//                isErrorSlash = isErrorSlash,
-//                isErrorPrice = isErrorPrice,
-                onClick = onClickUpdate,
-                dailyExpensesFoodUI = dailyExpensesFoodUI,
-                countAnimalUI = countAnimalUI,
-                setDailyExpensesFoodAndCountUI = setDailyExpensesFoodAndCountUI,
-//                isErrorDailyExpensesFood = isErrorDailyExpensesFood,
-//                isErrorCountAnimalUI = isErrorCountAnimalUI
-            )
+            focusManager.clearFocus()
+            onClickUpdate()
         }
         ButtonDelete { onClickDelete() }
     }
-}
-
-private fun onClickButton(
-    title: String,
-    count: String,
-    priceAll: String,
-    dailyExpensesFoodUI: String,
-    countAnimalUI: String,
-    setDailyExpensesFoodAndCountUI: Boolean,
-    focusManager: FocusManager,
-//    isErrorTitle: (Boolean) -> Unit,
-//    isErrorCount: (Boolean) -> Unit,
-//    isErrorSlash: (Boolean) -> Unit,
-//    isErrorPrice: (Boolean) -> Unit,
-//    isErrorDailyExpensesFood: (Boolean) -> Unit,
-//    isErrorCountAnimalUI: (Boolean) -> Unit,
-    onClick: () -> Unit = {}
-) {
-//    if (isErrorExpenses(
-//            title = title, count = count,
-//            price = priceAll,
-//            dailyExpensesFoodUI = dailyExpensesFoodUI,
-//            countAnimalUI = countAnimalUI,
-//            setDailyExpensesFoodAndCountUI = setDailyExpensesFoodAndCountUI,
-////            isErrorTitle = { isErrorTitle(it) },
-////            isErrorCount = { isErrorCount(it) },
-////            isErrorSlash = { isErrorSlash(it) },
-////            isErrorPrice = { isErrorPrice(it) },
-////            isErrorDailyExpensesFood = { isErrorDailyExpensesFood(it) },
-////            isErrorCountAnimalUI = { isErrorCountAnimalUI(it) })
-//        ) { onClick() } else {
-//    }
-////        {
-////        focusManager.clearFocus()
-////        onClick()
-////    }
 }
 
 
@@ -533,7 +440,7 @@ private fun ShowAnimal(
     onValueChange: (DomainExpensesTable) -> Unit,
     animalList: MutableList<AnimalExpensesList2>
 ) {
-    var selectedFilters2 = remember { mutableStateMapOf<Long, Double>() }
+    val selectedFilters2 = remember { mutableStateMapOf<Long, Double>() }
     var openAlertAnimal by remember { mutableStateOf(false) }
     if (openAlertAnimal) {
         AlertDialogInfo(
@@ -609,7 +516,7 @@ private fun ShowAnimal(
 
                     Text(
                         text = "$nameAnimal: $productExpensesOnAnimal ${domainExpensesTable.suffix} / " +
-                                "$priceProductExpensesOnAnimal +  -  ${formatter(animal.value)}%",
+                                "$priceProductExpensesOnAnimal -  ${formatter(animal.value)}%",
                         fontSize = 18.sp,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -764,7 +671,7 @@ private fun InputText(
     OutlinedTextCountNoCard(
         value = expensesTable.dailyExpensesFood,
         onValueChange = {
-            onValueChange(expensesTable.copy(dailyExpensesFood = it).validate())
+            onValueChange(expensesTable.copy(dailyExpensesFood = it).validateDailyExpensesFood())
         },
         isWarehouseShow = false,
         isDropMenuShow = false,
@@ -778,7 +685,7 @@ private fun InputText(
     OutlinedTextCountNoCard(
         value = expensesTable.countAnimal,
         onValueChange = {
-            onValueChange(expensesTable.copy(countAnimal = it).validate())
+            onValueChange(expensesTable.copy(countAnimal = it).validateCountAnimal())
         },
         drawableRes = R.drawable.baseline_spoke_24,
         isWarehouseShow = false,
