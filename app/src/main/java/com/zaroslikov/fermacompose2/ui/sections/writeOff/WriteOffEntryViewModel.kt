@@ -104,38 +104,44 @@ class WriteOffEntryViewModel @Inject constructor(
 
     fun insertItem() {
         viewModelScope.launch {
-            itemsRepository.insertWriteOff(
-                writeOffUiState.copy(
-                    priceAll = autoCalculate(),
-                    idPT = itemIdPT.toLong()
-                ).toRoomMap()
-            )
+            if (!isError()) {
+                itemsRepository.insertWriteOff(
+                    writeOffUiState.copy(
+                        priceAll = autoCalculate(),
+                        idPT = itemIdPT.toLong()
+                    ).toRoomMap()
+                )
 //            metricaWriteOff(writeOffUiState.copy(priceAll = autoCalculate()))
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_sale_s)
-                    .format(
-                        writeOffUiState.title,
-                        writeOffUiState.count,
-                        writeOffUiState.suffix
-                    ) //Todo Обновить название
-            )
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_sale_s)
+                        .format(
+                            writeOffUiState.title,
+                            writeOffUiState.count,
+                            writeOffUiState.suffix
+                        ) //Todo Обновить название
+                )
+            }
         }
     }
 
     fun updateItem() {
         viewModelScope.launch {
-            autoCalculate()
-            itemsRepository.updateWriteOff(writeOffUiState.copy(priceAll = autoCalculate()).toRoomMap())
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s_s)
-                    .format(
-                        writeOffUiState.title,
-                        writeOffUiState.count,
-                        writeOffUiState.suffix
-                    ) //Todo Обновить название
-            )
+            if (!isError()) {
+                autoCalculate()
+                itemsRepository.updateWriteOff(
+                    writeOffUiState.copy(priceAll = autoCalculate()).toRoomMap()
+                )
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_refresh_s_s)
+                        .format(
+                            writeOffUiState.title,
+                            writeOffUiState.count,
+                            writeOffUiState.suffix
+                        ) //Todo Обновить название
+                )
+            }
         }
     }
 
@@ -164,6 +170,8 @@ class WriteOffEntryViewModel @Inject constructor(
         }
     }
 
+    fun isError() : Boolean = writeOffUiState.validate().error.hasAnyError
+
     fun autoCalculate(): String = if (isAutoCalculate.value) calculatePriceAll(
         writeOffUiState.priceAll,
         writeOffUiState.count
@@ -172,5 +180,4 @@ class WriteOffEntryViewModel @Inject constructor(
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
 }

@@ -108,7 +108,7 @@ class AddEntryViewModel @Inject constructor(
 
     fun insertItem() {
         viewModelScope.launch {
-            if (isError()) {
+            if (!isError()) {
                 itemsRepository.insertItem(addUiState.copy(idPT = itemIdPT.toLong()).toRoomMap())
                 metricAdd(addUiState)
                 _eventFlow.emit(UiEvent.NavigateBack)
@@ -122,7 +122,7 @@ class AddEntryViewModel @Inject constructor(
 
     fun updateItem() {
         viewModelScope.launch {
-            if (isError()) {
+            if (!isError()) {
                 itemsRepository.updateItem(addUiState.toRoomMap())
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(

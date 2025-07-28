@@ -51,7 +51,6 @@ object SaleEntryDestination : NavigationDestination {
     val routeWithArgs = "$route?$itemIdPT={$itemIdPT}&$itemId={$itemId}"
 }
 
-
 @Composable
 fun SaleEntryProduct(
     navigateBack: () -> Unit,
@@ -59,7 +58,6 @@ fun SaleEntryProduct(
     viewModel: SaleEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
-
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
@@ -123,20 +121,12 @@ fun SaleEntryContainerProduct(
     var selectedItemIndex by remember { mutableIntStateOf(0) }
     var countWarehouseBoolean by rememberSaveable { mutableStateOf(false) }
 
-    //Error
-    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
-    var isErrorSlash by rememberSaveable { mutableStateOf(false) }
-    var isErrorCount by rememberSaveable { mutableStateOf(false) }
-    var isErrorPrice by rememberSaveable { mutableStateOf(false) }
-
     Column(modifier = modifier) {
 
         OutlinedTextTitleSale(
             value = domainSaleTable.title,
             onValueChange = {
-                onValueChange(domainSaleTable.copy(title = it))
-                isErrorTitle = it.isError()
-                isErrorSlash = it.isErrorSlash()
+                onValueChange(domainSaleTable.copy(title = it).validateTitle())
             },
             onValueChoice = {
                 selectedItemIndex = it.first
@@ -146,19 +136,17 @@ fun SaleEntryContainerProduct(
             },
             selectedItemIndex = selectedItemIndex,
             titleList = titleList,
-
-            isErrorTitle = isErrorTitle,
-            isErrorSlash = isErrorSlash,
+            isErrorTitle = domainSaleTable.error.isErrorTitle,
+            isErrorSlash = domainSaleTable.error.isErrorSlash,
             focusManager = focusManager
         )
         OutlinedTextCount(
             value = domainSaleTable.count,
             onValueChange = {
-                onValueChange(domainSaleTable.copy(count = it))
-                isErrorCount = it.isError()
+                onValueChange(domainSaleTable.copy(count = it).validateCount())
             },
             onClick = { onValueChange(domainSaleTable.copy(suffix = it)) },
-            isError = isErrorCount,
+            isError = domainSaleTable.error.isErrorCount,
             suffix = domainSaleTable.suffix,
             intResSup = R.string.support_text_count_product_sale,
             countWarehouse = countWarehouse.first,
@@ -168,11 +156,10 @@ fun SaleEntryContainerProduct(
         OutlinedPriceInput(
             price = domainSaleTable.priceAll,
             onPriceChange = {
-                onValueChange(domainSaleTable.copy(priceAll = it))
-                isErrorPrice = it.isError()
+                onValueChange(domainSaleTable.copy(priceAll = it).validatePrice())
             },
             count = domainSaleTable.count,
-            isError = isErrorPrice,
+            isError = domainSaleTable.error.isErrorPrice,
             isAutoCalculate = isAutoCalculate.value,
             onAutoCalculate = { isAutoCalculate.value = it },
             isManyCount = true,
@@ -200,7 +187,7 @@ fun SaleEntryContainerProduct(
         )
         OutlinedTextBuyer(
             value = domainSaleTable.buyer,
-            onValueChange = { domainSaleTable.copy(buyer = it) },
+            onValueChange = { onValueChange(domainSaleTable.copy(buyer = it)) },
             list = buyerList,
             focusManager = focusManager
         )
@@ -210,15 +197,8 @@ fun SaleEntryContainerProduct(
             focusManager = focusManager
         )
         ButtonPanel(
-            title = domainSaleTable.title,
-            count = domainSaleTable.count,
-            priceAll = domainSaleTable.priceAll,
             isEntry = isEntry,
             focusManager = focusManager,
-            isErrorTitle = { isErrorTitle = it },
-            isErrorCount = { isErrorCount = it },
-            isErrorSlash = { isErrorSlash = it },
-            isErrorPrice = { isErrorPrice = it },
             onClickInsert = { onClickInsert() },
             onClickUpdate = { onClickUpdate() },
             onClickDelete = { onClickDelete() }
@@ -228,15 +208,8 @@ fun SaleEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    title: String,
-    count: String,
-    priceAll: String,
     isEntry: Boolean,
     focusManager: FocusManager,
-    isErrorTitle: (Boolean) -> Unit,
-    isErrorCount: (Boolean) -> Unit,
-    isErrorSlash: (Boolean) -> Unit,
-    isErrorPrice: (Boolean) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
@@ -245,97 +218,15 @@ private fun ButtonPanel(
         ButtonStandart(
             intRes = R.string.button_sale,
             onClick = {
-                onClickButton(
-                    title = title,
-                    count = count,
-                    priceAll = priceAll,
-                    focusManager = focusManager,
-                    isErrorTitle = isErrorTitle,
-                    isErrorCount = isErrorCount,
-                    isErrorSlash = isErrorSlash,
-                    isErrorPrice = isErrorPrice,
-                    onClick = onClickInsert
-                )
+                focusManager.clearFocus()
+                onClickInsert()
             }
         )
     else {
         ButtonRefresh {
-            onClickButton(
-                title = title,
-                count = count,
-                priceAll = priceAll,
-                focusManager = focusManager,
-                isErrorTitle = isErrorTitle,
-                isErrorCount = isErrorCount,
-                isErrorSlash = isErrorSlash,
-                isErrorPrice = isErrorPrice,
-                onClick = onClickUpdate
-            )
+            focusManager.clearFocus()
+            onClickUpdate()
         }
         ButtonDelete { onClickDelete() }
     }
 }
-
-private fun onClickButton(
-    title: String,
-    count: String,
-    priceAll: String,
-    focusManager: FocusManager,
-    isErrorTitle: (Boolean) -> Unit,
-    isErrorCount: (Boolean) -> Unit,
-    isErrorSlash: (Boolean) -> Unit,
-    isErrorPrice: (Boolean) -> Unit,
-    onClick: () -> Unit
-) {
-    if (isErrorSale(
-            title = title, count = count,
-            price = priceAll,
-            isErrorTitle = { isErrorTitle(it) },
-            isErrorCount = { isErrorCount(it) },
-            isErrorSlash = { isErrorSlash(it) },
-            isErrorPrice = { isErrorPrice(it) })
-    ) {
-        focusManager.clearFocus()
-        onClick()
-    }
-}
-
-//ButtonStandart(
-//intRes = R.string.button_sale,
-//onClick = {
-//    if (isErrorSale(
-//            title = title, count = count,
-//            price = priceAll,
-//            isErrorTitle = { isErrorTitle = it },
-//            isErrorCount = { isErrorCount = it },
-//            isErrorSlash = { isErrorSlash = it },
-//            isErrorPrice = { isErrorPrice = it })
-//    ) {
-//        focusManager.clearFocus()
-//        val formattedDateList = date.split(".")
-//        saveInRoomSale(
-//            SaleTable(
-//                id = 0,
-//                title = title,
-//                count = count.toDouble(),
-//                day = formattedDateList[0].toInt(),
-//                mount = formattedDateList[1].toInt(),
-//                year = formattedDateList[2].toInt(),
-//                suffix = suffix,
-//                category = category,
-//                priceAll = priceAll.toDouble(),
-//                buyer = buyer,
-//                note = note,
-//                idPT = idProject.toLong()
-//            )
-//        )
-//        toastShort(
-//            context = context,
-//            text = toastText
-//        )
-//        metricaSale(
-//            title, count, priceAll, category, buyer, note
-//        )
-//    }
-//}
-//)

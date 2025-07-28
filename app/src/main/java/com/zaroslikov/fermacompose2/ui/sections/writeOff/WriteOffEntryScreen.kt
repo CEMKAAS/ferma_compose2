@@ -113,10 +113,6 @@ fun WriteOffEntryContainerProduct(
             )
         )
     }
-
-    var isErrorTitle by rememberSaveable { mutableStateOf(false) }
-    var isErrorCount by rememberSaveable { mutableStateOf(false) }
-
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     Column(modifier = modifier) {
@@ -124,7 +120,7 @@ fun WriteOffEntryContainerProduct(
             value = domainWriteOffTable.title,
             onValueChoice = {
                 selectedItemIndex = it.first
-                onValueChange(domainWriteOffTable.copy(title = it.second))
+                onValueChange(domainWriteOffTable.copy(title = it.second).validateTitle())
                 updateCountWarehouse(
                     Pair(
                         it.second,
@@ -134,6 +130,8 @@ fun WriteOffEntryContainerProduct(
             },
             selectedItemIndex = selectedItemIndex,
             titleList = titleList,
+            isErrorTitle = domainWriteOffTable.error.isErrorTitle,
+            isErrorSlash = domainWriteOffTable.error.isErrorSlash,
             enable = !isIndicationValue,
             readOnly = isIndicationValue,
             focusManager = focusManager
@@ -141,11 +139,10 @@ fun WriteOffEntryContainerProduct(
         OutlinedTextCount(
             value = domainWriteOffTable.count,
             onValueChange = {
-                onValueChange(domainWriteOffTable.copy(count = it))
-                isErrorCount = it.isError()
+                onValueChange(domainWriteOffTable.copy(count = it).validateCount())
             },
             onClick = { onValueChange(domainWriteOffTable.copy(suffix = it)) },
-            isError = isErrorCount,
+            isError = domainWriteOffTable.error.isErrorCount,
             suffix = domainWriteOffTable.suffix,
             intResSup = R.string.support_text_count_product_write_off,
             countWarehouse = countWarehouse.first,
@@ -188,12 +185,8 @@ fun WriteOffEntryContainerProduct(
             onStateSelect = { onValueChange(domainWriteOffTable.copy(status = it)) }
         )
         ButtonPanel(
-            title = domainWriteOffTable.title,
-            count = domainWriteOffTable.count,
             isEntry = isEntry,
             focusManager = focusManager,
-            isErrorTitle = { isErrorTitle = it },
-            isErrorCount = { isErrorCount = it },
             onClickInsert = { onClickInsert() },
             onClickUpdate = { onClickUpdate() },
             onClickDelete = { onClickDelete() }
@@ -203,12 +196,8 @@ fun WriteOffEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    title: String,
-    count: String,
     isEntry: Boolean,
     focusManager: FocusManager,
-    isErrorTitle: (Boolean) -> Unit,
-    isErrorCount: (Boolean) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
@@ -217,90 +206,17 @@ private fun ButtonPanel(
         ButtonStandart(
             intRes = R.string.button_add,
             onClick = {
-                onClickButton(
-                    title = title,
-                    count = count,
-                    focusManager = focusManager,
-                    isErrorTitle = isErrorTitle,
-                    isErrorCount = isErrorCount,
-                    onClick = onClickInsert
-                )
+                focusManager.clearFocus()
+                onClickInsert()
             }
         )
     else {
         ButtonRefresh {
-            onClickButton(
-                title = title,
-                count = count,
-                focusManager = focusManager,
-                isErrorTitle = isErrorTitle,
-                isErrorCount = isErrorCount,
-                onClick = onClickUpdate
-            )
+            focusManager.clearFocus()
+            onClickUpdate()
         }
         ButtonDelete { onClickDelete() }
     }
 }
-
-private fun onClickButton(
-    title: String,
-    count: String,
-    focusManager: FocusManager,
-    isErrorTitle: (Boolean) -> Unit,
-    isErrorCount: (Boolean) -> Unit,
-    onClick: () -> Unit
-) {
-    if (isErrorAdd(
-            title = title, count = count,
-            isErrorTitle = { isErrorTitle(it) },
-            isErrorCount = { isErrorCount(it) })
-    ) {
-        focusManager.clearFocus()
-        onClick()
-    }
-
-}
-//        ButtonStandart(
-//            intRes = R.string.button_write_off,
-//            onClick = {
-//                if (isErrorAdd(
-//                        title = title, count = count,
-//                        isErrorTitle = { isErrorTitle = it },
-//                        isErrorCount = { isErrorCount = it })
-//                ) {
-//                    focusManager.clearFocus()
-//                    val formattedDateList = date.split(".")
-//                    saveInRoomSale(
-//                        WriteOffTable(
-//                            id = 0,
-//                            title = title,
-//                            count = count.replace(Regex("[^\\d.]"), "").replace(",", ".")
-//                                .toDouble(),
-//                            day = formattedDateList[0].toInt(),
-//                            mount = formattedDateList[1].toInt(),
-//                            year = formattedDateList[2].toInt(),
-//                            suffix = suffix,
-//                            priceAll = if (priceAll == "") 0.0 else priceAll.replace(
-//                                Regex("[^\\d.]"),
-//                                ""
-//                            ).replace(",", ".")
-//                                .toDouble(),
-//                            status = if (state1) 0 else 1,
-//                            note = note,
-//                            idPT = idProject
-//                        )
-//                    )
-//                    toastShort(
-//                        context = context,
-//                        text = toastText
-//                    )
-//                    metricaWriteOff(
-//                        title, count, suffix, priceAll, note, state1
-//                    )
-//                }
-//            }
-//        )
-//    }
-//}
 
 

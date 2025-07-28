@@ -14,5 +14,41 @@ data class DomainWriteOffTable(
     var suffix: String = "",
     val status: Boolean = false,
     val note: String = "",
-    val animalCountId : Long? = null
-)
+    val animalCountId : Long? = null,
+    val error: Error = Error()
+){
+    data class Error(
+        val isErrorTitle: Boolean = false,
+        val isErrorSlash: Boolean = false,
+        val isErrorCount: Boolean = false,
+    ) {
+        val hasAnyError: Boolean
+            get() = isErrorTitle || isErrorSlash || isErrorCount
+    }
+
+    fun validate(): DomainWriteOffTable{
+        val error = Error(
+            isErrorTitle = title.isBlank(),
+            isErrorSlash = title.contains("/"),
+            isErrorCount = count.isBlank()
+        )
+        return this.copy(error = error)
+    }
+
+    fun validateTitle(): DomainWriteOffTable {
+        return this.copy(
+            error = Error(
+                isErrorTitle = title.isBlank(),
+                isErrorSlash = title.contains("/")
+            )
+        )
+    }
+
+    fun validateCount(): DomainWriteOffTable{
+        return this.copy(
+            error = Error(
+                isErrorCount = count.isBlank()
+            )
+        )
+    }
+}

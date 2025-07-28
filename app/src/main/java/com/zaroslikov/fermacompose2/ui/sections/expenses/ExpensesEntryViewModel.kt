@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -131,7 +132,7 @@ class ExpensesEntryViewModel @Inject constructor(
 
     fun insertItem() {
         viewModelScope.launch {
-            if (isError()) {
+            if (!isError()) {
                 itemsRepository.insertExpenses(
                     expensesUiState.copy(
                         idPT = itemIdPT.toLong()
@@ -154,7 +155,7 @@ class ExpensesEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
 //            autoCalculate()
-            if (isError()) {
+            if (!isError()) {
                 itemsRepository.updateExpenses(
                     expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
                 )
@@ -173,20 +174,18 @@ class ExpensesEntryViewModel @Inject constructor(
 
     fun deleteItem() {
         viewModelScope.launch {
-            if (isError()) {
-                itemsRepository.deleteExpenses(
-                    expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
-                )
-                _eventFlow.emit(UiEvent.NavigateBack)
-                showMessage(
-                    resourceProvider.getString(R.string.toast_delete_s)
-                        .format(
-                            expensesUiState.title,
-                            expensesUiState.count,
-                            expensesUiState.suffix
-                        )
-                )
-            }
+            itemsRepository.deleteExpenses(
+                expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
+            )
+            _eventFlow.emit(UiEvent.NavigateBack)
+            showMessage(
+                resourceProvider.getString(R.string.toast_delete_s)
+                    .format(
+                        expensesUiState.title,
+                        expensesUiState.count,
+                        expensesUiState.suffix
+                    )
+            )
         }
     }
 
@@ -200,7 +199,11 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
-    private fun isError(): Boolean = expensesUiState.validate().error.hasAnyError
+    private fun isError(): Boolean {
+        expensesUiState.validate()
+        Log.i("isError", "isError: ${expensesUiState.error}")
+        return expensesUiState.error.hasAnyError
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

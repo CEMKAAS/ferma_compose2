@@ -126,38 +126,42 @@ class SaleEntryViewModel @Inject constructor(
 
     fun insertItem() {
         viewModelScope.launch {
-            itemsRepository.insertSale(
-                saleUiState.copy(
-                    priceAll = autoCalculate(),
-                    idPT = itemIdPT.toLong()
-                ).toRoomMap()
-            )
-            metricaSale(saleUiState.copy(priceAll = autoCalculate()))
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_sale_s)
-                    .format(
-                        saleUiState.title,
-                        saleUiState.count,
-                        saleUiState.suffix
-                    ) //Todo Обновить название
-            )
+            if (!isError()) {
+                itemsRepository.insertSale(
+                    saleUiState.copy(
+                        priceAll = autoCalculate(),
+                        idPT = itemIdPT.toLong()
+                    ).toRoomMap()
+                )
+                metricaSale(saleUiState.copy(priceAll = autoCalculate()))
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_sale_s)
+                        .format(
+                            saleUiState.title,
+                            saleUiState.count,
+                            saleUiState.suffix
+                        ) //Todo Обновить название
+                )
+            }
         }
     }
 
     fun updateItem() {
         viewModelScope.launch {
-            autoCalculate()
-            itemsRepository.updateSale(saleUiState.copy(priceAll = autoCalculate()).toRoomMap())
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s_s)
-                    .format(
-                        saleUiState.title,
-                        saleUiState.count,
-                        saleUiState.suffix
-                    ) //Todo Обновить название
-            )
+            if (!isError()) {
+                autoCalculate()
+                itemsRepository.updateSale(saleUiState.copy(priceAll = autoCalculate()).toRoomMap())
+                _eventFlow.emit(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_refresh_s_s)
+                        .format(
+                            saleUiState.title,
+                            saleUiState.count,
+                            saleUiState.suffix
+                        ) //Todo Обновить название
+                )
+            }
         }
     }
 
@@ -190,6 +194,9 @@ class SaleEntryViewModel @Inject constructor(
         saleUiState.priceAll,
         saleUiState.count
     ) else saleUiState.priceAll
+
+    fun isError(): Boolean = saleUiState.validate().error.hasAnyError
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

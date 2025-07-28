@@ -15,5 +15,50 @@ data class DomainSaleTable (
     var buyer: String = "",
     var note: String = "",
     val idPT: Long = 0,
-    val animalCountId : Long? = null
-)
+    val animalCountId : Long? = null,
+    val error: Error = Error()
+){
+    data class Error(
+        val isErrorTitle: Boolean = false,
+        val isErrorSlash: Boolean = false,
+        val isErrorCount: Boolean = false,
+        val isErrorPrice: Boolean = false
+    ) {
+        val hasAnyError: Boolean
+            get() = isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice
+    }
+
+    fun validate(): DomainSaleTable{
+        val error = Error(
+            isErrorTitle = title.isBlank(),
+            isErrorSlash = title.contains("/"),
+            isErrorCount = count.isBlank(),
+            isErrorPrice = priceAll.isBlank()
+        )
+        return this.copy(error = error)
+    }
+
+    fun validateTitle(): DomainSaleTable {
+        return this.copy(
+            error = Error(
+                isErrorTitle = title.isBlank(),
+                isErrorSlash = title.contains("/")
+            )
+        )
+    }
+
+    fun validateCount(): DomainSaleTable {
+        return this.copy(
+            error = Error(
+                isErrorCount = count.isBlank()
+            )
+        )
+    }
+    fun validatePrice(): DomainSaleTable {
+        return this.copy(
+            error = Error(
+                isErrorPrice = priceAll.isBlank()
+            )
+        )
+    }
+}
