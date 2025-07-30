@@ -27,7 +27,7 @@ data class DomainWriteOffTable(
     }
 
     fun validate(): DomainWriteOffTable{
-        val error = Error(
+        val error = error.copy(
             isErrorTitle = title.isBlank(),
             isErrorSlash = title.contains("/"),
             isErrorCount = count.isBlank()
@@ -37,7 +37,7 @@ data class DomainWriteOffTable(
 
     fun validateTitle(): DomainWriteOffTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorTitle = title.isBlank(),
                 isErrorSlash = title.contains("/")
             )
@@ -46,7 +46,7 @@ data class DomainWriteOffTable(
 
     fun validateCount(): DomainWriteOffTable{
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorCount = count.isBlank()
             )
         )

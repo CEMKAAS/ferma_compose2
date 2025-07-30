@@ -51,39 +51,6 @@ fun isErrorSale(
     return !(title.contains("/") || title == "" || count == "" || price == "")
 }
 
-fun isErrorExpenses(
-    title: String,
-    count: String,
-    price: String,
-    dailyExpensesFoodUI: String,
-    countAnimalUI: String,
-    setDailyExpensesFoodAndCountUI: Boolean,
-//    isErrorTitle: (Boolean) -> Unit,
-//    isErrorCount: (Boolean) -> Unit,
-//    isErrorSlash: (Boolean) -> Unit,
-//    isErrorPrice: (Boolean) -> Unit,
-//    isErrorDailyExpensesFood: (Boolean) -> Unit,
-//    isErrorCountAnimalUI: (Boolean) -> Unit,
-
-): Boolean {
-//    isErrorTitle(title.isError())
-//    isErrorCount(count.isError())
-//    isErrorSlash(title.isErrorSlash())
-//    isErrorPrice(price.isError())
-//
-//    if (setDailyExpensesFoodAndCountUI) {
-//        isErrorDailyExpensesFood(dailyExpensesFoodUI.isError())
-//        isErrorCountAnimalUI(countAnimalUI.isError())
-//    }
-
-    return if (setDailyExpensesFoodAndCountUI) {
-        !(title.isErrorSlash() || title.isError() || count.isError() || price.isError() || dailyExpensesFoodUI.isError() || countAnimalUI.isError())
-    } else {
-        !(title.isErrorSlash() || title.isError() || count.isError() || price.isError())
-    }
-}
-
-
 fun isErrorAnimal(
     title: String,
     type: String,

@@ -30,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -44,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsClear
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
@@ -54,15 +52,11 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsGo
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
-import com.zaroslikov.fermacompose2.supportFun.toConvertDb1
 import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSampleNoLimit
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.start.formatter
-import io.appmetrica.analytics.impl.T
 import java.time.Instant
 
 
@@ -359,7 +353,7 @@ fun OutlinedTextCategory(
         ) {
             OutlinedTextField(
                 value = value,
-                onValueChange = { text -> onValueChange(text.trim()) },
+                onValueChange = { text -> onValueChange(text) },
                 label = { Text(stringResource(R.string.outlined_text_field_category)) },
                 modifier = it.first,
                 leadingIcon = {
@@ -624,6 +618,7 @@ fun OutlinedPriceInput(
     isError: Boolean = false,
     @StringRes supportTextRes: Int = R.string.support_text_count_product_sale,
     @StringRes supportTextResAutoCal: Int = R.string.support_text_count_product_sale,
+    @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_price,
     focusManager: FocusManager
 ) {
     val target = when {
@@ -677,6 +672,7 @@ fun OutlinedPriceInput(
             AutoCalculateCheckbox(
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
+                tooltipTextResAutoCal = tooltipTextResAutoCal,
                 price = price,
                 count = count
             )
@@ -904,6 +900,7 @@ fun OutlinedTextSex(
 
 @Composable
 fun OutlinedTextCountNoCard(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     onClick: (String) -> Unit = {},
@@ -929,7 +926,7 @@ fun OutlinedTextCountNoCard(
             onValueChange(it)
         },
         label = { Text(stringResource(intRes)) },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         leadingIcon = {
             Icon(
                 painter = painterResource(drawableRes),
@@ -957,6 +954,7 @@ fun OutlinedTextCountNoCard(
         },
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        isError = isError
+        isError = isError,
+
     )
 }

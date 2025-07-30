@@ -153,7 +153,11 @@ class AddEntryViewModel @Inject constructor(
             )
         }
     }
-    private fun isError(): Boolean = addUiState.validate().error.hasAnyError
+
+    private fun isError(): Boolean {
+        updateUiState(addUiState.validate())
+        return addUiState.error.hasAnyError
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

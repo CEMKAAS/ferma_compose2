@@ -195,7 +195,10 @@ class SaleEntryViewModel @Inject constructor(
         saleUiState.count
     ) else saleUiState.priceAll
 
-    fun isError(): Boolean = saleUiState.validate().error.hasAnyError
+    fun isError(): Boolean {
+        updateUiState(saleUiState.validate())
+        return saleUiState.error.hasAnyError
+    }
 
 
     companion object {

@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,9 +16,7 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
-import com.zaroslikov.fermacompose2.supportFun.isError
-import com.zaroslikov.fermacompose2.supportFun.isErrorExpenses
-import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
+import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -84,6 +81,18 @@ class ExpensesEntryViewModel @Inject constructor(
             domainExpensesTable
     }
 
+    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
+        private set
+
+    fun updateWarehouseUiState(name: String) {
+        viewModelScope.launch {
+            itemUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
+                .filterNotNull()
+                .first()
+                .toDomainMap()
+        }
+    }
+
     val titleUiState: StateFlow<DataStringListState> =
         itemsRepository.getItemsTitleExpensesList(itemIdPT).map { DataStringListState(it) }
             .stateIn(
@@ -108,18 +117,6 @@ class ExpensesEntryViewModel @Inject constructor(
                 initialValue = AnimalExpensesUiState()
             )
 
-    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
-        private set
-
-    fun updateWarehouseUiState(name: String) {
-        viewModelScope.launch {
-            itemUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
-                .filterNotNull()
-                .first()
-                .toDomainMap()
-        }
-    }
-
 
     suspend fun saveItem(expensesTable: ExpensesTable, set: MutableMap<Long, Double>) {
         val id = itemsRepository.insertExpenses(expensesTable)
@@ -133,8 +130,10 @@ class ExpensesEntryViewModel @Inject constructor(
     fun insertItem() {
         viewModelScope.launch {
             if (!isError()) {
+                autoCalculate()
                 itemsRepository.insertExpenses(
                     expensesUiState.copy(
+                        priceAll = autoCalculate(),
                         idPT = itemIdPT.toLong()
                     ).toRoomMap()
                 )
@@ -154,10 +153,11 @@ class ExpensesEntryViewModel @Inject constructor(
 
     fun updateItem() {
         viewModelScope.launch {
-//            autoCalculate()
             if (!isError()) {
+                autoCalculate()
                 itemsRepository.updateExpenses(
-                    expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
+                    expensesUiState.copy(priceAll = autoCalculate(), idPT = itemIdPT.toLong())
+                        .toRoomMap()
                 )
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
@@ -189,6 +189,63 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
+    suspend fun saveExpensesAnimal(animalExpensesList2: MutableList<AnimalExpensesList2>) {
+        animalExpensesList2.forEach {
+            if (it.ps && (it.idExpensesAnimal == 0.toLong())) {
+                itemsRepository.insertExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = 0,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
+                )
+            } else if (it.ps) {
+                itemsRepository.updateExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = it.idExpensesAnimal,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
+                )
+            } else {
+                itemsRepository.deleteExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = it.idExpensesAnimal,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
+                )
+            }
+        }
+    }
+
+    suspend fun deleteExpensesAnimal(animalExpensesList2: List<AnimalExpensesList2>) {
+        animalExpensesList2.forEach {
+            if (it.idExpensesAnimal != 0.toLong()) {
+                itemsRepository.deleteExpensesAnimal(
+                    ExpensesAnimalTable(
+                        id = it.idExpensesAnimal,
+                        idExpenses = itemId.toLong(),
+                        idAnimal = it.id.toLong(),
+                        percentExpenses = it.presentException,
+                        idPT = itemIdPT.toLong()
+                    )
+                )
+            }
+        }
+    }
+
+    private fun isError(): Boolean {
+        updateUiState(expensesUiState.validate())
+        return expensesUiState.hasAnyError
+    }
+
     fun showMessage(message: String) {
         viewModelScope.launch {
             SnackbarController.sendEvent(
@@ -199,11 +256,10 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
-    private fun isError(): Boolean {
-        expensesUiState.validate()
-        Log.i("isError", "isError: ${expensesUiState.error}")
-        return expensesUiState.error.hasAnyError
-    }
+    fun autoCalculate(): String = if (isAutoCalculate.value) calculatePriceAll(
+        expensesUiState.priceAll,
+        expensesUiState.count
+    ) else expensesUiState.priceAll
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

@@ -162,6 +162,7 @@ fun SaleEntryContainerProduct(
             isError = domainSaleTable.error.isErrorPrice,
             isAutoCalculate = isAutoCalculate.value,
             onAutoCalculate = { isAutoCalculate.value = it },
+            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isManyCount = true,
             focusManager = focusManager
         )

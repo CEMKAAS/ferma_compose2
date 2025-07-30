@@ -55,6 +55,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CheckboxTextIcon
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCountNoCard
@@ -247,15 +248,21 @@ fun ExpensesEntryContainerProduct(
             countWarehouse = countWarehouse.first,
             focusManager = focusManager
         )
-        OutlinedTextPrice(
-            value = domainExpensesTable.priceAll,
-            onValueChange = {
+        OutlinedPriceInput(
+            price = domainExpensesTable.priceAll,
+            onPriceChange = {
                 onValueChange(
                     domainExpensesTable.copy(priceAll = it).validatePrice()
                 )
             },
+            count = domainExpensesTable.count,
             isError = domainExpensesTable.error.isErrorPrice,
-            intSupportText = R.string.support_text_price_expenses,
+            isAutoCalculate = isAutoCalculate.value,
+            onAutoCalculate = { isAutoCalculate.value = it },
+            isManyCount = true,
+            supportTextRes = R.string.support_text_price_expenses,
+            supportTextResAutoCal = R.string.support_text_price_expenses,
+            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             focusManager = focusManager
         )
         OutlinedTextCategory(
@@ -339,29 +346,31 @@ private fun AdditionalSettings(
             stiffness = Spring.StiffnessLow
         ), label = ""
     )
-    TextButtonWarehouse(
-        boolean = details,
-        onClick = { details = !details },
-        intRes = R.string.card_extra_set
-    )
-    if (details) {
-        Food(
-            modifier = Modifier.padding(extraPadding),
-            expensesTable = domainExpensesTable,
-            onValueChange = onValueChange,
-            animalList = animalList2
+    if (!domainExpensesTable.count.isBlank() && !domainExpensesTable.priceAll.isBlank()) {
+        TextButtonWarehouse(
+            boolean = details,
+            onClick = { details = !details },
+            intRes = R.string.card_extra_set
         )
-        ShowWarehouse(
-            modifier = Modifier.padding(extraPadding),
-            domainExpensesTable = domainExpensesTable,
-            onValueChange = onValueChange
-        )
-        ShowAnimal(
-            modifier = Modifier.padding(extraPadding),
-            domainExpensesTable = domainExpensesTable,
-            onValueChange = onValueChange,
-            animalList = animalList2
-        )
+        if (details) {
+            Food(
+                modifier = Modifier.padding(extraPadding),
+                expensesTable = domainExpensesTable,
+                onValueChange = onValueChange,
+                animalList = animalList2
+            )
+            ShowWarehouse(
+                modifier = Modifier.padding(extraPadding),
+                domainExpensesTable = domainExpensesTable,
+                onValueChange = onValueChange
+            )
+            ShowAnimal(
+                modifier = Modifier.padding(extraPadding),
+                domainExpensesTable = domainExpensesTable,
+                onValueChange = onValueChange,
+                animalList = animalList2
+            )
+        }
     }
 }
 
@@ -423,6 +432,7 @@ private fun ShowWarehouse(
         CheckboxTextIcon(
             checked = domainExpensesTable.showWarehouse,
             onCheckedChange = { onValueChange(domainExpensesTable.copy(showWarehouse = it)) },
+            enabled = !domainExpensesTable.showFood,
 //                enabled = enableCheckBoxExpenses(
 //                    value = count,
 //                    boolean = showFoodUI
@@ -459,6 +469,7 @@ private fun ShowAnimal(
                 onValueChange(domainExpensesTable.copy(showAnimals = it))
                 selectedFilters2.clear()
             },
+            enabled = !domainExpensesTable.showFood,
 //                enabled = enableCheckBoxExpenses(
 //                    value = count,
 //                    valueTwo = priceAll,
@@ -663,12 +674,14 @@ fun ChoiceAnimal(
 
 @Composable
 private fun InputText(
+    modifier: Modifier = Modifier,
     expensesTable: DomainExpensesTable,
     onValueChange: (DomainExpensesTable) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
     OutlinedTextCountNoCard(
+        modifier = modifier,
         value = expensesTable.dailyExpensesFood,
         onValueChange = {
             onValueChange(expensesTable.copy(dailyExpensesFood = it).validateDailyExpensesFood())
@@ -683,6 +696,7 @@ private fun InputText(
         focusManager = focusManager
     )
     OutlinedTextCountNoCard(
+        modifier = modifier,
         value = expensesTable.countAnimal,
         onValueChange = {
             onValueChange(expensesTable.copy(countAnimal = it).validateCountAnimal())
@@ -754,4 +768,10 @@ fun settingDay(
     if (days > 1000) days = 1000
     val newDate = dateLocal.plusDays(days)
     return days.toInt() to newDate.format(formatter)
+}
+
+fun animalListClean(list: MutableList<AnimalExpensesList2>) {
+    list.forEach {
+        it.ps = false
+    }
 }

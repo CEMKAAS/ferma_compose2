@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.Domain.models
 
+import android.util.Log
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 
 data class DomainExpensesTable(
@@ -14,7 +15,7 @@ data class DomainExpensesTable(
     var category: String = "",
     val note: String = "",
     val showFood: Boolean = false, // Показывать на складе еду
-    val showWarehouse: Boolean = true, // Показывать на складе
+    val showWarehouse: Boolean = false, // Показывать на складе
     val showAnimals: Boolean = false, // Связывает животных
     val dailyExpensesFoodAndCount: Boolean = false, // указать вручную
     val dailyExpensesFood: String = "", // Ежедневный расход еды
@@ -27,6 +28,9 @@ data class DomainExpensesTable(
     val animalCountId: Long? = null,
     val error: Error = Error()
 ) {
+    val hasAnyError: Boolean
+        get() = error.hasAnyError(dailyExpensesFoodAndCount)
+
     data class Error(
         val isErrorTitle: Boolean = false,
         val isErrorSlash: Boolean = false,
@@ -35,8 +39,13 @@ data class DomainExpensesTable(
         val isErrorDailyExpensesFood: Boolean = false,
         val isErrorCountAnimal: Boolean = false,
     ) {
-        val hasAnyError: Boolean
-            get() = isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorDailyExpensesFood || isErrorCountAnimal
+        fun hasAnyError(dailyExpensesFoodAndCount: Boolean): Boolean {
+            return if (dailyExpensesFoodAndCount) {
+                isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorDailyExpensesFood || isErrorCountAnimal
+            } else {
+                isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice
+            }
+        }
     }
 
     fun validate(): DomainExpensesTable {
@@ -53,7 +62,7 @@ data class DomainExpensesTable(
 
     fun validateTitle(): DomainExpensesTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorTitle = title.isBlank(),
                 isErrorSlash = title.contains("/")
             )
@@ -61,12 +70,13 @@ data class DomainExpensesTable(
     }
 
     fun validateCount(): DomainExpensesTable {
-        return this.copy(error = Error(isErrorCount = count.isBlank()))
+        Log.i("isError", "validateCount: ${count.isBlank()} ")
+        return this.copy(error = error.copy(isErrorCount = count.isBlank()))
     }
 
     fun validatePrice(): DomainExpensesTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorPrice = priceAll.isBlank()
             )
         )
@@ -74,7 +84,7 @@ data class DomainExpensesTable(
 
     fun validateDailyExpensesFood(): DomainExpensesTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorDailyExpensesFood = dailyExpensesFood.isBlank()
             )
         )
@@ -82,7 +92,7 @@ data class DomainExpensesTable(
 
     fun validateCountAnimal(): DomainExpensesTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorCountAnimal = countAnimal.isBlank()
             )
         )

@@ -972,8 +972,3 @@ fun ExpensesEditContainerProduct(
 }
 
 
-fun animalListClean(list: MutableList<AnimalExpensesList2>) {
-    list.forEach {
-        it.ps = false
-    }
-}

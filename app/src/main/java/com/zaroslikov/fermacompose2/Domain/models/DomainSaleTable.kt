@@ -29,7 +29,7 @@ data class DomainSaleTable (
     }
 
     fun validate(): DomainSaleTable{
-        val error = Error(
+        val error = error.copy(
             isErrorTitle = title.isBlank(),
             isErrorSlash = title.contains("/"),
             isErrorCount = count.isBlank(),
@@ -40,7 +40,7 @@ data class DomainSaleTable (
 
     fun validateTitle(): DomainSaleTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorTitle = title.isBlank(),
                 isErrorSlash = title.contains("/")
             )
@@ -49,14 +49,14 @@ data class DomainSaleTable (
 
     fun validateCount(): DomainSaleTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorCount = count.isBlank()
             )
         )
     }
     fun validatePrice(): DomainSaleTable {
         return this.copy(
-            error = Error(
+            error = error.copy(
                 isErrorPrice = priceAll.isBlank()
             )
         )

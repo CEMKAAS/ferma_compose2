@@ -448,6 +448,7 @@
     <string name="expenses_entry_screen_food_day">%s хватит на %s %s суток до %s</string>
     <string name="expenses_entry_screen_every_day">Ежедневный расход составляет - %s %s</string>
     <string name="expenses_entry_screen_animal_count">Количество голов - %s %s</string>
+    <string name="expenses_entry_screen_auto_calculate">В случае активации этой опции необходимо указать стоимость не за всё весь товар, а за одну его единицу. При этом сохранится общая сумма.</string>
 
 
     //Ration Button

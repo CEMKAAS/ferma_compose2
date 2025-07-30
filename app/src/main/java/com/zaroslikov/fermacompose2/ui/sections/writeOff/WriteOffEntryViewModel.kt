@@ -170,7 +170,10 @@ class WriteOffEntryViewModel @Inject constructor(
         }
     }
 
-    fun isError() : Boolean = writeOffUiState.validate().error.hasAnyError
+    fun isError(): Boolean {
+        updateUiState(writeOffUiState.validate())
+        return writeOffUiState.error.hasAnyError
+    }
 
     fun autoCalculate(): String = if (isAutoCalculate.value) calculatePriceAll(
         writeOffUiState.priceAll,
