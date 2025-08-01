@@ -95,9 +95,9 @@ fun ExpensesEntryProduct(
         }
     }
 
-    val animalList = mutableListOf<AnimalExpensesList2>()
-    val projectList = viewModel.items.value
-    animalList.addAll(projectList)
+//    val animalList = mutableListOf<AnimalExpensesList2>()
+//    val projectList = viewModel.items.value
+//    animalList.addAll(projectList)
 
 
     Scaffold(
@@ -115,7 +115,7 @@ fun ExpensesEntryProduct(
             titleList = viewModel.titleUiState.collectAsState().value.list,
             categoryList = viewModel.categoryUiState.collectAsState().value.list,
             animalList = viewModel.animalUiState.collectAsState().value.animalList,
-            animalList2 = animalList,
+            animalList2 = viewModel.animalList2,
             countWarehouse = viewModel.itemUiState,
             updateCountWarehouse = viewModel::updateWarehouseUiState,
             onValueChange = viewModel::updateUiState,
@@ -224,22 +224,6 @@ fun ExpensesEntryContainerProduct(
                 onValueChange(
                     domainExpensesTable.copy(count = it).validateCount()
                 )
-//                if (showFoodUI && !setDailyExpensesFoodAndCountUI) {
-//                    foodDesignedDayUI = settingDay(
-//                        date,
-//                        if (count == "") 0.0 else count.toDouble(),
-//                        dailyExpensesFoodTotal
-//                    )
-//                }
-//
-//                if (showFoodUI && setDailyExpensesFoodAndCountUI) {
-//                    foodDesignedDayUI = settingDay(
-//                        date,
-//                        if (count == "") 0.0 else count.toDouble(),
-//                        if (dailyExpensesFoodUI == "") 0.0 else dailyExpensesFoodUI.toDouble(),
-//                        if (countAnimalUI == "") 0 else countAnimalUI.toInt()
-//                    )
-//                }
             },
             onClick = { onValueChange(domainExpensesTable.copy(suffix = it)) },
             isError = domainExpensesTable.error.isErrorCount,

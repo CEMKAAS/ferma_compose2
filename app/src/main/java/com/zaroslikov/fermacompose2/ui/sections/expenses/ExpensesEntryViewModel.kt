@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,18 +63,21 @@ class ExpensesEntryViewModel @Inject constructor(
     private val _items = mutableStateOf<List<AnimalExpensesList2>>(emptyList())
     val items: State<List<AnimalExpensesList2>> = _items
 
+    var animalList2 = mutableListOf<AnimalExpensesList2>()
 
     init {
-        if (!isEntry)
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (!isEntry)
                 expensesUiState = itemsRepository.getItemExpenses(itemId)
                     .filterNotNull()
                     .first()
                     .toDomainMap()
 
-                _items.value =
-                    itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
-            }
+            animalList2 =
+                itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
+                    .toMutableList()
+            Log.i("Animal", ":$animalList2 ")
+        }
     }
 
     fun updateUiState(domainExpensesTable: DomainExpensesTable) {
@@ -130,6 +134,7 @@ class ExpensesEntryViewModel @Inject constructor(
     fun insertItem() {
         viewModelScope.launch {
             if (!isError()) {
+                saveExpensesAnimal(animalList2)
                 autoCalculate()
                 itemsRepository.insertExpenses(
                     expensesUiState.copy(
