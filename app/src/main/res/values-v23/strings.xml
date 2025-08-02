@@ -103,6 +103,7 @@
     <string name="checkbox_born">Дата рождения совпадает с датой завода животного</string>
     <string name="checkbox_born_s">Даты рождения совпадают с датой завода животных</string>
     <string name="checkbox_auto_calculate">Включить авторасчет цены</string>
+    <string name="checkbox_auto_weight">Рассчитать вес</string>
     <string name="checkbox_auto_calculate_kill">Включить авторасчет продукции</string>
 
     //ButtonText
@@ -210,6 +211,7 @@
     <string name="support_text_no_expenses_category">"Расходов за %s не было (Это хорошо)</string>
     <string name="support_text_data_next_vaccination">Дата следующей прививки</string>
     <string name="support_text_all_price">Общая сумма составить: %s %s</string>
+    <string name="support_text_all_weight">Общий вес составит: %s %s</string>
     <string name="support_text_empty">Не указано</string>
 
     //SupportTextWidget

@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
+import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -61,7 +62,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCountNoCard
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
@@ -95,11 +95,6 @@ fun ExpensesEntryProduct(
         }
     }
 
-//    val animalList = mutableListOf<AnimalExpensesList2>()
-//    val projectList = viewModel.items.value
-//    animalList.addAll(projectList)
-
-
     Scaffold(
         topBar = {
             TopAppBarBack(intRes = R.string.expenses_screen_title, navigateUp = navigateBack)
@@ -114,7 +109,6 @@ fun ExpensesEntryProduct(
             isAutoCalculate = viewModel.isAutoCalculate,
             titleList = viewModel.titleUiState.collectAsState().value.list,
             categoryList = viewModel.categoryUiState.collectAsState().value.list,
-            animalList = viewModel.animalUiState.collectAsState().value.animalList,
             animalList2 = viewModel.animalList2,
             countWarehouse = viewModel.itemUiState,
             updateCountWarehouse = viewModel::updateWarehouseUiState,
@@ -135,8 +129,7 @@ fun ExpensesEntryContainerProduct(
     isAutoCalculate: MutableState<Boolean>,
     titleList: List<String>,
     categoryList: List<String>,
-    animalList: List<AnimalExpensesList>,
-    animalList2: MutableList<AnimalExpensesList2>,
+    animalList2: MutableList<AnimalExpensesList3>,
     countWarehouse: DomainPairDataDoubleSting,
     updateCountWarehouse: (String) -> Unit,
     onValueChange: (DomainExpensesTable) -> Unit,
@@ -155,54 +148,6 @@ fun ExpensesEntryContainerProduct(
             )
         )
     }
-
-//    var title by remember { mutableStateOf("") } // Имя
-//    var count by rememberSaveable { mutableStateOf("") } // кол-во
-//    var category by remember { mutableStateOf("Без категории") } // Категория
-//    var suffix by remember { mutableStateOf("Шт.") } // Единица измерения
-//    var priceAll by remember { mutableStateOf("") } // Цена за все
-//    var date by remember { mutableStateOf(dateToday()) }
-//    var note by remember { mutableStateOf("") } // Примечание
-//    var showFoodUI by remember { mutableStateOf(false) } // Корм
-//    var showWarehouseUI by remember { mutableStateOf(false) } // Показать на складе
-//    var showAnimalsUI by remember { mutableStateOf(false) } // Расход на животных
-    var dailyExpensesFoodUI by remember { mutableStateOf("") } //Ежедневный расход
-    var countAnimalUI by remember { mutableStateOf("") } // Кол-во животных
-    var foodDesignedDayUI by remember { mutableStateOf(Pair<Int, String>(0, "")) } // Кол-во дней
-//    var dailyExpensesFoodTotal by remember { mutableStateOf(0.0) } // Общий ежедневный расход
-//    var setDailyExpensesFoodAndCountUI by remember { mutableStateOf(false) } // Уставновить ежедневный расход
-
-//    val toastText = stringResource(
-//        R.string.toast_expenses_s_s,
-//        "$title $count $suffix",
-//        priceAll,
-//        stringResource(R.string.currency_ruble)
-//    )
-
-
-//    fun validateCount(text: String) {
-//        if (text == "") {
-//            isErrorCount = true
-//            showFoodUI = false
-//            showAnimalsUI = false
-//            dailyExpensesFoodTotal = 0.0
-//            countAnimal = 0
-//        }
-//    }
-
-//    fun validatePrice(text: String) {
-//        if (text == "") {
-//            isErrorPrice = true
-//            showAnimalsUI = false
-//        }
-//    }
-
-    // Прочее
-//    if (count == "") {
-//        showFoodUI = false
-//        showWarehouseUI = false
-//    }
-
 
     Column(modifier = modifier) {
         OutlinedTextTitleAdd(
@@ -320,7 +265,7 @@ private fun ButtonPanel(
 private fun AdditionalSettings(
     domainExpensesTable: DomainExpensesTable,
     onValueChange: (DomainExpensesTable) -> Unit,
-    animalList2: MutableList<AnimalExpensesList2>
+    animalList2: MutableList<AnimalExpensesList3>
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
     val extraPadding by animateDpAsState(
@@ -365,7 +310,7 @@ private fun Food(
     modifier: Modifier = Modifier,
     expensesTable: DomainExpensesTable,
     onValueChange: (DomainExpensesTable) -> Unit,
-    animalList: MutableList<AnimalExpensesList2>,
+    animalList: MutableList<AnimalExpensesList3>,
 ) {
     CardField(
         modifier = modifier,
@@ -432,9 +377,8 @@ private fun ShowAnimal(
     modifier: Modifier = Modifier,
     domainExpensesTable: DomainExpensesTable,
     onValueChange: (DomainExpensesTable) -> Unit,
-    animalList: MutableList<AnimalExpensesList2>
+    animalList: MutableList<AnimalExpensesList3>
 ) {
-    val selectedFilters2 = remember { mutableStateMapOf<Long, Double>() }
     var openAlertAnimal by remember { mutableStateOf(false) }
     if (openAlertAnimal) {
         AlertDialogInfo(
@@ -451,7 +395,7 @@ private fun ShowAnimal(
             checked = domainExpensesTable.showAnimals,
             onCheckedChange = {
                 onValueChange(domainExpensesTable.copy(showAnimals = it))
-                selectedFilters2.clear()
+                animalListClean(animalList)
             },
             enabled = !domainExpensesTable.showFood,
 //                enabled = enableCheckBoxExpenses(
@@ -465,69 +409,74 @@ private fun ShowAnimal(
 
 //    РАСПРЕДЕЛЕНИЕ РАСХОДОВ
         if (domainExpensesTable.showAnimals) {
-            val totalFood by remember { mutableFloatStateOf(100f) }
+            val totalFood = 100f
             FlowRow(modifier = Modifier.fillMaxWidth()) {
                 if (animalList.isNotEmpty()) {
                     animalList.forEach { animal ->
-                        var selected by remember { mutableStateOf(false) }
                         FilterChip(
-                            selected = selected,
+                            selected = animal.ps,
                             onClick = {
-                                selected = !selected
-                                if (selected) selectedFilters2[animal.id.toLong()] = 0.0
-                                else selectedFilters2.remove(animal.id.toLong())
-                                selectedFilters2.forEach {
-                                    selectedFilters2[it.key] =
-                                        (totalFood / selectedFilters2.size).toDouble()
+                                animal.ps = !animal.ps
+                                val selectedCount = animalList.count { it.ps }
+
+                                // Распределение процентов поровну
+                                if (selectedCount > 0) {
+                                    val equalShare = 100.0 / selectedCount
+                                    animalList.forEach {
+                                        if (it.ps) it.presentException = equalShare
+                                        else it.presentException = 0.0
+                                    }
+                                } else {
+                                    animalList.forEach { it.presentException = 0.0 }
                                 }
                             },
                             label = { Text(animal.name) },
                             leadingIcon = {
                                 Icon(
-                                    imageVector = if (selected) Icons.Filled.Done else Icons.Filled.Add,
-                                    contentDescription = "Done icon",
+                                    imageVector = if (animal.ps) Icons.Filled.Done else Icons.Filled.Add,
+                                    contentDescription = null,
                                     modifier = Modifier.size(FilterChipDefaults.IconSize)
                                 )
                             },
-                            modifier = Modifier
-                                .padding(horizontal = 10.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp)
                         )
                     }
                 } else Text(text = stringResource(R.string.support_text_no_animal))
+
             }
 
             // Отображаем слайдеры для каждого выбранного животного
-            selectedFilters2.forEach { animal ->
+            animalList.filter { it.ps }.forEach { animal ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 5.dp)
                 ) {
-                    val nameAnimal = "${animalList.find { it.id.toLong() == animal.key }?.name}"
-                    val productExpensesOnAnimal =
-                        formatter(animal.value * domainExpensesTable.count.toDouble() / 100.0)
-                    val priceProductExpensesOnAnimal =
-                        "${formatter(animal.value * domainExpensesTable.priceAll.toDouble() / 100.0)} ₽"
+                    val productExpenses =
+                        formatter(animal.presentException * domainExpensesTable.count.toDouble() / 100.0)
+                    val price =
+                        formatter(animal.presentException * domainExpensesTable.priceAll.toDouble() / 100.0)
 
                     Text(
-                        text = "$nameAnimal: $productExpensesOnAnimal ${domainExpensesTable.suffix} / " +
-                                "$priceProductExpensesOnAnimal -  ${formatter(animal.value)}%",
+                        text = "${animal.name}: $productExpenses ${domainExpensesTable.suffix} / $price ₽ - ${
+                            formatter(
+                                animal.presentException
+                            )
+                        }%",
                         fontSize = 18.sp,
                         modifier = Modifier.fillMaxWidth()
                     )
+
                     Slider(
-                        value = animal.value.toFloat(),
-                        onValueChange = {
-                            selectedFilters2[animal.key] = it.toDouble()
+                        value = animal.presentException.toFloat(),
+                        onValueChange = { newValue ->
+                            animal.presentException = newValue.toDouble()
 
-                            // Пересчитываем значения для остальных животных
-                            val remainingFood = totalFood - it
-                            val otherAnimalsCount = selectedFilters2.size - 1
-
-                            selectedFilters2.forEach { otherAnimal ->
-                                if (otherAnimal.key != animal.key) {
-                                    selectedFilters2[otherAnimal.key] =
-                                        (remainingFood / otherAnimalsCount).toDouble()
+                            val remaining = totalFood - newValue
+                            val others = animalList.count { it.ps } - 1
+                            if (others > 0) {
+                                animalList.filter { it.ps && it.id != animal.id }.forEach {
+                                    it.presentException = (remaining / others).toDouble()
                                 }
                             }
                         },
@@ -547,7 +496,7 @@ private fun ShowAnimal(
 private fun Checkbox(
     expensesTable: DomainExpensesTable,
     onValueChange: (DomainExpensesTable) -> Unit,
-    animalList: MutableList<AnimalExpensesList2>
+    animalList: MutableList<AnimalExpensesList3>
 ) {
     //Подсказки
     var openAlertFood by remember { mutableStateOf(false) }
@@ -568,6 +517,7 @@ private fun Checkbox(
                     showAnimals = if (it) false else false
                 )
             )
+            animalListClean(animalList)
         },
         enabled = expensesTable.count != "",
         intTitle = R.string.checkbox_food,
@@ -593,7 +543,7 @@ private fun Checkbox(
 @Composable
 fun ChoiceAnimal(
     expensesTable: DomainExpensesTable,
-    animalList: List<AnimalExpensesList2>,
+    animalList: List<AnimalExpensesList3>,
     onValueChange: (DomainExpensesTable) -> Unit
 ) {
     if (animalList.isNotEmpty()) {
@@ -623,6 +573,10 @@ fun ChoiceAnimal(
                             dailyExpensesFoodTotal += (it.foodDay * it.countAnimal)
                             it.presentException =
                                 (it.foodDay / dailyExpensesFoodTotal) * 100.0
+                            Log.i(
+                                "dailyExpensesFoodTotal",
+                                "ChoiceAnimal: $dailyExpensesFoodTotal "
+                            )
                         } else {
                             countAnimal -= it.countAnimal
                             dailyExpensesFoodTotal -= (it.foodDay * it.countAnimal)
@@ -663,6 +617,8 @@ private fun InputText(
     onValueChange: (DomainExpensesTable) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    var suffixCountAnimal by rememberSaveable { mutableStateOf(expensesTable.suffix) }
+    var suffixExpensesFood by rememberSaveable { mutableStateOf(expensesTable.suffix) }
 
     OutlinedTextCountNoCard(
         modifier = modifier,
@@ -671,12 +627,13 @@ private fun InputText(
             onValueChange(expensesTable.copy(dailyExpensesFood = it).validateDailyExpensesFood())
         },
         isWarehouseShow = false,
-        isDropMenuShow = false,
+        versionDropMenu = 0,
         intRes = R.string.outlined_food_day_animals,
         intResSup = R.string.support_text_food_day,
         intResError = R.string.error_no_count_animals,
         isError = expensesTable.error.isErrorDailyExpensesFood,
-        suffix = expensesTable.suffix,
+        onClick = { suffixExpensesFood = it },
+        suffix = suffixExpensesFood,
         focusManager = focusManager
     )
     OutlinedTextCountNoCard(
@@ -687,12 +644,13 @@ private fun InputText(
         },
         drawableRes = R.drawable.baseline_spoke_24,
         isWarehouseShow = false,
-        isDropMenuShow = false,
+        versionDropMenu = 2,
         intRes = R.string.outlined_text_field_quantity,
         intResSup = R.string.support_text_count_animals,
         intResError = R.string.error_no_count_product,
         isError = expensesTable.error.isErrorCountAnimal,
-        suffix = expensesTable.suffix,
+        suffix = suffixCountAnimal,
+        onClick = { suffixCountAnimal = it },
         focusManager = focusManager,
         keyboardActions = keyboardActionsClear(focusManager)
     )
@@ -744,17 +702,21 @@ fun settingDay(
     )
     val count = domainExpensesTable.count.toDouble()
     val foodDay = domainExpensesTable.dailyExpensesFood.toConvertZeroDouble()
-    val countAnimal = domainExpensesTable.countAnimal.toConvertZero()
+    val countAnimal = domainExpensesTable.countAnimal.toConvertZeroDouble()
 
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
     val dateLocal = LocalDate.parse(date, formatter)
-    var days = (count / (foodDay * countAnimal.toDouble())).toLong()
+
+    var days =
+        (if (domainExpensesTable.dailyExpensesFoodAndCount) count / (countAnimal * foodDay)
+        else count / foodDay).toLong()
+
     if (days > 1000) days = 1000
     val newDate = dateLocal.plusDays(days)
     return days.toInt() to newDate.format(formatter)
 }
 
-fun animalListClean(list: MutableList<AnimalExpensesList2>) {
+fun animalListClean(list: MutableList<AnimalExpensesList3>) {
     list.forEach {
         it.ps = false
     }

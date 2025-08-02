@@ -83,7 +83,7 @@ fun AnimalCardProduct(
     }) { innerPadding ->
         AnimalCardContainer(
             modifier = Modifier
-                .modifierScreenLazy(innerPadding),
+                .modifierScreen(innerPadding),
             animalTable = animalTable,
             animalWeightTable = viewModel.domainWeight,
             animalSizeTable = viewModel.domainHeight,

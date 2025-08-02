@@ -15,7 +15,7 @@ data class DomainExpensesTable(
     var category: String = "",
     val note: String = "",
     val showFood: Boolean = false, // Показывать на складе еду
-    val showWarehouse: Boolean = false, // Показывать на складе
+    val showWarehouse: Boolean = false, // Показывать на складе (Перекупство)
     val showAnimals: Boolean = false, // Связывает животных
     val dailyExpensesFoodAndCount: Boolean = false, // указать вручную
     val dailyExpensesFood: String = "", // Ежедневный расход еды

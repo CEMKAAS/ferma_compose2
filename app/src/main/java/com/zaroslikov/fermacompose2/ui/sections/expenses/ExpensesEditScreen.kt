@@ -581,7 +581,7 @@ fun ExpensesEditContainerProduct(
                                             countAnimal = "0"
                                         )
                                     )
-                                    animalListClean(animalList)
+//                                    animalListClean(animalList)
 //
 //                                    expensesTable.dailyExpensesFood = ""
 //                                    expensesTable.countAnimal = ""
@@ -616,7 +616,7 @@ fun ExpensesEditContainerProduct(
                         checked = expensesTable.showAnimals,
                         onCheckedChange = {
                             onValueChange(expensesTable.copy(showAnimals = it))
-                            animalListClean(animalList)
+//                            animalListClean(animalList)
                         },
                         enabled = if (expensesTable.count == "" || expensesTable.priceAll == "") {
                             false

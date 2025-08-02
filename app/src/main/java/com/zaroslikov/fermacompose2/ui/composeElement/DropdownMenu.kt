@@ -73,7 +73,7 @@ fun DropdownMenuIconProductSuffix(
                     setSuffix(gramSuffix)
                     expanded = !expanded
                 },
-                text = { Text(text = kilogramSuffix) }
+                text = { Text(text = gramSuffix) }
             )
             DropdownMenuItem(
                 onClick = {

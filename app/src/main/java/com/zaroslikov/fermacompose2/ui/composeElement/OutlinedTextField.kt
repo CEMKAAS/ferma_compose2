@@ -402,6 +402,13 @@ fun OutlinedTextCount(
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     keyboardActions: KeyboardActions = keyboardActionsDown(focusManager)
 ) {
+    val animatedPadding by animateDpAsState(
+        targetValue = target,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
     CardField(
         modifier = Modifier.toOutlinedText(),
         row = false
@@ -442,6 +449,15 @@ fun OutlinedTextCount(
             keyboardActions = keyboardActions,
             isError = isError
         )
+        if (isManyCount) {
+            AutoCalculateCheckbox(
+                isChecked = isAutoCalculate,
+                onCheckedChange = onAutoCalculate,
+                tooltipTextResAutoCal = tooltipTextResAutoCal,
+                price = price,
+                count = count
+            )
+        }
     }
 }
 
@@ -957,4 +973,64 @@ fun OutlinedTextCountNoCard(
         isError = isError,
 
     )
+}
+
+@Composable
+fun OutlinedTextCountNoCard2(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onClick: (String) -> Unit = {},
+    isError: Boolean,
+    suffix: String,
+    isAnimal: Boolean = false,
+    isWarehouseShow: Boolean = true,
+    isDropMenuShow: Boolean = true,
+    versionDropMenu: Int = 5,
+    drawableRes: Int = R.drawable.baseline_shopping_basket_24,
+    @StringRes intRes: Int = R.string.outlined_text_field_quantity,
+    @StringRes intResSup: Int = R.string.support_text_product,
+    @StringRes intResError: Int = R.string.error_no_count_product,
+    countWarehouse: Double = 0.0,
+    countWarehouseSuffix: String = "",
+    focusManager: FocusManager,
+    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
+    keyboardActions: KeyboardActions = keyboardActionsDown(focusManager)
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {
+            onValueChange(it)
+        },
+        label = { Text(stringResource(intRes)) },
+        modifier = modifier.fillMaxWidth(),
+        leadingIcon = {
+            Icon(
+                painter = painterResource(drawableRes),
+                contentDescription = null,
+                modifier = Modifier.padding(end = 5.dp)
+            )
+        },
+        supportingText = {
+            ErrorSupportTextSlash(
+                isError = isError,
+                isWarehouse = isWarehouseShow,
+                isAnimal = isAnimal,
+                count = formatter(countWarehouse),
+                suffix = countWarehouseSuffix,
+                intRes = intResSup,
+                intResError = intResError
+            )
+        },
+        trailingIcon = {
+            if (isDropMenuShow)
+                GetDropDownMenu(versionDropMenu) { onClick(it) }
+        },
+        suffix = {
+            Text(text = suffix)
+        },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        isError = isError
+        )
 }

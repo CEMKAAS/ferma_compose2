@@ -161,7 +161,38 @@ fun AutoCalculateCheckbox(
         isTooltipShow = true,
         intTooltip = tooltipTextResAutoCal
     )
+    if (isChecked) {
+        TextBuildAnnotated(
+            intRes = R.string.support_text_all_price,
+            priceAll = price,
+            count = count
+        )
+    }
+}
 
+@Composable
+fun AutoWeightCheckbox(
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    @StringRes tooltipTextResAutoCal: Int,
+    price: String,
+    count: String
+) {
+    CheckboxTextIcon(
+        modifier = if (isChecked) Modifier.toOutlinedText() else Modifier,
+        checked = isChecked,
+        onCheckedChange = onCheckedChange,
+        intTitle = R.string.checkbox_auto_weight,
+        isTooltipShow = true,
+        intTooltip = tooltipTextResAutoCal
+    )
+    OutlinedTextCountNoCard2(
+        value = TODO(),
+        onValueChange = TODO(),
+        isError = TODO(),
+        suffix = TODO(),
+        focusManager = TODO()
+    )
     if (isChecked) {
         TextBuildAnnotated(
             intRes = R.string.support_text_all_price,

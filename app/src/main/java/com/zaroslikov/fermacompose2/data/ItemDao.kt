@@ -26,7 +26,6 @@ import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
-import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -206,32 +205,12 @@ interface ItemDao {
     @Query("SELECT MyFermaEXPENSES.category from MyFermaEXPENSES Where idPT=:id group by MyFermaEXPENSES.category")
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
 
-    @Query(
-        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal from AnimalTable a JOIN (" +
-                "    SELECT idAnimal, count" +
-                "    FROM animalcounttable" +
-                "    WHERE id IN (" +
-                "        SELECT MAX(id)" +
-                "        FROM animalcounttable " +
-                "    GROUP by idAnimal)" +
-                ") t ON a.id = t.idAnimal Where a.idPT=:id"
-    )
-    fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
-
-//    @Query(
-//        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal, (Select case when e.idAnimal = a.id and e.idExpenses =:idExpenses Then 1 else 0 end as ps From ExpensesAnimalTable e) as ps" +
-//                " from AnimalTable a JOIN (" +
-//                "    SELECT idAnimal, count" +
-//                "    FROM animalcounttable" +
-//                "    WHERE id IN (" +
-//                "        SELECT MAX(id)" +
-//                "        FROM animalcounttable " +
-//                "    GROUP by idAnimal)" +
-//                ") t ON a.id = t.idAnimal Join ExpensesAnimalTable e On e.idAnimal = a.id Where a.idPT=:id GROUP BY a.id"
-//    )
 
     @Query(
-        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal,  case when e._id NOT NULL Then e._id  else 0 end as idExpensesAnimal, case when e.idAnimal NOT NULL  Then 1 else 0 end as ps,   case when  e.percentExpenses NOT NULL Then e.percentExpenses else 0 end as presentException " +
+        "SELECT a.id, a.name as name, a.foodDay as foodDay, t.count as countAnimal," +
+                " case when e._id NOT NULL Then e._id  else 0 end as idExpensesAnimal," +
+                " case when e.idAnimal NOT NULL  Then 1 else 0 end as ps," +
+                " case when  e.percentExpenses NOT NULL Then e.percentExpenses else 0 end as presentException " +
                 " from AnimalTable a JOIN (" +
                 "    SELECT idAnimal, count" +
                 "    FROM animalcounttable" +

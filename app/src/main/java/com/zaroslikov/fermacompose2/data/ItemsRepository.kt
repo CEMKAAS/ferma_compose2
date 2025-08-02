@@ -20,7 +20,6 @@ import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
-import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -99,7 +98,6 @@ interface ItemsRepository {
 
     fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
-    fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>>
 
     suspend fun getItemExpensesAnimal(id: Int): List<Long>
     suspend fun getItemsAnimalExpensesList2(id: Int, idExpenses: Long): List<AnimalExpensesList2>

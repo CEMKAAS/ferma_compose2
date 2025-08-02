@@ -64,13 +64,13 @@ class ExpensesEditViewModel(
                 initialValue =  DataStringListState()
             )
 
-    val animalUiState: StateFlow<AnimalExpensesUiState> =
-        itemsRepository.getItemsAnimalExpensesList(itemId).map { AnimalExpensesUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalExpensesUiState()
-            )
+//    val animalUiState: StateFlow<AnimalExpensesUiState> =
+//        itemsRepository.getItemsAnimalExpensesList(itemId).map { AnimalExpensesUiState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//                initialValue = AnimalExpensesUiState()
+//            )
 
 
     fun updateUiState(itemDetails: ExpensesTableUiState) {

@@ -20,7 +20,6 @@ import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
-import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList
 import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -128,9 +127,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getItemsCategoryExpensesList(id: Int): Flow<List<String>> =
         itemDao.getItemsCategoryExpensesList(id)
-
-    override fun getItemsAnimalExpensesList(id: Int): Flow<List<AnimalExpensesList>> =
-        itemDao.getItemsAnimalExpensesList(id)
 
     override suspend fun getItemsAnimalExpensesList2(
         id: Int,
