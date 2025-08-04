@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
-import java.util.concurrent.locks.LockSupport
 
 
 @Composable
@@ -32,13 +31,12 @@ fun ErrorSupportTextSlash(
     isWarehouse: Boolean = false,
     isAnimal: Boolean = false,
     isErrorSlash: Boolean = false,
-    count: String = "",
+    countWarehouse: String = "",
+    suffixWarehouse: String = "",
     countAnimals: String = "",
-    suffix: String = "",
     @StringRes intRes: Int,
     @StringRes intResError: Int
 ) {
-
     when (true) {
 
         isError -> Text(
@@ -54,14 +52,14 @@ fun ErrorSupportTextSlash(
         isWarehouse -> Text(
             text = stringResource(
                 R.string.support_text_count_warehouse_s,
-                "$count $suffix"
+                "$countWarehouse $suffixWarehouse"
             ),
-            color = if (count.contains("-")) MaterialTheme.colorScheme.error else Color.Unspecified
+            color = if (countWarehouse.contains("-")) MaterialTheme.colorScheme.error else Color.Unspecified
         )
 
         isAnimal -> Text(
             text = stringResource(
-                R.string.support_text_count_sale_animals, count.toFormatNumber(), suffix
+                R.string.support_text_count_sale_animals, countWarehouse.toFormatNumber(), suffixWarehouse
             )
         )
 

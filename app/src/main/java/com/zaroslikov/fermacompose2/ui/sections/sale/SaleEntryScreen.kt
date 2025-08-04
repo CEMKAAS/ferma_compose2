@@ -145,7 +145,7 @@ fun SaleEntryContainerProduct(
             onValueChange = {
                 onValueChange(domainSaleTable.copy(count = it).validateCount())
             },
-            onClick = { onValueChange(domainSaleTable.copy(suffix = it)) },
+            onSuffixChange = { onValueChange(domainSaleTable.copy(suffix = it)) },
             isError = domainSaleTable.error.isErrorCount,
             suffix = domainSaleTable.suffix,
             intResSup = R.string.support_text_count_product_sale,

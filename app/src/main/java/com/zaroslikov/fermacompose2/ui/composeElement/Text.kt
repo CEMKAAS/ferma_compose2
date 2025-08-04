@@ -303,14 +303,16 @@ fun TextColumn(
 
 @Composable
 fun TextBuildAnnotated(
-    @StringRes intRes: Int,
     priceAll: String,
-    count: String
+    count: String,
+    @StringRes intRes: Int,
+    suffix: String = stringResource(R.string.currency_ruble)
 ) {
     val amount = (priceAll.toConvertZeroDouble() * count.toConvertZero()).formatNumber()
     Text(
         text = buildAnnotatedString {
-            val fullText = stringResource(intRes, amount, stringResource(R.string.currency_ruble))
+            val fullText =
+                stringResource(intRes).format(amount, suffix)
 
             val startIndex = fullText.indexOf(amount)
             val endIndex = startIndex + amount.length

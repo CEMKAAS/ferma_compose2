@@ -141,7 +141,7 @@ fun WriteOffEntryContainerProduct(
             onValueChange = {
                 onValueChange(domainWriteOffTable.copy(count = it).validateCount())
             },
-            onClick = { onValueChange(domainWriteOffTable.copy(suffix = it)) },
+            onSuffixChange = { onValueChange(domainWriteOffTable.copy(suffix = it)) },
             isError = domainWriteOffTable.error.isErrorCount,
             suffix = domainWriteOffTable.suffix,
             intResSup = R.string.support_text_count_product_write_off,

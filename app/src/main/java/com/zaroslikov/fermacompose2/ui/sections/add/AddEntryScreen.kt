@@ -129,7 +129,7 @@ fun AddEntryContainerProduct(
             onValueChange = {
                 onValueChange(addTable.copy(count = it).validateCount())
             },
-            onClick = { onValueChange(addTable.copy(suffix = it)) },
+            onSuffixChange = { onValueChange(addTable.copy(suffix = it)) },
             isError = addTable.error.isErrorCount,
             suffix = addTable.suffix,
             intResSup = R.string.support_text_count_product,

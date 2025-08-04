@@ -393,7 +393,7 @@ fun IndicatorsBottomSheet(
                     count = if (version == 3) it else it.toConvertDb()
                     isErrorCount = it.isError()
                 },
-                onClick = { suffix = it },
+                onSuffixChange = { suffix = it },
                 isWarehouseShow = false,
                 intRes = getVersionToStringTitle(version),
                 drawableRes = getVersionToImage(version),

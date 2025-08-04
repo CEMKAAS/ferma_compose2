@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.Domain.models
 
 import android.util.Log
+import com.zaroslikov.fermacompose2.supportFun.DataFourWeight
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 
 data class DomainExpensesTable(
@@ -26,7 +27,10 @@ data class DomainExpensesTable(
     val animalId: Long? = null,
     val animalVaccinationId: Long? = null,
     val animalCountId: Long? = null,
-    val error: Error = Error()
+    val error: Error = Error(),
+    val weight: String = "",
+    val weightSuffix: String = "",
+    val isAutoWeight: Boolean = false
 ) {
     val hasAnyError: Boolean
         get() = error.hasAnyError(dailyExpensesFoodAndCount)

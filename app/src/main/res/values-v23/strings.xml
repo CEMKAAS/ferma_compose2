@@ -182,6 +182,7 @@
     <string name="support_text_write_off_animal_reason">Укажите причину списания</string>
 
     <string name="support_text_product">Введите или выберите товар</string>
+    <string name="support_text_weight">Укажите вес</string>
     <string name="support_text_title">Укажите заголовок</string>
     <string name="support_text_count_warehouse_s">Сейчас на складе: %s</string>
     <string name="support_text_category">Укажите или выберите категорию, к которой относится данный товар</string>
@@ -253,6 +254,7 @@
     //Tooltip
     <string name="tooltip_animals_born">Дата рождения является приоритетной для расчета возраста</string>
     <string name="tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за всё поголовье, а за одно животное. При этом сохранится общая сумма.</string>
+    <string name="tooltip_auto_calculate_weight">В случае активации этой опции необходимо указать вес не за весь товар, а за одну единицу. При этом расчет корма будет прозводится по общей сумме.</string>
     <string name="tooltip_auto_calculate_kill">В случае активации этой опции необходимо указать кол-во товара не за всё поголовье, а за одно животное. При этом сохранится общая сумма товара.</string>
     <string name="tooltip_weight_big_kill">Предупреждение!\nВес товаров больше, чем вес животного</string>
     <string name="tooltip_weight_big_average_kill">Предупреждение!\nВес товаров больше, чем средний вес животных</string>

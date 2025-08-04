@@ -170,11 +170,20 @@ fun ExpensesEntryContainerProduct(
                     domainExpensesTable.copy(count = it).validateCount()
                 )
             },
-            onClick = { onValueChange(domainExpensesTable.copy(suffix = it)) },
+            onSuffixChange = { onValueChange(domainExpensesTable.copy(suffix = it)) },
             isError = domainExpensesTable.error.isErrorCount,
             suffix = domainExpensesTable.suffix,
             intResSup = R.string.support_text_count_product_expenses,
             countWarehouse = countWarehouse.first,
+            onWeightChange = {onValueChange(
+                domainExpensesTable.copy(weight = it)
+            )},
+            isWarehouseShow = false,
+            weightValue = domainExpensesTable.weight,
+            weightSuffix = domainExpensesTable.weightSuffix,
+            isAutoCalculate = domainExpensesTable.isAutoWeight,
+            onAutoCalculate = {onValueChange(domainExpensesTable.copy(isAutoWeight = it))},
+            onWeightSuffixChance = {onValueChange(domainExpensesTable.copy(weightSuffix = it))},
             focusManager = focusManager
         )
         OutlinedPriceInput(

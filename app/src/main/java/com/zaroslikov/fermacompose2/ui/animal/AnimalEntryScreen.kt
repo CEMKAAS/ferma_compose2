@@ -288,7 +288,7 @@ fun AnimalEntryContainer(
                 foodDay = it.toConvertDb()
             },
             isError = false,
-            onClick = { suffixFoodDay = it },
+            onSuffixChange = { suffixFoodDay = it },
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
             suffix = suffixFoodDay,

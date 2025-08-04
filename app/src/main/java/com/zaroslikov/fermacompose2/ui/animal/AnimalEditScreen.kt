@@ -252,19 +252,19 @@ fun AnimalEditContainer(
 //                }
             }
         }
-        OutlinedTextCount(
-            value = animalEditUiState.foodDay,
-            onValueChange = {
-//                foodDay = it.toConvertDb()
-            },
-            isError = false,
-            intRes = R.string.outlined_food_day_animals,
-            intResSup = if (!isGroupAnimal) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
-            suffix = stringResource(R.string.suffix_pieces),
-            isWarehouseShow = false,
-            isDropMenuShow = true,
-            focusManager = focusManager
-        )
+//        OutlinedTextCount(
+//            value = animalEditUiState.foodDay,
+//            onValueChange = {
+////                foodDay = it.toConvertDb()
+//            },
+//            isError = false,
+//            intRes = R.string.outlined_food_day_animals,
+//            intResSup = if (!isGroupAnimal) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
+//            suffix = stringResource(R.string.suffix_pieces),
+//            isWarehouseShow = false,
+//            isDropMenuShow = true,
+//            focusManager = focusManager
+//        )
 //        ButtonPanel(
 //            onRefreshClick = { saveInRoomSale(errorBoolean()) },
 //            onArchiveClick = { onValueChange(animalEditUiState.copy(arhiv = "1")) },

@@ -192,7 +192,7 @@ fun AlertDialogKillAnimal(
                                             isErrorCount = newCount.isError()
                                         )
                                     },
-                                    onClick = {
+                                    onSuffixChange = {
                                         textFields[index] = textFields[index].copy(suffix = it)
                                     },
                                     versionDropMenu = 0,
