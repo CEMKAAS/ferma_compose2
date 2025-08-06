@@ -41,6 +41,17 @@ fun keyboardOptionsNextNumber(): KeyboardOptions {
 }
 
 
+enum class KeyboardActionFocus {
+    DOWN, RIGHT, CLEAN;
+
+    fun toFocus(focusManager: FocusManager) = when (this) {
+        DOWN -> keyboardActionsDown(focusManager)
+        RIGHT -> keyboardActionsRight(focusManager)
+        CLEAN -> keyboardActionsClear(focusManager)
+    }
+}
+
+
 fun keyboardActionsDown(
     focusManager: FocusManager
 ): KeyboardActions {
@@ -65,7 +76,7 @@ fun keyboardActionsRight(
 fun keyboardActionsEnter(
 ): KeyboardActions {
     return KeyboardActions(
-        onAny = {  }
+        onAny = { }
     )
 }
 

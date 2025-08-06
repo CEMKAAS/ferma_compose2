@@ -199,7 +199,6 @@ fun AnimalEditContainer(
             titleList = typeList,
             isErrorTitle = isErrorType,
             isErrorSlash = false,
-            focusManager = focusManager
         )
 //        if (!isGroupAnimal)
 //            OutlinedTextSex(

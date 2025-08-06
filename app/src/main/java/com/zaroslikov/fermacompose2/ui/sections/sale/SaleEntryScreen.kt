@@ -24,9 +24,6 @@ import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
-import com.zaroslikov.fermacompose2.supportFun.isError
-import com.zaroslikov.fermacompose2.supportFun.isErrorSale
-import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -151,7 +148,6 @@ fun SaleEntryContainerProduct(
             intResSup = R.string.support_text_count_product_sale,
             countWarehouse = countWarehouse.first,
             countWarehouseSuffix = countWarehouse.second,
-            focusManager = focusManager
         )
         OutlinedPriceInput(
             price = domainSaleTable.priceAll,
@@ -164,13 +160,11 @@ fun SaleEntryContainerProduct(
             onAutoCalculate = { isAutoCalculate.value = it },
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isManyCount = true,
-            focusManager = focusManager
         )
         OutlinedTextCategory(
             value = domainSaleTable.category,
             onValueChange = { onValueChange(domainSaleTable.copy(category = it)) },
             titleList = categoryList,
-            focusManager = focusManager
         )
         OutlinedTextDateEdit(
             value = date,
@@ -195,7 +189,6 @@ fun SaleEntryContainerProduct(
         OutlinedTextNote(
             value = domainSaleTable.note,
             onValueChange = { onValueChange(domainSaleTable.copy(note = it)) },
-            focusManager = focusManager
         )
         ButtonPanel(
             isEntry = isEntry,

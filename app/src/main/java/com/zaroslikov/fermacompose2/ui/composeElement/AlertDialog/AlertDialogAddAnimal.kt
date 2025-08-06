@@ -124,7 +124,6 @@ fun AlertDialogAddAnimal(
                     },
                     label = R.string.outlined_text_reason,
                     supportingText = R.string.support_text_add_animal_reason,
-                    focusManager = focusManager
                 )
             }
         },

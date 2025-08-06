@@ -1,16 +1,14 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
+
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
@@ -36,6 +34,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.forEach
 
+
 @HiltViewModel
 class ExpensesEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -46,66 +45,55 @@ class ExpensesEntryViewModel @Inject constructor(
     private val itemIdPT: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdPT])
     private val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
     val isEntry: Boolean = itemId == -1
-    var isIndicatorsValue = false
-
-    val isAutoCalculate = mutableStateOf(false)
-
-
-    var expensesUiState by mutableStateOf(
-        DomainExpensesTable().copy(
-            category = resourceProvider.getString(R.string.support_text_no_category),
-            suffix = resourceProvider.getString(R.string.suffix_pieces),
-        )
-    )
-        private set
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    var animalList2 = mutableStateListOf<AnimalExpensesList3>()
+
+    var expensesUiState by mutableStateOf(
+        ExpensesEntryState().copy(
+            weightSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+            feedFoodChipSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+            feedFoodInputSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+            domainExpensesTable = DomainExpensesTable().copy(
+                category = resourceProvider.getString(R.string.support_text_no_category),
+                suffix = resourceProvider.getString(R.string.suffix_pieces),
+            )
+        )
+    )
         private set
 
     init {
         viewModelScope.launch {
-            if (!isEntry)
-                expensesUiState = itemsRepository.getItemExpenses(itemId)
+            if (!isEntry) {
+                val domainExpensesTable = itemsRepository.getItemExpenses(itemId)
                     .filterNotNull()
                     .first()
                     .toDomainMap()
 
-            val entities = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
-            animalList2.clear()
-            animalList2.addAll(
-                entities.map {
-                    AnimalExpensesList3(
-                        id = it.id,
-                        name = it.name,
-                        foodDay = it.foodDay,
-                        countAnimal = it.countAnimal,
-                        idExpensesAnimal = it.idExpensesAnimal,
-                        ps = it.ps,
-                        presentException = it.presentException,
-                    )
-                }
+                expensesUiState = expensesUiState.updateFromDomain(domainExpensesTable)
+            }
+            val animalList = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
+            Log.i("updateForSale", "animalList: $animalList")
+            expensesUiState = expensesUiState.copy(
+                animalList2 = animalList
             )
-            Log.i("Animal", ":$animalList2 ")
         }
     }
 
-    fun updateUiState(domainExpensesTable: DomainExpensesTable) {
+    fun updateUiState(expensesEntryState: ExpensesEntryState) {
         expensesUiState =
-            domainExpensesTable
+            expensesEntryState
     }
-
-    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
-        private set
 
     fun updateWarehouseUiState(name: String) {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
-                .filterNotNull()
-                .first()
-                .toDomainMap()
+            expensesUiState = expensesUiState.copy(
+                countInWarehouse = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
+                    .filterNotNull()
+                    .first()
+                    .toDomainMap()
+            )
         }
     }
 
@@ -130,10 +118,7 @@ class ExpensesEntryViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isError()) {
                 val id = itemsRepository.insertExpenses(
-                    expensesUiState.copy(
-                        priceAll = autoCalculate(),
-                        idPT = itemIdPT.toLong()
-                    ).toRoomMap()
+                    expensesUiState.updateForSave(itemIdPT.toLong()).domainExpensesTable.toRoomMap()
                 )
                 setExpensesAnimal(id)
 //            metricaSale(saleUiState.copy(priceAll = autoCalculate()))
@@ -141,9 +126,9 @@ class ExpensesEntryViewModel @Inject constructor(
                 showMessage(
                     resourceProvider.getString(R.string.toast_expenses_s_s)
                         .format(
-                            expensesUiState.title,
-                            expensesUiState.count,
-                            expensesUiState.suffix
+                            expensesUiState.domainExpensesTable.title,
+                            expensesUiState.domainExpensesTable.count,
+                            expensesUiState.domainExpensesTable.suffix
                         )
                 )
             }
@@ -154,17 +139,16 @@ class ExpensesEntryViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isError()) {
                 itemsRepository.updateExpenses(
-                    expensesUiState.copy(priceAll = autoCalculate(), idPT = itemIdPT.toLong())
-                        .toRoomMap()
+                    expensesUiState.updateForSave(itemIdPT.toLong()).domainExpensesTable.toRoomMap()
                 )
                 saveExpensesAnimal()
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_refresh_s_s)
                         .format(
-                            expensesUiState.title,
-                            expensesUiState.count,
-                            expensesUiState.suffix
+                            expensesUiState.domainExpensesTable.title,
+                            expensesUiState.domainExpensesTable.count,
+                            expensesUiState.domainExpensesTable.suffix
                         )
                 )
             }
@@ -174,23 +158,23 @@ class ExpensesEntryViewModel @Inject constructor(
     fun deleteItem() {
         viewModelScope.launch {
             itemsRepository.deleteExpenses(
-                expensesUiState.copy(idPT = itemIdPT.toLong()).toRoomMap()
+                expensesUiState.domainExpensesTable.copy(idPT = itemIdPT.toLong()).toRoomMap()
             )
             deleteExpensesAnimal()
             _eventFlow.emit(UiEvent.NavigateBack)
             showMessage(
                 resourceProvider.getString(R.string.toast_delete_s)
                     .format(
-                        expensesUiState.title,
-                        expensesUiState.count,
-                        expensesUiState.suffix
+                        expensesUiState.domainExpensesTable.title,
+                        expensesUiState.domainExpensesTable.count,
+                        expensesUiState.domainExpensesTable.suffix
                     )
             )
         }
     }
 
     suspend fun setExpensesAnimal(id: Long) {
-        animalList2.filter { it.ps }.map {
+        expensesUiState.animalList2.filter { it.ps }.map {
             ExpensesAnimalTable(
                 idExpenses = id,
                 idAnimal = it.id.toLong(),
@@ -203,7 +187,7 @@ class ExpensesEntryViewModel @Inject constructor(
     }
 
     suspend fun saveExpensesAnimal() {
-        animalList2.forEach {
+        expensesUiState.animalList2.forEach {
             val table = ExpensesAnimalTable(
                 id = it.idExpensesAnimal,
                 idExpenses = itemId.toLong(),
@@ -221,7 +205,7 @@ class ExpensesEntryViewModel @Inject constructor(
     }
 
     suspend fun deleteExpensesAnimal() {
-        animalList2.filter { it.idExpensesAnimal != 0L }
+        expensesUiState.animalList2.filter { it.idExpensesAnimal != 0L }
             .forEach {
                 val table = ExpensesAnimalTable(
                     id = it.idExpensesAnimal,
@@ -249,11 +233,6 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
-    fun autoCalculate(): String = if (isAutoCalculate.value) calculatePriceAll(
-        expensesUiState.priceAll,
-        expensesUiState.count
-    ) else expensesUiState.priceAll
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
@@ -263,21 +242,9 @@ data class AnimalExpensesList2(
     val id: Int,
     val name: String,
     val foodDay: Double,
+    val foodDaySuffix: String,
     val countAnimal: Int,
     val idExpensesAnimal: Long,
-    var ps: Boolean,
-    var presentException: Double,
+    val ps: Boolean = false,
+    val presentException: Double = 0.0,
 )
-
-class AnimalExpensesList3(
-    val id: Int,
-    val name: String,
-    val foodDay: Double,
-    val countAnimal: Int,
-    val idExpensesAnimal: Long,
-    ps: Boolean = false,
-    presentException: Double = 0.0
-) {
-    var ps by mutableStateOf(ps)
-    var presentException by mutableDoubleStateOf(presentException)
-}

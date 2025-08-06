@@ -218,7 +218,6 @@ fun AnimalEntryContainer(
             titleList = typeList,
             isErrorTitle = isErrorType,
             isErrorSlash = false,
-            focusManager = focusManager
         )
         if (!isAnimalGroup)
             OutlinedTextSex(
@@ -239,7 +238,6 @@ fun AnimalEntryContainer(
             intResSup = R.string.support_text_count_animals,
             isWarehouseShow = false,
             isDropMenuShow = false,
-            focusManager = focusManager
         )
         OutlinedPriceInput(
             price = price,
@@ -248,7 +246,6 @@ fun AnimalEntryContainer(
             isAutoCalculate = isAutoCalculate,
             onAutoCalculate = { isAutoCalculate = it },
             isManyCount = isAnimalGroup,
-            focusManager = focusManager
         )
         OutlinedTextDate(
             value = dateBorn,
@@ -294,13 +291,11 @@ fun AnimalEntryContainer(
             suffix = suffixFoodDay,
             isWarehouseShow = false,
             isDropMenuShow = true,
-            versionDropMenu = 0,
-            focusManager = focusManager
+            versionDropMenu = 0
         )
         OutlinedTextNote(
             value = note,
             onValueChange = { note = it },
-            focusManager = focusManager
         )
         ButtonStandart(
             intRes = R.string.button_add,

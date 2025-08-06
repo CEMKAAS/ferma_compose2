@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.Domain.models
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable.Error
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 
 data class DomainAddTable(

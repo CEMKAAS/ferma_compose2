@@ -122,7 +122,6 @@ fun AddEntryContainerProduct(
             titleList = titleList,
             isErrorTitle = addTable.error.isErrorTitle,
             isErrorSlash = addTable.error.isErrorSlash,
-            focusManager = focusManager
         )
         OutlinedTextCount(
             value = addTable.count,
@@ -135,13 +134,11 @@ fun AddEntryContainerProduct(
             intResSup = R.string.support_text_count_product,
             countWarehouse = countWarehouse.first,
             countWarehouseSuffix = countWarehouse.second,
-            focusManager = focusManager
         )
         OutlinedTextCategory(
             value = addTable.category,
             onValueChange = { onValueChange(addTable.copy(category = it)) },
             titleList = categoryList,
-            focusManager = focusManager
         )
         OutlinedTextDateEdit(
             value = date,
@@ -184,7 +181,6 @@ fun AddEntryContainerProduct(
         OutlinedTextNote(
             value = addTable.note,
             onValueChange = { onValueChange(addTable.copy(note = it)) },
-            focusManager = focusManager
         )
         ButtonPanel(
             isEntry = isEntry,

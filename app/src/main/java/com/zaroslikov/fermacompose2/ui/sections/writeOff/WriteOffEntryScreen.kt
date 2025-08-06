@@ -147,7 +147,6 @@ fun WriteOffEntryContainerProduct(
             intResSup = R.string.support_text_count_product_write_off,
             countWarehouse = countWarehouse.first,
             countWarehouseSuffix = countWarehouse.second,
-            focusManager = focusManager
         )
         OutlinedPriceInput(
             price = domainWriteOffTable.priceAll,
@@ -159,7 +158,6 @@ fun WriteOffEntryContainerProduct(
             isAutoCalculate = isAutoCalculate.value,
             onAutoCalculate = { isAutoCalculate.value = it },
             isManyCount = true,
-            focusManager = focusManager
         )
         OutlinedTextDateEdit(
             value = date,
@@ -178,7 +176,6 @@ fun WriteOffEntryContainerProduct(
         OutlinedTextNote(
             value = domainWriteOffTable.note,
             onValueChange = { onValueChange(domainWriteOffTable.copy(note = it)) },
-            focusManager = focusManager
         )
         RadioButtonWriteOff(
             state = domainWriteOffTable.status,

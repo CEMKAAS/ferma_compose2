@@ -402,9 +402,8 @@ fun IndicatorsBottomSheet(
                 isError = isErrorCount,
                 suffix = suffix,
                 intResSup = getVersionToStringSup(version),
-                focusManager = focusManager,
                 keyboardOptions = if (version == 3) keyboardOptionsNext() else keyboardOptionsNextNumber(),
-                keyboardActions = keyboardActionsClear(focusManager)
+//                keyboardActions = keyboardActionsClear(focusManager)
             )
             if (version == 3 || version == 2) {
                 if (version == 3 && animalUiState?.groop == true)
@@ -422,7 +421,6 @@ fun IndicatorsBottomSheet(
                         isError = isErrorCountAnimal,
                         countWarehouse = animalCountUiState?.weight?.toDouble() ?: 0.0,
                         suffix = animalCountUiState?.suffix ?: "",
-                        focusManager = focusManager,
                     )
                 OutlinedPriceInput(
                     price = price,
@@ -437,7 +435,6 @@ fun IndicatorsBottomSheet(
                     isError = isErrorPrice,
                     supportTextRes = if (animalUiState?.groop == true) R.string.support_text_price_animals else R.string.support_text_price_animal,
                     supportTextResAutoCal = R.string.support_text_price_one_animals,
-                    focusManager = focusManager
                 )
             }
             OutlinedTextDate(
@@ -457,9 +454,7 @@ fun IndicatorsBottomSheet(
             OutlinedTextNote(
                 value = note,
                 onValueChange = { note = it },
-                focusManager = focusManager
             )
-
         }
 
         if (indicationUiState == null) {

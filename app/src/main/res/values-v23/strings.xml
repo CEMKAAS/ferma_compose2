@@ -447,7 +447,7 @@
 
 
     //ExpensesEntryScreen
-    <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма</string>
+    <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма:</string>
     <string name="expenses_entry_screen_no_animal_auto_food">У вас нет животных для авторасчета кормов</string>
     <string name="expenses_entry_screen_food_day">%s хватит на %s %s суток до %s</string>
     <string name="expenses_entry_screen_every_day">Ежедневный расход составляет - %s %s</string>

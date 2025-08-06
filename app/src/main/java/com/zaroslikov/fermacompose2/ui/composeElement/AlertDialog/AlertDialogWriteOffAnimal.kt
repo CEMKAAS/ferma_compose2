@@ -119,7 +119,6 @@ fun AlertDialogWriteOffAnimal(
                     },
                     label = R.string.outlined_text_reason,
                     supportingText = R.string.support_text_write_off_animal_reason,
-                    focusManager = focusManager
                 )
             }
         },

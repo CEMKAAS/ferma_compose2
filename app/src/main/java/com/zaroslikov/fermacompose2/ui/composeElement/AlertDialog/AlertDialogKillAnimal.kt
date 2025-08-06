@@ -181,7 +181,6 @@ fun AlertDialogKillAnimal(
                                     titleList = titleList,
                                     isErrorTitle = text.isError,
                                     isErrorSlash = text.isErrorSlash,
-                                    focusManager = focusManager
                                 )
                                 OutlinedTextCount(
                                     value = text.count,
@@ -201,7 +200,6 @@ fun AlertDialogKillAnimal(
                                     intResSup = R.string.support_text_count_product,
                                     countWarehouse = text.countWarehouse,
                                     countWarehouseSuffix = text.countWarehouseSuffix,
-                                    focusManager = focusManager
                                 )
                             }
                         }

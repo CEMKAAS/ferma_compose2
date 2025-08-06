@@ -121,7 +121,6 @@ fun AlertDialogSaleAnimal(
                     isError = isErrorPrice,
                     supportTextRes = if (isAnimalGroup) R.string.support_text_price_animals else R.string.support_text_price_animal,
                     supportTextResAutoCal = R.string.support_text_price_one_animals,
-                    focusManager = focusManager
                 )
                 OutlinedTextBuyer(
                     value = buyer,
