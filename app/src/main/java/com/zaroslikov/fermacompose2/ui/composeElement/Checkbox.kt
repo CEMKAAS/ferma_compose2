@@ -191,6 +191,7 @@ fun AutoWeightCheckbox(
     )
     if (isChecked) {
         WeightOutlinedText(
+            modifier = Modifier.padding(bottom = 8.dp),
             value = weight,
             onValueChange = onWeightChange,
             suffix = suffix,

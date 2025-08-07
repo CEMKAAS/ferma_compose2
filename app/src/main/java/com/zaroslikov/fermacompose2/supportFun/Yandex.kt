@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
+import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import io.appmetrica.analytics.AppMetrica
 
@@ -26,25 +27,17 @@ fun metricaSale(
     AppMetrica.reportEvent("Sale Products", eventParameters)
 }
 
-fun metricaExpenses(
-    title: String,
-    count: String,
-    suffix: String,
-    price: String,
-    category: String,
-    showFoodUI: Boolean,
-    showWarehouseUI: Boolean,
-    showAnimalsUI: Boolean,
-    note: String
+fun metricalExpenses(
+   domainExpensesTable: DomainExpensesTable
 ) {
     val eventParameters: MutableMap<String, Any> = HashMap()
-    eventParameters["Имя"] = title
-    eventParameters["Кол-во"] = "$title $count $suffix $price ₽"
-    eventParameters["Категория"] = category
-    eventParameters["Примечание"] = note
-    eventParameters["Корм"] = showFoodUI
-    eventParameters["Склад"] = showWarehouseUI
-    eventParameters["Распределение"] = showAnimalsUI
+    eventParameters["Имя"] = domainExpensesTable.title
+    eventParameters["Кол-во"] = "${domainExpensesTable.title} ${domainExpensesTable.count} ${domainExpensesTable.suffix} ${domainExpensesTable.priceAll} ₽"
+    eventParameters["Категория"] = domainExpensesTable.category
+    eventParameters["Примечание"] = domainExpensesTable.note
+    eventParameters["Корм"] = domainExpensesTable.showFood
+    eventParameters["Склад"] = domainExpensesTable.showWarehouse
+    eventParameters["Распределение"] = domainExpensesTable.showAnimals
     AppMetrica.reportEvent("Expenses Products", eventParameters)
 }
 

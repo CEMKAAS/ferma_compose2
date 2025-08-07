@@ -389,13 +389,18 @@ private fun ShowAnimal(
                         .fillMaxWidth()
                         .padding(top = 5.dp)
                 ) {
+                    val countTable = domainExpensesTable.domainExpensesTable.count.toConvertZeroDouble()
+                    val weightTable = domainExpensesTable.weight.toConvertZeroDouble()
+                    val priceTable =
+                        domainExpensesTable.domainExpensesTable.priceAll.toConvertZeroDouble()
+
                     val count =
-                        if (domainExpensesTable.isAutoWeight) domainExpensesTable.weight.toConvertZeroDouble() * domainExpensesTable.domainExpensesTable.count.toDouble()
-                        else domainExpensesTable.domainExpensesTable.count.toDouble()
+                        if (domainExpensesTable.isAutoWeight) weightTable * countTable
+                        else countTable
 
                     val priceAll =
-                        if (domainExpensesTable.isAutoCalculate) domainExpensesTable.domainExpensesTable.priceAll.toDouble() * domainExpensesTable.domainExpensesTable.count.toDouble()
-                        else domainExpensesTable.domainExpensesTable.priceAll.toDouble()
+                        if (domainExpensesTable.isAutoCalculate) priceTable * countTable
+                        else priceTable
 
                     val suffix =
                         if (domainExpensesTable.isAutoWeight) domainExpensesTable.domainExpensesTable.dailyExpensesFoodSuffix
@@ -416,7 +421,12 @@ private fun ShowAnimal(
                     Slider(
                         value = animal.presentException.toFloat(),
                         onValueChange = { newValue ->
-                            onValueChange(domainExpensesTable.updateAnimalSlider(animal.id, newValue.toDouble()))
+                            onValueChange(
+                                domainExpensesTable.updateAnimalSlider(
+                                    animal.id,
+                                    newValue.toDouble()
+                                )
+                            )
                         },
                         valueRange = 0f..totalFood,
                         steps = 99,

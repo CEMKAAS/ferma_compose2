@@ -16,6 +16,8 @@ import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
+import com.zaroslikov.fermacompose2.supportFun.metricaSale
+import com.zaroslikov.fermacompose2.supportFun.metricalExpenses
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -117,11 +119,12 @@ class ExpensesEntryViewModel @Inject constructor(
     fun insertItem() {
         viewModelScope.launch {
             if (!isError()) {
+                expensesUiState = expensesUiState.updateForSave(itemIdPT.toLong())
                 val id = itemsRepository.insertExpenses(
-                    expensesUiState.updateForSave(itemIdPT.toLong()).domainExpensesTable.toRoomMap()
+                    expensesUiState.domainExpensesTable.toRoomMap()
                 )
                 setExpensesAnimal(id)
-//            metricaSale(saleUiState.copy(priceAll = autoCalculate()))
+                metricalExpenses(expensesUiState.domainExpensesTable)
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_expenses_s_s)
@@ -138,6 +141,7 @@ class ExpensesEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
             if (!isError()) {
+                expensesUiState = expensesUiState.updateForSave(itemIdPT.toLong())
                 itemsRepository.updateExpenses(
                     expensesUiState.updateForSave(itemIdPT.toLong()).domainExpensesTable.toRoomMap()
                 )
@@ -173,7 +177,7 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
-    suspend fun setExpensesAnimal(id: Long) {
+    private suspend fun setExpensesAnimal(id: Long) {
         expensesUiState.animalList2.filter { it.ps }.map {
             ExpensesAnimalTable(
                 idExpenses = id,
@@ -186,7 +190,7 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
-    suspend fun saveExpensesAnimal() {
+    private suspend fun saveExpensesAnimal() {
         expensesUiState.animalList2.forEach {
             val table = ExpensesAnimalTable(
                 id = it.idExpensesAnimal,
@@ -223,7 +227,7 @@ class ExpensesEntryViewModel @Inject constructor(
         return expensesUiState.hasAnyError
     }
 
-    fun showMessage(message: String) {
+    private fun showMessage(message: String) {
         viewModelScope.launch {
             SnackbarController.sendEvent(
                 event = SnackbarEvent(

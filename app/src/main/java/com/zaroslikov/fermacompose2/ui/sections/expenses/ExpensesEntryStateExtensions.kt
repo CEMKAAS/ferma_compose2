@@ -44,9 +44,9 @@ fun ExpensesEntryState.updateFromDomain(domain: DomainExpensesTable): ExpensesEn
         countAnimalInput = if (useDaily) domain.countAnimal else "",
         feedFoodInput = if (useDaily) domain.dailyExpensesFood else "",
         feedFoodInputSuffix = if (useDaily) domain.dailyExpensesFoodSuffix else "",
-        countAnimalChip = if (useDaily) domain.countAnimal else "",
-        feedFoodChip = if (useDaily) domain.dailyExpensesFood else "",
-        feedFoodChipSuffix = if (useDaily) domain.dailyExpensesFoodSuffix else "",
+        countAnimalChip = if (!useDaily) domain.countAnimal else "",
+        feedFoodChip = if (!useDaily) domain.dailyExpensesFood else "",
+        feedFoodChipSuffix = if (!useDaily) domain.dailyExpensesFoodSuffix else "",
         domainExpensesTable = domain
     )
 }
@@ -335,7 +335,17 @@ fun ExpensesEntryState.updateForSave(itemIdPT: Long): ExpensesEntryState {
     } else{
         animalList2
     }
-    Log.i("updateForSale", "updateForSave: $animalList")
+    Log.i("expenses", "updateForSave: $animalList")
+    Log.i("expenses", "updateForSave: ${copy(
+        animalList2 = animalList,
+        domainExpensesTable = domainExpensesTable.copy(
+            countAnimal = title.first,
+            dailyExpensesFood = title.second,
+            dailyExpensesFoodSuffix = title.third,
+            priceAll = price,
+            idPT = itemIdPT
+        ))}")
+
     return copy(
         animalList2 = animalList,
         domainExpensesTable = domainExpensesTable.copy(
