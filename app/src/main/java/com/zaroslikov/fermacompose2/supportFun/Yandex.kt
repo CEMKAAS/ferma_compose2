@@ -32,12 +32,12 @@ fun metricalExpenses(
 ) {
     val eventParameters: MutableMap<String, Any> = HashMap()
     eventParameters["Имя"] = domainExpensesTable.title
-    eventParameters["Кол-во"] = "${domainExpensesTable.title} ${domainExpensesTable.count} ${domainExpensesTable.suffix} ${domainExpensesTable.priceAll} ₽"
+    eventParameters["Кол-во"] = "${domainExpensesTable.title} ${domainExpensesTable.count} ${domainExpensesTable.countSuffix} ${domainExpensesTable.price} ₽"
     eventParameters["Категория"] = domainExpensesTable.category
     eventParameters["Примечание"] = domainExpensesTable.note
-    eventParameters["Корм"] = domainExpensesTable.showFood
-    eventParameters["Склад"] = domainExpensesTable.showWarehouse
-    eventParameters["Распределение"] = domainExpensesTable.showAnimals
+    eventParameters["Корм"] = domainExpensesTable.isShowFood
+    eventParameters["Склад"] = domainExpensesTable.isShowWarehouse
+    eventParameters["Распределение"] = domainExpensesTable.isShowAnimals
     AppMetrica.reportEvent("Expenses Products", eventParameters)
 }
 

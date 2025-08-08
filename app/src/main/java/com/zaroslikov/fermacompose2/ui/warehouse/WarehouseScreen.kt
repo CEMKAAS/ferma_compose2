@@ -499,7 +499,7 @@ fun WarehouseFoodCard(
                                 year = calendar.get(Calendar.YEAR),
                                 status = false,
                                 priceAll = 0.0,
-                                suffix = warehouseProduct.suffix,
+                                suffix = warehouseProduct.countSuffix,
                                 note = "",
                                 idPT = idProject
                             ), warehouseProduct

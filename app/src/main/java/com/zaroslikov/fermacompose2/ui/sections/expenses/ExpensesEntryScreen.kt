@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
-import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -92,7 +91,7 @@ fun ExpensesEntryProduct(
         ExpensesEntryContainerProduct(
             modifier = Modifier
                 .modifierScreen(innerPadding),
-            expensesEntryState = viewModel.expensesUiState,
+            state = viewModel.expensesUiState,
             isEntry = viewModel.isEntry,
             titleList = viewModel.titleUiState.collectAsState().value.list,
             categoryList = viewModel.categoryUiState.collectAsState().value.list,
@@ -108,7 +107,7 @@ fun ExpensesEntryProduct(
 @Composable
 fun ExpensesEntryContainerProduct(
     modifier: Modifier,
-    expensesEntryState: ExpensesEntryState,
+    state: ExpensesEntryState,
     isEntry: Boolean,
     titleList: List<String>,
     categoryList: List<String>,
@@ -118,76 +117,61 @@ fun ExpensesEntryContainerProduct(
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit,
 ) {
-    var date by rememberSaveable {
-        mutableStateOf(
-            formatDateToString(
-                expensesEntryState.domainExpensesTable.day,
-                expensesEntryState.domainExpensesTable.mount,
-                expensesEntryState.domainExpensesTable.year
-            )
-        )
-    }
-
     Column(modifier = modifier) {
         OutlinedTextTitleAdd(
-            value = expensesEntryState.domainExpensesTable.title,
+            value = state.title,
             onValueChange = {
-                onValueChange(expensesEntryState.updateTitle(it))
+                onValueChange(state.updateTitle(it))
                 updateCountWarehouse(it)
             },
             titleList = titleList,
-            isErrorTitle = expensesEntryState.error.isErrorTitle,
-            isErrorSlash = expensesEntryState.error.isErrorSlash,
+            isErrorTitle = state.error.isErrorTitle,
+            isErrorSlash = state.error.isErrorSlash,
         )
         OutlinedTextCount(
-            value = expensesEntryState.domainExpensesTable.count,
-            onValueChange = { onValueChange(expensesEntryState.updateCount(it)) },
-            onSuffixChange = { onValueChange(expensesEntryState.updateSuffix(it)) },
-            isError = expensesEntryState.error.isErrorCount,
-            suffix = expensesEntryState.domainExpensesTable.suffix,
+            value = state.count,
+            onValueChange = { onValueChange(state.updateCount(it)) },
+            onSuffixChange = { onValueChange(state.updateCountSuffix(it)) },
+            isError = state.error.isErrorCount,
+            suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_expenses,
-            countWarehouse = expensesEntryState.countInWarehouse.first,
-            onWeightChange = { onValueChange(expensesEntryState.copy(weight = it)) },
+            countWarehouse = state.countInWarehouse.first,
+            onWeightChange = { onValueChange(state.updateWeight(it)) },
             isWarehouseShow = false,
-            weightValue = expensesEntryState.weight,
-            weightSuffix = expensesEntryState.weightSuffix,
-            isAutoCalculate = expensesEntryState.isAutoWeight,
-            onAutoCalculate = { onValueChange(expensesEntryState.copy(isAutoWeight = it)) },
-            onWeightSuffixChance = { onValueChange(expensesEntryState.copy(weightSuffix = it)) },
+            weightValue = state.weight,
+            weightSuffix = state.weightSuffix,
+            onWeightSuffixChance = { onValueChange(state.updateWeightSuffix(it)) },
+            isAutoCalculate = state.isAutoWeight,
+            onAutoCalculate = { onValueChange(state.updateAutoWeight(it)) },
             isWeightCalculate = true,
         )
         OutlinedPriceInput(
-            price = expensesEntryState.domainExpensesTable.priceAll,
-            onPriceChange = { onValueChange(expensesEntryState.updatePrice(it)) },
-            count = expensesEntryState.domainExpensesTable.count,
-            isError = expensesEntryState.error.isErrorPrice,
-            isAutoCalculate = expensesEntryState.isAutoCalculate,
-            onAutoCalculate = { onValueChange(expensesEntryState.updateAutoCalculate(it)) },
+            price = state.price,
+            onPriceChange = { onValueChange(state.updatePrice(it)) },
+            count = state.priceAll,
+            isError = state.error.isErrorPrice,
+            isAutoCalculate = state.isAutoPrice,
+            onAutoCalculate = { onValueChange(state.updateAutoPrice(it)) },
             isManyCount = true,
             supportTextRes = R.string.support_text_price_expenses,
             supportTextResAutoCal = R.string.support_text_price_expenses,
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
         )
         OutlinedTextCategory(
-            value = expensesEntryState.domainExpensesTable.category,
-            onValueChange = { onValueChange(expensesEntryState.updateCategory(it)) },
+            value = state.category,
+            onValueChange = { onValueChange(state.updateCategory(it)) },
             titleList = categoryList,
         )
         OutlinedTextDateEdit(
-            value = date,
-            onValueChange = {
-                date = it
-                onValueChange(
-                    expensesEntryState.updateDate(it)
-                )
-            }
+            value = state.date,
+            onValueChange = { onValueChange(state.updateDate(it)) }
         )
         OutlinedTextNote(
-            value = expensesEntryState.domainExpensesTable.note,
-            onValueChange = { onValueChange(expensesEntryState.updateNote(it)) },
+            value = state.note,
+            onValueChange = { onValueChange(state.updateNote(it)) },
         )
         AdditionalSettings(
-            domainExpensesTable = expensesEntryState,
+            domainExpensesTable = state,
             onValueChange = onValueChange,
         )
         ButtonPanel(
@@ -239,7 +223,7 @@ private fun AdditionalSettings(
             stiffness = Spring.StiffnessLow
         ), label = ""
     )
-    if (!domainExpensesTable.domainExpensesTable.count.isBlank() && !domainExpensesTable.domainExpensesTable.priceAll.isBlank()) {
+    if (!domainExpensesTable.count.isBlank() && !domainExpensesTable.price.isBlank()) {
         TextButtonWarehouse(
             boolean = details,
             onClick = { details = !details },
@@ -248,17 +232,17 @@ private fun AdditionalSettings(
         if (details) {
             Food(
                 modifier = Modifier.padding(extraPadding),
-                expensesTable = domainExpensesTable,
+                state = domainExpensesTable,
                 onValueChange = onValueChange,
             )
             ShowWarehouse(
                 modifier = Modifier.padding(extraPadding),
-                domainExpensesTable = domainExpensesTable,
+                state = domainExpensesTable,
                 onValueChange = onValueChange
             )
             ShowAnimal(
                 modifier = Modifier.padding(extraPadding),
-                domainExpensesTable = domainExpensesTable,
+                state = domainExpensesTable,
                 onValueChange = onValueChange,
             )
         }
@@ -270,7 +254,7 @@ private fun AdditionalSettings(
 @Composable
 private fun Food(
     modifier: Modifier = Modifier,
-    expensesTable: ExpensesEntryState,
+    state: ExpensesEntryState,
     onValueChange: (ExpensesEntryState) -> Unit,
 ) {
     CardField(
@@ -278,28 +262,28 @@ private fun Food(
         row = false
     ) {
         Checkbox(
-            expensesTable = expensesTable,
+            expensesTable = state,
             onValueChange = onValueChange,
         )
-        if (expensesTable.domainExpensesTable.showFood && expensesTable.domainExpensesTable.count != "") {
-            if (!expensesTable.domainExpensesTable.dailyExpensesFoodAndCount)
+        if (state.isShowFood && state.count != "") {
+            if (!state.isShowFoodHand)
                 ChoiceAnimal(
-                    expensesTable,
+                    state,
                     onValueChange
                 )
-            if (expensesTable.domainExpensesTable.dailyExpensesFoodAndCount)
+            if (state.isShowFoodHand)
                 InputText(
-                    expensesTable = expensesTable,
+                    state = state,
                     onValueChange = onValueChange
                 )
-            if ((!expensesTable.domainExpensesTable.dailyExpensesFoodAndCount &&
-                        expensesTable.animalList2.isNotEmpty() &&
-                        expensesTable.animalList2.any { it.ps })
-                || (expensesTable.domainExpensesTable.dailyExpensesFoodAndCount &&
-                        expensesTable.feedFoodInput != "" &&
-                        expensesTable.countAnimalInput != "")
+            if ((!state.isShowFoodHand &&
+                        state.animalList2.isNotEmpty() &&
+                        state.animalList2.any { it.ps })
+                || (state.isShowFoodHand &&
+                        state.feedFoodInput != "" &&
+                        state.countAnimalInput != "")
             )
-                TextFoodExpenses(expensesTable)
+                TextFoodExpenses(state)
         }
     }
 }
@@ -307,7 +291,7 @@ private fun Food(
 @Composable
 private fun ShowWarehouse(
     modifier: Modifier = Modifier,
-    domainExpensesTable: ExpensesEntryState,
+    state: ExpensesEntryState,
     onValueChange: (ExpensesEntryState) -> Unit
 ) {
     var openAlertWarehouse by remember { mutableStateOf(false) }
@@ -322,9 +306,9 @@ private fun ShowWarehouse(
         modifier = modifier
     ) {
         CheckboxTextIcon(
-            checked = domainExpensesTable.domainExpensesTable.showWarehouse,
-            onCheckedChange = { onValueChange(domainExpensesTable.updateShowWarehouse(it)) },
-            enabled = !domainExpensesTable.domainExpensesTable.showFood,
+            checked = state.isShowWarehouse,
+            onCheckedChange = { onValueChange(state.updateShowWarehouse(it)) },
+            enabled = !state.isShowFood,
             intTitle = R.string.checkbox_show_warehouse,
             onClick = { openAlertWarehouse = !openAlertWarehouse }
         )
@@ -334,7 +318,7 @@ private fun ShowWarehouse(
 @Composable
 private fun ShowAnimal(
     modifier: Modifier = Modifier,
-    domainExpensesTable: ExpensesEntryState,
+    state: ExpensesEntryState,
     onValueChange: (ExpensesEntryState) -> Unit
 ) {
     var openAlertAnimal by remember { mutableStateOf(false) }
@@ -350,23 +334,23 @@ private fun ShowAnimal(
         row = false
     ) {
         CheckboxTextIcon(
-            checked = domainExpensesTable.domainExpensesTable.showAnimals,
-            onCheckedChange = { onValueChange(domainExpensesTable.updateShowAnimal(it)) },
-            enabled = !domainExpensesTable.domainExpensesTable.showFood,
+            checked = state.isShowAnimals,
+            onCheckedChange = { onValueChange(state.updateShowAnimal(it)) },
+            enabled = !state.isShowFood,
             intTitle = R.string.checkbox_animals_expenses,
             onClick = { openAlertAnimal = !openAlertAnimal }
         )
 
 //    РАСПРЕДЕЛЕНИЕ РАСХОДОВ
-        if (domainExpensesTable.domainExpensesTable.showAnimals) {
+        if (state.isShowAnimals) {
             val totalFood = 100f
             FlowRow(modifier = Modifier.fillMaxWidth()) {
-                if (domainExpensesTable.animalList2.isNotEmpty()) {
-                    domainExpensesTable.animalList2.forEach { animal ->
+                if (state.animalList2.isNotEmpty()) {
+                    state.animalList2.forEach { animal ->
                         FilterChip(
                             selected = animal.ps,
                             onClick = {
-                                onValueChange(domainExpensesTable.toggleAnimalSelection(animal.id))
+                                onValueChange(state.toggleAnimalSelection(animal.id))
                             },
                             label = { Text(animal.name) },
                             leadingIcon = {
@@ -383,28 +367,30 @@ private fun ShowAnimal(
             }
 
             // Отображаем слайдеры для каждого выбранного животного
-            domainExpensesTable.animalList2.filter { it.ps }.forEach { animal ->
+            state.animalList2.filter { it.ps }.forEach { animal ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 5.dp)
                 ) {
-                    val countTable = domainExpensesTable.domainExpensesTable.count.toConvertZeroDouble()
-                    val weightTable = domainExpensesTable.weight.toConvertZeroDouble()
+                    val countTable =
+                        state.count.toConvertZeroDouble()
+                    val weightTable =
+                        state.weight.toConvertZeroDouble()
                     val priceTable =
-                        domainExpensesTable.domainExpensesTable.priceAll.toConvertZeroDouble()
+                        state.price.toConvertZeroDouble()
 
                     val count =
-                        if (domainExpensesTable.isAutoWeight) weightTable * countTable
+                        if (state.isAutoWeight) weightTable * countTable
                         else countTable
 
                     val priceAll =
-                        if (domainExpensesTable.isAutoCalculate) priceTable * countTable
+                        if (state.isAutoPrice) priceTable * countTable
                         else priceTable
 
                     val suffix =
-                        if (domainExpensesTable.isAutoWeight) domainExpensesTable.domainExpensesTable.dailyExpensesFoodSuffix
-                        else domainExpensesTable.domainExpensesTable.suffix
+                        if (state.isAutoWeight) state.weightSuffix
+                        else state.countSuffix
 
                     val productExpenses =
                         formatter(animal.presentException * count / 100.0)
@@ -422,7 +408,7 @@ private fun ShowAnimal(
                         value = animal.presentException.toFloat(),
                         onValueChange = { newValue ->
                             onValueChange(
-                                domainExpensesTable.updateAnimalSlider(
+                                state.updateAnimalSlider(
                                     animal.id,
                                     newValue.toDouble()
                                 )
@@ -455,15 +441,15 @@ private fun Checkbox(
         )
     }
     CheckboxTextIcon(
-        checked = expensesTable.domainExpensesTable.showFood,
+        checked = expensesTable.isShowFood,
         onCheckedChange = { onValueChange(expensesTable.updateShowFood(it)) },
-        enabled = expensesTable.domainExpensesTable.count != "",
+        enabled = expensesTable.count != "",
         intTitle = R.string.checkbox_food,
         onClick = { openAlertFood = !openAlertFood }
     )
-    if (expensesTable.domainExpensesTable.showFood)
+    if (expensesTable.isShowFood)
         CheckboxTextIcon(
-            checked = expensesTable.domainExpensesTable.dailyExpensesFoodAndCount,
+            checked = expensesTable.isShowFoodHand,
             onCheckedChange = { onValueChange(expensesTable.updateDailyExpensesFoodAndCount(it)) },
             intTitle = R.string.checkbox_set_hand
         )
@@ -471,10 +457,10 @@ private fun Checkbox(
 
 @Composable
 fun ChoiceAnimal(
-    expensesTable: ExpensesEntryState,
+    state: ExpensesEntryState,
     onValueChange: (ExpensesEntryState) -> Unit
 ) {
-    if (expensesTable.animalList2.isNotEmpty()) {
+    if (state.animalList2.isNotEmpty()) {
         Text(
             text = stringResource(R.string.expenses_entry_screen_chooise_animal_auto_food),
             modifier = Modifier.fillMaxWidth()
@@ -482,12 +468,12 @@ fun ChoiceAnimal(
         FlowRow(
             modifier = Modifier.fillMaxWidth()
         ) {
-            expensesTable.animalList2.forEach { animal ->
+            state.animalList2.forEach { animal ->
                 val selected = animal.ps
                 FilterChip(
                     selected = selected,
                     onClick = {
-                        onValueChange(expensesTable.toggleAnimalChipSelection(animal))
+                        onValueChange(state.toggleAnimalChipSelection(animal))
                     },
                     label = { Text(animal.name) },
                     leadingIcon = if (selected) {
@@ -508,30 +494,30 @@ fun ChoiceAnimal(
 
 @Composable
 private fun InputText(
-    expensesTable: ExpensesEntryState,
+    state: ExpensesEntryState,
     onValueChange: (ExpensesEntryState) -> Unit
 ) {
-    var suffixCountAnimal by rememberSaveable { mutableStateOf(expensesTable.domainExpensesTable.suffix) }
+    var suffixCountAnimal by rememberSaveable { mutableStateOf(state.countSuffix) }
 
     OutlinedTextCountNoCard(
-        value = expensesTable.feedFoodInput,
-        onValueChange = { onValueChange(expensesTable.updateDailyExpensesFood(it)) },
+        value = state.feedFoodInput,
+        onValueChange = { onValueChange(state.updateDailyExpensesFood(it)) },
         versionDropMenu = 0,
         intRes = R.string.outlined_food_day_animals,
         intResSup = R.string.support_text_food_day,
         intResError = R.string.error_no_count_animals,
-        isError = expensesTable.error.isErrorDailyExpensesFood,
-        suffix = expensesTable.feedFoodChipSuffix,
-        onSuffixChance = { onValueChange(expensesTable.updateDailyExpensesFoodSuffix(it)) },
+        isError = state.error.isErrorDailyExpensesFood,
+        suffix = state.feedFoodChipSuffix,
+        onSuffixChance = { onValueChange(state.updateDailyExpensesFoodSuffix(it)) },
     )
     OutlinedTextCountNoCard(
-        value = expensesTable.countAnimalInput,
-        onValueChange = { onValueChange(expensesTable.updateCountAnimal(it)) },
+        value = state.countAnimalInput,
+        onValueChange = { onValueChange(state.updateCountAnimal(it)) },
         versionDropMenu = 2,
         intRes = R.string.outlined_text_field_quantity,
         intResSup = R.string.support_text_count_animals,
         intResError = R.string.error_no_count_product,
-        isError = expensesTable.error.isErrorCountAnimal,
+        isError = state.error.isErrorCountAnimal,
         suffix = suffixCountAnimal,
         onSuffixChance = { suffixCountAnimal = it },
         drawableRes = R.drawable.baseline_spoke_24,
@@ -542,34 +528,34 @@ private fun InputText(
 
 @Composable
 fun TextFoodExpenses(
-    expensesTable: ExpensesEntryState
+    state: ExpensesEntryState
 ) {
-    val foodDesignedDayUI = expensesTable.updateSettingDay()
+    val foodDesignedDayUI = state.updateSettingDay()
     Text(
         text = stringResource(
             R.string.expenses_entry_screen_food_day
         ).format(
-            if (expensesTable.domainExpensesTable.title == "") stringResource(R.string.support_text_food)
-            else expensesTable.domainExpensesTable.title,
+            if (state.title == "") stringResource(R.string.support_text_food)
+            else state.title,
             if (foodDesignedDayUI.daysFood >= 1000) stringResource(R.string.support_text_more) else "",
             foodDesignedDayUI.daysFood,
             foodDesignedDayUI.dateEndFood,
         )
     )
-    if (!expensesTable.domainExpensesTable.dailyExpensesFoodAndCount) {
+    if (!state.isShowFoodHand) {
         Text(
             text = stringResource(
                 R.string.expenses_entry_screen_every_day
             ).format(
-                expensesTable.feedFoodChip.toFormatNumber(),
-                expensesTable.feedFoodChipSuffix,
+                state.feedFoodChip.toFormatNumber(),
+                state.feedFoodChipSuffix,
             )
         )
         Text(
             text = stringResource(
                 R.string.expenses_entry_screen_animal_count
             ).format(
-                expensesTable.countAnimalChip.toFormatNumber(),
+                state.countAnimalChip.toFormatNumber(),
                 stringResource(R.string.suffix_pieces)
             )
         )

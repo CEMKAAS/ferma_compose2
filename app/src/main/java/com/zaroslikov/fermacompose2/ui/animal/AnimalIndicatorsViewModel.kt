@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
@@ -68,7 +67,7 @@ class AnimalIndicatorsViewModel(
                 expensesUiTable =
                     itemsRepository.getItemExpensesForVaccination(animalIndicatorsVM.id.toLong())
                         .first()
-                (expensesUiTable?.priceAll ?: 0.0) to (expensesUiTable?.count ?: 0.0)
+                (expensesUiTable?.price ?: 0.0) to (expensesUiTable?.count ?: 0.0)
             }
 
             2 -> {
@@ -191,21 +190,27 @@ class AnimalIndicatorsViewModel(
                                 day = dateArray[0],
                                 mount = dateArray[1],
                                 year = dateArray[2],
-                                priceAll = price.toConvertZeroDouble(),
-                                suffix = suffix,
+                                price = price.toConvertZeroDouble(),
+                                countSuffix = suffix,
                                 category = category,
                                 note = note,
-                                showFood = false,
-                                showWarehouse = false,
-                                showAnimals = false,
-                                dailyExpensesFoodAndCount = false,
-                                dailyExpensesFood = 0.0,
+                                isShowFood = false,
+                                isShowWarehouse = false,
+                                isShowAnimals = false,
+                                isShowFoodHand = false,
+                                feedFood = 0.0,
                                 countAnimal = 0,
                                 foodDesignedDay = 0,
                                 lastDayFood = "",
                                 idPT = idPT,
                                 animalId = itemId.toLong(),
-                                animalVaccinationId = vaccinationId
+                                animalVaccinationId = vaccinationId,
+                                priceAll = 0.0,
+                                feedFoodSuffix = "",
+                                weight = 0.0,
+                                weightSuffix = "",
+                                isAutoWeight = false,
+                                isAutoPrice = false
                             )
                         )
                     }
@@ -254,7 +259,7 @@ class AnimalIndicatorsViewModel(
                                 day = dateArray[0],
                                 mount = dateArray[1],
                                 year = dateArray[2],
-                                priceAll = price.toConvertZeroDouble(),
+                                price = price.toConvertZeroDouble(),
                             )?.let {
                                 itemsRepository.updateExpenses(
                                     it
@@ -268,21 +273,27 @@ class AnimalIndicatorsViewModel(
                                     day = dateArray[0],
                                     mount = dateArray[1],
                                     year = dateArray[2],
-                                    priceAll = price.toConvertZeroDouble(),
-                                    suffix = suffix,
+                                    price = price.toConvertZeroDouble(),
+                                    countSuffix = suffix,
                                     category = category,
                                     note = note,
-                                    showFood = false,
-                                    showWarehouse = false,
-                                    showAnimals = false,
-                                    dailyExpensesFoodAndCount = false,
-                                    dailyExpensesFood = 0.0,
+                                    isShowFood = false,
+                                    isShowWarehouse = false,
+                                    isShowAnimals = false,
+                                    isShowFoodHand = false,
+                                    feedFood = 0.0,
                                     countAnimal = 0,
                                     foodDesignedDay = 0,
                                     lastDayFood = "",
                                     idPT = idPT,
                                     animalId = itemId.toLong(),
-                                    animalVaccinationId = animalIndicatorsVM.id.toLong()
+                                    animalVaccinationId = animalIndicatorsVM.id.toLong(),
+                                    priceAll = 0.0,
+                                    feedFoodSuffix = "",
+                                    weight = 0.0,
+                                    weightSuffix = "",
+                                    isAutoWeight = false,
+                                    isAutoPrice = false
                                 )
                             )
                     }
@@ -325,8 +336,8 @@ class AnimalIndicatorsViewModel(
                 itemsRepository.updateExpenses(
                     it.copy(
                         count = count.toDouble(),
-                        priceAll = price,
-                        suffix = suffix
+                        price = price,
+                        countSuffix = suffix
                     )
                 )
             }
@@ -368,7 +379,7 @@ class AnimalIndicatorsViewModel(
 
             1 -> {
                 expensesUiTable = itemsRepository.getItemExpensesIdAnimalCount(idCount).first()
-                expensesUiTable?.priceAll
+                expensesUiTable?.price
             }
 
             2, 3 -> {

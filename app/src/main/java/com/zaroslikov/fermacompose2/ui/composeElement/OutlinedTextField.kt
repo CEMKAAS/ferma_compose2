@@ -556,7 +556,7 @@ fun OutlinedTextPrice(
 fun OutlinedPriceInput(
     price: String,
     onPriceChange: (String) -> Unit,
-    count: String = "",
+    count: String? = "",
     isAutoCalculate: Boolean,
     onAutoCalculate: (Boolean) -> Unit,
     isManyCount: Boolean = false,
@@ -596,12 +596,11 @@ fun OutlinedPriceInput(
             keyboardOptions = keyboardOptionsNextNumber(),
         )
         if (isManyCount) {
-            AutoCalculateCheckbox(
+            AutoCalculateCheckbox2(
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
                 tooltipTextResAutoCal = tooltipTextResAutoCal,
-                price = price,
-                count = count
+                price = count,
             )
         }
     }

@@ -22,7 +22,6 @@ import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorAddAnimal
-import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
@@ -162,19 +161,25 @@ fun AlertDialogAddAnimal(
                                         day = dateTodayArray()[0],
                                         mount = dateTodayArray()[1],
                                         year = dateTodayArray()[2],
-                                        priceAll = priceInDB.toConvertDbDouble(),
-                                        suffix = countSuffix,
+                                        price = priceInDB.toConvertDbDouble(),
+                                        countSuffix = countSuffix,
                                         category = category,
                                         note = reasonNote,
-                                        showFood = false,
-                                        showWarehouse = false,
-                                        showAnimals = false,
-                                        dailyExpensesFoodAndCount = false,
-                                        dailyExpensesFood = 0.0,
+                                        isShowFood = false,
+                                        isShowWarehouse = false,
+                                        isShowAnimals = false,
+                                        isShowFoodHand = false,
+                                        feedFood = 0.0,
                                         countAnimal = 0,
                                         foodDesignedDay = 0,
                                         lastDayFood = "",
                                         idPT = idPT.toLong(),
+                                        priceAll = 0.0,
+                                        feedFoodSuffix = "",
+                                        weight = 0.0,
+                                        weightSuffix = "",
+                                        isAutoWeight = false,
+                                        isAutoPrice = false,
                                     )
                                 }
                             )

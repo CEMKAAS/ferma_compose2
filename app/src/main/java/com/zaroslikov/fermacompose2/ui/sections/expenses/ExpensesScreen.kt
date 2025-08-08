@@ -49,7 +49,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -338,8 +337,8 @@ fun ExpensesCard(
             Text(
                 text = stringResource(
                     R.string.card_count_s,
-                    "${expensesTable.count.formatNumber()} ${expensesTable.suffix}",
-                    expensesTable.priceAll.formatNumber(),
+                    "${expensesTable.count.formatNumber()} ${expensesTable.countSuffix}",
+                    expensesTable.price.formatNumber(),
                     stringResource(R.string.currency_ruble),
                 ),
                 textAlign = TextAlign.Center,

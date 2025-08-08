@@ -15,8 +15,6 @@ import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
-import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
-import com.zaroslikov.fermacompose2.supportFun.metricaSale
 import com.zaroslikov.fermacompose2.supportFun.metricalExpenses
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
@@ -54,13 +52,11 @@ class ExpensesEntryViewModel @Inject constructor(
 
     var expensesUiState by mutableStateOf(
         ExpensesEntryState().copy(
-            weightSuffix = resourceProvider.getString(R.string.suffix_kilogram),
             feedFoodChipSuffix = resourceProvider.getString(R.string.suffix_kilogram),
             feedFoodInputSuffix = resourceProvider.getString(R.string.suffix_kilogram),
-            domainExpensesTable = DomainExpensesTable().copy(
-                category = resourceProvider.getString(R.string.support_text_no_category),
-                suffix = resourceProvider.getString(R.string.suffix_pieces),
-            )
+            category = resourceProvider.getString(R.string.support_text_no_category),
+            countSuffix = resourceProvider.getString(R.string.suffix_pieces),
+            weightSuffix = resourceProvider.getString(R.string.suffix_kilogram),
         )
     )
         private set
@@ -119,19 +115,19 @@ class ExpensesEntryViewModel @Inject constructor(
     fun insertItem() {
         viewModelScope.launch {
             if (!isError()) {
-                expensesUiState = expensesUiState.updateForSave(itemIdPT.toLong())
+                expensesUiState = expensesUiState.updateForSaveAnimalList()
                 val id = itemsRepository.insertExpenses(
-                    expensesUiState.domainExpensesTable.toRoomMap()
+                    expensesUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
                 )
                 setExpensesAnimal(id)
-                metricalExpenses(expensesUiState.domainExpensesTable)
+//                metricalExpenses(expensesUiState)
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_expenses_s_s)
                         .format(
-                            expensesUiState.domainExpensesTable.title,
-                            expensesUiState.domainExpensesTable.count,
-                            expensesUiState.domainExpensesTable.suffix
+                            expensesUiState.title,
+                            expensesUiState.count,
+                            expensesUiState.countSuffix
                         )
                 )
             }
@@ -141,18 +137,23 @@ class ExpensesEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
             if (!isError()) {
-                expensesUiState = expensesUiState.updateForSave(itemIdPT.toLong())
+                expensesUiState = expensesUiState.updateForSaveAnimalList()
+                Log.i("expenses", "updateItem: ${expensesUiState.animalList2}")
                 itemsRepository.updateExpenses(
-                    expensesUiState.updateForSave(itemIdPT.toLong()).domainExpensesTable.toRoomMap()
+                    expensesUiState.updateForSave(
+                        id = itemId.toLong(),
+                        itemIdPT = itemIdPT.toLong()
+                    )
+                        .toRoomMap()
                 )
                 saveExpensesAnimal()
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_refresh_s_s)
                         .format(
-                            expensesUiState.domainExpensesTable.title,
-                            expensesUiState.domainExpensesTable.count,
-                            expensesUiState.domainExpensesTable.suffix
+                            expensesUiState.title,
+                            expensesUiState.count,
+                            expensesUiState.countSuffix
                         )
                 )
             }
@@ -162,16 +163,16 @@ class ExpensesEntryViewModel @Inject constructor(
     fun deleteItem() {
         viewModelScope.launch {
             itemsRepository.deleteExpenses(
-                expensesUiState.domainExpensesTable.copy(idPT = itemIdPT.toLong()).toRoomMap()
+                expensesUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
             )
             deleteExpensesAnimal()
             _eventFlow.emit(UiEvent.NavigateBack)
             showMessage(
                 resourceProvider.getString(R.string.toast_delete_s)
                     .format(
-                        expensesUiState.domainExpensesTable.title,
-                        expensesUiState.domainExpensesTable.count,
-                        expensesUiState.domainExpensesTable.suffix
+                        expensesUiState.title,
+                        expensesUiState.count,
+                        expensesUiState.countSuffix
                     )
             )
         }

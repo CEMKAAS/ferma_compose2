@@ -1,13 +1,22 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
+import com.zaroslikov.fermacompose2.supportFun.dateToday
 
 data class ExpensesEntryState(
-    val weight: String = "",
-    val weightSuffix: String = "",
+    val title: String = "",
+    val count: String = "",
+    val date: String = dateToday(),
+    val price: String = "",
+    val priceAll: String = "",
+    val countSuffix: String = "",
+    val category: String = "",
+    val note: String = "",
+    val isShowFood: Boolean = false,
+    val isShowFoodHand: Boolean = false,
+    val isShowWarehouse: Boolean = false,
+    val isShowAnimals: Boolean = false,
 
-    val countInWarehouse: DomainPairDataDoubleSting = DomainPairDataDoubleSting(),
     val feedFoodChip: String = "",
     val feedFoodChipSuffix: String = "",
     val countAnimalChip: String = "",
@@ -18,15 +27,22 @@ data class ExpensesEntryState(
 
     val daysFood: Int = 0,
     val dateEndFood: String = "",
-    val isAutoWeight: Boolean = false, // Расчет веса
-    val isAutoCalculate: Boolean = false, // Расчет цены
+
+    val weight: String = "",
+    val weightSuffix: String = "",
+    val isAutoWeight: Boolean = false,
+    val isAutoPrice: Boolean = false,
+
+
+    val countInWarehouse: DomainPairDataDoubleSting = DomainPairDataDoubleSting(),
+
     val isIndicatorsValue: Boolean = false,
     val animalList2: List<AnimalExpensesList2> = emptyList(),
-    val domainExpensesTable: DomainExpensesTable = DomainExpensesTable(),
+//    val domainExpensesTable: DomainExpensesTable = DomainExpensesTable(),
     val error: ValidationError = ValidationError()
 ) {
     val hasAnyError: Boolean
-        get() = error.hasAnyError(domainExpensesTable.dailyExpensesFoodAndCount)
+        get() = error.hasAnyError(isShowFoodHand)
 
     data class ValidationError(
         val isErrorTitle: Boolean = false,
@@ -36,8 +52,8 @@ data class ExpensesEntryState(
         val isErrorDailyExpensesFood: Boolean = false,
         val isErrorCountAnimal: Boolean = false,
     ) {
-        fun hasAnyError(dailyExpensesFoodAndCount: Boolean): Boolean {
-            return if (dailyExpensesFoodAndCount) {
+        fun hasAnyError(isShowFoodHand: Boolean): Boolean {
+            return if (isShowFoodHand) {
                 isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorDailyExpensesFood || isErrorCountAnimal
             } else {
                 isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice

@@ -1,59 +1,71 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses
 
+
 import android.util.Log
 import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
-import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbOnlyInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroString
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 fun ExpensesEntryState.validate(): ExpensesEntryState {
 
-    val (dailyExpensesFood, countAnimal) = if (domainExpensesTable.dailyExpensesFoodAndCount) {
+    val (feedFood, countAnimal) = if (isShowFoodHand) {
         feedFoodInput to countAnimalInput
     } else feedFoodChip to countAnimalChip
 
     val newError = ExpensesEntryState.ValidationError(
-        isErrorTitle = domainExpensesTable.title.isBlank(),
-        isErrorSlash = domainExpensesTable.title.contains("/"),
-        isErrorCount = domainExpensesTable.count.isBlank(),
-        isErrorPrice = domainExpensesTable.priceAll.isBlank(),
-        isErrorDailyExpensesFood = dailyExpensesFood.isBlank(),
+        isErrorTitle = title.isBlank(),
+        isErrorSlash = title.contains("/"),
+        isErrorCount = count.isBlank(),
+        isErrorPrice = price.isBlank(),
+        isErrorDailyExpensesFood = feedFood.isBlank(),
         isErrorCountAnimal = countAnimal.isBlank()
     )
     return this.copy(error = newError)
 }
 
-fun ExpensesEntryState.validateAll(domain: DomainExpensesTable): ExpensesEntryState {
-    val error = ExpensesEntryState.ValidationError(
-        isErrorTitle = domain.title.isBlank(),
-        isErrorSlash = domain.title.contains("/"),
-        isErrorCount = domain.count.isBlank(),
-        isErrorPrice = domain.priceAll.isBlank(),
-        isErrorDailyExpensesFood = domain.dailyExpensesFood.isBlank(),
-        isErrorCountAnimal = domain.countAnimal.isBlank()
-    )
-    return ExpensesEntryState(domainExpensesTable = domain, error = error)
-}
-
 fun ExpensesEntryState.updateFromDomain(domain: DomainExpensesTable): ExpensesEntryState {
-    val useDaily = domain.dailyExpensesFoodAndCount
+    val useDaily = domain.isShowFoodHand
     return copy(
-        countAnimalInput = if (useDaily) domain.countAnimal else "",
-        feedFoodInput = if (useDaily) domain.dailyExpensesFood else "",
-        feedFoodInputSuffix = if (useDaily) domain.dailyExpensesFoodSuffix else "",
-        countAnimalChip = if (!useDaily) domain.countAnimal else "",
-        feedFoodChip = if (!useDaily) domain.dailyExpensesFood else "",
-        feedFoodChipSuffix = if (!useDaily) domain.dailyExpensesFoodSuffix else "",
-        domainExpensesTable = domain
+        title = domain.title,
+        count = domain.count.toString(),
+        date = formatDateToString(
+            domain.day,
+            domain.month,
+            domain.year
+        ),
+        price = domain.price.toString(),
+        priceAll = domain.priceAll.toString(),
+        countSuffix = domain.countSuffix,
+        category = domain.category,
+        note = domain.note,
+        isShowFood = domain.isShowFood,
+        isShowFoodHand = domain.isShowFoodHand,
+        isShowWarehouse = domain.isShowWarehouse,
+        isShowAnimals = domain.isShowAnimals,
+        countAnimalChip = if (!useDaily) domain.countAnimal.toString() else "",
+        feedFoodChip = if (!useDaily) domain.feedFood.toString() else "",
+        feedFoodChipSuffix = if (!useDaily) domain.feedFoodSuffix else "",
+        countAnimalInput = if (useDaily) domain.countAnimal.toString() else "",
+        feedFoodInput = if (useDaily) domain.feedFood.toString() else "",
+        feedFoodInputSuffix = if (useDaily) domain.feedFoodSuffix else "",
+        daysFood = domain.foodDesignedDay,
+        dateEndFood = domain.lastDayFood,
+        isAutoWeight = domain.isAutoWeight,
+        isAutoPrice = domain.isAutoPrice,
+        weight = domain.weight.toString(),
+        weightSuffix = domain.weightSuffix
     )
 }
 
 fun ExpensesEntryState.updateTitle(title: String): ExpensesEntryState {
     return copy(
-        domainExpensesTable = domainExpensesTable.copy(title = title),
+        title = title,
         error = error.copy(
             isErrorTitle = title.isBlank(),
             isErrorSlash = title.contains("/")
@@ -63,78 +75,84 @@ fun ExpensesEntryState.updateTitle(title: String): ExpensesEntryState {
 
 fun ExpensesEntryState.updateCount(count: String): ExpensesEntryState {
     return copy(
-        domainExpensesTable = domainExpensesTable.copy(count = count),
+        count = count,
         error = error.copy(
             isErrorCount = count.isBlank()
         )
+    ).updatePriceAll()
+}
+
+fun ExpensesEntryState.updateCountSuffix(suffix: String): ExpensesEntryState {
+    return copy(
+        countSuffix = suffix
     )
 }
 
-fun ExpensesEntryState.updateSuffix(suffix: String): ExpensesEntryState {
+fun ExpensesEntryState.updateAutoWeight(isAutoWeight: Boolean): ExpensesEntryState {
     return copy(
-        domainExpensesTable = domainExpensesTable.copy(suffix = suffix)
+        isAutoWeight = isAutoWeight
+    )
+}
+
+fun ExpensesEntryState.updateWeight(weight: String): ExpensesEntryState {
+    return copy(
+        weight = weight
+    )
+}
+
+fun ExpensesEntryState.updateWeightSuffix(weightSuffix: String): ExpensesEntryState {
+    return copy(
+        weightSuffix = weightSuffix
     )
 }
 
 fun ExpensesEntryState.updatePrice(price: String): ExpensesEntryState {
     return copy(
-        domainExpensesTable = domainExpensesTable.copy(priceAll = price),
+        price = price,
         error = error.copy(
             isErrorPrice = price.isBlank()
         )
-    )
+    ).updatePriceAll()
 }
 
-fun ExpensesEntryState.updateAutoCalculate(isAutoCalculate: Boolean): ExpensesEntryState {
+fun ExpensesEntryState.updateAutoPrice(isAutoCalculate: Boolean): ExpensesEntryState {
+    return copy(isAutoPrice = isAutoCalculate).updatePriceAll()
+}
+
+fun ExpensesEntryState.updatePriceAll(): ExpensesEntryState {
     return copy(
-        isAutoCalculate = isAutoCalculate,
+        priceAll = if (isAutoPrice) (price.toConvertZeroDouble() * count.toConvertZeroDouble()).toString() else ""
     )
 }
 
 fun ExpensesEntryState.updateCategory(category: String): ExpensesEntryState {
     return copy(
-        domainExpensesTable = domainExpensesTable.copy(category = category)
+        category = category
     )
 }
 
 fun ExpensesEntryState.updateDate(date: String): ExpensesEntryState {
-    val dateList = date.split(".")
     return copy(
-        domainExpensesTable = domainExpensesTable.copy(
-            day = dateList[0].toInt(),
-            mount = dateList[1].toInt(),
-            year = dateList[2].toInt()
-        )
+        date = date
     )
 }
 
 fun ExpensesEntryState.updateNote(note: String): ExpensesEntryState {
-    return copy(
-        domainExpensesTable = domainExpensesTable.copy(
-            note = note
-        )
-    )
+    return copy(note = note)
 }
 
 fun ExpensesEntryState.updateShowFood(showFood: Boolean): ExpensesEntryState {
     return copy(
         animalList2 = animalList2.map { it.copy(ps = false) },
-        domainExpensesTable = domainExpensesTable.copy(
-            showFood = showFood,
-            showWarehouse = showFood,
-            showAnimals = false
-        ),
+        isShowFood = showFood,
+        isShowWarehouse = showFood,
+        isShowAnimals = false
     )
 }
 
 fun ExpensesEntryState.updateDailyExpensesFoodAndCount(dailyExpensesFoodAndCount: Boolean): ExpensesEntryState {
     return copy(
-//        animalList2 = animalList2.map { it.copy(ps = false) },
-        domainExpensesTable = domainExpensesTable.copy(
-            dailyExpensesFoodAndCount = dailyExpensesFoodAndCount,
-//            dailyExpensesFood = "",
-//            countAnimal = ""
-        ),
+        isShowFoodHand = dailyExpensesFoodAndCount
     )
 }
 
@@ -202,18 +220,14 @@ fun ExpensesEntryState.toggleAnimalChipSelection(
 
 fun ExpensesEntryState.updateShowWarehouse(showWarehouse: Boolean): ExpensesEntryState {
     return copy(
-        domainExpensesTable = domainExpensesTable.copy(
-            showWarehouse = showWarehouse
-        ),
+        isShowWarehouse = showWarehouse
     )
 }
 
 fun ExpensesEntryState.updateShowAnimal(showAnimal: Boolean): ExpensesEntryState {
     return copy(
         animalList2 = animalList2.map { it.copy(ps = false) },
-        domainExpensesTable = domainExpensesTable.copy(
-            showAnimals = showAnimal
-        ),
+        isShowAnimals = showAnimal
     )
 }
 
@@ -270,15 +284,9 @@ fun ExpensesEntryState.updateAnimalSlider(
 }
 
 fun ExpensesEntryState.updateSettingDay(): ExpensesEntryState {
-    val date = formatDateToString(
-        domainExpensesTable.day,
-        domainExpensesTable.mount,
-        domainExpensesTable.year
-    )
-    val dailyExpensesFoodAndCount =
-        domainExpensesTable.dailyExpensesFoodAndCount
+    val dailyExpensesFoodAndCount = isShowFoodHand
 
-    val countTable = domainExpensesTable.count.toConvertZeroDouble()
+    val countTable = count.toConvertZeroDouble()
     val weight = weight.toConvertZeroDouble()
 
     val countAnimal = if (dailyExpensesFoodAndCount)
@@ -287,14 +295,14 @@ fun ExpensesEntryState.updateSettingDay(): ExpensesEntryState {
         feedFoodInput.toConvertZeroDouble() else feedFoodChip.toConvertZeroDouble()
 
     val countProduct =
-        if (isAutoWeight) {
+        if (isAutoPrice) {
             (countTable * weight)
                 .convertWeight(
                     weightSuffix,
                     feedFoodChipSuffix
                 )
         } else countTable.convertWeight(
-            domainExpensesTable.suffix,
+            countSuffix,
             feedFoodChipSuffix
         )
 
@@ -320,40 +328,52 @@ fun ExpensesEntryState.updateSettingDay(): ExpensesEntryState {
 }
 
 
-fun ExpensesEntryState.updateForSave(itemIdPT: Long): ExpensesEntryState {
-    val title = if (domainExpensesTable.dailyExpensesFoodAndCount) {
+fun ExpensesEntryState.updateForSave(
+    id: Long = 0,
+    itemIdPT: Long
+): DomainExpensesTable {
+    val title2 = if (isShowFoodHand) {
         Triple(countAnimalInput, feedFoodInput, feedFoodInputSuffix)
     } else Triple(countAnimalChip, feedFoodChip, feedFoodChipSuffix)
 
-    val price = if (isAutoCalculate) calculatePriceAll(
-        domainExpensesTable.priceAll,
-        domainExpensesTable.count
-    ) else domainExpensesTable.priceAll
-
-    val animalList = if (domainExpensesTable.dailyExpensesFoodAndCount){
-        emptyList()
-    } else{
-        animalList2
-    }
-    Log.i("expenses", "updateForSave: $animalList")
-    Log.i("expenses", "updateForSave: ${copy(
-        animalList2 = animalList,
-        domainExpensesTable = domainExpensesTable.copy(
-            countAnimal = title.first,
-            dailyExpensesFood = title.second,
-            dailyExpensesFoodSuffix = title.third,
-            priceAll = price,
-            idPT = itemIdPT
-        ))}")
-
-    return copy(
-        animalList2 = animalList,
-        domainExpensesTable = domainExpensesTable.copy(
-            countAnimal = title.first,
-            dailyExpensesFood = title.second,
-            dailyExpensesFoodSuffix = title.third,
-            priceAll = price,
-            idPT = itemIdPT
-        )
+    Log.i("expenses", "updateForSave: $isShowAnimals")
+//    Log.i("expenses", "updateForSave: $isShowFoodHand")
+    val dateList = date.split(".")
+    return DomainExpensesTable(
+        id = id,
+        title = title.trim(),
+        count = count.toConvertDbDouble(),
+        day = dateList[0].toInt(),
+        month = dateList[1].toInt(),
+        year = dateList[2].toInt(),
+        price = price.toConvertDbDouble(),
+        priceAll = priceAll.toDoubleOrNull(),
+        countSuffix = countSuffix,
+        category = category,
+        note = note,
+        isShowFood = isShowFood,
+        isShowFoodHand = isShowFoodHand,
+        isShowWarehouse = isShowWarehouse,
+        isShowAnimals = isShowAnimals,
+        countAnimal = title2.first.toConvertZeroString().toConvertDbOnlyInt(),
+        feedFood = title2.second.toConvertZeroString().toConvertDbDouble(),
+        feedFoodSuffix = title2.third,
+        foodDesignedDay = daysFood,
+        lastDayFood = dateEndFood,
+        weight = weight.toConvertDbDouble(),
+        weightSuffix = weightSuffix,
+        isAutoWeight = isAutoWeight,
+        isAutoPrice = isAutoPrice,
+        idPT = itemIdPT,
     )
+}
+
+fun ExpensesEntryState.updateForSaveAnimalList(): ExpensesEntryState {
+    val animalList = if (isShowFoodHand && isShowFood) emptyList()
+    else animalList2
+
+    Log.i("expenses", "updateForSaveAnimalList:$animalList")
+    Log.i("expenses", "updateForSaveAnimalList:$animalList2")
+
+    return copy(animalList2 = animalList)
 }

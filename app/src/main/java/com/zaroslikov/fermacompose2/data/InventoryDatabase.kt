@@ -185,23 +185,29 @@ abstract class InventoryDatabase : RoomDatabase() {
                     """
             CREATE TABLE IF NOT EXISTS MyFermaEXPENSES_new (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                titleEXPENSES TEXT NOT NULL,
-                discEXPENSES REAL NOT NULL,
-                DAY INTEGER NOT NULL,
-                MOUNT INTEGER NOT NULL,
-                YEAR INTEGER NOT NULL,
-                countEXPENSES REAL NOT NULL,
-                suffix TEXT NOT NULL,
+                title TEXT NOT NULL,
+                count REAL NOT NULL,
+                day INTEGER NOT NULL,
+                month INTEGER NOT NULL,
+                year INTEGER NOT NULL,
+                price REAL NOT NULL,
+                price_all REAL,
+                count_suffix TEXT NOT NULL,
                 category TEXT NOT NULL,
                 note TEXT NOT NULL,
-                showFood INTEGER NOT NULL,
-                showWarehouse INTEGER NOT NULL,
-                showAnimals INTEGER NOT NULL,
-                dailyExpensesFoodAndCount INTEGER NOT NULL,
-                dailyExpensesFood REAL NOT NULL,
-                countAnimal INTEGER NOT NULL,
-                foodDesignedDay INTEGER NOT NULL,
-                lastDayFood TEXT NOT NULL,
+                is_show_food INTEGER NOT NULL,
+                is_show_warehouse INTEGER NOT NULL,
+                is_show_animals INTEGER NOT NULL,
+                is_show_food_hand INTEGER NOT NULL,
+                feed_food REAL,
+                feed_food_suffix TEXT,
+                count_animal INTEGER,
+                food_designed_day INTEGER,
+                last_day_food TEXT,
+                weight REAL,
+                weight_suffix,
+                is_auto_weight INTEGER NOT NULL,
+                is_auto_price INTEGER NOT NULL,
                 idPT INTEGER NOT NULL,
                 animalId INTEGER,
                 animal_vaccination_id INTEGER,
@@ -210,24 +216,21 @@ abstract class InventoryDatabase : RoomDatabase() {
                 FOREIGN KEY(animalId) REFERENCES AnimalTable(id) ON DELETE CASCADE,
                 FOREIGN KEY(animal_vaccination_id) REFERENCES AnimalVaccinationTable(id) ON DELETE CASCADE,
                 FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE,
-            )
-        """.trimIndent()
-                )
-                db.execSQL(
-                    """
+            )""".trimIndent())
+                db.execSQL("""
             INSERT INTO MyFermaEXPENSES_new (
-                _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES,
-                suffix, category, note,
-                showFood, showWarehouse, showAnimals,
-                dailyExpensesFoodAndCount, dailyExpensesFood, countAnimal,
-                foodDesignedDay, lastDayFood, idPT, animalId, animal_vaccination_id, animal_count_id
+                _id, title, count, day, month, year, price, price_all,
+                count_suffix, category, note,
+                is_show_food, is_show_food_hand, is_show_warehouse, is_show_animals,
+                feed_food, feed_food_suffix, count_animal,
+                food_designed_day, last_day_food, idPT, animalId, animal_vaccination_id, animal_count_id
             )
             SELECT
-                _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES,
+                _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES, NULL,
                 suffix, category, note,
-                showFood, showWarehouse, showAnimals,
-                dailyExpensesFoodAndCount, dailyExpensesFood, countAnimal,
-                foodDesignedDay, lastDayFood, idPT, NULL, NULL, NULL
+                showFood, dailyExpensesFoodAndCount, showWarehouse, showAnimals,
+                dailyExpensesFood, 'кг.', countAnimal,
+                foodDesignedDay, lastDayFood, NULL, NULL, 0, 0, idPT, NULL, NULL, NULL
             FROM MyFermaEXPENSES
         """.trimIndent()
                 )
@@ -236,66 +239,76 @@ abstract class InventoryDatabase : RoomDatabase() {
                 db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animal_vaccination_id)")
                 db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animal_count_id)")
                 db.execSQL("DROP TABLE MyFermaEXPENSES")
-                db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO MyFermaEXPENSES")
+                db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO expenses_table")
 
                 //==================== Перенос данных из AnimalTable в ExpensesTable ====================
                 db.execSQL(
                     """
-            INSERT INTO MyFermaEXPENSES (
-                titleEXPENSES,
-                discEXPENSES,
-                DAY,
-                MOUNT,
-                YEAR,
-                countEXPENSES,
-                suffix,
+            INSERT INTO expenses_table (
+                title,
+                count,
+                day,
+                month,
+                year,
+                price,
+                price_all
+                count_suffix,
                 category,
                 note,
-                showFood,
-                showWarehouse,
-                showAnimals,
-                dailyExpensesFoodAndCount,
-                dailyExpensesFood,
-                countAnimal,
-                foodDesignedDay,
-                lastDayFood,
+                is_show_food,
+                is_show_warehouse,
+                is_show_animals,
+                is_show_food_hand,
+                feed_food,
+                feed_food_suffix
+                count_animal,
+                food_designed_day,
+                last_day_food,
+                weight,
+                weight_suffix,
+                is_auto_weight,
+                is_auto_price
                 idPT, 
                 animalId
             )
             SELECT
-                name AS titleEXPENSES,
-                price AS discEXPENSES,
-                CAST(substr(data, 1, 2) AS INTEGER) AS DAY,
-                CAST(substr(data, 4, 2) AS INTEGER) AS MOUNT,
-                CAST(substr(data, 7, 4) AS INTEGER) AS YEAR,
+                name AS title,
                 CAST((
                     SELECT ac.count
                     FROM AnimalCountTable ac
                     WHERE ac.idAnimal = a.id
                     ORDER BY substr(ac.date, 7, 4) || substr(ac.date, 4, 2) || substr(ac.date, 1, 2) DESC
                     LIMIT 1
-                ) AS REAL) AS countEXPENSES,
-                'шт.' AS suffix,
+                ) AS REAL) AS count,
+                CAST(substr(data, 1, 2) AS INTEGER) AS day,
+                CAST(substr(data, 4, 2) AS INTEGER) AS month,
+                CAST(substr(data, 7, 4) AS INTEGER) AS year,
+                price,
+                NULL,
+                'шт.' AS count_suffix,
                 'Покупка животных' AS category,
                 note,
-                0 AS showFood,
-                0 AS showWarehouse,
-                0 AS showAnimals,
-                0 AS dailyExpensesFoodAndCount,
-                0 AS dailyExpensesFood,
-                0 AS countAnimal,
-                0 AS foodDesignedDay,
-                '' AS lastDayFood,
+                0 AS is_show_food,
+                0 AS is_show_warehouse,
+                0 AS is_show_animals,
+                0 AS is_show_food_hand,
+                NULL AS feed_food,
+                NULL AS feed_food_suffix,
+                NULL AS count_animal,
+                NULL AS food_designed_day ,
+                NULL AS last_day_food,
+                NULL AS weight,
+                NULL AS weight_suffix,
+                0 AS is_auto_weight, 
+                0 AS is_auto_price,
                 idPT,
                _id AS animalId
             FROM AnimalTable
             WHERE LENGTH(data) = 10 AND instr(data, '.') = 3
         """.trimIndent()
                 )
-
             }
         }
-
 
         fun getDatabase(context: Context): InventoryDatabase {
             return Instance ?: synchronized(this) {

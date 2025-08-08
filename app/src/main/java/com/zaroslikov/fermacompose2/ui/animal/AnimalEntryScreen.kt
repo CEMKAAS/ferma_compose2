@@ -3,26 +3,21 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
 
-import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -43,12 +38,8 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.metricalAnimal
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
-import com.zaroslikov.fermacompose2.supportFun.toConvertZero
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CheckboxTextIcon
@@ -64,7 +55,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 import com.zaroslikov.fermacompose2.ui.composeElement.toOutlinedText
-import java.time.Instant
 
 
 object AnimalEntryDestination : NavigationDestination {
@@ -344,19 +334,25 @@ fun AnimalEntryContainer(
                                     day = formattedDateList[0].toInt(),
                                     mount = formattedDateList[1].toInt(),
                                     year = formattedDateList[2].toInt(),
-                                    priceAll = finalPrice.toDouble(),
-                                    suffix = suffixCount,
+                                    price = finalPrice.toDouble(),
+                                    countSuffix = suffixCount,
                                     category = category,
                                     note = "",
-                                    showFood = false,
-                                    showWarehouse = false,
-                                    showAnimals = false,
-                                    dailyExpensesFoodAndCount = false,
-                                    dailyExpensesFood = 0.0,
+                                    isShowFood = false,
+                                    isShowWarehouse = false,
+                                    isShowAnimals = false,
+                                    isShowFoodHand = false,
+                                    feedFood = 0.0,
                                     countAnimal = 0,
                                     foodDesignedDay = 0,
                                     lastDayFood = "",
-                                    idPT = idPT
+                                    idPT = idPT,
+                                    priceAll = 0.0,
+                                    feedFoodSuffix = "",
+                                    weight = 0.0,
+                                    weightSuffix = "",
+                                    isAutoWeight = false,
+                                    isAutoPrice = false,
                                 ) else null
                         )
                     )

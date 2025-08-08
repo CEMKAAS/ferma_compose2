@@ -52,7 +52,7 @@ fun String.toFormatNumber(): String {
     val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
     numberFormat.minimumFractionDigits = 0
     numberFormat.maximumFractionDigits = 2
-    return numberFormat.format(this.toDouble()).toString()
+    return numberFormat.format(this.toConvertZeroDouble()).toString()
 }
 
 fun getImageWriteOff(

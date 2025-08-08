@@ -8,10 +8,9 @@ import androidx.room.PrimaryKey
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 
 @Entity(
-    tableName = "MyFermaEXPENSES",
+    tableName = "expenses_table",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
         parentColumns = arrayOf("_id"),
@@ -43,29 +42,49 @@ data class ExpensesTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     val id: Long = 0,
-    @ColumnInfo(name = "titleEXPENSES")
-    val title: String, // название
-    @ColumnInfo(name = "discEXPENSES")
-    val count: Double, // Кол-во
+    @ColumnInfo(name = "title")
+    val title: String,
+    @ColumnInfo(name = "count")
+    val count: Double,
     @ColumnInfo(name = "DAY")
-    val day: Int,  // день
+    val day: Int,
     @ColumnInfo(name = "MOUNT")
-    val mount: Int, // месяц
+    val mount: Int,
     @ColumnInfo(name = "YEAR")
-    val year: Int, // время
-    @ColumnInfo(name = "countEXPENSES")
-    val priceAll: Double, // кол-во товара
-    var suffix: String,
-    var category: String,
+    val year: Int,
+    @ColumnInfo(name = "price")
+    val price: Double,
+    @ColumnInfo(name = "price_all")
+    val priceAll: Double?,
+    @ColumnInfo(name = "count_suffix")
+    val countSuffix: String,
+    val category: String,
     val note: String,
-    val showFood: Boolean, // Показывать на складе иду
-    val showWarehouse: Boolean, // Показывать на складе
-    val showAnimals: Boolean, // Связывает животных
-    val dailyExpensesFoodAndCount: Boolean, // указать вручную
-    val dailyExpensesFood: Double, // Ежедневный расход еды
-    val countAnimal: Int, // Кол-во животных
+    @ColumnInfo(name = "is_show_food")
+    val isShowFood: Boolean,
+    @ColumnInfo(name = "is_show_food_hand")
+    val isShowFoodHand: Boolean,
+    @ColumnInfo(name = "is_show_warehouse")
+    val isShowWarehouse: Boolean,
+    @ColumnInfo(name = "is_show_animals")
+    val isShowAnimals: Boolean,
+    @ColumnInfo(name = "feed_food")
+    val feedFood: Double,
+    @ColumnInfo(name = "feed_food_suffix")
+    val feedFoodSuffix: String,
+    @ColumnInfo(name = "count_animal")
+    val countAnimal: Int, //
+    @ColumnInfo(name = "food_designed_day")
     val foodDesignedDay: Int, // Кол-во дней
+    @ColumnInfo(name = "last_day_food")
     val lastDayFood: String, //Последний день еды
+    val weight: Double,
+    @ColumnInfo(name = "weight_suffix")
+    val weightSuffix: String,
+    @ColumnInfo(name = "is_auto_weight")
+    val isAutoWeight: Boolean,
+    @ColumnInfo(name = "is_auto_price")
+    val isAutoPrice: Boolean,
     @ColumnInfo(name = "idPT")
     val idPT: Long,
     @ColumnInfo(name = "animalId")
@@ -73,5 +92,5 @@ data class ExpensesTable(
     @ColumnInfo(name = "animal_vaccination_id")
     val animalVaccinationId: Long? = null,
     @ColumnInfo(name = "animal_count_id")
-    val animalCountId: Long? = null
+    val animalCountId: Long? = null,
 )
