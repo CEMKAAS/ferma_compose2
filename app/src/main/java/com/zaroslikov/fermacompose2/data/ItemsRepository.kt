@@ -20,7 +20,7 @@ import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
-import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList2
+import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails

@@ -41,7 +41,7 @@ fun String.toConvertZeroString(): String {
 }
 
 fun String.toConvertZeroDouble(): Double {
-    return if (this == "") 0.0 else this.replace(Regex("[^\\d.]"), "").toDouble()
+    return if (this == "") 0.0 else this.replace(",", ".").toDouble()
 }
 
 fun String.toConvertZeroTooOneDouble(): Double {

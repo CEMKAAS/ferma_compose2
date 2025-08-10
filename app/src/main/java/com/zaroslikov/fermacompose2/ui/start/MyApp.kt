@@ -149,10 +149,19 @@ fun formatter(number: Double): String {
     return numberFormat.format(number).toString()
 }
 
-fun Double.formatNumber(): String {
+fun Double.formatNumber(isGroupingUsed: Boolean = true): String {
     val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
     numberFormat.minimumFractionDigits = 0
     numberFormat.maximumFractionDigits = 2
+    numberFormat.isGroupingUsed = isGroupingUsed
+    return numberFormat.format(this).toString()
+}
+
+fun Int.formatNumber(isGroupingUsed: Boolean = true): String {
+    val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
+    numberFormat.minimumFractionDigits = 0
+    numberFormat.maximumFractionDigits = 2
+    numberFormat.isGroupingUsed = isGroupingUsed
     return numberFormat.format(this).toString()
 }
 

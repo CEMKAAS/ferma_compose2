@@ -17,13 +17,13 @@ data class DomainExpensesTable(
     val isShowFoodHand: Boolean, // указать вручную
     val isShowWarehouse: Boolean, // Показывать на складе (Перекупство)
     val isShowAnimals: Boolean, // Связывает животных
-    val feedFood: Double, // Ежедневный расход еды
-    val feedFoodSuffix: String, // Суффикс ежедневного расхода
-    val countAnimal: Int, // Кол-во животных
-    val foodDesignedDay: Int, // Кол-во дней
-    val lastDayFood: String, //Последний день еды
-    val weight: Double,
-    val weightSuffix: String,
+    val feedFood: Double?, // Ежедневный расход еды
+    val feedFoodSuffix: String?, // Суффикс ежедневного расхода
+    val countAnimal: Int?, // Кол-во животных
+    val foodDesignedDay: Int?, // Кол-во дней
+    val lastDayFood: String?, //Последний день еды
+    val weight: Double?,
+    val weightSuffix: String?,
     val isAutoWeight: Boolean, // Расчет веса
     val isAutoPrice: Boolean, // Расчет цены
     val idPT: Long,

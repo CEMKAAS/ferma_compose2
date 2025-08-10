@@ -69,18 +69,18 @@ data class ExpensesTable(
     @ColumnInfo(name = "is_show_animals")
     val isShowAnimals: Boolean,
     @ColumnInfo(name = "feed_food")
-    val feedFood: Double,
+    val feedFood: Double?,
     @ColumnInfo(name = "feed_food_suffix")
-    val feedFoodSuffix: String,
+    val feedFoodSuffix: String?,
     @ColumnInfo(name = "count_animal")
-    val countAnimal: Int, //
+    val countAnimal: Int?,
     @ColumnInfo(name = "food_designed_day")
-    val foodDesignedDay: Int, // Кол-во дней
+    val foodDesignedDay: Int?, // Кол-во дней
     @ColumnInfo(name = "last_day_food")
-    val lastDayFood: String, //Последний день еды
-    val weight: Double,
+    val lastDayFood: String?, //Последний день еды
+    val weight: Double?,
     @ColumnInfo(name = "weight_suffix")
-    val weightSuffix: String,
+    val weightSuffix: String?,
     @ColumnInfo(name = "is_auto_weight")
     val isAutoWeight: Boolean,
     @ColumnInfo(name = "is_auto_price")

@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,8 @@ import com.zaroslikov.fermacompose2.ui.start.formatNumber
 @Composable
 fun CardField(
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    isNecessarily: Boolean = false,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     row: Boolean = true,
@@ -48,10 +51,16 @@ fun CardField(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable () -> Unit,
 ) {
+    val border = when {
+        isError -> BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.error)
+        isNecessarily -> BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary)
+        else -> null
+    }
     Card(
         modifier = modifier.padding(vertical = 6.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
+        colors = CardDefaults.cardColors(),
+        border = border
     ) {
         if (row) {
             Row(

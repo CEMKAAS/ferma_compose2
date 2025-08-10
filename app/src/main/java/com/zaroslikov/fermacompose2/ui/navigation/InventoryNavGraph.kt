@@ -24,8 +24,8 @@ import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivScreen
 import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivDestination
 import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivScreen
 import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesDestination
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesEntryProduct
+import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryProduct
 import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesScreen
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisProduct

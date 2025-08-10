@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.expenses
+package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
 
 import android.util.Log
@@ -9,38 +9,66 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbOnlyInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroString
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 fun ExpensesEntryState.validate(): ExpensesEntryState {
 
     val (feedFood, countAnimal) = if (isShowFoodHand) {
-        feedFoodInput to countAnimalInput
-    } else feedFoodChip to countAnimalChip
+        feedFoodInput.isBlank() to countAnimalInput.isBlank()
+    } else false to false
+
+    val isErrorFood =
+        if (isShowFood && !isShowFoodHand) animalList2.filter { it.foodDay != 0.0 }
+            .none { it.ps == true } else false
+
+    val isErrorAnimal =
+        if (isShowAnimals) animalList2.none { it.ps == true } else false
+
 
     val newError = ExpensesEntryState.ValidationError(
         isErrorTitle = title.isBlank(),
         isErrorSlash = title.contains("/"),
         isErrorCount = count.isBlank(),
         isErrorPrice = price.isBlank(),
-        isErrorDailyExpensesFood = feedFood.isBlank(),
-        isErrorCountAnimal = countAnimal.isBlank()
+        isErrorFood = isErrorFood,
+        isErrorAnimal = isErrorAnimal,
+        isErrorDailyExpensesFood = feedFood,
+        isErrorCountAnimal = countAnimal
     )
+
+    Log.i("expenses", "newError: $newError")
     return this.copy(error = newError)
 }
 
-fun ExpensesEntryState.updateFromDomain(domain: DomainExpensesTable): ExpensesEntryState {
+fun ExpensesEntryState.updateFromDomain(
+    domain: DomainExpensesTable,
+    suffix: String,
+    countSuffix: String
+): ExpensesEntryState {
     val useDaily = domain.isShowFoodHand
+    val isIndicatorsValue =
+        setOf(domain.animalId, domain.animalVaccinationId, domain.animalCountId)
+            .any { it != null }
+
+    Log.i("expenses", "updateFromDomain: $isIndicatorsValue")
+    Log.i("expenses", "animalId: ${domain.animalId}")
+    Log.i("expenses", "animalVaccinationId: ${domain.animalVaccinationId}")
+    Log.i("expenses", "animalCountId: ${domain.animalCountId}")
+    Log.i("expenses", "feedFood: ${domain.feedFood}")
+    Log.i("expenses", "feedFood: ${domain.weight?.formatNumber(false)}")
+
     return copy(
         title = domain.title,
-        count = domain.count.toString(),
+        count = domain.count.formatNumber(false),
         date = formatDateToString(
             domain.day,
             domain.month,
             domain.year
         ),
-        price = domain.price.toString(),
-        priceAll = domain.priceAll.toString(),
+        price = domain.price.formatNumber(false),
+        priceAll = domain.priceAll?.formatNumber() ?: "",
         countSuffix = domain.countSuffix,
         category = domain.category,
         note = domain.note,
@@ -48,18 +76,19 @@ fun ExpensesEntryState.updateFromDomain(domain: DomainExpensesTable): ExpensesEn
         isShowFoodHand = domain.isShowFoodHand,
         isShowWarehouse = domain.isShowWarehouse,
         isShowAnimals = domain.isShowAnimals,
-        countAnimalChip = if (!useDaily) domain.countAnimal.toString() else "",
-        feedFoodChip = if (!useDaily) domain.feedFood.toString() else "",
-        feedFoodChipSuffix = if (!useDaily) domain.feedFoodSuffix else "",
-        countAnimalInput = if (useDaily) domain.countAnimal.toString() else "",
-        feedFoodInput = if (useDaily) domain.feedFood.toString() else "",
-        feedFoodInputSuffix = if (useDaily) domain.feedFoodSuffix else "",
-        daysFood = domain.foodDesignedDay,
-        dateEndFood = domain.lastDayFood,
+        countAnimalChip = if (!useDaily) domain.countAnimal?.formatNumber() ?: "" else "",
+        feedFoodChip = if (!useDaily) domain.feedFood?.formatNumber() ?: "" else "",
+        feedFoodChipSuffix = if (!useDaily) domain.feedFoodSuffix ?: suffix else suffix,
+        countAnimalInput = if (useDaily) domain.countAnimal?.formatNumber(false) ?: "" else "",
+        feedFoodInput = if (useDaily) domain.feedFood?.formatNumber(false) ?: "" else "",
+        feedFoodInputSuffix = if (useDaily) domain.feedFoodSuffix ?: suffix else suffix,
+        daysFood = domain.foodDesignedDay ?: 0,
+        dateEndFood = domain.lastDayFood ?: "",
         isAutoWeight = domain.isAutoWeight,
         isAutoPrice = domain.isAutoPrice,
-        weight = domain.weight.toString(),
-        weightSuffix = domain.weightSuffix
+        weight = domain.weight?.formatNumber(false) ?: "",
+        weightSuffix = domain.weightSuffix ?: countSuffix,
+        isIndicatorsValue = isIndicatorsValue
     )
 }
 
@@ -82,15 +111,26 @@ fun ExpensesEntryState.updateCount(count: String): ExpensesEntryState {
     ).updatePriceAll()
 }
 
-fun ExpensesEntryState.updateCountSuffix(suffix: String): ExpensesEntryState {
+fun ExpensesEntryState.updateCountSuffix(
+    suffix: String,
+    suffixSet: Set<String>
+): ExpensesEntryState {
     return copy(
-        countSuffix = suffix
+        countSuffix = suffix,
+        isAutoWeight = if (suffix in suffixSet) false else isAutoWeight,
+        isShowFood = if (suffix !in suffixSet && !isAutoWeight) false else isShowFood,
+        isShowFoodHand = if (suffix !in suffixSet && !isAutoWeight) false else isShowFoodHand
     )
 }
 
-fun ExpensesEntryState.updateAutoWeight(isAutoWeight: Boolean): ExpensesEntryState {
+fun ExpensesEntryState.updateAutoWeight(
+    isAutoWeight: Boolean,
+    suffixSet: Set<String>
+): ExpensesEntryState {
     return copy(
-        isAutoWeight = isAutoWeight
+        isAutoWeight = isAutoWeight,
+        isShowFood = if (countSuffix !in suffixSet && !isAutoWeight) false else isShowFood,
+        isShowFoodHand = if (countSuffix !in suffixSet && !isAutoWeight) false else isShowFoodHand
     )
 }
 
@@ -121,7 +161,7 @@ fun ExpensesEntryState.updateAutoPrice(isAutoCalculate: Boolean): ExpensesEntryS
 
 fun ExpensesEntryState.updatePriceAll(): ExpensesEntryState {
     return copy(
-        priceAll = if (isAutoPrice) (price.toConvertZeroDouble() * count.toConvertZeroDouble()).toString() else ""
+        priceAll = if (isAutoPrice) (price.toConvertZeroDouble() * count.toConvertZeroDouble()).formatNumber() else "0"
     )
 }
 
@@ -146,13 +186,20 @@ fun ExpensesEntryState.updateShowFood(showFood: Boolean): ExpensesEntryState {
         animalList2 = animalList2.map { it.copy(ps = false) },
         isShowFood = showFood,
         isShowWarehouse = showFood,
-        isShowAnimals = false
+        isShowAnimals = false,
+        error = error.copy(
+            isErrorFood = false,
+            isErrorAnimal = false
+        )
     )
 }
 
 fun ExpensesEntryState.updateDailyExpensesFoodAndCount(dailyExpensesFoodAndCount: Boolean): ExpensesEntryState {
     return copy(
-        isShowFoodHand = dailyExpensesFoodAndCount
+        isShowFoodHand = dailyExpensesFoodAndCount,
+        error = error.copy(
+            isErrorFood = false
+        )
     )
 }
 
@@ -188,9 +235,22 @@ fun ExpensesEntryState.toggleAnimalChipSelection(
     // Обновляем список животных с пересчетом presentException
     val updatedAnimals = animalList2.map {
         if (it.id == toggledAnimal.id) {
+
+            Log.i("expenses", "foodDaySuffix: ${it.foodDaySuffix}")
+            Log.i("expenses", "feedFoodChipSuffix: ${feedFoodChipSuffix}")
             val convertedFood =
                 it.foodDay.convertWeight(it.foodDaySuffix, feedFoodChipSuffix)
             val dailyFood = convertedFood * it.countAnimal
+            Log.i(
+                "expenses", "convertedFood: $convertedFood"
+            )
+            Log.i(
+                "expenses", "dailyFood: $dailyFood"
+            )
+            Log.i(
+                "expenses",
+                "toggleAnimalChipSelection: ${if (newSelected) (it.foodDay / dailyFood) * 100.0 else 0.0}"
+            )
             it.copy(
                 ps = newSelected,
                 presentException = if (newSelected) (it.foodDay / dailyFood) * 100.0 else 0.0
@@ -204,6 +264,7 @@ fun ExpensesEntryState.toggleAnimalChipSelection(
         .sumOf { it.countAnimal }
         .toString()
 
+
     val updatedDailyFood = updatedAnimals
         .filter { it.ps }
         .sumOf {
@@ -211,10 +272,13 @@ fun ExpensesEntryState.toggleAnimalChipSelection(
         }
         .toString()
 
+
+
     return this.copy(
         animalList2 = updatedAnimals,
-        feedFoodChip = updatedCountAnimal,
-        countAnimalChip = updatedDailyFood
+        feedFoodChip = updatedDailyFood,
+        countAnimalChip = updatedCountAnimal,
+        error = error.copy(isErrorFood = false)
     )
 }
 
@@ -227,7 +291,11 @@ fun ExpensesEntryState.updateShowWarehouse(showWarehouse: Boolean): ExpensesEntr
 fun ExpensesEntryState.updateShowAnimal(showAnimal: Boolean): ExpensesEntryState {
     return copy(
         animalList2 = animalList2.map { it.copy(ps = false) },
-        isShowAnimals = showAnimal
+        isShowFoodHand = false,
+        isShowAnimals = showAnimal,
+        error = error.copy(
+            isErrorAnimal = false
+        )
     )
 }
 
@@ -241,7 +309,10 @@ fun ExpensesEntryState.redistributeSelectedShare(totalShare: Double = 100.0): Ex
     }
 
     return this.copy(
-        animalList2 = updatedList
+        animalList2 = updatedList,
+        error = error.copy(
+            isErrorAnimal = false
+        )
     )
 }
 
@@ -295,7 +366,7 @@ fun ExpensesEntryState.updateSettingDay(): ExpensesEntryState {
         feedFoodInput.toConvertZeroDouble() else feedFoodChip.toConvertZeroDouble()
 
     val countProduct =
-        if (isAutoPrice) {
+        if (isAutoWeight) {
             (countTable * weight)
                 .convertWeight(
                     weightSuffix,
@@ -332,12 +403,12 @@ fun ExpensesEntryState.updateForSave(
     id: Long = 0,
     itemIdPT: Long
 ): DomainExpensesTable {
-    val title2 = if (isShowFoodHand) {
-        Triple(countAnimalInput, feedFoodInput, feedFoodInputSuffix)
-    } else Triple(countAnimalChip, feedFoodChip, feedFoodChipSuffix)
-
-    Log.i("expenses", "updateForSave: $isShowAnimals")
-//    Log.i("expenses", "updateForSave: $isShowFoodHand")
+    val title2 =
+        when {
+            isShowFood -> Triple(countAnimalChip, feedFoodChip, feedFoodChipSuffix)
+            isShowFoodHand -> Triple(countAnimalInput, feedFoodInput, feedFoodInputSuffix)
+            else -> Triple(null, null, null)
+        }
     val dateList = date.split(".")
     return DomainExpensesTable(
         id = id,
@@ -347,21 +418,21 @@ fun ExpensesEntryState.updateForSave(
         month = dateList[1].toInt(),
         year = dateList[2].toInt(),
         price = price.toConvertDbDouble(),
-        priceAll = priceAll.toDoubleOrNull(),
+        priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
         countSuffix = countSuffix,
-        category = category,
-        note = note,
+        category = category.trim(),
+        note = note.trim(),
         isShowFood = isShowFood,
         isShowFoodHand = isShowFoodHand,
         isShowWarehouse = isShowWarehouse,
         isShowAnimals = isShowAnimals,
-        countAnimal = title2.first.toConvertZeroString().toConvertDbOnlyInt(),
-        feedFood = title2.second.toConvertZeroString().toConvertDbDouble(),
+        countAnimal = title2.first?.toConvertZeroString()?.toConvertDbOnlyInt(),
+        feedFood = title2.second?.toConvertZeroString()?.toConvertDbDouble(),
         feedFoodSuffix = title2.third,
-        foodDesignedDay = daysFood,
-        lastDayFood = dateEndFood,
-        weight = weight.toConvertDbDouble(),
-        weightSuffix = weightSuffix,
+        foodDesignedDay = if (isShowFood || isShowFoodHand) daysFood else null,
+        lastDayFood = if (isShowFood || isShowFoodHand) dateEndFood else null,
+        weight = if (isAutoWeight) weight.toConvertDbDouble() else null,
+        weightSuffix = if (isAutoWeight) weightSuffix else null,
         isAutoWeight = isAutoWeight,
         isAutoPrice = isAutoPrice,
         idPT = itemIdPT,

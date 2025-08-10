@@ -98,34 +98,3 @@ fun ExpensesTable.toDomainMap(): DomainExpensesTable = DomainExpensesTable(
     isAutoWeight = isAutoWeight,
     isAutoPrice = isAutoPrice
 )
-
-//fun ExpensesTable.toDomainMap(): DomainExpensesTable = DomainExpensesTable(
-//    id = id,
-//    title = title,
-//    count = count.formatNumber(),
-//    day = day,
-//    month = mount,
-//    year = year,
-//    price = price.formatNumber(),
-//    countSuffix = countSuffix,
-//    category = category,
-//    note = note,
-//    isShowFood = isShowFood,
-//    isShowWarehouse = isShowWarehouse,
-//    isShowAnimals = isShowAnimals,
-//    isShowFoodHand = isShowFoodHand,
-//    feedFood = feedFood.formatNumber(),
-//    countAnimal = countAnimal.toString(),
-//    foodDesignedDay = foodDesignedDay.toString(),
-//    lastDayFood = lastDayFood,
-//    idPT = idPT,
-//    animalId = animalId,
-//    animalVaccinationId = animalVaccinationId,
-//    animalCountId = animalCountId,
-//    priceAll = priceAll?.formatNumber(),
-//    feedFoodSuffix = feedFoodSuffix,
-//    weight = weight.formatNumber(),
-//    weightSuffix = weightSuffix,
-//    isAutoWeight = isAutoWeight,
-//    isAutoPrice = isAutoPrice
-//)

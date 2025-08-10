@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.expenses
+package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
 
 import android.util.Log
@@ -8,14 +8,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
-import com.zaroslikov.fermacompose2.supportFun.metricalExpenses
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -52,6 +50,7 @@ class ExpensesEntryViewModel @Inject constructor(
 
     var expensesUiState by mutableStateOf(
         ExpensesEntryState().copy(
+            isEntry = isEntry,
             feedFoodChipSuffix = resourceProvider.getString(R.string.suffix_kilogram),
             feedFoodInputSuffix = resourceProvider.getString(R.string.suffix_kilogram),
             category = resourceProvider.getString(R.string.support_text_no_category),
@@ -69,7 +68,9 @@ class ExpensesEntryViewModel @Inject constructor(
                     .first()
                     .toDomainMap()
 
-                expensesUiState = expensesUiState.updateFromDomain(domainExpensesTable)
+                expensesUiState = expensesUiState.updateFromDomain(domainExpensesTable,
+                    suffix = resourceProvider.getString(R.string.suffix_kilogram),
+                    countSuffix = resourceProvider.getString(R.string.suffix_pieces) )
             }
             val animalList = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
             Log.i("updateForSale", "animalList: $animalList")

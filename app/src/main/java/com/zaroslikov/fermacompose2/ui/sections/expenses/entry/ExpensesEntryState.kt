@@ -1,7 +1,11 @@
-package com.zaroslikov.fermacompose2.ui.sections.expenses
+package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
+import android.util.Log
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.utils.ResourceProvider
+import javax.inject.Inject
+
 
 data class ExpensesEntryState(
     val title: String = "",
@@ -36,27 +40,39 @@ data class ExpensesEntryState(
 
     val countInWarehouse: DomainPairDataDoubleSting = DomainPairDataDoubleSting(),
 
+    val isEntry: Boolean = false,
     val isIndicatorsValue: Boolean = false,
     val animalList2: List<AnimalExpensesList2> = emptyList(),
-//    val domainExpensesTable: DomainExpensesTable = DomainExpensesTable(),
-    val error: ValidationError = ValidationError()
+    val error: ValidationError = ValidationError(),
 ) {
     val hasAnyError: Boolean
-        get() = error.hasAnyError(isShowFoodHand)
+        get() = error.hasAnyError(isShowFood, isShowFoodHand, isShowAnimals)
 
     data class ValidationError(
         val isErrorTitle: Boolean = false,
         val isErrorSlash: Boolean = false,
         val isErrorCount: Boolean = false,
         val isErrorPrice: Boolean = false,
+        val isErrorFood: Boolean = false,
+        val isErrorAnimal : Boolean = false,
         val isErrorDailyExpensesFood: Boolean = false,
         val isErrorCountAnimal: Boolean = false,
     ) {
-        fun hasAnyError(isShowFoodHand: Boolean): Boolean {
-            return if (isShowFoodHand) {
-                isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorDailyExpensesFood || isErrorCountAnimal
-            } else {
-                isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice
+        fun hasAnyError(isShowFood: Boolean, isShowFoodHand: Boolean, isShowAnimals: Boolean): Boolean {
+            Log.i("expenses", "isShowFood: $isShowFood")
+            Log.i("expenses", "isShowFoodHand: $isShowFoodHand")
+            Log.i("expenses", "isShowAnimals: $isShowAnimals")
+            return when {
+                isShowFoodHand ->
+                    isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorDailyExpensesFood || isErrorCountAnimal
+
+                isShowFood ->
+                    isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorFood
+
+                isShowAnimals->
+                    isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice || isErrorAnimal
+
+                else -> isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice
             }
         }
     }

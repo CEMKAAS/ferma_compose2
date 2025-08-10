@@ -26,7 +26,7 @@ import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
-import com.zaroslikov.fermacompose2.ui.sections.expenses.AnimalExpensesList2
+import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
 import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
@@ -199,10 +199,13 @@ interface ItemDao {
     @Query("SELECT idAnimal from ExpensesAnimalTable Where idExpenses=:id")
     suspend fun getItemExpensesAnimal(id: Int): List<Long>
 
-    @Query("SELECT title from expenses_table Where idPT=:id group by title ORDER BY MAX(_id) DESC")
+    @Query("SELECT title FROM expenses_table" +
+            " WHERE idPT=:id AND animalId IS NULL AND animal_vaccination_id IS NULL AND animal_count_id IS NULL " +
+            " GROUP BY title" +
+            " ORDER BY MAX(_id) DESC")
     fun getItemsTitleExpensesList(id: Int): Flow<List<String>>
 
-    @Query("SELECT category from expenses_table Where idPT=:id group by category")
+    @Query("SELECT category FROM expenses_table WHERE idPT=:id GROUP BY category")
     fun getItemsCategoryExpensesList(id: Int): Flow<List<String>>
 
 

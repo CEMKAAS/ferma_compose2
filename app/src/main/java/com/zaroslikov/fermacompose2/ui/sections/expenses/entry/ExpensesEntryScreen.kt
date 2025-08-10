@@ -1,10 +1,8 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 
-package com.zaroslikov.fermacompose2.ui.sections.expenses
+package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -18,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
+import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -53,6 +53,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCountNoCard
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
+import com.zaroslikov.fermacompose2.ui.composeElement.Suffix
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
@@ -92,7 +93,6 @@ fun ExpensesEntryProduct(
             modifier = Modifier
                 .modifierScreen(innerPadding),
             state = viewModel.expensesUiState,
-            isEntry = viewModel.isEntry,
             titleList = viewModel.titleUiState.collectAsState().value.list,
             categoryList = viewModel.categoryUiState.collectAsState().value.list,
             updateCountWarehouse = viewModel::updateWarehouseUiState,
@@ -108,7 +108,6 @@ fun ExpensesEntryProduct(
 fun ExpensesEntryContainerProduct(
     modifier: Modifier,
     state: ExpensesEntryState,
-    isEntry: Boolean,
     titleList: List<String>,
     categoryList: List<String>,
     updateCountWarehouse: (String) -> Unit,
@@ -117,6 +116,8 @@ fun ExpensesEntryContainerProduct(
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit,
 ) {
+    val suffixSet =
+        setOf(Suffix.GRAM.asString(), Suffix.KILOGRAM.asString(), Suffix.TONS.asString())
     Column(modifier = modifier) {
         OutlinedTextTitleAdd(
             value = state.title,
@@ -127,23 +128,26 @@ fun ExpensesEntryContainerProduct(
             titleList = titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
+            readOnly = state.isIndicatorsValue,
+            enable = !state.isIndicatorsValue
         )
         OutlinedTextCount(
             value = state.count,
             onValueChange = { onValueChange(state.updateCount(it)) },
-            onSuffixChange = { onValueChange(state.updateCountSuffix(it)) },
+            onSuffixChange = { onValueChange(state.updateCountSuffix(it, suffixSet)) },
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_expenses,
             countWarehouse = state.countInWarehouse.first,
             onWeightChange = { onValueChange(state.updateWeight(it)) },
             isWarehouseShow = false,
+            versionDropMenu = if (state.isIndicatorsValue) 2 else 5,
             weightValue = state.weight,
             weightSuffix = state.weightSuffix,
             onWeightSuffixChance = { onValueChange(state.updateWeightSuffix(it)) },
             isAutoCalculate = state.isAutoWeight,
-            onAutoCalculate = { onValueChange(state.updateAutoWeight(it)) },
-            isWeightCalculate = true,
+            onAutoCalculate = { onValueChange(state.updateAutoWeight(it, suffixSet)) },
+            isWeightCalculate = !state.isIndicatorsValue,
         )
         OutlinedPriceInput(
             price = state.price,
@@ -153,29 +157,32 @@ fun ExpensesEntryContainerProduct(
             isAutoCalculate = state.isAutoPrice,
             onAutoCalculate = { onValueChange(state.updateAutoPrice(it)) },
             isManyCount = true,
+            isNecessarily = true,
             supportTextRes = R.string.support_text_price_expenses,
             supportTextResAutoCal = R.string.support_text_price_expenses,
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
         )
-        OutlinedTextCategory(
-            value = state.category,
-            onValueChange = { onValueChange(state.updateCategory(it)) },
-            titleList = categoryList,
-        )
-        OutlinedTextDateEdit(
-            value = state.date,
-            onValueChange = { onValueChange(state.updateDate(it)) }
-        )
+        if (!state.isIndicatorsValue)
+            OutlinedTextCategory(
+                value = state.category,
+                onValueChange = { onValueChange(state.updateCategory(it)) },
+                titleList = categoryList
+            )
+        if (!state.isIndicatorsValue)
+            OutlinedTextDateEdit(
+                value = state.date,
+                onValueChange = { onValueChange(state.updateDate(it)) },
+            )
         OutlinedTextNote(
             value = state.note,
             onValueChange = { onValueChange(state.updateNote(it)) },
         )
         AdditionalSettings(
-            domainExpensesTable = state,
+            state = state,
             onValueChange = onValueChange,
         )
         ButtonPanel(
-            isEntry = isEntry,
+            state = state,
             onClickInsert = { onClickInsert() },
             onClickUpdate = { onClickUpdate() },
             onClickDelete = { onClickDelete() }
@@ -186,13 +193,13 @@ fun ExpensesEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    isEntry: Boolean,
+    state: ExpensesEntryState,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    if (isEntry)
+    if (state.isEntry)
         ButtonStandart(
             intRes = R.string.button_expenses,
             onClick = {
@@ -205,25 +212,19 @@ private fun ButtonPanel(
             focusManager.clearFocus()
             onClickUpdate()
         }
-        ButtonDelete { onClickDelete() }
+        if (!state.isIndicatorsValue)
+            ButtonDelete { onClickDelete() }
     }
 }
 
 
 @Composable
 private fun AdditionalSettings(
-    domainExpensesTable: ExpensesEntryState,
+    state: ExpensesEntryState,
     onValueChange: (ExpensesEntryState) -> Unit,
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
-    val extraPadding by animateDpAsState(
-        if (details) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-    if (!domainExpensesTable.count.isBlank() && !domainExpensesTable.price.isBlank()) {
+    if (!state.count.isBlank() && !state.price.isBlank() && !state.isIndicatorsValue) {
         TextButtonWarehouse(
             boolean = details,
             onClick = { details = !details },
@@ -231,24 +232,23 @@ private fun AdditionalSettings(
         )
         if (details) {
             Food(
-                modifier = Modifier.padding(extraPadding),
-                state = domainExpensesTable,
+                modifier = Modifier.padding(bottom = animatedErrorPadding(details)),
+                state = state,
                 onValueChange = onValueChange,
             )
             ShowWarehouse(
-                modifier = Modifier.padding(extraPadding),
-                state = domainExpensesTable,
+                modifier = Modifier.padding(bottom = animatedErrorPadding(details)),
+                state = state,
                 onValueChange = onValueChange
             )
             ShowAnimal(
-                modifier = Modifier.padding(extraPadding),
-                state = domainExpensesTable,
+                modifier = Modifier.padding(bottom = animatedErrorPadding(details)),
+                state = state,
                 onValueChange = onValueChange,
             )
         }
     }
 }
-
 
 // КОРМ
 @Composable
@@ -258,8 +258,10 @@ private fun Food(
     onValueChange: (ExpensesEntryState) -> Unit,
 ) {
     CardField(
-        modifier = modifier,
-        row = false
+        modifier = modifier.padding(bottom = animatedErrorPadding(state.error.isErrorFood)),
+        row = false,
+        isError = state.error.isErrorFood,
+        isNecessarily = state.isShowFood
     ) {
         Checkbox(
             expensesTable = state,
@@ -284,6 +286,11 @@ private fun Food(
                         state.countAnimalInput != "")
             )
                 TextFoodExpenses(state)
+            if (state.error.isErrorFood)
+                Text(
+                    text = stringResource(R.string.error_show_food),
+                    color = MaterialTheme.colorScheme.error
+                )
         }
     }
 }
@@ -330,8 +337,10 @@ private fun ShowAnimal(
         )
     }
     CardField(
-        modifier = modifier,
-        row = false
+        modifier = modifier.padding(bottom = animatedErrorPadding(state.error.isErrorAnimal)),
+        row = false,
+        isError = state.error.isErrorAnimal,
+        isNecessarily = state.isShowAnimals
     ) {
         CheckboxTextIcon(
             checked = state.isShowAnimals,
@@ -423,6 +432,11 @@ private fun ShowAnimal(
                 }
             }
         }
+        if (state.error.isErrorAnimal)
+            Text(
+                text = stringResource(R.string.error_show_food),
+                color = MaterialTheme.colorScheme.error
+            )
     }
 }
 
@@ -440,10 +454,12 @@ private fun Checkbox(
             intText = R.string.alert_dialog_info_text_food,
         )
     }
+    val suffixSet =
+        setOf(Suffix.GRAM.asString(), Suffix.KILOGRAM.asString(), Suffix.TONS.asString())
     CheckboxTextIcon(
         checked = expensesTable.isShowFood,
         onCheckedChange = { onValueChange(expensesTable.updateShowFood(it)) },
-        enabled = expensesTable.count != "",
+        enabled = !(expensesTable.countSuffix !in suffixSet && !expensesTable.isAutoWeight),
         intTitle = R.string.checkbox_food,
         onClick = { openAlertFood = !openAlertFood }
     )
@@ -460,7 +476,9 @@ fun ChoiceAnimal(
     state: ExpensesEntryState,
     onValueChange: (ExpensesEntryState) -> Unit
 ) {
-    if (state.animalList2.isNotEmpty()) {
+    val animalList = state.animalList2.filter { it.foodDay != 0.0 }
+
+    if (animalList.isNotEmpty()) {
         Text(
             text = stringResource(R.string.expenses_entry_screen_chooise_animal_auto_food),
             modifier = Modifier.fillMaxWidth()
@@ -468,7 +486,7 @@ fun ChoiceAnimal(
         FlowRow(
             modifier = Modifier.fillMaxWidth()
         ) {
-            state.animalList2.forEach { animal ->
+            animalList.forEach { animal ->
                 val selected = animal.ps
                 FilterChip(
                     selected = selected,
@@ -507,7 +525,7 @@ private fun InputText(
         intResSup = R.string.support_text_food_day,
         intResError = R.string.error_no_count_animals,
         isError = state.error.isErrorDailyExpensesFood,
-        suffix = state.feedFoodChipSuffix,
+        suffix = state.feedFoodInputSuffix,
         onSuffixChance = { onValueChange(state.updateDailyExpensesFoodSuffix(it)) },
     )
     OutlinedTextCountNoCard(

@@ -329,11 +329,11 @@ fun TextBuildAnnotated(
 
 @Composable
 fun TextBuildAnnotated2(
-    priceAll: String?,
+    priceAll: String,
     @StringRes intRes: Int,
     suffix: String = stringResource(R.string.currency_ruble)
 ) {
-    val amount = priceAll?.toConvertZeroDouble()?.formatNumber() ?: "0"
+    val amount = priceAll
     Text(
         text = buildAnnotatedString {
             val fullText =

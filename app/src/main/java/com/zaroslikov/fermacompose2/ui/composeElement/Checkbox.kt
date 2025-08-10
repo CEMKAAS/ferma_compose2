@@ -4,9 +4,11 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Checkbox
@@ -46,61 +48,53 @@ fun CheckboxTextIcon(
 ) {
     val tooltipState = rememberTooltipState(isPersistent = true)
     val scope = rememberCoroutineScope()
+
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .clickable(enabled = enabled) { // клик по всей строке
+                onCheckedChange(!checked)
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
             checked = checked,
-            onCheckedChange = {
-                onCheckedChange(it)
-            },
+            onCheckedChange = { onCheckedChange(it) },
             enabled = enabled
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
 
-            Text(
-                modifier = Modifier.weight(0.8f),
-                text = stringResource(intTitle),
-                style = text_16
-            )
+        Text(
+            text = stringResource(id = intTitle),
+            modifier = Modifier.weight(1f)
+        )
 
-            if (onClick != null)
-                IconButton(
-                    modifier = Modifier.weight(0.2f),
-                    onClick = onClick
-                ) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = "Показать меню"
-                    )
-                }
-            if (isTooltipShow)
-                TooltipBox(
-                    modifier = Modifier.weight(0.2f),
-                    positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
-                    tooltip = {
-                        RichTooltip {
-                            Text(
-                                text = stringResource(intTooltip),
-                                style = text_14
-                            )
-                        }
-                    },
-                    state = tooltipState
-                ) {
-                    IconButton(onClick = { scope.launch { tooltipState.show() } }) {
-                        Icon(
-                            Icons.Default.Info,
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                }
+        if (onClick != null) {
+            IconButton(
+                modifier = Modifier.weight(0.2f, fill = false),
+                onClick = onClick
+            ) {
+                Icon(Icons.Default.Info, contentDescription = "Показать меню")
+            }
         }
 
+        if (isTooltipShow) {
+            TooltipBox(
+                modifier = Modifier.weight(0.2f, fill = false),
+                positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                tooltip = {
+                    RichTooltip {
+                        Text(
+                            text = stringResource(intTooltip),
+                            style = text_14
+                        )
+                    }
+                },
+                state = tooltipState
+            ) {
+                IconButton(onClick = { scope.launch { tooltipState.show() } }) {
+                    Icon(Icons.Default.Info, contentDescription = "Показать меню")
+                }
+            }
+        }
     }
 }
 
@@ -175,7 +169,7 @@ fun AutoCalculateCheckbox2(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     @StringRes tooltipTextResAutoCal: Int,
-    price: String?,
+    price: String,
 ) {
     CheckboxTextIcon(
         modifier = if (isChecked) Modifier.toOutlinedText() else Modifier,

@@ -2,7 +2,6 @@
 
 package com.zaroslikov.fermacompose2.ui.composeElement
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -26,8 +25,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +32,21 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
+
+
+enum class Suffix(val resId: Int) {
+    PIECES(R.string.suffix_pieces),
+    GRAM(R.string.suffix_gram),
+    KILOGRAM(R.string.suffix_kilogram),
+    TONS(R.string.suffix_tons),
+    LITERS(R.string.suffix_liters),
+    CUBIC_METERS(R.string.suffix_cubic_meters),
+    METERS(R.string.suffix_meters);
+
+    @Composable
+    fun asString(): String = stringResource(id = resId)
+}
+
 
 @Composable
 fun DropdownMenuIconProductSuffix(
@@ -259,6 +271,7 @@ fun ExposedDropdownMenuProduct(
     title: String,
     setTitle: (String) -> Unit,
     titleList: List<String>,
+    enableDropMenu: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -267,7 +280,9 @@ fun ExposedDropdownMenuProduct(
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
-                expanded = !expanded
+                if (enableDropMenu) {
+                    expanded = !expanded
+                }
             }
         ) {
             content(
@@ -284,7 +299,7 @@ fun ExposedDropdownMenuProduct(
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = {
-//                            expanded = false
+                            expanded = false
                     }
                 ) {
                     filteredOptions.forEach { item ->

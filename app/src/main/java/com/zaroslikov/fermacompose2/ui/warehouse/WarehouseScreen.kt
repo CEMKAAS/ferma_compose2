@@ -458,7 +458,7 @@ fun WarehouseFoodCard(
         val startDate =
             LocalDate.of(warehouseProduct.year, warehouseProduct.mount, warehouseProduct.day)
         val daysToAdd = warehouseProduct.foodDesignedDay
-        val endDate = startDate.plusDays(daysToAdd.toLong())
+        val endDate = startDate.plusDays(daysToAdd!!.toLong())
         val currentDate = LocalDate.now()
 
 
@@ -593,37 +593,31 @@ fun TextButtonWarehouse(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             HorizontalDivider(
-                thickness = 1.dp, modifier = Modifier
-                    .fillMaxWidth(0.30f)
+                thickness = 1.dp,
+                modifier = Modifier.weight(1f) // линия слева занимает свободное место
             )
             Icon(
                 if (boolean) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = "Показать меню",
-                modifier = Modifier
-                    .padding(start = 3.dp)
-                    .fillMaxWidth(0.1f)
+                modifier = Modifier.padding(horizontal = 4.dp)
             )
             Text(
                 text = stringResource(intRes),
                 textAlign = TextAlign.Center,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .fillMaxWidth(0.5f)
+                modifier = Modifier.padding(end = 10.dp)
             )
             HorizontalDivider(
-                thickness = 1.dp, modifier = Modifier
-                    .fillMaxWidth()
+                thickness = 1.dp,
+                modifier = Modifier.weight(1f) // линия справа занимает свободное место
             )
         }
     }
 }
-
 
 @Composable
 fun FastAddCard(

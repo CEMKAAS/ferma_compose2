@@ -46,6 +46,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
+import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsEnter
@@ -230,6 +231,7 @@ fun OutlinedTextDateEdit(
     @StringRes intResSup: Int = R.string.support_text_date,
     drawableRes: Int = R.drawable.baseline_calendar_month_24,
     onValueChange: (String) -> Unit,
+    enable: Boolean = true
 ) {
     var openDialog by remember { mutableStateOf(false) }
     if (openDialog) {
@@ -252,6 +254,7 @@ fun OutlinedTextDateEdit(
                 openDialog = !openDialog
             },
             readOnly = true,
+            enable = enable,
             intRes = intRes,
             intResSup = intResSup,
             leadingIconRes = drawableRes,
@@ -310,7 +313,9 @@ fun OutlinedTextDateNoLimit(
 fun OutlinedTextCategory(
     value: String,
     onValueChange: (String) -> Unit,
-    titleList: List<String>
+    titleList: List<String>,
+    enable: Boolean = true,
+    readOnly: Boolean = false,
 ) {
     CardField(
         modifier = Modifier.toOutlinedText(),
@@ -330,6 +335,8 @@ fun OutlinedTextCategory(
                 intRes = R.string.outlined_text_field_category,
                 intResSup = R.string.support_text_category,
                 keyboardOptions = keyboardOptionsNext(),
+                enable = enable,
+                readOnly = readOnly
             )
         }
     }
@@ -363,18 +370,12 @@ fun OutlinedTextCount(
     isAutoCalculate: Boolean = true,
     onAutoCalculate: (Boolean) -> Unit = {},
 ) {
-    val animatedPadding by animateDpAsState(
-        targetValue = if (isAutoCalculate) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
     CardField(
         modifier = Modifier
             .toOutlinedText()
-            .padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
-        row = false
+            .padding(bottom = animatedErrorPadding(isAutoCalculate)),
+        row = false,
+        isNecessarily = true
     ) {
         BaseOutlinedText(
             modifier = modifier,
@@ -382,6 +383,7 @@ fun OutlinedTextCount(
             onValueChange = onValueChange,
             suffix = suffix,
             onSuffixChance = onSuffixChange,
+            versionDropMenu = versionDropMenu,
             isError = isError,
             isWarehouseShow = isWarehouseShow,
             countWarehouse = countWarehouse.formatNumber(),
@@ -481,18 +483,22 @@ fun OutlinedTextTitleAdd(
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_product,
     drawableRes: Int? = null,
+    readOnly: Boolean = false,
+    enable: Boolean = true,
     titleList: List<String>,
     isErrorTitle: Boolean,
     isErrorSlash: Boolean,
 ) {
     CardField(
         modifier = Modifier.toOutlinedText(),
-        row = false
+        row = false,
+        isNecessarily = true
     ) {
         ExposedDropdownMenuProduct(
             title = value,
             setTitle = { onValueChange(it) },
-            titleList = titleList
+            titleList = titleList,
+            enableDropMenu = enable
         ) {
             BaseOutlinedText(
                 modifier = it.first,
@@ -503,7 +509,8 @@ fun OutlinedTextTitleAdd(
                 isErrorSlash = isErrorSlash,
                 intRes = intRes,
                 intResError = intResError,
-                intResSup = intResSup
+                intResSup = intResSup,
+                readOnly = readOnly, enable = enable
             )
         }
     }
@@ -556,11 +563,12 @@ fun OutlinedTextPrice(
 fun OutlinedPriceInput(
     price: String,
     onPriceChange: (String) -> Unit,
-    count: String? = "",
+    count: String = "",
     isAutoCalculate: Boolean,
     onAutoCalculate: (Boolean) -> Unit,
     isManyCount: Boolean = false,
     isError: Boolean = false,
+    isNecessarily: Boolean = false,
     @StringRes supportTextRes: Int = R.string.support_text_count_product_sale,
     @StringRes supportTextResAutoCal: Int = R.string.support_text_count_product_sale,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_price,
@@ -580,7 +588,8 @@ fun OutlinedPriceInput(
     val supportText = if (isAutoCalculate) supportTextRes else supportTextResAutoCal
     CardField(
         modifier = Modifier.toOutlinedText(),
-        row = false
+        row = false,
+        isNecessarily = isNecessarily
     ) {
         BaseOutlinedText(
             value = price,
@@ -898,6 +907,7 @@ fun BaseOutlinedText(
     leadingIconRes: Int? = null,
     leadingIconClick: () -> Unit = {},
     readOnly: Boolean = false,
+    enable: Boolean = true,
     @StringRes intRes: Int,
     @StringRes intResSup: Int,
     @StringRes intResError: Int = R.string.error_no_count_product,
@@ -956,6 +966,7 @@ fun BaseOutlinedText(
         trailingIcon = trailingIcon,
         suffix = suffixValue,
         readOnly = readOnly,
+        enabled = enable,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions.toFocus(focusManager),
         isError = isError

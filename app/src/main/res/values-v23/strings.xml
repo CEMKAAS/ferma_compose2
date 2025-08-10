@@ -50,7 +50,7 @@
     <string name="card_date">Дата:</string>
     <string name="card_count_s">%s\n за \n%s %s</string>
     <string name="card_count_briefly_s">%s за %s %s</string>
-    <string name="card_extra_set">Дополнительные настройки</string>
+    <string name="card_extra_set">Дополнительные\nнастройки</string>
     <string name="card_income">Доход</string>
     <string name="card_expenditure">Расход</string>
     <string name="card_own_need">Сэкономлено</string>
@@ -240,6 +240,7 @@
 
     <string name="error_count_sale_animals">У Вас нет столько животных!</string>
     <string name="error_count_zero_animals">Нельзя указывать 0</string>
+    <string name="error_show_food">Выберите животное!</string>
 
     //Toast
     <string name="toast_add_s">Добавлено: %s %s %s</string>
