@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.sale
+package com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -33,15 +33,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
@@ -52,14 +52,15 @@ import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
-object SaleDestination : NavigationDestination {
-    override val route = "Sale"
+object ExpensesDestination : NavigationDestination {
+    override val route = "expenses"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -67,23 +68,23 @@ object SaleDestination : NavigationDestination {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SaleScreen(
+fun ExpensesScreen(
     modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
-    viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.saleUiState.collectAsState()
+    val homeUiState by viewModel.homeUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val coroutineScope = rememberCoroutineScope()
 
     val idProject = viewModel.itemId
+    val coroutineScope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -93,7 +94,7 @@ fun SaleScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                4,
+                5,
                 idProject.toString()
             )
         },
@@ -102,25 +103,27 @@ fun SaleScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarNavigation(
-                    title = R.string.sale_screen_title,
+                    title = R.string.expenses_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
-            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
+            floatingActionButton = {
+                FloatButton { navigateToItemAdd(idProject) }
+            }
         ) { innerPadding ->
             if (isLoading) {
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
             } else {
-                SaleBody(
+                ExpensesBody(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
-                    viewModel = viewModel,
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
+                    viewModel = viewModel,
                     onItemClick = navigateToItemUpdate,
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
@@ -129,12 +132,11 @@ fun SaleScreen(
     }
 }
 
-
 @Composable
-fun SaleBody(
+private fun ExpensesBody(
     modifier: Modifier = Modifier,
-    viewModel: SaleViewModel,
-    itemList: List<SaleTable>,
+    viewModel: ExpensesViewModel,
+    itemList: List<ExpensesTable>,
     brieflyList: List<BrieflyItemPrice>,
     onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit
@@ -159,10 +161,10 @@ fun SaleBody(
 
 @Composable
 private fun InventoryList(
-    viewModel: SaleViewModel,
-    itemList: List<SaleTable>,
+    viewModel: ExpensesViewModel,
+    itemList: List<ExpensesTable>,
     brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (SaleTable) -> Unit,
+    onItemClick: (ExpensesTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
@@ -172,14 +174,14 @@ private fun InventoryList(
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        )
+        ), label = ""
     )
     val extraPaddingResd by animateDpAsState(
         if (!details) 2.dp else 0.dp,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        )
+        ), label = ""
     )
 
     LazyColumn(
@@ -195,7 +197,8 @@ private fun InventoryList(
         }
         if (details) {
             items(items = itemList, key = { it.id }) { item ->
-                SaleProductCard(saleTable = item,
+                ExpensesCard(
+                    expensesTable = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
                         .padding(bottom = extraPadding.coerceAtLeast(0.dp))
@@ -204,8 +207,8 @@ private fun InventoryList(
         } else {
             items(items = brieflyList) { item ->
                 BrieflyPriceCard(
-                    product = item,
                     viewModel = viewModel,
+                    product = item,
                     onItemClick = onItemClick,
                     modifier = Modifier
                         .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
@@ -217,9 +220,9 @@ private fun InventoryList(
 
 @Composable
 fun BrieflyPriceCard(
-    viewModel: SaleViewModel,
+    viewModel: ExpensesViewModel,
     product: BrieflyItemPrice,
-    onItemClick: (SaleTable) -> Unit,
+    onItemClick: (ExpensesTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -243,15 +246,14 @@ fun BrieflyPriceCard(
         ) {
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .weight(0.7f)
             ) {
-
                 TextLine(
                     modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
                     valueString = product.title,
                     textStyle = textBold_20
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
                     valueString = stringResource(
@@ -259,13 +261,10 @@ fun BrieflyPriceCard(
                         "${product.count.formatNumber()} ${product.suffix}",
                         product.price.formatNumber(),
                         stringResource(R.string.currency_ruble),
-                    )
+                    ),
                 )
-
             }
-            IconButton(onClick = {
-                expanded = !expanded
-            }) {
+            IconButton(onClick = { expanded = !expanded }) {
                 Icon(
                     if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "Показать меню"
@@ -273,11 +272,11 @@ fun BrieflyPriceCard(
             }
         }
     }
-
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            SaleProductCard(saleTable = it,
+            ExpensesCard(
+                expensesTable = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f
@@ -290,10 +289,11 @@ fun BrieflyPriceCard(
 
 
 @Composable
-fun SaleProductCard(
-    saleTable: SaleTable,
+fun ExpensesCard(
+    expensesTable: ExpensesTable,
     modifier: Modifier = Modifier
 ) {
+    val price = expensesTable.priceAll ?: expensesTable.price
     CardField(modifier = modifier) {
         Row(
             modifier = Modifier
@@ -306,48 +306,52 @@ fun SaleProductCard(
                     .fillMaxWidth()
                     .weight(0.7f)
             ) {
-                Text(
+                Row(
                     modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    text = saleTable.title,
-                    style = textBold_20,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = expensesTable.title,
+                        style = textBold_20,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (expensesTable.animalId != null)
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_pets_24),
+                            contentDescription = stringResource(R.string.is_empty)
+                        )
+                }
                 IconAndText(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
-                        saleTable.day,
-                        saleTable.mount,
-                        saleTable.year
+                        expensesTable.day,
+                        expensesTable.mount,
+                        expensesTable.year
                     )
                 )
-                saleTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
+                expensesTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
                     ?.let { category ->
                         IconAndText(
                             iconRes = R.drawable.baseline_format_list_bulleted_24,
                             valueString = category
                         )
                     }
-                saleTable.buyer.takeUnless { it == "Неизвестный" || it.isEmpty() }
-                    ?.let { buyer ->
-                        IconAndText(
-                            iconRes = R.drawable.baseline_person_24,
-                            valueString = buyer
-                        )
-                    }
-                if (saleTable.note != "")
+                if (expensesTable.note != "")
                     IconAndText(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = saleTable.note
+                        valueString = expensesTable.note
                     )
+
             }
 
             Text(
                 text = stringResource(
-                    R.string.card_count_briefly_s,
-                    "${saleTable.count.formatNumber()} ${saleTable.suffix}",
-                    saleTable.priceAll.formatNumber(),
-                    stringResource(R.string.currency_ruble)
+                    R.string.card_count_s,
+                    "${expensesTable.count.formatNumber()} ${expensesTable.countSuffix}",
+                    price.formatNumber(),
+                    stringResource(R.string.currency_ruble),
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -358,9 +362,3 @@ fun SaleProductCard(
         }
     }
 }
-
-
-data class navigateId(
-    val id: Int,
-    val idPT: Int
-)

@@ -8,9 +8,9 @@ import io.appmetrica.analytics.AppMetrica
 fun metricAdd(domainAddTable: DomainAddTable) {
     val eventParameters: MutableMap<String, Any> = HashMap()
     eventParameters["Имя"] = domainAddTable.title
-    eventParameters["Кол-во"] = "${domainAddTable.count} ${domainAddTable.suffix}"
+    eventParameters["Кол-во"] = "${domainAddTable.count} ${domainAddTable.countSuffix}"
     eventParameters["Категория"] = domainAddTable.category
-    eventParameters["Животное"] = domainAddTable.animal
+    eventParameters["Животное"] = domainAddTable.note
     eventParameters["Примечание"] = domainAddTable.note
     AppMetrica.reportEvent("Add Products", eventParameters);
 }

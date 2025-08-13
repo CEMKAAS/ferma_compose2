@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.expenses
+package com.zaroslikov.fermacompose2.ui.sections.add.list_screen
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -33,14 +33,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
+import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
@@ -51,15 +52,16 @@ import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
+import io.appmetrica.analytics.AppMetrica
 
-object ExpensesDestination : NavigationDestination {
-    override val route = "expenses"
+object HomeDestination : NavigationDestination {
+    override val route = "home"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -67,22 +69,23 @@ object ExpensesDestination : NavigationDestination {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpensesScreen(
+fun AddScreen(
     modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
+    navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
-    viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val idProject = viewModel.itemId
+
     val homeUiState by viewModel.homeUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
+
     val isLoading by viewModel.isLoading.collectAsState()
-
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
@@ -93,7 +96,7 @@ fun ExpensesScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                5,
+                3,
                 idProject.toString()
             )
         },
@@ -102,43 +105,47 @@ fun ExpensesScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarNavigation(
-                    title = R.string.expenses_screen_title,
+                    title = R.string.add_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
-            floatingActionButton = {
-                FloatButton { navigateToItemAdd(idProject) }
-            }
+            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
+
         ) { innerPadding ->
-            if (isLoading) {
+            if (isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
-            } else {
-                ExpensesBody(
-                    modifier = Modifier
+            else
+                AddContainer(
+                    modifier = modifier
                         .modifierScreenLazy(innerPadding),
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
                     viewModel = viewModel,
                     onItemClick = navigateToItemUpdate,
-                    navigateToItemAdd = { navigateToItemAdd(idProject) }
+                    navigateToItemAdd = { navigateToItemAdd(idProject) },
+                    navigationToAnalysis = {
+                        navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
+                        AppMetrica.reportEvent("Анализ через Продукцию")
+                    }
                 )
-            }
         }
     }
 }
 
+
 @Composable
-private fun ExpensesBody(
+fun AddContainer(
     modifier: Modifier = Modifier,
-    viewModel: ExpensesViewModel,
-    itemList: List<ExpensesTable>,
-    brieflyList: List<BrieflyItemPrice>,
+    viewModel: AddViewModel,
+    itemList: List<AddTable>,
+    brieflyList: List<BrieflyItemCount>,
     onItemClick: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: () -> Unit
+    navigateToItemAdd: () -> Unit,
+    navigationToAnalysis: (String) -> Unit,
 ) {
     if (itemList.isNotEmpty())
         InventoryList(
@@ -146,25 +153,29 @@ private fun ExpensesBody(
             brieflyList = brieflyList,
             viewModel = viewModel,
             onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
-            modifier = modifier
-        )
+            modifier = modifier,
+            navigationToAnalysis = navigationToAnalysis,
+
+            )
     else MessageNoData(
         modifier = modifier,
         onClick = navigateToItemAdd,
-        titleRes = R.string.message_no_date_title_sale,
-        messageRes = R.string.message_no_date_message_sale,
-        supportRes = R.string.message_no_date_support_text_sale,
-        buttonRes = R.string.button_sale_message_no_data
+        titleRes = R.string.message_no_date_title_add,
+        messageRes = R.string.message_no_date_message_add,
+        supportRes = R.string.message_no_date_support_text_add,
+        buttonRes = R.string.button_add_message_no_data
     )
 }
 
+
 @Composable
-private fun InventoryList(
-    viewModel: ExpensesViewModel,
-    itemList: List<ExpensesTable>,
-    brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (ExpensesTable) -> Unit,
-    modifier: Modifier = Modifier
+fun InventoryList(
+    modifier: Modifier = Modifier,
+    viewModel: AddViewModel,
+    itemList: List<AddTable>,
+    brieflyList: List<BrieflyItemCount>,
+    onItemClick: (AddTable) -> Unit,
+    navigationToAnalysis: (String) -> Unit,
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
 
@@ -187,6 +198,7 @@ private fun InventoryList(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
     ) {
+
         item {
             TextButtonWarehouse(
                 boolean = details,
@@ -194,36 +206,37 @@ private fun InventoryList(
                 intRes = if (details) R.string.widget_briefly else R.string.widget_detail
             )
         }
-        if (details) {
+
+        if (details)
             items(items = itemList, key = { it.id }) { item ->
-                ExpensesCard(
-                    expensesTable = item,
+                AddProductCard(addProduct = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
-                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
-                )
+                        .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
             }
-        } else {
+        else
             items(items = brieflyList) { item ->
-                BrieflyPriceCard(
-                    viewModel = viewModel,
+                BrieflyCountCard(
                     product = item,
+                    viewModel = viewModel,
                     onItemClick = onItemClick,
+                    navigationToAnalysis = navigationToAnalysis,
                     modifier = Modifier
                         .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
                 )
             }
-        }
     }
 }
 
 @Composable
-fun BrieflyPriceCard(
-    viewModel: ExpensesViewModel,
-    product: BrieflyItemPrice,
-    onItemClick: (ExpensesTable) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun BrieflyCountCard(
+    modifier: Modifier = Modifier,
+    viewModel: AddViewModel,
+    product: BrieflyItemCount,
+    onItemClick: (AddTable) -> Unit,
+    navigationToAnalysis: (String) -> Unit = {},
+
+    ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val extraPadding by animateDpAsState(
@@ -233,7 +246,6 @@ fun BrieflyPriceCard(
             stiffness = Spring.StiffnessLow
         ), label = ""
     )
-
     CardField(modifier = modifier.clickable {
         expanded = !expanded
     }) {
@@ -255,15 +267,19 @@ fun BrieflyPriceCard(
                 )
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
-                    valueString = stringResource(
-                        R.string.card_count_briefly_s,
-                        "${product.count.formatNumber()} ${product.suffix}",
-                        product.price.formatNumber(),
-                        stringResource(R.string.currency_ruble),
-                    ),
+                    valueString = "${product.count.formatNumber()} ${product.suffix}",
                 )
             }
-            IconButton(onClick = { expanded = !expanded }) {
+
+            IconButton(onClick = { navigationToAnalysis(product.title) }) {
+                Icon(
+                    painterResource(id = R.drawable.baseline_analytics_24),
+                    contentDescription = "Анализ",
+                )
+            }
+            IconButton(onClick = {
+                expanded = !expanded
+            }) {
                 Icon(
                     if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "Показать меню"
@@ -274,22 +290,22 @@ fun BrieflyPriceCard(
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            ExpensesCard(
-                expensesTable = it,
+            AddProductCard(addProduct = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f
                     }
                     .clickable { onItemClick(it) }
-                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
+                    .padding(bottom = extraPadding.coerceAtLeast(0.dp))
+            )
         }
     }
 }
 
 
 @Composable
-fun ExpensesCard(
-    expensesTable: ExpensesTable,
+fun AddProductCard(
+    addProduct: AddTable,
     modifier: Modifier = Modifier
 ) {
     CardField(modifier = modifier) {
@@ -304,43 +320,49 @@ fun ExpensesCard(
                     .fillMaxWidth()
                     .weight(0.7f)
             ) {
+
                 Text(
                     modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    text = expensesTable.title,
+                    text = addProduct.title,
                     style = textBold_20,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
                 IconAndText(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
-                        expensesTable.day,
-                        expensesTable.mount,
-                        expensesTable.year
+                        addProduct.day,
+                        addProduct.mount,
+                        addProduct.year
                     )
                 )
-                expensesTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
+
+                addProduct.category.takeUnless { it == "Без категории" || it.isEmpty() }
                     ?.let { category ->
                         IconAndText(
                             iconRes = R.drawable.baseline_format_list_bulleted_24,
                             valueString = category
                         )
                     }
-                if (expensesTable.note != "")
+
+//                if (addProduct.animal != "")
+//                    IconAndText(
+//                        iconRes = R.drawable.baseline_pets_24,
+//                        valueString = addProduct.animal
+//                    )
+
+
+                if (addProduct.note != "")
                     IconAndText(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = expensesTable.note
+                        valueString = addProduct.note
                     )
 
             }
 
             Text(
-                text = stringResource(
-                    R.string.card_count_s,
-                    "${expensesTable.count.formatNumber()} ${expensesTable.countSuffix}",
-                    expensesTable.price.formatNumber(),
-                    stringResource(R.string.currency_ruble),
-                ),
+                text = "${addProduct.count.formatNumber()} ${addProduct.countSuffix}",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()

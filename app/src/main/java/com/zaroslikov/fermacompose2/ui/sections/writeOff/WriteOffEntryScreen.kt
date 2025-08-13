@@ -134,7 +134,6 @@ fun WriteOffEntryContainerProduct(
             isErrorSlash = domainWriteOffTable.error.isErrorSlash,
             enable = !isIndicationValue,
             readOnly = isIndicationValue,
-            focusManager = focusManager
         )
         OutlinedTextCount(
             value = domainWriteOffTable.count,
@@ -145,7 +144,7 @@ fun WriteOffEntryContainerProduct(
             isError = domainWriteOffTable.error.isErrorCount,
             suffix = domainWriteOffTable.suffix,
             intResSup = R.string.support_text_count_product_write_off,
-            countWarehouse = countWarehouse.first,
+            countWarehouse = countWarehouse.first.toString(),
             countWarehouseSuffix = countWarehouse.second,
         )
         OutlinedPriceInput(

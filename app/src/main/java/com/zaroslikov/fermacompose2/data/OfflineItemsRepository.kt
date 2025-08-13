@@ -18,6 +18,8 @@ import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
+import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
+import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.AnimalExpensesList2
@@ -52,7 +54,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         itemDao.getIncubatorEditDay(id, day)
 
     override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)
-    override fun getItemsTitleAddList(id: Int): Flow<List<String>> =
+    override fun getItemsTitleAddList(id: Int): Flow<List<PairData>> =
         itemDao.getItemsTitleAddList(id)
 
     override fun getItemsWriteoffList(id: Int): Flow<List<PairData>> =
@@ -71,7 +73,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         itemDao.insertProjectLong(projectTable)
 
     override suspend fun insertItem(item: AddTable) = itemDao.insert(item)
-    override suspend fun deleteItem(item: AddTable) = itemDao.delete(item)
+    override suspend fun deleteAddById(id: Long) = itemDao.deleteAddById(id)
     override suspend fun updateItem(item: AddTable) = itemDao.update(item)
 
     override fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>> =
@@ -79,6 +81,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>> =
         itemDao.getBrieflyDetailsItemAdd(id, name)
+
+    override fun getAnimalById(id: Long): Flow<String> = itemDao.getAnimalById(id)
 
     //==================== Sale ====================
     override fun getAllSaleItems(id: Int): Flow<List<SaleTable>> = itemDao.getAllSaleItems(id)
@@ -92,7 +96,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<SaleTable>> =
         itemDao.getBrieflyDetailsItemSale(id, name)
 
-    override fun getItemsTitleSaleList(id: Int): Flow<List<PairData>> =
+    override fun getItemsTitleSaleList(id: Int): Flow<List<SaleTitleData>> =
         itemDao.getItemsTitleSaleList(id)
 
     override fun getItemsCategorySaleList(id: Int): Flow<List<String>> =
@@ -103,7 +107,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override suspend fun insertSale(item: SaleTable) = itemDao.insertSale(item)
     override suspend fun updateSale(item: SaleTable) = itemDao.updateSale(item)
-    override suspend fun deleteSale(item: SaleTable) = itemDao.deleteSale(item)
+    override suspend fun deleteSaleById(id: Long) = itemDao.deleteSaleById(id)
 
     //==================== Expenese ====================
     override fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>> =
@@ -122,7 +126,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun getItemExpensesAnimal(id: Int): List<Long> =
         itemDao.getItemExpensesAnimal(id)
 
-    override fun getItemsTitleExpensesList(id: Int): Flow<List<String>> =
+    override fun getItemsTitleExpensesList(id: Int): Flow<List<PairData>> =
         itemDao.getItemsTitleExpensesList(id)
 
     override fun getItemsCategoryExpensesList(id: Int): Flow<List<String>> =
@@ -146,7 +150,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun deleteExpensesAnimal(item: ExpensesAnimalTable) =
         itemDao.deleteExpensesAnimal(item)
 
-     //==================== WriteOff ====================
+    //==================== WriteOff ====================
     override fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>> =
         itemDao.getAllWriteOffItems(id)
 
@@ -266,6 +270,11 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getCurrentBalanceProduct(name: String, id: Long): Flow<PairDataDoubleSting> =
         itemDao.getCurrentBalanceProduct(name, id)
+
+    override fun getCurrentBalanceProductList(
+        name: String,
+        id: Long
+    ): Flow<List<PairDataDoubleSting>> = itemDao.getCurrentBalanceProductList(name, id)
 
     override fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double> =
         itemDao.getCurrentExpensesProduct(name, id)

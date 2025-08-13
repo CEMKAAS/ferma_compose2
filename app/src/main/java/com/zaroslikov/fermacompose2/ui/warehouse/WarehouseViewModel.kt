@@ -81,13 +81,12 @@ class WarehouseViewModel(
                 day = calendar[Calendar.DAY_OF_MONTH],
                 mount = calendar[Calendar.MONTH] + 1,
                 year = calendar[Calendar.YEAR],
-                priceAll = 0.0,
-                suffix = fastAdd.suffix,
+                price = 0.0,
+                countSuffix = fastAdd.suffix,
                 category = fastAdd.category,
-                idAnimal = fastAdd.idAnimal,
-                animal = fastAdd.animal,
+                animalId = fastAdd.idAnimal,
                 note = "",
-                idPT = itemId
+                idPT = itemId.toLong()
             )
         )
     }

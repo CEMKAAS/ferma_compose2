@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.add
+package com.zaroslikov.fermacompose2.ui.sections.add.list_screen
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

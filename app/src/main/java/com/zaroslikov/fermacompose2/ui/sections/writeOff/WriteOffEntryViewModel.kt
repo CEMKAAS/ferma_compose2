@@ -16,7 +16,7 @@ import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent

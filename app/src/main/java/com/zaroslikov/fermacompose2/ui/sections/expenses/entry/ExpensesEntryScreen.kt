@@ -2,7 +2,6 @@
 
 package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -20,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
+import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
@@ -52,7 +54,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCountNoCard
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd2
 import com.zaroslikov.fermacompose2.ui.composeElement.Suffix
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
@@ -76,6 +78,7 @@ fun ExpensesEntryProduct(
     viewModel: ExpensesEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
@@ -83,10 +86,13 @@ fun ExpensesEntryProduct(
             }
         }
     }
-
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBarBack(intRes = R.string.expenses_screen_title, navigateUp = navigateBack)
+            TopAppBarBack(
+                intRes = R.string.expenses_screen_title, navigateUp = navigateBack,
+                scrollBehavior = scrollBehavior
+            )
         }
     ) { innerPadding ->
         ExpensesEntryContainerProduct(
@@ -108,7 +114,7 @@ fun ExpensesEntryProduct(
 fun ExpensesEntryContainerProduct(
     modifier: Modifier,
     state: ExpensesEntryState,
-    titleList: List<String>,
+    titleList: List<PairData>,
     categoryList: List<String>,
     updateCountWarehouse: (String) -> Unit,
     onValueChange: (ExpensesEntryState) -> Unit,
@@ -119,11 +125,15 @@ fun ExpensesEntryContainerProduct(
     val suffixSet =
         setOf(Suffix.GRAM.asString(), Suffix.KILOGRAM.asString(), Suffix.TONS.asString())
     Column(modifier = modifier) {
-        OutlinedTextTitleAdd(
+        OutlinedTextTitleAdd2(
             value = state.title,
             onValueChange = {
                 onValueChange(state.updateTitle(it))
                 updateCountWarehouse(it)
+            },
+            onValueChangeSuffix = {
+                onValueChange(state.updateTitleAndSuffix(it, suffixSet))
+                updateCountWarehouse(it.first)
             },
             titleList = titleList,
             isErrorTitle = state.error.isErrorTitle,
@@ -138,7 +148,7 @@ fun ExpensesEntryContainerProduct(
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_expenses,
-            countWarehouse = state.countInWarehouse.first,
+            countWarehouse = state.countInWarehouse.first.toString(),
             onWeightChange = { onValueChange(state.updateWeight(it)) },
             isWarehouseShow = false,
             versionDropMenu = if (state.isIndicatorsValue) 2 else 5,

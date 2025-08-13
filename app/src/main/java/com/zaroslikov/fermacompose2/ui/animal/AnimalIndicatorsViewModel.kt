@@ -345,7 +345,7 @@ class AnimalIndicatorsViewModel(
             2 -> saleUiTable?.let {
                 itemsRepository.updateSale(
                     it.copy(
-                        count = count.toDouble(), priceAll = price, suffix = suffix
+                        count = count.toDouble(), priceAll = price, countSuffix = suffix
                     )
                 )
             }
@@ -374,7 +374,7 @@ class AnimalIndicatorsViewModel(
         return when (version) {
             0 -> {
                 saleUiTable = itemsRepository.getItemSaleIdCountAnimal(idCount).first()
-                saleUiTable?.priceAll
+                saleUiTable?.price
             }
 
             1 -> {

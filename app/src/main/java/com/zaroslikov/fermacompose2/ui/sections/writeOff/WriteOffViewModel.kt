@@ -7,6 +7,7 @@ import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
 import com.zaroslikov.fermacompose2.data.water.WriteOffUiState
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,12 +42,12 @@ class WriteOffViewModel(
                 initialValue = WriteOffUiState()
             )
 
-    val titleUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsTitleAddList(itemId).map {  DataStringListState(it) }
+    val titleUiState: StateFlow<DataPairListState> =
+        itemsRepository.getItemsTitleAddList(itemId).map { DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =  DataStringListState()
+                initialValue =  DataPairListState()
             )
 
     val brieflyUiState: StateFlow<BrieflyUiState> =

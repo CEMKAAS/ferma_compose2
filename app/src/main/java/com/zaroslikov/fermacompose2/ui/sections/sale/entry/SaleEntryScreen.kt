@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.sections.sale
+package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -8,7 +8,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,8 +21,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.PairData
-import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -32,6 +29,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount2
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
@@ -69,18 +67,11 @@ fun SaleEntryProduct(
     ) { innerPadding ->
         SaleEntryContainerProduct(
             modifier = Modifier.modifierScreen(innerPadding),
-            domainSaleTable = viewModel.saleUiState,
-            isEntry = viewModel.isEntry,
-            isIndicationValue = viewModel.isIndicatorsValue,
-            isAutoCalculate = viewModel.isAutoCalculate,
-            titleList = viewModel.titleUiState.collectAsState().value.list,
-            categoryList = viewModel.categoryUiState.collectAsState().value.list,
-            buyerList = viewModel.buyerUiState.collectAsState().value.list,
+            state = viewModel.saleUiState,
             onValueChange = viewModel::updateUiState,
             onClickInsert = viewModel::insertItem,
             onClickUpdate = viewModel::updateItem,
             onClickDelete = viewModel::deleteItem,
-            countWarehouse = viewModel.itemUiState,
             updateCountWarehouse = viewModel::updateWarehouseUiState
         )
     }
@@ -90,109 +81,78 @@ fun SaleEntryProduct(
 @Composable
 fun SaleEntryContainerProduct(
     modifier: Modifier,
-    domainSaleTable: DomainSaleTable,
-    isEntry: Boolean,
-    isIndicationValue: Boolean,
-    isAutoCalculate: MutableState<Boolean>,
-    titleList: List<PairData>,
-    categoryList: List<String>,
-    buyerList: List<String>,
-    countWarehouse: DomainPairDataDoubleSting,
-    updateCountWarehouse: (Pair<String, String>) -> Unit,
-    onValueChange: (DomainSaleTable) -> Unit,
+    state: SaleEntryState,
+    updateCountWarehouse: (String) -> Unit,
+    onValueChange: (SaleEntryState) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit,
 ) {
-    val focusManager = LocalFocusManager.current
-
-    var date by rememberSaveable {
-        mutableStateOf(
-            formatDateToString(
-                domainSaleTable.day,
-                domainSaleTable.mount,
-                domainSaleTable.year
-            )
-        )
-    }
-    var selectedItemIndex by remember { mutableIntStateOf(0) }
-    var countWarehouseBoolean by rememberSaveable { mutableStateOf(false) }
-
     Column(modifier = modifier) {
 
         OutlinedTextTitleSale(
-            value = domainSaleTable.title,
+            value = state.title,
             onValueChange = {
-                onValueChange(domainSaleTable.copy(title = it).validateTitle())
+                onValueChange(state.updateTitle(it))
             },
             onValueChoice = {
-                selectedItemIndex = it.first
-                onValueChange(domainSaleTable.copy(title = it.second))
-                countWarehouseBoolean = it.third == "Моя Продукция" || it.third == "Купленный товар"
-                updateCountWarehouse(Pair(it.second, it.third))
+                onValueChange(state.updateTitleAndSuffix(it.second, it.third))
+
+//                countWarehouseBoolean = it.third ==
+//                        "Моя Продукция" || it.third == "Купленный товар"
+//                updateCountWarehouse(Pair(it.second, it.third))
+                updateCountWarehouse(it.second)
             },
-            selectedItemIndex = selectedItemIndex,
-            titleList = titleList,
-            isErrorTitle = domainSaleTable.error.isErrorTitle,
-            isErrorSlash = domainSaleTable.error.isErrorSlash,
-            focusManager = focusManager
+            titleList = state.titleList,
+            isErrorTitle = state.error.isErrorTitle,
+            isErrorSlash = state.error.isErrorSlash
         )
-        OutlinedTextCount(
-            value = domainSaleTable.count,
+        OutlinedTextCount2(
+            value = state.count,
             onValueChange = {
-                onValueChange(domainSaleTable.copy(count = it).validateCount())
+                onValueChange(state.updateCount(it))
             },
-            onSuffixChange = { onValueChange(domainSaleTable.copy(suffix = it)) },
-            isError = domainSaleTable.error.isErrorCount,
-            suffix = domainSaleTable.suffix,
+            onSuffixChange = { onValueChange(state.updateSuffix(it)) },
+            isError = state.error.isErrorCount,
+            suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_sale,
-            countWarehouse = countWarehouse.first,
-            countWarehouseSuffix = countWarehouse.second,
+            isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
+            warehouseList = state.warehouseList,
         )
         OutlinedPriceInput(
-            price = domainSaleTable.priceAll,
+            price = state.price,
             onPriceChange = {
-                onValueChange(domainSaleTable.copy(priceAll = it).validatePrice())
+                onValueChange(state.updatePrice(it))
             },
-            count = domainSaleTable.count,
-            isError = domainSaleTable.error.isErrorPrice,
-            isAutoCalculate = isAutoCalculate.value,
-            onAutoCalculate = { isAutoCalculate.value = it },
+            count = state.priceAll,
+            isError = state.error.isErrorPrice,
+            isAutoCalculate = state.isAutoPrice,
+            onAutoCalculate = { onValueChange(state.updateIsAutoPrice(it)) },
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isManyCount = true,
+            isNecessarily = true
         )
         OutlinedTextCategory(
-            value = domainSaleTable.category,
-            onValueChange = { onValueChange(domainSaleTable.copy(category = it)) },
-            titleList = categoryList,
+            value = state.category,
+            onValueChange = { onValueChange(state.updateCategory(it)) },
+            titleList = state.categoryList,
         )
         OutlinedTextDateEdit(
-            value = date,
-            onValueChange = {
-                date = it
-                val dateList = it.split(".")
-                onValueChange(
-                    domainSaleTable.copy(
-                        day = dateList[0].toInt(),
-                        mount = dateList[1].toInt(),
-                        year = dateList[2].toInt()
-                    )
-                )
-            }
+            value = state.date,
+            onValueChange = { onValueChange(state.updateDate(it)) }
         )
         OutlinedTextBuyer(
-            value = domainSaleTable.buyer,
-            onValueChange = { onValueChange(domainSaleTable.copy(buyer = it)) },
-            list = buyerList,
-            focusManager = focusManager
+            value = state.buyer,
+            onValueChange = { onValueChange(state.updateBuyer(it)) },
+            onTrailingChance = { onValueChange(state.updateBuyerClear()) },
+            list = state.buyerList,
         )
         OutlinedTextNote(
-            value = domainSaleTable.note,
-            onValueChange = { onValueChange(domainSaleTable.copy(note = it)) },
+            value = state.note,
+            onValueChange = { onValueChange(state.updateNote(it)) },
         )
         ButtonPanel(
-            isEntry = isEntry,
-            focusManager = focusManager,
+            state = state,
             onClickInsert = { onClickInsert() },
             onClickUpdate = { onClickUpdate() },
             onClickDelete = { onClickDelete() }
@@ -202,13 +162,13 @@ fun SaleEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    isEntry: Boolean,
-    focusManager: FocusManager,
+    state: SaleEntryState,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
 ) {
-    if (isEntry)
+    val focusManager = LocalFocusManager.current
+    if (state.isEntry)
         ButtonStandart(
             intRes = R.string.button_sale,
             onClick = {

@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.PairData
+import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
+import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 
 
@@ -45,6 +48,19 @@ enum class Suffix(val resId: Int) {
 
     @Composable
     fun asString(): String = stringResource(id = resId)
+}
+
+
+enum class Category {
+    ADD, EXPENSES, SALE;
+
+    fun toDrawer(): Int {
+        return when (this) {
+            ADD -> R.drawable.baseline_add_circle_outline_24
+            EXPENSES -> R.drawable.baseline_add_shopping_cart_24
+            SALE -> R.drawable.baseline_add_card_24
+        }
+    }
 }
 
 
@@ -299,7 +315,7 @@ fun ExposedDropdownMenuProduct(
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = {
-                            expanded = false
+                        expanded = false
                     }
                 ) {
                     filteredOptions.forEach { item ->
@@ -316,6 +332,83 @@ fun ExposedDropdownMenuProduct(
         }
     }
 }
+
+@Composable
+fun ExposedDropdownMenuProduct2(
+    title: String,
+    setTitle: (Pair<String, String>) -> Unit,
+    titleList: List<PairData>,
+    enableDropMenu: Boolean = true,
+    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var showAllOnOpen by remember { mutableStateOf(false) } // показать весь список при первом открытии
+    var lastTitle by remember { mutableStateOf(title) }
+
+    // Если пользователь меняет текст, при открытом меню снова включаем фильтрацию
+    LaunchedEffect(title) {
+        if (title != lastTitle) {
+            lastTitle = title
+            if (expanded) showAllOnOpen = false
+        }
+    }
+
+    Box {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                if (!enableDropMenu) return@ExposedDropdownMenuBox
+                val opening = !expanded
+                expanded = !expanded
+                if (opening) {
+                    showAllOnOpen = title.isNotBlank()
+                }
+            }
+        ) {
+            content(
+                Pair(
+                    Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(), expanded
+                )
+            )
+
+            val options = if (showAllOnOpen) {
+                titleList
+            } else {
+                titleList.filter { it.first.contains(title, ignoreCase = true) }
+            }
+
+            if (titleList.isNotEmpty()) {
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                        showAllOnOpen = false
+                    }
+                ) {
+                    options.forEach { item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = "${item.first}, ${item.second}",
+                                    fontWeight = if (item.first == title) FontWeight.Bold else null
+                                )
+                            },
+
+                            onClick = {
+                                setTitle(item.first to item.second)
+                                expanded = false
+                                showAllOnOpen = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun ExposedDropdownMenuSex(
@@ -381,9 +474,8 @@ fun ExposedDropdownMenuSex(
 
 @Composable
 fun ExposedDropdownMenuAnimals(
-    title: String,
-    selectedItemIndex: Int,
-    setTitle: (Pair<Int, String>) -> Unit,
+    selectedItemIndex: Long,
+    setTitle: (Pair<Long, String>) -> Unit,
     animalList: List<TripleData>,
     content: @Composable (Modifier) -> Unit,
 ) {
@@ -410,11 +502,11 @@ fun ExposedDropdownMenuAnimals(
                         text = {
                             Text(
                                 text = "${item.second} - ${item.third}",
-                                fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                fontWeight = if (item.first == selectedItemIndex) FontWeight.Bold else null
                             )
                         },
                         onClick = {
-                            setTitle(Pair(index, item.second))
+                            setTitle(Pair(item.first, item.second))
                             expanded = !expanded
                         }
                     )
@@ -427,18 +519,33 @@ fun ExposedDropdownMenuAnimals(
 @Composable
 fun ExposedDropdownMenuPair(
     title: String,
-    selectedItemIndex: Int,
     setTitle: (Triple<Int, String, String>) -> Unit,
-    list: List<PairData>,
+    list: List<SaleTitleData>,
+    enableDropMenu: Boolean = true,
     content: @Composable (Modifier) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showAllOnOpen by remember { mutableStateOf(false) }
+    var lastTitle by remember { mutableStateOf(title) }
+
+
+    LaunchedEffect(title) {
+        if (title != lastTitle) {
+            lastTitle = title
+            if (expanded) showAllOnOpen = false
+        }
+    }
 
     Box {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
+                if (!enableDropMenu) return@ExposedDropdownMenuBox
+                val opening = !expanded
                 expanded = !expanded
+                if (opening) {
+                    showAllOnOpen = title.isNotBlank()
+                }
             }
         ) {
             content(
@@ -446,23 +553,30 @@ fun ExposedDropdownMenuPair(
                     .menuAnchor()
                     .fillMaxWidth()
             )
-            val filteredOptions =
+            val options = if (showAllOnOpen) {
+                list
+            } else {
                 list.filter { it.first.contains(title, ignoreCase = true) }
-            if (filteredOptions.isNotEmpty()) {
+            }
+
+            if (list.isNotEmpty()) {
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = !expanded }
+                    onDismissRequest = {
+                        expanded = false
+                        showAllOnOpen = false
+                    }
                 ) {
-                    list.forEachIndexed { index, item ->
+                    options.forEachIndexed { index, item ->
                         DropdownMenuItem(
                             text = {
                                 Text(
                                     text = "${item.first} - ${item.second}",
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                    fontWeight = if (item.first == title) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
-                                setTitle(Triple(index, item.first, item.second))
+                                setTitle(Triple(index, item.first, item.second.toString()))
                                 expanded = !expanded
                             }
                         )

@@ -184,7 +184,7 @@
     <string name="support_text_product">Введите или выберите товар</string>
     <string name="support_text_weight">Укажите вес</string>
     <string name="support_text_title">Укажите заголовок</string>
-    <string name="support_text_count_warehouse_s">Сейчас на складе: %s</string>
+    <string name="support_text_count_warehouse_s">Сейчас на складе:</string>
     <string name="support_text_category">Укажите или выберите категорию, к которой относится данный товар</string>
     <string name="support_text_date">Выберите дату</string>
     <string name="support_text_animal">Выберите животное, которое дало вам продукцию</string>

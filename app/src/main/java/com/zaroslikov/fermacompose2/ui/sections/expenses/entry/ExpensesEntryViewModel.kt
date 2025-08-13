@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,9 +12,10 @@ import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.sections.sale.SaleEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent
@@ -73,7 +73,6 @@ class ExpensesEntryViewModel @Inject constructor(
                     countSuffix = resourceProvider.getString(R.string.suffix_pieces) )
             }
             val animalList = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
-            Log.i("updateForSale", "animalList: $animalList")
             expensesUiState = expensesUiState.copy(
                 animalList2 = animalList
             )
@@ -96,12 +95,12 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
-    val titleUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsTitleExpensesList(itemIdPT).map { DataStringListState(it) }
+    val titleUiState: StateFlow<DataPairListState> =
+        itemsRepository.getItemsTitleExpensesList(itemIdPT).map { DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataStringListState()
+                initialValue = DataPairListState()
             )
 
     val categoryUiState: StateFlow<DataStringListState> =
@@ -121,7 +120,7 @@ class ExpensesEntryViewModel @Inject constructor(
                     expensesUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
                 )
                 setExpensesAnimal(id)
-//                metricalExpenses(expensesUiState)
+//                metricalExpenses() TODO Нужно придумать, как грамотно сохранять
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_expenses_s_s)
@@ -139,7 +138,6 @@ class ExpensesEntryViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isError()) {
                 expensesUiState = expensesUiState.updateForSaveAnimalList()
-                Log.i("expenses", "updateItem: ${expensesUiState.animalList2}")
                 itemsRepository.updateExpenses(
                     expensesUiState.updateForSave(
                         id = itemId.toLong(),
@@ -244,6 +242,7 @@ class ExpensesEntryViewModel @Inject constructor(
     }
 }
 
+//TODO придумать, что деать с этими классами
 data class AnimalExpensesList2(
     val id: Int,
     val name: String,

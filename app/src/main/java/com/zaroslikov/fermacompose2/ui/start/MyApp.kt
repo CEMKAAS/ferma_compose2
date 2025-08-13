@@ -29,11 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesDestination
+import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
-import com.zaroslikov.fermacompose2.ui.sections.add.HomeDestination
+import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.HomeDestination
 import com.zaroslikov.fermacompose2.ui.note.NoteDestination
-import com.zaroslikov.fermacompose2.ui.sections.sale.SaleDestination
+import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffDestination
 import io.appmetrica.analytics.AppMetrica

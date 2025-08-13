@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.add
+package com.zaroslikov.fermacompose2.ui.sections.sale.list_screen
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -33,15 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
@@ -57,12 +56,10 @@ import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
-import io.appmetrica.analytics.AppMetrica
 
-object HomeDestination : NavigationDestination {
-    override val route = "home"
+object SaleDestination : NavigationDestination {
+    override val route = "Sale"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
@@ -70,25 +67,23 @@ object HomeDestination : NavigationDestination {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddScreen(
+fun SaleScreen(
     modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
+    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
-    navigationToAnalysis: (AnalysisNav) -> Unit,
     drawerState: DrawerState,
-    viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val idProject = viewModel.itemId
-
-    val homeUiState by viewModel.homeUiState.collectAsState()
+    val homeUiState by viewModel.saleUiState.collectAsState()
     val brieflyUiState by viewModel.brieflyUiState.collectAsState()
-
     val isLoading by viewModel.isLoading.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val coroutineScope = rememberCoroutineScope()
 
+    val idProject = viewModel.itemId
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -98,7 +93,7 @@ fun AddScreen(
                 navigateToStart = navigateToStart,
                 navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                3,
+                4,
                 idProject.toString()
             )
         },
@@ -107,47 +102,42 @@ fun AddScreen(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TopAppBarNavigation(
-                    title = R.string.add_screen_title,
+                    title = R.string.sale_screen_title,
                     scope = coroutineScope,
                     drawerState = drawerState,
                     scrollBehavior = scrollBehavior
                 )
             },
             floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
-
         ) { innerPadding ->
-            if (isLoading)
+            if (isLoading) {
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
-            else
-                AddContainer(
-                    modifier = modifier
+            } else {
+                SaleBody(
+                    modifier = Modifier
                         .modifierScreenLazy(innerPadding),
+                    viewModel = viewModel,
                     itemList = homeUiState.itemList,
                     brieflyList = brieflyUiState.itemList,
-                    viewModel = viewModel,
                     onItemClick = navigateToItemUpdate,
-                    navigateToItemAdd = { navigateToItemAdd(idProject) },
-                    navigationToAnalysis = {
-                        navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
-                        AppMetrica.reportEvent("Анализ через Продукцию")
-                    }
+                    navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
+            }
         }
     }
 }
 
 
 @Composable
-fun AddContainer(
+fun SaleBody(
     modifier: Modifier = Modifier,
-    viewModel: AddViewModel,
-    itemList: List<AddTable>,
-    brieflyList: List<BrieflyItemCount>,
-    onItemClick: (Pair<Int, Int>) -> Unit,
-    navigateToItemAdd: () -> Unit,
-    navigationToAnalysis: (String) -> Unit,
+    viewModel: SaleViewModel,
+    itemList: List<SaleTable>,
+    brieflyList: List<BrieflyItemPrice>,
+    onItemClick: (Pair<Long, Long>) -> Unit,
+    navigateToItemAdd: () -> Unit
 ) {
     if (itemList.isNotEmpty())
         InventoryList(
@@ -155,29 +145,25 @@ fun AddContainer(
             brieflyList = brieflyList,
             viewModel = viewModel,
             onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
-            modifier = modifier,
-            navigationToAnalysis = navigationToAnalysis,
-
-            )
+            modifier = modifier
+        )
     else MessageNoData(
         modifier = modifier,
         onClick = navigateToItemAdd,
-        titleRes = R.string.message_no_date_title_add,
-        messageRes = R.string.message_no_date_message_add,
-        supportRes = R.string.message_no_date_support_text_add,
-        buttonRes = R.string.button_add_message_no_data
+        titleRes = R.string.message_no_date_title_sale,
+        messageRes = R.string.message_no_date_message_sale,
+        supportRes = R.string.message_no_date_support_text_sale,
+        buttonRes = R.string.button_sale_message_no_data
     )
 }
 
-
 @Composable
-fun InventoryList(
-    modifier: Modifier = Modifier,
-    viewModel: AddViewModel,
-    itemList: List<AddTable>,
-    brieflyList: List<BrieflyItemCount>,
-    onItemClick: (AddTable) -> Unit,
-    navigationToAnalysis: (String) -> Unit,
+private fun InventoryList(
+    viewModel: SaleViewModel,
+    itemList: List<SaleTable>,
+    brieflyList: List<BrieflyItemPrice>,
+    onItemClick: (SaleTable) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
 
@@ -186,21 +172,20 @@ fun InventoryList(
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        ), label = ""
+        )
     )
     val extraPaddingResd by animateDpAsState(
         if (!details) 2.dp else 0.dp,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        ), label = ""
+        )
     )
 
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
     ) {
-
         item {
             TextButtonWarehouse(
                 boolean = details,
@@ -208,37 +193,35 @@ fun InventoryList(
                 intRes = if (details) R.string.widget_briefly else R.string.widget_detail
             )
         }
-
-        if (details)
+        if (details) {
             items(items = itemList, key = { it.id }) { item ->
-                AddProductCard(addProduct = item,
+                SaleProductCard(saleTable = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
-                        .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
+                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
+                )
             }
-        else
+        } else {
             items(items = brieflyList) { item ->
-                BrieflyCountCard(
+                BrieflyPriceCard(
                     product = item,
                     viewModel = viewModel,
                     onItemClick = onItemClick,
-                    navigationToAnalysis = navigationToAnalysis,
                     modifier = Modifier
                         .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
                 )
             }
+        }
     }
 }
 
 @Composable
-fun BrieflyCountCard(
-    modifier: Modifier = Modifier,
-    viewModel: AddViewModel,
-    product: BrieflyItemCount,
-    onItemClick: (AddTable) -> Unit,
-    navigationToAnalysis: (String) -> Unit = {},
-
-    ) {
+fun BrieflyPriceCard(
+    viewModel: SaleViewModel,
+    product: BrieflyItemPrice,
+    onItemClick: (SaleTable) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val extraPadding by animateDpAsState(
@@ -248,6 +231,7 @@ fun BrieflyCountCard(
             stiffness = Spring.StiffnessLow
         ), label = ""
     )
+
     CardField(modifier = modifier.clickable {
         expanded = !expanded
     }) {
@@ -259,25 +243,25 @@ fun BrieflyCountCard(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .weight(0.7f)
             ) {
+
                 TextLine(
                     modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
                     valueString = product.title,
                     textStyle = textBold_20
                 )
+
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
-                    valueString = "${product.count.formatNumber()} ${product.suffix}",
+                    valueString = stringResource(
+                        R.string.card_count_briefly_s,
+                        "${product.count.formatNumber()} ${product.suffix}",
+                        product.price.formatNumber(),
+                        stringResource(R.string.currency_ruble),
+                    )
                 )
-            }
 
-            IconButton(onClick = { navigationToAnalysis(product.title) }) {
-                Icon(
-                    painterResource(id = R.drawable.baseline_analytics_24),
-                    contentDescription = "Анализ",
-                )
             }
             IconButton(onClick = {
                 expanded = !expanded
@@ -289,25 +273,25 @@ fun BrieflyCountCard(
             }
         }
     }
+
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            AddProductCard(addProduct = it,
+            SaleProductCard(saleTable = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f
                     }
                     .clickable { onItemClick(it) }
-                    .padding(bottom = extraPadding.coerceAtLeast(0.dp))
-            )
+                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
         }
     }
 }
 
 
 @Composable
-fun AddProductCard(
-    addProduct: AddTable,
+fun SaleProductCard(
+    saleTable: SaleTable,
     modifier: Modifier = Modifier
 ) {
     CardField(modifier = modifier) {
@@ -322,49 +306,49 @@ fun AddProductCard(
                     .fillMaxWidth()
                     .weight(0.7f)
             ) {
-
                 Text(
                     modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    text = addProduct.title,
+                    text = saleTable.title,
                     style = textBold_20,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
-                        addProduct.day,
-                        addProduct.mount,
-                        addProduct.year
+                        saleTable.day,
+                        saleTable.mount,
+                        saleTable.year
                     )
                 )
-
-                addProduct.category.takeUnless { it == "Без категории" || it.isEmpty() }
+                saleTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
                     ?.let { category ->
                         IconAndText(
                             iconRes = R.drawable.baseline_format_list_bulleted_24,
                             valueString = category
                         )
                     }
-
-                if (addProduct.animal != "")
-                    IconAndText(
-                        iconRes = R.drawable.baseline_pets_24,
-                        valueString = addProduct.animal
-                    )
-
-
-                if (addProduct.note != "")
+                saleTable.buyer.takeUnless { it == "Неизвестный" || it.isEmpty() }
+                    ?.let { buyer ->
+                        IconAndText(
+                            iconRes = R.drawable.baseline_person_24,
+                            valueString = buyer
+                        )
+                    }
+                if (saleTable.note != "")
                     IconAndText(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = addProduct.note
+                        valueString = saleTable.note
                     )
-
             }
 
             Text(
-                text = "${addProduct.count.formatNumber()} ${addProduct.suffix}",
+                text = stringResource(
+                    R.string.card_count_briefly_s,
+                    "${saleTable.count.formatNumber()} ${saleTable.countSuffix}",
+                    saleTable.price.formatNumber(),
+                    stringResource(R.string.currency_ruble)
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -375,24 +359,8 @@ fun AddProductCard(
     }
 }
 
-@Preview
-@Composable
-fun AddCard() {
-    AddProductCard(
-        addProduct = AddTable(
-            0,
-            "Яйцоbvcbbvcbbvcbcbvcbbcvbcvbc",
-            320.0,
-            1,
-            2,
-            3,
-            234.0,
-            "шт.",
-            "2321",
-            1,
-            "Боря",
-            "231",
-            1
-        ), modifier = Modifier
-    )
-}
+
+data class navigateId(
+    val id: Int,
+    val idPT: Int
+)

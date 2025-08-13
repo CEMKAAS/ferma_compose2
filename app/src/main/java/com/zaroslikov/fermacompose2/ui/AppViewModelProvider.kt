@@ -12,13 +12,13 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
-import com.zaroslikov.fermacompose2.ui.sections.expenses.ExpensesViewModel
+import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceMountViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceViewModel
-import com.zaroslikov.fermacompose2.ui.sections.add.AddViewModel
+import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.AddViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditViewModel
@@ -27,7 +27,7 @@ import com.zaroslikov.fermacompose2.ui.new_year.NewYearViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteEditViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteEntryViewModel
 import com.zaroslikov.fermacompose2.ui.note.NoteViewModel
-import com.zaroslikov.fermacompose2.ui.sections.sale.SaleViewModel
+import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.start.StartScreenViewModel
 import com.zaroslikov.fermacompose2.ui.add.ProjectAddViewModel
 import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorViewModel

@@ -16,6 +16,7 @@ import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.mapper.toCountRoomMap
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -96,12 +97,12 @@ class AnimalCardViewModel(
         }
     }
 
-    val titleUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsTitleAddList(itemIdPT).map { DataStringListState(it) }
+    val titleUiState: StateFlow<DataPairListState> =
+        itemsRepository.getItemsTitleAddList(itemIdPT).map { DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataStringListState()
+                initialValue = DataPairListState()
             )
 
     val buyerUiState: StateFlow<DataStringListState> =

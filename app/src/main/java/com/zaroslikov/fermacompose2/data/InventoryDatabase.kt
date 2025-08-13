@@ -91,6 +91,42 @@ abstract class InventoryDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE AnimalTable ADD COLUMN suffix_food_day TEXT NOT NULL DEFAULT ''")
 
 
+                //==================== Миграция AddTable ====================
+                db.execSQL(
+                    """
+            CREATE TABLE IF NOT EXISTS add_table (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                title TEXT NOT NULL,
+                count REAL NOT NULL,
+                day INTEGER NOT NULL,
+                month INTEGER NOT NULL,
+                year INTEGER NOT NULL,
+                price REAL NOT NULL,
+                count_suffix TEXT NOT NULL,
+                category TEXT NOT NULL,
+                animal_id INTEGER,
+                note TEXT NOT NULL,
+                idPT INTEGER NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+            )
+        """.trimIndent()
+                )
+
+                db.execSQL(
+                    """
+            INSERT INTO add_table (
+                _id, title, count, day, month, year, price,
+                count_suffix, category, animal_id, note, idPT
+            )
+            SELECT
+                _id, title, disc, DAY, MOUNT, YEAR, PRICE,
+                suffix, category, idAnimal, note, idPT
+            FROM MyFerma
+        """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX index_add_table_idPT ON add_table(idPT)")
+                db.execSQL("DROP TABLE MyFerma")
+
                 //==================== Миграция WriteOffTable ====================
                 db.execSQL(
                     """
@@ -140,23 +176,24 @@ abstract class InventoryDatabase : RoomDatabase() {
                 //==================== Миграция SaleTable ====================
                 db.execSQL(
                     """
-            CREATE TABLE IF NOT EXISTS MyFermaSale_new (
+            CREATE TABLE IF NOT EXISTS sale_table(
                 _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                titleSale TEXT NOT NULL,
-                discSale REAL NOT NULL,
-                DAY INTEGER NOT NULL,
-                MOUNT INTEGER NOT NULL,
-                YEAR INTEGER NOT NULL,
-                PRICE REAL NOT NULL,
-                suffix TEXT NOT NULL,
+                title TEXT NOT NULL,
+                count REAL NOT NULL,
+                count_suffix TEXT NOT NULL,
+                price REAL NOT NULL,
+                price_all REAL,
+                day INTEGER NOT NULL,
+                month INTEGER NOT NULL,
+                year INTEGER NOT NULL,
                 category TEXT NOT NULL,
                 buyer TEXT NOT NULL,
                 note TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
-                animalId INTEGER,
+                animal_id INTEGER,
                 animal_count_id INTEGER,
                 FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
-                FOREIGN KEY(animalId) REFERENCES AnimalTable(id) ON DELETE CASCADE
+                FOREIGN KEY(animal_id) REFERENCES AnimalTable(id) ON DELETE CASCADE
                 FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE
             )
         """.trimIndent()
@@ -164,21 +201,20 @@ abstract class InventoryDatabase : RoomDatabase() {
 
                 db.execSQL(
                     """
-            INSERT INTO MyFermaSale_new (
-                _id, titleSale, discSale, DAY, MOUNT, YEAR, PRICE,
-                suffix, category, buyer, note, idPT, animalId, animal_count_id
+            INSERT INTO sale_table(
+                _id, title, count, count_suffix, price, price_all,day, month, year,
+                category, buyer, note, idPT, animal_id, animal_count_id
             )
             SELECT
-                _id, titleSale, discSale, DAY, MOUNT, YEAR, PRICE,
-                suffix, category, buyer, note, idPT, NULL, NULL
+                _id, titleSale, discSale, suffix, PRICE, NULL, DAY, MOUNT, YEAR, 
+                 category, buyer, note, idPT, NULL, NULL
             FROM MyFermaSale
         """.trimIndent()
                 )
-                db.execSQL("CREATE INDEX index_MyFermaSale_new_idPT ON MyFermaSale_new(idPT)")
-                db.execSQL("CREATE INDEX index_MyFermaSale_new_animalId ON MyFermaSale_new(animalId)")
-                db.execSQL("CREATE INDEX index_MyFermaSale_new_animalId ON MyFermaSale_new(animal_count_id)")
+                db.execSQL("CREATE INDEX index_sale_table_idPT ON sale_table(idPT)")
+                db.execSQL("CREATE INDEX index_sale_table_animalId ON sale_table(animal_id)")
+                db.execSQL("CREATE INDEX index_sale_table_animalId ON sale_table(animal_count_id)")
                 db.execSQL("DROP TABLE MyFermaSale")
-                db.execSQL("ALTER TABLE MyFermaSale_new RENAME TO MyFermaSale")
 
                 //==================== Миграция ExpensesTable ====================
                 db.execSQL(

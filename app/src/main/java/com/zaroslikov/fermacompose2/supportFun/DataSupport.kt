@@ -17,6 +17,14 @@ data class PairData(
     val first: String, val second: String
 )
 
+data class PairDataStringInt(
+    val first: String, val second: Int
+)
+
+data class SaleTitleData(
+    val first: String, val second: String, val third: Int
+)
+
 data class PairDataDoubleSting(
     val first: Double, val second: String? = null
 )

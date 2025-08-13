@@ -58,3 +58,33 @@ fun Double.convertWeight(from: String, to: String): Double {
     }
     return result
 }
+
+
+fun Double.convertVolume(from: String, to: String): Double {
+
+    val result = when (from) {
+        "м3." -> when (to) {
+            "м3." -> this
+            "л." -> this * 1000
+            "мл." -> this * 1000000
+            else -> this
+        }
+
+        "л." -> when (to) {
+            "м3." -> this * 0.001
+            "л." -> this
+            "мл." -> this * 1000
+            else -> this
+        }
+
+        "мл." -> when (to) {
+            "м3." -> this * 0.000001
+            "л." -> this * 0.001
+            "мл." -> this
+            else -> this
+        }
+
+        else -> this
+    }
+    return result
+}

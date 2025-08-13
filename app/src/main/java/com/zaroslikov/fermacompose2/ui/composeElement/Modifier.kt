@@ -38,14 +38,14 @@ fun Modifier.modifierScreen(
         .padding(innerPadding)
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
-            vertical = dimensionResource(R.dimen.padding_small)
+//            vertical = dimensionResource(R.dimen.padding_small)
         )
         .verticalScroll(rememberScrollState())
         .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
             })
-        }
+        }.padding(bottom = 8.dp)
 }
 
 @Composable

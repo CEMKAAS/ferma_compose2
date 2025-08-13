@@ -126,7 +126,6 @@ fun AlertDialogSaleAnimal(
                     value = buyer,
                     onValueChange = { buyer = it },
                     list = buyerList,
-                    focusManager = focusManager
                 )
             }
         },
@@ -176,11 +175,13 @@ fun AlertDialogSaleAnimal(
                                     day = dateTodayArray()[0],
                                     mount = dateTodayArray()[1],
                                     year = dateTodayArray()[2],
-                                    suffix = countSuffix,
+                                    countSuffix = countSuffix,
                                     category = animalCategory,
                                     note = note,
                                     buyer = finalBuyer,
                                     idPT = idPT.toLong(),
+                                    price = 0.0,
+
                                 ),
                                 third = if (isAnimalGroup) isAnimalCountZero(
                                     countAnimalSale,

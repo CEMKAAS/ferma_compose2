@@ -28,6 +28,8 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
+import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -154,7 +156,7 @@ fun AnimalCardContainer(
     animalCountTable: DomainIndicatorsVM,
     animalVaccinationTable: DomainIndicatorsVM?,
     countWarehouse: Double,
-    titleList: List<String>,
+    titleList: List<PairData>,
     buyerList: List<String>,
     animalProductTable: List<AnimalTitSuff>,
     onNavigateIndicators: (Pair<Int, Int>) -> Unit,

@@ -46,11 +46,11 @@ data class ExpensesTable(
     val title: String,
     @ColumnInfo(name = "count")
     val count: Double,
-    @ColumnInfo(name = "DAY")
+    @ColumnInfo(name = "day")
     val day: Int,
-    @ColumnInfo(name = "MOUNT")
+    @ColumnInfo(name = "month")
     val mount: Int,
-    @ColumnInfo(name = "YEAR")
+    @ColumnInfo(name = "year")
     val year: Int,
     @ColumnInfo(name = "price")
     val price: Double,

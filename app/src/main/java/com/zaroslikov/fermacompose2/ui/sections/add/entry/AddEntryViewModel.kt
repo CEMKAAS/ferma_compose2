@@ -1,17 +1,17 @@
-package com.zaroslikov.fermacompose2.ui.sections.add
+package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
+import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
 import com.zaroslikov.fermacompose2.supportFun.metricAdd
@@ -26,8 +26,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,9 +45,10 @@ class AddEntryViewModel @Inject constructor(
     val isEntry: Boolean = itemId == -1
 
     var addUiState by mutableStateOf(
-        DomainAddTable().copy(
+        AddEntryState().copy(
+            isEntry = isEntry,
             category = resourceProvider.getString(R.string.support_text_no_category),
-            suffix = resourceProvider.getString(R.string.suffix_pieces)
+            countSuffix = resourceProvider.getString(R.string.suffix_pieces)
         )
     )
         private set
@@ -55,66 +58,65 @@ class AddEntryViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        if (!isEntry)
-            viewModelScope.launch {
-                addUiState = itemsRepository.getItemAdd(itemId)
+        viewModelScope.launch {
+            if (!isEntry) {
+                val domainAddTable = itemsRepository.getItemAdd(itemId)
                     .filterNotNull()
                     .first()
                     .toDomainMap()
+
+                addUiState = addUiState.updateFromDomain(domainAddTable)
+
+                updateWarehouseUiStateSync(addUiState.title)
+
+                addUiState.animalId?.let {
+                    addUiState = addUiState.updateAnimalNameById(
+                        itemsRepository.getAnimalById(it).first()
+                    )
+                }
             }
+
+            val titleList = itemsRepository.getItemsTitleAddList(itemIdPT).first()
+            val categoryList = itemsRepository.getItemsCategoryAddList(itemIdPT).first()
+            val animalList = itemsRepository.getItemsAnimalAddList(itemIdPT).first()
+            addUiState = addUiState.updateList(titleList, categoryList, animalList)
+        }
     }
-
-    fun updateUiState(domainAddTable: DomainAddTable) {
-        addUiState =
-            domainAddTable
-    }
-
-    val titleUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsTitleAddList(itemIdPT).map { DataStringListState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataStringListState()
-            )
-
-    val categoryUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsCategoryAddList(itemIdPT).map { DataStringListState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataStringListState()
-            )
-
-    val animalUiState: StateFlow<DataTripleListState> =
-        itemsRepository.getItemsAnimalAddList(itemIdPT).map { DataTripleListState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataTripleListState()
-            )
-
-
-    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
-        private set
 
     fun updateWarehouseUiState(name: String) {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
-                .filterNotNull()
-                .first()
-                .toDomainMap()
+            updateWarehouseUiStateSync(name)
         }
+    }
+
+    private suspend fun updateWarehouseUiStateSync(name: String) {
+        val pair = itemsRepository
+            .getCurrentBalanceProductList(name, itemIdPT.toLong())
+            .filterNotNull()
+            .firstOrNull()
+
+        if (pair != null) {
+            addUiState = addUiState.updateCountWarehouse(pair)
+        }
+    }
+
+
+    fun updateUiState(domainAddTable: AddEntryState) {
+        addUiState =
+            domainAddTable
     }
 
     fun insertItem() {
         viewModelScope.launch {
             if (!isError()) {
-                itemsRepository.insertItem(addUiState.copy(idPT = itemIdPT.toLong()).toRoomMap())
-                metricAdd(addUiState)
+                itemsRepository.insertItem(
+                    addUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
+                )
+//                metricAdd(addUiState)
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_add_s)
-                        .format(addUiState.title, addUiState.count, addUiState.suffix)
+                        .format(addUiState.title, addUiState.count, addUiState.countSuffix)
                 )
             }
         }
@@ -123,11 +125,14 @@ class AddEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
             if (!isError()) {
-                itemsRepository.updateItem(addUiState.toRoomMap())
+                itemsRepository.updateItem(
+                    addUiState.updateForSave(id = itemId.toLong(), itemIdPT = itemIdPT.toLong())
+                        .toRoomMap()
+                )
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_refresh_s)
-                        .format(addUiState.title, addUiState.count, addUiState.suffix)
+                        .format(addUiState.title, addUiState.count, addUiState.countSuffix)
                 )
             }
         }
@@ -135,11 +140,11 @@ class AddEntryViewModel @Inject constructor(
 
     fun deleteItem() {
         viewModelScope.launch {
-            itemsRepository.deleteItem(addUiState.toRoomMap())
+            itemsRepository.deleteAddById(itemId.toLong())
             _eventFlow.emit(UiEvent.NavigateBack)
             showMessage(
                 resourceProvider.getString(R.string.toast_delete_s)
-                    .format(addUiState.title, addUiState.count, addUiState.suffix)
+                    .format(addUiState.title, addUiState.count, addUiState.countSuffix)
             )
         }
     }
@@ -157,10 +162,6 @@ class AddEntryViewModel @Inject constructor(
     private fun isError(): Boolean {
         updateUiState(addUiState.validate())
         return addUiState.error.hasAnyError
-    }
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
 }
 

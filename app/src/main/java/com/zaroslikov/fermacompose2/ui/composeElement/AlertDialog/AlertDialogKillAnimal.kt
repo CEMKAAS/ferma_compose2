@@ -34,6 +34,7 @@ import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.animalCountWeightComposition
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -52,6 +53,7 @@ import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd2
 import com.zaroslikov.fermacompose2.ui.composeElement.TextAndIconRow
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
@@ -67,7 +69,7 @@ fun AlertDialogKillAnimal(
     weightSuffix: String?,
     idPT: Int,
     idAnimal: Long,
-    titleList: List<String>,
+    titleList: List<PairData>,
     onConfirmation: () -> Unit,
     onUpdateAnimalGroupClick: (String) -> Unit,
     onUpdateCountWarehouse: suspend (String) -> DomainPairDataDoubleSting,
@@ -159,7 +161,7 @@ fun AlertDialogKillAnimal(
                                         onClickIconEnd = { textFields.remove(text) }
                                     )
 
-                                OutlinedTextTitleAdd(
+                                OutlinedTextTitleAdd2(
                                     value = text.title,
                                     onValueChange = { newTitle ->
                                         textFields[index] = textFields[index].copy(
@@ -181,6 +183,7 @@ fun AlertDialogKillAnimal(
                                     titleList = titleList,
                                     isErrorTitle = text.isError,
                                     isErrorSlash = text.isErrorSlash,
+                                    onValueChangeSuffix = {  },
                                 )
                                 OutlinedTextCount(
                                     value = text.count,
@@ -198,7 +201,7 @@ fun AlertDialogKillAnimal(
                                     isError = text.isErrorCount,
                                     suffix = text.suffix,
                                     intResSup = R.string.support_text_count_product,
-                                    countWarehouse = text.countWarehouse,
+                                    countWarehouse = text.countWarehouse.toString(),
                                     countWarehouseSuffix = text.countWarehouseSuffix,
                                 )
                             }
@@ -256,13 +259,12 @@ fun AlertDialogKillAnimal(
                                         day = dateTodayArray()[0],
                                         mount = dateTodayArray()[1],
                                         year = dateTodayArray()[2],
-                                        suffix = it.suffix,
+                                        countSuffix = it.suffix,
                                         category = animalCategory,
-                                        idAnimal = idPT.toLong(),
-                                        animal = title,
+                                        animalId = idPT.toLong(),
                                         note = note,
-                                        priceAll = 0.0,
-                                        idPT = idPT
+                                        price = 0.0,
+                                        idPT = idPT.toLong()
                                     )
                                 )
                             }

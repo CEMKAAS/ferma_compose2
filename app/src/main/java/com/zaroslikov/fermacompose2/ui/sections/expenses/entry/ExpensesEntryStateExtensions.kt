@@ -38,58 +38,7 @@ fun ExpensesEntryState.validate(): ExpensesEntryState {
         isErrorCountAnimal = countAnimal
     )
 
-    Log.i("expenses", "newError: $newError")
     return this.copy(error = newError)
-}
-
-fun ExpensesEntryState.updateFromDomain(
-    domain: DomainExpensesTable,
-    suffix: String,
-    countSuffix: String
-): ExpensesEntryState {
-    val useDaily = domain.isShowFoodHand
-    val isIndicatorsValue =
-        setOf(domain.animalId, domain.animalVaccinationId, domain.animalCountId)
-            .any { it != null }
-
-    Log.i("expenses", "updateFromDomain: $isIndicatorsValue")
-    Log.i("expenses", "animalId: ${domain.animalId}")
-    Log.i("expenses", "animalVaccinationId: ${domain.animalVaccinationId}")
-    Log.i("expenses", "animalCountId: ${domain.animalCountId}")
-    Log.i("expenses", "feedFood: ${domain.feedFood}")
-    Log.i("expenses", "feedFood: ${domain.weight?.formatNumber(false)}")
-
-    return copy(
-        title = domain.title,
-        count = domain.count.formatNumber(false),
-        date = formatDateToString(
-            domain.day,
-            domain.month,
-            domain.year
-        ),
-        price = domain.price.formatNumber(false),
-        priceAll = domain.priceAll?.formatNumber() ?: "",
-        countSuffix = domain.countSuffix,
-        category = domain.category,
-        note = domain.note,
-        isShowFood = domain.isShowFood,
-        isShowFoodHand = domain.isShowFoodHand,
-        isShowWarehouse = domain.isShowWarehouse,
-        isShowAnimals = domain.isShowAnimals,
-        countAnimalChip = if (!useDaily) domain.countAnimal?.formatNumber() ?: "" else "",
-        feedFoodChip = if (!useDaily) domain.feedFood?.formatNumber() ?: "" else "",
-        feedFoodChipSuffix = if (!useDaily) domain.feedFoodSuffix ?: suffix else suffix,
-        countAnimalInput = if (useDaily) domain.countAnimal?.formatNumber(false) ?: "" else "",
-        feedFoodInput = if (useDaily) domain.feedFood?.formatNumber(false) ?: "" else "",
-        feedFoodInputSuffix = if (useDaily) domain.feedFoodSuffix ?: suffix else suffix,
-        daysFood = domain.foodDesignedDay ?: 0,
-        dateEndFood = domain.lastDayFood ?: "",
-        isAutoWeight = domain.isAutoWeight,
-        isAutoPrice = domain.isAutoPrice,
-        weight = domain.weight?.formatNumber(false) ?: "",
-        weightSuffix = domain.weightSuffix ?: countSuffix,
-        isIndicatorsValue = isIndicatorsValue
-    )
 }
 
 fun ExpensesEntryState.updateTitle(title: String): ExpensesEntryState {
@@ -102,6 +51,19 @@ fun ExpensesEntryState.updateTitle(title: String): ExpensesEntryState {
     )
 }
 
+fun ExpensesEntryState.updateTitleAndSuffix(pair: Pair<String, String>,  suffixSet: Set<String>): ExpensesEntryState {
+    return copy(
+        title = pair.first,
+        countSuffix = pair.second,
+        isShowFood = if (pair.second !in suffixSet && !isAutoWeight) false else isShowFood,
+        isShowFoodHand = if (pair.second !in suffixSet && !isAutoWeight) false else isShowFoodHand,
+        error = error.copy(
+            isErrorTitle = pair.first.isBlank(),
+            isErrorSlash = pair.first.contains("/")
+        )
+    )
+}
+
 fun ExpensesEntryState.updateCount(count: String): ExpensesEntryState {
     return copy(
         count = count,
@@ -110,6 +72,8 @@ fun ExpensesEntryState.updateCount(count: String): ExpensesEntryState {
         )
     ).updatePriceAll()
 }
+
+
 
 fun ExpensesEntryState.updateCountSuffix(
     suffix: String,
@@ -398,6 +362,55 @@ fun ExpensesEntryState.updateSettingDay(): ExpensesEntryState {
     return this.copy(daysFood = days.toInt(), dateEndFood = newDate.format(formatter))
 }
 
+fun ExpensesEntryState.updateFromDomain(
+    domain: DomainExpensesTable,
+    suffix: String,
+    countSuffix: String
+): ExpensesEntryState {
+    val useDaily = domain.isShowFoodHand
+    val isIndicatorsValue =
+        setOf(domain.animalId, domain.animalVaccinationId, domain.animalCountId)
+            .any { it != null }
+
+    Log.i("expenses", "updateFromDomain: $isIndicatorsValue")
+    Log.i("expenses", "animalId: ${domain.animalId}")
+    Log.i("expenses", "animalVaccinationId: ${domain.animalVaccinationId}")
+    Log.i("expenses", "animalCountId: ${domain.animalCountId}")
+    Log.i("expenses", "feedFood: ${domain.feedFood}")
+    Log.i("expenses", "feedFood: ${domain.weight?.formatNumber(false)}")
+
+    return copy(
+        title = domain.title,
+        count = domain.count.formatNumber(false),
+        date = formatDateToString(
+            domain.day,
+            domain.month,
+            domain.year
+        ),
+        price = domain.price.formatNumber(false),
+        priceAll = domain.priceAll?.formatNumber() ?: "",
+        countSuffix = domain.countSuffix,
+        category = domain.category,
+        note = domain.note,
+        isShowFood = domain.isShowFood,
+        isShowFoodHand = domain.isShowFoodHand,
+        isShowWarehouse = domain.isShowWarehouse,
+        isShowAnimals = domain.isShowAnimals,
+        countAnimalChip = if (!useDaily) domain.countAnimal?.formatNumber() ?: "" else "",
+        feedFoodChip = if (!useDaily) domain.feedFood?.formatNumber() ?: "" else "",
+        feedFoodChipSuffix = if (!useDaily) domain.feedFoodSuffix ?: suffix else suffix,
+        countAnimalInput = if (useDaily) domain.countAnimal?.formatNumber(false) ?: "" else "",
+        feedFoodInput = if (useDaily) domain.feedFood?.formatNumber(false) ?: "" else "",
+        feedFoodInputSuffix = if (useDaily) domain.feedFoodSuffix ?: suffix else suffix,
+        daysFood = domain.foodDesignedDay ?: 0,
+        dateEndFood = domain.lastDayFood ?: "",
+        isAutoWeight = domain.isAutoWeight,
+        isAutoPrice = domain.isAutoPrice,
+        weight = domain.weight?.formatNumber(false) ?: "",
+        weightSuffix = domain.weightSuffix ?: countSuffix,
+        isIndicatorsValue = isIndicatorsValue
+    )
+}
 
 fun ExpensesEntryState.updateForSave(
     id: Long = 0,
