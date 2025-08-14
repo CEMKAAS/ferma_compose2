@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
@@ -27,6 +28,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
+import com.zaroslikov.fermacompose2.data.converter.CategoryConverter
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
@@ -42,6 +44,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
     version = 4,
     exportSchema = false
 )
+@TypeConverters(CategoryConverter::class)
 abstract class InventoryDatabase : RoomDatabase() {
 
     abstract fun itemDao(): ItemDao

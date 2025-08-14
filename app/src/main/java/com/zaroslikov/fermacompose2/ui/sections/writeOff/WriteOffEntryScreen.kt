@@ -116,25 +116,25 @@ fun WriteOffEntryContainerProduct(
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     Column(modifier = modifier) {
-        OutlinedTextTitleSale(
-            value = domainWriteOffTable.title,
-            onValueChoice = {
-                selectedItemIndex = it.first
-                onValueChange(domainWriteOffTable.copy(title = it.second).validateTitle())
-                updateCountWarehouse(
-                    Pair(
-                        it.second,
-                        titleList[selectedItemIndex].second == "Моя Продукция"
-                    )
-                )
-            },
-            selectedItemIndex = selectedItemIndex,
-            titleList = titleList,
-            isErrorTitle = domainWriteOffTable.error.isErrorTitle,
-            isErrorSlash = domainWriteOffTable.error.isErrorSlash,
-            enable = !isIndicationValue,
-            readOnly = isIndicationValue,
-        )
+//        OutlinedTextTitleSale(
+//            value = domainWriteOffTable.title,
+//            onValueChoice = {
+//                selectedItemIndex = it.first
+//                onValueChange(domainWriteOffTable.copy(title = it.second).validateTitle())
+//                updateCountWarehouse(
+//                    Pair(
+//                        it.second,
+//                        titleList[selectedItemIndex].second == "Моя Продукция"
+//                    )
+//                )
+//            },
+////            selectedItemIndex = selectedItemIndex,
+//            titleList = titleList,
+//            isErrorTitle = domainWriteOffTable.error.isErrorTitle,
+//            isErrorSlash = domainWriteOffTable.error.isErrorSlash,
+//            enable = !isIndicationValue,
+//            readOnly = isIndicationValue,
+//        )
         OutlinedTextCount(
             value = domainWriteOffTable.count,
             onValueChange = {

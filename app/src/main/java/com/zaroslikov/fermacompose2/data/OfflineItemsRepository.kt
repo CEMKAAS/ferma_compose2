@@ -276,8 +276,13 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         id: Long
     ): Flow<List<PairDataDoubleSting>> = itemDao.getCurrentBalanceProductList(name, id)
 
-    override fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double> =
-        itemDao.getCurrentExpensesProduct(name, id)
+//    override fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double> =
+//        itemDao.getCurrentExpensesProduct(name, id)
+
+    override fun getCurrentExpensesProductList(
+        name: String,
+        id: Long
+    ): Flow<List<PairDataDoubleSting>> = itemDao.getCurrentExpensesProductList(name, id)
 
     override fun getFastAddProduct(id: Long): Flow<List<FastAdd>> = itemDao.getFastAddProduct(id)
 

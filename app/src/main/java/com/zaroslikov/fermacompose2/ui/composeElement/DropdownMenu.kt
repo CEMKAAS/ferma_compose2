@@ -51,7 +51,7 @@ enum class Suffix(val resId: Int) {
 }
 
 
-enum class Category {
+/*enum class Category {
     ADD, EXPENSES, SALE;
 
     fun toDrawer(): Int {
@@ -60,6 +60,40 @@ enum class Category {
             EXPENSES -> R.drawable.baseline_add_shopping_cart_24
             SALE -> R.drawable.baseline_add_card_24
         }
+    }
+
+    fun toResInt(): Int {
+        return when (this) {
+            ADD -> R.string.add_screen_title
+            EXPENSES -> R.string.expenses_screen_title
+            SALE -> R.string.sale_screen_title
+        }
+    }
+}*/
+
+enum class Category(val id: Int, val drawerRes: Int, val titleRes: Int) {
+    ADD(
+        id = 0,
+        drawerRes = R.drawable.baseline_add_circle_outline_24,
+        titleRes = R.string.add_screen_title
+    ),
+    EXPENSES(
+        id = 1,
+        drawerRes = R.drawable.baseline_add_shopping_cart_24,
+        titleRes = R.string.expenses_screen_title
+    ),
+    SALE(
+        id = 2,
+        drawerRes = R.drawable.baseline_add_card_24,
+        titleRes = R.string.sale_screen_title
+    );
+
+    fun toDrawer(): Int = drawerRes
+    fun toResInt(): Int = titleRes
+
+    companion object {
+        fun fromId(id: Int): Category =
+            entries.firstOrNull { it.id == id } ?: ADD
     }
 }
 
@@ -519,7 +553,7 @@ fun ExposedDropdownMenuAnimals(
 @Composable
 fun ExposedDropdownMenuPair(
     title: String,
-    setTitle: (Triple<Int, String, String>) -> Unit,
+    setTitle: (SaleTitleData) -> Unit,
     list: List<SaleTitleData>,
     enableDropMenu: Boolean = true,
     content: @Composable (Modifier) -> Unit,
@@ -527,7 +561,6 @@ fun ExposedDropdownMenuPair(
     var expanded by remember { mutableStateOf(false) }
     var showAllOnOpen by remember { mutableStateOf(false) }
     var lastTitle by remember { mutableStateOf(title) }
-
 
     LaunchedEffect(title) {
         if (title != lastTitle) {
@@ -567,16 +600,22 @@ fun ExposedDropdownMenuPair(
                         showAllOnOpen = false
                     }
                 ) {
-                    options.forEachIndexed { index, item ->
+                    options.forEach { item ->
                         DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(item.third.drawerRes),
+                                    contentDescription = null
+                                )
+                            },
                             text = {
                                 Text(
-                                    text = "${item.first} - ${item.second}",
+                                    text = "${item.first}, ${item.second} - ${stringResource(item.third.titleRes)}",
                                     fontWeight = if (item.first == title) FontWeight.Bold else null
                                 )
                             },
                             onClick = {
-                                setTitle(Triple(index, item.first, item.second.toString()))
+                                setTitle(item)
                                 expanded = !expanded
                             }
                         )

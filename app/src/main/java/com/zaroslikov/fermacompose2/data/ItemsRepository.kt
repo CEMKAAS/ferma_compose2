@@ -190,7 +190,8 @@ interface ItemsRepository {
 
     fun getCurrentBalanceProduct(name: String, id: Long): Flow<PairDataDoubleSting>
     fun getCurrentBalanceProductList(name: String, id: Long): Flow<List<PairDataDoubleSting>>
-    fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
+//    fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
+    fun getCurrentExpensesProductList(name: String, id: Long): Flow<List<PairDataDoubleSting>>
     fun getFastAddProduct(id: Long): Flow<List<FastAdd>>
 
     // Analysis

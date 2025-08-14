@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.supportFun
 import android.content.Context
 import androidx.core.content.ContextCompat.getString
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
@@ -22,7 +23,7 @@ data class PairDataStringInt(
 )
 
 data class SaleTitleData(
-    val first: String, val second: String, val third: Int
+    val first: String, val second: String, val third: Category
 )
 
 data class PairDataDoubleSting(

@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
+import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.add.entry.updateCountWarehouse
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -59,16 +61,23 @@ class SaleEntryViewModel @Inject constructor(
                     .toDomainMap()
 
                 saleUiState = saleUiState.updateFromDomain(domainSaleTable)
-
-                updateWarehouseUiStateSync(saleUiState.title)
             }
 
             val titleList = itemsRepository.getItemsTitleSaleList(itemIdPT).first()
+
+
             val categoryList = itemsRepository.getItemsCategorySaleList(itemIdPT).first()
             val buyerList = itemsRepository.getItemsBuyerSaleList(itemIdPT).first()
             saleUiState = saleUiState.updateList(
                 titleList, categoryList, buyerList
             )
+            val suffix = saleUiState.titleList
+                .firstOrNull { it.first == saleUiState.title }
+                ?.third
+
+           suffix?.let {
+               if (!isEntry) updateWarehouseUiStateSync(saleUiState.title, it)
+           }
         }
     }
 
@@ -77,25 +86,29 @@ class SaleEntryViewModel @Inject constructor(
             state
     }
 
-    fun updateWarehouseUiState(name: String) {
+    fun updateWarehouseUiState(name: String, category: Category) {
         viewModelScope.launch {
-            updateWarehouseUiStateSync(name)
+            updateWarehouseUiStateSync(name, category)
         }
     }
 
-    private suspend fun updateWarehouseUiStateSync(name: String) {
-        val pair = itemsRepository
-            .getCurrentBalanceProductList(name, itemIdPT.toLong())
-            .filterNotNull()
-            .firstOrNull() // берём одно значение и завершаем
-
+    private suspend fun updateWarehouseUiStateSync(name: String, category: Category) {
+        val pair = if (category == Category.EXPENSES) {
+            itemsRepository.getCurrentExpensesProductList(name, itemIdPT.toLong())
+                .filterNotNull()
+                .firstOrNull()
+        } else {
+            itemsRepository
+                .getCurrentBalanceProductList(name,  itemIdPT.toLong())
+                .filterNotNull()
+                .firstOrNull()
+        }
+        Log.i("sale_table", "updateWarehouseUiStateSync: $pair")
+        Log.i("sale_table", "updateWarehouseUiStateSync: $category")
         if (pair != null) {
             saleUiState = saleUiState.updateCountWarehouse(pair)
         }
     }
-
-
-
 
 
 //    fun updateWarehouseUiState(pair: Pair<String, String>) {

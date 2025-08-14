@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -806,7 +807,7 @@ fun OutlinedTextPriceCount(
 fun OutlinedTextTitleSale(
     value: String,
     onValueChange: (String) -> Unit = {},
-    onValueChoice: (Triple<Int, String, String>) -> Unit,
+    onValueChoice: (SaleTitleData) -> Unit = {},
     readOnly: Boolean = false,
     enable: Boolean = true,
     titleList: List<SaleTitleData>,
@@ -814,6 +815,7 @@ fun OutlinedTextTitleSale(
     isErrorSlash: Boolean = false
 ) {
     val focusManager = LocalFocusManager.current
+    var leadingIconRes by rememberSaveable { mutableStateOf<Int?>(null) }
     CardField(
         modifier = Modifier.toOutlinedText(),
         row = false,
@@ -821,29 +823,24 @@ fun OutlinedTextTitleSale(
     ) {
         ExposedDropdownMenuPair(
             title = value,
-            setTitle = { onValueChoice(it)},
+            setTitle = {
+                onValueChoice(it)
+                leadingIconRes = it.third.drawerRes
+                focusManager.moveFocus(FocusDirection.Down)
+            },
             list = titleList
         ) {
-            OutlinedTextField(
+            BaseOutlinedText(
                 value = value,
-                onValueChange = { text ->
-                    onValueChange(text)
-                },
-                label = { Text(text = stringResource(R.string.outlined_text_product)) },
-                supportingText = {
-                    ErrorSupportTextSlash(
-                        isError = isErrorTitle,
-                        isErrorSlash = isErrorSlash,
-                        intRes = R.string.support_text_product,
-                        intResError = R.string.error_no_product,
-                    )
-                },
+                onValueChange = { text -> onValueChange(text) },
+                leadingIconRes = leadingIconRes,
+                labelIntRes = R.string.outlined_text_product,
+                isError = isErrorTitle, isErrorSlash = isErrorSlash,
+                intResSup = R.string.support_text_product,
+                intResError = R.string.error_no_product,
                 readOnly = readOnly,
                 modifier = it,
-                enabled = enable,
-                isError = isErrorTitle,
-                keyboardOptions = keyboardOptionsNext(),
-                keyboardActions = keyboardActionsDown(focusManager)
+                keyboardOptions = keyboardOptionsNext()
             )
         }
     }

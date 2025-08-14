@@ -550,46 +550,66 @@ interface ItemDao {
 
     @Query(
         "SELECT " +
-                "    grouped.total_count AS first, " +
-                "    grouped.suffix AS second " +
+                "    base.suffix AS second, " +
+                "    SUM(base.count) AS first " +
                 "FROM (" +
-                "    SELECT " +
-                "        base.suffix, " +
-                "        SUM(base.count) - " +
-                "        COALESCE((SELECT SUM(s.count) FROM sale_table s WHERE s.title = base.title AND s.count_suffix = base.suffix AND s.idPT = :id), 0) - " +
-                "        COALESCE((SELECT SUM(w.discWRITEOFF) FROM MyFermaWRITEOFF w WHERE w.titleWRITEOFF = base.title AND w.suffix = base.suffix AND w.idPT = :id), 0) " +
-                "        AS total_count " +
-                "    FROM (" +
-                "        SELECT title, count, count_suffix AS suffix FROM add_table WHERE idPT = :id AND title = :name " +
-                "        UNION ALL " +
-                "        SELECT title, -count, count_suffix FROM sale_table WHERE idPT = :id AND title = :name " +
-                "        UNION ALL " +
-                "        SELECT titleWRITEOFF, -discWRITEOFF, suffix FROM MyFermaWRITEOFF WHERE idPT = :id AND titleWRITEOFF = :name " +
-                "    ) AS base " +
-                "    GROUP BY base.suffix " +
-                ") AS grouped"
+                "    SELECT title, count, count_suffix AS suffix " +
+                "    FROM add_table " +
+                "    WHERE idPT = :id AND title = :name " +
+                "    UNION ALL " +
+                "    SELECT title, -count, count_suffix " +
+                "    FROM sale_table " +
+                "    WHERE idPT = :id AND title = :name " +
+                "    UNION ALL " +
+                "    SELECT titleWRITEOFF, -discWRITEOFF, suffix " +
+                "    FROM MyFermaWRITEOFF " +
+                "    WHERE idPT = :id AND titleWRITEOFF = :name " +
+                ") AS base " +
+                "GROUP BY base.suffix"
     )
     fun getCurrentBalanceProductList(name: String, id: Long): Flow<List<PairDataDoubleSting>>
 
+//    @Query(
+//        "SELECT SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) - COALESCE(SUM(SaleCount), 0) AS ResultCount" +
+//                " FROM (SELECT title,price, SUM(count) AS ExpensesCount, 0 AS WriteOffCount, 0 AS SaleCount" +
+//                "    FROM expenses_table" +
+//                "    WHERE title =:name and idPT = :id and is_show_warehouse = 1 and is_show_food != 1" +
+//                "    GROUP BY title" +
+//                "    UNION ALL" +
+//                "    SELECT titleWRITEOFF, suffix, 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount, 0 AS SaleCount" +
+//                "    FROM MyFermaWRITEOFF" +
+//                "    WHERE idPT = :id and titleWRITEOFF =:name" +
+//                "    GROUP BY titleWRITEOFF" +
+//                "    UNION ALL" +
+//                "    SELECT title, count_suffix, 0 AS ExpensesCoun, 0 AS WriteOffCount, SUM(count) AS SaleCount" +
+//                "    FROM sale_table" +
+//                "    WHERE idPT = :id and title =:name" +
+//                "    GROUP BY title" +
+//                ")"
+//    )
+//    fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
+
     @Query(
-        "SELECT SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) - COALESCE(SUM(SaleCount), 0) AS ResultCount" +
-                " FROM ( SELECT title,price, SUM(count) AS ExpensesCount, 0 AS WriteOffCount, 0 AS SaleCount" +
-                "    FROM expenses_table" +
-                "    WHERE title =:name and idPT = :id and is_show_warehouse = 1 and is_show_food != 1" +
-                "    GROUP BY title" +
-                "    UNION ALL" +
-                "    SELECT titleWRITEOFF, suffix, 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount, 0 AS SaleCount" +
-                "    FROM MyFermaWRITEOFF" +
-                "    WHERE idPT = :id and titleWRITEOFF =:name" +
-                "    GROUP BY titleWRITEOFF" +
-                "    UNION ALL" +
-                "    SELECT title, count_suffix, 0 AS ExpensesCoun, 0 AS WriteOffCount, SUM(count) AS SaleCount" +
-                "    FROM sale_table" +
-                "    WHERE idPT = :id and title =:name" +
-                "    GROUP BY title" +
-                ")"
+        "SELECT SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) - COALESCE(SUM(SaleCount), 0) AS first, suffix AS second " +
+                "FROM (" +
+                "   SELECT title, count_suffix AS suffix, SUM(count) AS ExpensesCount, 0 AS WriteOffCount, 0 AS SaleCount " +
+                "   FROM expenses_table " +
+                "   WHERE title = :name AND idPT = :id AND is_show_warehouse = 1 AND is_show_food != 1 " +
+                "   GROUP BY title, count_suffix " +
+                "   UNION ALL " +
+                "   SELECT titleWRITEOFF AS title, suffix, 0 AS ExpensesCount, SUM(discWRITEOFF) AS WriteOffCount, 0 AS SaleCount " +
+                "   FROM MyFermaWRITEOFF " +
+                "   WHERE idPT = :id AND titleWRITEOFF = :name " +
+                "   GROUP BY titleWRITEOFF, suffix " +
+                "   UNION ALL " +
+                "   SELECT title, count_suffix AS suffix, 0 AS ExpensesCount, 0 AS WriteOffCount, SUM(count) AS SaleCount " +
+                "   FROM sale_table " +
+                "   WHERE idPT = :id AND title = :name " +
+                "   GROUP BY title, count_suffix" +
+                ") " +
+                "GROUP BY suffix"
     )
-    fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
+    fun getCurrentExpensesProductList(name: String, id: Long): Flow<List<PairDataDoubleSting>>
 
     @Query("SELECT title, count as disc, count_suffix AS suffix, category, animal_id as idAnimal, title as animal, Count(*) as count from add_table Where idPT=:id GROUP BY title, count, idAnimal, category order by count desc limit 5")
     fun getFastAddProduct(id: Long): Flow<List<FastAdd>> //todo title заменить на animal

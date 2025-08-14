@@ -5,6 +5,7 @@ package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -16,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
@@ -25,6 +27,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
@@ -53,6 +56,7 @@ fun SaleEntryProduct(
     viewModel: SaleEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
@@ -61,8 +65,13 @@ fun SaleEntryProduct(
         }
     }
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBarBack(intRes = R.string.sale_screen_title, navigateUp = navigateBack)
+            TopAppBarBack(
+                intRes = R.string.sale_screen_title,
+                navigateUp = navigateBack,
+                scrollBehavior = scrollBehavior
+            )
         }
     ) { innerPadding ->
         SaleEntryContainerProduct(
@@ -77,12 +86,11 @@ fun SaleEntryProduct(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaleEntryContainerProduct(
     modifier: Modifier,
     state: SaleEntryState,
-    updateCountWarehouse: (String) -> Unit,
+    updateCountWarehouse: (String, Category) -> Unit,
     onValueChange: (SaleEntryState) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
@@ -94,14 +102,11 @@ fun SaleEntryContainerProduct(
             value = state.title,
             onValueChange = {
                 onValueChange(state.updateTitle(it))
+//                updateCountWarehouse(it.second, it.third)
             },
             onValueChoice = {
-                onValueChange(state.updateTitleAndSuffix(it.second, it.third))
-
-//                countWarehouseBoolean = it.third ==
-//                        "Моя Продукция" || it.third == "Купленный товар"
-//                updateCountWarehouse(Pair(it.second, it.third))
-                updateCountWarehouse(it.second)
+                onValueChange(state.updateTitleAndSuffix(it.first, it.second))
+                updateCountWarehouse(it.first, it.third)
             },
             titleList = state.titleList,
             isErrorTitle = state.error.isErrorTitle,
