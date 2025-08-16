@@ -446,15 +446,18 @@ fun ExposedDropdownMenuProduct2(
 
 @Composable
 fun ExposedDropdownMenuSex(
-    title: String,
-    setTitle: (String) -> Unit,
-    titleList: List<String>,
+    sex: Boolean,
+    setSex: (Boolean) -> Unit,
+    setList: List<Triple<Boolean, Int, String>>,
     standardPadding: Boolean = true,
     isFilterUsed: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
+
+
+
     Box {
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -471,34 +474,26 @@ fun ExposedDropdownMenuSex(
                 )
             )
 
-            val filteredOptions =
-                if (isFilterUsed) titleList.filter {
-                    it.contains(
-                        title,
-                        ignoreCase = true
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {}
+            ) {
+                setList.forEachIndexed { index, item ->
+                    DropdownMenuItem(
+                        trailingIcon = { painterResource(item.second) },
+                        text = {
+                            Text(
+                                text = item.third,
+                                fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                            )
+                        },
+                        onClick = {
+                            setSex(item.first)
+//                            setSex(item)
+//                            selectedItemIndex = index
+                            expanded = !expanded
+                        }
                     )
-                } else titleList
-
-            if (filteredOptions.isNotEmpty()) {
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = {}
-                ) {
-                    filteredOptions.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = item,
-                                    fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
-                                )
-                            },
-                            onClick = {
-                                setTitle(item)
-                                selectedItemIndex = index
-                                expanded = !expanded
-                            }
-                        )
-                    }
                 }
             }
         }

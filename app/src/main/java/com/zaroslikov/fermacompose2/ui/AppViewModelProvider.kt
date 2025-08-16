@@ -8,7 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEditViewModel
-import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryViewModel
+import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
@@ -33,7 +33,7 @@ import com.zaroslikov.fermacompose2.ui.add.ProjectAddViewModel
 import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditViewModel
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffViewModel
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffViewModel
 
 
 object AppViewModelProvider {

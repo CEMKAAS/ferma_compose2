@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.writeOff
+package com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -73,7 +73,7 @@ object WriteOffDestination : NavigationDestination {
 fun WriteOffScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Int, Int>) -> Unit,
+    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Int) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
@@ -143,7 +143,7 @@ private fun WriteOffBody(
     viewModel: WriteOffViewModel,
     itemList: List<WriteOffTable>,
     brieflyList: List<BrieflyItemCount>,
-    onItemClick: (Pair<Int, Int>) -> Unit,
+    onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit,
     writeOffBoolean: Boolean,
 ) {
@@ -338,7 +338,7 @@ fun WriteOffProductCard(
                     contentDescription = "delete"
                 )
                 Text(
-                    text = "${formatter(writeOffTable.count)} ${writeOffTable.suffix}",
+                    text = "${formatter(writeOffTable.count)} ${writeOffTable.countSuffix}",
                     textAlign = TextAlign.Center,
                     style = textBold_20
                 )

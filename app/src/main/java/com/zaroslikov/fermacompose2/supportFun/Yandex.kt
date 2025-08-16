@@ -22,7 +22,7 @@ fun metricaSale(
     eventParameters["Имя"] = domainSaleTable.title
     eventParameters["Кол-во"] = "${domainSaleTable.title} ${domainSaleTable.count} ${domainSaleTable.priceAll}"
     eventParameters["Категория"] = domainSaleTable.category
-    eventParameters["Покупатель"] = domainSaleTable.buyer
+//    eventParameters["Покупатель"] = domainSaleTable.buyer
     eventParameters["Примечание"] = domainSaleTable.note
     AppMetrica.reportEvent("Sale Products", eventParameters)
 }

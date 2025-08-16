@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.sections.writeOff
+package com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -8,7 +8,6 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
 import com.zaroslikov.fermacompose2.data.water.WriteOffUiState
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState
-import com.zaroslikov.fermacompose2.supportFun.DataStringListState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -265,27 +265,27 @@ interface ItemDao {
     suspend fun deleteExpensesAnimal(item: ExpensesAnimalTable)
 
     //WriteOff
-    @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day) ) DESC, _id DESC")
+    @Query("SELECT * from write_off_table Where idPT=:id ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC")
     fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>>
 
-    @Query("SELECT * from MyFermaWRITEOFF Where _id=:id ")
+    @Query("SELECT * from write_off_table Where _id=:id ")
     fun getItemWriteOff(id: Int): Flow<WriteOffTable>
 
-    @Query("SELECT * from MyFermaWRITEOFF Where animal_count_id=:id ")
+    @Query("SELECT * from write_off_table Where animal_count_id=:id ")
     fun getItemWriteOffIdAnimalCount(id: Int): Flow<WriteOffTable>
 
-    @Query("SELECT titleWRITEOFF as title, SUM(discWRITEOFF) as count, suffix from MyFermaWRITEOFF Where idPT=:id group by title ORDER BY count DESC")
+    @Query("SELECT title as title, SUM(count) as count, count_suffix as suffix from write_off_table Where idPT=:id group by title ORDER BY count DESC")
     fun getBrieflyItemWriteOff(id: Int): Flow<List<BrieflyItemCount>>
 
-    @Query("SELECT * from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, mount, day)) DESC")
+    @Query("SELECT * from write_off_table Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC")
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
 
     @Query(
-        "SELECT Title as first, 'Моя Продукция' as second from add_table Where idPT=:id group by title" +
+        "SELECT Title as first, count_suffix AS second, 0 AS third from add_table Where idPT=:id group by title, count_suffix" +
                 " UNION ALL" +
-                " SELECT title as first, 'Купленый товар' as second from expenses_table Where idPT=:id and is_show_warehouse = 1 group by title"
+                " SELECT title as first,  count_suffix AS second, 1 AS third from expenses_table Where idPT=:id and is_show_warehouse = 1 group by title, count_suffix"
     )
-    fun getItemsWriteoffList(id: Int): Flow<List<PairData>>
+    fun getItemsWriteoffList(id: Int): Flow<List<SaleTitleData>>
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -294,8 +294,8 @@ interface ItemDao {
     @Update
     suspend fun updateWriteOff(item: WriteOffTable)
 
-    @Delete
-    suspend fun deleteWriteOff(item: WriteOffTable)
+    @Query("DELETE FROM write_off_table WHERE _id = :id")
+    suspend fun deleteWriteOff(id: Long)
 
 
     //Finance
@@ -315,10 +315,10 @@ interface ItemDao {
     )
     fun getExpenses(id: Int): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id and statusWRITEOFF=0")
+    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount FROM write_off_table WHERE write_off_table.idPT =:id and status=0")
     fun getOwnNeed(id: Int): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id and statusWRITEOFF=1")
+    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount FROM write_off_table WHERE write_off_table.idPT =:id and status=1")
     fun getScrap(id: Int): Flow<Double>
 
     @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount FROM sale_table WHERE idPT =:id and month =:month and year =:year")
@@ -345,10 +345,10 @@ interface ItemDao {
     )
     fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and statusWRITEOFF=0")
+    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount FROM write_off_table WHERE write_off_table.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and status=0")
     fun getOwnNeedMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0.0) AS ResultCount FROM MyFermaWRITEOFF WHERE MyFermaWRITEOFF.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and statusWRITEOFF=1")
+    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount FROM write_off_table WHERE write_off_table.idPT =:id AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and status=1")
     fun getScrapMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double>
 
     @Query("SELECT category as title, COALESCE(SUM(price), 0.0) AS priceAll FROM sale_table Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) group by category ORDER BY price DESC")
@@ -454,10 +454,10 @@ interface ItemDao {
                 "    WHERE idPT = :id" +
                 "    GROUP BY title" +
                 "    UNION ALL" +
-                "    SELECT titleWRITEOFF, suffix, 0 AS AddCount, 0 AS SaleCount, SUM(discWRITEOFF) AS WriteOffCount" +
-                "    FROM MyFermaWRITEOFF" +
+                "    SELECT title, count_suffix as suffix, 0 AS AddCount, 0 AS SaleCount, SUM(count) AS WriteOffCount" +
+                "    FROM write_off_table" +
                 "    WHERE idPT = :id" +
-                "    GROUP BY titleWRITEOFF" +
+                "    GROUP BY title" +
                 ")" +
                 "  GROUP BY Title HAVING ResultCount > 0 ORDER BY ResultCount DESC "
     )
@@ -478,10 +478,10 @@ interface ItemDao {
                 "    WHERE idPT = :id and is_show_warehouse = 1 and is_show_food != 1" +
                 "    GROUP BY title" +
                 "    UNION ALL" +
-                "    SELECT titleWRITEOFF, suffix, 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount, 0 AS SaleCount" +
-                "    FROM MyFermaWRITEOFF" +
+                "    SELECT title, count_suffix as suffix, 0 AS ExpensesCoun, SUM(count) AS WriteOffCount, 0 AS SaleCount" +
+                "    FROM write_off_table" +
                 "    WHERE idPT = :id" +
-                "    GROUP BY titleWRITEOFF" +
+                "    GROUP BY title" +
                 "    UNION ALL" +
                 "    SELECT title, count_suffix, 0 AS ExpensesCoun, 0 AS WriteOffCount, SUM(count) AS SaleCount" +
                 "    FROM sale_table" +
@@ -507,10 +507,10 @@ interface ItemDao {
 //                "    WHERE titleSale = :name and idPT = :id" +
 //                "    GROUP BY titleSale" +
 //                "    UNION ALL" +
-//                "    SELECT 0 AS AddCount, 0 AS SaleCount, SUM(discWRITEOFF) AS WriteOffCount" +
-//                "    FROM MyFermaWRITEOFF" +
-//                "    WHERE titleWRITEOFF = :name and idPT = :id" +
-//                "    GROUP BY titleWRITEOFF )" +
+//                "    SELECT 0 AS AddCount, 0 AS SaleCount, SUM(count) AS WriteOffCount" +
+//                "    FROM write_off_table" +
+//                "    WHERE title = :name and idPT = :id" +
+//                "    GROUP BY title )" +
 //                " ) AS first," +
 //                " (" +
 //                "        SELECT count_suffix" +
@@ -532,14 +532,14 @@ interface ItemDao {
                 "        base.suffix, " +
                 "        SUM(base.count) - " +
                 "        COALESCE((SELECT SUM(s.count) FROM sale_table s WHERE s.title = base.title AND s.count_suffix = base.suffix AND s.idPT = :id), 0) - " +
-                "        COALESCE((SELECT SUM(w.discWRITEOFF) FROM MyFermaWRITEOFF w WHERE w.titleWRITEOFF = base.title AND w.suffix = base.suffix AND w.idPT = :id), 0) " +
+                "        COALESCE((SELECT SUM(w.count) FROM write_off_table w WHERE w.title = base.title AND w.count_suffix = base.suffix AND w.idPT = :id), 0) " +
                 "        AS total_count " +
                 "    FROM (" +
                 "        SELECT title, count, count_suffix AS suffix FROM add_table WHERE idPT = :id AND title = :name " +
                 "        UNION ALL " +
                 "        SELECT title, -count, count_suffix FROM sale_table WHERE idPT = :id AND title = :name " +
                 "        UNION ALL " +
-                "        SELECT titleWRITEOFF, -discWRITEOFF, suffix FROM MyFermaWRITEOFF WHERE idPT = :id AND titleWRITEOFF = :name " +
+                "        SELECT title, -count, count_suffix as suffix FROM write_off_table WHERE idPT = :id AND title = :name " +
                 "    ) AS base " +
                 "    GROUP BY base.suffix " +
                 "    HAVING total_count > 0 " +
@@ -561,9 +561,9 @@ interface ItemDao {
                 "    FROM sale_table " +
                 "    WHERE idPT = :id AND title = :name " +
                 "    UNION ALL " +
-                "    SELECT titleWRITEOFF, -discWRITEOFF, suffix " +
-                "    FROM MyFermaWRITEOFF " +
-                "    WHERE idPT = :id AND titleWRITEOFF = :name " +
+                "    SELECT title, -count, count_suffix as suffix " +
+                "    FROM write_off_table " +
+                "    WHERE idPT = :id AND title = :name " +
                 ") AS base " +
                 "GROUP BY base.suffix"
     )
@@ -576,10 +576,10 @@ interface ItemDao {
 //                "    WHERE title =:name and idPT = :id and is_show_warehouse = 1 and is_show_food != 1" +
 //                "    GROUP BY title" +
 //                "    UNION ALL" +
-//                "    SELECT titleWRITEOFF, suffix, 0 AS ExpensesCoun, SUM(discWRITEOFF) AS WriteOffCount, 0 AS SaleCount" +
-//                "    FROM MyFermaWRITEOFF" +
-//                "    WHERE idPT = :id and titleWRITEOFF =:name" +
-//                "    GROUP BY titleWRITEOFF" +
+//                "    SELECT title, suffix, 0 AS ExpensesCoun, SUM(count) AS WriteOffCount, 0 AS SaleCount" +
+//                "    FROM write_off_table" +
+//                "    WHERE idPT = :id and title =:name" +
+//                "    GROUP BY title" +
 //                "    UNION ALL" +
 //                "    SELECT title, count_suffix, 0 AS ExpensesCoun, 0 AS WriteOffCount, SUM(count) AS SaleCount" +
 //                "    FROM sale_table" +
@@ -594,13 +594,13 @@ interface ItemDao {
                 "FROM (" +
                 "   SELECT title, count_suffix AS suffix, SUM(count) AS ExpensesCount, 0 AS WriteOffCount, 0 AS SaleCount " +
                 "   FROM expenses_table " +
-                "   WHERE title = :name AND idPT = :id AND is_show_warehouse = 1 AND is_show_food != 1 " +
+                "   WHERE title = :name AND idPT = :id AND (is_show_warehouse = 1 OR is_show_food != 1) " +
                 "   GROUP BY title, count_suffix " +
                 "   UNION ALL " +
-                "   SELECT titleWRITEOFF AS title, suffix, 0 AS ExpensesCount, SUM(discWRITEOFF) AS WriteOffCount, 0 AS SaleCount " +
-                "   FROM MyFermaWRITEOFF " +
-                "   WHERE idPT = :id AND titleWRITEOFF = :name " +
-                "   GROUP BY titleWRITEOFF, suffix " +
+                "   SELECT title AS title, count_suffix as suffix, 0 AS ExpensesCount, SUM(count) AS WriteOffCount, 0 AS SaleCount " +
+                "   FROM write_off_table " +
+                "   WHERE idPT = :id AND title = :name " +
+                "   GROUP BY title, suffix " +
                 "   UNION ALL " +
                 "   SELECT title, count_suffix AS suffix, 0 AS ExpensesCount, 0 AS WriteOffCount, SUM(count) AS SaleCount " +
                 "   FROM sale_table " +
@@ -621,22 +621,22 @@ interface ItemDao {
     @Query("SELECT count_suffix as title, COALESCE(SUM(count), 0) AS priceAll from sale_table Where idPT=:id and title=:name")
     fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin>
 
-    @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name")
+    @Query("SELECT count_suffix as title, COALESCE(SUM(count), 0) AS priceAll from write_off_table Where idPT=:id and title=:name")
     fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Fin>
 
-    @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0")
+    @Query("SELECT count_suffix as title, COALESCE(SUM(count), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=0")
     fun getAnalysisWriteOffOwnNeedsAllTime(id: Int, name: String): Flow<Fin>
 
-    @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1")
+    @Query("SELECT count_suffix as title, COALESCE(SUM(count), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=1")
     fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Fin>
 
     @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from sale_table Where idPT=:id and title=:name")
     fun getAnalysisSaleSoldAllTime(id: Int, name: String): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0")
+    @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=0")
     fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int, name: String): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1")
+    @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=1")
     fun getAnalysisWriteOffScrapMoneyAllTime(id: Int, name: String): Flow<Double>
 
     @Query("SELECT count_suffix as title, CASE WHEN COALESCE(SUM(count), 0) = 0 THEN 0 ELSE COALESCE(SUM(count), 0) / 365 END AS priceAll from add_table Where idPT=:id and title=:name")
@@ -680,7 +680,7 @@ interface ItemDao {
         dateEnd: String
     ): Flow<Fin>
 
-    @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    @Query("SELECT count_suffix as title, COALESCE(SUM(count), 0) AS priceAll from write_off_table Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisWriteOffAllTimeRange(
         id: Int,
         name: String,
@@ -688,7 +688,7 @@ interface ItemDao {
         dateEnd: String
     ): Flow<Fin>
 
-    @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    @Query("SELECT count_suffix as title, COALESCE(SUM(count), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=0 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisWriteOffOwnNeedsAllTimeRange(
         id: Int,
         name: String,
@@ -696,7 +696,7 @@ interface ItemDao {
         dateEnd: String
     ): Flow<Fin>
 
-    @Query("SELECT suffix as title, COALESCE(SUM(discWRITEOFF), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    @Query("SELECT count_suffix as title, COALESCE(SUM(count), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=1 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisWriteOffScrapAllTimeRange(
         id: Int,
         name: String,
@@ -712,7 +712,7 @@ interface ItemDao {
         dateEnd: String
     ): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=0 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(
         id: Int,
         name: String,
@@ -720,7 +720,7 @@ interface ItemDao {
         dateEnd: String
     ): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where idPT=:id and titleWRITEOFF=:name and statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table Where idPT=:id and title=:name and status=1 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisWriteOffScrapMoneyAllTimeRange(
         id: Int,
         name: String,
@@ -911,7 +911,7 @@ interface ItemDao {
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)" +
                 "        WHEN version = 1 THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)" +
-                "        WHEN version IN (2, 3) THEN (SELECT priceAll FROM myfermawriteoff WHERE animal_count_id = id)" +
+                "        WHEN version IN (2, 3) THEN (SELECT price FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS price," +
                 " CASE" +
@@ -921,13 +921,13 @@ interface ItemDao {
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT _id FROM sale_table WHERE animal_count_id = id)" +
                 "        WHEN version = 1 THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)" +
-                "        WHEN version IN (2, 3) THEN (SELECT _id FROM myfermawriteoff WHERE animal_count_id = id)" +
+                "        WHEN version IN (2, 3) THEN (SELECT _id FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS _id," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT idPT FROM sale_table WHERE animal_count_id = id)" +
                 "        WHEN version = 1 THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)" +
-                "        WHEN version IN (2, 3) THEN (SELECT idPT FROM myfermawriteoff WHERE animal_count_id = id)" +
+                "        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS idPT" +
                 " FROM AnimalCountTable" +
@@ -1015,8 +1015,8 @@ interface ItemDao {
     ): Flow<Double>
 
     @Query(
-        "SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF" +
-                " WHERE idPT=:id and statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
+        "SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table" +
+                " WHERE idPT=:id and status=0 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
     fun getAnalysisWriteOffOwnNeedsNewYearProject(
         id: Int,
@@ -1025,8 +1025,8 @@ interface ItemDao {
     ): Flow<Double>
 
     @Query(
-        "SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF" +
-                " WHERE idPT=:id and statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
+        "SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table" +
+                " WHERE idPT=:id and status=1 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
     fun getAnalysisWriteOffScrapNewYearProject(
         id: Int,
@@ -1100,13 +1100,13 @@ interface ItemDao {
         dateEnd: String
     ): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where statusWRITEOFF=0 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table Where status=0 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisWriteOffOwnNeedsNewYear(
         dateBegin: String,
         dateEnd: String
     ): Flow<Double>
 
-    @Query("SELECT COALESCE(SUM(priceAll), 0) AS priceAll from MyFermaWRITEOFF Where statusWRITEOFF=1 AND DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
+    @Query("SELECT COALESCE(SUM(price), 0) AS priceAll from write_off_table Where status=1 AND DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)")
     fun getAnalysisWriteOffScrapNewYear(
         dateBegin: String,
         dateEnd: String
@@ -1178,10 +1178,10 @@ interface ItemDao {
 
     @Query(
         "SELECT name as title, COALESCE((SELECT SUM(PRICE) FROM sale_table WHERE DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY idPT ), 0) +" +
-                " COALESCE((SELECT SUM(priceAll) FROM MyFermaWRITEOFF WHERE DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY idPT), 0) -" +
+                " COALESCE((SELECT SUM(price) FROM write_off_table WHERE DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY idPT), 0) -" +
                 " COALESCE((SELECT SUM(price) FROM expenses_table WHERE DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)  GROUP BY idPT), 0) - " +
                 " COALESCE((SELECT SUM(price) FROM AnimalTable WHERE DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY idPT), 0) - " +
-                " COALESCE((SELECT SUM(priceAll) FROM MyFermaWRITEOFF WHERE DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY idPT), 0)" +
+                " COALESCE((SELECT SUM(price) FROM write_off_table WHERE DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY idPT), 0)" +
                 " AS priceAll FROM МyINCUBATOR Where mode = 1 and DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)  GROUP BY name "
     )
     fun getBestProjectNewYear(
@@ -1194,14 +1194,14 @@ interface ItemDao {
 //            " LEFT JOIN" +
 //            " (SELECT idPT, SUM(PRICE) as price FROM MyFermaSale WHERE DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) " +
 //            " UNION ALL" +
-//            " SELECT idPT, SUM(priceAll) as price  FROM MyFermaWRITEOFF WHERE statusWRITEOFF = 0 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)) pd1" +
+//            " SELECT idPT, SUM(priceAll) as price  FROM write_off_table WHERE status = 0 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)) pd1" +
 //            " ON i._id = pd1.idPT" +
 //            " LEFT JOIN" +
 //            " (SELECT idPT, SUM(countEXPENSES) as price  FROM MyFermaEXPENSES WHERE DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
 //            " UNION ALL" +
 //            " SELECT idPT, SUM(price) as price  FROM AnimalTable WHERE DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
 //            " UNION ALL" +
-//            " SELECT idPT, SUM(priceAll) as price  FROM MyFermaWRITEOFF WHERE statusWRITEOFF = 1 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+//            " SELECT idPT, SUM(priceAll) as price  FROM write_off_table WHERE status = 1 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
 //            ") pd_sub ON i._id = pd_sub.idPT" +
 //            " Where i.mode = 1 and DATE(printf('%04d-%02d-%02d', substr(i.data, 7, 4), substr(i.data, 4, 2), substr(i.data, 1, 2))) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)  GROUP BY i._id,i.NAME ORDER BY priceAll DESC LIMIT 1 ")
 //    fun getBestProjectNewYear(
@@ -1223,13 +1223,13 @@ interface ItemDao {
 //                "    GROUP BY idPT" +
 //                "    UNION ALL" +
 //                "    SELECT  idPT, 0 AS SaleCount, 0 AS ExpensesCount, SUM(priceAll) AS WriteOffCount0, 0 AS WriteOffCount1, 0 AS AnimalCount" +
-//                "    FROM MyFermaWRITEOFF w0" +
-//                "    where statusWRITEOFF = 0 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+//                "    FROM write_off_table w0" +
+//                "    where status = 0 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
 //                "    GROUP BY idPT " +
 //                "    UNION ALL" +
 //                "    SELECT  idPT,  0 AS SaleCount, 0 AS ExpensesCount, 0 AS WriteOffCount, SUM(priceAll) AS WriteOffCount1, 0 AS AnimalCount" +
-//                "    FROM MyFermaWRITEOFF w1" +
-//                "    where statusWRITEOFF = 1 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) " +
+//                "    FROM write_off_table w1" +
+//                "    where status = 1 and DATE(printf('%04d-%02d-%02d', year, mount, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) " +
 //                "    GROUP BY idPT " +
 //                "    UNION ALL" +
 //                "    SELECT  idPT, 0 AS SaleCount, 0 AS ExpensesCount, 0 AS WriteOffCount, 0 AS WriteOffCount1, SUM(price) AS AnimalCount" +

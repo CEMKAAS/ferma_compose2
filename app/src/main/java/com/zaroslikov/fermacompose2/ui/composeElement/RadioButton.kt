@@ -2,8 +2,8 @@ package com.zaroslikov.fermacompose2.ui.composeElement
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -30,52 +30,27 @@ fun RadioButtonWriteOff(
     @StringRes intResOne: Int = R.string.ration_button_own_needs,
     @StringRes intResTwo: Int = R.string.ration_button_disposal,
 ) {
-    CardField {
-        Column(
-            Modifier
-                .selectableGroup()
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = state,
-                    onClick = { onStateSelect(!state) },
-                    modifier = Modifier.semantics { contentDescription = "Localized Description" }
-                )
-                Image(
-                    painter = painterResource(id = imageOne),
-                    contentDescription = "delete"
-                )
-                Text(
-                    text = stringResource(intResOne),
-                    style = text_14
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = !state,
-                    onClick = { onStateSelect(!state) },
-                    modifier = Modifier.semantics { contentDescription = "Localized Description" },
-                )
-                Image(
-                    painter = painterResource(id = imageTwo),
-                    contentDescription = "delete"
-                )
-                Text(
-                    text = stringResource(intResTwo),
-                    style = text_14
-                )
-            }
-        }
+    CardField(
+        modifier = Modifier
+            .selectableGroup(),
+        row = false
+    ) {
+        RowRadioButton(
+            selected = state,
+            onStateSelect = { onStateSelect(!state) },
+            imageRes = imageOne,
+            intRes = intResOne
+        )
+        RowRadioButton(
+            selected = !state,
+            onStateSelect = { onStateSelect(state) },
+            imageRes = imageTwo,
+            intRes = intResTwo
+        )
     }
 }
+
+
 
 @Composable
 fun RadioButtonRow(
@@ -92,45 +67,53 @@ fun RadioButtonRow(
             .fillMaxWidth()
             .padding(vertical = 5.dp)
     ) {
-        Row(
+        RowRadioButton(
             modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(
-                selected = !state,
-                onClick = { onStateSelect(!state) },
-                modifier = Modifier.semantics { contentDescription = "Localized Description" }
-            )
-            Image(
-                painter = painterResource(id = imageOne),
-                contentDescription = "delete"
-            )
-            Text(
-                modifier = Modifier.padding(start = 3.dp),
-                text = stringResource(intResOne),
-                style = text_14
-            )
-        }
-        Row(
+            selected = !state,
+            onStateSelect = { onStateSelect(!state) },
+            imageRes = imageOne,
+            intRes = intResOne
+        )
+        RowRadioButton(
             modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(
-                selected = state,
-                onClick = { onStateSelect(!state) },
-                modifier = Modifier.semantics { contentDescription = "Localized Description" },
-            )
-            Image(
-                painter = painterResource(id = imageTwo),
-                contentDescription = "delete"
-            )
-            Text(
-                modifier = Modifier.padding(start = 3.dp),
-                text = stringResource(intResTwo),
-                style = text_14
-            )
-        }
+            selected = state,
+            onStateSelect = { onStateSelect(state) },
+            imageRes = imageTwo,
+            intRes = intResTwo
+        )
+    }
+}
+
+@Composable
+fun RowRadioButton(
+    modifier: Modifier = Modifier,
+    selected: Boolean,
+    onStateSelect: () -> Unit,
+    imageRes: Int,
+    @StringRes intRes: Int
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onStateSelect()
+            },
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onStateSelect,
+            modifier = Modifier.semantics { contentDescription = "Localized Description" },
+        )
+        Image(
+            modifier = Modifier.padding(end = 10.dp),
+            painter = painterResource(id = imageRes),
+            contentDescription = null
+        )
+        Text(
+            text = stringResource(intRes),
+            style = text_14
+        )
     }
 }

@@ -11,7 +11,7 @@ data class DomainSaleTable (
     val month: Int,
     val year: Int,
     val category: String,
-    val buyer: String,
+    val buyer: String?,
     val note: String,
     val idPT: Long,
     val animalId: Long?,

@@ -50,7 +50,7 @@ data class SaleTable(
     @ColumnInfo(name = "year")
     val year: Int, // время
     val category: String,
-    val buyer: String,
+    val buyer: String?,
     val note: String,
     @ColumnInfo(name = "idPT")
     val idPT: Long,

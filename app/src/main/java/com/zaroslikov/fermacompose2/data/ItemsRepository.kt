@@ -60,7 +60,7 @@ interface ItemsRepository {
 
     fun getItemsTitleAddList(id: Int): Flow<List<PairData>>
 
-    fun getItemsWriteoffList(id: Int): Flow<List<PairData>>
+    fun getItemsWriteoffList(id: Int): Flow<List<SaleTitleData>>
 
     fun getItemsCategoryAddList(id: Int): Flow<List<String>>
     fun getItemsAnimalAddList(id: Int): Flow<List<TripleData>>
@@ -123,7 +123,7 @@ interface ItemsRepository {
 
     suspend fun insertWriteOff(item: WriteOffTable)
     suspend fun updateWriteOff(item: WriteOffTable)
-    suspend fun deleteWriteOff(item: WriteOffTable)
+    suspend fun deleteWriteOff(id: Long)
 
     //==================== Finance ====================
     fun getCurrentBalance(id: Int): Flow<Double>
@@ -190,7 +190,8 @@ interface ItemsRepository {
 
     fun getCurrentBalanceProduct(name: String, id: Long): Flow<PairDataDoubleSting>
     fun getCurrentBalanceProductList(name: String, id: Long): Flow<List<PairDataDoubleSting>>
-//    fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
+
+    //    fun getCurrentExpensesProduct(name: String, id: Long): Flow<Double>
     fun getCurrentExpensesProductList(name: String, id: Long): Flow<List<PairDataDoubleSting>>
     fun getFastAddProduct(id: Long): Flow<List<FastAdd>>
 

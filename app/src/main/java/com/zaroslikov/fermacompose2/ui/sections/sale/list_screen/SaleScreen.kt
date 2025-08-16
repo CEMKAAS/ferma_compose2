@@ -328,7 +328,7 @@ fun SaleProductCard(
                             valueString = category
                         )
                     }
-                saleTable.buyer.takeUnless { it == "Неизвестный" || it.isEmpty() }
+                saleTable.buyer.takeUnless { it == "Неизвестный" }
                     ?.let { buyer ->
                         IconAndText(
                             iconRes = R.drawable.baseline_person_24,

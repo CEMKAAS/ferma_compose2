@@ -1,16 +1,12 @@
 package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 
 import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
-import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
 import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.composeElement.Suffix
-import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryState
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import kotlin.text.trim
 
@@ -176,7 +172,7 @@ fun SaleEntryState.updateFromDomain(domain: DomainSaleTable): SaleEntryState {
             domain.year
         ),
         category = domain.category,
-        buyer = domain.buyer,
+        buyer = domain.buyer ?: buyer,
         note = domain.note,
         animalId = domain.animalId,
         animalCountId = domain.animalCountId,
@@ -200,7 +196,7 @@ fun SaleEntryState.updateForSave(
         year = dateList[2].toInt(),
         category = category.trim(),
         note = note.trim(),
-        buyer = buyer.trim(),
+        buyer = if (buyer.isBlank()) null else buyer.trim(),
         idPT = itemIdPT,
         animalId = animalId,
         animalCountId = animalCountId

@@ -169,10 +169,11 @@ fun WarehouseScreen(
                                     mount = it.first.mount,
                                     year = it.first.year,
                                     priceAll = it.first.priceAll,
-                                    suffix = it.first.suffix,
+                                    countSuffix = it.first.countSuffix,
                                     status = it.first.status,
-                                    idPT = idProject,
-                                    note = it.first.note
+                                    idPT = idProject.toLong(),
+                                    note = it.first.note,
+                                    price = null
                                 ), it.second
                             )
                         }
@@ -499,9 +500,10 @@ fun WarehouseFoodCard(
                                 year = calendar.get(Calendar.YEAR),
                                 status = false,
                                 priceAll = 0.0,
-                                suffix = warehouseProduct.countSuffix,
                                 note = "",
-                                idPT = idProject
+                                idPT = idProject.toLong(),
+                                countSuffix = warehouseProduct.countSuffix,
+                                price = TODO()
                             ), warehouseProduct
                         )
                     )

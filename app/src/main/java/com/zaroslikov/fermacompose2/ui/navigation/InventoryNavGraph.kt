@@ -14,8 +14,8 @@ import com.zaroslikov.fermacompose2.ui.animal.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEditDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalEditProduct
-import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryDestination
-import com.zaroslikov.fermacompose2.ui.animal.AnimalEntryProduct
+import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryDestination
+import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryProduct
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsDestination
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsScreen
 import com.zaroslikov.fermacompose2.ui.animal.AnimalScreen
@@ -73,10 +73,10 @@ import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseScreen
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffDestination
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffEntryProduct
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffScreen
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffDestination
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryProduct
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -133,21 +133,22 @@ abstract class InventoryDatabase : RoomDatabase() {
                 //==================== Миграция WriteOffTable ====================
                 db.execSQL(
                     """
-            CREATE TABLE IF NOT EXISTS `MyFermaWRITEOFF_new` (
-                `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `titleWRITEOFF` TEXT NOT NULL,
-                `discWRITEOFF` REAL NOT NULL,
-                `DAY` INTEGER NOT NULL,
-                `MOUNT` INTEGER NOT NULL,
-                `YEAR` INTEGER NOT NULL,
-                `statusWRITEOFF` INTEGER NOT NULL,
-                `priceAll` REAL NOT NULL,
-                `suffix` TEXT NOT NULL,
-                `note` TEXT NOT NULL,
-                `idPT` INTEGER NOT NULL,
-                `animal_count_id` INTEGER,
-                FOREIGN KEY(`idPT`) REFERENCES `ProjectTable`(`_id`) ON DELETE CASCADE,
-                FOREIGN KEY(`animal_count_id`) REFERENCES `AnimalCountTable`(`id`) ON DELETE CASCADE
+            CREATE TABLE IF NOT EXISTS write_off_table (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                title TEXT NOT NULL,
+                count REAL NOT NULL,
+                count_suffix TEXT NOT NULL,
+                price REAL,
+                price_all REAL,
+                day INTEGER NOT NULL,
+                month INTEGER NOT NULL,
+                year INTEGER NOT NULL,
+                status INTEGER NOT NULL,
+                note TEXT NOT NULL,
+                idPT INTEGER NOT NULL,
+                animal_count_id INTEGER,
+                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE
             )
         """.trimIndent()
                 )
@@ -155,26 +156,22 @@ abstract class InventoryDatabase : RoomDatabase() {
                 // 2. Копируем данные из старой таблицы
                 db.execSQL(
                     """
-            INSERT INTO `MyFermaWRITEOFF_new` (
-                `_id`, `titleWRITEOFF`, `discWRITEOFF`, `DAY`, `MOUNT`, `YEAR`,
-                `statusWRITEOFF`, `priceAll`, `suffix`, `note`, `idPT`
+            INSERT INTO write_off_table (
+                _id, title, count, count_suffix, price, price_all, day, month, year,
+                status, note, idPT, animal_count_id
             )
-
-            SELECT `_id`, `titleWRITEOFF`, `discWRITEOFF`, `DAY`, `MOUNT`, `YEAR`,
-                   `statusWRITEOFF`, `priceAll`, `suffix`, `note`, `idPT`
-            FROM `MyFermaWRITEOFF`
+            SELECT _id, titleWRITEOFF, discWRITEOFF, suffix, priceAll, NULL, DAY, MOUNT, YEAR,
+                statusWRITEOFF, note, idPT, NUll
+            FROM MyFermaWRITEOFF
         """.trimIndent()
                 )
 
                 // 3. Удаляем старую таблицу
-                db.execSQL("DROP TABLE `MyFermaWRITEOFF`")
-
-                // 4. Переименовываем новую таблицу в старое имя
-                db.execSQL("ALTER TABLE `MyFermaWRITEOFF_new` RENAME TO `MyFermaWRITEOFF`")
+                db.execSQL("DROP TABLE MyFermaWRITEOFF")
 
                 // 5. Добавляем нужные индексы
-                db.execSQL("CREATE INDEX IF NOT EXISTS `index_MyFermaWRITEOFF_idPT` ON `MyFermaWRITEOFF` (`idPT`)")
-                db.execSQL("CREATE INDEX IF NOT EXISTS `index_MyFermaWRITEOFF_animal_count_id` ON `MyFermaWRITEOFF` (`animal_count_id`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_write_off_table_idPT ON write_off_table (idPT)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_write_off_table_animal_count_id ON write_off_table (animal_count_id)")
 
                 //==================== Миграция SaleTable ====================
                 db.execSQL(
@@ -190,7 +187,7 @@ abstract class InventoryDatabase : RoomDatabase() {
                 month INTEGER NOT NULL,
                 year INTEGER NOT NULL,
                 category TEXT NOT NULL,
-                buyer TEXT NOT NULL,
+                buyer TEXT,
                 note TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
                 animal_id INTEGER,

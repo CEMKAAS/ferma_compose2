@@ -353,7 +353,7 @@ class AnimalIndicatorsViewModel(
             1 -> writeOffUiTable?.let {
                 itemsRepository.updateWriteOff(
                     it.copy(
-                        count = count.toDouble(), priceAll = price, suffix = suffix
+                        count = count.toDouble(), priceAll = price, countSuffix =  suffix
                     )
                 )
             }
@@ -361,7 +361,7 @@ class AnimalIndicatorsViewModel(
             0 -> writeOffUiTable?.let {
                 itemsRepository.updateWriteOff(
                     it.copy(
-                        count = count.toDouble(), priceAll = price, suffix = suffix
+                        count = count.toDouble(), priceAll = price, countSuffix = suffix
                     )
                 )
             }

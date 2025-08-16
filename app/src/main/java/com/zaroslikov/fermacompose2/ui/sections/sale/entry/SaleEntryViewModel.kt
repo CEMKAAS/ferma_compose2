@@ -38,7 +38,6 @@ class SaleEntryViewModel @Inject constructor(
     private val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
     val isEntry: Boolean = itemId == -1
 
-
     var saleUiState by mutableStateOf(
         SaleEntryState().copy(
             isEntry = isEntry,
@@ -64,13 +63,12 @@ class SaleEntryViewModel @Inject constructor(
             }
 
             val titleList = itemsRepository.getItemsTitleSaleList(itemIdPT).first()
-
-
             val categoryList = itemsRepository.getItemsCategorySaleList(itemIdPT).first()
             val buyerList = itemsRepository.getItemsBuyerSaleList(itemIdPT).first()
             saleUiState = saleUiState.updateList(
                 titleList, categoryList, buyerList
             )
+
             val suffix = saleUiState.titleList
                 .firstOrNull { it.first == saleUiState.title }
                 ?.third
@@ -103,34 +101,11 @@ class SaleEntryViewModel @Inject constructor(
                 .filterNotNull()
                 .firstOrNull()
         }
-        Log.i("sale_table", "updateWarehouseUiStateSync: $pair")
-        Log.i("sale_table", "updateWarehouseUiStateSync: $category")
+
         if (pair != null) {
             saleUiState = saleUiState.updateCountWarehouse(pair)
         }
     }
-
-
-//    fun updateWarehouseUiState(pair: Pair<String, String>) {
-//        viewModelScope.launch {
-//            itemUiState = when (pair.second) {
-//                "Моя Продукция" -> {
-//                    itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
-//                        .filterNotNull()
-//                        .first()
-//                        .toDomainMap()
-//                }
-//                //todo
-////                "Купленный товар" -> {
-////                    itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
-////                        .filterNotNull()
-////                        .first()
-////                        .toDouble()
-////                }
-//                else -> DomainPairDataDoubleSting()
-//            }
-//        }
-//    }
 
     fun insertItem() {
         viewModelScope.launch {
@@ -155,7 +130,6 @@ class SaleEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
             if (!isError()) {
-//                autoCalculate()
                 itemsRepository.updateSale(
                     saleUiState.updateForSave(id = itemId.toLong(), itemIdPT = itemIdPT.toLong())
                         .toRoomMap()

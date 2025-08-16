@@ -101,7 +101,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.navNull
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.WriteOffEntryDestination
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue

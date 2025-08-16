@@ -57,7 +57,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getItemsTitleAddList(id: Int): Flow<List<PairData>> =
         itemDao.getItemsTitleAddList(id)
 
-    override fun getItemsWriteoffList(id: Int): Flow<List<PairData>> =
+    override fun getItemsWriteoffList(id: Int): Flow<List<SaleTitleData>> =
         itemDao.getItemsWriteoffList(id)
 
     override fun getItemsCategoryAddList(id: Int): Flow<List<String>> =
@@ -166,7 +166,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override suspend fun insertWriteOff(item: WriteOffTable) = itemDao.insertWriteOff(item)
     override suspend fun updateWriteOff(item: WriteOffTable) = itemDao.updateWriteOff(item)
-    override suspend fun deleteWriteOff(item: WriteOffTable) = itemDao.deleteWriteOff(item)
+    override suspend fun deleteWriteOff(id: Long) = itemDao.deleteWriteOff(id)
 
     //==================== Finance ====================
     override fun getCurrentBalance(id: Int): Flow<Double> = itemDao.getCurrentBalance(id)

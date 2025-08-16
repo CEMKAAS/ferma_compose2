@@ -150,7 +150,8 @@
     <string name="support_text_count_product_write_off">Укажите количество товара для списания</string>
     <string name="support_text_price_sale">Укажите стоимость за проданный товар</string>
     <string name="support_text_price_expenses">Укажите стоимость за купленный товар</string>
-    <string name="support_text_price_write_off">Укажите стоимость за списанный товар</string>
+    <string name="support_text_price_write_off_all">Укажите стоимость за весь списанный товар</string>
+    <string name="support_text_price_write_off_one">Укажите стоимость за один списанный товар</string>
     <string name="support_text_price_animal">Укажите стоимость животного</string>
     <string name="support_text_price_animals">Укажите стоимость животных</string>
     <string name="support_text_price_one_animals">Укажите цену за одного животного</string>
@@ -385,6 +386,9 @@
     //AnimalEntryScreen
     <string name="animal_entry_screen_">Вносим данные по группе или одному животному?</string>
     <string name="animal_entry_screen_info_animal">Вносим данные по группе или одному животному?</string>
+    <string name="animal_entry_screen_sex_man">Мужской</string>
+    <string name="animal_entry_screen_sex_woman">Женский</string>
+
 
     //AnimalCardScreen
     <string name="animal_card_screen_animal_card">Карточка животного</string>
@@ -453,7 +457,7 @@
     <string name="expenses_entry_screen_food_day">%s хватит на %s %s суток до %s</string>
     <string name="expenses_entry_screen_every_day">Ежедневный расход составляет - %s %s</string>
     <string name="expenses_entry_screen_animal_count">Количество голов - %s %s</string>
-    <string name="expenses_entry_screen_auto_calculate">В случае активации этой опции необходимо указать стоимость не за всё весь товар, а за одну его единицу. При этом сохранится общая сумма.</string>
+    <string name="expenses_entry_screen_auto_calculate">В случае активации этой опции необходимо указать стоимость не за всё весь товар, а за одну его единицу.</string>
 
 
     //Ration Button

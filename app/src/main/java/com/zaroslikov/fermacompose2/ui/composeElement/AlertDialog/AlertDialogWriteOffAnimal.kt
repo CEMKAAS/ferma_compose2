@@ -166,9 +166,12 @@ fun AlertDialogWriteOffAnimal(
                                         year = dateTodayArray()[2],
                                         status = true,
                                         priceAll = priceInDB.toConvertDbDouble(),
-                                        suffix = countSuffix,
+                                        countSuffix = countSuffix,
                                         note = reasonNote,
-                                        idPT = idPT
+                                        idPT = idPT.toLong(),
+                                        id = TODO(),
+                                        price = TODO(),
+                                        animalCountId = TODO()
                                     )
                                 },
                                 third = count.toInt() == 0

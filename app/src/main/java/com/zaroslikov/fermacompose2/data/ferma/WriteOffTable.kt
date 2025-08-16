@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 
 @Entity(
-    tableName = "MyFermaWRITEOFF",
+    tableName = "write_off_table",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
         parentColumns = arrayOf("_id"),
@@ -26,24 +26,28 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 data class WriteOffTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
-    val id: Int = 0,
-    @ColumnInfo(name = "titleWRITEOFF")
+    val id: Long = 0,
+    @ColumnInfo(name = "title")
     val title: String, // название
-    @ColumnInfo(name = "discWRITEOFF")
+    @ColumnInfo(name = "count")
     val count: Double, // Кол-во
-    @ColumnInfo(name = "DAY")
+    @ColumnInfo(name = "count_suffix")
+    val countSuffix: String,
+    @ColumnInfo(name = "price")
+    val price: Double?,
+    @ColumnInfo(name = "price_all")
+    val priceAll: Double?,
+    @ColumnInfo(name = "day")
     val day: Int,  // день
-    @ColumnInfo(name = "MOUNT")
+    @ColumnInfo(name = "month")
     val mount: Int, // месяц
-    @ColumnInfo(name = "YEAR")
+    @ColumnInfo(name = "year")
     val year: Int, // время
-    @ColumnInfo(name = "statusWRITEOFF")
-    var status: Boolean, //0-на собственные 1-утиль
-    val priceAll: Double,
-    var suffix: String,
+    @ColumnInfo(name = "status")
+    val status: Boolean, //0-на собственные 1-утиль
     val note: String,
     @ColumnInfo(name = "idPT")
-    val idPT: Int,
+    val idPT: Long,
     @ColumnInfo(name = "animal_count_id")
     val animalCountId: Long? = null
 )

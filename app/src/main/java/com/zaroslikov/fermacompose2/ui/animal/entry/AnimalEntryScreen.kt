@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.animal
+package com.zaroslikov.fermacompose2.ui.animal.entry
 
 
 import androidx.compose.animation.core.Spring
@@ -39,6 +39,7 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.metricalAnimal
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.composeElement.AnimalNameOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
@@ -88,6 +89,7 @@ fun AnimalEntryProduct(
         AnimalEntryContainer(
             modifier = Modifier
                 .modifierScreen(innerPadding),
+            onValueChange = viewModel::updateUiState,
             idPT = viewModel.itemId,
             typeList = typeList.list,
             saveInRoomSale = {
@@ -111,6 +113,8 @@ fun AnimalEntryProduct(
 fun AnimalEntryContainer(
     idPT: Long,
     modifier: Modifier,
+    state: AnimalEntryState,
+    onValueChange: (AnimalEntryState) -> Unit,
     typeList: List<String>,
     saveInRoomSale: (Triple<AnimalTable, AnimalCountTable, ExpensesTable?>) -> Unit,
     titleAppBar: (Boolean) -> Unit
@@ -176,53 +180,35 @@ fun AnimalEntryContainer(
                 imageTwo = R.drawable.baseline_spoke_24
             )
         }
-        OutlinedTextField(
-            value = title,
-            onValueChange = {
-                title = it
-                isErrorTitle = it.isError()
-            },
-            label = { Text(text = stringResource(if (!isAnimalGroup) R.string.outlined_text_name_animal else R.string.outlined_text_name_animals)) },
-            supportingText = {
-                ErrorSupportTextSlash(
-                    isError = isErrorTitle,
-                    intRes = if (!isAnimalGroup) R.string.support_text_name_animal else R.string.support_text_names_animals,
-                    intResError = if (!isAnimalGroup) R.string.error_no_name_animal else R.string.error_no_name_animals,
-                )
-            },
-            modifier = Modifier.toOutlinedText(),
-            isError = isErrorTitle,
-            keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = keyboardActionsDown(focusManager)
+        AnimalNameOutlinedText(
+            value = state.title,
+            onValueChange = { onValueChange(state.updateTitle(it)) },
+            isAnimalGroup = state.isAnimalGroup,
+            isErrorTitle = state.error.isErrorTitle
         )
+
         OutlinedTextTitleAdd(
             intRes = R.string.outlined_text_type,
-            intResSup = if (!isAnimalGroup) R.string.support_text_type_animal else R.string.support_text_type_animals,
+            intResSup = if (!state.isAnimalGroup) R.string.support_text_type_animal
+            else R.string.support_text_type_animals,
             intResError = R.string.error_no_type_animal,
-            value = type,
-            onValueChange = {
-                type = it.trim()
-                isErrorType = it.isError()
-            },
+            value = state.type,
+            onValueChange = { onValueChange(state.updateType(it)) },
             drawableRes = R.drawable.baseline_pets_24,
             titleList = typeList,
-            isErrorTitle = isErrorType,
+            isErrorTitle = state.error.isErrorType,
             isErrorSlash = false,
         )
         if (!isAnimalGroup)
             OutlinedTextSex(
-                value = sex,
-                onValueChange = { sex = it },
-                focusManager = focusManager
+                value = state.sex,
+                onValueChange = { onValueChange(state.updateSex(it)) },
             )
         else OutlinedTextCount(
-            value = count,
-            onValueChange = {
-                count = it.toConvertDb()
-                isErrorCount = it.isError()
-            },
+            value = state.count,
+            onValueChange = { onValueChange(state.updateCount(it)) },
             drawableRes = R.drawable.baseline_spoke_24,
-            isError = isErrorCount,
+            isError = state.error.isErrorCount,
             suffix = stringResource(R.string.suffix_pieces),
             intRes = R.string.outlined_text_field_quantity,
             intResSup = R.string.support_text_count_animals,
@@ -230,18 +216,19 @@ fun AnimalEntryContainer(
             isDropMenuShow = false,
         )
         OutlinedPriceInput(
-            price = price,
-            onPriceChange = { price = it },
-            count = count,
-            isAutoCalculate = isAutoCalculate,
-            onAutoCalculate = { isAutoCalculate = it },
-            isManyCount = isAnimalGroup,
+            price = state.price,
+            onPriceChange = { onValueChange(state.updatePrice(it)) },
+            count = state.priceAll,
+            isAutoCalculate = state.isAutoPrice,
+            onAutoCalculate = { onValueChange(state.updateIsAutoPrice(it)) },
+            isManyCount = state.isAnimalGroup,
         )
         OutlinedTextDate(
-            value = dateBorn,
+            value = state.dateBorn,
             intRes = R.string.outlined_text_date_born,
-            intResSup = if (!isAnimalGroup) R.string.outlined_text_date_born else R.string.support_text_date_born_s,
-            onValueChange = { dateBorn = it}
+            intResSup = if (!state.isAnimalGroup) R.string.outlined_text_date_born
+            else R.string.support_text_date_born_s,
+            onValueChange = { onValueChange(state.updateDate(it)) }
         )
         CardField(
             modifier = Modifier
@@ -250,42 +237,40 @@ fun AnimalEntryContainer(
             row = false
         ) {
             CheckboxTextIcon(
-                modifier = if (!isDateFactory) Modifier.toOutlinedText() else Modifier,
-                checked = isDateFactory,
+                modifier = if (!state.isDateFactory) Modifier.toOutlinedText() else Modifier,
+                checked = state.isDateFactory,
                 onCheckedChange = {
-                    isDateFactory = it
+                    onValueChange(state.updateIsDateFactory(it))
                 },
-                intTitle = if (!isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
+                intTitle = if (!state.isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
                 isTooltipShow = true,
                 intTooltip = R.string.tooltip_animals_born
             )
-            if (!isDateFactory) {
+            if (!state.isDateFactory) {
                 OutlinedTextDate(
-                    value = dateFactory,
+                    value = state.dateFactory,
                     intRes = R.string.outlined_text_date_factory,
-                    intResSup = if (!isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
+                    intResSup = if (!state.isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
                     drawableRes = R.drawable.baseline_event_24,
-                    onValueChange = { dateFactory = it }
+                    onValueChange = { onValueChange(state.updateDateFactory(it)) }
                 )
             }
         }
         OutlinedTextCount(
-            value = foodDay,
-            onValueChange = {
-                foodDay = it.toConvertDb()
-            },
+            value = state.foodDay,
+            onValueChange = { onValueChange(state.updateFoodDay(it)) },
             isError = false,
-            onSuffixChange = { suffixFoodDay = it },
+            onSuffixChange = { onValueChange(state.updateFoodDaySuffix(it)) },
             intRes = R.string.outlined_food_day_animals,
-            intResSup = if (!isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
-            suffix = suffixFoodDay,
+            intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
+            suffix = state.foodDaySuffix,
             isWarehouseShow = false,
             isDropMenuShow = true,
             versionDropMenu = 0
         )
         OutlinedTextNote(
-            value = note,
-            onValueChange = { note = it },
+            value = state.note,
+            onValueChange = { onValueChange(state.updateNote(it)) },
         )
         ButtonStandart(
             intRes = R.string.button_add,

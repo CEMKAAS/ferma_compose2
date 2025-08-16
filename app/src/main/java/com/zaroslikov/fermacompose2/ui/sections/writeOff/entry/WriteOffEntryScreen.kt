@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.sections.sale.entry
+package com.zaroslikov.fermacompose2.ui.sections.writeOff.entry
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -8,20 +8,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
-import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
@@ -29,31 +19,30 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount2
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
+import com.zaroslikov.fermacompose2.ui.composeElement.RadioButtonWriteOff
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 
-object SaleEntryDestination : NavigationDestination {
-    override val route = "SaleEntry"
+object WriteOffEntryDestination : NavigationDestination {
+    override val route = "WriteOffEntry"
     override val titleRes = R.string.app_name
     const val itemIdPT = "itemIdPT"
     const val itemId = "itemId"
     val routeWithArgs = "$route?$itemIdPT={$itemIdPT}&$itemId={$itemId}"
 }
 
+
 @Composable
-fun SaleEntryProduct(
+fun WriteOffEntryProduct(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: SaleEntryViewModel = hiltViewModel()
+    viewModel: WriteOffEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -68,15 +57,16 @@ fun SaleEntryProduct(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = R.string.sale_screen_title,
+                intRes = R.string.write_off_screen_title,
                 navigateUp = navigateBack,
                 scrollBehavior = scrollBehavior
             )
         }
     ) { innerPadding ->
-        SaleEntryContainerProduct(
-            modifier = Modifier.modifierScreen(innerPadding),
-            state = viewModel.saleUiState,
+        WriteOffEntryContainerProduct(
+            modifier = Modifier
+                .modifierScreen(innerPadding),
+            state = viewModel.writeOffUiState,
             onValueChange = viewModel::updateUiState,
             onClickInsert = viewModel::insertItem,
             onClickUpdate = viewModel::updateItem,
@@ -86,12 +76,13 @@ fun SaleEntryProduct(
     }
 }
 
+
 @Composable
-fun SaleEntryContainerProduct(
+fun WriteOffEntryContainerProduct(
     modifier: Modifier,
-    state: SaleEntryState,
+    state: WriteOffEntryState,
+    onValueChange: (WriteOffEntryState) -> Unit,
     updateCountWarehouse: (String, Category) -> Unit,
-    onValueChange: (SaleEntryState) -> Unit,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit,
@@ -99,61 +90,45 @@ fun SaleEntryContainerProduct(
     Column(modifier = modifier) {
         OutlinedTextTitleSale(
             value = state.title,
-            onValueChange = {
-                onValueChange(state.updateTitle(it))
-                //TODO Обновление кол-во на складе
-            },
             onValueChoice = {
                 onValueChange(state.updateTitleAndSuffix(it.first, it.second))
                 updateCountWarehouse(it.first, it.third)
             },
             titleList = state.titleList,
             isErrorTitle = state.error.isErrorTitle,
-            isErrorSlash = state.error.isErrorSlash
+            isErrorSlash = state.error.isErrorSlash,
         )
         OutlinedTextCount2(
             value = state.count,
-            onValueChange = {
-                onValueChange(state.updateCount(it))
-            },
-            onSuffixChange = { onValueChange(state.updateSuffix(it)) },
+            onValueChange = { onValueChange(state.updateCount(it)) },
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
-            intResSup = R.string.support_text_count_product_sale,
+            intResSup = R.string.support_text_count_product_write_off,
             isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
             warehouseList = state.warehouseList,
         )
         OutlinedPriceInput(
             price = state.price,
-            onPriceChange = {
-                onValueChange(state.updatePrice(it))
-            },
+            onPriceChange = { onValueChange(state.updatePrice(it)) },
             count = state.priceAll,
-            isError = state.error.isErrorPrice,
+            supportTextRes = R.string.support_text_price_write_off_all,
+            supportTextResAutoCal = R.string.support_text_price_write_off_one,
+            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isAutoCalculate = state.isAutoPrice,
             onAutoCalculate = { onValueChange(state.updateIsAutoPrice(it)) },
-            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isManyCount = true,
-            isNecessarily = true
-        )
-        OutlinedTextCategory(
-            value = state.category,
-            onValueChange = { onValueChange(state.updateCategory(it)) },
-            titleList = state.categoryList,
         )
         OutlinedTextDateEdit(
             value = state.date,
             onValueChange = { onValueChange(state.updateDate(it)) }
         )
-        OutlinedTextBuyer(
-            value = state.buyer,
-            onValueChange = { onValueChange(state.updateBuyer(it)) },
-            onTrailingChance = { onValueChange(state.updateBuyerClear()) },
-            list = state.buyerList,
-        )
         OutlinedTextNote(
             value = state.note,
             onValueChange = { onValueChange(state.updateNote(it)) },
+        )
+        RadioButtonWriteOff(
+            state = state.status,
+            onStateSelect = { onValueChange(state.updateStatus(it)) }
         )
         ButtonPanel(
             state = state,
@@ -166,7 +141,7 @@ fun SaleEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    state: SaleEntryState,
+    state: WriteOffEntryState,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
@@ -174,7 +149,7 @@ private fun ButtonPanel(
     val focusManager = LocalFocusManager.current
     if (state.isEntry)
         ButtonStandart(
-            intRes = R.string.button_sale,
+            intRes = R.string.button_add,
             onClick = {
                 focusManager.clearFocus()
                 onClickInsert()
@@ -188,3 +163,5 @@ private fun ButtonPanel(
         ButtonDelete { onClickDelete() }
     }
 }
+
+

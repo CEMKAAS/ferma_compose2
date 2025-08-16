@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -43,12 +42,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.yandex.mobile.ads.impl.va
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
 import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
@@ -338,7 +335,7 @@ fun OutlinedTextCount(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    onSuffixChange: (String) -> Unit = {},
+    onSuffixChange: ((String) -> Unit)? = null,
     isError: Boolean,
     suffix: String,
     isAnimal: Boolean = false,
@@ -407,7 +404,7 @@ fun OutlinedTextCount2(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    onSuffixChange: (String) -> Unit = {},
+    onSuffixChange: ((String) -> Unit)? = null,
     isError: Boolean,
     suffix: String,
     isAnimal: Boolean = false,
@@ -883,38 +880,37 @@ fun OutlinedTextBuyer(
 
 @Composable
 fun OutlinedTextSex(
-    value: String,
-    onValueChange: (String) -> Unit,
-    standardPadding: Boolean = true,
-    focusManager: FocusManager
+    value: Boolean,
+    onValueChange: (Boolean) -> Unit,
+    standardPadding: Boolean = true
 ) {
-    val list = arrayListOf("Мужской", "Женский")
+    val focusManager = LocalFocusManager.current
+
+    val setList = listOf(
+        Triple(true, R.drawable.baseline_male_24, stringResource(R.string.animal_entry_screen_sex_man)),
+        Triple(false, R.drawable.baseline_female_24, stringResource(R.string.animal_entry_screen_sex_woman))
+    )
+    val current = setList.first { it.first == value }
 
     ExposedDropdownMenuSex(
-        title = value,
-        setTitle = { onValueChange(it) },
+        sex = value,
+        setSex = {
+            onValueChange(it)
+            focusManager.moveFocus(FocusDirection.Down)
+        },
         standardPadding = standardPadding,
-        titleList = list,
+        setList = setList,
         isFilterUsed = false
     ) {
-        OutlinedTextField(
-            value = value,
+        BaseOutlinedText(
+            value = current.third,
             onValueChange = {},
             readOnly = true,
-            label = { Text(stringResource(R.string.outlined_text_sex)) },
+            labelIntRes = R.string.outlined_text_sex,
             modifier = it.first,
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(if (value == list[0]) R.drawable.baseline_male_24 else R.drawable.baseline_female_24),
-                    contentDescription = null
-                )
-            },
-            supportingText = {
-                Text(stringResource(R.string.support_text_sex_animals))
-            },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = it.second) },
-            keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = keyboardActionsDown(focusManager)
+            intResSup = R.string.support_text_sex_animals,
+            leadingIconRes = current.second
+//            onTrailingChance = {ExposedDropdownMenuDefaults.TrailingIcon(expanded = it.second)}
         )
     }
 }
@@ -976,6 +972,31 @@ fun WeightOutlinedText(
 }
 
 @Composable
+fun AnimalNameOutlinedText(
+    value: String,
+    onValueChange: (String) -> Unit,
+    isAnimalGroup: Boolean,
+    isErrorTitle: Boolean
+) {
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false,
+        isNecessarily = true
+    ) {
+        BaseOutlinedText(
+            value = value,
+            onValueChange = onValueChange,
+            labelIntRes = if (!isAnimalGroup) R.string.outlined_text_name_animal else R.string.outlined_text_name_animals,
+            isError = isErrorTitle,
+            intResSup = if (!isAnimalGroup) R.string.support_text_name_animal else R.string.support_text_names_animals,
+            intResError = if (!isAnimalGroup) R.string.error_no_name_animal else R.string.error_no_name_animals,
+            keyboardOptions = keyboardOptionsNext()
+        )
+    }
+}
+
+
+@Composable
 fun BaseOutlinedText(
     modifier: Modifier = Modifier,
     value: String,
@@ -1034,7 +1055,6 @@ fun BaseOutlinedText(
 
         else -> null
     }
-
 
     OutlinedTextField(
         value = value,

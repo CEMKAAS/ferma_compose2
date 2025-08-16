@@ -1,20 +1,18 @@
-package com.zaroslikov.fermacompose2.ui.sections.writeOff
+package com.zaroslikov.fermacompose2.ui.sections.writeOff.entry
 
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
-import com.zaroslikov.fermacompose2.Domain.models.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
-import com.zaroslikov.fermacompose2.supportFun.DataPairListState
-import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
+import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -22,15 +20,13 @@ import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.firstOrNull
 
 @HiltViewModel
 class WriteOffEntryViewModel @Inject constructor(
@@ -42,13 +38,12 @@ class WriteOffEntryViewModel @Inject constructor(
     private val itemIdPT: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdPT])
     private val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
     val isEntry: Boolean = itemId == -1
-    var isIndicatorsValue = false
 
-    val isAutoCalculate = mutableStateOf(false)
 
     var writeOffUiState by mutableStateOf(
-        DomainWriteOffTable().copy(
-            suffix = resourceProvider.getString(R.string.suffix_pieces),
+        WriteOffEntryState().copy(
+            isEntry = isEntry,
+            countSuffix = resourceProvider.getString(R.string.suffix_pieces),
         )
     )
         private set
@@ -57,47 +52,53 @@ class WriteOffEntryViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        if (!isEntry)
-            viewModelScope.launch {
-                writeOffUiState = itemsRepository.getItemWriteOff(itemId)
-                    .filterNotNull()
-                    .first()
-                    .toDomainMap()
-                isIndicatorsValue = writeOffUiState.animalCountId != null
-            }
-    }
-
-    fun updateUiState(domainTable: DomainWriteOffTable) {
-        writeOffUiState =
-            domainTable
-    }
-
-    val titleUiState: StateFlow<DataPairListState> =
-        itemsRepository.getItemsWriteoffList(itemId).map { DataPairListState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataPairListState()
-            )
-
-
-    var itemUiState by mutableStateOf(DomainPairDataDoubleSting())
-        private set
-
-    fun updateWarehouseUiState(pair: Pair<String, Boolean>) {
         viewModelScope.launch {
-            itemUiState = if (pair.second) {
-                itemsRepository.getCurrentBalanceProduct(pair.first, itemId.toLong())
+            if (!isEntry) {
+                val writeOffTable = itemsRepository.getItemWriteOff(itemId)
                     .filterNotNull()
                     .first()
                     .toDomainMap()
-            } else {
-                DomainPairDataDoubleSting()
-//                itemsRepository.getCurrentExpensesProduct(pair.first, itemId.toLong())
-//                    .filterNotNull()
-//                    .first()
-//                    .toDouble()
+                writeOffUiState = writeOffUiState.updateFromDomain(writeOffTable)
             }
+            val titleList = itemsRepository.getItemsWriteoffList(itemIdPT).first()
+            writeOffUiState = writeOffUiState.updateList(titleList)
+
+            val suffix = writeOffUiState.titleList
+                .firstOrNull { it.first == writeOffUiState.title }
+                ?.third
+
+            suffix?.let {
+                if (!isEntry) updateWarehouseUiStateSync(writeOffUiState.title, it)
+            }
+        }
+    }
+
+    fun updateUiState(state: WriteOffEntryState) {
+        writeOffUiState =
+            state
+    }
+
+    fun updateWarehouseUiState(name: String, category: Category) {
+        viewModelScope.launch {
+            updateWarehouseUiStateSync(name, category)
+        }
+    }
+
+    private suspend fun updateWarehouseUiStateSync(name: String, category: Category) {
+        val pair = if (category == Category.EXPENSES) {
+            itemsRepository.getCurrentExpensesProductList(name, itemIdPT.toLong())
+                .filterNotNull()
+                .firstOrNull()
+        } else {
+            itemsRepository
+                .getCurrentBalanceProductList(name, itemIdPT.toLong())
+                .filterNotNull()
+                .firstOrNull()
+        }
+        Log.i("Expenses_table", "updateWarehouseUiStateSync: $pair")
+        Log.i("Expenses_table", "updateWarehouseUiStateSync: $category")
+        if (pair != null) {
+            writeOffUiState = writeOffUiState.updateCountWarehouse(pair)
         }
     }
 
@@ -106,10 +107,7 @@ class WriteOffEntryViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isError()) {
                 itemsRepository.insertWriteOff(
-                    writeOffUiState.copy(
-                        priceAll = autoCalculate(),
-                        idPT = itemIdPT.toLong()
-                    ).toRoomMap()
+                    writeOffUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
                 )
 //            metricaWriteOff(writeOffUiState.copy(priceAll = autoCalculate()))
                 _eventFlow.emit(UiEvent.NavigateBack)
@@ -118,7 +116,7 @@ class WriteOffEntryViewModel @Inject constructor(
                         .format(
                             writeOffUiState.title,
                             writeOffUiState.count,
-                            writeOffUiState.suffix
+                            writeOffUiState.countSuffix
                         ) //Todo Обновить название
                 )
             }
@@ -128,9 +126,9 @@ class WriteOffEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
             if (!isError()) {
-                autoCalculate()
                 itemsRepository.updateWriteOff(
-                    writeOffUiState.copy(priceAll = autoCalculate()).toRoomMap()
+                    writeOffUiState.updateForSave(id = itemId.toLong(), itemIdPT.toLong())
+                        .toRoomMap()
                 )
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
@@ -138,7 +136,7 @@ class WriteOffEntryViewModel @Inject constructor(
                         .format(
                             writeOffUiState.title,
                             writeOffUiState.count,
-                            writeOffUiState.suffix
+                            writeOffUiState.countSuffix
                         ) //Todo Обновить название
                 )
             }
@@ -147,14 +145,14 @@ class WriteOffEntryViewModel @Inject constructor(
 
     fun deleteItem() {
         viewModelScope.launch {
-            itemsRepository.deleteWriteOff(writeOffUiState.toRoomMap())
+            itemsRepository.deleteWriteOff(itemId.toLong())
             _eventFlow.emit(UiEvent.NavigateBack)
             showMessage(
                 resourceProvider.getString(R.string.toast_delete_s)
                     .format(
                         writeOffUiState.title,
                         writeOffUiState.count,
-                        writeOffUiState.suffix
+                        writeOffUiState.countSuffix
                     ) //Todo Обновить название
             )
         }
@@ -173,14 +171,5 @@ class WriteOffEntryViewModel @Inject constructor(
     fun isError(): Boolean {
         updateUiState(writeOffUiState.validate())
         return writeOffUiState.error.hasAnyError
-    }
-
-    fun autoCalculate(): String = if (isAutoCalculate.value) calculatePriceAll(
-        writeOffUiState.priceAll,
-        writeOffUiState.count
-    ) else writeOffUiState.priceAll
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
 }

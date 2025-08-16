@@ -287,9 +287,12 @@ fun AlertDialogKillAnimal(
                                         year = dateTodayArray()[2],
                                         status = false,
                                         priceAll = 0.0,
-                                        suffix = countSuffix,
+                                        countSuffix = countSuffix,
                                         note = reasonNote + resultText,
-                                        idPT = idPT
+                                        idPT = idPT.toLong(),
+                                        id = TODO(),
+                                        price = TODO(),
+                                        animalCountId = TODO()
                                     ),
                                     third = count.toInt() == 0
                                 )
