@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.zaroslikov.fermacompose2.data
 
 import android.content.Context
@@ -71,7 +55,7 @@ abstract class InventoryDatabase : RoomDatabase() {
             }
         }
 
-         val MIGRATION_2_3 = object : Migration(2, 3) {
+        val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE МyINCUBATOR ADD COLUMN imageData BLOB null")
             }
@@ -90,8 +74,42 @@ abstract class InventoryDatabase : RoomDatabase() {
 
                 db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN version INTEGER")
 
-                db.execSQL("ALTER TABLE AnimalTable ADD COLUMN date_factory TEXT NOT NULL DEFAULT ''")
-                db.execSQL("ALTER TABLE AnimalTable ADD COLUMN suffix_food_day TEXT NOT NULL DEFAULT ''")
+                //==================== Миграция AnimalTable ====================
+                db.execSQL(
+                    """
+            CREATE TABLE IF NOT EXISTS animal_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL,
+                type TEXT NOT NULL,
+                date TEXT NOT NULL,
+                date_factory TEXT,
+                group INTEGER NOT NULL,
+                sex INTEGER NOT NULL,
+                note TEXT NOT NULL,
+                image TEXT,
+                archive INTEGER NOT NULL,
+                food_day REAL,
+                food_day_suffix REAL,
+                idPT INTEGER NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+            )
+        """.trimIndent()
+                )
+
+                db.execSQL(
+                    """
+            INSERT INTO animal_table (
+                id, name, type, date, date_factory, group, sex,
+                note, image, archive, food_day, food_day_suffix, idPT
+            )
+            SELECT
+                id, name, type, data, NULL, groop, (CASE WHEN sex IS 'Мужской' THEN 0 ELSE 1 END) AS sex, 
+                note, NULL, arhiv, foodDay, NULL, idPT
+            FROM AnimalTable
+        """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX index_animal_table_idPT ON animal_table(idPT)")
+                db.execSQL("DROP TABLE AnimalTable")
 
 
                 //==================== Миграция AddTable ====================
@@ -242,8 +260,6 @@ abstract class InventoryDatabase : RoomDatabase() {
                 last_day_food TEXT,
                 weight REAL,
                 weight_suffix,
-                is_auto_weight INTEGER NOT NULL,
-                is_auto_price INTEGER NOT NULL,
                 idPT INTEGER NOT NULL,
                 animalId INTEGER,
                 animal_vaccination_id INTEGER,
@@ -252,21 +268,23 @@ abstract class InventoryDatabase : RoomDatabase() {
                 FOREIGN KEY(animalId) REFERENCES AnimalTable(id) ON DELETE CASCADE,
                 FOREIGN KEY(animal_vaccination_id) REFERENCES AnimalVaccinationTable(id) ON DELETE CASCADE,
                 FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE,
-            )""".trimIndent())
-                db.execSQL("""
+            )""".trimIndent()
+                )
+                db.execSQL(
+                    """
             INSERT INTO MyFermaEXPENSES_new (
                 _id, title, count, day, month, year, price, price_all,
                 count_suffix, category, note,
                 is_show_food, is_show_food_hand, is_show_warehouse, is_show_animals,
                 feed_food, feed_food_suffix, count_animal,
-                food_designed_day, last_day_food, idPT, animalId, animal_vaccination_id, animal_count_id
+                food_designed_day, last_day_food, weight,  weight_suffix,idPT, animalId, animal_vaccination_id, animal_count_id
             )
             SELECT
                 _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES, NULL,
                 suffix, category, note,
                 showFood, dailyExpensesFoodAndCount, showWarehouse, showAnimals,
                 dailyExpensesFood, 'кг.', countAnimal,
-                foodDesignedDay, lastDayFood, NULL, NULL, 0, 0, idPT, NULL, NULL, NULL
+                foodDesignedDay, lastDayFood, NULL, NULL, idPT, NULL, NULL, NULL
             FROM MyFermaEXPENSES
         """.trimIndent()
                 )
@@ -302,8 +320,6 @@ abstract class InventoryDatabase : RoomDatabase() {
                 last_day_food,
                 weight,
                 weight_suffix,
-                is_auto_weight,
-                is_auto_price
                 idPT, 
                 animalId
             )
@@ -335,8 +351,6 @@ abstract class InventoryDatabase : RoomDatabase() {
                 NULL AS last_day_food,
                 NULL AS weight,
                 NULL AS weight_suffix,
-                0 AS is_auto_weight, 
-                0 AS is_auto_price,
                 idPT,
                _id AS animalId
             FROM AnimalTable

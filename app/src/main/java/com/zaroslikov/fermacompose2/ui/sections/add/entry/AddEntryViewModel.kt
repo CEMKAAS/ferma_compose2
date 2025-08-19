@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,27 +8,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toRoomMap
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
-import com.zaroslikov.fermacompose2.supportFun.DataPairListState
-import com.zaroslikov.fermacompose2.supportFun.DataStringListState
-import com.zaroslikov.fermacompose2.supportFun.DataTripleListState
-import com.zaroslikov.fermacompose2.supportFun.metricAdd
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

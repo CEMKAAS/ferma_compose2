@@ -81,10 +81,6 @@ data class ExpensesTable(
     val weight: Double?,
     @ColumnInfo(name = "weight_suffix")
     val weightSuffix: String?,
-    @ColumnInfo(name = "is_auto_weight")
-    val isAutoWeight: Boolean,
-    @ColumnInfo(name = "is_auto_price")
-    val isAutoPrice: Boolean,
     @ColumnInfo(name = "idPT")
     val idPT: Long,
     @ColumnInfo(name = "animalId")

@@ -1,33 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.animal
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.mapper.toCountRoomMap
-import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
-import com.zaroslikov.fermacompose2.supportFun.DataPairListState
-import com.zaroslikov.fermacompose2.supportFun.DataStringListState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 class AnimalCardViewModel(
     savedStateHandle: SavedStateHandle,
@@ -37,7 +12,7 @@ class AnimalCardViewModel(
     val itemId: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArg])
     val itemIdPT: Int = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdArgTwo])
 
-    var animalTableUiState by mutableStateOf(AnimalEditUiState())
+   /* var animalTableUiState by mutableStateOf(AnimalEditUiState())
         private set
     var domainWeight by mutableStateOf<DomainIndicatorsVM?>(null)
         private set
@@ -208,7 +183,7 @@ class AnimalCardViewModel(
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
-    }
+    }*/
 }
 
 

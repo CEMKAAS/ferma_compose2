@@ -4,54 +4,24 @@ package com.zaroslikov.fermacompose2.ui.animal
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarStart
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.supportFun.DataPairListState
-import com.zaroslikov.fermacompose2.supportFun.PairData
-import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogAddAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogArchiveAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogKillAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogSaleAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogWriteOffAnimal
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonArchive
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonCustom
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
-import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.IconAndTextMore
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNoteWidget
 import com.zaroslikov.fermacompose2.ui.composeElement.TextAndIconRow
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_18
-import com.zaroslikov.fermacompose2.ui.finance.PullOutCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import kotlinx.coroutines.launch
 
 object AnimalCardDestination : NavigationDestination {
     override val route = "animalCard"
@@ -68,14 +38,14 @@ fun AnimalCardProduct(
     onNavigateIndicators: (Triple<Int, Int, Long>) -> Unit,
     viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val animalTable = viewModel.animalTableUiState
-    val product = viewModel.productState(animalTable.name).collectAsState()
-    val buyerUiState by viewModel.buyerUiState.collectAsState()
-    val titleUiState by viewModel.titleUiState.collectAsState()
+//    val animalTable = viewModel.animalTableUiState
+//    val product = viewModel.productState(animalTable.name).collectAsState()
+//    val buyerUiState by viewModel.buyerUiState.collectAsState()
+//    val titleUiState by viewModel.titleUiState.collectAsState()
 
     val cor = rememberCoroutineScope()
 
-    Scaffold(topBar = {
+    /*Scaffold(topBar = {
         TopAppBarStart(
             title = animalTable.name,
             true,
@@ -144,13 +114,13 @@ fun AnimalCardProduct(
                 navigateBack()
             }
         )
-    }
+    }*/
 }
 
-@Composable
+/*@Composable
 fun AnimalCardContainer(
     modifier: Modifier,
-    animalTable: AnimalEditUiState,
+    animalTable: DomainAnimalTable,
     animalWeightTable: DomainIndicatorsVM?,
     animalSizeTable: DomainIndicatorsVM?,
     animalCountTable: DomainIndicatorsVM,
@@ -179,7 +149,7 @@ fun AnimalCardContainer(
     Column(modifier = modifier) {
         DataCardOne(animalTable)
         DataCardTwo(
-            isSoloAnimal = !animalTable.groop,
+            isSoloAnimal = !animalTable.group,
             countTable = animalCountTable,
             weightTable = animalWeightTable,
             sizeTable = animalSizeTable,
@@ -339,7 +309,7 @@ private fun DataCardOne(
             )
         }
     }
-}
+}*/
 
 
 @Composable

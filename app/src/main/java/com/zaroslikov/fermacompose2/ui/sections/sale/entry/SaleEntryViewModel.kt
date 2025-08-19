@@ -1,20 +1,18 @@
 package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toRoomMap
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.sections.add.entry.updateCountWarehouse
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent

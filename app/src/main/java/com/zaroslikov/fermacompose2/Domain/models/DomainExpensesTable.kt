@@ -24,8 +24,6 @@ data class DomainExpensesTable(
     val lastDayFood: String?, //Последний день еды
     val weight: Double?,
     val weightSuffix: String?,
-    val isAutoWeight: Boolean, // Расчет веса
-    val isAutoPrice: Boolean, // Расчет цены
     val idPT: Long,
     val animalId: Long? = null,
     val animalVaccinationId: Long? = null,

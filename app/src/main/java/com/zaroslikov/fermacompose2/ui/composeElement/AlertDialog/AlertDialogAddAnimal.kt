@@ -178,8 +178,6 @@ fun AlertDialogAddAnimal(
                                         feedFoodSuffix = "",
                                         weight = 0.0,
                                         weightSuffix = "",
-                                        isAutoWeight = false,
-                                        isAutoPrice = false,
                                     )
                                 }
                             )

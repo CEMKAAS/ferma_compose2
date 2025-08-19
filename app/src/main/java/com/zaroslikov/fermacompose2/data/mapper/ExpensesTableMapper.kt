@@ -64,9 +64,7 @@ fun DomainExpensesTable.toRoomMap(): ExpensesTable = ExpensesTable(
     animalCountId = animalCountId,
     priceAll = priceAll,
     weight = weight,
-    weightSuffix = weightSuffix,
-    isAutoWeight = isAutoWeight,
-    isAutoPrice = isAutoPrice
+    weightSuffix = weightSuffix
 )
 fun ExpensesTable.toDomainMap(): DomainExpensesTable = DomainExpensesTable(
     id = id,
@@ -95,6 +93,4 @@ fun ExpensesTable.toDomainMap(): DomainExpensesTable = DomainExpensesTable(
     feedFoodSuffix = feedFoodSuffix,
     weight = weight,
     weightSuffix = weightSuffix,
-    isAutoWeight = isAutoWeight,
-    isAutoPrice = isAutoPrice
 )

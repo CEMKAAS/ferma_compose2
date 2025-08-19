@@ -7,10 +7,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
 import com.zaroslikov.fermacompose2.ui.animal.AnimalCardViewModel
-import com.zaroslikov.fermacompose2.ui.animal.AnimalEditViewModel
-import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
-import com.zaroslikov.fermacompose2.ui.animal.AnimalViewModel
+import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel
 import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisViewModel
@@ -193,12 +191,6 @@ object AppViewModelProvider {
             )
         }
 
-        initializer {
-            AnimalEntryViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
 
         initializer {
             AnimalCardViewModel(
@@ -209,12 +201,6 @@ object AppViewModelProvider {
 
         initializer {
             AnimalIndicatorsViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
-        initializer {
-            AnimalEditViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository
             )

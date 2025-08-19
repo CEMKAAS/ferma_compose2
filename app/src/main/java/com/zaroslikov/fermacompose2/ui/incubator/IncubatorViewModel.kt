@@ -83,9 +83,9 @@ class IncubatorViewModel(
         itemsRepository.insertAnimalCountTable(
             AnimalCountTable(
                 count = count,
-                date = animalTable.data,
+                date = animalTable.date,
                 suffix = "",//TODO
-                idAnimal = id.toInt(),
+                idAnimal = TODO(),
                 note = "",
             )
         )
@@ -104,14 +104,14 @@ class IncubatorViewModel(
         waterRepository.cancelAllNotifications(itemUiState.titleProject)
         val idPT = itemsRepository.insertProjectLong(itemUiState.toProjectTable())
 
-        val id = itemsRepository.insertAnimalTable(animalTable.copy(idPT = idPT.toInt()))
+//        val id = itemsRepository.insertAnimalTable(animalTable.copy(idPT = idPT.toInt()))
 
         itemsRepository.insertAnimalCountTable(
             AnimalCountTable(
                 count = count,
-                date = animalTable.data,
+                date = animalTable.date,
                 suffix = "",//TODO
-                idAnimal = id.toInt(),
+                idAnimal = TODO(),
                 note = "",
             )
         )

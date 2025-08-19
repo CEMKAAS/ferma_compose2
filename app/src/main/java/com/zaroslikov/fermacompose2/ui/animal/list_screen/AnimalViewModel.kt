@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.animal
+package com.zaroslikov.fermacompose2.ui.animal.list_screen
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 
 class AnimalViewModel(
     savedStateHandle: SavedStateHandle,
@@ -23,24 +21,10 @@ class AnimalViewModel(
 ) : ViewModel() {
 
 
-    val itemId: Int = checkNotNull(savedStateHandle[AnimalDestination.itemIdArg])
+    val itemId: Long = checkNotNull(savedStateHandle[AnimalDestination.itemIdArg])
 
     private var _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
-
-//    val animalUiState: StateFlow<AnimalUiState> =
-//        itemsRepository.getAllAnimal(itemId).map { AnimalUiState(it) }.onStart {
-//            // Устанавливаем состояние загрузки перед началом загрузки данных
-//            _isLoading.value = true
-//        }.onEach {
-//            // Отключаем состояние загрузки после завершения загрузки данных
-//            _isLoading.value = false
-//        }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-//                initialValue = AnimalUiState()
-//            )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val animalUiState: StateFlow<AnimalUiState> =

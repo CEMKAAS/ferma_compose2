@@ -296,15 +296,15 @@ interface ItemsRepository {
 
     suspend fun insertIncubator(item: Incubator)
     suspend fun updateIncubator(item: Incubator)
-    fun getAllAnimal(id: Int): Flow<List<AnimalTable>>
-    fun getAnimal(id: Int): Flow<AnimalTable>
+    fun getAllAnimal(id: Long): Flow<List<AnimalTable>>
+    fun getAnimal(id: Long): Flow<AnimalTable>
     fun getAnimalCard(id: Int): Flow<AnimalTable>
     fun getTypeAnimal(id: Long): Flow<List<String>>
 
     //AnimalScreen
     suspend fun insertAnimalTable(animalTable: AnimalTable): Long
     suspend fun updateAnimalTable(animalTable: AnimalTable)
-    suspend fun deleteAnimalTable(animalTable: AnimalTable)
+    suspend fun deleteAnimalTable(id: Long)
 
     suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable): Long
     suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)

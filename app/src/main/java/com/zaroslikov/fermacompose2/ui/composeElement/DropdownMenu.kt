@@ -454,9 +454,6 @@ fun ExposedDropdownMenuSex(
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
-
-
 
     Box {
         ExposedDropdownMenuBox(
@@ -480,11 +477,16 @@ fun ExposedDropdownMenuSex(
             ) {
                 setList.forEachIndexed { index, item ->
                     DropdownMenuItem(
-                        trailingIcon = { painterResource(item.second) },
+                        trailingIcon = {
+                            Icon(
+                                painter = painterResource(item.second),
+                                contentDescription = null
+                            )
+                        },
                         text = {
                             Text(
                                 text = item.third,
-                                fontWeight = if (index == selectedItemIndex) FontWeight.Bold else null
+                                fontWeight = if (sex == item.first) FontWeight.Bold else null
                             )
                         },
                         onClick = {

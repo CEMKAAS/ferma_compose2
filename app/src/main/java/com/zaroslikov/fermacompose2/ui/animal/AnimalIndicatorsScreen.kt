@@ -404,7 +404,7 @@ fun IndicatorsBottomSheet(
 //                keyboardActions = keyboardActionsClear(focusManager)
             )
             if (version == 3 || version == 2) {
-                if (version == 3 && animalUiState?.groop == true)
+                if (version == 3 && animalUiState?.group == true)
                     OutlinedTextCount(
                         value = countAnimal,
                         onValueChange = {
@@ -429,9 +429,9 @@ fun IndicatorsBottomSheet(
                     count = count,
                     isAutoCalculate = isAutoCalculate,
                     onAutoCalculate = { isAutoCalculate = it },
-                    isManyCount = animalUiState?.groop == true,
+                    isManyCount = animalUiState?.group == true,
                     isError = isErrorPrice,
-                    supportTextRes = if (animalUiState?.groop == true) R.string.support_text_price_animals else R.string.support_text_price_animal,
+                    supportTextRes = if (animalUiState?.group == true) R.string.support_text_price_animals else R.string.support_text_price_animal,
                     supportTextResAutoCal = R.string.support_text_price_one_animals,
                 )
             }
@@ -463,7 +463,7 @@ fun IndicatorsBottomSheet(
                             version = version,
                             title = count,
                             countAll = countAnimal,
-                            isAnimalGroup = animalUiState?.groop == true,
+                            isAnimalGroup = animalUiState?.group == true,
                             isErrorTitle = { isErrorCount = it },
                             isErrorCountAnimal = { isErrorCountAnimal = it }
                         )
@@ -477,7 +477,7 @@ fun IndicatorsBottomSheet(
                             suffix = suffix,
                             note = note,
                             isAutoCalculate = isAutoCalculate,
-                            isAnimalGroup = animalUiState?.groop ?: false,
+                            isAnimalGroup = animalUiState?.group ?: false,
                             context = context,
                             animalCountUiState = animalCountUiState,
                             previousItem = previousItem,
@@ -514,7 +514,7 @@ fun IndicatorsBottomSheet(
                         version = version,
                         title = count,
                         countAll = countAnimal,
-                        isAnimalGroup = animalUiState?.groop == true,
+                        isAnimalGroup = animalUiState?.group == true,
                         isErrorTitle = { isErrorCount = it },
                         isErrorCountAnimal = { isErrorCountAnimal = it }
                     )
@@ -528,7 +528,7 @@ fun IndicatorsBottomSheet(
                         suffix = suffix,
                         note = note,
                         isAutoCalculate = isAutoCalculate,
-                        isAnimalGroup = animalUiState?.groop ?: false,
+                        isAnimalGroup = animalUiState?.group ?: false,
                         context = context,
                         animalCountUiState = animalCountUiState,
                         previousItem = previousItem,

@@ -8,9 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.Domain.models.DomainNoteTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.NoteTable
-import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
-import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toRoomMap
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -26,7 +25,7 @@ class NoteEditViewModel(
 
     init {
         viewModelScope.launch {
-            itemUiState = itemsRepository.getNote(itemId).filterNotNull().first().toDomainMap()
+//            itemUiState = itemsRepository.getNote(itemId).filterNotNull().first().toDomainMap()
         }
     }
 
@@ -35,11 +34,11 @@ class NoteEditViewModel(
     }
 
     suspend fun saveItem() {
-        itemsRepository.updateNote(itemUiState.toRoomMap())
+//        itemsRepository.updateNote(itemUiState.toRoomMap())
     }
 
     suspend fun deleteItem() {
-        itemsRepository.deleteNote(itemUiState.toRoomMap())
+//        itemsRepository.deleteNote(itemUiState.toRoomMap())
     }
 
 }

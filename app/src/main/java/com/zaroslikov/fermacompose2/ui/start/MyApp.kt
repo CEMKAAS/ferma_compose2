@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.animal.AnimalDestination
+import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.HomeDestination

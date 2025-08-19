@@ -3,6 +3,7 @@
 package com.zaroslikov.fermacompose2.ui.composeElement
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -17,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -172,6 +172,7 @@ fun OutlinedTextDate(
     @StringRes intResSup: Int = R.string.support_text_date,
     drawableRes: Int = R.drawable.baseline_calendar_month_24,
     onValueChange: (String) -> Unit,
+    cardBorder: Boolean = true
 ) {
     var openDialog by remember { mutableStateOf(false) }
     val state = rememberDatePickerState(
@@ -185,10 +186,7 @@ fun OutlinedTextDate(
         }
     }
 
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false
-    ) {
+    val textField: @Composable () -> Unit = {
         OutlinedTextField(
             value = value,
             onValueChange = {
@@ -212,6 +210,15 @@ fun OutlinedTextDate(
                 .clickable { openDialog = !openDialog }
         )
     }
+    if (cardBorder) {
+        CardField(
+            modifier = Modifier
+                .toOutlinedText(),
+            row = false
+        ) {
+            textField()
+        }
+    } else textField()
 }
 
 @Composable
@@ -355,6 +362,7 @@ fun OutlinedTextCount(
     onWeightChange: (String) -> Unit = {},
     weightSuffix: String = stringResource(R.string.suffix_kilogram),
     onWeightSuffixChance: (String) -> Unit = {},
+    isNecessarily: Boolean = true,
     isAutoCalculate: Boolean = true,
     onAutoCalculate: (Boolean) -> Unit = {},
 ) {
@@ -363,7 +371,7 @@ fun OutlinedTextCount(
             .toOutlinedText()
             .padding(bottom = animatedErrorPadding(isAutoCalculate)),
         row = false,
-        isNecessarily = true
+        isNecessarily = isNecessarily
     ) {
         BaseOutlinedText(
             modifier = modifier,
@@ -706,8 +714,11 @@ fun OutlinedPriceInput(
             leadingIconRes = R.drawable.baseline_add_card_24,
             keyboardOptions = keyboardOptionsNextNumber(),
         )
-        if (isManyCount) {
-            AutoCalculateCheckbox2(
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxWidth(),
+            visible = isManyCount
+        ) {
+            AutoCalculateCheckbox(
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
                 tooltipTextResAutoCal = tooltipTextResAutoCal,
@@ -887,31 +898,43 @@ fun OutlinedTextSex(
     val focusManager = LocalFocusManager.current
 
     val setList = listOf(
-        Triple(true, R.drawable.baseline_male_24, stringResource(R.string.animal_entry_screen_sex_man)),
-        Triple(false, R.drawable.baseline_female_24, stringResource(R.string.animal_entry_screen_sex_woman))
+        Triple(
+            true,
+            R.drawable.baseline_male_24,
+            stringResource(R.string.animal_entry_screen_sex_man)
+        ),
+        Triple(
+            false,
+            R.drawable.baseline_female_24,
+            stringResource(R.string.animal_entry_screen_sex_woman)
+        )
     )
     val current = setList.first { it.first == value }
-
-    ExposedDropdownMenuSex(
-        sex = value,
-        setSex = {
-            onValueChange(it)
-            focusManager.moveFocus(FocusDirection.Down)
-        },
-        standardPadding = standardPadding,
-        setList = setList,
-        isFilterUsed = false
+    CardField(
+        modifier = Modifier.toOutlinedText(),
+        row = false
     ) {
-        BaseOutlinedText(
-            value = current.third,
-            onValueChange = {},
-            readOnly = true,
-            labelIntRes = R.string.outlined_text_sex,
-            modifier = it.first,
-            intResSup = R.string.support_text_sex_animals,
-            leadingIconRes = current.second
+        ExposedDropdownMenuSex(
+            sex = value,
+            setSex = {
+                onValueChange(it)
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            standardPadding = standardPadding,
+            setList = setList,
+            isFilterUsed = false
+        ) {
+            BaseOutlinedText(
+                value = current.third,
+                onValueChange = {},
+                readOnly = true,
+                labelIntRes = R.string.outlined_text_sex,
+                modifier = it.first,
+                intResSup = R.string.support_text_sex_animals,
+                leadingIconRes = current.second
 //            onTrailingChance = {ExposedDropdownMenuDefaults.TrailingIcon(expanded = it.second)}
-        )
+            )
+        }
     }
 }
 

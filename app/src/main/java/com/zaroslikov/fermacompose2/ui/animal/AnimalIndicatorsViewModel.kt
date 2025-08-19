@@ -15,8 +15,6 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.mapper.toCountRoomMap
-import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toSizeRoomMap
 import com.zaroslikov.fermacompose2.data.mapper.toVaccinationRoomMap
 import com.zaroslikov.fermacompose2.data.mapper.toWeightRoomMap
@@ -85,8 +83,8 @@ class AnimalIndicatorsViewModel(
             println("update: true")
             itemsRepository.updateAnimalTable(
                 it.copy(
-                    sex = sex,
-                    groop = false
+//                    sex = sex,
+                    group = false
                 )
             )
         }
@@ -95,25 +93,25 @@ class AnimalIndicatorsViewModel(
 
     init {
         viewModelScope.launch {
-            animalUiState = itemsRepository.getAnimal(itemId).first()
-            animalCountUiState = itemsRepository.getCountAnimalLimit(itemId).first().toDomainMap()
+//            animalUiState = itemsRepository.getAnimal(itemId).first()
+//            animalCountUiState = itemsRepository.getCountAnimalLimit(itemId).first().toDomainMap()
         }
     }
 
     val indicatorsUiState: StateFlow<AnimalIndicatorsUiState> = when (indicators) {
 
-        3 -> itemsRepository.getVaccinationAnimal(itemId).map { list ->
-            val mappedList = list.map { item -> item.toDomainMap() }
-            AnimalIndicatorsUiState(mappedList)
-        }.onStart {
-            _isLoading.value = true
-        }.onEach {
-            _isLoading.value = false
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = AnimalIndicatorsUiState()
-        )
+//        3 -> itemsRepository.getVaccinationAnimal(itemId).map { list ->
+//            val mappedList = list.map { item -> item.toDomainMap() }
+//            AnimalIndicatorsUiState(mappedList)
+//        }.onStart {
+//            _isLoading.value = true
+//        }.onEach {
+//            _isLoading.value = false
+//        }.stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//            initialValue = AnimalIndicatorsUiState()
+//        )
 
         2 -> itemsRepository.getCountAnimal(itemId).map { AnimalIndicatorsUiState(it) }.onStart {
             _isLoading.value = true
@@ -209,15 +207,13 @@ class AnimalIndicatorsViewModel(
                                 feedFoodSuffix = "",
                                 weight = 0.0,
                                 weightSuffix = "",
-                                isAutoWeight = false,
-                                isAutoPrice = false
                             )
                         )
                     }
                 }
 
                 2 -> {
-                    itemsRepository.insertAnimalCountTable(animalIndicatorsVM.toCountRoomMap())
+//                    itemsRepository.insertAnimalCountTable(animalIndicatorsVM.toCountRoomMap())
                 }
 
                 1 -> itemsRepository.insertAnimalSizeTable(animalIndicatorsVM.toSizeRoomMap())
@@ -292,15 +288,13 @@ class AnimalIndicatorsViewModel(
                                     feedFoodSuffix = "",
                                     weight = 0.0,
                                     weightSuffix = "",
-                                    isAutoWeight = false,
-                                    isAutoPrice = false
                                 )
                             )
                     }
                 }
 
                 2 -> {
-                    itemsRepository.updateAnimalCountTable(animalIndicatorsVM.toCountRoomMap())
+//                    itemsRepository.updateAnimalCountTable(animalIndicatorsVM.toCountRoomMap())
                     update(
                         count = animalIndicatorsVM.weight,
                         price = price?.toConvertZeroDouble() ?: 0.0,
@@ -321,7 +315,7 @@ class AnimalIndicatorsViewModel(
             when (indicators) {
 
                 3 -> itemsRepository.deleteAnimalVaccinationTable(animalIndicatorsVM.toVaccinationRoomMap())
-                2 -> itemsRepository.deleteAnimalCountTable(animalIndicatorsVM.toCountRoomMap())
+//                2 -> itemsRepository.deleteAnimalCountTable(animalIndicatorsVM.toCountRoomMap())
                 1 -> itemsRepository.deleteAnimalSizeTable(animalIndicatorsVM.toSizeRoomMap())
                 0 -> itemsRepository.deleteAnimalWeightTable(animalIndicatorsVM.toWeightRoomMap())
 

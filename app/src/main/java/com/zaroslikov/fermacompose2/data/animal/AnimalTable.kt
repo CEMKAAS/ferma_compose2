@@ -3,36 +3,37 @@ package com.zaroslikov.fermacompose2.data.animal
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 
 
 @Entity(
-    tableName = "AnimalTable",
+    tableName = "animal_table",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
         parentColumns = arrayOf("_id"),
         childColumns = arrayOf("idPT"),
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [Index("idPT")]
 )
 data class AnimalTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String,
     val type: String,
-    val data: String,
+    val date: String,
     @ColumnInfo(name= "date_factory")
-    val dateFactory: String,
-    val groop: Boolean,//groop = true, one = false
-    val sex: String,
+    val dateFactory: String?,
+    val group: Boolean,//groop = true, one = false
+    val sex: Boolean,
     val note : String,
-    val image:String,
-    val arhiv: Boolean,
-    val price: Double,
+    val image:String?,
+    val archive: Boolean,
     val foodDay:Double,
-    @ColumnInfo(name= "suffix_food_day")
-    val suffixFoodDay : String,
+    @ColumnInfo(name= "food_day_suffix")
+    val foodDaySuffix : String,
     @ColumnInfo(name = "idPT")
-    val idPT: Int,
+    val idPT: Long,
     )

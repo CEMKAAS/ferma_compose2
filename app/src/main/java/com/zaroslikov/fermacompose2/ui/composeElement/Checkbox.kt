@@ -6,9 +6,9 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Checkbox
@@ -145,45 +145,22 @@ fun AutoCalculateCheckbox(
     onCheckedChange: (Boolean) -> Unit,
     @StringRes tooltipTextResAutoCal: Int,
     price: String,
-    count: String
 ) {
-    CheckboxTextIcon(
-        modifier = if (isChecked) Modifier.toOutlinedText() else Modifier,
-        checked = isChecked,
-        onCheckedChange = onCheckedChange,
-        intTitle = R.string.checkbox_auto_calculate,
-        isTooltipShow = true,
-        intTooltip = tooltipTextResAutoCal
-    )
-    if (isChecked) {
-        TextBuildAnnotated(
-            intRes = R.string.support_text_all_price,
-            priceAll = price,
-            count = count
+    Column {
+        CheckboxTextIcon(
+            modifier = if (isChecked) Modifier.toOutlinedText() else Modifier,
+            checked = isChecked,
+            onCheckedChange = onCheckedChange,
+            intTitle = R.string.checkbox_auto_calculate,
+            isTooltipShow = true,
+            intTooltip = tooltipTextResAutoCal
         )
-    }
-}
-
-@Composable
-fun AutoCalculateCheckbox2(
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    @StringRes tooltipTextResAutoCal: Int,
-    price: String,
-) {
-    CheckboxTextIcon(
-        modifier = if (isChecked) Modifier.toOutlinedText() else Modifier,
-        checked = isChecked,
-        onCheckedChange = onCheckedChange,
-        intTitle = R.string.checkbox_auto_calculate,
-        isTooltipShow = true,
-        intTooltip = tooltipTextResAutoCal
-    )
-    if (isChecked) {
-        TextBuildAnnotated2(
-            intRes = R.string.support_text_all_price,
-            priceAll = price
-        )
+        if (isChecked) {
+            TextBuildAnnotated2(
+                intRes = R.string.support_text_all_price,
+                priceAll = price
+            )
+        }
     }
 }
 

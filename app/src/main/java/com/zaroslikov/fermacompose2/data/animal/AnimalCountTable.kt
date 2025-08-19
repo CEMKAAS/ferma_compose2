@@ -1,10 +1,8 @@
 package com.zaroslikov.fermacompose2.data.animal
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 
 @Entity(
     tableName = "AnimalCountTable",
@@ -17,12 +15,11 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 )
 data class AnimalCountTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val count: String,
     val suffix: String,
     val date: String,
-    val idAnimal: Int,
     val note: String,
-    val version: Int? = null//0-SaleTable 1-ExpensesTable 2-WriteOffSop
-// 3-WriteOffUtil 4-AddTable null - Старые не считаются
+    val version: Int? = null,//0-SaleTable 1-ExpensesTable 2-WriteOffSop // 3-WriteOffUtil 4-AddTable null - Старые не считаются
+    val idAnimal: Long
 )

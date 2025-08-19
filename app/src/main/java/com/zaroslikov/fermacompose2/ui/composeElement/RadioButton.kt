@@ -77,7 +77,7 @@ fun RadioButtonRow(
         RowRadioButton(
             modifier = Modifier.weight(1f),
             selected = state,
-            onStateSelect = { onStateSelect(state) },
+            onStateSelect = { onStateSelect(!state) },
             imageRes = imageTwo,
             intRes = intResTwo
         )

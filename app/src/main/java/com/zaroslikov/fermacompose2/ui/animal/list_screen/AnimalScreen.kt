@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.animal
+package com.zaroslikov.fermacompose2.ui.animal.list_screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +18,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -29,7 +31,6 @@ import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
 import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
 import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -48,8 +49,8 @@ object AnimalDestination : NavigationDestination {
 fun AnimalScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemCard: (Pair<Int, Int>) -> Unit,
-    navigateToItemAdd: (Int) -> Unit,
+    navigateToItemCard: (Pair<Long, Long>) -> Unit,
+    navigateToItemAdd: (Long) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     isFirstStart: Boolean,
@@ -98,7 +99,7 @@ fun AnimalScreen(
                 AnimalBody(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
-                    itemList = animalUiState.itemList,
+                    itemList = animalUiState,
                     onItemClick = { navigateToItemCard(Pair(it, idProject)) },
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
@@ -111,8 +112,8 @@ fun AnimalScreen(
 @Composable
 private fun AnimalBody(
     modifier: Modifier = Modifier,
-    itemList: List<AnimalTable>,
-    onItemClick: (Int) -> Unit,
+    itemList: List<DomainAnimalTable>,
+    onItemClick: (Long) -> Unit,
     navigateToItemAdd: () -> Unit
 ) {
     if (itemList.isNotEmpty())
@@ -134,16 +135,16 @@ private fun AnimalBody(
 @Composable
 private fun AnimalList(
     modifier: Modifier = Modifier,
-    itemList: List<AnimalTable>,
-    onItemClick: (Int) -> Unit
+    itemList: List<DomainAnimalTable>,
+    onItemClick: (Long) -> Unit
 ) {
     LazyColumn(
         modifier = modifier, verticalArrangement = Arrangement.Top
     ) {
         items(items = itemList, key = { it.id }) { item ->
-            AnimalCard(animalTable = item,
-                modifier = Modifier
-                    .clickable { onItemClick(item.id) })
+            AnimalCard(
+                animalTable = item,
+                modifier = Modifier.clickable { onItemClick(item.id) })
         }
     }
 }
@@ -151,7 +152,7 @@ private fun AnimalList(
 @Composable
 fun AnimalCard(
     modifier: Modifier = Modifier,
-    animalTable: AnimalTable
+    animalTable: DomainAnimalTable
 ) {
     CardField(
         modifier = modifier
@@ -167,17 +168,19 @@ fun AnimalCard(
                 iconRes = R.drawable.baseline_pets_24,
                 valueString = animalTable.type
             )
-            if (!animalTable.groop)
+            if (!animalTable.group)
                 IconAndText(
-                    iconRes = if (animalTable.sex == "Мужской") R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
-                    valueString = animalTable.sex
+                    iconRes = if (animalTable.sex) R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
+                    valueString = stringResource(
+                        if (animalTable.sex) R.string.animal_entry_screen_sex_man else R.string.animal_entry_screen_sex_woman
+                    )
                 )
             else
                 IconAndText(iconRes = R.drawable.baseline_spoke_24, valueString = animalTable.note)
 
             IconAndText(
-                iconRes = if (animalTable.dateFactory == "") R.drawable.baseline_calendar_month_24 else R.drawable.baseline_event_24,
-                valueString = if (animalTable.dateFactory == "") animalTable.data else animalTable.dateFactory
+                iconRes = if (animalTable.dateFactory == null) R.drawable.baseline_calendar_month_24 else R.drawable.baseline_event_24,
+                valueString = animalTable.dateFactory ?: animalTable.date
             )
         }
     }

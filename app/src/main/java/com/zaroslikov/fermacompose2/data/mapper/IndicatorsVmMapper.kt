@@ -21,10 +21,10 @@ fun AnimalSizeTable.toDomainMap(): DomainIndicatorsVM = DomainIndicatorsVM(
     note = note,
 )
 
-fun AnimalCountTable.toDomainMap(): DomainIndicatorsVM = DomainIndicatorsVM(
-    id = id, weight = count, suffix = suffix, date = date, idAnimal = idAnimal,
-    note = note, version = version
-)
+//fun AnimalCountTable.toDomainMap(): DomainIndicatorsVM = DomainIndicatorsVM(
+//    id = id, weight = count, suffix = suffix, date = date, idAnimal = idAnimal,
+//    note = note, version = version
+//)
 
 fun AnimalVaccinationTable.toDomainMap(): DomainIndicatorsVM = DomainIndicatorsVM(
     id = id, weight = vaccination, suffix = nextVaccination, date = date, idAnimal = idAnimal,
@@ -43,10 +43,10 @@ fun DomainIndicatorsVM.toSizeRoomMap(): AnimalSizeTable = AnimalSizeTable(
     note = note,
 )
 
-fun DomainIndicatorsVM.toCountRoomMap(): AnimalCountTable = AnimalCountTable(
-    id = id, count = weight, suffix = suffix, date = date, idAnimal = idAnimal,
-    note = note, version = version
-)
+//fun DomainIndicatorsVM.toCountRoomMap(): AnimalCountTable = AnimalCountTable(
+//    id = id, count = weight, suffix = suffix, date = date, idAnimal = idAnimal,
+//    note = note, version = version
+//)
 
 fun DomainIndicatorsVM.toVaccinationRoomMap(): AnimalVaccinationTable = AnimalVaccinationTable(
     id = id, vaccination = weight, date = date, nextVaccination = suffix, idAnimal = idAnimal,

@@ -51,7 +51,10 @@ fun ExpensesEntryState.updateTitle(title: String): ExpensesEntryState {
     )
 }
 
-fun ExpensesEntryState.updateTitleAndSuffix(pair: Pair<String, String>,  suffixSet: Set<String>): ExpensesEntryState {
+fun ExpensesEntryState.updateTitleAndSuffix(
+    pair: Pair<String, String>,
+    suffixSet: Set<String>
+): ExpensesEntryState {
     return copy(
         title = pair.first,
         countSuffix = pair.second,
@@ -72,7 +75,6 @@ fun ExpensesEntryState.updateCount(count: String): ExpensesEntryState {
         )
     ).updatePriceAll()
 }
-
 
 
 fun ExpensesEntryState.updateCountSuffix(
@@ -387,6 +389,7 @@ fun ExpensesEntryState.updateFromDomain(
             domain.month,
             domain.year
         ),
+        isAutoPrice = domain.priceAll != null,
         price = domain.price.formatNumber(false),
         priceAll = domain.priceAll?.formatNumber() ?: "",
         countSuffix = domain.countSuffix,
@@ -404,8 +407,7 @@ fun ExpensesEntryState.updateFromDomain(
         feedFoodInputSuffix = if (useDaily) domain.feedFoodSuffix ?: suffix else suffix,
         daysFood = domain.foodDesignedDay ?: 0,
         dateEndFood = domain.lastDayFood ?: "",
-        isAutoWeight = domain.isAutoWeight,
-        isAutoPrice = domain.isAutoPrice,
+        isAutoWeight = domain.weight != null,
         weight = domain.weight?.formatNumber(false) ?: "",
         weightSuffix = domain.weightSuffix ?: countSuffix,
         isIndicatorsValue = isIndicatorsValue
@@ -446,8 +448,6 @@ fun ExpensesEntryState.updateForSave(
         lastDayFood = if (isShowFood || isShowFoodHand) dateEndFood else null,
         weight = if (isAutoWeight) weight.toConvertDbDouble() else null,
         weightSuffix = if (isAutoWeight) weightSuffix else null,
-        isAutoWeight = isAutoWeight,
-        isAutoPrice = isAutoPrice,
         idPT = itemIdPT,
     )
 }

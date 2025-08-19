@@ -420,8 +420,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateIncubator(item: Incubator) =
         itemDao.updateIncubator(item)
 
-    override fun getAllAnimal(id: Int): Flow<List<AnimalTable>> = itemDao.getAllAnimal(id)
-    override fun getAnimal(id: Int): Flow<AnimalTable> = itemDao.getAnimal(id)
+    override fun getAllAnimal(id: Long): Flow<List<AnimalTable>> = itemDao.getAllAnimal(id)
+    override fun getAnimal(id: Long): Flow<AnimalTable> = itemDao.getAnimal(id)
     override fun getAnimalCard(id: Int): Flow<AnimalTable> = itemDao.getAnimalCard(id)
     override fun getTypeAnimal(id: Long): Flow<List<String>> = itemDao.getTypeAnimal(id)
 
@@ -432,8 +432,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateAnimalTable(animalTable: AnimalTable) =
         itemDao.updateAnimalTable(animalTable)
 
-    override suspend fun deleteAnimalTable(animalTable: AnimalTable) =
-        itemDao.deleteAnimalTable(animalTable)
+    override suspend fun deleteAnimalTable(id: Long) =
+        itemDao.deleteAnimalTable(id)
 
     override suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable): Long =
         itemDao.insertAnimalCountTable(animalCountTable)
