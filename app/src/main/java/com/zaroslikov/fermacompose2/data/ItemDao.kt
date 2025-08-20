@@ -12,6 +12,7 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
+import com.zaroslikov.fermacompose2.data.dto.AnimalWithCountDto
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
@@ -776,7 +777,7 @@ interface ItemDao {
 
     //Animal
     @Query("SELECT * from animal_table Where idPT=:id and archive = 0 ORDER BY id DESC")
-    fun getAllAnimal(id: Long): Flow<List<AnimalTable>>
+    fun getAllAnimal(id: Long): Flow<List<AnimalWithCountDto>>
 
     @Query("SELECT * from animal_table Where id=:id")
     fun getAnimal(id: Long): Flow<AnimalTable>
