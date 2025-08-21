@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
@@ -296,7 +297,7 @@ interface ItemsRepository {
 
     suspend fun insertIncubator(item: Incubator)
     suspend fun updateIncubator(item: Incubator)
-    fun getAllAnimal(id: Long): Flow<List<AnimalTable>>
+    fun getAllAnimal(id: Long): Flow<List<DomainAnimalWithCount>>
     fun getAnimal(id: Long): Flow<AnimalTable>
     fun getAnimalCard(id: Int): Flow<AnimalTable>
     fun getTypeAnimal(id: Long): Flow<List<String>>

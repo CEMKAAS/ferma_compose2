@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
@@ -14,6 +15,7 @@ import com.zaroslikov.fermacompose2.data.ferma.NoteTable
 import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.dto.toDomain
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
@@ -29,6 +31,7 @@ import com.zaroslikov.fermacompose2.ui.finance.IncomeExpensesDetails
 import com.zaroslikov.fermacompose2.ui.warehouse.FastAdd
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseData
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAllItemsStream(id: Int): Flow<List<AddTable>> = itemDao.getAllItems(id)
@@ -420,7 +423,10 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateIncubator(item: Incubator) =
         itemDao.updateIncubator(item)
 
-    override fun getAllAnimal(id: Long): Flow<List<AnimalTable>> = itemDao.getAllAnimal(id)
+    override fun getAllAnimal(id: Long): Flow<List<DomainAnimalWithCount>> {
+        return itemDao.getAllAnimal(id).map { list -> list.map { it.toDomain() } }
+    }
+
     override fun getAnimal(id: Long): Flow<AnimalTable> = itemDao.getAnimal(id)
     override fun getAnimalCard(id: Int): Flow<AnimalTable> = itemDao.getAnimalCard(id)
     override fun getTypeAnimal(id: Long): Flow<List<String>> = itemDao.getTypeAnimal(id)

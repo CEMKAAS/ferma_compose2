@@ -63,7 +63,7 @@ fun FinanceArhivScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     val project = viewModel.projectState
-    val animalUiState by viewModel.animalUiState.collectAsState()
+//    val animalUiState by viewModel.animalUiState.collectAsState()
     val currentBalance = viewModel.currentBalanceUiState
     val income = viewModel.incomeUiState
     val expenses = viewModel.expensesUiState
@@ -91,7 +91,7 @@ fun FinanceArhivScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             contentPadding = innerPadding,
-            animalList = animalUiState.itemList,
+            animalList = emptyList(),
             projectState = project,
             onValueChange = viewModel::updateUiState,
             unarchive = {
@@ -215,12 +215,12 @@ private fun FinanceBody(
             }
         }
 
-        animalList.forEach {
+       /* animalList.forEach {
             AnimalCard(
                 animalTable = it, modifier = Modifier
                     .padding(4.dp)
             )
-        }
+        }*/
 
         OutlinedButton(
             onClick = {

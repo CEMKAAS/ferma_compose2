@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
@@ -99,7 +100,7 @@ fun AnimalScreen(
                 AnimalBody(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
-                    itemList = animalUiState,
+                    itemList = animalUiState.itemList,
                     onItemClick = { navigateToItemCard(Pair(it, idProject)) },
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
@@ -112,7 +113,7 @@ fun AnimalScreen(
 @Composable
 private fun AnimalBody(
     modifier: Modifier = Modifier,
-    itemList: List<DomainAnimalTable>,
+    itemList: List<DomainAnimalWithCount>,
     onItemClick: (Long) -> Unit,
     navigateToItemAdd: () -> Unit
 ) {
@@ -135,7 +136,7 @@ private fun AnimalBody(
 @Composable
 private fun AnimalList(
     modifier: Modifier = Modifier,
-    itemList: List<DomainAnimalTable>,
+    itemList: List<DomainAnimalWithCount>,
     onItemClick: (Long) -> Unit
 ) {
     LazyColumn(
@@ -152,36 +153,38 @@ private fun AnimalList(
 @Composable
 fun AnimalCard(
     modifier: Modifier = Modifier,
-    animalTable: DomainAnimalTable
+    animalTable: DomainAnimalWithCount
 ) {
     CardField(
-        modifier = modifier
+        modifier = modifier,
+        row = false,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = animalTable.name,
-                style = textBold_16
-            )
+        Text(
+            text = animalTable.name,
+            style = textBold_16
+        )
+        IconAndText(
+            iconRes = R.drawable.baseline_pets_24,
+            valueString = animalTable.type
+        )
+        if (!animalTable.group)
             IconAndText(
-                iconRes = R.drawable.baseline_pets_24,
-                valueString = animalTable.type
-            )
-            if (!animalTable.group)
-                IconAndText(
-                    iconRes = if (animalTable.sex) R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
-                    valueString = stringResource(
-                        if (animalTable.sex) R.string.animal_entry_screen_sex_man else R.string.animal_entry_screen_sex_woman
-                    )
+                iconRes = if (animalTable.sex) R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
+                valueString = stringResource(
+                    if (animalTable.sex) R.string.animal_entry_screen_sex_man else R.string.animal_entry_screen_sex_woman
                 )
-            else
-                IconAndText(iconRes = R.drawable.baseline_spoke_24, valueString = animalTable.note)
-
-            IconAndText(
-                iconRes = if (animalTable.dateFactory == null) R.drawable.baseline_calendar_month_24 else R.drawable.baseline_event_24,
-                valueString = animalTable.dateFactory ?: animalTable.date
             )
-        }
+        else
+            IconAndText(
+                iconRes = R.drawable.baseline_spoke_24,
+                valueString = "${animalTable.count} ${animalTable.suffix}"
+            )
+
+        IconAndText(
+            iconRes = if (animalTable.dateFactory == null) R.drawable.baseline_calendar_month_24 else R.drawable.baseline_event_24,
+            valueString = animalTable.dateFactory ?: animalTable.date
+        )
     }
 }
+

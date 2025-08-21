@@ -776,8 +776,25 @@ interface ItemDao {
     suspend fun updateIncubator(item: Incubator)
 
     //Animal
-    @Query("SELECT * from animal_table Where idPT=:id and archive = 0 ORDER BY id DESC")
+    @Query("SELECT an.id, " +
+            "an.name, " +
+            "an.type, " +
+            "an.date, " +
+            "an.date_factory, " +
+            "an.`group`, " +
+            "an.sex, " +
+            "ac.count AS count, " +
+            "ac.suffix AS suffix " +
+            "FROM animal_table an " +
+            "LEFT JOIN AnimalCountTable ac ON ac.id = ( " +
+            "   SELECT MAX(id) " +
+            "   FROM AnimalCountTable " +
+            "   WHERE idAnimal = an.id " +
+            ") " +
+            "WHERE an.idPT = :id AND an.archive = 0 " +
+            "ORDER BY an.id DESC")
     fun getAllAnimal(id: Long): Flow<List<AnimalWithCountDto>>
+
 
     @Query("SELECT * from animal_table Where id=:id")
     fun getAnimal(id: Long): Flow<AnimalTable>

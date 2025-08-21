@@ -1,3 +1,13 @@
 package com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable
 
-data class DomainAnimalWithCount()
+data class DomainAnimalWithCount(
+    val id: Long,
+    val name: String,
+    val type: String,
+    val date: String,
+    val dateFactory: String?,
+    val group: Boolean,
+    val sex: Boolean,
+    val count: String?,
+    val suffix: String?
+)

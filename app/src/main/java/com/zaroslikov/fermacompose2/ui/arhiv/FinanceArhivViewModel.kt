@@ -40,13 +40,13 @@ class FinanceArhivViewModel(
     var projectState by mutableStateOf(IncubatorProjectEditState())
         private set
 
-    val animalUiState: StateFlow<AnimalUiState> =
+   /* val animalUiState: StateFlow<AnimalUiState> =
         itemsRepository.getAllAnimal(itemId).map { AnimalUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = AnimalUiState()
-            )
+            )*/
 
     init {
         viewModelScope.launch {
