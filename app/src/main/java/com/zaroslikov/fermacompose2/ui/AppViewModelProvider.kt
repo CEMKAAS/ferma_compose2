@@ -193,13 +193,6 @@ object AppViewModelProvider {
 
 
         initializer {
-            AnimalCardViewModel(
-                this.createSavedStateHandle(),
-                inventoryApplication().container.itemsRepository
-            )
-        }
-
-        initializer {
             AnimalIndicatorsViewModel(
                 this.createSavedStateHandle(),
                 inventoryApplication().container.itemsRepository

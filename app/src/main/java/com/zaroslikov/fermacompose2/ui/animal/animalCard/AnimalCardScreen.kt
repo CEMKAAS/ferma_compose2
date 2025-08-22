@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
@@ -29,6 +30,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogAddAnimal
 import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogArchiveAnimal
 import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogKillAnimal
@@ -51,17 +53,17 @@ import kotlinx.coroutines.launch
 object AnimalCardDestination : NavigationDestination {
     override val route = "animalCard"
     override val titleRes = R.string.app_name
-    const val itemIdArg = "itemId"
-    const val itemIdArgTwo = "itemCategory"
-    val routeWithArgs = "$route/{$itemIdArg}/{$itemIdArgTwo}"
+    const val itemIdPT = "itemIdPT"
+    const val itemId = "itemId"
+    val routeWithArgs = "$route?$itemIdPT={$itemIdPT}&$itemId={$itemId}"
 }
 
 @Composable
 fun AnimalCardProduct(
     navigateBack: () -> Unit,
-    onNavigateSetting: (Int) -> Unit,
+    onNavigateSetting: (Pair<Long, Long>) -> Unit,
     onNavigateIndicators: (Triple<Int, Int, Long>) -> Unit,
-    viewModel: AnimalCardViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AnimalCardViewModel = hiltViewModel()
 ) {
     val animalTable = viewModel.animalUiState
     val product = viewModel.productState(animalTable.name).collectAsState()
@@ -72,20 +74,16 @@ fun AnimalCardProduct(
 
     Scaffold(topBar = {
         TopAppBarStart(
-            title = animalTable.name,
+            title = stringResource(R.string.animal_card_screen_animal_card),
             true,
             navigateUp = navigateBack,
-            settingUp = { onNavigateSetting(animalTable.id.toInt()) }
+            settingUp = { onNavigateSetting(viewModel.itemIdPT to viewModel.itemId) }
         )
     }) { innerPadding ->
         AnimalCardContainer(
             modifier = Modifier
                 .modifierScreen(innerPadding),
             state = animalTable,
-            animalWeightTable = viewModel.domainWeight,
-            animalSizeTable = viewModel.domainHeight,
-            animalCountTable = viewModel.domainCount,
-            animalVaccinationTable = viewModel.domainVaccination,
             titleList = titleUiState.list,
             buyerList = buyerUiState.list,
             animalProductTable = product.value.itemList,
@@ -95,7 +93,7 @@ fun AnimalCardProduct(
                     Triple(
                         it.first,
                         it.second,
-                        viewModel.itemIdPT.toLong()
+                        viewModel.itemIdPT
                     )
                 )
             },
@@ -146,10 +144,6 @@ fun AnimalCardProduct(
 fun AnimalCardContainer(
     modifier: Modifier,
     state: AnimalCardState,
-    animalWeightTable: DomainIndicatorsVM?,
-    animalSizeTable: DomainIndicatorsVM?,
-    animalCountTable: DomainIndicatorsVM,
-    animalVaccinationTable: DomainIndicatorsVM?,
     countWarehouse: Double,
     titleList: List<PairData>,
     buyerList: List<String>,
@@ -175,13 +169,7 @@ fun AnimalCardContainer(
         DataCardOne(state)
         DataCardTwo(
             state = state,
-            isSoloAnimal = !state.group,
-            countTable = animalCountTable,
-            weightTable = animalWeightTable,
-            sizeTable = animalSizeTable,
-            vaccinationsTable = animalVaccinationTable,
             onNavigateIndicators = { onNavigateIndicators(Pair(state.id.toInt(), it)) }
-
         )
         NoteWidget(state.note) { updateNote(it) }
         PullOutCard(
@@ -218,7 +206,7 @@ fun AnimalCardContainer(
             onWriteOffClick = { openWriteOffDialog = !openWriteOffDialog },
             onArchiveClick = { openArchiveDialog = !openArchiveDialog }
         )
-        if (openSaleDialog)
+        /*if (openSaleDialog)
             AlertDialogSaleAnimal(
                 buyerList = buyerList,
                 isAnimalGroup = state.group,
@@ -275,7 +263,7 @@ fun AnimalCardContainer(
             AlertDialogArchiveAnimal(
                 onConfirmation = { openArchiveDialog = !openArchiveDialog },
                 onArchiveClick = updateArchive
-            )
+            )*/
     }
 }
 
@@ -289,7 +277,7 @@ private fun DataCardOne(
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
-            text = stringResource(R.string.animal_card_screen_animal_card),
+            text = state.name,
             style = textBold_18
         )
         IconAndText(
@@ -338,48 +326,43 @@ private fun DataCardOne(
 @Composable
 private fun DataCardTwo(
     state: AnimalCardState,
-    isSoloAnimal: Boolean,
-    countTable: DomainIndicatorsVM,
-    weightTable: DomainIndicatorsVM?,
-    sizeTable: DomainIndicatorsVM?,
-    vaccinationsTable: DomainIndicatorsVM?,
     onNavigateIndicators: (Int) -> Unit
 ) {
-    CardField {
-        Column {
-            Text(
-                text = stringResource(R.string.animal_card_screen_animal_card_two),
-                style = textBold_18
-            )
-            if (!isSoloAnimal)
-                IconAndTextMore(
-                    iconRes = R.drawable.baseline_spoke_24,
-                    valueString = stringResource(R.string.card_pieces_s, state.weight),
-                    onClick = { onNavigateIndicators(2) }
-                )
-            else {
-                IconAndTextMore(
-                    iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
-                    valueString = if (sizeTable == null) stringResource(R.string.animal_card_screen_animal_card_no_height)
-                    else "${state.weight} ${state.weightSuffix}",
-                    onClick = { onNavigateIndicators(1) }
-                )
-            }
+    CardField(
+        row = false
+    ) {
+        Text(
+            text = stringResource(R.string.animal_card_screen_animal_card_two),
+            style = textBold_18
+        )
+        if (state.group)
             IconAndTextMore(
-                iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
-                valueString = if (weightTable == null) stringResource(R.string.animal_card_screen_animal_card_no_weight)
-                else "${state.weight} ${state.weightSuffix}",
-                onClick = { onNavigateIndicators(0) }
+                iconRes = R.drawable.baseline_spoke_24,
+                valueString = stringResource(R.string.card_pieces_s, state.countAnimal.toString()),
+                onClick = { onNavigateIndicators(2) }
             )
+        else
             IconAndTextMore(
-                iconRes = R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
-                valueString = if (vaccinationsTable == null) stringResource(R.string.animal_card_screen_animal_card_no_vaccination)
-                else "${state.weight} ${state.date}",
-                onClick = { onNavigateIndicators(3) }
+                iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
+                valueString = if (state.size == null) stringResource(R.string.animal_card_screen_animal_card_no_height)
+                else "${state.size} ${state.sizeSuffix}",
+                onClick = { onNavigateIndicators(1) }
             )
-        }
+        IconAndTextMore(
+            iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
+            valueString = if (state.weight == null) stringResource(R.string.animal_card_screen_animal_card_no_weight)
+            else "${state.weight} ${state.weightSuffix}",
+            onClick = { onNavigateIndicators(0) }
+        )
+        IconAndTextMore(
+            iconRes = R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
+            valueString = if (state.vaccination == null) stringResource(R.string.animal_card_screen_animal_card_no_vaccination)
+            else "${state.vaccination} ${state.vaccinationDate}",
+            onClick = { onNavigateIndicators(3) }
+        )
     }
 }
+
 
 @Composable
 private fun NoteWidget(
@@ -396,7 +379,6 @@ private fun NoteWidget(
             isTooltipShow = true,
             isShowValue = false,
             intTooltip = R.string.support_text_widget_animal_note_tooltip
-
         )
         OutlinedTextNoteWidget(
             value = note,

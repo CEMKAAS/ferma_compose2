@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
@@ -55,7 +56,7 @@ fun AnimalScreen(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     isFirstStart: Boolean,
-    viewModel: AnimalViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AnimalViewModel = hiltViewModel()
 ) {
     val idProject = viewModel.itemId
 
@@ -101,7 +102,7 @@ fun AnimalScreen(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
                     itemList = animalUiState.itemList,
-                    onItemClick = { navigateToItemCard(Pair(it, idProject)) },
+                    onItemClick = { navigateToItemCard(Pair(idProject, it)) },
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
             }

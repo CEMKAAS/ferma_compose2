@@ -456,18 +456,19 @@ fun InventoryNavHost(
                 type = NavType.LongType
             })
         ) {
-            ExpensesScreen(drawerState = drawerState, navigateToStart = {
-                navController.navigate(StartDestination.route)
-            }, navigateToModalSheet = {
-                navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-            }, navigateToItemAdd = {
-                navController.navigate(
-                    navNull(
-                        route = ExpensesEntryDestination.route,
-                        itemOne = it.toString()
+            ExpensesScreen(
+                drawerState = drawerState, navigateToStart = {
+                    navController.navigate(StartDestination.route)
+                }, navigateToModalSheet = {
+                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                }, navigateToItemAdd = {
+                    navController.navigate(
+                        navNull(
+                            route = ExpensesEntryDestination.route,
+                            itemOne = it.toString()
+                        )
                     )
-                )
-            },
+                },
                 navigateToItemUpdate = {
                     navController.navigate(
                         navNull(
@@ -563,7 +564,11 @@ fun InventoryNavHost(
                     )
                 }, navigateToItemCard = {
                     navController.navigate(
-                        "${AnimalCardDestination.route}/${it.first}/${it.second}"
+                        navNull(
+                            route = AnimalCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
                     )
                 }, isFirstStart = isFirstStart
             )
@@ -573,10 +578,10 @@ fun InventoryNavHost(
             route = AnimalEntryDestination.routeWithArgs,
             arguments = listOf(
                 navArgument(AnimalEntryDestination.itemIdPT) {
-                    type = NavType.IntType
+                    type = NavType.LongType
                 },
                 navArgument(AnimalEntryDestination.itemId) {
-                    type = NavType.IntType
+                    type = NavType.LongType
                     defaultValue = -1
                 })
         ) {
@@ -587,15 +592,23 @@ fun InventoryNavHost(
 
         composable(
             route = AnimalCardDestination.routeWithArgs,
-            arguments = listOf(navArgument(AnimalCardDestination.itemIdArg) {
-                type = NavType.IntType
-            }, navArgument(AnimalCardDestination.itemIdArgTwo) {
-                type = NavType.IntType
+            arguments = listOf(navArgument(AnimalCardDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalCardDestination.itemId) {
+                type = NavType.LongType
             })
         ) {
             AnimalCardProduct(
                 navigateBack = { navController.popBackStack() },
-                onNavigateSetting = { navController.navigate("${AnimalEntryDestination.route}/${it}") },
+                onNavigateSetting = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalEntryDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
                 onNavigateIndicators = { navController.navigate("${AnimalIndicatorsDestination.route}/${it.first}/${it.second}/${it.third}") })
         }
 

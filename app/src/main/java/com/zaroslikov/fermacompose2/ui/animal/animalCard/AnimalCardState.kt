@@ -19,14 +19,14 @@ data class AnimalCardState(
     val foodDaySuffix: String = "",
     val idPT: Long = 0,
     val price : Double=0.0,
-    val countAnimal : String ="",
-    val countAnimalSuffix : String ="",
-    val size: String ="",
-    val sizeSuffix: String ="",
-    val weight :String = "",
-    val weightSuffix: String ="",
-    val vaccination: String ="",
-    val vaccinationDate: String ="",
+    val countAnimal : String? ="",
+    val countAnimalSuffix : String? ="",
+    val size: String? ="",
+    val sizeSuffix: String? ="",
+    val weight :String? = "",
+    val weightSuffix: String? ="",
+    val vaccination: String? ="",
+    val vaccinationDate: String? ="",
 )
 
 fun AnimalCardState.updateFromDomain(domain: DomainAnimalCard): AnimalCardState {
@@ -41,7 +41,14 @@ fun AnimalCardState.updateFromDomain(domain: DomainAnimalCard): AnimalCardState 
         archive = domain.archive,
         foodDay = domain.foodDay,
         foodDaySuffix = domain.foodDaySuffix,
-        price = price
-
+        price = price,
+        countAnimal = domain.countAnimal,
+        countAnimalSuffix = domain.countAnimalSuffix,
+        size = domain.size,
+        sizeSuffix = domain.sizeSuffix,
+        weight = domain.weight,
+        weightSuffix = domain.weightSuffix,
+        vaccination = domain.vaccination,
+        vaccinationDate = domain.vaccinationDate
     )
 }
