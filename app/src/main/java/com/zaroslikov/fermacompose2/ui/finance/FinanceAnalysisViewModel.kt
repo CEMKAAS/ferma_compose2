@@ -11,7 +11,7 @@ import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQLPair
 import com.zaroslikov.fermacompose2.supportFun.firstDayOfMonth
 import com.zaroslikov.fermacompose2.supportFun.todayOfMonth
-import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalTitSuff
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull

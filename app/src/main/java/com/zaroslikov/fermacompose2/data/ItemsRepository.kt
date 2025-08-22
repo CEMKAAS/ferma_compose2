@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
@@ -19,10 +21,9 @@ import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
 import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -299,7 +300,7 @@ interface ItemsRepository {
     suspend fun updateIncubator(item: Incubator)
     fun getAllAnimal(id: Long): Flow<List<DomainAnimalWithCount>>
     fun getAnimal(id: Long): Flow<AnimalTable>
-    fun getAnimalCard(id: Int): Flow<AnimalTable>
+    fun getAnimalCard(id: Int): Flow<DomainAnimalCard>
     fun getTypeAnimal(id: Long): Flow<List<String>>
 
     //AnimalScreen

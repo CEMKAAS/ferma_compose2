@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "FermaCompose2"
 include(":app")
- 
+include(":data")
+include(":domain")

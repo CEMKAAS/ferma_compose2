@@ -6,7 +6,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zaroslikov.fermacompose2.InventoryApplication
-import com.zaroslikov.fermacompose2.ui.animal.AnimalCardViewModel
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardViewModel
 import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsViewModel
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalViewModel
 import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivViewModel

@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.data.dto
+package com.zaroslikov.fermacompose2.data.dto.animal
 
 
 data class AnimalWithCountDto(

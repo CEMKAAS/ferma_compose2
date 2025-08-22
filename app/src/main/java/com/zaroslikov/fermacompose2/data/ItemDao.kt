@@ -12,7 +12,8 @@ import com.zaroslikov.fermacompose2.data.animal.AnimalSizeTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalVaccinationTable
 import com.zaroslikov.fermacompose2.data.animal.AnimalWeightTable
-import com.zaroslikov.fermacompose2.data.dto.AnimalWithCountDto
+import com.zaroslikov.fermacompose2.data.dto.animal.AnimalCardDto
+import com.zaroslikov.fermacompose2.data.dto.animal.AnimalWithCountDto
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesAnimalTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
@@ -25,10 +26,9 @@ import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
 import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -776,23 +776,25 @@ interface ItemDao {
     suspend fun updateIncubator(item: Incubator)
 
     //Animal
-    @Query("SELECT an.id, " +
-            "an.name, " +
-            "an.type, " +
-            "an.date, " +
-            "an.date_factory, " +
-            "an.`group`, " +
-            "an.sex, " +
-            "ac.count AS count, " +
-            "ac.suffix AS suffix " +
-            "FROM animal_table an " +
-            "LEFT JOIN AnimalCountTable ac ON ac.id = ( " +
-            "   SELECT MAX(id) " +
-            "   FROM AnimalCountTable " +
-            "   WHERE idAnimal = an.id " +
-            ") " +
-            "WHERE an.idPT = :id AND an.archive = 0 " +
-            "ORDER BY an.id DESC")
+    @Query(
+        "SELECT an.id, " +
+                "an.name, " +
+                "an.type, " +
+                "an.date, " +
+                "an.date_factory, " +
+                "an.`group`, " +
+                "an.sex, " +
+                "ac.count AS count, " +
+                "ac.suffix AS suffix " +
+                "FROM animal_table an " +
+                "LEFT JOIN AnimalCountTable ac ON ac.id = ( " +
+                "   SELECT MAX(id) " +
+                "   FROM AnimalCountTable " +
+                "   WHERE idAnimal = an.id " +
+                ") " +
+                "WHERE an.idPT = :id AND an.archive = 0 " +
+                "ORDER BY an.id DESC"
+    )
     fun getAllAnimal(id: Long): Flow<List<AnimalWithCountDto>>
 
 
@@ -800,17 +802,60 @@ interface ItemDao {
     fun getAnimal(id: Long): Flow<AnimalTable>
 
     @Query(
-        "SELECT " +
-                "animal_table.id, animal_table.name, animal_table.type, animal_table.date, animal_table.date_factory, " +
-                "animal_table.`group`, animal_table.sex, animal_table.note, animal_table.image, animal_table.archive, " +
-                "(SELECT IFNULL(SUM(price), 0) " +
-                "FROM expenses_table " +
-                "WHERE animalId = animal_table.id ) AS price, " +
-                "animal_table.foodDay, animal_table.food_day_suffix, animal_table.idPT " +
-                "FROM animal_table " +
-                "WHERE animal_table.id = :id"
+        "WITH " +
+                "LastSize AS ( " +
+                "   SELECT s.idAnimal, s.size, s.suffix " +
+                "   FROM AnimalSizeTable s " +
+                "   WHERE s.idAnimal = :id " +
+                "   ORDER BY DATE(printf('%04d-%02d-%02d', substr(s.date, 7, 4), substr(s.date, 4, 2), substr(s.date, 1, 2))) DESC, s.id DESC " +
+                "   LIMIT 1 " +
+                "), " +
+                "LastWeight AS ( " +
+                "   SELECT w.idAnimal, w.weight, w.suffix " +
+                "   FROM AnimalWeightTable w " +
+                "   WHERE w.idAnimal = :id " +
+                "   ORDER BY DATE(printf('%04d-%02d-%02d', substr(w.date, 7, 4), substr(w.date, 4, 2), substr(w.date, 1, 2))) DESC, w.id DESC " +
+                "   LIMIT 1 " +
+                "), " +
+                "LastVaccination AS ( " +
+                "   SELECT v.idAnimal, v.vaccination, v.date AS vaccinationDate " +
+                "   FROM AnimalVaccinationTable v " +
+                "   WHERE v.idAnimal = :id " +
+                "   ORDER BY DATE(printf('%04d-%02d-%02d', substr(v.date, 7, 4), substr(v.date, 4, 2), substr(v.date, 1, 2))) DESC, v.id DESC " +
+                "   LIMIT 1 " +
+                "), " +
+                "LastCount AS ( " +
+                "   SELECT c.idAnimal, c.count, c.suffix " +
+                "   FROM AnimalCountTable c " +
+                "   WHERE c.idAnimal = :id " +
+                "   ORDER BY DATE(printf('%04d-%02d-%02d', substr(c.date, 7, 4), substr(c.date, 4, 2), substr(c.date, 1, 2))) DESC, c.id DESC " +
+                "   LIMIT 1 " +
+                "), " +
+                "PriceSum AS ( " +
+                "   SELECT animalId, IFNULL(SUM(CASE WHEN price_all IS NOT NULL THEN price_all ELSE price END), 0) AS totalPrice " +
+                "   FROM expenses_table " +
+                "   WHERE animalId = :id " +
+                ") " +
+                "SELECT " +
+                "   a.name, a.type, a.date, a.date_factory, " +
+                "   a.`group`, a.sex, a.note, a.archive, " +
+                "   a.foodDay, a.food_day_suffix as foodDaySuffix, " +
+                "   ps.totalPrice AS price, " +
+                "   lc.count AS countAnimal, lc.suffix AS countAnimalSuffix, " +
+                "   ls.size, ls.suffix AS sizeSuffix, " +
+                "   lw.weight, lw.suffix AS weightSuffix, " +
+                "   lv.vaccination, vaccinationDate " +
+                "FROM animal_table a " +
+                "LEFT JOIN PriceSum ps ON ps.animalId = a.id " +
+                "LEFT JOIN LastSize ls ON ls.idAnimal = a.id " +
+                "LEFT JOIN LastWeight lw ON lw.idAnimal = a.id " +
+                "LEFT JOIN LastVaccination lv ON lv.idAnimal = a.id " +
+                "LEFT JOIN LastCount lc ON lc.idAnimal = a.id " +
+                "WHERE a.id = :id"
     )
-    fun getAnimalCard(id: Int): Flow<AnimalTable>
+    fun getAnimalCard(id: Int): Flow<AnimalCardDto>
+
+
 
     @Query("SELECT type from animal_table Where idPT=:id GROUP BY type")
     fun getTypeAnimal(id: Long): Flow<List<String>>

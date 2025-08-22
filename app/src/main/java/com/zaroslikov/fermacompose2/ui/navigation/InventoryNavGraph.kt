@@ -9,8 +9,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.zaroslikov.fermacompose2.ui.animal.AnimalCardDestination
-import com.zaroslikov.fermacompose2.ui.animal.AnimalCardProduct
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardDestination
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryDestination
 import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryProduct

@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
@@ -16,14 +18,15 @@ import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.dto.toDomain
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.dto.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
 import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.TripleData
-import com.zaroslikov.fermacompose2.ui.animal.AnimalTitSuff
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalTitSuff
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.AnimalExpensesList2
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.Fin
@@ -428,7 +431,10 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     }
 
     override fun getAnimal(id: Long): Flow<AnimalTable> = itemDao.getAnimal(id)
-    override fun getAnimalCard(id: Int): Flow<AnimalTable> = itemDao.getAnimalCard(id)
+    override fun getAnimalCard(id: Int): Flow<DomainAnimalCard> {
+        return itemDao.getAnimalCard(id).map { it.toDomainMap() }
+    }
+
     override fun getTypeAnimal(id: Long): Flow<List<String>> = itemDao.getTypeAnimal(id)
 
     /**Animal**/

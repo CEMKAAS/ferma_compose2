@@ -1,7 +1,7 @@
 package com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.dto
 
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
-import com.zaroslikov.fermacompose2.data.dto.AnimalWithCountDto
+import com.zaroslikov.fermacompose2.data.dto.animal.AnimalWithCountDto
 
 fun DomainAnimalWithCount.toRoom(): AnimalWithCountDto = AnimalWithCountDto(
     id = id,
