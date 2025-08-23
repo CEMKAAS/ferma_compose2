@@ -73,8 +73,7 @@ fun AnimalEntryProduct(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = if (state.isAnimalGroup) R.string.animals_add_screen_title
-                else R.string.animal_add_screen_title,
+                intRes = gerAppBarTitle(state.isAnimalGroup, state.isEntry),
                 navigateUp = navigateBack,
                 scrollBehavior = scrollBehavior
             )
@@ -92,7 +91,6 @@ fun AnimalEntryProduct(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalEntryContainer(
     modifier: Modifier,
@@ -138,10 +136,11 @@ fun AnimalEntryContainer(
                 isWarehouseShow = false,
                 isDropMenuShow = false
             )
-        else OutlinedTextSex(
-            value = state.sex,
-            onValueChange = { onValueChange(state.updateSex(it)) },
-        )
+        if (!state.isAnimalGroup)
+            OutlinedTextSex(
+                value = state.sex,
+                onValueChange = { onValueChange(state.updateSex(it)) },
+            )
         if (state.isEntry)
             OutlinedPriceInput(
                 price = state.price,
@@ -162,20 +161,19 @@ fun AnimalEntryContainer(
             state = state,
             onValueChange = onValueChange
         )
-        if (state.isEntry)
-            OutlinedTextCount(
-                value = state.foodDay,
-                onValueChange = { onValueChange(state.updateFoodDay(it)) },
-                isError = false,
-                onSuffixChange = { onValueChange(state.updateFoodDaySuffix(it)) },
-                intRes = R.string.outlined_food_day_animals,
-                intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
-                suffix = state.foodDaySuffix,
-                isWarehouseShow = false,
-                isDropMenuShow = true,
-                versionDropMenu = 0,
-                isNecessarily = false
-            )
+        OutlinedTextCount(
+            value = state.foodDay,
+            onValueChange = { onValueChange(state.updateFoodDay(it)) },
+            isError = false,
+            onSuffixChange = { onValueChange(state.updateFoodDaySuffix(it)) },
+            intRes = R.string.outlined_food_day_animals,
+            intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
+            suffix = state.foodDaySuffix,
+            isWarehouseShow = false,
+            isDropMenuShow = true,
+            versionDropMenu = 0,
+            isNecessarily = false
+        )
         if (state.isEntry)
             OutlinedTextNote(
                 value = state.note,
@@ -275,5 +273,14 @@ private fun DateFactoryCard(
                 cardBorder = false
             )
         }
+    }
+}
+
+private fun gerAppBarTitle(isAnimalGroup: Boolean, isEntry: Boolean): Int {
+    return when {
+        isAnimalGroup && isEntry -> R.string.animals_add_screen_title
+        !isAnimalGroup && isEntry -> R.string.animal_add_screen_title
+        isAnimalGroup && !isEntry -> R.string.animals_add_screen_edit_s
+        else -> R.string.animals_add_screen_edit
     }
 }

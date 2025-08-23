@@ -14,24 +14,41 @@ import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
 import com.zaroslikov.fermacompose2.data.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
-import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryDestination
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.AddAnimal
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+sealed class AddCardIntent {
+    data class CountChanged(val count: String) : AddCardIntent()
+    data class PriceChanged(val price: String) : AddCardIntent()
+    data class AutoPriceChanged(val isAutoPrice: Boolean) : AddCardIntent()
+    data class NoteChanged(val note: String) : AddCardIntent()
+    data object SaveButton : AddCardIntent()
+    data object Exit : AddCardIntent()
+}
+
 
 @HiltViewModel
 class AnimalCardViewModel @Inject constructor(
@@ -43,65 +60,85 @@ class AnimalCardViewModel @Inject constructor(
     val itemIdPT: Long = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdPT])
     val itemId: Long = checkNotNull(savedStateHandle[AnimalCardDestination.itemId])
 
+    private var _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     var animalUiState by mutableStateOf(AnimalCardState())
         private set
-
-    /*    var domainWeight by mutableStateOf<DomainIndicatorsVM?>(null)
-            private set
-        var domainHeight by mutableStateOf<DomainIndicatorsVM?>(null)
-            private set
-        var domainCount by mutableStateOf(DomainIndicatorsVM())
-            private set
-        var domainVaccination by mutableStateOf<DomainIndicatorsVM?>(null)
-            private set*/
     var countInWarehouse by mutableDoubleStateOf(0.0)
         private set
+
+    private val _state = MutableStateFlow(AnimalCardState())
+    val state: StateFlow<AnimalCardState> = _state.asStateFlow()
+
+
+    fun onIntent(intent: AddCardIntent) {
+        when (intent) {
+            is AddCardIntent.CountChanged -> updateCount(intent.count)
+            is AddCardIntent.AutoPriceChanged -> updateAutoPrice(intent.isAutoPrice)
+            is AddCardIntent.PriceChanged -> updatePrice(intent.price)
+            is AddCardIntent.NoteChanged -> updateNote(intent.note)
+            AddCardIntent.Exit -> {}
+            AddCardIntent.SaveButton -> {}
+        }
+    }
+
+    private fun updateCount(count: String) {
+        updateState {
+            it.copy(
+                count = count,
+                isErrorCount = count.isBlank()
+            )
+        }
+        updatePriceAll()
+    }
+
+    private fun updatePrice(price: String) {
+        updateState { it.copy(price = price) }
+        updatePriceAll()
+    }
+
+    private fun updateAutoPrice(isAutoPrice: Boolean) {
+        updateState { it.copy(isAutoPrice = isAutoPrice) }
+        updatePriceAll()
+    }
+
+    private fun updateNote(note: String) {
+        updateState { it.copy(note = note) }
+    }
+
+    private fun updatePriceAll() {
+        updateState {
+            it.copy(
+                priceAll = if (it.isAutoPrice) (it.price.toConvertZeroDouble() * it.count.toConvertZeroDouble()).formatNumber() else "0",
+            )
+        }
+    }
+
+    private fun updateState(update: (AddAnimal) -> AddAnimal) {
+        _state.update { current ->
+            current.copy(addAnimal = update(current.addAnimal))
+        }
+    }
 
 
     init {
         viewModelScope.launch {
             launch {
                 itemsRepository.getAnimalCard(itemId.toInt())
-                    .flowOn(Dispatchers.IO)
-                    .collectLatest {
+                    .flowOn(Dispatchers.IO).onStart {
+                        _isLoading.value = true
+                    }.onEach {
+                        _isLoading.value = false
+                    }.collectLatest {
                         animalUiState = animalUiState.updateFromDomain(it)
                     }
             }
-            /*    launch {
-                    itemsRepository.getWeightAnimalLimit(itemId)
-                        .flowOn(Dispatchers.IO)
-                        .collectLatest {
-                            it?.let {
-                                domainWeight = it.toDomainMap()
-                            }
-                        }
-                }
-                launch {
-                    itemsRepository.getSizeAnimalLimit(itemId)
-                        .flowOn(Dispatchers.IO)
-                        .collectLatest {
-                            it?.let {
-                                domainHeight = it.toDomainMap()
-                            }
-                        }
-                }
-                launch {
-                    itemsRepository.getCountAnimalLimit(itemId)
-                        .flowOn(Dispatchers.IO)
-                        .collectLatest {
-    //                        domainCount = it.toDomainMap()
-                        }
-                }
-                launch {
-                    itemsRepository.getVaccinationAnimalLimit(itemId)
-                        .flowOn(Dispatchers.IO)
-                        .collectLatest {
-                            it?.let {
-                                domainVaccination = it.toDomainMap()
-                            }
-                        }
-                }*/
         }
+    }
+
+    fun update(animalCardState: AnimalCardState) {
+        animalUiState = animalCardState
     }
 
     val titleUiState: StateFlow<DataPairListState> =
@@ -121,10 +158,9 @@ class AnimalCardViewModel @Inject constructor(
             )
 
 
-    fun updateNote(note: String) {
+    fun updateNote() {
         viewModelScope.launch {
-            println("___________$note")
-//            itemsRepository.updateAnimalTable(animalUiState.copy(note = note).toAnimalTable())
+//            itemsRepository.updateAnimalTable(animalUiState.)
         }
     }
 
@@ -212,12 +248,6 @@ class AnimalCardViewModel @Inject constructor(
                  animalUiState.copy(arhiv = pair.third).toAnimalTable()
              )*/
         }
-    }
-
-
-    fun updateUiState(state: AnimalCardState) {
-        animalUiState =
-            state
     }
 
     companion object {

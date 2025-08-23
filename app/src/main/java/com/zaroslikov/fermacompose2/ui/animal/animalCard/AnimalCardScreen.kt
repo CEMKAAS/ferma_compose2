@@ -1,9 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
+import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryState
 import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogAddAnimal
 import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogArchiveAnimal
@@ -39,6 +42,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogWri
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonArchive
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonCustom
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
+import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
 import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
 import com.zaroslikov.fermacompose2.ui.composeElement.IconAndTextMore
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNoteWidget
@@ -65,11 +69,11 @@ fun AnimalCardProduct(
     onNavigateIndicators: (Triple<Int, Int, Long>) -> Unit,
     viewModel: AnimalCardViewModel = hiltViewModel()
 ) {
-    val animalTable = viewModel.animalUiState
-    val product = viewModel.productState(animalTable.name).collectAsState()
+    val animalTable = viewModel.state.collectAsState()
+    val product = viewModel.productState(animalTable.value.name).collectAsState()
     val buyerUiState by viewModel.buyerUiState.collectAsState()
     val titleUiState by viewModel.titleUiState.collectAsState()
-
+    val isLoading by viewModel.isLoading.collectAsState()
     val cor = rememberCoroutineScope()
 
     Scaffold(topBar = {
@@ -80,63 +84,67 @@ fun AnimalCardProduct(
             settingUp = { onNavigateSetting(viewModel.itemIdPT to viewModel.itemId) }
         )
     }) { innerPadding ->
-        AnimalCardContainer(
-            modifier = Modifier
-                .modifierScreen(innerPadding),
-            state = animalTable,
-            titleList = titleUiState.list,
-            buyerList = buyerUiState.list,
-            animalProductTable = product.value.itemList,
-            countWarehouse = viewModel.countInWarehouse,
-            onNavigateIndicators = {
-                onNavigateIndicators(
-                    Triple(
-                        it.first,
-                        it.second,
-                        viewModel.itemIdPT
+        if (isLoading)
+            CircularProgress(
+                modifier = Modifier.padding(innerPadding),
+            )
+        else
+            AnimalCardContainer(
+                modifier = Modifier
+                    .modifierScreen(innerPadding),
+                state = animalTable.value,
+                titleList = titleUiState.list,
+                buyerList = buyerUiState.list,
+                animalProductTable = product.value.itemList,
+                countWarehouse = viewModel.countInWarehouse,
+                onNavigateIndicators = {
+                    onNavigateIndicators(
+                        Triple(
+                            it.first,
+                            it.second,
+                            viewModel.itemIdPT
+                        )
                     )
-                )
-            },
-            onSaleClick = {
-                viewModel.insertSaleAnimal(
-                    Triple(
-                        it.first,
-                        it.second,
-                        it.third
+                },
+                onSaleClick = {
+                    viewModel.insertSaleAnimal(
+                        Triple(
+                            it.first,
+                            it.second,
+                            it.third
+                        )
                     )
-                )
-                if (it.third) navigateBack()
-            },
-            onSaleProductClick = {
-                viewModel.saveAddAnimal(it)
-            },
-            onSaleCountClick = {
-                viewModel.saveCountAnimal(it)
-                if (it.third) navigateBack() // возможно баг(возвращение редактор или вакцину)
-            },
-            onAddAnimalClick = {
-                cor.launch {
-                    viewModel.insertAddAnimal(it)
-                }
-            },
-            onAddWriteOffClick = {
-                cor.launch {
-                    viewModel.insertWriteOffAnimal(it)
                     if (it.third) navigateBack()
-                }
-            },
-            onUpdateCountWarehouse = {
-                viewModel.updateUiState(it)
-            },
-            onUpdateAnimalGroupClick = viewModel::updateAnimalGroup,
-            updateNote = {
-                viewModel.updateNote(it)
-            },
-            updateArchive = {
-                viewModel.updateArchive()
-                navigateBack()
-            }
-        )
+                },
+                onSaleProductClick = {
+                    viewModel.saveAddAnimal(it)
+                },
+                onSaleCountClick = {
+                    viewModel.saveCountAnimal(it)
+                    if (it.third) navigateBack() // возможно баг(возвращение редактор или вакцину)
+                },
+                onAddAnimalClick = {
+                    cor.launch {
+                        viewModel.insertAddAnimal(it)
+                    }
+                },
+                onAddWriteOffClick = {
+                    cor.launch {
+                        viewModel.insertWriteOffAnimal(it)
+                        if (it.third) navigateBack()
+                    }
+                },
+                onUpdateCountWarehouse = {
+                    viewModel.updateUiState(it)
+                },
+                onUpdateAnimalGroupClick = viewModel::updateAnimalGroup,
+                onValueChange = viewModel::update,
+                updateArchive = {
+                    viewModel.updateArchive()
+                    navigateBack()
+                },
+                viewModel = viewModel
+            )
     }
 }
 
@@ -156,8 +164,9 @@ fun AnimalCardContainer(
     onSaleClick: (Triple<DomainIndicatorsVM, SaleTable, Boolean>) -> Unit,
     onAddAnimalClick: (Pair<DomainIndicatorsVM, ExpensesTable?>) -> Unit,
     onAddWriteOffClick: (Triple<DomainIndicatorsVM, WriteOffTable?, Boolean>) -> Unit,
-    updateNote: (String) -> Unit,
-    updateArchive: () -> Unit
+    onValueChange: (AnimalCardState) -> Unit,
+    updateArchive: () -> Unit,
+    viewModel: AnimalCardViewModel
 ) {
     var openSaleDialog by rememberSaveable { mutableStateOf(false) }
     var openKillDialog by rememberSaveable { mutableStateOf(false) }
@@ -171,7 +180,7 @@ fun AnimalCardContainer(
             state = state,
             onNavigateIndicators = { onNavigateIndicators(Pair(state.id.toInt(), it)) }
         )
-        NoteWidget(state.note) { updateNote(it) }
+        NoteWidget(state.note) { onValueChange(state.updateNote(it)) }
         PullOutCard(
             modifier = Modifier,
             intRes = R.string.animal_card_screen_animal_card_product,
@@ -236,15 +245,7 @@ fun AnimalCardContainer(
                 onUpdateAnimalGroupClick = onUpdateAnimalGroupClick,
                 onConfirmation = { openKillDialog = !openKillDialog },
             )
-        if (openAddDialog)
-            AlertDialogAddAnimal(
-                title = state.name,
-                countAll = animalCountTable.weight,
-                countSuffix = animalCountTable.suffix,
-                idPT = state.id.toInt(),
-                onConfirmation = { openAddDialog = !openAddDialog },
-                onSaveClick = onAddAnimalClick
-            )
+
 
         if (openWriteOffDialog)
             AlertDialogWriteOffAnimal(
@@ -264,6 +265,12 @@ fun AnimalCardContainer(
                 onConfirmation = { openArchiveDialog = !openArchiveDialog },
                 onArchiveClick = updateArchive
             )*/
+
+        if (openAddDialog)
+            AlertDialogAddAnimal(
+                state = state.addAnimal,
+                onIntent = viewModel::onIntent
+            )
     }
 }
 
@@ -292,19 +299,14 @@ private fun DataCardOne(
         }
         IconAndText(
             iconRes = R.drawable.baseline_calendar_month_24,
-            valueString = if (state.date != "") state.date + " (${
-                getAgeFromDate(
-                    context,
-                    state.date
-                )
-            })" else ""
+            valueString = state.date + getAgeFromDate(context, state.date)
         )
         if (state.dateFactory != null)
             IconAndText(
                 iconRes = R.drawable.baseline_event_24,
                 valueString = state.dateFactory
             )
-        if (state.group) {
+        if (state.price != null) {
             IconAndText(
                 iconRes = R.drawable.baseline_add_card_24,
                 valueString = stringResource(

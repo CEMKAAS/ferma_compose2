@@ -37,15 +37,6 @@ data class AddEntryState(
     }
 }
 
-fun AddEntryState.validate(): AddEntryState {
-    val error = AddEntryState.Error(
-        isErrorTitle = title.isBlank(),
-        isErrorSlash = title.contains("/"),
-        isErrorCount = count.isBlank(),
-    )
-    return this.copy(error = error)
-}
-
 fun AddEntryState.updateTitle(title: String): AddEntryState {
     return this.copy(
         title = title,
@@ -66,6 +57,17 @@ fun AddEntryState.updateTitleAndSuffix(pair: Pair<String, String>): AddEntryStat
         )
     )
 }
+
+fun AddEntryState.validate(): AddEntryState {
+    val error = AddEntryState.Error(
+        isErrorTitle = title.isBlank(),
+        isErrorSlash = title.contains("/"),
+        isErrorCount = count.isBlank(),
+    )
+    return this.copy(error = error)
+}
+
+
 
 fun AddEntryState.updateCount(count: String): AddEntryState {
     return this.copy(

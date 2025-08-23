@@ -13,6 +13,7 @@
     <string name="animal_add_screen_title">Добавление Животного</string>
     <string name="animals_add_screen_title">Добавление Животных</string>
     <string name="animals_add_screen_edit">Редактировать Животного</string>
+    <string name="animals_add_screen_edit_s">Редактировать Животных</string>
     <string name="weight_screen_title">Вес</string>
     <string name="height_screen_title">Размер</string>
     <string name="count_screen_title">Количество</string>

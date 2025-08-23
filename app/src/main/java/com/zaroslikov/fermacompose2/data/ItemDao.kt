@@ -832,12 +832,12 @@ interface ItemDao {
                 "   LIMIT 1 " +
                 "), " +
                 "PriceSum AS ( " +
-                "   SELECT animalId, IFNULL(SUM(CASE WHEN price_all IS NOT NULL THEN price_all ELSE price END), 0) AS totalPrice " +
+                "   SELECT animalId, SUM(CASE WHEN price_all IS NOT NULL THEN price_all ELSE price END) AS totalPrice " +
                 "   FROM expenses_table " +
                 "   WHERE animalId = :id " +
                 ") " +
                 "SELECT " +
-                "   a.name, a.type, a.date, a.date_factory, " +
+                "   a.name, a.type, a.date, a.date_factory as dateFactory, " +
                 "   a.`group`, a.sex, a.note, a.archive, " +
                 "   a.foodDay, a.food_day_suffix as foodDaySuffix, " +
                 "   ps.totalPrice AS price, " +

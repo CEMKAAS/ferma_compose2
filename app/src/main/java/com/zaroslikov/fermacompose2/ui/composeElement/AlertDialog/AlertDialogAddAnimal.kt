@@ -24,6 +24,11 @@ import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorAddAnimal
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AddCardIntent
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
+import com.zaroslikov.fermacompose2.ui.animal.entry.updateIsAutoPrice
+import com.zaroslikov.fermacompose2.ui.animal.entry.updatePrice
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
@@ -34,12 +39,8 @@ import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 
 @Composable
 fun AlertDialogAddAnimal(
-    title: String,
-    countAll: String,
-    countSuffix: String,
-    idPT: Int,
-    onConfirmation: () -> Unit,
-    onSaveClick: (Pair<DomainIndicatorsVM, ExpensesTable?>) -> Unit
+    state: AnimalCardState.AddAnimal,
+    onIntent: (AddCardIntent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     var price by rememberSaveable { mutableStateOf("") }
@@ -51,7 +52,6 @@ fun AlertDialogAddAnimal(
     var isErrorCount by rememberSaveable { mutableStateOf(false) }
 
     val category = stringResource(R.string.animal_card_screen_add_category_expenses)
-
 
     val priceInDB = if (isAutoCalculate.value) priceAll else price
 
@@ -75,119 +75,37 @@ fun AlertDialogAddAnimal(
             )
         }
 
-    AlertDialog(
-        icon = {
-            Icon(
-                painterResource(titlePaint),
-                contentDescription = titleText
+    AlertDialogAni(
+        icon = painterResource(titlePaint),
+        title = titleText,
+        titleButton = titleButton,
+        onDismissClick = { onIntent(AddCardIntent.Exit) },
+        content = {
+            OutlinedTextCount(
+                value = state.count,
+                onValueChange = { onIntent(AddCardIntent.CountChanged(it)) },
+                isError = state.isErrorCount,
+                intRes = R.string.outlined_text_field_quantity,
+                drawableRes = R.drawable.baseline_spoke_24,
+                count = state.price,
+                suffix = state.countSuffix,
+                focusManager = focusManager
+            )
+            OutlinedPriceInput(
+                price = state.price,
+                onPriceChange = { onIntent(AddCardIntent.PriceChanged(it)) },
+                count = state.priceAll,
+                isAutoCalculate = state.isAutoPrice,
+                onAutoCalculate = { onIntent(AddCardIntent.AutoPriceChanged(it)) },
+            )
+            OutlinedTextNote(
+                value = state.note,
+                onValueChange = { onIntent(AddCardIntent.NoteChanged(it)) },
+                label = R.string.outlined_text_reason,
+                supportingText = R.string.support_text_add_animal_reason,
+                cardBorder = false
             )
         },
-        title = {
-            Text(
-                text = titleText,
-                style = textBold_16
-            )
-        },
-        text = {
-            Column(modifier = Modifier.modifierDialogScreen()) {
-                OutlinedTextCount(
-                    value = countAnimal,
-                    onValueChange = {
-                        countAnimal = it
-                        isErrorCount = it.isError()
-                    },
-                    isError = isErrorCount,
-                    intRes = R.string.outlined_text_field_quantity,
-                    drawableRes = R.drawable.baseline_spoke_24,
-                    count = countAll,
-                    suffix = countSuffix,
-                    focusManager = focusManager
-                )
-                OutlinedTextPrice(
-                    value = price,
-                    onValueChange = {
-                        price = it
-                    },
-                    intSupportText = R.string.support_text_price_one_animals,
-                    focusManager = focusManager
-                )
-                priceAll = autoCalculate(
-                    isAutoCalculate = isAutoCalculate,
-                    count = countAnimal,
-                    price = price
-                )
-                OutlinedTextNote(
-                    value = note,
-                    onValueChange = {
-                        note = it
-                    },
-                    label = R.string.outlined_text_reason,
-                    supportingText = R.string.support_text_add_animal_reason,
-                )
-            }
-        },
-        onDismissRequest = onConfirmation,
-        dismissButton = {
-            TextButton(
-                onClick = onConfirmation
-            ) {
-                Text(stringResource(R.string.button_text_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    if (isErrorAddAnimal(count = countAnimal, isErrorCount = { isErrorCount = it })
-                    ) {
-                        val count =
-                            (countAnimal.toConvertOnlyInt().toInt() + countAll.toInt()).toString()
-                                .toConvertOnlyInt()
-                        onSaveClick(
-                            Pair(
-                                first = DomainIndicatorsVM(
-//                                    weight = count,
-                                    weight = countAnimal,
-                                    suffix = countSuffix,
-                                    date = dateToday(),
-                                    idAnimal = idPT,
-                                    note = reasonNote,
-                                    version = if (priceInDB.isBlank() || priceInDB == "0") 4 else 1
-                                ),
-                                second = if (priceInDB.isBlank() || priceInDB == "0") null else {
-                                    ExpensesTable(
-                                        title = title,
-                                        count = countAnimal.toConvertDbDouble(),
-                                        day = dateTodayArray()[0],
-                                        mount = dateTodayArray()[1],
-                                        year = dateTodayArray()[2],
-                                        price = priceInDB.toConvertDbDouble(),
-                                        countSuffix = countSuffix,
-                                        category = category,
-                                        note = reasonNote,
-                                        isShowFood = false,
-                                        isShowWarehouse = false,
-                                        isShowAnimals = false,
-                                        isShowFoodHand = false,
-                                        feedFood = 0.0,
-                                        countAnimal = 0,
-                                        foodDesignedDay = 0,
-                                        lastDayFood = "",
-                                        idPT = idPT.toLong(),
-                                        priceAll = 0.0,
-                                        feedFoodSuffix = "",
-                                        weight = 0.0,
-                                        weightSuffix = "",
-                                    )
-                                }
-                            )
-                        )
-                        onConfirmation()
-                    }
-                }
-            ) {
-                Text(titleButton)
-            }
-        }
+        onConfirmationClick = { onIntent(AddCardIntent.SaveButton) }
     )
 }

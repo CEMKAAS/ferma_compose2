@@ -61,10 +61,10 @@ fun getAgeFromDate(context: Context, dateString: String): String {
     val monthsString = getString(context, R.string.date_months)
 
     return when {
-        years >= 1 -> "$years $yeatsString $months $monthsString"
+        years >= 1 -> " ($years $yeatsString $months $monthsString)"
         else -> {
             val totalMonths = ChronoUnit.MONTHS.between(birthDate, currentDate)
-            "$totalMonths $monthsString"
+            " ($totalMonths $monthsString)"
         }
     }
 }

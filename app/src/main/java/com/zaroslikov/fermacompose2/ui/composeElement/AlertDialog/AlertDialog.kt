@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog
 
+import android.app.AlertDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,13 +17,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
+import com.zaroslikov.fermacompose2.supportFun.isError
+import com.zaroslikov.fermacompose2.supportFun.isErrorAddAnimal
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextSex
+import com.zaroslikov.fermacompose2.ui.composeElement.autoCalculate
+import com.zaroslikov.fermacompose2.ui.composeElement.modifierDialogScreen
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 
 
@@ -149,6 +164,56 @@ fun AlertDialogArchiveAnimal(
                 }
             ) {
                 Text(stringResource(R.string.button_archive))
+            }
+        }
+    )
+}
+
+
+@Composable
+fun AlertDialogAni(
+    icon: Painter,
+    title: String,
+    titleButton: String,
+    onDismissClick:() -> Unit,
+    onConfirmationClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    AlertDialog(
+        icon = {
+            Icon(
+                icon,
+                contentDescription = title
+            )
+        },
+        title = {
+            Text(
+                text = title,
+                style = textBold_16
+            )
+        },
+        text = {
+            Column(modifier = Modifier.modifierDialogScreen()) {
+                content()
+            }
+        },
+        onDismissRequest = onDismissClick,
+        dismissButton = {
+            TextButton(
+                onClick = onDismissClick
+            ) {
+                Text(stringResource(R.string.button_text_cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    focusManager.clearFocus()
+                    onConfirmationClick()
+                }
+            ) {
+                Text(titleButton)
             }
         }
     )

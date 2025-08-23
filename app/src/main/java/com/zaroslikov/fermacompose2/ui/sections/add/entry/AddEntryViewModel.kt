@@ -45,6 +45,10 @@ class AddEntryViewModel @Inject constructor(
     )
         private set
 
+    fun updateUiState(domainAddTable: AddEntryState) {
+        addUiState =
+            domainAddTable
+    }
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -93,10 +97,7 @@ class AddEntryViewModel @Inject constructor(
     }
 
 
-    fun updateUiState(domainAddTable: AddEntryState) {
-        addUiState =
-            domainAddTable
-    }
+
 
     fun insertItem() {
         viewModelScope.launch {

@@ -93,11 +93,11 @@ fun AnimalScreen(
                 FloatButton { navigateToItemAdd(idProject) }
             }
         ) { innerPadding ->
-            if (isLoading) {
+            if (isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
-            } else {
+             else
                 AnimalBody(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
@@ -105,7 +105,7 @@ fun AnimalScreen(
                     onItemClick = { navigateToItemCard(Pair(idProject, it)) },
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
-            }
+
         }
     }
 }

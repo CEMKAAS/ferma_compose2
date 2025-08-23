@@ -66,13 +66,12 @@ import java.time.Instant
 fun OutlinedTextNote(
     value: String,
     onValueChange: (String) -> Unit,
+    cardBorder: Boolean = true,
     @StringRes label: Int = R.string.outlined_text_note,
     @StringRes supportingText: Int = R.string.support_text_note,
 ) {
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false
-    ) {
+
+    val outlined: @Composable () -> Unit = {
         BaseOutlinedText(
             value = value,
             onValueChange = { onValueChange(it) },
@@ -83,6 +82,16 @@ fun OutlinedTextNote(
             keyboardActions = KeyboardActionFocus.CLEAN
         )
     }
+
+    if (cardBorder) {
+        CardField(
+            modifier = Modifier
+                .toOutlinedText(),
+            row = false
+        ) {
+            outlined()
+        }
+    } else outlined()
 }
 
 @Composable

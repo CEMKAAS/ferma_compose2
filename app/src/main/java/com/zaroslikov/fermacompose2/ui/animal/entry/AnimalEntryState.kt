@@ -39,7 +39,7 @@ data class AnimalEntryState(
 
 ) {
     val hasAnyError: Boolean
-        get() = error.hasAnyError(isAnimalGroup)
+        get() = error.hasAnyError(isAnimalGroup, isEntry)
 
     data class Error(
         val isErrorTitle: Boolean = false,
@@ -47,9 +47,9 @@ data class AnimalEntryState(
         val isErrorType: Boolean = false,
         val isErrorCount: Boolean = false,
     ) {
-        fun hasAnyError(isAnimalGroup: Boolean): Boolean {
+        fun hasAnyError(isAnimalGroup: Boolean, isEntry: Boolean): Boolean {
             return when {
-                isAnimalGroup -> isErrorTitle || isErrorCount || isErrorType
+                isAnimalGroup && isEntry -> isErrorTitle || isErrorCount || isErrorType
                 else -> isErrorTitle || isErrorType
             }
         }
