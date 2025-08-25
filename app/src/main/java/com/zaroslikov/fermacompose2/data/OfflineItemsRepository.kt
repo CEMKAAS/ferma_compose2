@@ -1,6 +1,8 @@
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
@@ -20,6 +22,9 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.dto.toDomain
 import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.dto.toDomainMap
 import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toRoomMap
+import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
+import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.supportFun.PairData
@@ -59,17 +64,20 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getIncubatorEditDay(id: Int, day: Int): Flow<Incubator> =
         itemDao.getIncubatorEditDay(id, day)
 
-    override fun getItemAdd(id: Int): Flow<AddTable> = itemDao.getItemAdd(id)
-    override fun getItemsTitleAddList(id: Int): Flow<List<PairData>> =
+    override fun getItemAdd(id: Long): Flow<DomainAddTable> {
+        return itemDao.getItemAdd(id).map { it.toDomainMap() }
+    }
+
+    override fun getItemsTitleAddList(id: Long): Flow<List<PairData>> =
         itemDao.getItemsTitleAddList(id)
 
     override fun getItemsWriteoffList(id: Int): Flow<List<SaleTitleData>> =
         itemDao.getItemsWriteoffList(id)
 
-    override fun getItemsCategoryAddList(id: Int): Flow<List<String>> =
+    override fun getItemsCategoryAddList(id: Long): Flow<List<String>> =
         itemDao.getItemsCategoryAddList(id)
 
-    override fun getItemsAnimalAddList(id: Int): Flow<List<TripleData>> =
+    override fun getItemsAnimalAddList(id: Long): Flow<List<TripleData>> =
         itemDao.getItemsAnimalAddList(id)
 
     override suspend fun insertProject(projectTable: ProjectTable) =
@@ -78,9 +86,14 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun insertProjectLong(projectTable: ProjectTable): Long =
         itemDao.insertProjectLong(projectTable)
 
-    override suspend fun insertItem(item: AddTable) = itemDao.insert(item)
+    override suspend fun insertItem(item: DomainAddTable) {
+        return itemDao.insert(item.toRoomMap())
+    }
+
     override suspend fun deleteAddById(id: Long) = itemDao.deleteAddById(id)
-    override suspend fun updateItem(item: AddTable) = itemDao.update(item)
+    override suspend fun updateItem(item: DomainAddTable) {
+        return itemDao.update(item.toRoomMap())
+    }
 
     override fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>> =
         itemDao.getBrieflyItemAdd(id)
@@ -441,14 +454,16 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun insertAnimalTable(animalTable: AnimalTable): Long =
         itemDao.insertAnimalTable(animalTable)
 
-    override suspend fun updateAnimalTable(animalTable: AnimalTable) =
-        itemDao.updateAnimalTable(animalTable)
+    override suspend fun updateAnimalTable(animalTable: DomainAnimalTable) {
+        return itemDao.updateAnimalTable(animalTable.toRoomMap())
+    }
 
     override suspend fun deleteAnimalTable(id: Long) =
         itemDao.deleteAnimalTable(id)
 
-    override suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable): Long =
-        itemDao.insertAnimalCountTable(animalCountTable)
+    override suspend fun insertAnimalCountTable(animalCountTable: DomainAnimalCount): Long {
+        return itemDao.insertAnimalCountTable(animalCountTable.toRoomMap())
+    }
 
     override suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
         itemDao.insertAnimalSizeTable(animalSizeTable)

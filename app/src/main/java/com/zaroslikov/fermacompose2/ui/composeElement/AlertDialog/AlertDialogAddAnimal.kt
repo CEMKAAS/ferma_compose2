@@ -43,37 +43,20 @@ fun AlertDialogAddAnimal(
     onIntent: (AddCardIntent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    var price by rememberSaveable { mutableStateOf("") }
-    var priceAll by rememberSaveable { mutableStateOf("") }
-    var countAnimal by rememberSaveable { mutableStateOf("") }
-    var note by rememberSaveable { mutableStateOf("") }
-    val isAutoCalculate = rememberSaveable { mutableStateOf(false) }
-
-    var isErrorCount by rememberSaveable { mutableStateOf(false) }
-
-    val category = stringResource(R.string.animal_card_screen_add_category_expenses)
-
-    val priceInDB = if (isAutoCalculate.value) priceAll else price
-
-    val reasonNote = if ((priceInDB.isBlank() || priceInDB == "0")) {
-        if (note == "") stringResource(R.string.animal_card_screen_add_no_note_reason)
-        else stringResource(R.string.animal_card_screen_add_note_reason, note)
-    } else ""
 
     val (titleText, titlePaint, titleButton) =
-        if (price.isBlank() && (priceAll.isBlank() || priceAll == "0")) {
+        if (state.price.isBlank())
             Triple(
                 stringResource(R.string.alert_dialog_info_add_animals),
                 R.drawable.baseline_add_circle_outline_24,
                 stringResource(R.string.button_text_add)
             )
-        } else {
+        else
             Triple(
                 stringResource(R.string.alert_dialog_info_expenses_animals),
                 R.drawable.baseline_add_shopping_cart_24,
                 stringResource(R.string.button_text_expenses)
             )
-        }
 
     AlertDialogAni(
         icon = painterResource(titlePaint),

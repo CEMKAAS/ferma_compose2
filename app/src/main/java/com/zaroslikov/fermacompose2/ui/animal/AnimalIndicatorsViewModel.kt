@@ -81,12 +81,12 @@ class AnimalIndicatorsViewModel(
         println("animalUiState: $animalUiState")
         animalUiState?.let {
             println("update: true")
-            itemsRepository.updateAnimalTable(
-                it.copy(
-//                    sex = sex,
-                    group = false
-                )
-            )
+//            itemsRepository.updateAnimalTable(
+//                it.copy(
+////                    sex = sex,
+//                    group = false
+//                )
+//            )
         }
     }
 

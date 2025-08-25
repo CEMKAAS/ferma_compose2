@@ -98,7 +98,7 @@ interface ItemDao {
     fun getAllItems(id: Int): Flow<List<AddTable>>
 
     @Query("SELECT * from add_table Where _id=:id")
-    fun getItemAdd(id: Int): Flow<AddTable>
+    fun getItemAdd(id: Long): Flow<AddTable>
 
     @Query("SELECT title as title, SUM(count) as count, count_suffix AS suffix from add_table Where idPT=:id group by title ORDER BY count DESC")
     fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
@@ -113,14 +113,14 @@ interface ItemDao {
                 " GROUP BY title" +
                 " ORDER BY MAX(_id) DESC"
     )
-    fun getItemsTitleAddList(id: Int): Flow<List<PairData>>
+    fun getItemsTitleAddList(id: Long): Flow<List<PairData>>
 
 
     @Query("SELECT category from add_table Where idPT=:id group by category ")
-    fun getItemsCategoryAddList(id: Int): Flow<List<String>>
+    fun getItemsCategoryAddList(id: Long): Flow<List<String>>
 
     @Query("SELECT id as first, name as second, type as third from animal_table Where idPT=:id")
-    fun getItemsAnimalAddList(id: Int): Flow<List<TripleData>>
+    fun getItemsAnimalAddList(id: Long): Flow<List<TripleData>>
 
     @Query("SELECT name FROM animal_table WHERE id=:id")
     fun getAnimalById(id: Long): Flow<String>

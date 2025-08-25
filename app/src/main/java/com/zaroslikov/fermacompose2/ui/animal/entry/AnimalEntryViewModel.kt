@@ -78,7 +78,7 @@ class AnimalEntryViewModel @Inject constructor(
                 val pair = animalUiState.updateForSave(idAnimal, itemIdPT)
 
                 itemsRepository.insertAnimalCountTable(
-                    pair.first.toRoomMap()
+                    pair.first
                 )
                 pair.second?.let {
                     itemsRepository.insertExpenses(it.toRoomMap())
@@ -103,9 +103,9 @@ class AnimalEntryViewModel @Inject constructor(
     fun updateItem() {
         viewModelScope.launch {
             if (!isError()) {
-                itemsRepository.updateAnimalTable(
+                /*itemsRepository.updateAnimalTable(
                     animalUiState.saveAnimal(id = itemId, itemIdPT).toRoomMap()
-                )
+                )*/
                 _eventFlow.emit(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_refresh_s_s)

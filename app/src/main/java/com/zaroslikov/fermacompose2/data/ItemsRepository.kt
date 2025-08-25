@@ -1,6 +1,8 @@
 package com.zaroslikov.fermacompose2.data
 
+import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
@@ -58,23 +60,23 @@ interface ItemsRepository {
     fun getIncubator(id: Int): Flow<Incubator>
     fun getIncubatorEditDay(id: Int, day: Int): Flow<Incubator>
 
-    fun getItemAdd(id: Int): Flow<AddTable>
+    fun getItemAdd(id: Long): Flow<DomainAddTable>
 
-    fun getItemsTitleAddList(id: Int): Flow<List<PairData>>
+    fun getItemsTitleAddList(id: Long): Flow<List<PairData>>
 
     fun getItemsWriteoffList(id: Int): Flow<List<SaleTitleData>>
 
-    fun getItemsCategoryAddList(id: Int): Flow<List<String>>
-    fun getItemsAnimalAddList(id: Int): Flow<List<TripleData>>
+    fun getItemsCategoryAddList(id: Long): Flow<List<String>>
+    fun getItemsAnimalAddList(id: Long): Flow<List<TripleData>>
 
     suspend fun insertProject(projectTable: ProjectTable)
     suspend fun insertProjectLong(projectTable: ProjectTable): Long
 
     //==================== Add ====================
-    suspend fun insertItem(item: AddTable)
+    suspend fun insertItem(item: DomainAddTable)
 
     suspend fun deleteAddById(id: Long)
-    suspend fun updateItem(item: AddTable)
+    suspend fun updateItem(item: DomainAddTable)
 
     fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>>
     fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
@@ -305,10 +307,10 @@ interface ItemsRepository {
 
     //AnimalScreen
     suspend fun insertAnimalTable(animalTable: AnimalTable): Long
-    suspend fun updateAnimalTable(animalTable: AnimalTable)
+    suspend fun updateAnimalTable(animalTable: DomainAnimalTable)
     suspend fun deleteAnimalTable(id: Long)
 
-    suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable): Long
+    suspend fun insertAnimalCountTable(animalCountTable: DomainAnimalCount): Long
     suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
     suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
     suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable): Long

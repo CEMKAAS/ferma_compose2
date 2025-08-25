@@ -3,17 +3,17 @@
 package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
@@ -44,6 +44,7 @@ fun AddEntryProduct(
     viewModel: AddEntryViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.eventFlow
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     LaunchedEffect(Unit) {
@@ -65,12 +66,8 @@ fun AddEntryProduct(
     ) { innerPadding ->
         AddEntryContainerProduct(
             modifier = modifier.modifierScreen(innerPadding),
-            state = viewModel.addUiState,
-            onValueChange = viewModel::updateUiState,
-            onClickInsert = viewModel::insertItem,
-            onClickUpdate = viewModel::updateItem,
-            onClickDelete = viewModel::deleteItem,
-            updateCountWarehouse = viewModel::updateWarehouseUiState
+            state = state,
+            onIntent = viewModel::onIntent,
         )
     }
 }
@@ -79,23 +76,13 @@ fun AddEntryProduct(
 fun AddEntryContainerProduct(
     modifier: Modifier,
     state: AddEntryState,
-    updateCountWarehouse: (String) -> Unit,
-    onValueChange: (AddEntryState) -> Unit,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit,
+    onIntent: (AddEntryIntent) -> Unit
 ) {
     Column(modifier = modifier) {
         OutlinedTextTitleAdd2(
             value = state.title,
-            onValueChange = {
-                onValueChange(state.updateTitle(it))
-                updateCountWarehouse(it)
-            },
-            onValueChangeSuffix = {
-                onValueChange(state.updateTitleAndSuffix(it))
-                updateCountWarehouse(it.first)
-            },
+            onValueChange = { onIntent(AddEntryIntent.TitleChanged(it)) },
+            onValueChangeSuffix = { onIntent(AddEntryIntent.TitleAndSuffix(it)) },
             titleList = state.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
@@ -103,43 +90,42 @@ fun AddEntryContainerProduct(
         OutlinedTextCount2(
             value = state.count,
             onValueChange = {
-                onValueChange(state.updateCount(it))
+                onIntent(AddEntryIntent.CountChanged(it))
             },
-            onSuffixChange = { onValueChange(state.updateSuffix(it)) },
+            onSuffixChange = { onIntent(AddEntryIntent.Suffix(it)) },
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product,
             isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
             warehouseList = state.warehouseList
         )
-
         OutlinedTextCategory(
             value = state.category,
-            onValueChange = { onValueChange(state.updateCategory(it)) },
+            onValueChange = { onIntent(AddEntryIntent.CategoryChanged(it)) },
             titleList = state.categoryList,
         )
         OutlinedTextDateEdit(
             value = state.date,
-            onValueChange = { onValueChange(state.updateDate(it)) }
+            onValueChange = { onIntent(AddEntryIntent.Date(it)) }
         )
         if (state.animalList.isNotEmpty()) {
             OutlinedTextAnimal(
                 value = state.animal,
-                onValueChange = { onValueChange(state.updateAnimal(it)) },
+                onValueChange = { onIntent(AddEntryIntent.Animal(it)) },
                 selectedAnimalIndex = state.selectedAnimalIndex,
-                onClickClear = { onValueChange(state.updateAnimalClear(it)) },
+                onClickClear = { onIntent(AddEntryIntent.AnimalClear(it)) },
                 animalList = state.animalList,
             )
         }
         OutlinedTextNote(
             value = state.note,
-            onValueChange = { onValueChange(state.updateNote(it)) },
+            onValueChange = { onIntent(AddEntryIntent.NoteChanged(it)) },
         )
         ButtonPanel(
             state = state,
-            onClickInsert = { onClickInsert() },
-            onClickUpdate = { onClickUpdate() },
-            onClickDelete = { onClickDelete() }
+            onClickInsert = { onIntent(AddEntryIntent.Insert) },
+            onClickUpdate = { onIntent(AddEntryIntent.Update) },
+            onClickDelete = { onIntent(AddEntryIntent.Delete) }
         )
     }
 }

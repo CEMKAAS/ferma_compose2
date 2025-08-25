@@ -125,7 +125,7 @@ fun AnimalCardProduct(
                 },
                 onAddAnimalClick = {
                     cor.launch {
-                        viewModel.insertAddAnimal(it)
+//                        viewModel.insertAddAnimal()
                     }
                 },
                 onAddWriteOffClick = {

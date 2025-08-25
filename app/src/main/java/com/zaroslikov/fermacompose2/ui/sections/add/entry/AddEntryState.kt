@@ -37,109 +37,7 @@ data class AddEntryState(
     }
 }
 
-fun AddEntryState.updateTitle(title: String): AddEntryState {
-    return this.copy(
-        title = title,
-        error = error.copy(
-            isErrorTitle = title.isBlank(),
-            isErrorSlash = title.contains("/")
-        )
-    )
-}
-
-fun AddEntryState.updateTitleAndSuffix(pair: Pair<String, String>): AddEntryState {
-    return copy(
-        title = pair.first,
-        countSuffix = pair.second,
-        error = error.copy(
-            isErrorTitle = pair.first.isBlank(),
-            isErrorSlash = pair.first.contains("/")
-        )
-    )
-}
-
-fun AddEntryState.validate(): AddEntryState {
-    val error = AddEntryState.Error(
-        isErrorTitle = title.isBlank(),
-        isErrorSlash = title.contains("/"),
-        isErrorCount = count.isBlank(),
-    )
-    return this.copy(error = error)
-}
-
-
-
-fun AddEntryState.updateCount(count: String): AddEntryState {
-    return this.copy(
-        count = count,
-        error = error.copy(
-            isErrorCount = count.isBlank()
-        )
-    )
-}
-
-fun AddEntryState.updateSuffix(countSuffix: String): AddEntryState {
-    return this.copy(
-        countSuffix = countSuffix,
-    )
-}
-
-fun AddEntryState.updateCountWarehouse(domainPairDataDoubleSting: List<PairDataDoubleSting>): AddEntryState {
-    return this.copy(
-        warehouseList = domainPairDataDoubleSting
-    )
-}
-
-fun AddEntryState.updateCategory(category: String): AddEntryState {
-    return this.copy(
-        category = category,
-    )
-}
-
-fun AddEntryState.updateDate(date: String): AddEntryState {
-    return this.copy(
-        date = date,
-    )
-}
-
-fun AddEntryState.updateAnimal(animal: Pair<Long, String>): AddEntryState {
-    return this.copy(
-        selectedAnimalIndex = animal.first,
-        animalId = animal.first,
-        animal = animal.second
-    )
-}
-
-fun AddEntryState.updateAnimalNameById(name: String): AddEntryState {
-    return this.copy(
-        animal = name
-    )
-}
-
-fun AddEntryState.updateAnimalClear(animal: String): AddEntryState {
-    return this.copy(
-        animalId = 0,
-        animal = animal
-    )
-}
-
-fun AddEntryState.updateNote(note: String): AddEntryState {
-    return this.copy(note = note)
-}
-
-fun AddEntryState.updateList(
-    titleList: List<PairData>,
-    categoryList: List<String>,
-    animalList: List<TripleData>
-): AddEntryState {
-    return copy(
-        titleList = titleList,
-        categoryList = categoryList,
-        animalList = animalList
-    )
-}
-
-fun AddEntryState.updateFromDomain(domain: DomainAddTable): AddEntryState {
+fun AddEntryState.toUiMap(domain: DomainAddTable): AddEntryState {
     return copy(
         title = domain.title,
         count = domain.count.formatNumber(false),
@@ -156,7 +54,7 @@ fun AddEntryState.updateFromDomain(domain: DomainAddTable): AddEntryState {
     )
 }
 
-fun AddEntryState.updateForSave(
+fun AddEntryState.toDomainMap(
     id: Long = 0,
     itemIdPT: Long
 ): DomainAddTable {
@@ -176,3 +74,5 @@ fun AddEntryState.updateForSave(
         idPT = itemIdPT
     )
 }
+
+

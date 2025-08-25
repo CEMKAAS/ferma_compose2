@@ -4,11 +4,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCount
+import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
 import com.zaroslikov.fermacompose2.data.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
@@ -17,8 +23,12 @@ import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState
 import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.AddAnimal
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,7 +64,8 @@ sealed class AddCardIntent {
 class AnimalCardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val itemsRepository: ItemsRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val insertAnimalDataUseCase: InsertAnimalDataUseCase
 ) : ViewModel() {
 
     val itemIdPT: Long = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdPT])
@@ -80,6 +91,12 @@ class AnimalCardViewModel @Inject constructor(
             is AddCardIntent.NoteChanged -> updateNote(intent.note)
             AddCardIntent.Exit -> {}
             AddCardIntent.SaveButton -> {}
+        }
+    }
+
+    private fun updateState(update: (AddAnimal) -> AddAnimal) {
+        _state.update { current ->
+            current.copy(addAnimal = update(current.addAnimal))
         }
     }
 
@@ -115,13 +132,6 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
-    private fun updateState(update: (AddAnimal) -> AddAnimal) {
-        _state.update { current ->
-            current.copy(addAnimal = update(current.addAnimal))
-        }
-    }
-
-
     init {
         viewModelScope.launch {
             launch {
@@ -142,7 +152,7 @@ class AnimalCardViewModel @Inject constructor(
     }
 
     val titleUiState: StateFlow<DataPairListState> =
-        itemsRepository.getItemsTitleAddList(itemIdPT.toInt()).map { DataPairListState(it) }
+        itemsRepository.getItemsTitleAddList(itemIdPT).map { DataPairListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -189,7 +199,7 @@ class AnimalCardViewModel @Inject constructor(
     }
 
     fun saveAddAnimal(addTable: AddTable) {
-        viewModelScope.launch { itemsRepository.insertItem(addTable) }
+//        viewModelScope.launch { itemsRepository.insertItem(addTable) }
     }
 
     fun updateAnimalGroup(sex: String) {
@@ -213,45 +223,133 @@ class AnimalCardViewModel @Inject constructor(
     }
 
     //Покупка
-    suspend fun insertAddAnimal(pair: Pair<DomainIndicatorsVM, ExpensesTable?>) {
-        /*val id = itemsRepository.insertAnimalCountTable(pair.first.toCountRoomMap())
-        itemsRepository.updateAnimalTable(animalUiState.copy(groop = true).toAnimalTable())
-        pair.second?.let {
-            itemsRepository.insertExpenses(
-                it.copy(
-                    animalId = itemId.toLong(),
-                    animalCountId = id,
-                    idPT = itemIdPT.toLong()
-                )
-            )
-        }*/
+    /* suspend fun insertAddAnimal(pair: Pair<DomainIndicatorsVM, ExpensesTable?>) {
+         val id = itemsRepository.insertAnimalCountTable(pair.first.toCountRoomMap())
+         itemsRepository.updateAnimalTable(animalUiState.copy(groop = true).toAnimalTable())
+         pair.second?.let {
+             itemsRepository.insertExpenses(
+                 it.copy(
+                     animalId = itemId.toLong(),
+                     animalCountId = id,
+                     idPT = itemIdPT.toLong()
+                 )
+             )
+         }
+     }*/
+
+    private fun insertAddAnimal() {
+        viewModelScope.launch {
+            insertAnimalDataUseCase(_state.value, itemIdPT, itemId)
+        }
     }
+
 
     //
     suspend fun insertWriteOffAnimal(triple: Triple<DomainIndicatorsVM, WriteOffTable?, Boolean>) {
         /*val id = itemsRepository.insertAnimalCountTable(triple.first.toCountRoomMap())
-        triple.second?.let {
-            itemsRepository.insertWriteOff(
-                it.copy(animalCountId = id)
-            )
-        }
-        itemsRepository.updateAnimalTable(
-            animalUiState.copy(arhiv = triple.third).toAnimalTable()
-        )*/
+    triple.second?.let {
+        itemsRepository.insertWriteOff(
+            it.copy(animalCountId = id)
+        )
+    }
+    itemsRepository.updateAnimalTable(
+        animalUiState.copy(arhiv = triple.third).toAnimalTable()
+    )*/
     }
 
     fun saveCountAnimal(pair: Triple<DomainIndicatorsVM, WriteOffTable, Boolean>) {
         viewModelScope.launch {
             /* val id = itemsRepository.insertAnimalCountTable(pair.first.toCountRoomMap())
-             itemsRepository.insertWriteOff(pair.second.copy(animalCountId = id))
-             itemsRepository.updateAnimalTable(
-                 animalUiState.copy(arhiv = pair.third).toAnimalTable()
-             )*/
+         itemsRepository.insertWriteOff(pair.second.copy(animalCountId = id))
+         itemsRepository.updateAnimalTable(
+             animalUiState.copy(arhiv = pair.third).toAnimalTable()
+         )*/
         }
     }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
+    }
+
+}
+
+class InsertAnimalDataUseCase @Inject constructor(
+    private val itemsRepository: ItemsRepository,
+) {
+    /* val reasonNote = if ((priceInDB.isBlank() || priceInDB == "0")) {
+                if (note == "") stringResource(R.string.animal_card_screen_add_no_note_reason)
+                else stringResource(R.string.animal_card_screen_add_note_reason, note)
+            } else ""
+            if (isErrorAddAnimal(count = countAnimal, isErrorCount = { isErrorCount = it })
+            ) {
+                val count =
+                    (countAnimal.toConvertOnlyInt().toInt() + countAll.toInt()).toString()
+                        .toConvertOnlyInt()*/
+
+    suspend operator fun invoke(
+        state: AnimalCardState,
+        itemIdPT: Long,
+        itemId: Long
+    ): Result<Long> {
+        return try {
+            // Сохраняем основную запись
+            val countId = itemsRepository.insertAnimalCountTable(
+                DomainAnimalCount(
+                    id = 0,
+                    count = state.addAnimal.count,
+                    suffix = state.countAnimalSuffix.toString(),
+                    date = dateToday(),
+                    idAnimal = itemIdPT,
+                    note = state.addAnimal.note,
+                    version = if (state.addAnimal.price.isBlank()) 4 else 1
+                )
+            )
+            itemsRepository.updateAnimalTable(
+                DomainAnimalTable(
+                    id = itemId,
+                    name = state.name,
+                    type = state.type,
+                    date = state.date,
+                    dateFactory = state.dateFactory,
+                    group = state.group,
+                    sex = state.sex,
+                    note = state.note,
+                    image = null,
+                    archive = state.archive,
+                    foodDay = state.foodDay,
+                    foodDaySuffix = state.foodDaySuffix,
+                    idPT = itemIdPT
+                )
+            )
+            // Сохраняем расходы если есть цена
+            /*  if (state.addAnimal.price.isNotBlank()) {
+                  itemsRepository.insertExpenses(
+                      DomainExpensesTable(
+                          id = 0,
+                          title = state.name,
+                          count = state.countAnimal!!.toConvertDbDouble(),
+                          day = dateTodayArray()[0],
+                          month = dateTodayArray()[1],
+                          year = dateTodayArray()[2],
+                          price = state.addAnimal.price.toConvertDbDouble(),
+                          countSuffix = state.countAnimalSuffix.toString(),
+                          category = "",
+                          note = state.addAnimal.note,
+                          isShowFood = false,
+                          isShowWarehouse = false,
+                          isShowAnimals = false,
+                          isShowFoodHand = false,
+                          idPT = itemIdPT.toLong(),
+                          animalId = itemId.toLong(),
+                          animalCountId = countId
+                      )
+                  )
+              }*/
+
+            Result.success(countId)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
 
