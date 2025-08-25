@@ -1,40 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog
 
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.supportFun.dateToday
-import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
-import com.zaroslikov.fermacompose2.supportFun.isError
-import com.zaroslikov.fermacompose2.supportFun.isErrorAddAnimal
-import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
-import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AddCardIntent
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
-import com.zaroslikov.fermacompose2.ui.animal.entry.updateIsAutoPrice
-import com.zaroslikov.fermacompose2.ui.animal.entry.updatePrice
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
-import com.zaroslikov.fermacompose2.ui.composeElement.autoCalculate
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierDialogScreen
-import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 
 
 @Composable

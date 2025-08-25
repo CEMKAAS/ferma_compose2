@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog
 
-import android.app.AlertDialog
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,20 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.supportFun.dateToday
-import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
-import com.zaroslikov.fermacompose2.supportFun.isError
-import com.zaroslikov.fermacompose2.supportFun.isErrorAddAnimal
-import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
-import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextPrice
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextSex
-import com.zaroslikov.fermacompose2.ui.composeElement.autoCalculate
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierDialogScreen
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
 

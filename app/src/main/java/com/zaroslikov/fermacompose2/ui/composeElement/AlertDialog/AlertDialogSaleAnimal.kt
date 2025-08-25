@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray

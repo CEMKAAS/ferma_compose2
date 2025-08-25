@@ -3,13 +3,6 @@ package com.zaroslikov.fermacompose2.ui.animal.animalCard
 import android.util.Log
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
-import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.supportFun.dateToday
-import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
-import com.zaroslikov.fermacompose2.supportFun.isErrorAddAnimal
-import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
-import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
 
 data class AnimalCardState(
     val id: Long = 0,

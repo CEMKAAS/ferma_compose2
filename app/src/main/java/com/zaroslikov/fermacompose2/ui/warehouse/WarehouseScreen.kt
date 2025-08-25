@@ -65,8 +65,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarFermaWarehouse
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.ferma.ExpensesTable
+import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation

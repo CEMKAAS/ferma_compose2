@@ -1,13 +1,10 @@
 package com.zaroslikov.fermacompose2.data.water
 
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.ferma.AddTable
+import com.zaroslikov.data.room.table.ferma.ExpensesTable
+import com.zaroslikov.data.room.table.ferma.SaleTable
+import com.zaroslikov.data.room.table.ferma.WriteOffTable
 
 data class BrieflyItemPrice(
     var title: String,

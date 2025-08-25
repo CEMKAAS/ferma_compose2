@@ -1,6 +1,8 @@
 package com.zaroslikov.fermacompose2.data
 
 import android.content.Context
+import com.zaroslikov.data.room.database.AppDatabase
+import com.zaroslikov.data.room.repository.OfflineItemsRepository
 import com.zaroslikov.fermacompose2.data.Alarm.AlarmMangerRepository
 import com.zaroslikov.fermacompose2.data.Alarm.AlarmRepository
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
@@ -17,7 +19,7 @@ interface AppContainer {
 class AppDataContainer(private val context: Context) : AppContainer {
 
     override val itemsRepository: ItemsRepository by lazy {
-        OfflineItemsRepository(InventoryDatabase.getDatabase(context).itemDao())
+        OfflineItemsRepository(AppDatabase.getDatabase(context).itemDao())
     }
 
     override val waterRepository = WorkManagerWaterRepository(context)

@@ -85,10 +85,10 @@ class AddEntryViewModel @Inject constructor(
 
                 updateWarehouseUiStateSync(_state.value.title)
 
-                _state.value.animalId?.let { animalId ->
-                    _state.update {
-                        it.copy(animal = itemsRepository.getAnimalById(animalId).first())
-                    }
+                val currentAnimalId = _state.value.animalId
+                if (currentAnimalId != null) {
+                    val animal = itemsRepository.getAnimalById(currentAnimalId).first()
+                    _state.update { it.copy(animal = animal) }
                 }
             }
         }

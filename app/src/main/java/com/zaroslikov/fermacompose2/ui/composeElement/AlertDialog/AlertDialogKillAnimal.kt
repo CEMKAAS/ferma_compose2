@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.ferma.AddTable
+import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.animalCountWeightComposition
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
@@ -52,7 +52,6 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd2
 import com.zaroslikov.fermacompose2.ui.composeElement.TextAndIconRow
 import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16

@@ -7,10 +7,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.animal.AnimalCountTable
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.data.ferma.Incubator
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.data.room.table.animal.AnimalTable
+import com.zaroslikov.data.room.table.ferma.Incubator
+import com.zaroslikov.data.room.table.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

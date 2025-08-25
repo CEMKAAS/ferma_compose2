@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,25 +19,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
-import com.zaroslikov.fermacompose2.data.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.ferma.AddTable
+import com.zaroslikov.data.room.table.ferma.ExpensesTable
+import com.zaroslikov.data.room.table.ferma.SaleTable
+import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.PairData
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryState
-import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryViewModel
 import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogAddAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogArchiveAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogKillAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogSaleAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogWriteOffAnimal
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonArchive
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonCustom
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField

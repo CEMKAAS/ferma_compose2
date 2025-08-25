@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
 import com.zaroslikov.fermacompose2.data.water.WriteOffUiState
 import com.zaroslikov.fermacompose2.supportFun.DataPairListState

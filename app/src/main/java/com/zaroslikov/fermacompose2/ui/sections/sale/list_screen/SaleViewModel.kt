@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.SaleTable
+import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyPriceUiState
 import com.zaroslikov.fermacompose2.data.water.SaleUiState
 import kotlinx.coroutines.flow.Flow

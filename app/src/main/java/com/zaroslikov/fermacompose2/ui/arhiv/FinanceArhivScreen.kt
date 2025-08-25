@@ -18,8 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,9 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalCard
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatter

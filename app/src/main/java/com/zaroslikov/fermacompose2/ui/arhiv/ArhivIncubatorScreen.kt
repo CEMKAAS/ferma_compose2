@@ -2,9 +2,7 @@ package com.zaroslikov.fermacompose2.ui.arhiv
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
@@ -25,9 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.ferma.Incubator
+import com.zaroslikov.data.room.table.ferma.Incubator
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorViewModel
 import com.zaroslikov.fermacompose2.ui.incubator.MyRowIncubatorSettting

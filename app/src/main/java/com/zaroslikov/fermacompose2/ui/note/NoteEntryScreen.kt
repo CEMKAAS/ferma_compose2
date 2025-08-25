@@ -3,15 +3,8 @@
 package com.zaroslikov.fermacompose2.ui.note
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,17 +16,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.data.ferma.NoteTable
+import com.zaroslikov.data.room.table.ferma.NoteTable
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
@@ -46,11 +35,7 @@ import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
 import com.zaroslikov.fermacompose2.ui.composeElement.toOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.TimeZone
 
 
 object NoteEntryDestination : NavigationDestination {

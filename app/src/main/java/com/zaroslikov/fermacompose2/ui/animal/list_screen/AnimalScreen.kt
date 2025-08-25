@@ -2,7 +2,6 @@ package com.zaroslikov.fermacompose2.ui.animal.list_screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,12 +20,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
 import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton

@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toRoomMap
-import com.zaroslikov.fermacompose2.data.mapper.toDomainMap
-import com.zaroslikov.fermacompose2.data.mapper.toRoomMap
+import com.zaroslikov.data.room.mapper.AnimaMapper.toRoomMap
+import com.zaroslikov.data.room.mapper.toDomainMap
+import com.zaroslikov.data.room.mapper.toRoomMap
 import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider

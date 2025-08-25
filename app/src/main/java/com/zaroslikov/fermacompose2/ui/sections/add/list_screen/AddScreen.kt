@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.AddTable
+import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider

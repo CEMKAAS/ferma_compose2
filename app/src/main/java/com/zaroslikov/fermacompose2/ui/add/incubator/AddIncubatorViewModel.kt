@@ -7,8 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.ferma.Incubator
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.data.room.table.ferma.Incubator
+import com.zaroslikov.data.room.table.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import com.zaroslikov.fermacompose2.ui.incubator.toProjectTable

@@ -8,10 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.Domain.models.DomainNoteTable
 import com.zaroslikov.fermacompose2.data.ItemsRepository
-import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toDomainMap
-import com.zaroslikov.fermacompose2.data.mapper.AnimaMapper.toRoomMap
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class NoteEditViewModel(

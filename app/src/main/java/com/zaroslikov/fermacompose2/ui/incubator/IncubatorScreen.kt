@@ -56,9 +56,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
-import com.zaroslikov.fermacompose2.data.ferma.Incubator
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.data.room.table.animal.AnimalTable
+import com.zaroslikov.data.room.table.ferma.Incubator
+import com.zaroslikov.data.room.table.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import io.appmetrica.analytics.AppMetrica

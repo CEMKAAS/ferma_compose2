@@ -16,13 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 import com.zaroslikov.fermacompose2.supportFun.isAnimalCountIncrease
 import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorWriteOffAnimal
-import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount

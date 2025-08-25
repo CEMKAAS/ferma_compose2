@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.animal.AnimalTable
+import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
 import com.zaroslikov.fermacompose2.supportFun.convertSize
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
