@@ -1,0 +1,12 @@
+package com.zaroslikov.data.room.dto.animal
+
+data class AnimalExpensesDomain(
+    val id: Int,
+    val name: String,
+    val foodDay: Double,
+    val foodDaySuffix: String,
+    val countAnimal: Int,
+    val idExpensesAnimal: Long,
+    val ps: Boolean = false,
+    val presentException: Double = 0.0,
+)

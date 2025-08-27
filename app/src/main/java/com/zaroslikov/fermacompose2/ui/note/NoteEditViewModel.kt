@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.Domain.models.DomainNoteTable
-import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.domain.models.DomainNoteTable
+import com.zaroslikov.domain.repository.ItemsRepository
 import kotlinx.coroutines.launch
 
 class NoteEditViewModel(

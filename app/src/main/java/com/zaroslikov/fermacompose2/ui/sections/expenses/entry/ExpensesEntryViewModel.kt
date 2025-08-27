@@ -8,12 +8,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.ExpensesAnimalTable
-import com.zaroslikov.data.room.mapper.toDomainMap
-import com.zaroslikov.data.room.mapper.toRoomMap
-import com.zaroslikov.fermacompose2.supportFun.DataPairListState
-import com.zaroslikov.fermacompose2.supportFun.DataStringListState
+import com.zaroslikov.data.room.mapper.table.toDomainMap
+import com.zaroslikov.data.room.mapper.table.toRoomMap
+import com.zaroslikov.data.room.dto.DataPairListState
+import com.zaroslikov.data.room.dto.DataStringListState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
 import com.zaroslikov.fermacompose2.utils.ResourceProvider

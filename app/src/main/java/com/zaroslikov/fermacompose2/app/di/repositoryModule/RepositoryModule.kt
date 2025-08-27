@@ -8,7 +8,7 @@ import com.zaroslikov.data.room.database.AppDatabase.Companion.MIGRATION_1_2
 import com.zaroslikov.data.room.database.AppDatabase.Companion.MIGRATION_2_3
 import com.zaroslikov.data.room.database.AppDatabase.Companion.MIGRATION_3_4
 import com.zaroslikov.data.room.dao.ItemDao
-import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.repository.OfflineItemsRepository
 import dagger.Module
 import dagger.Provides

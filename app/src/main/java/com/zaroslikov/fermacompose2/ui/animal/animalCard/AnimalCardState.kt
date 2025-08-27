@@ -1,8 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
 import android.util.Log
-import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
-import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalCard
+import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 
 data class AnimalCardState(
     val id: Long = 0,

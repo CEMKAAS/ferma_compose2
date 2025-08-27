@@ -29,12 +29,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
+import com.zaroslikov.domain.models.DomainIndicatorsVM
+import com.zaroslikov.domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.supportFun.PairData
+import com.zaroslikov.data.room.dto.PairData
 import com.zaroslikov.fermacompose2.supportFun.animalCountWeightComposition
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.dateToday

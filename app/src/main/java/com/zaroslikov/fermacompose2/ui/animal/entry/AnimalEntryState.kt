@@ -1,8 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.animal.entry
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCount
-import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalTable
-import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
+import com.zaroslikov.domain.models.table.DomainAnimalCount
+import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble

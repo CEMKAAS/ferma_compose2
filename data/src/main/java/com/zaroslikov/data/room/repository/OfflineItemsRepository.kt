@@ -14,166 +14,18 @@ import com.zaroslikov.data.room.table.ferma.NoteTable
 import com.zaroslikov.data.room.table.ferma.ProjectTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
+import com.zaroslikov.domain.repository.ItemsRepository
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
-    override fun getAllItemsStream(id: Int): Flow<List<AddTable>> = itemDao.getAllItems(id)
-    override fun getItemStream(id: Int): Flow<AddTable?> = itemDao.getItem(id)
-    override suspend fun getIncubatorListArh4(idPT: Int): List<Incubator> =
-        itemDao.getIncubatorListArh4(idPT)
-
-    override suspend fun getIncubatorListArh6(type: String): List<ProjectTable> =
-        itemDao.getIncubatorListArh6(type)
-
-    override fun getAllProject(): Flow<List<ProjectTable>> = itemDao.getAllProject()
-    override fun getProject(id: Int): Flow<ProjectTable> = itemDao.getProject(id)
-    override suspend fun updateProject(item: ProjectTable) = itemDao.updateProject(item)
-    override suspend fun deleteProject(item: ProjectTable) = itemDao.deleteProject(item)
-    override fun getLastProject(): Flow<Int> = itemDao.getLastProject()
-    override fun getCountRowIncubator(): Flow<Int> = itemDao.getCountRowIncubator()
-    override fun getCountRowProject(): Flow<Int> = itemDao.getCountRowProject()
-    override fun getProjectListAct(): Flow<List<ProjectTable>> = itemDao.getProjectListAct()
-    override fun getIncubatorList(id: Int): Flow<List<Incubator>> = itemDao.getIncubatorList(id)
-    override suspend fun getIncubatorList2(id: Int): List<Incubator> = itemDao.getIncubatorList2(id)
-    override fun getIncubator(id: Int): Flow<Incubator> = itemDao.getIncubator(id)
-    override fun getIncubatorEditDay(id: Int, day: Int): Flow<Incubator> =
-        itemDao.getIncubatorEditDay(id, day)
-
-    override fun getItemAdd(id: Long): Flow<DomainAddTable> {
-        return itemDao.getItemAdd(id).map { it.toDomainMap() }
-    }
-
-    override fun getItemsTitleAddList(id: Long): Flow<List<PairData>> =
-        itemDao.getItemsTitleAddList(id)
-
-    override fun getItemsWriteoffList(id: Int): Flow<List<SaleTitleData>> =
-        itemDao.getItemsWriteoffList(id)
-
-    override fun getItemsCategoryAddList(id: Long): Flow<List<String>> =
-        itemDao.getItemsCategoryAddList(id)
-
-    override fun getItemsAnimalAddList(id: Long): Flow<List<TripleData>> =
-        itemDao.getItemsAnimalAddList(id)
-
-    override suspend fun insertProject(projectTable: ProjectTable) =
-        itemDao.insertProject(projectTable)
-
-    override suspend fun insertProjectLong(projectTable: ProjectTable): Long =
-        itemDao.insertProjectLong(projectTable)
-
-    override suspend fun insertItem(item: DomainAddTable) {
-        return itemDao.insert(item.toRoomMap())
-    }
-
-    override suspend fun deleteAddById(id: Long) = itemDao.deleteAddById(id)
-    override suspend fun updateItem(item: DomainAddTable) {
-        return itemDao.update(item.toRoomMap())
-    }
-
-    override fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyItemCount>> =
-        itemDao.getBrieflyItemAdd(id)
-
-    override fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>> =
-        itemDao.getBrieflyDetailsItemAdd(id, name)
-
-    override fun getAnimalById(id: Long): Flow<String> = itemDao.getAnimalById(id)
-
-    //==================== Sale ====================
-    override fun getAllSaleItems(id: Int): Flow<List<SaleTable>> = itemDao.getAllSaleItems(id)
-    override fun getItemSale(id: Int): Flow<SaleTable> = itemDao.getItemSale(id)
-    override fun getItemSaleIdCountAnimal(id: Int): Flow<SaleTable> =
-        itemDao.getItemSaleIdCountAnimal(id)
-
-    override fun getBrieflyItemSale(id: Int): Flow<List<BrieflyItemPrice>> =
-        itemDao.getBrieflyItemSale(id)
-
-    override fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<SaleTable>> =
-        itemDao.getBrieflyDetailsItemSale(id, name)
-
-    override fun getItemsTitleSaleList(id: Int): Flow<List<SaleTitleData>> =
-        itemDao.getItemsTitleSaleList(id)
-
-    override fun getItemsCategorySaleList(id: Int): Flow<List<String>> =
-        itemDao.getItemsCategorySaleList(id)
-
-    override fun getItemsBuyerSaleList(id: Int): Flow<List<String>> =
-        itemDao.getItemsBuyerSaleList(id)
-
-    override suspend fun insertSale(item: SaleTable) = itemDao.insertSale(item)
-    override suspend fun updateSale(item: SaleTable) = itemDao.updateSale(item)
-    override suspend fun deleteSaleById(id: Long) = itemDao.deleteSaleById(id)
-
-    //==================== Expenese ====================
-    override fun getAllExpensesItems(id: Int): Flow<List<ExpensesTable>> =
-        itemDao.getAllExpensesItems(id)
-
-    override fun getItemExpenses(id: Int): Flow<ExpensesTable> = itemDao.getItemExpenses(id)
-    override fun getItemExpensesIdAnimalCount(id: Int): Flow<ExpensesTable> =
-        itemDao.getItemExpensesIdAnimalCount(id)
-
-    override fun getBrieflyItemExpenses(id: Int): Flow<List<BrieflyItemPrice>> =
-        itemDao.getBrieflyItemExpenses(id)
-
-    override fun getBrieflyDetailsItemExpenses(id: Long, name: String): Flow<List<ExpensesTable>> =
-        itemDao.getBrieflyDetailsItemExpenses(id, name)
-
-    override suspend fun getItemExpensesAnimal(id: Int): List<Long> =
-        itemDao.getItemExpensesAnimal(id)
-
-    override fun getItemsTitleExpensesList(id: Int): Flow<List<PairData>> =
-        itemDao.getItemsTitleExpensesList(id)
-
-    override fun getItemsCategoryExpensesList(id: Int): Flow<List<String>> =
-        itemDao.getItemsCategoryExpensesList(id)
-
-    override suspend fun getItemsAnimalExpensesList2(
-        id: Int,
-        idExpenses: Long
-    ): List<AnimalExpensesList2> = itemDao.getItemsAnimalExpensesList2(id, idExpenses)
-
-    override suspend fun insertExpenses(item: ExpensesTable) = itemDao.insertExpenses(item)
-    override suspend fun updateExpenses(item: ExpensesTable) = itemDao.updateExpenses(item)
-    override suspend fun deleteExpenses(item: ExpensesTable) = itemDao.deleteExpenses(item)
-
-    override suspend fun insertExpensesAnimal(item: ExpensesAnimalTable) =
-        itemDao.insertExpensesAnimal(item)
-
-    override suspend fun updateExpensesAnimal(item: ExpensesAnimalTable) =
-        itemDao.updateExpensesAnimal(item)
-
-    override suspend fun deleteExpensesAnimal(item: ExpensesAnimalTable) =
-        itemDao.deleteExpensesAnimal(item)
-
-    //==================== WriteOff ====================
-    override fun getAllWriteOffItems(id: Int): Flow<List<WriteOffTable>> =
-        itemDao.getAllWriteOffItems(id)
-
-    override fun getItemWriteOff(id: Int): Flow<WriteOffTable> = itemDao.getItemWriteOff(id)
-    override fun getItemWriteOffIdCountAnimal(id: Int): Flow<WriteOffTable> =
-        itemDao.getItemWriteOffIdAnimalCount(id)
-
-    override fun getBrieflyItemWriteOff(id: Int): Flow<List<BrieflyItemCount>> =
-        itemDao.getBrieflyItemWriteOff(id)
-
-    override fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>> =
-        itemDao.getBrieflyDetailsItemWriteOff(id, name)
-
-    override suspend fun insertWriteOff(item: WriteOffTable) = itemDao.insertWriteOff(item)
-    override suspend fun updateWriteOff(item: WriteOffTable) = itemDao.updateWriteOff(item)
-    override suspend fun deleteWriteOff(id: Long) = itemDao.deleteWriteOff(id)
 
     //==================== Finance ====================
     override fun getCurrentBalance(id: Int): Flow<Double> = itemDao.getCurrentBalance(id)
-    override fun getIncome(id: Int): Flow<Double> = itemDao.getIncome(id)
+    override fun getIncome(id: Int): Flow<Double> =
     override fun getExpenses(id: Int): Flow<Double> = itemDao.getExpenses(id)
-    override fun getItemExpensesForVaccination(id: Long): Flow<ExpensesTable> =
-        itemDao.getItemExpensesForVaccination(id)
 
     override fun getOwnNeed(id: Int): Flow<Double> = itemDao.getOwnNeed(id)
     override fun getScrap(id: Int): Flow<Double> = itemDao.getScrap(id)
-
-    override fun getIncomeMountFin(id: Int, mount: Int, year: Int): Flow<Double> =
-        itemDao.getIncomeMountFin(id, mount, year)
 
     override fun getExpensesMountFin(
         id: Int,
@@ -184,9 +36,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         itemDao.getExpensesMountFin(id, mount, year, yearMonth)
 
 
-    override fun getIncomeMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
-        itemDao.getIncomeMount(id, dateBegin, dateEnd)
-
     override fun getExpensesMount(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
         itemDao.getExpensesMount(id, dateBegin, dateEnd)
 
@@ -195,13 +44,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getScrapMonth(id: Int, dateBegin: String, dateEnd: String): Flow<Double> =
         itemDao.getScrapMonth(id, dateBegin, dateEnd)
-
-    override fun getCategoryIncomeCurrentMonth(
-        id: Int,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<Fin>> =
-        itemDao.getCategoryIncomeCurrentMonth(id, dateBegin, dateEnd)
 
     override fun getCategoryExpensesCurrentMonth(
         id: Int,
@@ -219,24 +61,15 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
 
     //FinanceTap
-    override fun getIncomeAllList(id: Int): Flow<List<Fin>> = itemDao.getIncomeAllList(id)
+
     override fun getExpensesAllList(id: Int): Flow<List<Fin>> = itemDao.getExpensesAllList(id)
     override fun getExpensesAnimalAllList(id: Int): Flow<List<Fin>> =
         itemDao.getExpensesAnimalAllList(id)
 
-    override fun getIncomeCategoryAllList(id: Int): Flow<List<Fin>> =
-        itemDao.getIncomeCategoryAllList(id)
 
     override fun getExpensesCategoryAllList(id: Int): Flow<List<Fin>> =
         itemDao.getExpensesCategoryAllList(id)
 
-    override fun getProductListCategoryIncomeCurrentMonth(
-        id: Int,
-        dateBegin: String,
-        dateEnd: String,
-        category: String
-    ): Flow<List<Fin>> =
-        itemDao.getProductListCategoryIncomeCurrentMonth(id, dateBegin, dateEnd, category)
 
     override fun getProductLisCategoryExpensesCurrentMonth(
         id: Int,
@@ -283,9 +116,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAnalysisAddAllTime(id: Int, name: String): Flow<Fin> =
         itemDao.getAnalysisAddAllTime(id, name)
 
-    override fun getAnalysisSaleAllTime(id: Int, name: String): Flow<Fin> =
-        itemDao.getAnalysisSaleAllTime(id, name)
-
     override fun getAnalysisWriteOffAllTime(id: Int, name: String): Flow<Fin> =
         itemDao.getAnalysisWriteOffAllTime(id, name)
 
@@ -294,9 +124,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
 
     override fun getAnalysisWriteOffScrapAllTime(id: Int, name: String): Flow<Fin> =
         itemDao.getAnalysisWriteOffScrapAllTime(id, name)
-
-    override fun getAnalysisSaleSoldAllTime(id: Int, name: String): Flow<Double> =
-        itemDao.getAnalysisSaleSoldAllTime(id, name)
 
     override fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Int, name: String): Flow<Double> =
         itemDao.getAnalysisWriteOffOwnNeedsMoneyAllTime(id, name)
@@ -310,11 +137,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAnalysisAddAnimalAllTime(id: Int, name: String): Flow<List<AnimalTitSuff>> =
         itemDao.getAnalysisAddAnimalAllTime(id, name)
 
-    override fun getAnalysisSaleBuyerAllTime(
-        id: Int,
-        name: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> = itemDao.getAnalysisSaleBuyerAllTime(id, name)
-
     override fun getAnalysisCostPriceAllTime(id: Int, name: String): Flow<List<Fin>> =
         itemDao.getAnalysisCostPriceAllTime(id, name)
 
@@ -325,13 +147,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         dateBegin: String,
         dateEnd: String
     ): Flow<Fin> = itemDao.getAnalysisAddAllTimeRange(id, name, dateBegin, dateEnd)
-
-    override fun getAnalysisSaleAllTimeRange(
-        id: Int,
-        name: String,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<Fin> = itemDao.getAnalysisSaleAllTimeRange(id, name, dateBegin, dateEnd)
 
     override fun getAnalysisWriteOffAllTimeRange(
         id: Int,
@@ -354,12 +169,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         dateEnd: String
     ): Flow<Fin> = itemDao.getAnalysisWriteOffScrapAllTimeRange(id, name, dateBegin, dateEnd)
 
-    override fun getAnalysisSaleSoldAllTimeRange(
-        id: Int,
-        name: String,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<Double> = itemDao.getAnalysisSaleSoldAllTimeRange(id, name, dateBegin, dateEnd)
 
     override fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(
         id: Int,
@@ -392,14 +201,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     ): Flow<List<AnimalTitSuff>> =
         itemDao.getAnalysisAddAnimalAllTimeRange(id, name, dateBegin, dateEnd)
 
-    override fun getAnalysisSaleBuyerAllTimeRange(
-        id: Int,
-        name: String,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> =
-        itemDao.getAnalysisSaleBuyerAllTimeRange(id, name, dateBegin, dateEnd)
-
     override fun getAnalysisCostPriceAllTimeRange(
         id: Int,
         name: String,
@@ -414,103 +215,9 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun updateIncubator(item: Incubator) =
         itemDao.updateIncubator(item)
 
-    override fun getAllAnimal(id: Long): Flow<List<DomainAnimalWithCount>> {
-        return itemDao.getAllAnimal(id).map { list -> list.map { it.toDomain() } }
-    }
-
-    override fun getAnimal(id: Long): Flow<AnimalTable> = itemDao.getAnimal(id)
-    override fun getAnimalCard(id: Int): Flow<DomainAnimalCard> {
-        return itemDao.getAnimalCard(id).map { it.toDomainMap() }
-    }
-
-    override fun getTypeAnimal(id: Long): Flow<List<String>> = itemDao.getTypeAnimal(id)
-
-    /**Animal**/
-    override suspend fun insertAnimalTable(animalTable: AnimalTable): Long =
-        itemDao.insertAnimalTable(animalTable)
-
-    override suspend fun updateAnimalTable(animalTable: DomainAnimalTable) {
-        return itemDao.updateAnimalTable(animalTable.toRoomMap())
-    }
-
-    override suspend fun deleteAnimalTable(id: Long) =
-        itemDao.deleteAnimalTable(id)
-
-    override suspend fun insertAnimalCountTable(animalCountTable: DomainAnimalCount): Long {
-        return itemDao.insertAnimalCountTable(animalCountTable.toRoomMap())
-    }
-
-    override suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
-        itemDao.insertAnimalSizeTable(animalSizeTable)
-
-    override suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
-        itemDao.insertAnimalWeightTable(animalWeightTable)
-
-    override suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable): Long =
-        itemDao.insertAnimalVaccinationTable(animalVaccinationTable)
-
-    override suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable) =
-        itemDao.updateAnimalCountTable(animalCountTable)
-
-    override suspend fun updateAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
-        itemDao.updateAnimalSizeTable(animalSizeTable)
-
-    override suspend fun updateAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
-        itemDao.updateAnimalWeightTable(animalWeightTable)
-
-    override suspend fun updateAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
-        itemDao.updateAnimalVaccinationTable(animalVaccinationTable)
-
-    override suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable) =
-        itemDao.deleteAnimalCountTable(animalCountTable)
-
-    override suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable) =
-        itemDao.deleteAnimalSizeTable(animalSizeTable)
-
-    override suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable) =
-        itemDao.deleteAnimalWeightTable(animalWeightTable)
-
-    override suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable) =
-        itemDao.deleteAnimalVaccinationTable(animalVaccinationTable)
-
-    override fun getCountAnimalLimit(id: Int): Flow<AnimalCountTable> =
-        itemDao.getCountAnimalLimit(id)
-
-    override fun getSizeAnimalLimit(id: Int): Flow<AnimalSizeTable> =
-        itemDao.getSizeAnimalLimit(id)
-
-    override fun getVaccinationAnimalLimit(id: Int): Flow<AnimalVaccinationTable> =
-        itemDao.getVaccinationAnimalLimit(id)
-
-    override fun getWeightAnimalLimit(id: Int): Flow<AnimalWeightTable> =
-        itemDao.getWeightAnimalLimit(id)
-
-    override fun getCountAnimal(id: Int): Flow<List<DomainIndicatorsVM>> =
-        itemDao.getCountAnimal(id)
-
-    override fun getSizeAnimal(id: Int): Flow<List<DomainIndicatorsVM>> = itemDao.getSizeAnimal(id)
-
-    override fun getVaccinationAnimal(id: Int): Flow<List<AnimalVaccinationTable>> =
-        itemDao.getVaccinationAnimal(id)
-
-    override fun getWeightAnimal(id: Int): Flow<List<DomainIndicatorsVM>> =
-        itemDao.getWeightAnimal(id)
 
     override fun getProductAnimal(name: String): Flow<List<AnimalTitSuff>> =
         itemDao.getProductAnimal(name)
-
-    /**Note**/
-    override fun getAllNote(id: Int): Flow<List<NoteTable>> = itemDao.getAllNote(id)
-    override fun getNote(id: Int): Flow<NoteTable> = itemDao.getNote(id)
-
-    override suspend fun insertNote(item: NoteTable) = itemDao.insertNote(item)
-    override suspend fun updateNote(item: NoteTable) = itemDao.updateNote(item)
-    override suspend fun deleteNote(item: NoteTable) = itemDao.deleteNote(item)
-    override fun getAnalysisSaleNewYearProject(
-        id: Int,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<Double> = itemDao.getAnalysisSaleNewYearProject(id, dateBegin, dateEnd)
 
     override fun getAnalysisExpensesNewYearProject(
         id: Int,
@@ -536,26 +243,12 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         dateEnd: String
     ): Flow<Int> = itemDao.getAnalysisCountAnimalNewYearProject(id, dateBegin, dateEnd)
 
-    override fun getAnalysisSaleBuyerNewYearProject(
-        id: Int,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> =
-        itemDao.getAnalysisSaleBuyerNewYearProject(id, dateBegin, dateEnd)
-
     override fun getAnalysisAddProductNewYearProject(
         id: Int,
         dateBegin: String,
         dateEnd: String
     ): Flow<List<AnalysisSaleBuyerAllTime>> =
         itemDao.getAnalysisAddProductNewYearProject(id, dateBegin, dateEnd)
-
-    override fun getAnalysisSaleProductNewYearProject(
-        id: Int,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> =
-        itemDao.getAnalysisSaleProductNewYearProject(id, dateBegin, dateEnd)
 
     override fun getAnalysisExpensesProductNewYearProject(
         id: Int,
@@ -565,7 +258,7 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
         itemDao.getAnalysisExpensesProductNewYearProject(id, dateBegin, dateEnd)
 
     override fun getAnalysisSaleNewYear(dateBegin: String, dateEnd: String): Flow<Double> =
-        itemDao.getAnalysisSaleNewYear(dateBegin, dateEnd)
+
 
     override fun getAnalysisExpensesNewYear(dateBegin: String, dateEnd: String): Flow<Double> =
         itemDao.getAnalysisExpensesNewYear(dateBegin, dateEnd)
@@ -578,23 +271,11 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override fun getAnalysisWriteOffScrapNewYear(dateBegin: String, dateEnd: String): Flow<Double> =
         itemDao.getAnalysisWriteOffScrapNewYear(dateBegin, dateEnd)
 
-    override fun getAnalysisSaleBuyerNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> =
-        itemDao.getAnalysisSaleBuyerNewYear(dateBegin, dateEnd)
-
     override fun getAnalysisAddProductNewYear(
         dateBegin: String,
         dateEnd: String
     ): Flow<List<AnalysisSaleBuyerAllTime>> =
         itemDao.getAnalysisAddProductNewYear(dateBegin, dateEnd)
-
-    override fun getAnalysisSaleProductNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> =
-        itemDao.getAnalysisSaleProductNewYear(dateBegin, dateEnd)
 
     override fun getAnalysisExpensesProductNewYear(
         dateBegin: String,

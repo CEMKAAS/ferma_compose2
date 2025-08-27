@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyItemPrice
+import com.zaroslikov.data.room.dto.BrieflyItemPrice
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField
 import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress

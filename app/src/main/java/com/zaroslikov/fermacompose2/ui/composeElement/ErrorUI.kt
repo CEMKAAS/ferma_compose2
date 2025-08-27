@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
+import com.zaroslikov.data.room.dto.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 

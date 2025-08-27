@@ -17,10 +17,10 @@ import androidx.room.PrimaryKey
 
 data class AnimalVaccinationTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val vaccination: String,
     val date: String,
     val nextVaccination: String,
-    val idAnimal: Int,
-    val note:String
+    val idAnimal: Long,
+    val note: String
 )

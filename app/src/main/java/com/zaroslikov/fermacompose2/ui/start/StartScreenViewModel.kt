@@ -7,9 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.ProjectTable
-import com.zaroslikov.fermacompose2.data.water.ProjectTableStartScreen
+import com.zaroslikov.data.room.dto.ProjectTableStartScreen
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

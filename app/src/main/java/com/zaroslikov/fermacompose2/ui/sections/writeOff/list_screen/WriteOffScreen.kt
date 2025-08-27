@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyItemCount
+import com.zaroslikov.data.room.dto.BrieflyItemCount
 import com.zaroslikov.fermacompose2.supportFun.getImageWriteOff
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.composeElement.CardField

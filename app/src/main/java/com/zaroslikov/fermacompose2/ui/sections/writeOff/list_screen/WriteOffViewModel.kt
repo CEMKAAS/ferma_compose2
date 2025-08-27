@@ -3,11 +3,11 @@ package com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyUiState
-import com.zaroslikov.fermacompose2.data.water.WriteOffUiState
-import com.zaroslikov.fermacompose2.supportFun.DataPairListState
+import com.zaroslikov.data.room.dto.BrieflyUiState
+import com.zaroslikov.data.room.dto.WriteOffUiState
+import com.zaroslikov.data.room.dto.DataPairListState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

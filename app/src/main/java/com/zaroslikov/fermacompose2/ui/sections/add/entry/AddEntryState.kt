@@ -1,9 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
-import com.zaroslikov.fermacompose2.supportFun.PairData
-import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.TripleData
+import com.zaroslikov.domain.models.DomainAddTable
+import com.zaroslikov.data.room.dto.PairData
+import com.zaroslikov.data.room.dto.PairDataDoubleSting
+import com.zaroslikov.data.room.dto.TripleData
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble

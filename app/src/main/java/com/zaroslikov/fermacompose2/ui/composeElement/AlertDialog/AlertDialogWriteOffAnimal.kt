@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
+import com.zaroslikov.domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.dateToday

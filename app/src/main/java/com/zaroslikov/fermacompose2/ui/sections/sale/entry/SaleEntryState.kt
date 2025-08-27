@@ -1,8 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
-import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
+import com.zaroslikov.domain.models.DomainSaleTable
+import com.zaroslikov.data.room.dto.PairDataDoubleSting
+import com.zaroslikov.data.room.dto.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble

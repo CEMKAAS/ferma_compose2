@@ -1,8 +1,8 @@
 package com.zaroslikov.fermacompose2.supportFun
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainAddTable
-import com.zaroslikov.fermacompose2.Domain.models.DomainExpensesTable
-import com.zaroslikov.fermacompose2.Domain.models.DomainSaleTable
+import com.zaroslikov.domain.models.DomainAddTable
+import com.zaroslikov.domain.models.DomainExpensesTable
+import com.zaroslikov.domain.models.DomainSaleTable
 import io.appmetrica.analytics.AppMetrica
 
 fun metricAdd(domainAddTable: DomainAddTable) {

@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.data
 import android.content.Context
 import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.data.room.repository.OfflineItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.fermacompose2.data.Alarm.AlarmMangerRepository
 import com.zaroslikov.fermacompose2.data.Alarm.AlarmRepository
 import com.zaroslikov.fermacompose2.data.water.WaterRepository

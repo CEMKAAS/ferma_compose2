@@ -1,7 +1,7 @@
 package com.zaroslikov.data.room.mapper.AnimaMapper.dto
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainAnimalTable.DomainAnimalCard
-import com.zaroslikov.fermacompose2.data.dto.animal.AnimalCardDto
+import com.zaroslikov.data.room.dto.AnimalCardDto
+import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalCard
 
 fun AnimalCardDto.toDomainMap(): DomainAnimalCard = DomainAnimalCard(
     name = name,

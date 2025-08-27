@@ -8,9 +8,9 @@ import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.Domain.models.DomainIndicatorsVM
+import com.zaroslikov.domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
 import com.zaroslikov.data.room.table.ferma.SaleTable

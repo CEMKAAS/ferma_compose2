@@ -19,10 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,10 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.PairData
-import com.zaroslikov.fermacompose2.supportFun.PairDataStringInt
-import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
-import com.zaroslikov.fermacompose2.supportFun.TripleData
+import com.zaroslikov.data.room.dto.PairData
+import com.zaroslikov.data.room.dto.SaleTitleData
+import com.zaroslikov.data.room.dto.TripleData
 
 
 enum class Suffix(val resId: Int) {
@@ -70,32 +67,6 @@ enum class Suffix(val resId: Int) {
         }
     }
 }*/
-
-enum class Category(val id: Int, val drawerRes: Int, val titleRes: Int) {
-    ADD(
-        id = 0,
-        drawerRes = R.drawable.baseline_add_circle_outline_24,
-        titleRes = R.string.add_screen_title
-    ),
-    EXPENSES(
-        id = 1,
-        drawerRes = R.drawable.baseline_add_shopping_cart_24,
-        titleRes = R.string.expenses_screen_title
-    ),
-    SALE(
-        id = 2,
-        drawerRes = R.drawable.baseline_add_card_24,
-        titleRes = R.string.sale_screen_title
-    );
-
-    fun toDrawer(): Int = drawerRes
-    fun toResInt(): Int = titleRes
-
-    companion object {
-        fun fromId(id: Int): Category =
-            entries.firstOrNull { it.id == id } ?: ADD
-    }
-}
 
 
 @Composable

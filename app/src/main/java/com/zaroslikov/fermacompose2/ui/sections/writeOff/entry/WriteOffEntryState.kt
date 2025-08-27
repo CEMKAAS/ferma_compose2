@@ -1,8 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.sections.writeOff.entry
 
-import com.zaroslikov.fermacompose2.Domain.models.DomainWriteOffTable
-import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
+import com.zaroslikov.domain.models.table.DomainWriteOffTable
+import com.zaroslikov.data.room.dto.PairDataDoubleSting
+import com.zaroslikov.data.room.dto.SaleTitleData
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble

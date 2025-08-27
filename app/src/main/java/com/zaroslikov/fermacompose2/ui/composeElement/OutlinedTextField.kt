@@ -44,10 +44,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
-import com.zaroslikov.fermacompose2.supportFun.PairData
-import com.zaroslikov.fermacompose2.supportFun.PairDataDoubleSting
-import com.zaroslikov.fermacompose2.supportFun.SaleTitleData
-import com.zaroslikov.fermacompose2.supportFun.TripleData
+import com.zaroslikov.data.room.dto.PairData
+import com.zaroslikov.data.room.dto.PairDataDoubleSting
+import com.zaroslikov.data.room.dto.SaleTitleData
+import com.zaroslikov.data.room.dto.TripleData
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown

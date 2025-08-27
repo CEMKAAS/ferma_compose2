@@ -1,7 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
 import android.util.Log
-import com.zaroslikov.fermacompose2.Domain.models.DomainPairDataDoubleSting
+import com.zaroslikov.domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 
 

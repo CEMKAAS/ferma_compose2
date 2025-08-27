@@ -3,10 +3,10 @@ package com.zaroslikov.fermacompose2.ui.sections.sale.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.data.ItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.SaleTable
-import com.zaroslikov.fermacompose2.data.water.BrieflyPriceUiState
-import com.zaroslikov.fermacompose2.data.water.SaleUiState
+import com.zaroslikov.data.room.dto.BrieflyPriceUiState
+import com.zaroslikov.data.room.dto.SaleUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

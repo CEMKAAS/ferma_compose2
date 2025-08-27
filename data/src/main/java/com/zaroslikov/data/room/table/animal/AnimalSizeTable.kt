@@ -17,7 +17,7 @@ import androidx.room.PrimaryKey
 )
 data class AnimalSizeTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val size: String,
     val suffix: String,
     val date: String,

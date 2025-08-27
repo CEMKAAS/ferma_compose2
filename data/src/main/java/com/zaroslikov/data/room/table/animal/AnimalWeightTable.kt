@@ -16,10 +16,10 @@ import androidx.room.PrimaryKey
 )
 data class AnimalWeightTable(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val weight: String,
     val suffix: String,
     val date: String,
-    val idAnimal: Int,
+    val idAnimal: Long,
     val note: String
 )

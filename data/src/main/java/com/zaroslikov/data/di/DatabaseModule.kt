@@ -9,6 +9,7 @@ import com.zaroslikov.data.room.database.migration.MIGRATION_1_2
 import com.zaroslikov.data.room.database.migration.MIGRATION_2_3
 import com.zaroslikov.data.room.database.migration.MIGRATION_3_4
 import com.zaroslikov.data.room.repository.OfflineItemsRepository
+import com.zaroslikov.domain.repository.ItemsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

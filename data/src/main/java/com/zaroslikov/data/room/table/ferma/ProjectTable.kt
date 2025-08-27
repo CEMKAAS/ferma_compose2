@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class ProjectTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
-    val id: Int = 0,
+    val id: Long = 0,
     @ColumnInfo(name = "NAME")
     val titleProject: String, // название
     @ColumnInfo(name = "TYPE")
