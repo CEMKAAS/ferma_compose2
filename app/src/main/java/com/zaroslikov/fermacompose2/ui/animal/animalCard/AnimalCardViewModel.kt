@@ -11,7 +11,6 @@ import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainIndicatorsVM
 import com.zaroslikov.domain.models.DomainPairDataDoubleSting
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable

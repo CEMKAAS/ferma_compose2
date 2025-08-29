@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisAddAnimalAllTimeUiState
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTime
 import com.zaroslikov.fermacompose2.ui.finance.AnalysisSaleBuyerAllTimeUiState

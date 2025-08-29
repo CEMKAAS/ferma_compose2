@@ -18,7 +18,7 @@ fun String.isError(): Boolean {
     return this == ""
 }
 
-fun String.isErrorSlash(): Boolean {
+fun String.isSlash(): Boolean {
     return this.contains("/")
 }
 
@@ -31,7 +31,7 @@ fun isErrorAdd(
 ): Boolean {
     isErrorTitle(title.isError())
     isErrorCount(count.isError())
-    isErrorSlash(title.isErrorSlash())
+    isErrorSlash(title.isSlash())
     return !(title.contains("/") || title == "" || count == "")
 }
 
@@ -46,7 +46,7 @@ fun isErrorSale(
 ): Boolean {
     isErrorTitle(title.isError())
     isErrorCount(count.isError())
-    isErrorSlash(title.isErrorSlash())
+    isErrorSlash(title.isSlash())
     isErrorPrice(price.isError())
     return !(title.contains("/") || title == "" || count == "" || price == "")
 }
@@ -172,7 +172,7 @@ fun isErrorKillAnimal(
     textFields.forEachIndexed { index, it ->
         textFields[index] = it.copy(
             isError = it.title.isError(),
-            isErrorSlash = it.title.isErrorSlash(),
+            isErrorSlash = it.title.isSlash(),
             isErrorCount = it.count.isError()
         )
     }

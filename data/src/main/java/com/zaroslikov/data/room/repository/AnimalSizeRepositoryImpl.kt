@@ -7,8 +7,10 @@ import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class AnimalSizeRepositoryImpl(private val animalSizeDao: AnimalSizeDao) : AnimalSizeRepository {
+class AnimalSizeRepositoryImpl @Inject constructor(private val animalSizeDao: AnimalSizeDao) :
+    AnimalSizeRepository {
     override suspend fun insertAnimalSizeTable(animalSizeTable: DomainAnimalSize) {
         return animalSizeDao.insertAnimalSizeTable(animalSizeTable.toAnimalSizeTable())
     }
@@ -21,11 +23,11 @@ class AnimalSizeRepositoryImpl(private val animalSizeDao: AnimalSizeDao) : Anima
         return animalSizeDao.deleteAnimalSizeTable(animalSizeTable.toAnimalSizeTable())
     }
 
-    override fun getSizeAnimalLimit(id: Int): Flow<DomainAnimalSize> {
+    override fun getSizeAnimalLimit(id: Long): Flow<DomainAnimalSize> {
         return animalSizeDao.getSizeAnimalLimit(id).map { it.toDomainAnimalSize() }
     }
 
-    override fun getSizeAnimal(id: Int): Flow<List<DomainAnimalSize>> {
+    override fun getSizeAnimal(id: Long): Flow<List<DomainAnimalSize>> {
         return animalSizeDao.getSizeAnimal(id).map { it -> it.map { it.toDomainAnimalSize() } }
     }
 

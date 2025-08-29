@@ -33,10 +33,10 @@ interface AnimalDao {
     fun getAllAnimal(id: Long): Flow<List<AnimalWithCountDto>>
 
 
-    @Query("SELECT * from animal_table Where id=:id")
+    @Query("SELECT * FROM animal_table WHERE id=:id")
     fun getAnimal(id: Long): Flow<AnimalTable>
 
-    @Query("SELECT type from animal_table Where idPT=:id GROUP BY type")
+    @Query("SELECT type FROM animal_table WHERE idPT=:id GROUP BY type")
     fun getTypeAnimal(id: Long): Flow<List<String>>
 
     @Query("SELECT id, name, type from animal_table Where idPT=:id")
@@ -50,5 +50,27 @@ interface AnimalDao {
 
     @Query("DELETE FROM animal_table WHERE id =:id")
     suspend fun deleteAnimalTable(id: Long)
+
+    /*@Query("SELECT name as title," +
+            " COALESCE(SUM(0), 0.0) AS priceAll" +
+            " FROM animal_table" +
+            " WHERE idPT =:id" +
+            " GROUP BY name")
+    fun getExpensesAnimalAllList(id: Int): Flow<List<Fin>>//0 = price  //maybe
+
+    //0 = COALESCE(SUM(0.0), 0.0)
+    @Query("SELECT name as title," +
+            " 0.0 AS priceAll" +
+            " FROM animal_table" +
+            " Where idPT=:id" +
+            " AND DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2)))" +
+            " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+            " GROUP BY name")
+    fun getProductLisCategoryExpensesAnimalCurrentMonth(
+        id: Int,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<Fin>>  //maybe*/
+
 
 }

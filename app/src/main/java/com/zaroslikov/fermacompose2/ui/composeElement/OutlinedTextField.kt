@@ -48,6 +48,10 @@ import com.zaroslikov.data.room.dto.PairData
 import com.zaroslikov.data.room.dto.PairDataDoubleSting
 import com.zaroslikov.data.room.dto.SaleTitleData
 import com.zaroslikov.data.room.dto.TripleData
+import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.dto.write_off.TitleWriteOffDomain
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
@@ -140,7 +144,7 @@ fun OutlinedTextAnimal(
     onValueChange: (Pair<Long, String>) -> Unit,
     onClickClear: (String) -> Unit,
     selectedAnimalIndex: Long,
-    animalList: List<TripleData>,
+    animalList: List<AnimalForAddDomain>,
 ) {
     val focusManager = LocalFocusManager.current
     CardField(
@@ -433,7 +437,7 @@ fun OutlinedTextCount2(
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_weight,
-    warehouseList: List<PairDataDoubleSting>,
+    warehouseList: List<DomainCountSuffix>,
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     isWeightCalculate: Boolean = false,
     weightValue: String = "",
@@ -599,7 +603,7 @@ fun OutlinedTextTitleAdd2(
     drawableRes: Int? = null,
     readOnly: Boolean = false,
     enable: Boolean = true,
-    titleList: List<PairData>,
+    titleList: List<TitleAndSuffixDomain>,
     isErrorTitle: Boolean,
     isErrorSlash: Boolean,
 ) {
@@ -824,10 +828,10 @@ fun OutlinedTextPriceCount(
 fun OutlinedTextTitleSale(
     value: String,
     onValueChange: (String) -> Unit = {},
-    onValueChoice: (SaleTitleData) -> Unit = {},
+    onValueChoice: (TitleWriteOffDomain) -> Unit = {},
     readOnly: Boolean = false,
     enable: Boolean = true,
-    titleList: List<SaleTitleData>,
+    titleList: List<TitleWriteOffDomain>,
     isErrorTitle: Boolean = false,
     isErrorSlash: Boolean = false
 ) {
@@ -842,7 +846,7 @@ fun OutlinedTextTitleSale(
             title = value,
             setTitle = {
                 onValueChoice(it)
-                leadingIconRes = it.third.drawerRes
+                leadingIconRes = it.category.ordinal
                 focusManager.moveFocus(FocusDirection.Down)
             },
             list = titleList
@@ -1041,7 +1045,7 @@ fun BaseOutlinedText(
     isError: Boolean = false,
     isErrorSlash: Boolean = false,
     isWarehouseShow: Boolean = false,
-    warehouseList: List<PairDataDoubleSting> = emptyList(),
+    warehouseList: List<DomainCountSuffix> = emptyList(),
     isAnimal: Boolean = false,
     countAnimal: String = "",
     leadingIconRes: Int? = null,

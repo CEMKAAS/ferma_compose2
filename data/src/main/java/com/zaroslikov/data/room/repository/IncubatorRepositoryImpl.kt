@@ -7,9 +7,11 @@ import com.zaroslikov.domain.models.table.DomainIncubator
 import com.zaroslikov.domain.repository.IncubatorRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class IncubatorRepositoryImpl(private val incubatorDao: IncubatorDao) : IncubatorRepository {
-    override suspend fun getIncubatorListArh4(idPT: Long): Flow<List<DomainIncubator>> {
+class IncubatorRepositoryImpl @Inject constructor(private val incubatorDao: IncubatorDao) :
+    IncubatorRepository {
+    override fun getIncubatorListArh4(idPT: Long): Flow<List<DomainIncubator>> {
         return incubatorDao.getIncubatorListArh4(idPT)
             .map { it -> it.map { it.toDomainIncubator() } }
     }
@@ -18,7 +20,7 @@ class IncubatorRepositoryImpl(private val incubatorDao: IncubatorDao) : Incubato
         return incubatorDao.getIncubatorList(id).map { it -> it.map { it.toDomainIncubator() } }
     }
 
-    override suspend fun getIncubatorList2(id: Long): Flow<List<DomainIncubator>> {
+    override fun getIncubatorList2(id: Long): Flow<List<DomainIncubator>> {
         return incubatorDao.getIncubatorList2(id).map { it -> it.map { it.toDomainIncubator() } }
     }
 
@@ -39,5 +41,33 @@ class IncubatorRepositoryImpl(private val incubatorDao: IncubatorDao) : Incubato
 
     override suspend fun updateIncubator(domainIncubator: DomainIncubator) {
         return incubatorDao.updateIncubator(domainIncubator.toIncubator())
+    }
+
+    override fun getIncubatorCountNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int> {
+        return incubatorDao.getIncubatorCountNewYear(dateBegin, dateEnd)
+    }
+
+    override fun getEggInIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int> {
+        return incubatorDao.getEggInIncubatorNewYear(dateBegin, dateEnd)
+    }
+
+    override fun getChickenInIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Int> {
+        return incubatorDao.getChickenInIncubatorNewYear(dateBegin, dateEnd)
+    }
+
+    override fun getTypeIncubatorNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<String> {
+        return incubatorDao.getTypeIncubatorNewYear(dateBegin, dateEnd)
     }
 }

@@ -54,7 +54,7 @@ interface AnimalCountDao {
     FROM FirstRow
 """
     )
-    fun getCountAnimalLimit(id: Int): Flow<AnimalCountTable>
+    fun getCountAnimalLimit(id: Long): Flow<AnimalCountTable>
 
     @Query(
         "SELECT id, count, suffix, date, idAnimal, note, version," +
@@ -84,6 +84,6 @@ interface AnimalCountDao {
                 " WHERE idAnimal=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
-    fun getCountAnimal(id: Int): Flow<List<AnimalCountTable>>
+    fun getCountAnimal(id: Long): Flow<List<AnimalCountTable>>
 
 }

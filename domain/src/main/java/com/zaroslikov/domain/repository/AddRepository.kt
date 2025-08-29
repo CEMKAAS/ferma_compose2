@@ -2,19 +2,65 @@ package com.zaroslikov.domain.repository
 
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
+import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
+import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import kotlinx.coroutines.flow.Flow
 
 interface AddRepository {
-    fun getItem(id: Int): Flow<DomainAddTable>
-    fun getAllItems(id: Int): Flow<List<DomainAddTable>>
+    fun getItem(id: Long): Flow<DomainAddTable>
+    fun getAllItems(id: Long): Flow<List<DomainAddTable>>
     fun getItemAdd(id: Long): Flow<DomainAddTable>
-    fun getBrieflyItemAdd(id: Int): Flow<List<BrieflyAddDomain>>
+    fun getBrieflyItemAdd(id: Long): Flow<List<BrieflyAddDomain>>
     fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<DomainAddTable>>
     fun getItemsTitleAddList(id: Long): Flow<List<TitleAndSuffixDomain>>
     fun getItemsCategoryAddList(id: Long): Flow<List<String>>
     fun getAnimalById(id: Long): Flow<String>
-    suspend fun insert(item: DomainAddTable)
-    suspend fun update(item: DomainAddTable)
+
+    suspend fun insertAdd(item: DomainAddTable)
+    suspend fun updateAdd(item: DomainAddTable)
     suspend fun deleteAddById(id: Long)
+
+    fun getFastAddProduct(id: Long): Flow<List<DomainFastAddProduct>>
+    fun getAnalysisAddAllTime(id: Long, name: String): Flow<DomainCountSuffix>
+    fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<DomainCountSuffix>
+    fun getAnalysisAddAnimalAllTime(
+        id: Long,
+        name: String
+    ): Flow<List<DomainAnimalCountSuffix>>
+
+    fun getAnalysisAddAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<DomainCountSuffix>
+
+    fun getAnalysisAddAverageValueAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<DomainCountSuffix>
+
+    fun getAnalysisAddAnimalAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainAnimalCountSuffix>>
+
+    fun getProductAnimal(name: String): Flow<List<DomainAnimalCountSuffix>>
+  /*  fun getAnalysisAddProductNewYearProject(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
+
+    fun getAnalysisAddProductNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
+*/
 }

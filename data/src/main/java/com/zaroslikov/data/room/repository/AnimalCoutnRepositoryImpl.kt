@@ -7,8 +7,9 @@ import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class AnimalCountRepositoryImpl(private val animalCountDao: AnimalCountDao) :
+class AnimalCountRepositoryImpl @Inject constructor(private val animalCountDao: AnimalCountDao) :
     AnimalCountRepository {
     override suspend fun insertAnimalCountTable(animalCountTable: DomainAnimalCount): Long {
         return animalCountDao.insertAnimalCountTable(animalCountTable.toRoomMap())
@@ -22,11 +23,11 @@ class AnimalCountRepositoryImpl(private val animalCountDao: AnimalCountDao) :
         return animalCountDao.deleteAnimalCountTable(animalCountTable.toRoomMap())
     }
 
-    override fun getCountAnimalLimit(id: Int): Flow<DomainAnimalCount> {
+    override fun getCountAnimalLimit(id: Long): Flow<DomainAnimalCount> {
         return animalCountDao.getCountAnimalLimit(id).map { it.toDomainMap() }
     }
 
-    override fun getCountAnimal(id: Int): Flow<List<DomainAnimalCount>> {
+    override fun getCountAnimal(id: Long): Flow<List<DomainAnimalCount>> {
         return animalCountDao.getCountAnimal(id).map { it -> it.map { it.toDomainMap() } }
     }
 

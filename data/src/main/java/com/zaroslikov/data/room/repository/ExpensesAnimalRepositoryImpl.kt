@@ -5,8 +5,9 @@ import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.mapper.toExpensesAnimalTable
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
+import javax.inject.Inject
 
-class ExpensesAnimalRepositoryImpl(val expensesAnimalDao: ExpensesAnimalDao) :
+class ExpensesAnimalRepositoryImpl @Inject constructor(private val expensesAnimalDao: ExpensesAnimalDao) :
     ExpensesAnimalRepository {
 
     override suspend fun getItemExpensesAnimal(id: Long): List<Long> {

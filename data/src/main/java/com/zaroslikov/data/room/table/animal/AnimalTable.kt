@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.zaroslikov.fermacompose2.data.ferma.ProjectTable
+import com.zaroslikov.data.room.table.ferma.ProjectTable
 
 
 @Entity(

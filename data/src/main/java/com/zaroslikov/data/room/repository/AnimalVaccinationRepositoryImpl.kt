@@ -7,8 +7,9 @@ import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class AnimalVaccinationRepositoryImpl(private val animalVaccinationDao: AnimalVaccinationDao) :
+class AnimalVaccinationRepositoryImpl @Inject constructor(private val animalVaccinationDao: AnimalVaccinationDao) :
     AnimalVaccinationRepository {
     override suspend fun insertAnimalVaccinationTable(animalVaccinationTable: DomainAnimalVaccination): Long {
         return animalVaccinationDao.insertAnimalVaccinationTable(animalVaccinationTable.toAnimalVaccinationTable())
@@ -22,12 +23,12 @@ class AnimalVaccinationRepositoryImpl(private val animalVaccinationDao: AnimalVa
         return animalVaccinationDao.deleteAnimalVaccinationTable(animalVaccinationTable.toAnimalVaccinationTable())
     }
 
-    override fun getVaccinationAnimalLimit(id: Int): Flow<DomainAnimalVaccination> {
+    override fun getVaccinationAnimalLimit(id: Long): Flow<DomainAnimalVaccination> {
         return animalVaccinationDao.getVaccinationAnimalLimit(id)
             .map { it.toDomainAnimalVaccination() }
     }
 
-    override fun getVaccinationAnimal(id: Int): Flow<List<DomainAnimalVaccination>> {
+    override fun getVaccinationAnimal(id: Long): Flow<List<DomainAnimalVaccination>> {
         return animalVaccinationDao.getVaccinationAnimal(id)
             .map { it -> it.map { it.toDomainAnimalVaccination() } }
     }

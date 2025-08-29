@@ -3,9 +3,21 @@ package com.zaroslikov.data.room.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.zaroslikov.data.room.dao.ItemDao
+import com.zaroslikov.data.room.dao.AddDao
+import com.zaroslikov.data.room.dao.AnimalCountDao
+import com.zaroslikov.data.room.dao.AnimalDao
+import com.zaroslikov.data.room.dao.AnimalSizeDao
+import com.zaroslikov.data.room.dao.AnimalVaccinationDao
+import com.zaroslikov.data.room.dao.AnimalWeightDao
+import com.zaroslikov.data.room.dao.ExpensesAnimalDao
+import com.zaroslikov.data.room.dao.ExpensesDao
+import com.zaroslikov.data.room.dao.FinanceDao
+import com.zaroslikov.data.room.dao.IncubatorDao
+import com.zaroslikov.data.room.dao.NoteDao
+import com.zaroslikov.data.room.dao.ProjectDao
+import com.zaroslikov.data.room.dao.SaleDao
+import com.zaroslikov.data.room.dao.WarehouseDao
+import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import com.zaroslikov.data.room.table.animal.AnimalSizeTable
 import com.zaroslikov.data.room.table.animal.AnimalTable
@@ -21,16 +33,41 @@ import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 
 @Database(
-    entities = [AddTable::class, SaleTable::class, ExpensesTable::class, WriteOffTable::class,
-        ProjectTable::class, Incubator::class, AnimalTable::class, AnimalCountTable::class,
-        AnimalSizeTable::class, AnimalVaccinationTable::class, AnimalWeightTable::class, NoteTable::class,
-        ExpensesAnimalTable::class],
+    entities = [
+        AddTable::class,
+        SaleTable::class,
+        ExpensesTable::class,
+        WriteOffTable::class,
+        ProjectTable::class,
+        Incubator::class,
+        AnimalTable::class,
+        AnimalCountTable::class,
+        AnimalSizeTable::class,
+        AnimalVaccinationTable::class,
+        AnimalWeightTable::class,
+        NoteTable::class,
+        ExpensesAnimalTable::class
+    ],
     version = 4,
     exportSchema = false
 )
-@TypeConverters(CategoryConverter::class)
+//@TypeConverters(CategoryConverter::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun itemDao(): ItemDao
+    abstract fun addDao(): AddDao
+    abstract fun animalCountDao(): AnimalCountDao
+    abstract fun animalDao(): AnimalDao
+    abstract fun animalSizeDao(): AnimalSizeDao
+    abstract fun animalVaccinationDao(): AnimalVaccinationDao
+    abstract fun animalWeightDao(): AnimalWeightDao
+    abstract fun expensesAnimalDao() : ExpensesAnimalDao
+    abstract fun expensesDao(): ExpensesDao
+    abstract fun financeDao(): FinanceDao
+    abstract fun incubatorDao(): IncubatorDao
+    abstract fun noteDao(): NoteDao
+    abstract fun projectDao(): ProjectDao
+    abstract fun saleDao(): SaleDao
+    abstract fun warehouseDao(): WarehouseDao
+    abstract fun writeOffDao(): WriteOffDao
 
     companion object {
         @Volatile

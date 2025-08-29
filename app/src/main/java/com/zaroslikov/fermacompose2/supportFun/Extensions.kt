@@ -1,13 +1,17 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import android.content.Context
+import androidx.core.content.ContextCompat.getString
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -156,6 +160,31 @@ fun dateLongToString(timestamp: Long): String {
         .toLocalDate()
         .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
 
+}
+
+fun getAgeFromDate(context: Context, dateString: String): String {
+    val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    val birthDate = LocalDate.parse(dateString, formatter)
+    val currentDate = LocalDate.now()
+
+    if (birthDate.isAfter(currentDate)) {
+        return "Дата в будущем"
+    }
+
+    val period = Period.between(birthDate, currentDate)
+    val years = period.years
+    val months = period.months
+
+    val yeatsString = getString(context, R.string.date_years)
+    val monthsString = getString(context, R.string.date_months)
+
+    return when {
+        years >= 1 -> " ($years $yeatsString $months $monthsString)"
+        else -> {
+            val totalMonths = ChronoUnit.MONTHS.between(birthDate, currentDate)
+            " ($totalMonths $monthsString)"
+        }
+    }
 }
 
 fun getIndicatorsToVersion(indicators: String): Int {

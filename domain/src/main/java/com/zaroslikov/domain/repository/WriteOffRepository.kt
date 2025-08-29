@@ -1,5 +1,6 @@
 package com.zaroslikov.domain.repository
 
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
 import com.zaroslikov.domain.models.dto.write_off.TitleWriteOffDomain
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
@@ -15,4 +16,70 @@ interface WriteOffRepository {
     suspend fun insertWriteOff(item: DomainWriteOffTable)
     suspend fun updateWriteOff(item: DomainWriteOffTable)
     suspend fun deleteWriteOff(id: Long)
+
+    fun getOwnNeed(id: Long): Flow<Double>
+    fun getScrap(id: Long): Flow<Double>
+    fun getOwnNeedMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double>
+    fun getScrapMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double>
+    fun getAnalysisWriteOffAllTime(id: Long, name: String): Flow<DomainCountSuffix>
+    fun getAnalysisWriteOffOwnNeedsAllTime(id: Long, name: String): Flow<DomainCountSuffix>
+    fun getAnalysisWriteOffScrapAllTime(id: Long, name: String): Flow<DomainCountSuffix>
+    fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Long, name: String): Flow<Double>
+    fun getAnalysisWriteOffScrapMoneyAllTime(id: Long, name: String): Flow<Double>
+    fun getAnalysisWriteOffAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<DomainCountSuffix>
+
+    fun getAnalysisWriteOffOwnNeedsAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<DomainCountSuffix>
+
+    fun getAnalysisWriteOffScrapAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<DomainCountSuffix>
+
+    fun getAnalysisWriteOffOwnNeedsMoneyAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffScrapMoneyAllTimeRange(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffOwnNeedsNewYearProject(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffScrapNewYearProject(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffOwnNeedsNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
+
+    fun getAnalysisWriteOffScrapNewYear(
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<Double>
 }

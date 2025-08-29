@@ -1,12 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
 import com.zaroslikov.domain.models.DomainAddTable
-import com.zaroslikov.data.room.dto.PairData
-import com.zaroslikov.data.room.dto.PairDataDoubleSting
-import com.zaroslikov.data.room.dto.TripleData
+import com.zaroslikov.data.room.dto.shared.CountSuffixDto
+import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.fermacompose2.base.state.BaseError
+import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import kotlin.String
 
@@ -21,20 +25,26 @@ data class AddEntryState(
     val animal: String = "",
     val note: String = "",
     val isEntry: Boolean = false,
-    val warehouseList: List<PairDataDoubleSting> = emptyList(),
-    val titleList: List<PairData> = emptyList(),
-    val categoryList: List<String> = emptyList(),
-    val animalList: List<TripleData> = emptyList(),
-    val error: Error = Error()
-) {
+    val warehouseList: List<DomainCountSuffix> = emptyList(),
+    val pickList: PickList = PickList(),
+    override val error: Error = Error(),
+    override val navigate: UiEvent
+) : EntryState() {
+
     data class Error(
         val isErrorTitle: Boolean = false,
         val isErrorSlash: Boolean = false,
         val isErrorCount: Boolean = false,
-    ) {
-        val hasAnyError: Boolean
+    ) : BaseError {
+        override val hasAnyError: Boolean
             get() = isErrorTitle || isErrorSlash || isErrorCount
     }
+
+    data class PickList(
+        val titleList: List<TitleAndSuffixDomain> = emptyList(),
+        val categoryList: List<String> = emptyList(),
+        val animalList: List<AnimalForAddDomain> = emptyList(),
+    )
 }
 
 fun AddEntryState.toUiMap(domain: DomainAddTable): AddEntryState {

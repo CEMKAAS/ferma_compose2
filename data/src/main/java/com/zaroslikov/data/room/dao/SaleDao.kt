@@ -34,7 +34,7 @@ interface SaleDao {
 
 
     @Query(
-        "SELECT title, count_suffix AS suffix, 0 AS catefory FROM add_table WHERE idPT=:id" +
+        "SELECT title, count_suffix AS suffix, 0 AS category FROM add_table WHERE idPT=:id" +
                 " UNION " +
                 " SELECT title, count_suffix AS suffix, 1 AS catefory FROM expenses_table WHERE idPT=:id AND is_show_warehouse = 1 AND is_show_food != 1 GROUP BY title" +
                 " UNION " +

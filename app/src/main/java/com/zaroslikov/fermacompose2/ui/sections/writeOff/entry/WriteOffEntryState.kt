@@ -3,6 +3,10 @@ package com.zaroslikov.fermacompose2.ui.sections.writeOff.entry
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.data.room.dto.PairDataDoubleSting
 import com.zaroslikov.data.room.dto.SaleTitleData
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.dto.write_off.TitleWriteOffDomain
+import com.zaroslikov.fermacompose2.base.state.BaseError
+import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
@@ -21,20 +25,18 @@ data class WriteOffEntryState(
     val status: Boolean = false,
     val note: String = "",
     val animalCountId: Long? = null,
-
     val isEntry: Boolean = false,
     val isIndicatorsValue: Boolean = false,
-    val warehouseList: List<PairDataDoubleSting> = emptyList(),
-
-    val titleList: List<SaleTitleData> = emptyList(),
-    val error: Error = Error()
-) {
+    val warehouseList: List<DomainCountSuffix> = emptyList(),
+    val titleList: List<TitleWriteOffDomain> = emptyList(),
+    override val error: Error = Error()
+) : EntryState() {
     data class Error(
         val isErrorTitle: Boolean = false,
         val isErrorSlash: Boolean = false,
         val isErrorCount: Boolean = false,
-    ) {
-        val hasAnyError: Boolean
+    ) : BaseError {
+        override val hasAnyError: Boolean
             get() = isErrorTitle || isErrorSlash || isErrorCount
     }
 }
@@ -46,75 +48,6 @@ fun WriteOffEntryState.validate(): WriteOffEntryState {
         isErrorCount = count.isBlank()
     )
     return copy(error = error)
-}
-
-
-fun WriteOffEntryState.updateTitleAndSuffix(title: String, suffix: String): WriteOffEntryState {
-    return copy(
-        title = title,
-        countSuffix = suffix,
-        error = error.copy(
-            isErrorTitle = title.isBlank(),
-            isErrorSlash = title.contains("/")
-        )
-    )
-}
-
-fun WriteOffEntryState.updateCount(count: String): WriteOffEntryState {
-    return this.copy(
-        count = count,
-        error = error.copy(
-            isErrorCount = count.isBlank()
-        )
-    ).updatePriceAll()
-}
-
-fun WriteOffEntryState.updateSuffix(countSuffix: String): WriteOffEntryState {
-    return this.copy(
-        countSuffix = countSuffix,
-    )
-}
-
-fun WriteOffEntryState.updatePrice(price: String): WriteOffEntryState {
-    return this.copy(
-        price = price
-    ).updatePriceAll()
-}
-
-fun WriteOffEntryState.updateIsAutoPrice(isAutoPrice: Boolean): WriteOffEntryState {
-    return this.copy(
-        isAutoPrice = isAutoPrice
-    ).updatePriceAll()
-}
-
-fun WriteOffEntryState.updatePriceAll(): WriteOffEntryState {
-    return copy(
-        priceAll = if (isAutoPrice) (price.toConvertZeroDouble() * count.toConvertZeroDouble()).formatNumber() else "0"
-    )
-}
-
-fun WriteOffEntryState.updateCountWarehouse(domainPairDataDoubleSting: List<PairDataDoubleSting>): WriteOffEntryState {
-    return this.copy(
-        warehouseList = domainPairDataDoubleSting
-    )
-}
-
-fun WriteOffEntryState.updateDate(date: String): WriteOffEntryState {
-    return this.copy(
-        date = date,
-    )
-}
-
-fun WriteOffEntryState.updateNote(note: String): WriteOffEntryState {
-    return this.copy(note = note)
-}
-
-fun WriteOffEntryState.updateStatus(status: Boolean): WriteOffEntryState {
-    return this.copy(status = status)
-}
-
-fun WriteOffEntryState.updateList(titleList: List<SaleTitleData>): WriteOffEntryState {
-    return copy(titleList = titleList)
 }
 
 fun WriteOffEntryState.updateFromDomain(domain: DomainWriteOffTable): WriteOffEntryState {

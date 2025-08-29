@@ -15,7 +15,7 @@ data class BrieflyItemPrice(
 
 
 
-data class BrieflyUiState(val itemList: List<BrieflyItemCount> = listOf())
+//data class BrieflyUiState(val itemList: List<BrieflyItemCount> = listOf())
 data class BrieflyPriceUiState(val itemList: List<BrieflyItemPrice> = listOf())
 
 data class HomeUiState(val itemList: List<AddTable> = listOf())

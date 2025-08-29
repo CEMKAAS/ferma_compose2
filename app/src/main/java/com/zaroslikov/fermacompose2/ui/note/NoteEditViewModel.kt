@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainNoteTable
-import com.zaroslikov.domain.repository.ItemsRepository
 import kotlinx.coroutines.launch
 
 class NoteEditViewModel(

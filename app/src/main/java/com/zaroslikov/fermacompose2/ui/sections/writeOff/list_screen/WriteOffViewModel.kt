@@ -3,7 +3,6 @@ package com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.dto.BrieflyUiState
 import com.zaroslikov.data.room.dto.WriteOffUiState

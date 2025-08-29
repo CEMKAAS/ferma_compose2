@@ -32,6 +32,9 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.dto.PairData
 import com.zaroslikov.data.room.dto.SaleTitleData
 import com.zaroslikov.data.room.dto.TripleData
+import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
+import com.zaroslikov.domain.models.dto.write_off.TitleWriteOffDomain
 
 
 enum class Suffix(val resId: Int) {
@@ -342,7 +345,7 @@ fun ExposedDropdownMenuProduct(
 fun ExposedDropdownMenuProduct2(
     title: String,
     setTitle: (Pair<String, String>) -> Unit,
-    titleList: List<PairData>,
+    titleList: List<TitleAndSuffixDomain>,
     enableDropMenu: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
@@ -381,7 +384,7 @@ fun ExposedDropdownMenuProduct2(
             val options = if (showAllOnOpen) {
                 titleList
             } else {
-                titleList.filter { it.first.contains(title, ignoreCase = true) }
+                titleList.filter { it.title.contains(title, ignoreCase = true) }
             }
 
             if (titleList.isNotEmpty()) {
@@ -396,13 +399,13 @@ fun ExposedDropdownMenuProduct2(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "${item.first}, ${item.second}",
-                                    fontWeight = if (item.first == title) FontWeight.Bold else null
+                                    text = "${item.title}, ${item.suffix}",
+                                    fontWeight = if (item.title == title) FontWeight.Bold else null
                                 )
                             },
 
                             onClick = {
-                                setTitle(item.first to item.second)
+                                setTitle(item.title to item.suffix)
                                 expanded = false
                                 showAllOnOpen = false
                             }
@@ -478,7 +481,7 @@ fun ExposedDropdownMenuSex(
 fun ExposedDropdownMenuAnimals(
     selectedItemIndex: Long,
     setTitle: (Pair<Long, String>) -> Unit,
-    animalList: List<TripleData>,
+    animalList: List<AnimalForAddDomain>,
     content: @Composable (Modifier) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -521,8 +524,8 @@ fun ExposedDropdownMenuAnimals(
 @Composable
 fun ExposedDropdownMenuPair(
     title: String,
-    setTitle: (SaleTitleData) -> Unit,
-    list: List<SaleTitleData>,
+    setTitle: (TitleWriteOffDomain) -> Unit,
+    list: List<TitleWriteOffDomain>,
     enableDropMenu: Boolean = true,
     content: @Composable (Modifier) -> Unit,
 ) {
@@ -557,7 +560,7 @@ fun ExposedDropdownMenuPair(
             val options = if (showAllOnOpen) {
                 list
             } else {
-                list.filter { it.first.contains(title, ignoreCase = true) }
+                list.filter { it.title.contains(title, ignoreCase = true) }
             }
 
             if (list.isNotEmpty()) {
@@ -572,14 +575,14 @@ fun ExposedDropdownMenuPair(
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(item.third.drawerRes),
+                                    painter = painterResource(item.category.drawerRes),
                                     contentDescription = null
                                 )
                             },
                             text = {
                                 Text(
-                                    text = "${item.first}, ${item.second} - ${stringResource(item.third.titleRes)}",
-                                    fontWeight = if (item.first == title) FontWeight.Bold else null
+                                    text = "${item.title}, ${item.suffix} - ${stringResource(item.category.titleRes)}",
+                                    fontWeight = if (item.title == title) FontWeight.Bold else null
                                 )
                             },
                             onClick = {

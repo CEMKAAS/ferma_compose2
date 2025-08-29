@@ -83,7 +83,7 @@ fun AddEntryContainerProduct(
             value = state.title,
             onValueChange = { onIntent(AddEntryIntent.TitleChanged(it)) },
             onValueChangeSuffix = { onIntent(AddEntryIntent.TitleAndSuffix(it)) },
-            titleList = state.titleList,
+            titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
         )
@@ -102,19 +102,19 @@ fun AddEntryContainerProduct(
         OutlinedTextCategory(
             value = state.category,
             onValueChange = { onIntent(AddEntryIntent.CategoryChanged(it)) },
-            titleList = state.categoryList,
+            titleList = state.pickList.categoryList,
         )
         OutlinedTextDateEdit(
             value = state.date,
             onValueChange = { onIntent(AddEntryIntent.Date(it)) }
         )
-        if (state.animalList.isNotEmpty()) {
+        if (state.pickList.animalList.isNotEmpty()) {
             OutlinedTextAnimal(
                 value = state.animal,
                 onValueChange = { onIntent(AddEntryIntent.Animal(it)) },
                 selectedAnimalIndex = state.selectedAnimalIndex,
                 onClickClear = { onIntent(AddEntryIntent.AnimalClear(it)) },
-                animalList = state.animalList,
+                animalList = state.pickList.animalList,
             )
         }
         OutlinedTextNote(
@@ -122,7 +122,7 @@ fun AddEntryContainerProduct(
             onValueChange = { onIntent(AddEntryIntent.NoteChanged(it)) },
         )
         ButtonPanel(
-            state = state,
+            isEntry = state.isEntry,
             onClickInsert = { onIntent(AddEntryIntent.Insert) },
             onClickUpdate = { onIntent(AddEntryIntent.Update) },
             onClickDelete = { onIntent(AddEntryIntent.Delete) }
@@ -132,13 +132,13 @@ fun AddEntryContainerProduct(
 
 @Composable
 private fun ButtonPanel(
-    state: AddEntryState,
+    isEntry: Boolean,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    if (state.isEntry)
+    if (isEntry)
         ButtonStandart(
             intRes = R.string.button_add,
             onClick = {

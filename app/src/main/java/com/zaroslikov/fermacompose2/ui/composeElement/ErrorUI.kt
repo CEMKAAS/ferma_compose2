@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.dto.PairDataDoubleSting
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
@@ -36,7 +37,7 @@ fun ErrorSupportTextSlash(
     isWarehouse: Boolean = false,
     isAnimal: Boolean = false,
     isErrorSlash: Boolean = false,
-    warehouseList: List<PairDataDoubleSting> = emptyList(),
+    warehouseList: List<DomainCountSuffix> = emptyList(),
     countAnimals: String = "",
     @StringRes intRes: Int,
     @StringRes intResError: Int
@@ -62,8 +63,8 @@ fun ErrorSupportTextSlash(
                 )
                 warehouseList.forEachIndexed { index, item ->
                     Text(
-                        text = "${item.first.formatNumber()} ${item.second}",
-                        color = if (item.first < 0) MaterialTheme.colorScheme.error else Color.Unspecified
+                        text = "${item.count.formatNumber()} ${item.suffix}",
+                        color = if (item.count < 0) MaterialTheme.colorScheme.error else Color.Unspecified
                     )
 
                     if (index != warehouseList.lastIndex) {

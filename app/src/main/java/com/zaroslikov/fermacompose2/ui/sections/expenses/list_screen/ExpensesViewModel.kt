@@ -3,7 +3,6 @@ package com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
 import com.zaroslikov.data.room.dto.BrieflyPriceUiState
 import com.zaroslikov.data.room.dto.ExpensesUiState

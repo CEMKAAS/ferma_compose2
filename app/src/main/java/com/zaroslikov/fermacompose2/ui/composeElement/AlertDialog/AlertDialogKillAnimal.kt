@@ -46,7 +46,7 @@ import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
 import com.zaroslikov.fermacompose2.supportFun.isAnimalWeightIncrease
 import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorKillAnimal
-import com.zaroslikov.fermacompose2.supportFun.isErrorSlash
+import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
@@ -166,7 +166,7 @@ fun AlertDialogKillAnimal(
                                         textFields[index] = textFields[index].copy(
                                             title = newTitle,
                                             isError = newTitle.isError(),
-                                            isErrorSlash = newTitle.isErrorSlash()
+                                            isErrorSlash = newTitle.isSlash()
                                         )
                                         coroutineScope.launch {
                                             val countAndSuffix = onUpdateCountWarehouse(

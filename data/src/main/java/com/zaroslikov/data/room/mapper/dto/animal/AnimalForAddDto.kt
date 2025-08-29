@@ -4,5 +4,5 @@ import com.zaroslikov.data.room.dto.animal.AnimalForAddDto
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 
 fun AnimalForAddDto.toAnimalForAddDomain(): AnimalForAddDomain {
-    return AnimalForAddDomain(first = this.first, second = this.second, third = this.third,)
+    return AnimalForAddDomain(first = this.id, second = this.name, third = this.type)
 }

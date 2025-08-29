@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.Incubator
 import com.zaroslikov.data.room.table.ferma.ProjectTable
 import com.zaroslikov.fermacompose2.data.water.WaterRepository

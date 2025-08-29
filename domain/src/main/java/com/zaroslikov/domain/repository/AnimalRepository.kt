@@ -14,4 +14,10 @@ interface AnimalRepository {
     suspend fun updateAnimalTable(animalTable: DomainAnimalTable)
     suspend fun deleteAnimalTable(id: Long)
 
+   /* fun getExpensesAnimalAllList(id: Long): Flow<List<Fin>>//0 = price  //maybe
+    fun getProductLisCategoryExpensesAnimalCurrentMonth(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<Fin>>  //maybe*/
 }

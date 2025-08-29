@@ -8,16 +8,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
-import com.zaroslikov.fermacompose2.ui.composeElement.Category
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount2
 import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
@@ -46,6 +48,8 @@ fun WriteOffEntryProduct(
 ) {
     val eventFlow = viewModel.eventFlow
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
@@ -66,11 +70,8 @@ fun WriteOffEntryProduct(
         WriteOffEntryContainerProduct(
             modifier = Modifier
                 .modifierScreen(innerPadding),
-            state = viewModel.writeOffUiState,
-            onValueChange = viewModel::updateUiState,
-            onClickInsert = viewModel::insertItem,
-            onClickUpdate = viewModel::updateItem,
-            onClickDelete = viewModel::deleteItem,
+            state = state,
+            onIntent = viewModel::onIntent,
             updateCountWarehouse = viewModel::updateWarehouseUiState
         )
     }
@@ -81,18 +82,15 @@ fun WriteOffEntryProduct(
 fun WriteOffEntryContainerProduct(
     modifier: Modifier,
     state: WriteOffEntryState,
-    onValueChange: (WriteOffEntryState) -> Unit,
+    onIntent: (WriteOffIntent) -> Unit,
     updateCountWarehouse: (String, Category) -> Unit,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit,
 ) {
     Column(modifier = modifier) {
         OutlinedTextTitleSale(
             value = state.title,
             onValueChoice = {
-                onValueChange(state.updateTitleAndSuffix(it.first, it.second))
-                updateCountWarehouse(it.first, it.third)
+                onIntent(WriteOffIntent.TitleAndSuffix(it.title, it.suffix))
+                updateCountWarehouse(it.title, it.category)
             },
             titleList = state.titleList,
             isErrorTitle = state.error.isErrorTitle,
@@ -100,7 +98,9 @@ fun WriteOffEntryContainerProduct(
         )
         OutlinedTextCount2(
             value = state.count,
-            onValueChange = { onValueChange(state.updateCount(it)) },
+            onValueChange = {
+                onIntent(WriteOffIntent.CountChanged(it))
+            },
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_write_off,
@@ -109,45 +109,55 @@ fun WriteOffEntryContainerProduct(
         )
         OutlinedPriceInput(
             price = state.price,
-            onPriceChange = { onValueChange(state.updatePrice(it)) },
+            onPriceChange = {
+                onIntent(WriteOffIntent.PriceChanged(it))
+            },
             count = state.priceAll,
             supportTextRes = R.string.support_text_price_write_off_all,
             supportTextResAutoCal = R.string.support_text_price_write_off_one,
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isAutoCalculate = state.isAutoPrice,
-            onAutoCalculate = { onValueChange(state.updateIsAutoPrice(it)) },
+            onAutoCalculate = {
+                onIntent(WriteOffIntent.AutoPriceClicked(it))
+            },
             isManyCount = true,
         )
         OutlinedTextDateEdit(
             value = state.date,
-            onValueChange = { onValueChange(state.updateDate(it)) }
+            onValueChange = {
+                onIntent(WriteOffIntent.DateClicked(it))
+            }
         )
         OutlinedTextNote(
             value = state.note,
-            onValueChange = { onValueChange(state.updateNote(it)) },
+            onValueChange = {
+                onIntent(WriteOffIntent.NoteChanged(it))
+            },
         )
         RadioButtonWriteOff(
             state = state.status,
-            onStateSelect = { onValueChange(state.updateStatus(it)) }
+            onStateSelect = {
+                onIntent(WriteOffIntent.StatusClicked(it))
+            }
         )
         ButtonPanel(
-            state = state,
-            onClickInsert = { onClickInsert() },
-            onClickUpdate = { onClickUpdate() },
-            onClickDelete = { onClickDelete() }
+            isEntry = state.isEntry,
+            onClickInsert = { onIntent(WriteOffIntent.Insert) },
+            onClickUpdate = { onIntent(WriteOffIntent.Update) },
+            onClickDelete = { onIntent(WriteOffIntent.Delete) }
         )
     }
 }
 
 @Composable
 private fun ButtonPanel(
-    state: WriteOffEntryState,
+    isEntry: Boolean,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    if (state.isEntry)
+    if (isEntry)
         ButtonStandart(
             intRes = R.string.button_add,
             onClick = {

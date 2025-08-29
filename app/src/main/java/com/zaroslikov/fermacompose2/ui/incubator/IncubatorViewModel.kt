@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.ferma.Incubator
 import com.zaroslikov.data.room.table.ferma.ProjectTable

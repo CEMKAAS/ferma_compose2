@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.fermacompose2.ui.composeElement.Category

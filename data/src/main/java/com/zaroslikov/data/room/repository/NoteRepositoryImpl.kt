@@ -7,8 +7,9 @@ import com.zaroslikov.domain.models.DomainNoteTable
 import com.zaroslikov.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class NoteRepositoryImpl(val noteDao: NoteDao) : NoteRepository {
+class NoteRepositoryImpl @Inject constructor(private val noteDao: NoteDao) : NoteRepository {
     override fun getAllNote(id: Long): Flow<List<DomainNoteTable>> {
         return noteDao.getAllNote(id).map { it -> it.map { it.toDomainMap() } }
     }

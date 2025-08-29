@@ -3,7 +3,6 @@ package com.zaroslikov.fermacompose2.ui.warehouse
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable

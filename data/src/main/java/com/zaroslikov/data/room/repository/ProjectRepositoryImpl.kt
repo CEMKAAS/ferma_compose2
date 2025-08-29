@@ -7,8 +7,10 @@ import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.repository.ProjectRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class ProjectRepositoryImpl(private val projectDao: ProjectDao) : ProjectRepository {
+class ProjectRepositoryImpl @Inject constructor(private val projectDao: ProjectDao) :
+    ProjectRepository {
     override fun getAllProject(): Flow<List<DomainProjectTable>> {
         return projectDao.getAllProject().map { it -> it.map { it.toDomainProjectTable() } }
     }
@@ -17,7 +19,7 @@ class ProjectRepositoryImpl(private val projectDao: ProjectDao) : ProjectReposit
         return projectDao.getProject(id).map { it.toDomainProjectTable() }
     }
 
-    override suspend fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>> {
+    override fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>> {
         return projectDao.getIncubatorListArh6(type)
             .map { it -> it.map { it.toDomainProjectTable() } }
     }

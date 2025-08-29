@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.domain.repository.ItemsRepository
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
 import com.zaroslikov.data.room.table.ferma.SaleTable

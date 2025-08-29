@@ -17,10 +17,11 @@ import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.repository.SaleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 import kotlin.collections.map
 
 
-class SaleRepositoryImpl(private val saleDao: SaleDao) : SaleRepository {
+class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : SaleRepository {
 
     override fun getAllSaleItems(id: Long): Flow<List<DomainSaleTable>> {
         return saleDao.getAllSaleItems(id).map { it -> it.map { it.toDomainMap() } }

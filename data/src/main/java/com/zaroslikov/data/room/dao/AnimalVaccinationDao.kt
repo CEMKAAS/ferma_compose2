@@ -24,7 +24,7 @@ interface AnimalVaccinationDao {
                 " WHERE idAnimal=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
-    fun getVaccinationAnimalLimit(id: Int): Flow<AnimalVaccinationTable>
+    fun getVaccinationAnimalLimit(id: Long): Flow<AnimalVaccinationTable>
 
 
     @Query(
@@ -32,6 +32,6 @@ interface AnimalVaccinationDao {
                 " WHERE idAnimal=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
-    fun getVaccinationAnimal(id: Int): Flow<List<AnimalVaccinationTable>>
+    fun getVaccinationAnimal(id: Long): Flow<List<AnimalVaccinationTable>>
 
 }

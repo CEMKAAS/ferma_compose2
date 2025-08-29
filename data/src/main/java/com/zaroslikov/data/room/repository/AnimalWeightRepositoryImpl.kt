@@ -7,8 +7,9 @@ import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.domain.repository.AnimalWeightRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class AnimalWeightRepositoryImpl(private val animalWeightDao: AnimalWeightDao) :
+class AnimalWeightRepositoryImpl @Inject constructor(private val animalWeightDao: AnimalWeightDao) :
     AnimalWeightRepository {
 
     override suspend fun insertAnimalWeightTable(animalWeightTable: DomainAnimalWeight) {
@@ -23,11 +24,11 @@ class AnimalWeightRepositoryImpl(private val animalWeightDao: AnimalWeightDao) :
         return animalWeightDao.deleteAnimalWeightTable(animalWeightTable.toAnimalWeightTable())
     }
 
-    override fun getWeightAnimalLimit(id: Int): Flow<DomainAnimalWeight> {
+    override fun getWeightAnimalLimit(id: Long): Flow<DomainAnimalWeight> {
         return animalWeightDao.getWeightAnimalLimit(id).map { it.toDomainAnimalWeight() }
     }
 
-    override fun getWeightAnimal(id: Int): Flow<List<DomainAnimalWeight>> {
+    override fun getWeightAnimal(id: Long): Flow<List<DomainAnimalWeight>> {
         return animalWeightDao.getWeightAnimal(id)
             .map { it -> it.map { it.toDomainAnimalWeight() } }
     }
