@@ -1,3 +1,4 @@
+/*
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import android.annotation.SuppressLint
@@ -668,4 +669,4 @@ fun setOvoskop(typeBird: String, day: Int): Boolean {
 
         else -> false
     }
-}
+}*/

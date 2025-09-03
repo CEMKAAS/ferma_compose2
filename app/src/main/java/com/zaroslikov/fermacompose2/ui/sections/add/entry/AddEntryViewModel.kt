@@ -7,7 +7,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
-import com.zaroslikov.fermacompose2.base.BaseIntent
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
@@ -32,9 +32,9 @@ class AddEntryViewModel @Inject constructor(
 
     private val itemIdPT: Long = checkNotNull(savedStateHandle[AddEntryDestination.itemIdPT])
     private val itemId: Long = checkNotNull(savedStateHandle[AddEntryDestination.itemId])
-    val isEntry: Boolean = itemId == -1L
+    private val isEntry: Boolean = itemId == -1L
 
-    fun onIntent(intent: AddEntryIntent) {
+    override fun onIntent(intent: AddEntryIntent) {
         when (intent) {
             is AddEntryIntent.TitleAndSuffix -> updateTitleAndSuffix(intent.pair)
             is AddEntryIntent.TitleChanged -> updateTitle(intent.value)
@@ -152,16 +152,6 @@ class AddEntryViewModel @Inject constructor(
         }
     }
 
-    fun showMessage(message: String) {
-        viewModelScope.launch {
-            SnackbarController.sendEvent(
-                event = SnackbarEvent(
-                    message = message
-                )
-            )
-        }
-    }
-
     private fun updateTitleAndSuffix(pair: Pair<String, String>) {
         updateState {
             it.copy(
@@ -217,7 +207,7 @@ class AddEntryViewModel @Inject constructor(
         }
     }
 
-    private fun validation() {
+    override fun validation() {
         updateState { state ->
             state.copy(
                 error = state.error.copy(
@@ -228,16 +218,10 @@ class AddEntryViewModel @Inject constructor(
             )
         }
     }
-
-    private fun isError(): Boolean {
-        validation()
-        return getState().error.hasAnyError
-    }
-
 }
 
 
-sealed class AddEntryIntent : BaseIntent() {
+sealed class AddEntryIntent : BaseIntent {
     data class TitleChanged(val value: String) : AddEntryIntent()
     data class TitleAndSuffix(val pair: Pair<String, String>) : AddEntryIntent()
     data class CountChanged(val value: String) : AddEntryIntent()

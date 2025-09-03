@@ -10,23 +10,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
-import com.zaroslikov.fermacompose2.ui.composeElement.Category
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextBuyer
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextBuyer
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleSale
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 
@@ -44,8 +42,10 @@ fun SaleEntryProduct(
     onNavigateUp: () -> Unit,
     viewModel: SaleEntryViewModel = hiltViewModel()
 ) {
-    val eventFlow = viewModel.eventFlow
+    val eventFlow = viewModel.navigation
+    val state = viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
@@ -65,12 +65,9 @@ fun SaleEntryProduct(
     ) { innerPadding ->
         SaleEntryContainerProduct(
             modifier = Modifier.modifierScreen(innerPadding),
-            state = viewModel.saleUiState,
-            onValueChange = viewModel::updateUiState,
-            onClickInsert = viewModel::insertItem,
-            onClickUpdate = viewModel::updateItem,
-            onClickDelete = viewModel::deleteItem,
-            updateCountWarehouse = viewModel::updateWarehouseUiState
+            state = state.value,
+            updateCountWarehouse = viewModel::updateWarehouseUiState,
+            onIntent = viewModel::onIntent
         )
     }
 }
@@ -80,32 +77,31 @@ fun SaleEntryContainerProduct(
     modifier: Modifier,
     state: SaleEntryState,
     updateCountWarehouse: (String, Category) -> Unit,
-    onValueChange: (SaleEntryState) -> Unit,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit,
+    onIntent: (SaleEntryIntent) -> Unit
 ) {
     Column(modifier = modifier) {
         OutlinedTextTitleSale(
             value = state.title,
             onValueChange = {
-                onValueChange(state.updateTitle(it))
+                onIntent(SaleEntryIntent.TitleChanged(it))
                 //TODO Обновление кол-во на складе
             },
             onValueChoice = {
-                onValueChange(state.updateTitleAndSuffix(it.first, it.second))
-                updateCountWarehouse(it.first, it.third)
+                onIntent(SaleEntryIntent.TitleAndSuffixClicked(it.title, it.suffix))
+                updateCountWarehouse(it.title, it.category)
             },
-            titleList = state.titleList,
+            titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash
         )
         OutlinedTextCount2(
             value = state.count,
             onValueChange = {
-                onValueChange(state.updateCount(it))
+                onIntent(SaleEntryIntent.CountChanged(it))
             },
-            onSuffixChange = { onValueChange(state.updateSuffix(it)) },
+            onSuffixChange = {
+                onIntent(SaleEntryIntent.SuffixClicked(it))
+            },
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_sale,
@@ -115,65 +111,53 @@ fun SaleEntryContainerProduct(
         OutlinedPriceInput(
             price = state.price,
             onPriceChange = {
-                onValueChange(state.updatePrice(it))
+                onIntent(SaleEntryIntent.PriceChanged(it))
             },
             count = state.priceAll,
             isError = state.error.isErrorPrice,
             isAutoCalculate = state.isAutoPrice,
-            onAutoCalculate = { onValueChange(state.updateIsAutoPrice(it)) },
+            onAutoCalculate = {
+                onIntent(SaleEntryIntent.AutoPriceClicked(it))
+            },
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isManyCount = true,
             isNecessarily = true
         )
         OutlinedTextCategory(
             value = state.category,
-            onValueChange = { onValueChange(state.updateCategory(it)) },
-            titleList = state.categoryList,
+            onValueChange = {
+                onIntent(SaleEntryIntent.CategoryChanged(it))
+            },
+            titleList = state.pickList.categoryList,
         )
         OutlinedTextDateEdit(
             value = state.date,
-            onValueChange = { onValueChange(state.updateDate(it)) }
+            onValueChange = {
+                onIntent(SaleEntryIntent.DateClicked(it))
+            }
         )
         OutlinedTextBuyer(
             value = state.buyer,
-            onValueChange = { onValueChange(state.updateBuyer(it)) },
-            onTrailingChance = { onValueChange(state.updateBuyerClear()) },
-            list = state.buyerList,
+            onValueChange = {
+                onIntent(SaleEntryIntent.BuyerChanged(it))
+            },
+            onTrailingChance = {
+                onIntent(SaleEntryIntent.BuyerClearClicked)
+            },
+            list = state.pickList.buyerList,
         )
         OutlinedTextNote(
             value = state.note,
-            onValueChange = { onValueChange(state.updateNote(it)) },
+            onValueChange = {
+                onIntent(SaleEntryIntent.NoteChanged(it))
+            },
         )
         ButtonPanel(
-            state = state,
-            onClickInsert = { onClickInsert() },
-            onClickUpdate = { onClickUpdate() },
-            onClickDelete = { onClickDelete() }
+            isEntry = state.isEntry,
+            entryButton = R.string.button_sale,
+            onClickInsert = { onIntent(SaleEntryIntent.Insert) },
+            onClickUpdate = { onIntent(SaleEntryIntent.Update) },
+            onClickDelete = { onIntent(SaleEntryIntent.Delete) }
         )
-    }
-}
-
-@Composable
-private fun ButtonPanel(
-    state: SaleEntryState,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-    if (state.isEntry)
-        ButtonStandart(
-            intRes = R.string.button_sale,
-            onClick = {
-                focusManager.clearFocus()
-                onClickInsert()
-            }
-        )
-    else {
-        ButtonRefresh {
-            focusManager.clearFocus()
-            onClickUpdate()
-        }
-        ButtonDelete { onClickDelete() }
     }
 }

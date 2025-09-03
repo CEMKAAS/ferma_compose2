@@ -37,21 +37,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.table.ferma.SaleTable
-import com.zaroslikov.data.room.dto.BrieflyItemPrice
+import com.zaroslikov.domain.models.DomainSaleTable
+import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.composeElement.CardField
-import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
-import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
-import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
-import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
-import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
+import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.FloatButton
+import com.zaroslikov.fermacompose2.ui.elements.IconAndText
+import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.TextLine
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
@@ -72,18 +72,14 @@ fun SaleScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: (Int) -> Unit,
+    navigateToItemAdd: (Long) -> Unit,
     drawerState: DrawerState,
-    viewModel: SaleViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: SaleViewModel = hiltViewModel()
 ) {
-    val homeUiState by viewModel.saleUiState.collectAsState()
-    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val coroutineScope = rememberCoroutineScope()
-
-    val idProject = viewModel.itemId
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val idProject = state.idPT
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -110,7 +106,7 @@ fun SaleScreen(
             },
             floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
         ) { innerPadding ->
-            if (isLoading) {
+            if (state.isLoading) {
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
@@ -119,8 +115,8 @@ fun SaleScreen(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
                     viewModel = viewModel,
-                    itemList = homeUiState.itemList,
-                    brieflyList = brieflyUiState.itemList,
+                    itemList = state.list,
+                    brieflyList = state.briefly,
                     onItemClick = navigateToItemUpdate,
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
@@ -134,8 +130,8 @@ fun SaleScreen(
 fun SaleBody(
     modifier: Modifier = Modifier,
     viewModel: SaleViewModel,
-    itemList: List<SaleTable>,
-    brieflyList: List<BrieflyItemPrice>,
+    itemList: List<DomainSaleTable>,
+    brieflyList: List<BrieflySaleDomain>,
     onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit
 ) {
@@ -144,7 +140,7 @@ fun SaleBody(
             itemList = itemList,
             brieflyList = brieflyList,
             viewModel = viewModel,
-            onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
+            onItemClick = { onItemClick(it.idPT to it.id) },
             modifier = modifier
         )
     else MessageNoData(
@@ -160,9 +156,9 @@ fun SaleBody(
 @Composable
 private fun InventoryList(
     viewModel: SaleViewModel,
-    itemList: List<SaleTable>,
-    brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (SaleTable) -> Unit,
+    itemList: List<DomainSaleTable>,
+    brieflyList: List<BrieflySaleDomain>,
+    onItemClick: (DomainSaleTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
@@ -195,7 +191,8 @@ private fun InventoryList(
         }
         if (details) {
             items(items = itemList, key = { it.id }) { item ->
-                SaleProductCard(saleTable = item,
+                SaleProductCard(
+                    saleTable = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
                         .padding(bottom = extraPadding.coerceAtLeast(0.dp))
@@ -218,8 +215,8 @@ private fun InventoryList(
 @Composable
 fun BrieflyPriceCard(
     viewModel: SaleViewModel,
-    product: BrieflyItemPrice,
-    onItemClick: (SaleTable) -> Unit,
+    product: BrieflySaleDomain,
+    onItemClick: (DomainSaleTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -241,17 +238,12 @@ fun BrieflyPriceCard(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier
-                    .weight(0.7f)
-            ) {
-
+            Column(modifier = Modifier.weight(0.7f)) {
                 TextLine(
                     modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
                     valueString = product.title,
                     textStyle = textBold_20
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
                     valueString = stringResource(
@@ -277,7 +269,8 @@ fun BrieflyPriceCard(
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            SaleProductCard(saleTable = it,
+            SaleProductCard(
+                saleTable = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f
@@ -291,7 +284,7 @@ fun BrieflyPriceCard(
 
 @Composable
 fun SaleProductCard(
-    saleTable: SaleTable,
+    saleTable: DomainSaleTable,
     modifier: Modifier = Modifier
 ) {
     CardField(modifier = modifier) {
@@ -317,7 +310,7 @@ fun SaleProductCard(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
                         saleTable.day,
-                        saleTable.mount,
+                        saleTable.month,
                         saleTable.year
                     )
                 )
@@ -341,7 +334,6 @@ fun SaleProductCard(
                         valueString = saleTable.note
                     )
             }
-
             Text(
                 text = stringResource(
                     R.string.card_count_briefly_s,
@@ -358,9 +350,3 @@ fun SaleProductCard(
         }
     }
 }
-
-
-data class navigateId(
-    val id: Int,
-    val idPT: Int
-)

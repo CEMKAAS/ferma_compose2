@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
+import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.utils.SnackbarController
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AnimalEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository,
+    private val animalRepository: AnimalRepository,
     private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
@@ -49,13 +50,13 @@ class AnimalEntryViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             if (!isEntry) {
-                val domainAnimalTable = itemsRepository.getAnimal(itemId)
+                val domainAnimalTable = animalRepository.getAnimal(itemId)
                     .filterNotNull()
                     .first()
-                    .toDomainMap()
+
                 animalUiState = animalUiState.updateFromDomain(domainAnimalTable)
             }
-            val typeList = itemsRepository.getTypeAnimal(itemIdPT).first()
+            val typeList = animalRepository.getTypeAnimal(itemIdPT).first()
             animalUiState = animalUiState.updateList(typeList)
         }
     }
@@ -69,18 +70,18 @@ class AnimalEntryViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isError()) {
 
-                val idAnimal = itemsRepository.insertAnimalTable(
-                    animalUiState.saveAnimal(itemIdPT = itemIdPT).toRoomMap()
-                )
+//                val idAnimal = animalRepository.insertAnimalTable(
+//                    animalUiState.saveAnimal(itemIdPT = itemIdPT).toRoomMap()
+//                )
 
-                val pair = animalUiState.updateForSave(idAnimal, itemIdPT)
+//                val pair = animalUiState.updateForSave(idAnimal, itemIdPT)
 
-                itemsRepository.insertAnimalCountTable(
-                    pair.first
-                )
-                pair.second?.let {
-                    itemsRepository.insertExpenses(it.toRoomMap())
-                }
+//                animalRepository.insertAnimalCountTable(
+//                    pair.first
+//                )
+//                pair.second?.let {
+//                    itemsRepository.insertExpenses(it.toRoomMap())
+//                }
 
                 /*
                     metricaWriteOff(writeOffUiState.copy(priceAll = autoCalculate()))
@@ -119,7 +120,7 @@ class AnimalEntryViewModel @Inject constructor(
 
     fun deleteItem() {
         viewModelScope.launch {
-            itemsRepository.deleteAnimalTable(itemId)
+            animalRepository.deleteAnimalTable(itemId)
             _eventFlow.emit(UiEvent.NavigateBack)
             showMessage(
                 resourceProvider.getString(R.string.toast_delete_s)

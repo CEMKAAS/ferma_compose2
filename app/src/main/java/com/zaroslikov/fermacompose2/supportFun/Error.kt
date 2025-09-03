@@ -2,7 +2,7 @@ package com.zaroslikov.fermacompose2.supportFun
 
 import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.KillTitleList
+//import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.KillTitleList
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 
@@ -160,7 +160,7 @@ fun isErrorWriteOffAnimal(
     }
 }
 
-fun isErrorKillAnimal(
+/*fun isErrorKillAnimal(
     countAnimal: String,
     countAnimalAll: String,
     isAnimalGroup: Boolean,
@@ -192,7 +192,7 @@ fun isErrorKillAnimal(
     } else {
         return !hasFieldError
     }
-}
+}*/
 
 fun isAnimalCountIncrease(
     count: String,

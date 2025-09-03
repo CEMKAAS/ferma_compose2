@@ -57,12 +57,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.data.room.table.ferma.ProjectTable
+import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import io.appmetrica.analytics.AppMetrica
@@ -84,7 +86,7 @@ fun AddProject(
     navigateBack: () -> Unit,
     navigateToStart: () -> Unit,
     isFirstStart: Boolean,
-    viewModel: ProjectAddViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: ProjectAddViewModel = hiltViewModel()
 ) {
     AlterDialigStart(
         isFirstStart = isFirstStart,
@@ -115,7 +117,7 @@ fun AddProject(
 @Composable
 fun AddProjectContainer(
     modifier: Modifier,
-    navigateToStart: (ProjectTable) -> Unit,
+    navigateToStart: (DomainProjectTable) -> Unit,
 ) {
     //Календарь
     val format = SimpleDateFormat("dd.MM.yyyy")
@@ -261,7 +263,7 @@ fun AddProjectContainer(
                 if (errorBoolean()) {
 
                     navigateToStart(
-                        ProjectTable(
+                        DomainProjectTable(
                             id = 0,
                             titleProject = name,
                             type = "",
@@ -303,7 +305,7 @@ fun ImageLazyRow(
     onImageSelected: (Int) -> Unit,
     onAddImageClicked: () -> Unit,
     imageUri: Uri?,
-    selectedImage : Int = -1
+    selectedImage: Int = -1
 ) {
     var selectedImageIndex by remember { mutableStateOf(selectedImage) }
 
@@ -351,16 +353,17 @@ fun SelectableImageWithIcon(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.BottomEnd
     ) {
-        Box(modifier = Modifier
-            .size(100.dp)
-            .clip(CircleShape)
-            .border(
-                width = if (isSelected) 3.dp else 2.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = 0.5f
-                ),
-                shape = CircleShape
-            )
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .border(
+                    width = if (isSelected) 3.dp else 2.dp,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = 0.5f
+                    ),
+                    shape = CircleShape
+                )
         ) {
             Image(
                 painter = image,
@@ -454,7 +457,7 @@ object PastOrPresentSelectableDates : SelectableDates {
         return year <= LocalDate.now().year
     }
 }
-
+//
 fun getByteArrayFromDrawable(context: Context, drawableResId: Int): ByteArray {
     // Загружаем ресурс как Bitmap
     val bitmap = BitmapFactory.decodeResource(context.resources, drawableResId)

@@ -9,7 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.data.room.table.ferma.ProjectTable
 import com.zaroslikov.data.room.dto.ProjectTableStartScreen
+import com.zaroslikov.domain.models.table.DomainProjectTable
+import com.zaroslikov.domain.repository.ProjectRepository
+import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.data.water.WaterRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,10 +28,12 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class StartScreenViewModel(
-    private val fermaRepository: ItemsRepository,
-    private val waterRepository: WaterRepository
+@HiltViewModel
+class StartScreenViewModel @Inject constructor(
+    private val fermaRepository: ProjectRepository,
+//    private val waterRepository: WaterRepository
 ) : ViewModel() {
 
     private var _isLoading = MutableStateFlow(true)
@@ -37,7 +43,7 @@ class StartScreenViewModel(
 
     init {
         viewModelScope.launch {
-            time = waterRepository.getTimeReminder()
+//            time = waterRepository.getTimeReminder()
         }
     }
 
@@ -47,11 +53,11 @@ class StartScreenViewModel(
 
     fun saveItem() {
         viewModelScope.launch {
-            waterRepository.cancelAllNotifications("7bc20e66-fc56-4002-ac33-4cc15dd28213")
+         /*   waterRepository.cancelAllNotifications("7bc20e66-fc56-4002-ac33-4cc15dd28213")
             waterRepository.setTimeReminder(time)
             if (time != "") {
                 waterRepository.setupDailyReminder()
-            }
+            }*/
         }
     }
 
@@ -77,12 +83,12 @@ class StartScreenViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    private suspend fun ProjectTable.toProjectWithImage(): ProjectTableStartScreen =
+    private suspend fun DomainProjectTable.toProjectWithImage(): ProjectTableStartScreen =
         withContext(Dispatchers.IO) {
 
             val imageBitmap = imageData?.let {
-                        BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
-                    }
+                BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+            }
 
 
             val data = if (mode == 0) {
@@ -100,7 +106,7 @@ class StartScreenViewModel(
             } else data
 
             ProjectTableStartScreen(
-                id,
+                id.toInt(),
                 titleProject,
                 type,
                 data,

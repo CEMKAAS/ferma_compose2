@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
 import com.zaroslikov.domain.models.DomainAddTable
-import com.zaroslikov.data.room.dto.shared.CountSuffixDto
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
@@ -24,19 +23,22 @@ data class AddEntryState(
     val animalId: Long? = null,
     val animal: String = "",
     val note: String = "",
-    val isEntry: Boolean = false,
     val warehouseList: List<DomainCountSuffix> = emptyList(),
     val pickList: PickList = PickList(),
+    override val isEntry: Boolean = false,
     override val error: Error = Error(),
-    override val navigate: UiEvent
+    override val navigate: UiEvent? = null, override val isLoading: Boolean = false
 ) : EntryState() {
+    override val hasAnyError: Boolean
+        get() = error.hasAnyError
+
 
     data class Error(
         val isErrorTitle: Boolean = false,
         val isErrorSlash: Boolean = false,
         val isErrorCount: Boolean = false,
     ) : BaseError {
-        override val hasAnyError: Boolean
+        val hasAnyError: Boolean
             get() = isErrorTitle || isErrorSlash || isErrorCount
     }
 

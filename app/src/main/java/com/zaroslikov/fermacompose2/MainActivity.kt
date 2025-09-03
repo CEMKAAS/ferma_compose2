@@ -38,7 +38,7 @@ import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
-import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
+//import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
 import dagger.hilt.android.AndroidEntryPoint
 import io.appmetrica.analytics.AppMetrica

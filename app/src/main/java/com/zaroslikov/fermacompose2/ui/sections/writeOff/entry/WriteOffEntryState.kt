@@ -4,13 +4,14 @@ import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.data.room.dto.PairDataDoubleSting
 import com.zaroslikov.data.room.dto.SaleTitleData
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.dto.write_off.TitleWriteOffDomain
+import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import kotlin.text.trim
 
@@ -25,30 +26,27 @@ data class WriteOffEntryState(
     val status: Boolean = false,
     val note: String = "",
     val animalCountId: Long? = null,
-    val isEntry: Boolean = false,
+    override val isEntry: Boolean = false,
     val isIndicatorsValue: Boolean = false,
     val warehouseList: List<DomainCountSuffix> = emptyList(),
-    val titleList: List<TitleWriteOffDomain> = emptyList(),
-    override val error: Error = Error()
+    val titleList: List<DomainTitleSuffixCategory> = emptyList(),
+    override val error: Error = Error(),
+    override val navigate: UiEvent? = null, override val isLoading: Boolean = false,
 ) : EntryState() {
+    override val hasAnyError: Boolean
+        get() = error.hasAnyError
+
     data class Error(
         val isErrorTitle: Boolean = false,
         val isErrorSlash: Boolean = false,
         val isErrorCount: Boolean = false,
     ) : BaseError {
-        override val hasAnyError: Boolean
+
+        val hasAnyError: Boolean
             get() = isErrorTitle || isErrorSlash || isErrorCount
     }
 }
 
-fun WriteOffEntryState.validate(): WriteOffEntryState {
-    val error = error.copy(
-        isErrorTitle = title.isBlank(),
-        isErrorSlash = title.contains("/"),
-        isErrorCount = count.isBlank()
-    )
-    return copy(error = error)
-}
 
 fun WriteOffEntryState.updateFromDomain(domain: DomainWriteOffTable): WriteOffEntryState {
     return copy(

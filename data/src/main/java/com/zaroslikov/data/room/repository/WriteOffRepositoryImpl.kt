@@ -2,13 +2,13 @@ package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCountSuffix
+import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixCategory
 import com.zaroslikov.data.room.mapper.dto.write_off.toBrieflyWriteOffDomain
-import com.zaroslikov.data.room.mapper.dto.write_off.toTitleWriteOffDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
-import com.zaroslikov.domain.models.dto.write_off.TitleWriteOffDomain
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.WriteOffRepository
 import kotlinx.coroutines.flow.Flow
@@ -43,9 +43,9 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
             .map { it -> it.map { it.toDomainMap() } }
     }
 
-    override fun getItemsWriteOffList(id: Long): Flow<List<TitleWriteOffDomain>> {
+    override fun getItemsWriteOffList(id: Long): Flow<List<DomainTitleSuffixCategory>> {
         return writeOffDao.getItemsWriteOffList(id)
-            .map { it -> it.map { it.toTitleWriteOffDomain() } }
+            .map { it -> it.map { it.toDomainTitleSuffixCategory() } }
     }
 
     override suspend fun insertWriteOff(item: DomainWriteOffTable) {

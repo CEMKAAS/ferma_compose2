@@ -1,3 +1,4 @@
+/*
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import androidx.compose.runtime.getValue
@@ -112,4 +113,4 @@ data class IncubatorProjectEditState(
     val time3: String = "",
     val mode: Int = 0,
     val imageData: ByteArray? = byteArrayOf()
-)
+)*/

@@ -3,16 +3,16 @@ package com.zaroslikov.data.room.repository
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.mapper.dto.sale.toBrieflySaleDomain
 import com.zaroslikov.data.room.mapper.dto.sale.toDomainBuyerPrice
-import com.zaroslikov.data.room.mapper.dto.sale.toTitleSaleDomain
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
+import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixCategory
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
-import com.zaroslikov.domain.models.dto.sale.TitleSaleDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
+import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.repository.SaleRepository
 import kotlinx.coroutines.flow.Flow
@@ -46,8 +46,8 @@ class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : Sal
         return saleDao.getBrieflyDetailsItemSale(id, name).map { it -> it.map { it.toDomainMap() } }
     }
 
-    override fun getItemsTitleSaleList(id: Long): Flow<List<TitleSaleDomain>> {
-        return saleDao.getItemsTitleSaleList(id).map { it -> it.map { it.toTitleSaleDomain() } }
+    override fun getItemsTitleSaleList(id: Long): Flow<List<DomainTitleSuffixCategory>> {
+        return saleDao.getItemsTitleSaleList(id).map { it -> it.map { it.toDomainTitleSuffixCategory() } }
     }
 
     override fun getItemsCategorySaleList(id: Long): Flow<List<String>> {

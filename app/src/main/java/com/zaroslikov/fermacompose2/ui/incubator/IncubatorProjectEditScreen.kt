@@ -1,3 +1,4 @@
+/*
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import android.widget.Toast
@@ -385,3 +386,4 @@ fun IncubatorEditDayContainer(
         }
     }
 }
+*/

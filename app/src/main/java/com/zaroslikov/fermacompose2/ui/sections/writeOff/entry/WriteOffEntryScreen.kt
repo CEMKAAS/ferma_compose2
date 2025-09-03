@@ -11,23 +11,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleSale
-import com.zaroslikov.fermacompose2.ui.composeElement.RadioButtonWriteOff
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleSale
+import com.zaroslikov.fermacompose2.ui.elements.RadioButtonWriteOff
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 
@@ -46,7 +43,7 @@ fun WriteOffEntryProduct(
     onNavigateUp: () -> Unit,
     viewModel: WriteOffEntryViewModel = hiltViewModel()
 ) {
-    val eventFlow = viewModel.eventFlow
+    val eventFlow = viewModel.navigation
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -142,6 +139,7 @@ fun WriteOffEntryContainerProduct(
         )
         ButtonPanel(
             isEntry = state.isEntry,
+            entryButton = R.string.button_add,
             onClickInsert = { onIntent(WriteOffIntent.Insert) },
             onClickUpdate = { onIntent(WriteOffIntent.Update) },
             onClickDelete = { onIntent(WriteOffIntent.Delete) }
@@ -149,29 +147,5 @@ fun WriteOffEntryContainerProduct(
     }
 }
 
-@Composable
-private fun ButtonPanel(
-    isEntry: Boolean,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-    if (isEntry)
-        ButtonStandart(
-            intRes = R.string.button_add,
-            onClick = {
-                focusManager.clearFocus()
-                onClickInsert()
-            }
-        )
-    else {
-        ButtonRefresh {
-            focusManager.clearFocus()
-            onClickUpdate()
-        }
-        ButtonDelete { onClickDelete() }
-    }
-}
 
 

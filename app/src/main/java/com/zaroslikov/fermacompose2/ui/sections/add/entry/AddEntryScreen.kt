@@ -11,22 +11,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextAnimal
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd2
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimal
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 object AddEntryDestination : NavigationDestination {
@@ -43,7 +40,7 @@ fun AddEntryProduct(
     navigateBack: () -> Unit,
     viewModel: AddEntryViewModel = hiltViewModel()
 ) {
-    val eventFlow = viewModel.eventFlow
+    val eventFlow = viewModel.navigation
     val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -123,6 +120,7 @@ fun AddEntryContainerProduct(
         )
         ButtonPanel(
             isEntry = state.isEntry,
+            entryButton = R.string.button_add,
             onClickInsert = { onIntent(AddEntryIntent.Insert) },
             onClickUpdate = { onIntent(AddEntryIntent.Update) },
             onClickDelete = { onIntent(AddEntryIntent.Delete) }
@@ -130,27 +128,4 @@ fun AddEntryContainerProduct(
     }
 }
 
-@Composable
-private fun ButtonPanel(
-    isEntry: Boolean,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-    if (isEntry)
-        ButtonStandart(
-            intRes = R.string.button_add,
-            onClick = {
-                focusManager.clearFocus()
-                onClickInsert()
-            }
-        )
-    else {
-        ButtonRefresh {
-            focusManager.clearFocus()
-            onClickUpdate()
-        }
-        ButtonDelete { onClickDelete() }
-    }
-}
+

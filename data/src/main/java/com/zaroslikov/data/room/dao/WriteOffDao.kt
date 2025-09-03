@@ -6,8 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
+import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
 import com.zaroslikov.data.room.dto.write_off.BrieflyWriteOffDto
-import com.zaroslikov.data.room.dto.write_off.TitleWriteOffDto
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import kotlinx.coroutines.flow.Flow
 
@@ -36,7 +36,7 @@ interface WriteOffDao {
                 " UNION ALL" +
                 " SELECT title,  count_suffix AS suffix, 1 AS category from expenses_table Where idPT=:id and is_show_warehouse = 1 group by title, count_suffix"
     )
-    fun getItemsWriteOffList(id: Long): Flow<List<TitleWriteOffDto>>
+    fun getItemsWriteOffList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)

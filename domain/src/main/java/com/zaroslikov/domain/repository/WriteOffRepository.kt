@@ -1,8 +1,8 @@
 package com.zaroslikov.domain.repository
 
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
-import com.zaroslikov.domain.models.dto.write_off.TitleWriteOffDomain
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import kotlinx.coroutines.flow.Flow
 
@@ -12,7 +12,7 @@ interface WriteOffRepository {
     fun getItemWriteOffIdAnimalCount(id: Long): Flow<DomainWriteOffTable>
     fun getBrieflyItemWriteOff(id: Long): Flow<List<BrieflyWriteOffDomain>>
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<DomainWriteOffTable>>
-    fun getItemsWriteOffList(id: Long): Flow<List<TitleWriteOffDomain>>
+    fun getItemsWriteOffList(id: Long): Flow<List<DomainTitleSuffixCategory>>
     suspend fun insertWriteOff(item: DomainWriteOffTable)
     suspend fun updateWriteOff(item: DomainWriteOffTable)
     suspend fun deleteWriteOff(id: Long)

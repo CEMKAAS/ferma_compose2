@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.add
 
+import androidx.compose.runtime.Composable
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.zaroslikov.fermacompose2.ui.start.DrawerItems
 import androidx.compose.foundation.layout.Column
@@ -38,20 +39,22 @@ import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.fermacompose2.ui.Banner
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorDestination
-import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
+
+//import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+//import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorDestination
+//import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 
 object ChoiseProjectDestination : NavigationDestination {
     override val route = "ChoiseProject"
     override val titleRes = R.string.app_name
 
 }
+
 @Composable
 fun ChoiseProject(
     navigateBack: () -> Unit,
     navigateProject: (String) -> Unit,
-    isFirstStart :Boolean,
+    isFirstStart: Boolean,
     isFirstEnd: () -> Unit,
 ) {
     AlterDialigStart(
@@ -86,7 +89,9 @@ fun ChooiseProjectContainer(
 
     val drawerItems = listOf(
         DrawerItems(
-            R.drawable.chicken, "Инкубатор", AddIncubatorDestination.route
+            R.drawable.chicken,
+            "Инкубатор",
+            ProjectAddDestination.route //AddIncubatorDestination.route
         ),
         DrawerItems(
             R.drawable.livestock, "Хозяйство", ProjectAddDestination.route

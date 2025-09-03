@@ -1,63 +1,44 @@
 package com.zaroslikov.fermacompose2.ui.sections.sale.list_screen
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.data.room.table.ferma.SaleTable
-import com.zaroslikov.data.room.dto.BrieflyPriceUiState
-import com.zaroslikov.data.room.dto.SaleUiState
+import com.zaroslikov.domain.models.DomainSaleTable
+import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SaleViewModel(
+@HiltViewModel
+class SaleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository
-) : ViewModel() {
+    private val saleRepository: SaleRepository
+) : ListViewModel<SaleListState, SaleListIntent>(SaleListState()) {
 
-    val itemId: Int = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
+    private val itemIdPT: Long = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
 
-    private var _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-
-    val saleUiState: StateFlow<SaleUiState> =
-        itemsRepository.getAllSaleItems(itemId).map { SaleUiState(it) }.onStart {
-            // Устанавливаем состояние загрузки перед началом загрузки данных
-            _isLoading.value = true
-        }.onEach {
-            // Отключаем состояние загрузки после завершения загрузки данных
-            _isLoading.value = false
+    init {
+        viewModelScope.launch {
+            updateState { it.copy(isLoading = true) }
+            val addList = saleRepository.getAllSaleItems(itemIdPT).first()
+            val briefly = saleRepository.getBrieflyItemSale(itemIdPT).first()
+            updateState {
+                it.copy(
+                    idPT = itemIdPT,
+                    list = addList,
+                    briefly = briefly,
+                    isLoading = false
+                )
+            }
         }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = SaleUiState()
-            )
-
-
-    val brieflyUiState: StateFlow<BrieflyPriceUiState> =
-        itemsRepository.getBrieflyItemSale(itemId).map { BrieflyPriceUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = BrieflyPriceUiState()
-            )
-
-    fun getDetailsName(name: String): Flow<List<SaleTable>> {
-        return itemsRepository.getBrieflyDetailsItemSale(itemId.toLong(), name)
     }
 
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+    fun getDetailsName(name: String): Flow<List<DomainSaleTable>> {
+        return saleRepository.getBrieflyDetailsItemSale(itemIdPT, name)
     }
-
-
 }
 
+sealed class SaleListIntent() : BaseIntent

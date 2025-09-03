@@ -1,3 +1,4 @@
+/**//*
 package com.zaroslikov.fermacompose2.ui.arhiv
 
 import android.annotation.SuppressLint
@@ -149,3 +150,4 @@ fun IncubatorCard(projectTable: IncubatorProjectEditState, modifier: Modifier) {
     }
 }
 
+*/

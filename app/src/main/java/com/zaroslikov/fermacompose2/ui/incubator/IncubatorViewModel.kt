@@ -1,3 +1,4 @@
+/*
 package com.zaroslikov.fermacompose2.ui.incubator
 
 import androidx.compose.runtime.getValue
@@ -78,7 +79,8 @@ class IncubatorViewModel(
 
     suspend fun saveProject(animalTable: AnimalTable, count: String) {
         val id = itemsRepository.insertAnimalTable(animalTable)
-       /* itemsRepository.insertAnimalCountTable(
+       */
+/* itemsRepository.insertAnimalCountTable(
             AnimalCountTable(
                 count = count,
                 date = animalTable.date,
@@ -86,7 +88,8 @@ class IncubatorViewModel(
                 idAnimal = TODO(),
                 note = "",
             )
-        )*/
+        )*//*
+
     }
 
     suspend fun saveNewProjectArh(project: ProjectTable) {
@@ -104,7 +107,8 @@ class IncubatorViewModel(
 
 //        val id = itemsRepository.insertAnimalTable(animalTable.copy(idPT = idPT.toInt()))
 
-       /* itemsRepository.insertAnimalCountTable(
+       */
+/* itemsRepository.insertAnimalCountTable(
             AnimalCountTable(
                 count = count,
                 date = animalTable.date,
@@ -112,7 +116,8 @@ class IncubatorViewModel(
                 idAnimal = TODO(),
                 note = "",
             )
-        )*/
+        )*//*
+
     }
 
     suspend fun deleteItem() {
@@ -155,3 +160,4 @@ data class IncubatorProjectState(
 
 
 
+*/

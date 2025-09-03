@@ -1,61 +1,81 @@
 package com.zaroslikov.fermacompose2.ui.sections.add.list_screen
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.data.room.table.ferma.AddTable
-import com.zaroslikov.data.room.dto.HomeUiState
+import com.zaroslikov.domain.models.DomainAddTable
+import com.zaroslikov.domain.repository.AddRepository
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class AddViewModel(
+@HiltViewModel
+class AddViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository
-) : ViewModel() {
+    private val addRepository: AddRepository,
+) : ListViewModel<AddListState, AddListIntent>(AddListState()) {
+    private val itemIdPT: Long = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
-    val itemId: Int = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
-
-    private var _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    val homeUiState: StateFlow<HomeUiState> =
-        itemsRepository.getAllItemsStream(itemId).map { HomeUiState(it) }
-            .onStart {
-                // Устанавливаем состояние загрузки перед началом загрузки данных
-                _isLoading.value = true
-            }.onEach {
-                // Отключаем состояние загрузки после завершения загрузки данных
-                _isLoading.value = false
+    init {
+        viewModelScope.launch {
+            combine(
+                addRepository.getAllItems(itemIdPT),
+                addRepository.getBrieflyItemAdd(itemIdPT)
+            ) { addList, briefly ->
+                addList to briefly
+            }.collectLatest { (addList, briefly) ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        list = addList,
+                        briefly = briefly,
+                        isLoading = false
+                    )
+                }
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = HomeUiState()
-            )
-
-    val brieflyUiState: StateFlow<BrieflyUiState> =
-        itemsRepository.getBrieflyItemAdd(itemId).map { BrieflyUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = BrieflyUiState()
-            )
-
-    fun getDetailsName(name: String): Flow<List<AddTable>> {
-        return itemsRepository.getBrieflyDetailsItemAdd(itemId.toLong(), name)
+        }
     }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+
+    fun getDetailsName(name: String): Flow<List<DomainAddTable>> {
+        return addRepository.getBrieflyDetailsItemAdd(itemIdPT, name)
     }
+
+
+    /*    private var _isLoading = MutableStateFlow(true)
+        val isLoading: StateFlow<Boolean> = _isLoading
+
+        val homeUiState: StateFlow<HomeUiState> =
+            addRepository.getAllItems(itemId).map { HomeUiState(it) }
+                .onStart {
+                    // Устанавливаем состояние загрузки перед началом загрузки данных
+                    _isLoading.value = true
+                }.onEach {
+                    // Отключаем состояние загрузки после завершения загрузки данных
+                    _isLoading.value = false
+                }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                    initialValue = HomeUiState()
+                )
+
+        val brieflyUiState: StateFlow<BrieflyUiState> =
+            addRepository.getBrieflyItemAdd(itemId).map { BrieflyUiState(it) }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                    initialValue = BrieflyUiState()
+                )
+    */
+
 
 }
 
 
+sealed class AddListIntent() : BaseIntent

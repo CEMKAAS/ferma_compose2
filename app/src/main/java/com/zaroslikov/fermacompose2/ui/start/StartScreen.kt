@@ -55,6 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.zaroslikov.fermacompose2.AlterDialigStart
@@ -62,10 +63,12 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.data.room.dto.ProjectTableStartScreen
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
+import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
 import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
-import com.zaroslikov.fermacompose2.ui.warehouse.newYearBoolean
+import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+//import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
+//import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
+//import com.zaroslikov.fermacompose2.ui.warehouse.newYearBoolean
 import io.appmetrica.analytics.AppMetrica
 
 
@@ -86,7 +89,7 @@ fun StartScreen(
     modifier: Modifier = Modifier,
     isFirstStart: Boolean,
     isFirstEnd: () -> Unit,
-    viewModel: StartScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: StartScreenViewModel = hiltViewModel()
 ) {
     val projectList by viewModel.getAllProject.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -128,7 +131,12 @@ fun StartScreen(
             )
         }, floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate(ChoiseProjectDestination.route) },
+                onClick = {
+                    navController.navigate(
+//                    ChoiseProjectDestination.route
+                        ProjectAddDestination.route
+                    )
+                },
                 icon = { Icon(Icons.Filled.Add, "Localized description") },
                 text = { Text(text = "Добавить") },
             )
@@ -177,7 +185,6 @@ fun StartScreen(
     }
 }
 
-
 @Composable
 fun StartScreenContainer(
     modifier: Modifier,
@@ -194,19 +201,19 @@ fun StartScreenContainer(
     if (projectList.isNotEmpty()) {
         Column(modifier = modifier) {
 
-            if (newYearBoolean()) {
-                Button(
-                    onClick = {
-                        navigationToNewYear()
-                        AppMetrica.reportEvent("Итоги года общий")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp, horizontal = 15.dp)
-                ) {
-                    Text(text = "Итоги года!")
-                }
-            }
+            /*  if (newYearBoolean()) {
+                  Button(
+                      onClick = {
+                          navigationToNewYear()
+                          AppMetrica.reportEvent("Итоги года общий")
+                      },
+                      modifier = Modifier
+                          .fillMaxWidth()
+                          .padding(vertical = 5.dp, horizontal = 15.dp)
+                  ) {
+                      Text(text = "Итоги года!")
+                  }
+              }*/
 
             LazyColumn(contentPadding = PaddingValues(8.dp)) {
                 items(items = projectList, key = { it.id }) {
@@ -260,7 +267,12 @@ fun StartScreenContainer(
                 fontSize = 20.sp,
             )
             Button(
-                onClick = { navController.navigate(ChoiseProjectDestination.route) },
+                onClick = {
+                    navController.navigate(
+//                    ChoiseProjectDestination.route
+                        ProjectAddDestination.route
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 20.dp)
@@ -287,21 +299,21 @@ fun CardFerma(
                 .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .border(
-                            width = 3.dp,
-                            color = if (projectTable.arhive == "0") MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = 0.5f
-                            ),
-                            shape = CircleShape
-                        )
-                ) {
-                    if (projectTable.imageData != null) {
-                        Image(
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 3.dp,
+                        color = if (projectTable.arhive == "0") MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = 0.5f
+                        ),
+                        shape = CircleShape
+                    )
+            ) {
+                if (projectTable.imageData != null) {
+                    /*    Image(
                             bitmap = projectTable.imageData,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
@@ -309,19 +321,19 @@ fun CardFerma(
                             colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
                                 Color.Gray
                             )
+                        )*/
+                } else {
+                    Image(
+                        painter = painterResource(setImage(projectTable)),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(194.dp),
+                        colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
+                            Color.Gray
                         )
-                    } else {
-                        Image(
-                            painter = painterResource(setImage(projectTable)),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.size(194.dp),
-                            colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
-                                Color.Gray
-                            )
-                        )
-                    }
+                    )
                 }
+            }
 
 
             Column(

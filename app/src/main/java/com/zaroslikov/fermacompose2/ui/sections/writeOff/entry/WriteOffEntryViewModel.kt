@@ -15,7 +15,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
-import com.zaroslikov.fermacompose2.base.BaseIntent
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
@@ -47,7 +47,7 @@ class WriteOffEntryViewModel @Inject constructor(
     private val itemId: Long = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
     val isEntry: Boolean = itemId == -1L
 
-    fun onIntent(intent: WriteOffIntent) {
+    override fun onIntent(intent: WriteOffIntent) {
         when (intent) {
             is WriteOffIntent.TitleAndSuffix -> updateTitleAndSuffix(intent.title, intent.suffix)
             is WriteOffIntent.CountChanged -> updateCount(intent.value)
@@ -165,21 +165,17 @@ class WriteOffEntryViewModel @Inject constructor(
         }
     }
 
-    fun showMessage(message: String) {
-        viewModelScope.launch {
-            SnackbarController.sendEvent(
-                event = SnackbarEvent(
-                    message = message
+    override fun validation() {
+        updateState { state ->
+            state.copy(
+                error = state.error.copy(
+                    isErrorTitle = state.title.isBlank(),
+                    isErrorSlash = state.title.isSlash(),
+                    isErrorCount = state.count.isBlank()
                 )
             )
         }
     }
-
-    fun isError(): Boolean {
-        updateUiState(writeOffUiState.validate())
-        return getState().error.hasAnyError
-    }
-
 
     private fun updateTitleAndSuffix(title: String, suffix: String) {
         updateState {
@@ -262,7 +258,7 @@ class WriteOffEntryViewModel @Inject constructor(
     }
 }
 
-sealed class WriteOffIntent : BaseIntent() {
+sealed class WriteOffIntent : BaseIntent {
     data class TitleAndSuffix(val title: String, val suffix: String) : WriteOffIntent()
     data class CountChanged(val value: String) : WriteOffIntent()
     data class PriceChanged(val value: String) : WriteOffIntent()

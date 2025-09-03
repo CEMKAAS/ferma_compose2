@@ -38,21 +38,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.table.ferma.WriteOffTable
-import com.zaroslikov.data.room.dto.BrieflyItemCount
+import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
+import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.getImageWriteOff
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.composeElement.CardField
-import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
-import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
-import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
-import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
-import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
+import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.FloatButton
+import com.zaroslikov.fermacompose2.ui.elements.IconAndText
+import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.TextLine
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
@@ -60,6 +60,8 @@ import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
+
+//import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object WriteOffDestination : NavigationDestination {
     override val route = "WriteOff"
@@ -74,21 +76,17 @@ fun WriteOffScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: (Int) -> Unit,
+    navigateToItemAdd: (Long) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    viewModel: WriteOffViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: WriteOffViewModel = hiltViewModel()
 ) {
-    val homeUiState by viewModel.writeOffUiState.collectAsState()
-    val titleUiState by viewModel.titleUiState.collectAsState()
-    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val idProject = state.idPT
+    val writeOffBoolean = state.writeOffBoolean
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    val writeOffBoolean = titleUiState.list.isNotEmpty()
-    val idProject = viewModel.itemId
-
     val coroutineScope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
@@ -118,7 +116,7 @@ fun WriteOffScreen(
                 if (writeOffBoolean) FloatButton { navigateToItemAdd(idProject) }
             }
         ) { innerPadding ->
-            if (isLoading)
+            if (state.isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
@@ -126,8 +124,8 @@ fun WriteOffScreen(
                 WriteOffBody(
                     modifier = modifier.modifierScreenLazy(innerPadding),
                     viewModel = viewModel,
-                    itemList = homeUiState.itemList,
-                    brieflyList = brieflyUiState.itemList,
+                    itemList = state.list,
+                    brieflyList = state.listBriefly,
                     onItemClick = navigateToItemUpdate,
                     navigateToItemAdd = { navigateToItemAdd(idProject) },
                     writeOffBoolean = writeOffBoolean,
@@ -141,8 +139,8 @@ fun WriteOffScreen(
 private fun WriteOffBody(
     modifier: Modifier = Modifier,
     viewModel: WriteOffViewModel,
-    itemList: List<WriteOffTable>,
-    brieflyList: List<BrieflyItemCount>,
+    itemList: List<DomainWriteOffTable>,
+    brieflyList: List<BrieflyWriteOffDomain>,
     onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit,
     writeOffBoolean: Boolean,
@@ -169,9 +167,9 @@ private fun WriteOffBody(
 @Composable
 private fun InventoryList(
     viewModel: WriteOffViewModel,
-    itemList: List<WriteOffTable>,
-    brieflyList: List<BrieflyItemCount>,
-    onItemClick: (WriteOffTable) -> Unit,
+    itemList: List<DomainWriteOffTable>,
+    brieflyList: List<BrieflyWriteOffDomain>,
+    onItemClick: (DomainWriteOffTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
@@ -229,8 +227,8 @@ private fun InventoryList(
 @Composable
 fun BrieflyCountCard(
     viewModel: WriteOffViewModel,
-    product: BrieflyItemCount,
-    onItemClick: (WriteOffTable) -> Unit,
+    product: BrieflyWriteOffDomain,
+    onItemClick: (DomainWriteOffTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -293,7 +291,7 @@ fun BrieflyCountCard(
 
 @Composable
 fun WriteOffProductCard(
-    writeOffTable: WriteOffTable,
+    writeOffTable: DomainWriteOffTable,
     modifier: Modifier = Modifier
 ) {
     CardField(modifier = modifier) {
@@ -317,7 +315,7 @@ fun WriteOffProductCard(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
                         writeOffTable.day,
-                        writeOffTable.mount,
+                        writeOffTable.month,
                         writeOffTable.year
                     )
                 )

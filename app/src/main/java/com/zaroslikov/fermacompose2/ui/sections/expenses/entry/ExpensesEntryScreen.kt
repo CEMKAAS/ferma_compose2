@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,34 +29,33 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
-import com.zaroslikov.data.room.dto.PairData
+import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.composeElement.AlertDialog.AlertDialogInfo
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonDelete
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonRefresh
-import com.zaroslikov.fermacompose2.ui.composeElement.ButtonStandart
-import com.zaroslikov.fermacompose2.ui.composeElement.CardField
-import com.zaroslikov.fermacompose2.ui.composeElement.CheckboxTextIcon
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCategory
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCount
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextCountNoCard
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextDateEdit
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.composeElement.OutlinedTextTitleAdd2
-import com.zaroslikov.fermacompose2.ui.composeElement.Suffix
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
+import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNoCard
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
+import com.zaroslikov.fermacompose2.ui.elements.Suffix
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.toResId
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
@@ -77,8 +75,10 @@ fun ExpensesEntryProduct(
     navigateBack: () -> Unit,
     viewModel: ExpensesEntryViewModel = hiltViewModel()
 ) {
-    val eventFlow = viewModel.eventFlow
+    val eventFlow = viewModel.navigation
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
@@ -98,14 +98,9 @@ fun ExpensesEntryProduct(
         ExpensesEntryContainerProduct(
             modifier = Modifier
                 .modifierScreen(innerPadding),
-            state = viewModel.expensesUiState,
-            titleList = viewModel.titleUiState.collectAsState().value.list,
-            categoryList = viewModel.categoryUiState.collectAsState().value.list,
-            updateCountWarehouse = viewModel::updateWarehouseUiState,
-            onValueChange = viewModel::updateUiState,
-            onClickInsert = viewModel::insertItem,
-            onClickUpdate = viewModel::updateItem,
-            onClickDelete = viewModel::deleteItem,
+            state = state,
+            onIntent = viewModel::onIntent,
+            updateCountWarehouse = viewModel::updateWarehouseUiState
         )
     }
 }
@@ -114,28 +109,21 @@ fun ExpensesEntryProduct(
 fun ExpensesEntryContainerProduct(
     modifier: Modifier,
     state: ExpensesEntryState,
-    titleList: List<PairData>,
-    categoryList: List<String>,
     updateCountWarehouse: (String) -> Unit,
-    onValueChange: (ExpensesEntryState) -> Unit,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit,
+    onIntent: (ExpensesEntryIntent) -> Unit
 ) {
-    val suffixSet =
-        setOf(Suffix.GRAM.asString(), Suffix.KILOGRAM.asString(), Suffix.TONS.asString())
     Column(modifier = modifier) {
         OutlinedTextTitleAdd2(
             value = state.title,
             onValueChange = {
-                onValueChange(state.updateTitle(it))
+                onIntent(ExpensesEntryIntent.TitleChanged(it))
                 updateCountWarehouse(it)
             },
             onValueChangeSuffix = {
-                onValueChange(state.updateTitleAndSuffix(it, suffixSet))
+                onIntent(ExpensesEntryIntent.TitleAndSuffixClicked(it.first, it.second))
                 updateCountWarehouse(it.first)
             },
-            titleList = titleList,
+            titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
             readOnly = state.isIndicatorsValue,
@@ -143,29 +131,43 @@ fun ExpensesEntryContainerProduct(
         )
         OutlinedTextCount(
             value = state.count,
-            onValueChange = { onValueChange(state.updateCount(it)) },
-            onSuffixChange = { onValueChange(state.updateCountSuffix(it, suffixSet)) },
+            onValueChange = {
+                onIntent(ExpensesEntryIntent.CountChanged(it))
+            },
+            onSuffixChange = {
+                onIntent(ExpensesEntryIntent.SuffixClicked(it))
+            },
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_expenses,
-            countWarehouse = state.countInWarehouse.first.toString(),
-            onWeightChange = { onValueChange(state.updateWeight(it)) },
+            countWarehouse = state.countInWarehouse.count.toString(),
+            onWeightChange = {
+                onIntent(ExpensesEntryIntent.WeightChanged(it))
+            },
             isWarehouseShow = false,
             versionDropMenu = if (state.isIndicatorsValue) 2 else 5,
             weightValue = state.weight,
             weightSuffix = state.weightSuffix,
-            onWeightSuffixChance = { onValueChange(state.updateWeightSuffix(it)) },
+            onWeightSuffixChance = {
+                onIntent(ExpensesEntryIntent.WeightSuffixChanged(it))
+            },
             isAutoCalculate = state.isAutoWeight,
-            onAutoCalculate = { onValueChange(state.updateAutoWeight(it, suffixSet)) },
+            onAutoCalculate = {
+                onIntent(ExpensesEntryIntent.AutoWeightClicked(it))
+            },
             isWeightCalculate = !state.isIndicatorsValue,
         )
         OutlinedPriceInput(
             price = state.price,
-            onPriceChange = { onValueChange(state.updatePrice(it)) },
+            onPriceChange = {
+                onIntent(ExpensesEntryIntent.PriceChanged(it))
+            },
             count = state.priceAll,
             isError = state.error.isErrorPrice,
             isAutoCalculate = state.isAutoPrice,
-            onAutoCalculate = { onValueChange(state.updateAutoPrice(it)) },
+            onAutoCalculate = {
+                onIntent(ExpensesEntryIntent.AutoPriceClicked(it))
+            },
             isManyCount = true,
             isNecessarily = true,
             supportTextRes = R.string.support_text_price_expenses,
@@ -175,55 +177,36 @@ fun ExpensesEntryContainerProduct(
         if (!state.isIndicatorsValue)
             OutlinedTextCategory(
                 value = state.category,
-                onValueChange = { onValueChange(state.updateCategory(it)) },
-                titleList = categoryList
+                onValueChange = {
+                    onIntent(ExpensesEntryIntent.CategoryChanged(it))
+                },
+                titleList = state.pickList.categoryList
             )
         if (!state.isIndicatorsValue)
             OutlinedTextDateEdit(
                 value = state.date,
-                onValueChange = { onValueChange(state.updateDate(it)) },
+                onValueChange = {
+                    onIntent(ExpensesEntryIntent.DateClicked(it))
+                },
             )
         OutlinedTextNote(
             value = state.note,
-            onValueChange = { onValueChange(state.updateNote(it)) },
+            onValueChange = {
+                onIntent(ExpensesEntryIntent.NoteChanged(it))
+            }
         )
         AdditionalSettings(
             state = state,
-            onValueChange = onValueChange,
+            onIntent = onIntent
         )
         ButtonPanel(
-            state = state,
-            onClickInsert = { onClickInsert() },
-            onClickUpdate = { onClickUpdate() },
-            onClickDelete = { onClickDelete() }
+            isEntry = state.isEntry,
+            isIndicatorsValue = state.isIndicatorsValue,
+            entryButton = R.string.button_expenses,
+            onClickInsert = { onIntent(ExpensesEntryIntent.Insert) },
+            onClickUpdate = { onIntent(ExpensesEntryIntent.Update) },
+            onClickDelete = { onIntent(ExpensesEntryIntent.Delete) }
         )
-    }
-}
-
-
-@Composable
-private fun ButtonPanel(
-    state: ExpensesEntryState,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-    if (state.isEntry)
-        ButtonStandart(
-            intRes = R.string.button_expenses,
-            onClick = {
-                focusManager.clearFocus()
-                onClickInsert()
-            }
-        )
-    else {
-        ButtonRefresh {
-            focusManager.clearFocus()
-            onClickUpdate()
-        }
-        if (!state.isIndicatorsValue)
-            ButtonDelete { onClickDelete() }
     }
 }
 
@@ -231,7 +214,7 @@ private fun ButtonPanel(
 @Composable
 private fun AdditionalSettings(
     state: ExpensesEntryState,
-    onValueChange: (ExpensesEntryState) -> Unit,
+    onIntent: (ExpensesEntryIntent) -> Unit
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
     if (!state.count.isBlank() && !state.price.isBlank() && !state.isIndicatorsValue) {
@@ -244,17 +227,31 @@ private fun AdditionalSettings(
             Food(
                 modifier = Modifier.padding(bottom = animatedErrorPadding(details)),
                 state = state,
-                onValueChange = onValueChange,
+                onShowFoodClick = { onIntent(ExpensesEntryIntent.ShowFoodClicked(it)) },
+                onShowFoodHandClick = { onIntent(ExpensesEntryIntent.ShowFoodHandClicked(it)) },
+                onAnimalChipClick = { onIntent(ExpensesEntryIntent.AnimalChipClicked(it)) },
+                onFeedFoodChanged = { onIntent(ExpensesEntryIntent.FeedFoodChanged(it)) },
+                onFeedFoodSuffixClick = { onIntent(ExpensesEntryIntent.FeedFoodSuffixClicked(it)) },
+                onCountAnimalChanged = { onIntent(ExpensesEntryIntent.CountAnimalChanged(it)) },
             )
             ShowWarehouse(
                 modifier = Modifier.padding(bottom = animatedErrorPadding(details)),
                 state = state,
-                onValueChange = onValueChange
+                onCheckboxClick = { onIntent(ExpensesEntryIntent.ShowWarehouseClicked(it)) }
             )
             ShowAnimal(
                 modifier = Modifier.padding(bottom = animatedErrorPadding(details)),
                 state = state,
-                onValueChange = onValueChange,
+                onShowAnimal = { onIntent(ExpensesEntryIntent.ShowAnimalClicked(it)) },
+                onAnimalChipClick = { onIntent(ExpensesEntryIntent.AnimalChipByIdClicked(it)) },
+                onAnimalSliderClick = {
+                    onIntent(
+                        ExpensesEntryIntent.AnimalSliderClicked(
+                            animal = it.first,
+                            newValue = it.second
+                        )
+                    )
+                }
             )
         }
     }
@@ -265,7 +262,12 @@ private fun AdditionalSettings(
 private fun Food(
     modifier: Modifier = Modifier,
     state: ExpensesEntryState,
-    onValueChange: (ExpensesEntryState) -> Unit,
+    onShowFoodClick: (Boolean) -> Unit,
+    onShowFoodHandClick: (Boolean) -> Unit,
+    onAnimalChipClick: (AnimalExpensesDomain) -> Unit,
+    onFeedFoodChanged: (String) -> Unit,
+    onFeedFoodSuffixClick: (String) -> Unit,
+    onCountAnimalChanged: (String) -> Unit,
 ) {
     CardField(
         modifier = modifier.padding(bottom = animatedErrorPadding(state.error.isErrorFood)),
@@ -275,27 +277,30 @@ private fun Food(
     ) {
         Checkbox(
             expensesTable = state,
-            onValueChange = onValueChange,
+            onShowFoodClick = onShowFoodClick,
+            onShowFoodHandClick = onShowFoodHandClick,
         )
         if (state.isShowFood && state.count != "") {
             if (!state.isShowFoodHand)
                 ChoiceAnimal(
-                    state,
-                    onValueChange
+                    animalListState = state.pickList.animalList2,
+                    onAnimalChipClick = onAnimalChipClick
                 )
             if (state.isShowFoodHand)
                 InputText(
                     state = state,
-                    onValueChange = onValueChange
+                    onFeedFoodChanged = onFeedFoodChanged,
+                    onFeedFoodSuffixClick = onFeedFoodSuffixClick,
+                    onCountAnimalChanged = onCountAnimalChanged,
                 )
             if ((!state.isShowFoodHand &&
-                        state.animalList2.isNotEmpty() &&
-                        state.animalList2.any { it.ps })
+                        state.pickList.animalList2.isNotEmpty() &&
+                        state.pickList.animalList2.any { it.ps })
                 || (state.isShowFoodHand &&
                         state.feedFoodInput != "" &&
                         state.countAnimalInput != "")
             )
-                TextFoodExpenses(state)
+                TextFoodExpenses(state) // TODO Не обновлятет надо что-то думать
             if (state.error.isErrorFood)
                 Text(
                     text = stringResource(R.string.error_show_food),
@@ -309,7 +314,7 @@ private fun Food(
 private fun ShowWarehouse(
     modifier: Modifier = Modifier,
     state: ExpensesEntryState,
-    onValueChange: (ExpensesEntryState) -> Unit
+    onCheckboxClick: (Boolean) -> Unit
 ) {
     var openAlertWarehouse by remember { mutableStateOf(false) }
     if (openAlertWarehouse) {
@@ -324,7 +329,9 @@ private fun ShowWarehouse(
     ) {
         CheckboxTextIcon(
             checked = state.isShowWarehouse,
-            onCheckedChange = { onValueChange(state.updateShowWarehouse(it)) },
+            onCheckedChange = {
+                onCheckboxClick(it)
+            },
             enabled = !state.isShowFood,
             intTitle = R.string.checkbox_show_warehouse,
             onClick = { openAlertWarehouse = !openAlertWarehouse }
@@ -336,7 +343,9 @@ private fun ShowWarehouse(
 private fun ShowAnimal(
     modifier: Modifier = Modifier,
     state: ExpensesEntryState,
-    onValueChange: (ExpensesEntryState) -> Unit
+    onShowAnimal: (Boolean) -> Unit,
+    onAnimalChipClick: (Long) -> Unit,
+    onAnimalSliderClick: (Pair<Long, Double>) -> Unit,
 ) {
     var openAlertAnimal by remember { mutableStateOf(false) }
     if (openAlertAnimal) {
@@ -354,7 +363,9 @@ private fun ShowAnimal(
     ) {
         CheckboxTextIcon(
             checked = state.isShowAnimals,
-            onCheckedChange = { onValueChange(state.updateShowAnimal(it)) },
+            onCheckedChange = {
+                onShowAnimal(it)
+            },
             enabled = !state.isShowFood,
             intTitle = R.string.checkbox_animals_expenses,
             onClick = { openAlertAnimal = !openAlertAnimal }
@@ -364,12 +375,12 @@ private fun ShowAnimal(
         if (state.isShowAnimals) {
             val totalFood = 100f
             FlowRow(modifier = Modifier.fillMaxWidth()) {
-                if (state.animalList2.isNotEmpty()) {
-                    state.animalList2.forEach { animal ->
+                if (state.pickList.animalList2.isNotEmpty()) {
+                    state.pickList.animalList2.forEach { animal ->
                         FilterChip(
                             selected = animal.ps,
                             onClick = {
-                                onValueChange(state.toggleAnimalSelection(animal.id))
+                                onAnimalChipClick(animal.id)
                             },
                             label = { Text(animal.name) },
                             leadingIcon = {
@@ -386,7 +397,7 @@ private fun ShowAnimal(
             }
 
             // Отображаем слайдеры для каждого выбранного животного
-            state.animalList2.filter { it.ps }.forEach { animal ->
+            state.pickList.animalList2.filter { it.ps }.forEach { animal ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -426,11 +437,9 @@ private fun ShowAnimal(
                     Slider(
                         value = animal.presentException.toFloat(),
                         onValueChange = { newValue ->
-                            onValueChange(
-                                state.updateAnimalSlider(
-                                    animal.id,
-                                    newValue.toDouble()
-                                )
+                            onAnimalSliderClick(
+                                animal.id to
+                                        newValue.toDouble()
                             )
                         },
                         valueRange = 0f..totalFood,
@@ -453,7 +462,8 @@ private fun ShowAnimal(
 @Composable
 private fun Checkbox(
     expensesTable: ExpensesEntryState,
-    onValueChange: (ExpensesEntryState) -> Unit,
+    onShowFoodClick: (Boolean) -> Unit,
+    onShowFoodHandClick: (Boolean) -> Unit,
 ) {
     //Подсказки
     var openAlertFood by remember { mutableStateOf(false) }
@@ -465,10 +475,14 @@ private fun Checkbox(
         )
     }
     val suffixSet =
-        setOf(Suffix.GRAM.asString(), Suffix.KILOGRAM.asString(), Suffix.TONS.asString())
+        setOf(
+            stringResource(Suffix.GRAM.toResId()),
+            stringResource(Suffix.KILOGRAM.toResId()),
+            stringResource(Suffix.TONS.toResId())
+        )
     CheckboxTextIcon(
         checked = expensesTable.isShowFood,
-        onCheckedChange = { onValueChange(expensesTable.updateShowFood(it)) },
+        onCheckedChange = { onShowFoodClick(it) },
         enabled = !(expensesTable.countSuffix !in suffixSet && !expensesTable.isAutoWeight),
         intTitle = R.string.checkbox_food,
         onClick = { openAlertFood = !openAlertFood }
@@ -476,17 +490,17 @@ private fun Checkbox(
     if (expensesTable.isShowFood)
         CheckboxTextIcon(
             checked = expensesTable.isShowFoodHand,
-            onCheckedChange = { onValueChange(expensesTable.updateDailyExpensesFoodAndCount(it)) },
+            onCheckedChange = { onShowFoodHandClick(it) },
             intTitle = R.string.checkbox_set_hand
         )
 }
 
 @Composable
 fun ChoiceAnimal(
-    state: ExpensesEntryState,
-    onValueChange: (ExpensesEntryState) -> Unit
+    animalListState: List<AnimalExpensesDomain>,
+    onAnimalChipClick: (AnimalExpensesDomain) -> Unit
 ) {
-    val animalList = state.animalList2.filter { it.foodDay != 0.0 }
+    val animalList = animalListState.filter { it.foodDay != 0.0 }
 
     if (animalList.isNotEmpty()) {
         Text(
@@ -501,7 +515,7 @@ fun ChoiceAnimal(
                 FilterChip(
                     selected = selected,
                     onClick = {
-                        onValueChange(state.toggleAnimalChipSelection(animal))
+                        onAnimalChipClick(animal)
                     },
                     label = { Text(animal.name) },
                     leadingIcon = if (selected) {
@@ -523,24 +537,26 @@ fun ChoiceAnimal(
 @Composable
 private fun InputText(
     state: ExpensesEntryState,
-    onValueChange: (ExpensesEntryState) -> Unit
+    onFeedFoodChanged: (String) -> Unit,
+    onFeedFoodSuffixClick: (String) -> Unit,
+    onCountAnimalChanged: (String) -> Unit,
 ) {
     var suffixCountAnimal by rememberSaveable { mutableStateOf(state.countSuffix) }
 
     OutlinedTextCountNoCard(
         value = state.feedFoodInput,
-        onValueChange = { onValueChange(state.updateDailyExpensesFood(it)) },
+        onValueChange = { onFeedFoodChanged(it) },
         versionDropMenu = 0,
         intRes = R.string.outlined_food_day_animals,
         intResSup = R.string.support_text_food_day,
         intResError = R.string.error_no_count_animals,
         isError = state.error.isErrorDailyExpensesFood,
         suffix = state.feedFoodInputSuffix,
-        onSuffixChance = { onValueChange(state.updateDailyExpensesFoodSuffix(it)) },
+        onSuffixChance = { onFeedFoodSuffixClick(it) },
     )
     OutlinedTextCountNoCard(
         value = state.countAnimalInput,
-        onValueChange = { onValueChange(state.updateCountAnimal(it)) },
+        onValueChange = { onCountAnimalChanged },
         versionDropMenu = 2,
         intRes = R.string.outlined_text_field_quantity,
         intResSup = R.string.support_text_count_animals,
@@ -558,16 +574,16 @@ private fun InputText(
 fun TextFoodExpenses(
     state: ExpensesEntryState
 ) {
-    val foodDesignedDayUI = state.updateSettingDay()
+//    val foodDesignedDayUI = state.updateSettingDay()
     Text(
         text = stringResource(
             R.string.expenses_entry_screen_food_day
         ).format(
             if (state.title == "") stringResource(R.string.support_text_food)
             else state.title,
-            if (foodDesignedDayUI.daysFood >= 1000) stringResource(R.string.support_text_more) else "",
-            foodDesignedDayUI.daysFood,
-            foodDesignedDayUI.dateEndFood,
+            if (state.daysFood >= 1000) stringResource(R.string.support_text_more) else "",
+            state.daysFood,
+            state.dateEndFood,
         )
     )
     if (!state.isShowFoodHand) {

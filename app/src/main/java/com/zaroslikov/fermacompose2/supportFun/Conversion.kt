@@ -1,5 +1,8 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.fermacompose2.R
+
 
 fun Double.convertSize(from: String, to: String): Double {
 
@@ -87,4 +90,20 @@ fun Double.convertVolume(from: String, to: String): Double {
         else -> this
     }
     return result
+}
+
+fun Category.toDrawRes() : Int{
+    return when(this) {
+        Category.ADD ->  R.drawable.baseline_add_circle_outline_24
+        Category.EXPENSES -> R.drawable.baseline_add_shopping_cart_24
+        Category.SALE -> R.drawable.baseline_add_card_24
+    }
+}
+
+fun Category.toResInt(): Int{
+    return when (this) {
+        Category.ADD -> R.string.add_screen_title
+        Category.EXPENSES -> R.string.expenses_screen_title
+        Category.SALE  -> R.string.sale_screen_title
+    }
 }

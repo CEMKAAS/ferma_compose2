@@ -7,8 +7,8 @@ import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.data.room.dto.sale.BrieflySaleDto
 import com.zaroslikov.data.room.dto.sale.BuyerPriceDto
-import com.zaroslikov.data.room.dto.sale.TitleSaleDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
+import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +43,7 @@ interface SaleDao {
                 " UNION " +
                 " SELECT title FROM expenses_table WHERE idPT=:id AND is_show_warehouse = 1 AND is_show_food != 1 GROUP BY title)"
     )
-    fun getItemsTitleSaleList(id: Long): Flow<List<TitleSaleDto>>
+    fun getItemsTitleSaleList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 
 
     @Query("SELECT category from sale_table Where idPT=:id group by category")

@@ -2,7 +2,7 @@ package com.zaroslikov.fermacompose2.base.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.fermacompose2.base.BaseIntent
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,7 +30,6 @@ abstract class BaseViewModel<STATE : BaseState, INTENT : BaseIntent>(
     private val _navigation = MutableSharedFlow<UiEvent>()
     val navigation = _navigation.asSharedFlow()
 
-    // ✅ Protected свойство для доступа к MutableSharedFlow
     protected val mutableEventFlow: MutableSharedFlow<UiEvent>
         get() = _navigation
 

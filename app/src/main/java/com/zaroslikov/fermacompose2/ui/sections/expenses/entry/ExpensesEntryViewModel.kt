@@ -1,33 +1,31 @@
 package com.zaroslikov.fermacompose2.ui.sections.expenses.entry
 
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.table.ferma.ExpensesAnimalTable
-import com.zaroslikov.data.room.mapper.table.toDomainMap
-import com.zaroslikov.data.room.mapper.table.toRoomMap
-import com.zaroslikov.data.room.dto.DataPairListState
-import com.zaroslikov.data.room.dto.DataStringListState
+import com.zaroslikov.domain.models.DomainExpensesAnimal
+import com.zaroslikov.domain.repository.ExpensesAnimalRepository
+import com.zaroslikov.domain.repository.ExpensesRepository
+import com.zaroslikov.domain.repository.WarehouseRepository
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.supportFun.convertWeight
+import com.zaroslikov.fermacompose2.supportFun.isSlash
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.ui.elements.Suffix
+import com.zaroslikov.fermacompose2.ui.elements.toResId
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
-import com.zaroslikov.fermacompose2.utils.SnackbarController
-import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.collections.forEach
 
@@ -35,220 +33,634 @@ import kotlin.collections.forEach
 @HiltViewModel
 class ExpensesEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository,
+    private val expensesAnimalRepository: ExpensesAnimalRepository,
+    private val warehouseRepository: WarehouseRepository,
+    private val expensesRepository: ExpensesRepository,
     private val resourceProvider: ResourceProvider
-) : ViewModel() {
+) : EntryViewModel<ExpensesEntryState, ExpensesEntryIntent>(ExpensesEntryState()) {
 
-    private val itemIdPT: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdPT])
-    private val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
-    val isEntry: Boolean = itemId == -1
+    private val itemIdPT: Long = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdPT])
+    private val itemId: Long = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
+    val isEntry: Boolean = itemId == -1L
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    override fun onIntent(intent: ExpensesEntryIntent) {
+        when (intent) {
+            is ExpensesEntryIntent.TitleChanged -> updateTitle(intent.value)
+            is ExpensesEntryIntent.TitleAndSuffixClicked -> updateTitleAndSuffix(
+                intent.title,
+                intent.suffix
+            )
+            is ExpensesEntryIntent.CountChanged -> updateCount(intent.value)
+            is ExpensesEntryIntent.SuffixClicked -> updateCountSuffix(intent.value)
+            is ExpensesEntryIntent.AutoWeightClicked -> updateAutoWeight(intent.value)
+            is ExpensesEntryIntent.WeightChanged -> updateState { it.copy(weight = intent.value) }
+            is ExpensesEntryIntent.WeightSuffixChanged -> updateState { it.copy(weightSuffix = intent.value) }
+            is ExpensesEntryIntent.PriceChanged -> updatePrice(intent.value)
+            is ExpensesEntryIntent.AutoPriceClicked -> updateAutoPrice(intent.value)
+            is ExpensesEntryIntent.CategoryChanged -> updateState { it.copy(category = intent.value) }
+            is ExpensesEntryIntent.DateClicked -> updateState { it.copy(date = intent.value) }
+            is ExpensesEntryIntent.NoteChanged -> updateState { it.copy(note = intent.value) }
 
+            is ExpensesEntryIntent.ShowFoodClicked -> updateShowFood(intent.value)
+            is ExpensesEntryIntent.ShowFoodHandClicked -> updateShowFoodHand(intent.value)
 
-    var expensesUiState by mutableStateOf(
-        ExpensesEntryState().copy(
-            isEntry = isEntry,
-            feedFoodChipSuffix = resourceProvider.getString(R.string.suffix_kilogram),
-            feedFoodInputSuffix = resourceProvider.getString(R.string.suffix_kilogram),
-            category = resourceProvider.getString(R.string.support_text_no_category),
-            countSuffix = resourceProvider.getString(R.string.suffix_pieces),
-            weightSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+            is ExpensesEntryIntent.AnimalChipClicked -> updateAnimalChipSelection(intent.value)
+            is ExpensesEntryIntent.FeedFoodChanged -> updateFeedFoodInput(intent.value)
+            is ExpensesEntryIntent.FeedFoodSuffixClicked -> updateFeedFoodInputSuffix(intent.value)
+            is ExpensesEntryIntent.CountAnimalChanged -> updateCountAnimal(intent.value)
+
+            is ExpensesEntryIntent.ShowWarehouseClicked -> updateState { it.copy(isShowWarehouse = intent.value) }
+            is ExpensesEntryIntent.ShowAnimalClicked -> updateShowAnimal(intent.value)
+            is ExpensesEntryIntent.AnimalChipByIdClicked -> updateAnimalSelectionById(intent.value)
+            is ExpensesEntryIntent.AnimalSliderClicked -> updateAnimalSlider(
+                intent.animal,
+                intent.newValue
+            )
+
+            ExpensesEntryIntent.Insert -> insert()
+            ExpensesEntryIntent.Update -> update()
+            ExpensesEntryIntent.Delete -> delete()
+
+        }
+    }
+
+    val suffixSet =
+        setOf(
+            resourceProvider.getString(Suffix.GRAM.toResId()),
+            resourceProvider.getString(Suffix.KILOGRAM.toResId()),
+            resourceProvider.getString(Suffix.TONS.toResId())
         )
-    )
-        private set
 
     init {
         viewModelScope.launch {
-            if (!isEntry) {
-                val domainExpensesTable = itemsRepository.getItemExpenses(itemId)
-                    .filterNotNull()
-                    .first()
-                    .toDomainMap()
+            loadData()
+            loadDataUpdate()
+        }
+    }
 
-                expensesUiState = expensesUiState.updateFromDomain(domainExpensesTable,
-                    suffix = resourceProvider.getString(R.string.suffix_kilogram),
-                    countSuffix = resourceProvider.getString(R.string.suffix_pieces) )
-            }
-            val animalList = itemsRepository.getItemsAnimalExpensesList2(itemIdPT, itemId.toLong())
-            expensesUiState = expensesUiState.copy(
-                animalList2 = animalList
+    suspend fun loadData() {
+        val titleList = expensesRepository.getItemsTitleExpensesList(itemIdPT).first()
+        val categoryList = expensesRepository.getItemsCategoryExpensesList(itemIdPT).first()
+        val animalList =
+            expensesRepository.getItemsAnimalExpensesList2(itemIdPT, itemId).first()
+
+        updateState {
+            it.copy(
+                isEntry = isEntry,
+                feedFoodChipSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+                feedFoodInputSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+                category = resourceProvider.getString(R.string.support_text_no_category),
+                countSuffix = resourceProvider.getString(R.string.suffix_pieces),
+                weightSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+                pickList = it.pickList.copy(
+                    titleList = titleList,
+                    categoryList = categoryList,
+                    animalList2 = animalList
+                )
             )
         }
     }
 
-    fun updateUiState(expensesEntryState: ExpensesEntryState) {
-        expensesUiState =
-            expensesEntryState
+    suspend fun loadDataUpdate() {
+        if (!isEntry) {
+            val domainExpensesTable = expensesRepository.getItemExpenses(itemId)
+                .filterNotNull()
+                .first()
+
+            updateState { it.updateFromDomain(domainExpensesTable) }
+        }
+    }
+
+    override fun insert() {
+        viewModelScope.launch {
+            if (!isError()) {
+                updateForSaveAnimalList()
+
+                val id = expensesRepository.insertExpenses(
+                    getState().updateForSave(itemIdPT = itemIdPT)
+                )
+                setExpensesAnimal(id)
+//                metricalExpenses() TODO Нужно придумать, как грамотно сохранять
+                navigateTo(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_expenses_s_s)
+                        .format(
+                            getState().title,
+                            getState().count,
+                            getState().countSuffix
+                        )
+                )
+            }
+        }
+    }
+
+    override fun update() {
+        viewModelScope.launch {
+            if (!isError()) {
+                updateForSaveAnimalList()
+                expensesRepository.updateExpenses(
+                    getState().updateForSave(
+                        id = itemId,
+                        itemIdPT = itemIdPT
+                    )
+                )
+                saveExpensesAnimal()
+                navigateTo(UiEvent.NavigateBack)
+                showMessage(
+                    resourceProvider.getString(R.string.toast_refresh_s_s)
+                        .format(
+                            getState().title,
+                            getState().count,
+                            getState().countSuffix
+                        )
+                )
+            }
+        }
+    }
+
+    override fun delete() {
+        viewModelScope.launch {
+            expensesRepository.deleteExpenses(
+                getState().updateForSave(itemIdPT = itemIdPT)
+            )
+            deleteExpensesAnimal()
+            navigateTo(UiEvent.NavigateBack)
+            showMessage(
+                resourceProvider.getString(R.string.toast_delete_s)
+                    .format(
+                        getState().title,
+                        getState().count,
+                        getState().countSuffix
+                    )
+            )
+        }
+    }
+
+
+    override fun validation() {
+        val (feedFood, countAnimal) = if (getState().isShowFoodHand) {
+            getState().feedFoodInput.isBlank() to getState().countAnimalInput.isBlank()
+        } else false to false
+
+        val isErrorFood =
+            if (getState().isShowFood && !getState().isShowFoodHand) getState().pickList.animalList2.filter { it.foodDay != 0.0 }
+                .none { it.ps == true } else false
+
+        val isErrorAnimal =
+            if (getState().isShowAnimals) getState().pickList.animalList2.none { it.ps == true } else false
+
+
+        val newError = ExpensesEntryState.ValidationError(
+            isErrorTitle = getState().title.isBlank(),
+            isErrorSlash = getState().title.isSlash(),
+            isErrorCount = getState().count.isBlank(),
+            isErrorPrice = getState().price.isBlank(),
+            isErrorFood = isErrorFood,
+            isErrorAnimal = isErrorAnimal,
+            isErrorDailyExpensesFood = feedFood,
+            isErrorCountAnimal = countAnimal
+        )
+        updateState {
+            it.copy(error = newError)
+        }
     }
 
     fun updateWarehouseUiState(name: String) {
         viewModelScope.launch {
-            expensesUiState = expensesUiState.copy(
-                countInWarehouse = itemsRepository.getCurrentBalanceProduct(name, itemId.toLong())
-                    .filterNotNull()
-                    .first()
-                    .toDomainMap()
-            )
-        }
-    }
-
-    val titleUiState: StateFlow<DataPairListState> =
-        itemsRepository.getItemsTitleExpensesList(itemIdPT).map { DataPairListState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataPairListState()
-            )
-
-    val categoryUiState: StateFlow<DataStringListState> =
-        itemsRepository.getItemsCategoryExpensesList(itemIdPT).map { DataStringListState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = DataStringListState()
-            )
-
-
-    fun insertItem() {
-        viewModelScope.launch {
-            if (!isError()) {
-                expensesUiState = expensesUiState.updateForSaveAnimalList()
-                val id = itemsRepository.insertExpenses(
-                    expensesUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
-                )
-                setExpensesAnimal(id)
-//                metricalExpenses() TODO Нужно придумать, как грамотно сохранять
-                _eventFlow.emit(UiEvent.NavigateBack)
-                showMessage(
-                    resourceProvider.getString(R.string.toast_expenses_s_s)
-                        .format(
-                            expensesUiState.title,
-                            expensesUiState.count,
-                            expensesUiState.countSuffix
-                        )
-                )
-            }
-        }
-    }
-
-    fun updateItem() {
-        viewModelScope.launch {
-            if (!isError()) {
-                expensesUiState = expensesUiState.updateForSaveAnimalList()
-                itemsRepository.updateExpenses(
-                    expensesUiState.updateForSave(
-                        id = itemId.toLong(),
-                        itemIdPT = itemIdPT.toLong()
-                    )
-                        .toRoomMap()
-                )
-                saveExpensesAnimal()
-                _eventFlow.emit(UiEvent.NavigateBack)
-                showMessage(
-                    resourceProvider.getString(R.string.toast_refresh_s_s)
-                        .format(
-                            expensesUiState.title,
-                            expensesUiState.count,
-                            expensesUiState.countSuffix
-                        )
-                )
-            }
-        }
-    }
-
-    fun deleteItem() {
-        viewModelScope.launch {
-            itemsRepository.deleteExpenses(
-                expensesUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
-            )
-            deleteExpensesAnimal()
-            _eventFlow.emit(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_delete_s)
-                    .format(
-                        expensesUiState.title,
-                        expensesUiState.count,
-                        expensesUiState.countSuffix
-                    )
-            )
+            val domainCountSuffix = warehouseRepository.getCurrentBalanceProduct(
+                name,
+                itemId
+            ).filterNotNull().first()
+            updateState { it.copy(countInWarehouse = domainCountSuffix) }
         }
     }
 
     private suspend fun setExpensesAnimal(id: Long) {
-        expensesUiState.animalList2.filter { it.ps }.map {
-            ExpensesAnimalTable(
+        getState().pickList.animalList2.filter { it.ps }.map {
+            DomainExpensesAnimal(
+                id = it.id,
                 idExpenses = id,
-                idAnimal = it.id.toLong(),
+                idAnimal = it.id,
                 percentExpenses = it.presentException,
-                idPT = itemIdPT.toLong()
+                idPT = itemIdPT
             )
         }.forEach {
-            itemsRepository.insertExpensesAnimal(it)
+            expensesAnimalRepository.insertExpensesAnimal(it)
         }
     }
 
     private suspend fun saveExpensesAnimal() {
-        expensesUiState.animalList2.forEach {
-            val table = ExpensesAnimalTable(
+        getState().pickList.animalList2.forEach {
+            val table = DomainExpensesAnimal(
                 id = it.idExpensesAnimal,
-                idExpenses = itemId.toLong(),
-                idAnimal = it.id.toLong(),
+                idExpenses = itemId,
+                idAnimal = it.id,
                 percentExpenses = it.presentException,
-                idPT = itemIdPT.toLong()
+                idPT = itemIdPT
             )
 
             when {
-                it.ps && it.idExpensesAnimal == 0L -> itemsRepository.insertExpensesAnimal(table)
-                it.ps -> itemsRepository.updateExpensesAnimal(table)
-                else -> itemsRepository.deleteExpensesAnimal(table)
+                it.ps && it.idExpensesAnimal == 0L -> expensesAnimalRepository.insertExpensesAnimal(
+                    table
+                )
+
+                it.ps -> expensesAnimalRepository.updateExpensesAnimal(table)
+                else -> expensesAnimalRepository.deleteExpensesAnimal(table)
             }
         }
     }
 
     suspend fun deleteExpensesAnimal() {
-        expensesUiState.animalList2.filter { it.idExpensesAnimal != 0L }
+        getState().pickList.animalList2.filter { it.idExpensesAnimal != 0L }
             .forEach {
-                val table = ExpensesAnimalTable(
+                val table = DomainExpensesAnimal(
                     id = it.idExpensesAnimal,
-                    idExpenses = itemId.toLong(),
-                    idAnimal = it.id.toLong(),
+                    idExpenses = itemId,
+                    idAnimal = it.id,
                     percentExpenses = it.presentException,
-                    idPT = itemIdPT.toLong()
+                    idPT = itemIdPT
                 )
-                itemsRepository.deleteExpensesAnimal(table)
+                expensesAnimalRepository.deleteExpensesAnimal(table)
             }
     }
 
-    private fun isError(): Boolean {
-        updateUiState(expensesUiState.validate())
-        return expensesUiState.hasAnyError
-    }
 
-    private fun showMessage(message: String) {
-        viewModelScope.launch {
-            SnackbarController.sendEvent(
-                event = SnackbarEvent(
-                    message = message
+    private fun updateTitle(title: String) {
+        updateState {
+            it.copy(
+                title = title,
+                error = it.error.copy(
+                    isErrorTitle = title.isBlank(),
+                    isErrorSlash = title.isSlash()
                 )
             )
         }
     }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+    private fun updateTitleAndSuffix(
+        title: String,
+        suffix: String
+    ) {
+        updateState {
+            it.copy(
+                title = title,
+                countSuffix = suffix,
+                isShowFood = if (suffix !in suffixSet && !getState().isAutoWeight) false else getState().isShowFood,
+                isShowFoodHand = if (suffix !in suffixSet && !getState().isAutoWeight) false else getState().isShowFoodHand,
+                error = it.error.copy(
+                    isErrorTitle = title.isBlank(),
+                    isErrorSlash = title.isSlash()
+                )
+            )
+        }
+    }
+
+    fun updateCount(count: String) {
+        updateState {
+            it.copy(
+                count = count,
+                error = it.error.copy(
+                    isErrorCount = count.isBlank()
+                )
+            )
+        }
+        updatePriceAll()
+    }
+
+
+    private fun updateCountSuffix(
+        suffix: String
+    ) {
+        updateState {
+            it.copy(
+                countSuffix = suffix,
+                isAutoWeight = if (suffix in suffixSet) false else getState().isAutoWeight,
+                isShowFood = if (suffix !in suffixSet && !getState().isAutoWeight) false else getState().isShowFood,
+                isShowFoodHand = if (suffix !in suffixSet && !getState().isAutoWeight) false else getState().isShowFoodHand
+            )
+        }
+    }
+
+    private fun updateAutoWeight(
+        isAutoWeight: Boolean
+    ) {
+        updateState {
+            it.copy(
+                isAutoWeight = isAutoWeight,
+                isShowFood = if (getState().countSuffix !in suffixSet && !isAutoWeight) false else getState().isShowFood,
+                isShowFoodHand = if (getState().countSuffix !in suffixSet && !isAutoWeight) false else getState().isShowFoodHand
+            )
+        }
+    }
+
+    private fun updatePrice(price: String) {
+        updateState {
+            it.copy(
+                price = price,
+                error = it.error.copy(
+                    isErrorPrice = price.isBlank()
+                )
+            )
+        }
+        updatePriceAll()
+    }
+
+    private fun updateAutoPrice(isAutoCalculate: Boolean) {
+        updateState {
+            it.copy(isAutoPrice = isAutoCalculate)
+        }
+        updatePriceAll()
+    }
+
+    private fun updatePriceAll() {
+        updateState {
+            it.copy(
+                priceAll = if (it.isAutoPrice) (it.price.toConvertZeroDouble() * it.count.toConvertZeroDouble()).formatNumber() else "0"
+            )
+        }
+    }
+
+
+    private fun updateShowFood(showFood: Boolean) {
+        updateState { state ->
+            state.copy(
+                isShowFood = showFood,
+                isShowWarehouse = showFood,
+                isShowAnimals = false,
+                pickList = state.pickList.copy(
+                    animalList2 = state.pickList.animalList2.map { it.copy(ps = false) }
+                ),
+                error = state.error.copy(
+                    isErrorFood = false,
+                    isErrorAnimal = false
+                )
+            )
+        }
+    }
+
+    private fun updateShowFoodHand(dailyExpensesFoodAndCount: Boolean) {
+        updateState {
+            it.copy(
+                isShowFoodHand = dailyExpensesFoodAndCount,
+                error = it.error.copy(
+                    isErrorFood = false
+                )
+            )
+        }
+    }
+
+    private fun updateFeedFoodInput(feedFood: String) {
+        updateState {
+            it.copy(
+                feedFoodInput = feedFood,
+                error = it.error.copy(
+                    isErrorDailyExpensesFood = feedFood.isBlank()
+                )
+            )
+        }
+    }
+
+    private fun updateFeedFoodInputSuffix(feedFoodSuffix: String) {
+        updateState {
+            it.copy(
+                feedFoodInputSuffix = feedFoodSuffix,
+            )
+        }
+    }
+
+    fun updateCountAnimal(countAnimal: String) {
+        updateState {
+            it.copy(
+                countAnimalInput = countAnimal,
+                error = it.error.copy(
+                    isErrorCountAnimal = countAnimal.isBlank()
+                )
+            )
+        }
+    }
+
+    private fun updateAnimalChipSelection(
+        toggledAnimal: AnimalExpensesDomain
+    ) {
+        val newSelected = !toggledAnimal.ps
+
+        // Обновляем список животных с пересчетом presentException
+        val updatedAnimals = getState().pickList.animalList2.map {
+            if (it.id == toggledAnimal.id) {
+                val convertedFood =
+                    it.foodDay.convertWeight(it.foodDaySuffix, getState().feedFoodChipSuffix)
+                val dailyFood = convertedFood * it.countAnimal
+
+                it.copy(
+                    ps = newSelected,
+                    presentException = if (newSelected) (it.foodDay / dailyFood) * 100.0 else 0.0
+                )
+            } else it
+        }
+
+        // Сумма по выбранным животным
+        val updatedCountAnimal = updatedAnimals
+            .filter { it.ps }
+            .sumOf { it.countAnimal }
+            .toString()
+
+
+        val updatedDailyFood = updatedAnimals
+            .filter { it.ps }
+            .sumOf {
+                it.foodDay.convertWeight(
+                    it.foodDaySuffix,
+                    getState().feedFoodChipSuffix
+                ) * it.countAnimal
+            }
+            .toString()
+
+
+        updateState { state ->
+            state.copy(
+                feedFoodChip = updatedDailyFood,
+                countAnimalChip = updatedCountAnimal,
+                pickList = state.pickList.copy(animalList2 = updatedAnimals),
+                error = state.error.copy(isErrorFood = false)
+            )
+        }
+    }
+
+    private fun updateShowAnimal(showAnimal: Boolean) {
+        updateState { state ->
+            state.copy(
+                isShowFoodHand = false,
+                isShowAnimals = showAnimal,
+                pickList = state.pickList.copy(
+                    animalList2 = state.pickList.animalList2.map { it.copy(ps = false) }
+                ),
+                error = state.error.copy(
+                    isErrorAnimal = false
+                )
+            )
+        }
+    }
+
+    // Хелпер: Перераспределить presentException для всех выбранных
+    fun redistributeSelectedShare(totalShare: Double = 100.0) {
+        val selected = getState().pickList.animalList2.filter { it.ps }
+        val equalShare = if (selected.isNotEmpty()) totalShare / selected.size else 0.0
+
+        val updatedList = getState().pickList.animalList2.map {
+            if (it.ps) it.copy(presentException = equalShare) else it.copy(presentException = 0.0)
+        }
+
+        updateState {
+            it.copy(
+                pickList = it.pickList.copy(
+                    animalList2 = updatedList
+                ),
+                error = it.error.copy(
+                    isErrorAnimal = false
+                )
+            )
+        }
+    }
+
+
+    // Хелпер: Обновить ps у одного животного
+    private fun updateAnimalSelectionById(animalId: Long) {
+        val updatedList = getState().pickList.animalList2.map {
+            if (it.id == animalId) it.copy(ps = !it.ps) else it
+        }
+
+        updateState {
+            it.copy(
+                pickList = it.pickList.copy(
+                    animalList2 = updatedList
+                )
+            )
+        }
+        redistributeSelectedShare()
+    }
+
+
+    // Хелпер: Обновить presentException у одного животного, перераспределить остаток
+    private fun updateAnimalSlider(
+        animalId: Long,
+        newValue: Double,
+        totalShare: Double = 100.0
+    ) {
+        val selectedAnimals = getState().pickList.animalList2.filter { it.ps }
+        val remainingShare = (totalShare - newValue).coerceAtLeast(0.0)
+        val othersCount = selectedAnimals.size - 1
+
+        val updatedList = getState().pickList.animalList2.map {
+            when {
+                it.id == animalId -> it.copy(presentException = newValue)
+                it.ps -> {
+                    val redistributed =
+                        if (othersCount > 0) remainingShare / othersCount else 0.0
+                    it.copy(presentException = redistributed)
+                }
+
+                else -> it.copy(presentException = 0.0)
+            }
+        }
+        updateState {
+            it.copy(
+                pickList = it.pickList.copy(
+                    animalList2 = updatedList
+                )
+            )
+        }
+    }
+
+    private fun updateSettingDay() {
+        val dailyExpensesFoodAndCount = getState().isShowFoodHand
+
+        val countTable = getState().count.toConvertZeroDouble()
+        val weight = getState().weight.toConvertZeroDouble()
+
+        val countAnimal = if (dailyExpensesFoodAndCount)
+            getState().countAnimalInput.toConvertZeroDouble() else getState().countAnimalChip.toConvertZeroDouble()
+        val dailyExpensesFood = if (dailyExpensesFoodAndCount)
+            getState().feedFoodInput.toConvertZeroDouble() else getState().feedFoodChip.toConvertZeroDouble()
+
+        val countProduct =
+            if (getState().isAutoWeight) {
+                (countTable * weight)
+                    .convertWeight(
+                        getState().weightSuffix,
+                        getState().feedFoodChipSuffix
+                    )
+            } else countTable.convertWeight(
+                getState().countSuffix,
+                getState().feedFoodChipSuffix
+            )
+
+        val foodDay =
+            if (dailyExpensesFoodAndCount) dailyExpensesFood
+                .convertWeight(
+                    getState().feedFoodInputSuffix,
+                    getState().feedFoodChipSuffix
+                )
+            else dailyExpensesFood
+
+        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        val dateLocal = LocalDate.parse(getState().date, formatter)
+
+        var days =
+            (if (dailyExpensesFoodAndCount) countProduct / (countAnimal * foodDay)
+            else countProduct / foodDay).toLong()
+
+        if (days > 1000) days = 1000
+        val newDate = dateLocal.plusDays(days)
+
+        updateState {
+            it.copy(
+                daysFood = days.toInt(), dateEndFood = newDate.format(formatter)
+            )
+        }
+    }
+
+    private fun updateForSaveAnimalList() {
+        updateState {
+            it.copy(
+                pickList = it.pickList.copy(
+                    animalList2 = if (it.isShowFoodHand && it.isShowFood) emptyList()
+                    else it.pickList.animalList2
+                )
+            )
+        }
     }
 }
 
-//TODO придумать, что деать с этими классами
-data class AnimalExpensesList2(
-    val id: Int,
-    val name: String,
-    val foodDay: Double,
-    val foodDaySuffix: String,
-    val countAnimal: Int,
-    val idExpensesAnimal: Long,
-    val ps: Boolean = false,
-    val presentException: Double = 0.0,
-)
+sealed class ExpensesEntryIntent : BaseIntent {
+    data class TitleChanged(val value: String) : ExpensesEntryIntent()
+    data class TitleAndSuffixClicked(val title: String, val suffix: String) :
+        ExpensesEntryIntent()
+
+    data class CountChanged(val value: String) : ExpensesEntryIntent()
+    data class SuffixClicked(val value: String) : ExpensesEntryIntent()
+    data class WeightChanged(val value: String) : ExpensesEntryIntent()
+    data class WeightSuffixChanged(val value: String) : ExpensesEntryIntent()
+    data class AutoWeightClicked(val value: Boolean) : ExpensesEntryIntent()
+    data class PriceChanged(val value: String) : ExpensesEntryIntent()
+    data class AutoPriceClicked(val value: Boolean) : ExpensesEntryIntent()
+    data class CategoryChanged(val value: String) : ExpensesEntryIntent()
+    data class DateClicked(val value: String) : ExpensesEntryIntent()
+    data class NoteChanged(val value: String) : ExpensesEntryIntent()
+
+    data class ShowFoodClicked(val value: Boolean) : ExpensesEntryIntent()
+    data class ShowFoodHandClicked(val value: Boolean) : ExpensesEntryIntent()
+    data class AnimalChipClicked(val value: AnimalExpensesDomain) : ExpensesEntryIntent()
+    data class FeedFoodChanged(val value: String) : ExpensesEntryIntent()
+    data class FeedFoodSuffixClicked(val value: String) : ExpensesEntryIntent()
+    data class CountAnimalChanged(val value: String) : ExpensesEntryIntent()
+    data class ShowWarehouseClicked(val value: Boolean) : ExpensesEntryIntent()
+    data class ShowAnimalClicked(val value: Boolean) : ExpensesEntryIntent()
+    data class AnimalChipByIdClicked(val value: Long) : ExpensesEntryIntent()
+    data class AnimalSliderClicked(val animal: Long, val newValue: Double) :
+        ExpensesEntryIntent()
+
+
+    data object Insert : ExpensesEntryIntent()
+    data object Update : ExpensesEntryIntent()
+    data object Delete : ExpensesEntryIntent()
+}

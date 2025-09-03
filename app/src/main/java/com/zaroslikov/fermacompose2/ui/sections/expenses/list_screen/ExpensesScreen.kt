@@ -38,20 +38,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.table.ferma.ExpensesTable
-import com.zaroslikov.data.room.dto.BrieflyItemPrice
+import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
+import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.composeElement.CardField
-import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
-import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
-import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
-import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
-import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
+import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.FloatButton
+import com.zaroslikov.fermacompose2.ui.elements.IconAndText
+import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.TextLine
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
@@ -73,18 +74,15 @@ fun ExpensesScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: (Int) -> Unit,
+    navigateToItemAdd: (Long) -> Unit,
     drawerState: DrawerState,
     viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.homeUiState.collectAsState()
-    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    val idProject = viewModel.itemId
     val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val idProject = state.idPT
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -113,7 +111,7 @@ fun ExpensesScreen(
                 FloatButton { navigateToItemAdd(idProject) }
             }
         ) { innerPadding ->
-            if (isLoading) {
+            if (state.isLoading) {
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
@@ -121,8 +119,8 @@ fun ExpensesScreen(
                 ExpensesBody(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
-                    itemList = homeUiState.itemList,
-                    brieflyList = brieflyUiState.itemList,
+                    itemList = state.list,
+                    brieflyList = state.briefly,
                     viewModel = viewModel,
                     onItemClick = navigateToItemUpdate,
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
@@ -136,8 +134,8 @@ fun ExpensesScreen(
 private fun ExpensesBody(
     modifier: Modifier = Modifier,
     viewModel: ExpensesViewModel,
-    itemList: List<ExpensesTable>,
-    brieflyList: List<BrieflyItemPrice>,
+    itemList: List<DomainExpensesTable>,
+    brieflyList: List<BrieflyExpensesDomain>,
     onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit
 ) {
@@ -162,9 +160,9 @@ private fun ExpensesBody(
 @Composable
 private fun InventoryList(
     viewModel: ExpensesViewModel,
-    itemList: List<ExpensesTable>,
-    brieflyList: List<BrieflyItemPrice>,
-    onItemClick: (ExpensesTable) -> Unit,
+    itemList: List<DomainExpensesTable>,
+    brieflyList: List<BrieflyExpensesDomain>,
+    onItemClick: (DomainExpensesTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
@@ -221,8 +219,8 @@ private fun InventoryList(
 @Composable
 fun BrieflyPriceCard(
     viewModel: ExpensesViewModel,
-    product: BrieflyItemPrice,
-    onItemClick: (ExpensesTable) -> Unit,
+    product: BrieflyExpensesDomain,
+    onItemClick: (DomainExpensesTable) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -290,7 +288,7 @@ fun BrieflyPriceCard(
 
 @Composable
 fun ExpensesCard(
-    expensesTable: ExpensesTable,
+    expensesTable: DomainExpensesTable,
     modifier: Modifier = Modifier
 ) {
     val price = expensesTable.priceAll ?: expensesTable.price
@@ -327,7 +325,7 @@ fun ExpensesCard(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
                         expensesTable.day,
-                        expensesTable.mount,
+                        expensesTable.month,
                         expensesTable.year
                     )
                 )
@@ -343,9 +341,7 @@ fun ExpensesCard(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
                         valueString = expensesTable.note
                     )
-
             }
-
             Text(
                 text = stringResource(
                     R.string.card_count_s,

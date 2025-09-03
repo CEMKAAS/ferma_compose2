@@ -1,3 +1,4 @@
+/*
 package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.annotation.StringRes
@@ -28,13 +29,13 @@ import com.zaroslikov.fermacompose2.supportFun.dateLongToString
 import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQL
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.composeElement.CardFinance
-import com.zaroslikov.fermacompose2.ui.composeElement.CardFinanceOutlined
-import com.zaroslikov.fermacompose2.ui.composeElement.CardFinanceOutlinedRow
-import com.zaroslikov.fermacompose2.ui.composeElement.DateRangePickerModal
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreen
-import com.zaroslikov.fermacompose2.ui.composeElement.textBold_16
+import com.zaroslikov.fermacompose2.ui.elements.CardFinance
+import com.zaroslikov.fermacompose2.ui.elements.CardFinanceOutlined
+import com.zaroslikov.fermacompose2.ui.elements.CardFinanceOutlinedRow
+import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import io.appmetrica.analytics.AppMetrica
 
 
@@ -245,3 +246,4 @@ fun LazyRowMount(
 }
 
 
+*/

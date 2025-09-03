@@ -30,11 +30,11 @@ import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesDestination
-import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
+//import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.HomeDestination
-import com.zaroslikov.fermacompose2.ui.note.NoteDestination
+import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
+//import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.CoroutineScope
@@ -61,12 +61,12 @@ fun DrawerSheet(
         DrawerItems(
             R.drawable.baseline_arrow_back_24, "Вернуться к проектам", StartDestination.route
         ),
-        DrawerItems(
-            R.drawable.baseline_warehouse_24, "Мой Склад", WarehouseDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_currency_ruble_24, "Мои Финансы", FinanceDestination.route
-        ),
+//        DrawerItems(
+//            R.drawable.baseline_warehouse_24, "Мой Склад", WarehouseDestination.route
+//        ),
+//        DrawerItems(
+//            R.drawable.baseline_currency_ruble_24, "Мои Финансы", FinanceDestination.route
+//        ),
         DrawerItems(
             R.drawable.baseline_add_circle_outline_24, "Моя Продукция", HomeDestination.route
         ),

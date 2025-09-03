@@ -3,8 +3,8 @@ package com.zaroslikov.domain.repository
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
-import com.zaroslikov.domain.models.dto.sale.TitleSaleDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
+import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import kotlinx.coroutines.flow.Flow
 
@@ -14,7 +14,7 @@ interface SaleRepository {
     fun getItemSaleIdCountAnimal(id: Long): Flow<DomainSaleTable>
     fun getBrieflyItemSale(id: Long): Flow<List<BrieflySaleDomain>>
     fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<DomainSaleTable>>
-    fun getItemsTitleSaleList(id: Long): Flow<List<TitleSaleDomain>>
+    fun getItemsTitleSaleList(id: Long): Flow<List<DomainTitleSuffixCategory>>
     fun getItemsCategorySaleList(id: Long): Flow<List<String>>
     fun getItemsBuyerSaleList(id: Long): Flow<List<String>>
     suspend fun insertSale(item: DomainSaleTable)

@@ -37,26 +37,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.table.ferma.AddTable
-import com.zaroslikov.data.room.dto.BrieflyItemCount
+import com.zaroslikov.domain.models.DomainAddTable
+import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.composeElement.CardField
-import com.zaroslikov.fermacompose2.ui.composeElement.CircularProgress
-import com.zaroslikov.fermacompose2.ui.composeElement.FloatButton
-import com.zaroslikov.fermacompose2.ui.composeElement.IconAndText
-import com.zaroslikov.fermacompose2.ui.composeElement.MessageNoData
-import com.zaroslikov.fermacompose2.ui.composeElement.TextLine
-import com.zaroslikov.fermacompose2.ui.composeElement.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.composeElement.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.composeElement.textBold_20
+import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.FloatButton
+import com.zaroslikov.fermacompose2.ui.elements.IconAndText
+import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.TextLine
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.warehouse.AnalysisNav
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 import io.appmetrica.analytics.AppMetrica
 
@@ -74,19 +73,15 @@ fun AddScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: (Int) -> Unit,
-    navigationToAnalysis: (AnalysisNav) -> Unit,
+    navigateToItemAdd: (Long) -> Unit,
+    navigationToAnalysis: (Pair<Long, String>) -> Unit,
     drawerState: DrawerState,
-    viewModel: AddViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AddViewModel = hiltViewModel()
 ) {
-    val idProject = viewModel.itemId
-
-    val homeUiState by viewModel.homeUiState.collectAsState()
-    val brieflyUiState by viewModel.brieflyUiState.collectAsState()
-
-    val isLoading by viewModel.isLoading.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val idProject = state.idPT
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -114,7 +109,7 @@ fun AddScreen(
             floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
 
         ) { innerPadding ->
-            if (isLoading)
+            if (state.isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
@@ -122,13 +117,13 @@ fun AddScreen(
                 AddContainer(
                     modifier = modifier
                         .modifierScreenLazy(innerPadding),
-                    itemList = homeUiState.itemList,
-                    brieflyList = brieflyUiState.itemList,
+                    itemList = state.list,
+                    brieflyList = state.briefly,
                     viewModel = viewModel,
                     onItemClick = navigateToItemUpdate,
                     navigateToItemAdd = { navigateToItemAdd(idProject) },
                     navigationToAnalysis = {
-                        navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
+                        navigationToAnalysis(idProject to it)
                         AppMetrica.reportEvent("Анализ через Продукцию")
                     }
                 )
@@ -141,8 +136,8 @@ fun AddScreen(
 fun AddContainer(
     modifier: Modifier = Modifier,
     viewModel: AddViewModel,
-    itemList: List<AddTable>,
-    brieflyList: List<BrieflyItemCount>,
+    itemList: List<DomainAddTable>,
+    brieflyList: List<BrieflyAddDomain>,
     onItemClick: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: () -> Unit,
     navigationToAnalysis: (String) -> Unit,
@@ -154,9 +149,8 @@ fun AddContainer(
             viewModel = viewModel,
             onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
             modifier = modifier,
-            navigationToAnalysis = navigationToAnalysis,
-
-            )
+            navigationToAnalysis = navigationToAnalysis
+        )
     else MessageNoData(
         modifier = modifier,
         onClick = navigateToItemAdd,
@@ -172,9 +166,9 @@ fun AddContainer(
 fun InventoryList(
     modifier: Modifier = Modifier,
     viewModel: AddViewModel,
-    itemList: List<AddTable>,
-    brieflyList: List<BrieflyItemCount>,
-    onItemClick: (AddTable) -> Unit,
+    itemList: List<DomainAddTable>,
+    brieflyList: List<BrieflyAddDomain>,
+    onItemClick: (DomainAddTable) -> Unit,
     navigationToAnalysis: (String) -> Unit,
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
@@ -198,7 +192,6 @@ fun InventoryList(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
     ) {
-
         item {
             TextButtonWarehouse(
                 boolean = details,
@@ -206,10 +199,10 @@ fun InventoryList(
                 intRes = if (details) R.string.widget_briefly else R.string.widget_detail
             )
         }
-
         if (details)
             items(items = itemList, key = { it.id }) { item ->
-                AddProductCard(addProduct = item,
+                AddProductCard(
+                    addProduct = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
                         .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
@@ -232,11 +225,10 @@ fun InventoryList(
 fun BrieflyCountCard(
     modifier: Modifier = Modifier,
     viewModel: AddViewModel,
-    product: BrieflyItemCount,
-    onItemClick: (AddTable) -> Unit,
-    navigationToAnalysis: (String) -> Unit = {},
-
-    ) {
+    product: BrieflyAddDomain,
+    onItemClick: (DomainAddTable) -> Unit,
+    navigationToAnalysis: (String) -> Unit = {}
+) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val extraPadding by animateDpAsState(
@@ -290,7 +282,8 @@ fun BrieflyCountCard(
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            AddProductCard(addProduct = it,
+            AddProductCard(
+                addProduct = it,
                 modifier = Modifier
                     .graphicsLayer {
                         scaleX = 0.95f
@@ -305,7 +298,7 @@ fun BrieflyCountCard(
 
 @Composable
 fun AddProductCard(
-    addProduct: AddTable,
+    addProduct: DomainAddTable,
     modifier: Modifier = Modifier
 ) {
     CardField(modifier = modifier) {
@@ -320,7 +313,6 @@ fun AddProductCard(
                     .fillMaxWidth()
                     .weight(0.7f)
             ) {
-
                 Text(
                     modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
                     text = addProduct.title,
@@ -328,16 +320,14 @@ fun AddProductCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 IconAndText(
                     iconRes = R.drawable.baseline_calendar_month_24,
                     valueString = dateBuilder(
                         addProduct.day,
-                        addProduct.mount,
+                        addProduct.month,
                         addProduct.year
                     )
                 )
-
                 addProduct.category.takeUnless { it == "Без категории" || it.isEmpty() }
                     ?.let { category ->
                         IconAndText(
@@ -352,15 +342,12 @@ fun AddProductCard(
 //                        valueString = addProduct.animal
 //                    )
 
-
                 if (addProduct.note != "")
                     IconAndText(
                         iconRes = R.drawable.baseline_sticky_note_2_24,
                         valueString = addProduct.note
                     )
-
             }
-
             Text(
                 text = "${addProduct.count.formatNumber()} ${addProduct.countSuffix}",
                 textAlign = TextAlign.Center,

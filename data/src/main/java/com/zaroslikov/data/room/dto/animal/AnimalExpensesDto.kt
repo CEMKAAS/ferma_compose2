@@ -1,7 +1,7 @@
 package com.zaroslikov.data.room.dto.animal
 
 data class AnimalExpensesDto(
-    val id: Int,
+    val id: Long,
     val name: String,
     val foodDay: Double,
     val foodDaySuffix: String,

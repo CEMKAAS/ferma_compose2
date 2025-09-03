@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
+import com.zaroslikov.domain.repository.AnimalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AnimalViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository
+    private val animalRepository: AnimalRepository
 ) : ViewModel() {
 
 
@@ -27,7 +28,7 @@ class AnimalViewModel @Inject constructor(
     val isLoading: StateFlow<Boolean> = _isLoading
 
     val animalUiState: StateFlow<AnimalUiState> =
-        itemsRepository.getAllAnimal(itemId).map { AnimalUiState(it) }.onStart {
+        animalRepository.getAllAnimal(itemId).map { AnimalUiState(it) }.onStart {
             // Устанавливаем состояние загрузки перед началом загрузки данных
             _isLoading.value = true
         }.onEach {

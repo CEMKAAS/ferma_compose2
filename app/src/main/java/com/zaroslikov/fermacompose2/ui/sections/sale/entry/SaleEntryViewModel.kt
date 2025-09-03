@@ -1,22 +1,20 @@
 package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.mapper.table.toRoomMap
-import com.zaroslikov.data.room.mapper.table.toDomainMap
-import com.zaroslikov.fermacompose2.ui.composeElement.Category
+import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.WarehouseRepository
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.supportFun.isSlash
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
-import com.zaroslikov.fermacompose2.utils.SnackbarController
-import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -26,58 +24,73 @@ import javax.inject.Inject
 @HiltViewModel
 class SaleEntryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository,
+    private val saleRepository: SaleRepository,
+    private val warehouseRepository: WarehouseRepository,
     private val resourceProvider: ResourceProvider,
-) : ViewModel() {
+) : EntryViewModel<SaleEntryState, SaleEntryIntent>(SaleEntryState()) {
 
-    private val itemIdPT: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdPT])
-    private val itemId: Int = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
-    val isEntry: Boolean = itemId == -1
+    private val itemIdPT: Long = checkNotNull(savedStateHandle[SaleEntryDestination.itemIdPT])
+    private val itemId: Long = checkNotNull(savedStateHandle[SaleEntryDestination.itemId])
+    val isEntry: Boolean = itemId == -1L
 
-    var saleUiState by mutableStateOf(
-        SaleEntryState().copy(
-            isEntry = isEntry,
-            category = resourceProvider.getString(R.string.support_text_no_category),
-            countSuffix = resourceProvider.getString(R.string.suffix_pieces),
-            buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer)
-        )
-    )
-        private set
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    override fun onIntent(intent: SaleEntryIntent) {
+        when (intent) {
+            is SaleEntryIntent.TitleChanged -> updateTitle(intent.value)
+            is SaleEntryIntent.TitleAndSuffixClicked -> updateTitleAndSuffix(
+                intent.title,
+                intent.suffix
+            )
+            is SaleEntryIntent.SuffixClicked -> updateState { it.copy(countSuffix = intent.value) }
+            is SaleEntryIntent.CountChanged -> updateCount(intent.value)
+            is SaleEntryIntent.AutoPriceClicked -> updateIsAutoPrice(intent.value)
+            is SaleEntryIntent.PriceChanged -> updatePrice(intent.value)
+            is SaleEntryIntent.CategoryChanged -> updateState { it.copy(category = intent.value) }
+            is SaleEntryIntent.BuyerChanged -> updateState { it.copy(buyer = intent.value) }
+            SaleEntryIntent.BuyerClearClicked -> updateState { it.copy(buyer = "") }
+            is SaleEntryIntent.DateClicked -> updateState { it.copy(date = intent.value) }
+            is SaleEntryIntent.NoteChanged -> updateState { it.copy(note = intent.value) }
+            SaleEntryIntent.Insert -> insert()
+            SaleEntryIntent.Update -> update()
+            SaleEntryIntent.Delete -> delete()
+        }
+    }
 
     init {
         viewModelScope.launch {
             if (!isEntry) {
-                val domainSaleTable = itemsRepository.getItemSale(itemId)
+                val domainSaleTable = saleRepository.getItemSale(itemId)
                     .filterNotNull()
                     .first()
-                    .toDomainMap()
 
-                saleUiState = saleUiState.updateFromDomain(domainSaleTable)
+                updateState { it.updateFromDomain(domainSaleTable) }
             }
 
-            val titleList = itemsRepository.getItemsTitleSaleList(itemIdPT).first()
-            val categoryList = itemsRepository.getItemsCategorySaleList(itemIdPT).first()
-            val buyerList = itemsRepository.getItemsBuyerSaleList(itemIdPT).first()
-            saleUiState = saleUiState.updateList(
-                titleList, categoryList, buyerList
-            )
+            val titleList = saleRepository.getItemsTitleSaleList(itemIdPT).first()
+            val categoryList = saleRepository.getItemsCategorySaleList(itemIdPT).first()
+            val buyerList = saleRepository.getItemsBuyerSaleList(itemIdPT).first()
+            updateState {
+                it.copy(
+                    isEntry = isEntry,
+                    category = resourceProvider.getString(R.string.support_text_no_category),
+                    countSuffix = resourceProvider.getString(R.string.suffix_pieces),
+                    buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
+                    pickList = it.pickList.copy(
+                        titleList = titleList,
+                        categoryList = categoryList,
+                        buyerList = buyerList
+                    )
+                )
+            }
 
-            val suffix = saleUiState.titleList
-                .firstOrNull { it.first == saleUiState.title }
-                ?.third
+            val suffix = getState().pickList.titleList
+                .firstOrNull { it.title == getState().title }
+                ?.category
 
-           suffix?.let {
-               if (!isEntry) updateWarehouseUiStateSync(saleUiState.title, it)
-           }
+            suffix?.let {
+                if (!isEntry) updateWarehouseUiStateSync(getState().title, it)
+            }
         }
-    }
-
-    fun updateUiState(state: SaleEntryState) {
-        saleUiState =
-            state
     }
 
     fun updateWarehouseUiState(name: String, category: Category) {
@@ -87,89 +100,179 @@ class SaleEntryViewModel @Inject constructor(
     }
 
     private suspend fun updateWarehouseUiStateSync(name: String, category: Category) {
-        val pair = if (category == Category.EXPENSES) {
-            itemsRepository.getCurrentExpensesProductList(name, itemIdPT.toLong())
+        val pair = if (category == Category.EXPENSES)
+            warehouseRepository.getCurrentExpensesProductList(name, itemIdPT.toLong())
                 .filterNotNull()
                 .firstOrNull()
-        } else {
-            itemsRepository
-                .getCurrentBalanceProductList(name,  itemIdPT.toLong())
+        else
+            warehouseRepository
+                .getCurrentBalanceProductList(name, itemIdPT.toLong())
                 .filterNotNull()
                 .firstOrNull()
-        }
 
-        if (pair != null) {
-            saleUiState = saleUiState.updateCountWarehouse(pair)
-        }
+        if (pair != null)
+            updateCountWarehouse(pair)
     }
 
-    fun insertItem() {
+
+    override fun insert() {
         viewModelScope.launch {
             if (!isError()) {
-                itemsRepository.insertSale(
-                    saleUiState.updateForSave(itemIdPT = itemIdPT.toLong()).toRoomMap()
+                saleRepository.insertSale(
+                    getState().updateForSave(itemIdPT = itemIdPT)
                 )
 //                metricaSale(saleUiState.copy(priceAll = autoCalculate()))
-                _eventFlow.emit(UiEvent.NavigateBack)
+                navigateTo(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_sale_s)
                         .format(
-                            saleUiState.title,
-                            saleUiState.count,
-                            saleUiState.countSuffix
+                            getState().title,
+                            getState().count,
+                            getState().countSuffix
                         ) //Todo Обновить название
                 )
             }
         }
     }
 
-    fun updateItem() {
+    override fun update() {
         viewModelScope.launch {
             if (!isError()) {
-                itemsRepository.updateSale(
-                    saleUiState.updateForSave(id = itemId.toLong(), itemIdPT = itemIdPT.toLong())
-                        .toRoomMap()
-                )
-                _eventFlow.emit(UiEvent.NavigateBack)
+                saleRepository.updateSale(getState().updateForSave(itemId, itemIdPT))
+                navigateTo(UiEvent.NavigateBack)
                 showMessage(
                     resourceProvider.getString(R.string.toast_refresh_s_s)
                         .format(
-                            saleUiState.title,
-                            saleUiState.count,
-                            saleUiState.countSuffix
+                            getState().title,
+                            getState().count,
+                            getState().countSuffix
                         ) //Todo Обновить название
                 )
             }
         }
     }
 
-    fun deleteItem() {
+    override fun delete() {
         viewModelScope.launch {
-            itemsRepository.deleteSaleById(itemId.toLong())
-            _eventFlow.emit(UiEvent.NavigateBack)
+            saleRepository.deleteSaleById(itemId.toLong())
+            navigateTo(UiEvent.NavigateBack)
             showMessage(
                 resourceProvider.getString(R.string.toast_delete_s)
                     .format(
-                        saleUiState.title,
-                        saleUiState.count,
-                        saleUiState.countSuffix
+                        getState().title,
+                        getState().count,
+                        getState().countSuffix
                     ) //Todo Обновить название
             )
         }
     }
 
-    fun showMessage(message: String) {
-        viewModelScope.launch {
-            SnackbarController.sendEvent(
-                event = SnackbarEvent(
-                    message = message
+    override fun validation() {
+        updateState { state ->
+            state.copy(
+                error = state.error.copy(
+                    isErrorTitle = state.title.isBlank(),
+                    isErrorSlash = state.title.isSlash(),
+                    isErrorCount = state.count.isBlank(),
+                    isErrorPrice = state.priceAll.isBlank()
                 )
             )
         }
     }
 
-    fun isError(): Boolean {
-        updateUiState(saleUiState.validate())
-        return saleUiState.error.hasAnyError
+    private fun updateTitle(title: String) {
+        updateState {
+            it.copy(
+                title = title,
+                error = it.error.copy(
+                    isErrorTitle = title.isBlank(),
+                    isErrorSlash = title.isSlash()
+                )
+            )
+        }
+    }
+
+    private fun updateTitleAndSuffix(title: String, suffix: String) {
+        updateState {
+            it.copy(
+                title = title,
+                countSuffix = suffix,
+                error = it.error.copy(
+                    isErrorTitle = title.isBlank(),
+                    isErrorSlash = title.contains("/")
+                )
+            )
+        }
+    }
+
+    private fun updateCount(count: String) {
+        updateState {
+            it.copy(
+                count = count,
+                error = it.error.copy(
+                    isErrorCount = count.isBlank()
+                )
+            )
+        }
+        updatePriceAll()
+    }
+
+    private fun updatePrice(price: String) {
+        updateState {
+            it.copy(
+                price = price,
+                error = it.error.copy(
+                    isErrorPrice = price.isBlank()
+                )
+            )
+        }
+        updatePriceAll()
+    }
+
+    private fun updateIsAutoPrice(isAutoPrice: Boolean) {
+        updateState {
+            it.copy(
+                isAutoPrice = isAutoPrice
+            )
+        }
+        updatePriceAll()
+    }
+
+    private fun updatePriceAll() {
+        updateState {
+            it.copy(
+                priceAll = if (it.isAutoPrice) (it.price.toConvertZeroDouble() * it.count.toConvertZeroDouble()).formatNumber()
+                else "0"
+            )
+        }
+    }
+
+    fun updateCountWarehouse(domainCountSuffix: List<DomainCountSuffix>) {
+        updateState {
+            it.copy(
+                warehouseList = domainCountSuffix
+            )
+        }
     }
 }
+
+
+sealed class SaleEntryIntent : BaseIntent {
+    data class TitleChanged(val value: String) : SaleEntryIntent()
+    data class TitleAndSuffixClicked(val title: String, val suffix: String) :
+        SaleEntryIntent()
+
+    data class CountChanged(val value: String) : SaleEntryIntent()
+    data class SuffixClicked(val value: String) : SaleEntryIntent()
+    data class PriceChanged(val value: String) : SaleEntryIntent()
+    data class AutoPriceClicked(val value: Boolean) : SaleEntryIntent()
+    data class CategoryChanged(val value: String) : SaleEntryIntent()
+    data class DateClicked(val value: String) : SaleEntryIntent()
+    data class BuyerChanged(val value: String) : SaleEntryIntent()
+    data object BuyerClearClicked : SaleEntryIntent()
+    data class NoteChanged(val value: String) : SaleEntryIntent()
+    data object Insert : SaleEntryIntent()
+    data object Update : SaleEntryIntent()
+    data object Delete : SaleEntryIntent()
+}
+
