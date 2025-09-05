@@ -6,7 +6,7 @@ import com.zaroslikov.domain.repository.NoteRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,13 +20,14 @@ class NoteViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
-            val list = noteRepository.getAllNote(itemIdPT).first()
-            updateState {
-                it.copy(
-                    idPT = itemIdPT,
-                    list = list,
-                    isLoading = false
-                )
+            noteRepository.getAllNote(itemIdPT).collectLatest { list ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        list = list,
+                        isLoading = false
+                    )
+                }
             }
         }
     }

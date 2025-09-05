@@ -21,6 +21,6 @@ data class AnimalSizeTable(
     val size: String,
     val suffix: String,
     val date: String,
-    val idAnimal: Int,
+    val idAnimal: Long,
     val note: String
 )

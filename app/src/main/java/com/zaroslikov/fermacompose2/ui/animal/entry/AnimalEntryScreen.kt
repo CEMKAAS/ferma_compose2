@@ -13,18 +13,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.elements.AnimalNameOutlinedText
-import com.zaroslikov.fermacompose2.ui.elements.ButtonDelete
-import com.zaroslikov.fermacompose2.ui.elements.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.elements.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
@@ -38,6 +36,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.toOutlinedText
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 
@@ -55,8 +54,8 @@ fun AnimalEntryProduct(
     onNavigateUp: () -> Unit,
     viewModel: AnimalEntryViewModel = hiltViewModel()
 ) {
-    val state = viewModel.animalUiState
-    val eventFlow = viewModel.eventFlow
+    val eventFlow = viewModel.navigation
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     LaunchedEffect(Unit) {
@@ -81,10 +80,7 @@ fun AnimalEntryProduct(
             modifier = Modifier
                 .modifierScreen(innerPadding),
             state = state,
-            onValueChange = viewModel::updateUiState,
-            onClickInsert = viewModel::insertItem,
-            onClickUpdate = viewModel::updateItem,
-            onClickDelete = viewModel::deleteItem,
+            onIntent = viewModel::onIntent
         )
     }
 }
@@ -93,20 +89,19 @@ fun AnimalEntryProduct(
 fun AnimalEntryContainer(
     modifier: Modifier,
     state: AnimalEntryState,
-    onValueChange: (AnimalEntryState) -> Unit,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit
+    onIntent: (AnimalEntryIntent) -> Unit
 ) {
     Column(modifier = modifier) {
         if (state.isEntry)
             AnimalGroupCard(
-                state = state,
-                onValueChange = onValueChange
+                isAnimalGroup = state.isAnimalGroup,
+                animalGroupClicked = { onIntent(AnimalEntryIntent.AnimalGroupClicked(it)) }
             )
         AnimalNameOutlinedText(
             value = state.title,
-            onValueChange = { onValueChange(state.updateTitle(it)) },
+            onValueChange = {
+                onIntent(AnimalEntryIntent.TitleChanged(it))
+            },
             isAnimalGroup = state.isAnimalGroup,
             isErrorTitle = state.error.isErrorTitle
         )
@@ -116,7 +111,9 @@ fun AnimalEntryContainer(
             else R.string.support_text_type_animals,
             intResError = R.string.error_no_type_animal,
             value = state.type,
-            onValueChange = { onValueChange(state.updateType(it)) },
+            onValueChange = {
+                onIntent(AnimalEntryIntent.TypeChanged(it))
+            },
             drawableRes = R.drawable.baseline_pets_24,
             titleList = state.typeList,
             isErrorTitle = state.error.isErrorType,
@@ -125,7 +122,9 @@ fun AnimalEntryContainer(
         if (state.isAnimalGroup && state.isEntry)
             OutlinedTextCount(
                 value = state.count,
-                onValueChange = { onValueChange(state.updateCount(it)) },
+                onValueChange = {
+                    onIntent(AnimalEntryIntent.CountChanged(it))
+                },
                 drawableRes = R.drawable.baseline_spoke_24,
                 isError = state.error.isErrorCount,
                 suffix = stringResource(R.string.suffix_pieces),
@@ -137,15 +136,21 @@ fun AnimalEntryContainer(
         if (!state.isAnimalGroup)
             OutlinedTextSex(
                 value = state.sex,
-                onValueChange = { onValueChange(state.updateSex(it)) },
+                onValueChange = {
+                    onIntent(AnimalEntryIntent.SexClicked(it))
+                },
             )
         if (state.isEntry)
             OutlinedPriceInput(
                 price = state.price,
-                onPriceChange = { onValueChange(state.updatePrice(it)) },
+                onPriceChange = {
+                    onIntent(AnimalEntryIntent.PriceChanged(it))
+                },
                 count = state.priceAll,
                 isAutoCalculate = state.isAutoPrice,
-                onAutoCalculate = { onValueChange(state.updateIsAutoPrice(it)) },
+                onAutoCalculate = {
+                    onIntent(AnimalEntryIntent.AutoPriceClicked(it))
+                },
                 isManyCount = state.isAnimalGroup,
             )
         OutlinedTextDate(
@@ -153,17 +158,26 @@ fun AnimalEntryContainer(
             intRes = R.string.outlined_text_date_born,
             intResSup = if (!state.isAnimalGroup) R.string.outlined_text_date_born
             else R.string.support_text_date_born_s,
-            onValueChange = { onValueChange(state.updateDate(it)) }
+            onValueChange = {
+                onIntent(AnimalEntryIntent.DateClicked(it))
+            }
         )
         DateFactoryCard(
-            state = state,
-            onValueChange = onValueChange
+            dateFactory = state.dateFactory,
+            isAnimalGroup = state.isAnimalGroup,
+            isDateFactory = state.isDateFactory,
+            dateFactoryClicked = { onIntent(AnimalEntryIntent.DateFactoryClicked(it)) },
+            dateFactoryChanged = { onIntent(AnimalEntryIntent.DateFactoryChanged(it)) },
         )
         OutlinedTextCount(
             value = state.foodDay,
-            onValueChange = { onValueChange(state.updateFoodDay(it)) },
+            onValueChange = {
+                onIntent(AnimalEntryIntent.FoodDayChanged(it))
+            },
             isError = false,
-            onSuffixChange = { onValueChange(state.updateFoodDaySuffix(it)) },
+            onSuffixChange = {
+                onIntent(AnimalEntryIntent.FoodDaySuffixClicked(it))
+            },
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
             suffix = state.foodDaySuffix,
@@ -175,47 +189,25 @@ fun AnimalEntryContainer(
         if (state.isEntry)
             OutlinedTextNote(
                 value = state.note,
-                onValueChange = { onValueChange(state.updateNote(it)) },
+                onValueChange = {
+                    onIntent(AnimalEntryIntent.NoteChanged(it))
+                },
             )
         ButtonPanel(
-            state = state,
-            onClickInsert = { onClickInsert() },
-            onClickUpdate = { onClickUpdate() },
-            onClickDelete = { onClickDelete() }
+            entryButton = if (state.price.isBlank()) R.string.button_add else R.string.button_expenses,
+            isEntry = state.isEntry,
+            onClickInsert = { onIntent(AnimalEntryIntent.Insert) },
+            onClickUpdate = { onIntent(AnimalEntryIntent.Update) },
+            onClickDelete = { onIntent(AnimalEntryIntent.Delete) }
         )
-    }
-}
-
-@Composable
-private fun ButtonPanel(
-    state: AnimalEntryState,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-    if (state.isEntry)
-        ButtonStandart(
-            intRes = if (state.price.isBlank()) R.string.button_add else R.string.button_expenses,
-            onClick = {
-                focusManager.clearFocus()
-                onClickInsert()
-            }
-        )
-    else {
-        ButtonRefresh {
-            focusManager.clearFocus()
-            onClickUpdate()
-        }
-        ButtonDelete { onClickDelete() }
     }
 }
 
 
 @Composable
 private fun AnimalGroupCard(
-    state: AnimalEntryState,
-    onValueChange: (AnimalEntryState) -> Unit
+    isAnimalGroup: Boolean,
+    animalGroupClicked: (Boolean) -> Unit
 ) {
     CardField(
         modifier = Modifier
@@ -227,8 +219,8 @@ private fun AnimalGroupCard(
             style = textBold_16
         )
         RadioButtonRow(
-            state = state.isAnimalGroup,
-            onStateSelect = { onValueChange(state.updateIsAnimalGroup(it)) },
+            state = isAnimalGroup,
+            onStateSelect = { animalGroupClicked(it) },
             intResOne = R.string.ration_button_one,
             intResTwo = R.string.ration_button_many,
             imageOne = R.drawable.baseline_fiber_manual_record_24,
@@ -240,8 +232,11 @@ private fun AnimalGroupCard(
 
 @Composable
 private fun DateFactoryCard(
-    state: AnimalEntryState,
-    onValueChange: (AnimalEntryState) -> Unit
+    isDateFactory: Boolean,
+    isAnimalGroup: Boolean,
+    dateFactory: String,
+    dateFactoryClicked: (Boolean) -> Unit,
+    dateFactoryChanged: (String) -> Unit
 ) {
     CardField(
         modifier = Modifier
@@ -249,25 +244,25 @@ private fun DateFactoryCard(
         row = false
     ) {
         CheckboxTextIcon(
-            modifier = if (!state.isDateFactory) Modifier.toOutlinedText() else Modifier,
-            checked = state.isDateFactory,
+            modifier = if (!isDateFactory) Modifier.toOutlinedText() else Modifier,
+            checked = isDateFactory,
             onCheckedChange = {
-                onValueChange(state.updateIsDateFactory(it))
+                dateFactoryClicked(it)
             },
-            intTitle = if (!state.isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
+            intTitle = if (!isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
             isTooltipShow = true,
             intTooltip = R.string.tooltip_animals_born
         )
         AnimatedVisibility(
             modifier = Modifier.fillMaxWidth(),
-            visible = !state.isDateFactory,
+            visible = !isDateFactory,
         ) {
             OutlinedTextDate(
-                value = state.dateFactory,
+                value = dateFactory,
                 intRes = R.string.outlined_text_date_factory,
-                intResSup = if (!state.isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
+                intResSup = if (!isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
                 drawableRes = R.drawable.baseline_event_24,
-                onValueChange = { onValueChange(state.updateDateFactory(it)) },
+                onValueChange = { dateFactoryChanged(it) },
                 cardBorder = false
             )
         }

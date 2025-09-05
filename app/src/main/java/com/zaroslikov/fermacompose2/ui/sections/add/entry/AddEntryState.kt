@@ -32,7 +32,6 @@ data class AddEntryState(
     override val hasAnyError: Boolean
         get() = error.hasAnyError
 
-
     data class Error(
         val isErrorTitle: Boolean = false,
         val isErrorSlash: Boolean = false,

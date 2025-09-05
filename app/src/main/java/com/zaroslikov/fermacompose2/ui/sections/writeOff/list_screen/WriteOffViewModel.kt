@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -37,19 +39,22 @@ class WriteOffViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            updateState { it.copy(isLoading = true) }
-            val addList = writeOffRepository.getAllWriteOffItems(itemIdPT).first()
-            val briefly = writeOffRepository.getBrieflyItemWriteOff(itemIdPT).first()
-            val titleList = addRepository.getItemsTitleAddList(itemIdPT).first()
-
-            updateState {
-                it.copy(
-                    idPT = itemIdPT,
-                    list = addList,
-                    listBriefly = briefly,
-                    isLoading = false,
-                    writeOffBoolean = titleList.isNotEmpty()
-                )
+            combine(
+                writeOffRepository.getAllWriteOffItems(itemIdPT),
+                writeOffRepository.getBrieflyItemWriteOff(itemIdPT),
+                addRepository.getItemsTitleAddList(itemIdPT)
+            ) { addList, briefly, titleList ->
+                Triple(addList, briefly, titleList)
+            }.collectLatest { (addList, briefly, titleList) ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        list = addList,
+                        listBriefly = briefly,
+                        writeOffBoolean = titleList.isNotEmpty(),
+                        isLoading = false
+                    )
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.elements.CardField
@@ -53,13 +54,10 @@ fun AnimalScreen(
     isFirstStart: Boolean,
     viewModel: AnimalViewModel = hiltViewModel()
 ) {
-    val idProject = viewModel.itemId
-
-    val animalUiState by viewModel.animalUiState.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
     val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val idProject = state.idPT
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -88,23 +86,21 @@ fun AnimalScreen(
                 FloatButton { navigateToItemAdd(idProject) }
             }
         ) { innerPadding ->
-            if (isLoading)
+            if (state.isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
-             else
+            else
                 AnimalBody(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
-                    itemList = animalUiState.itemList,
+                    itemList = state.list,
                     onItemClick = { navigateToItemCard(Pair(idProject, it)) },
                     navigateToItemAdd = { navigateToItemAdd(idProject) }
                 )
-
         }
     }
 }
-
 
 @Composable
 private fun AnimalBody(

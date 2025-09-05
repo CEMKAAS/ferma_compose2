@@ -1,50 +1,40 @@
 package com.zaroslikov.fermacompose2.ui.animal.list_screen
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.domain.repository.AnimalRepository
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.state.ListState
+import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AnimalViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val animalRepository: AnimalRepository
-) : ViewModel() {
+) : ListViewModel<AnimalListState, AnimalListIntent>(AnimalListState()) {
 
+    private val itemIdPT: Long = checkNotNull(savedStateHandle[AnimalDestination.itemIdArg])
 
-    val itemId: Long = checkNotNull(savedStateHandle[AnimalDestination.itemIdArg])
-
-    private var _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    val animalUiState: StateFlow<AnimalUiState> =
-        animalRepository.getAllAnimal(itemId).map { AnimalUiState(it) }.onStart {
-            // Устанавливаем состояние загрузки перед началом загрузки данных
-            _isLoading.value = true
-        }.onEach {
-            // Отключаем состояние загрузки после завершения загрузки данных
-            _isLoading.value = false
+    init {
+        viewModelScope.launch {
+            updateState { it.copy(isLoading = true) }
+            animalRepository.getAllAnimal(itemIdPT).collectLatest { list ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        list = list,
+                        isLoading = false
+                    )
+                }
+            }
         }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AnimalUiState()
-            )
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
     }
-
 }
 
-data class AnimalUiState(val itemList: List<DomainAnimalWithCount> = listOf())
+sealed class AnimalListIntent : BaseIntent

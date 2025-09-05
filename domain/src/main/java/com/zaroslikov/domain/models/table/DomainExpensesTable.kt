@@ -2,7 +2,7 @@ package com.zaroslikov.domain.models
 
 
 data class DomainExpensesTable(
-    val id: Long,
+    val id: Long = 0,
     val title: String, // название
     val count: Double, // Кол-во
     val day: Int,  // день

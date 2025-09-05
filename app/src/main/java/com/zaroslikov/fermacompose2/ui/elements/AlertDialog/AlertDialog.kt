@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextSex
 import com.zaroslikov.fermacompose2.ui.elements.modifierDialogScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 
@@ -56,11 +57,11 @@ fun AlertDialogInfo(
 
 @Composable
 fun AlertDialogGroupToSolo(
+    sex: Boolean,
     onConfirmation: () -> Unit,
-    onUpdateClick: (String) -> Unit
+    onUpdateSex: (Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    var sex by rememberSaveable { mutableStateOf("Мужской") }
     AlertDialog(
         icon = {
             Icon(
@@ -80,12 +81,12 @@ fun AlertDialogGroupToSolo(
                     modifier = Modifier.padding(bottom = 8.dp),
                     text = stringResource(R.string.alert_dialog_group_to_solo_text)
                 )
-//                OutlinedTextSex(
-//                    value = sex,
-//                    onValueChange = { sex = it },
-//                    standardPadding = false,
-//                    focusManager = focusManager
-//                )
+                OutlinedTextSex(
+                    value = sex,
+                    onValueChange = {
+                        onUpdateSex(it)
+                    }
+                )
             }
         },
         onDismissRequest = onConfirmation,
@@ -161,7 +162,7 @@ fun AlertDialogAni(
     icon: Painter,
     title: String,
     titleButton: String,
-    onDismissClick:() -> Unit,
+    onDismissClick: () -> Unit,
     onConfirmationClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {

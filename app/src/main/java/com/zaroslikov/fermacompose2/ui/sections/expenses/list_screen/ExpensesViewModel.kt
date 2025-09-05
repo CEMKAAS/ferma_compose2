@@ -8,6 +8,8 @@ import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,16 +24,20 @@ class ExpensesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            updateState { it.copy(isLoading = true) }
-            val addList = expensesRepository.getAllExpensesItems(itemIdPT).first()
-            val briefly = expensesRepository.getBrieflyItemExpenses(itemIdPT).first()
-            updateState {
-                it.copy(
-                    idPT = itemIdPT,
-                    list = addList,
-                    briefly = briefly,
-                    isLoading = false
-                )
+            combine(
+                expensesRepository.getAllExpensesItems(itemIdPT),
+                expensesRepository.getBrieflyItemExpenses(itemIdPT)
+            ) { addList, briefly ->
+                addList to briefly
+            }.collectLatest { (addList, briefly) ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        list = addList,
+                        briefly = briefly,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
