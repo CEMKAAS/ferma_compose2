@@ -24,173 +24,68 @@ import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isErrorWriteOffAnimal
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardIntent
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextPrice
 import com.zaroslikov.fermacompose2.ui.elements.autoCalculate
 import com.zaroslikov.fermacompose2.ui.elements.modifierDialogScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
+import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryIntent
 
 @Composable
 fun AlertDialogWriteOffAnimal(
+    state: AnimalCardState.WriteOffAnimal,
+    onIntent: (AnimalCardIntent) -> Unit,
     isAnimalGroup: Boolean,
-    title: String,
     countAll: String,
     countSuffix: String,
-    idPT: Int,
-    idAnimal: Long,
-    onConfirmation: () -> Unit,
-    onSaveClick: (Triple<DomainIndicatorsVM, WriteOffTable?, Boolean>) -> Unit,
-    onUpdateAnimalGroupClick: (String) -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
-
-    var price by rememberSaveable { mutableStateOf("") }
-    var priceAll by rememberSaveable { mutableStateOf("") }
-    var countAnimal by rememberSaveable { mutableStateOf(if (isAnimalGroup) "" else "1") }
-    var note by rememberSaveable { mutableStateOf("") }
-
-    val isAutoCalculate = rememberSaveable { mutableStateOf(false) }
-
-    var openDialogGroup by rememberSaveable { mutableStateOf(false) }
-
-    //Error
-    var isErrorCount by rememberSaveable { mutableStateOf(false) }
-    var isErrorCountMore by rememberSaveable { mutableStateOf(false) }
-
-    val priceInDB = if (isAutoCalculate.value) priceAll else price
-
-    val reasonNote = if ((priceInDB.isBlank() || priceInDB == "0")) {
-        if (note == "") stringResource(R.string.animal_card_screen_add_no_note_reason)
-        else stringResource(R.string.animal_card_screen_add_note_reason, note)
-    } else ""
-
-
-    AlertDialog(
-        icon = {
-            Icon(
-                painterResource(R.drawable.baseline_edit_note_24),
-                contentDescription = stringResource(R.string.alert_dialog_info_write_off_animals)
-            )
-        },
-        title = {
-            Text(
-                text = stringResource(R.string.alert_dialog_info_write_off_animals),
-                style = textBold_16
-            )
-        },
-        text = {
+    AlertDialogAni(
+        icon = painterResource(R.drawable.baseline_edit_note_24),
+        title = stringResource(R.string.alert_dialog_info_write_off_animals),
+        titleButton = stringResource(R.string.button_text_write_off),
+        onDismissClick = { onIntent(AnimalCardIntent.DialogSaleClicked(false)) },
+        content = {
             Column(modifier = Modifier.modifierDialogScreen()) {
                 if (isAnimalGroup)
-                    OutlinedTextCount(
-                        value = countAnimal,
+                    OutlinedTextCountAnimal2(
+                        value = state.countAnimal,
                         onValueChange = {
-                            countAnimal = it
-                            isErrorCount = it.isError()
-                            isErrorCountMore = isAnimalCountIncrease(it, countAll)
+                            onIntent(AnimalCardIntent.CountWriteOffChanged(it))
                         },
-                        isError = isErrorCount,
-                        isErrorCountMore = isErrorCountMore,
-                        intRes = R.string.outlined_text_field_quantity,
-                        drawableRes = R.drawable.baseline_spoke_24,
-                        count = countAll,
+                        isError = state.error.isErrorCount,
+                        isErrorCountMore = state.error.isErrorCountMore,
+                        countAnimalAll = countAll,
                         suffix = countSuffix,
-                        focusManager = focusManager
                     )
-                OutlinedTextPrice(
-                    value = price,
-                    onValueChange = {
-                        price = it
+                OutlinedPriceInput(
+                    price = state.price,
+                    onPriceChange = {
+                        onIntent(AnimalCardIntent.PriceWriteOffChanged(it))
                     },
-                    intSupportText = R.string.support_text_price_one_animals,
-                    focusManager = focusManager
+                    count = state.countAnimal,
+                    isAutoCalculate = state.isAutoPrice,
+                    onAutoCalculate = {
+                        onIntent(AnimalCardIntent.AutoPriceWriteOffClicked(it))
+                    },
+                    isManyCount = state.isAutoPrice,
+                    supportTextRes = if (isAnimalGroup) R.string.support_text_price_animals else R.string.support_text_price_animal,
+                    supportTextResAutoCal = R.string.support_text_price_one_animals,
                 )
-                if (isAnimalGroup)
-                    priceAll = autoCalculate(
-                        isAutoCalculate = isAutoCalculate,
-                        count = countAnimal,
-                        price = price
-                    )
                 OutlinedTextNote(
-                    value = note,
+                    value = state.note,
                     onValueChange = {
-                        note = it
+                        onIntent(AnimalCardIntent.NoteWriteOffChanged(it))
                     },
                     label = R.string.outlined_text_reason,
                     supportingText = R.string.support_text_write_off_animal_reason,
                 )
             }
         },
-        onDismissRequest = onConfirmation,
-        dismissButton = {
-            TextButton(
-                onClick = onConfirmation
-            ) {
-                Text(stringResource(R.string.button_text_cancel))
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    if (isErrorWriteOffAnimal(
-                            count = countAnimal,
-                            countAll = countAll,
-                            isErrorCount = { isErrorCount = it },
-                            isErrorCountAll = { isErrorCountMore = it },
-                            isAnimalGroup = isAnimalGroup
-                        )
-                    ) {
-                        val count =
-                            (countAnimal.toConvertOnlyInt().toInt() - countAll.toConvertOnlyInt()
-                                .toInt()).toString()
-                                .toConvertOnlyInt()
-                        onSaveClick(
-                            Triple(
-                                first = DomainIndicatorsVM(
-//                                    weight = count,
-                                    weight = countAnimal,
-                                    suffix = countSuffix,
-                                    date = dateToday(),
-                                    idAnimal = idAnimal.toInt(),
-                                    note = reasonNote,
-                                    version = 3
-                                ),
-                                second = if (priceInDB.isBlank() || priceInDB == "0") null else {
-                                    WriteOffTable(
-                                        title = title,
-                                        count = countAnimal.toConvertDbDouble(),
-                                        day = dateTodayArray()[0],
-                                        mount = dateTodayArray()[1],
-                                        year = dateTodayArray()[2],
-                                        status = true,
-                                        priceAll = priceInDB.toConvertDbDouble(),
-                                        countSuffix = countSuffix,
-                                        note = reasonNote,
-                                        idPT = idPT.toLong(),
-                                        id = TODO(),
-                                        price = TODO(),
-                                        animalCountId = TODO()
-                                    )
-                                },
-                                third = count.toInt() == 0
-                            )
-                        )
-                        if (count.toInt() == 1) openDialogGroup = true
-                        else onConfirmation()
-                    }
-                }
-            ) {
-                Text(stringResource(R.string.button_text_write_off))
-            }
-        }
+        onConfirmationClick = { onIntent(AnimalCardIntent.SaveWriteOffPressed) }
     )
-    if (openDialogGroup)
-        AlertDialogGroupToSolo(
-            onConfirmation = {
-                openDialogGroup = !openDialogGroup
-                onConfirmation()
-            },
-            onUpdateClick = onUpdateAnimalGroupClick
-        )
 }

@@ -8,16 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,7 +25,6 @@ import com.zaroslikov.data.room.table.ferma.ExpensesTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.dto.PairData
-//import com.zaroslikov.data.room.dto.getAgeFromDate
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
@@ -39,7 +33,9 @@ import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogAddAnimal
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogKillAnimal
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogSaleAnimal
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogWriteOffAnimal
 import com.zaroslikov.fermacompose2.ui.elements.ButtonArchive
 import com.zaroslikov.fermacompose2.ui.elements.ButtonCustom
 import com.zaroslikov.fermacompose2.ui.elements.CardField
@@ -211,35 +207,27 @@ fun AnimalCardContainer(
                Pair(it.title, "${it.priceAll} ${it.suffix}")
            }*/
         ButtonPanel(
-            onSaleClick = {
-//                openSaleDialog = !openSaleDialog
-            },
             onKillClick = {
 //                openKillDialog = !openKillDialog
             },
             onAddClick = { onIntent(AnimalCardIntent.DialogAddClicked(true)) },
-            onWriteOffClick = {
-//                openWriteOffDialog = !openWriteOffDialog
-            },
+            onSaleClick = { onIntent(AnimalCardIntent.DialogSaleClicked(true)) },
+            onWriteOffClick = { onIntent(AnimalCardIntent.DialogWriteOffClicked(true)) },
             onArchiveClick = {
 //                openArchiveDialog = !openArchiveDialog
             }
         )
         if (state.openSaleDialog)
             AlertDialogSaleAnimal(
-                buyerList = buyerList,
-                isAnimalGroup = state.group,
-                title = state.name,
-                countAll = animalCountTable.weight,
-                countSuffix = animalCountTable.suffix,
-                idAnimal = state.id.toLong(),
-                idPT = state.idPT.toInt(),
-                onSaveClick = onSaleClick,
-                onUpdateAnimalGroupClick = onUpdateAnimalGroupClick,
-                onConfirmation = { openSaleDialog = !openSaleDialog },
+                state = state.saleAnimal,
+                onIntent = onIntent,
+                isAnimalGroup = state.animal.group,
+                countAll = state.countAnimal.count,
+                countSuffix = state.countAnimal.suffix,
+                buyerList = state.buyerList
             )
-        /*if
-        if (openKillDialog)
+
+        if (state.openKillDialog)
             AlertDialogKillAnimal(
                 titleList = titleList,
                 isAnimalGroup = state.group,
@@ -256,26 +244,21 @@ fun AnimalCardContainer(
                 onUpdateAnimalGroupClick = onUpdateAnimalGroupClick,
                 onConfirmation = { openKillDialog = !openKillDialog },
             )
+        /*
+          if (openArchiveDialog)
+                    AlertDialogArchiveAnimal(
+                        onConfirmation = { openArchiveDialog = !openArchiveDialog },
+                        onArchiveClick = updateArchive
+                    )*/
 
-
-        if (openWriteOffDialog)
+        if (state.openWriteOffDialog)
             AlertDialogWriteOffAnimal(
-                isAnimalGroup = state.group,
-                title = state.name,
-                countAll = animalCountTable.weight,
-                countSuffix = animalCountTable.suffix,
-                idPT = state.idPT.toInt(),
-                idAnimal = state.id,
-                onConfirmation = { openWriteOffDialog = !openWriteOffDialog },
-                onSaveClick = onAddWriteOffClick,
-                onUpdateAnimalGroupClick = onUpdateAnimalGroupClick
+                state = state.writeOffAnimal,
+                onIntent = onIntent,
+                isAnimalGroup = state.animal.group,
+                countAll = state.countAnimal.count,
+                countSuffix = state.countAnimal.suffix
             )
-
-        if (openArchiveDialog)
-            AlertDialogArchiveAnimal(
-                onConfirmation = { openArchiveDialog = !openArchiveDialog },
-                onArchiveClick = updateArchive
-            )*/
 
         if (state.openAddDialog)
             AlertDialogAddAnimal(
@@ -285,10 +268,8 @@ fun AnimalCardContainer(
         if (state.openSoloDialog)
             AlertDialogGroupToSolo(
                 sex = state.animal.sex,
-                onConfirmation = {
-                    onIntent(AnimalCardIntent.DialogSoloClicked(false))
-                },
-                onUpdateSex = { onIntent(AnimalCardIntent.SexClicked(it)) }
+                onUpdateSex = { onIntent(AnimalCardIntent.SexClicked(it)) },
+                onConfirmation = { onIntent(AnimalCardIntent.DialogSoloClicked(false)) }
             )
 
     }

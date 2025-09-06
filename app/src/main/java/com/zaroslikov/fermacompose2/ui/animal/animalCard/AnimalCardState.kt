@@ -13,6 +13,7 @@ import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.base.state.EntryState
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.SaleAnimal.Error
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class AnimalCardState(
@@ -29,11 +30,14 @@ data class AnimalCardState(
     val vaccination: DomainAnimalVaccination = DomainAnimalVaccination(),
     val age: String = "",
     val price: Double? = 0.0,
+    val buyerList: List<String> = emptyList(),
+    val writeOffAnimal: WriteOffAnimal = WriteOffAnimal(),
     val addAnimal: AddAnimal = AddAnimal(),
     val saleAnimal: SaleAnimal = SaleAnimal(),
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null
 ) : BaseState {
+
     data class AddAnimal(
         val count: String = "",
         val countSuffix: String = "",
@@ -66,6 +70,47 @@ data class AnimalCardState(
                 get() = isErrorPrice || isErrorCountMore || isErrorCount || isErrorCountZero
         }
     }
+
+    data class WriteOffAnimal(
+        val countAnimal: String = "",
+        val countSuffix: String = "",
+        val price: String = "",
+        val priceAll: String = "",
+        val isAutoPrice: Boolean = false,
+        val note: String = "",
+        val error: Error = Error()
+    ) {
+        val hasAnyError: Boolean
+            get() = error.hasAnyError
+
+        data class Error(
+            val isErrorCount: Boolean = false,
+            val isErrorCountMore: Boolean = false,
+        ) {
+            val hasAnyError: Boolean
+                get() = isErrorCountMore || isErrorCount
+        }
+    }
+
+    data class KillAnimal(
+        val countAnimal: String = "",
+        val countSuffix: String = "",
+        val price: String = "",
+        val error: Error = Error()
+    ) {
+        val hasAnyError: Boolean
+            get() = error.hasAnyError
+
+        data class Error(
+            val isErrorCount: Boolean = false,
+            val isErrorCountMore: Boolean = false,
+            val isErrorCountZero: Boolean = false
+        ) {
+            val hasAnyError: Boolean
+                get() = isErrorCountMore || isErrorCount
+        }
+    }
+
 
 }
 

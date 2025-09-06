@@ -2,7 +2,7 @@ package com.zaroslikov.domain.models.table
 
 
 data class DomainWriteOffTable(
-    val id: Long,
+    val id: Long = 0,
     val title: String,
     val count: Double,
     val countSuffix: String,
@@ -14,5 +14,5 @@ data class DomainWriteOffTable(
     val status: Boolean,
     val note: String,
     val idPT: Long,
-    val animalCountId: Long?
+    val animalCountId: Long? = null
 )

@@ -1,37 +1,15 @@
 package com.zaroslikov.fermacompose2.ui.elements.AlertDialog
 
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.zaroslikov.domain.models.DomainIndicatorsVM
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.table.ferma.SaleTable
-import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
-import com.zaroslikov.fermacompose2.supportFun.dateToday
-import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
-import com.zaroslikov.fermacompose2.supportFun.isAnimalCountDifference
-import com.zaroslikov.fermacompose2.supportFun.isAnimalCountIncrease
-import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
-import com.zaroslikov.fermacompose2.supportFun.isError
-import com.zaroslikov.fermacompose2.supportFun.isErrorAnimalSale
-import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardIntent
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextBuyer
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount
-import com.zaroslikov.fermacompose2.ui.elements.textBold_16
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 
 @Composable
 fun AlertDialogSaleAnimal(
@@ -52,7 +30,7 @@ fun AlertDialogSaleAnimal(
         onDismissClick = { onIntent(AnimalCardIntent.DialogSaleClicked(false)) },
         content = {
             if (isAnimalGroup)
-                OutlinedTextCount(
+                OutlinedTextCountAnimal2(
                     value = state.countAnimal,
                     onValueChange = {
                         onIntent(AnimalCardIntent.CountSaleChanged(it))
@@ -61,10 +39,8 @@ fun AlertDialogSaleAnimal(
                     isErrorCountMore = state.error.isErrorCountMore,
                     isErrorCountZero = state.error.isErrorCountZero,
                     intRes = R.string.outlined_text_field_quantity,
-                    drawableRes = R.drawable.baseline_spoke_24,
-                    count = countAll,
+                    countAnimalAll = countAll,
                     suffix = countSuffix,
-                    focusManager = focusManager
                 )
             OutlinedPriceInput(
                 price = state.price,

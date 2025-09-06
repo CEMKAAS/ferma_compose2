@@ -26,7 +26,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextSex
@@ -120,7 +120,7 @@ fun AnimalEntryContainer(
             isErrorSlash = false,
         )
         if (state.isAnimalGroup && state.isEntry)
-            OutlinedTextCount(
+            OutlinedTextCountAnimal(
                 value = state.count,
                 onValueChange = {
                     onIntent(AnimalEntryIntent.CountChanged(it))
@@ -169,7 +169,7 @@ fun AnimalEntryContainer(
             dateFactoryClicked = { onIntent(AnimalEntryIntent.DateFactoryClicked(it)) },
             dateFactoryChanged = { onIntent(AnimalEntryIntent.DateFactoryChanged(it)) },
         )
-        OutlinedTextCount(
+        OutlinedTextCountAnimal(
             value = state.foodDay,
             onValueChange = {
                 onIntent(AnimalEntryIntent.FoodDayChanged(it))

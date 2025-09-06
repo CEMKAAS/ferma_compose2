@@ -9,7 +9,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardIntent
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 
 
@@ -40,7 +40,7 @@ fun AlertDialogAddAnimal(
         titleButton = titleButton,
         onDismissClick = { onIntent(AnimalCardIntent.DialogAddClicked(false)) },
         content = {
-            OutlinedTextCount(
+            OutlinedTextCountAnimal(
                 value = state.count,
                 onValueChange = { onIntent(AnimalCardIntent.CountAddChanged(it)) },
                 isError = state.isErrorCount,

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -56,7 +55,6 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsEnter
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
-import com.zaroslikov.fermacompose2.supportFun.toConvertOnlyInt
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSampleNoLimit
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
@@ -383,7 +381,7 @@ fun OutlinedTextCategory(
 }
 
 @Composable
-fun OutlinedTextCount(
+fun OutlinedTextCountAnimal(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
@@ -523,62 +521,39 @@ fun OutlinedTextCount2(
 
 
 @Composable
-fun OutlinedTextCount(
+fun OutlinedTextCountAnimal2(
     value: String,
     onValueChange: (String) -> Unit,
     isError: Boolean,
     isErrorCountMore: Boolean = false,
     isErrorCountZero: Boolean = false,
-    count: String = "0",
+    countAnimalAll: String,
     suffix: String,
-    drawableRes: Int = R.drawable.baseline_shopping_basket_24,
-    @StringRes intRes: Int = R.string.outlined_text_product,
-    focusManager: FocusManager,
-    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
-    keyboardActions: KeyboardActions = keyboardActionsDown(focusManager)
+    @StringRes intRes: Int = R.string.outlined_text_field_quantity,
 ) {
+    val errorText = when {
+        isErrorCountZero -> R.string.error_count_sale_animals
+        isErrorCountMore -> R.string.error_count_zero_animals
+        else -> R.string.error_no_count_product
+    }
 
-    val errorText = stringResource(R.string.error_no_count_product)
-    val errorCountAllText = stringResource(R.string.error_count_sale_animals)
-    val errorCountZeroText = stringResource(R.string.error_count_zero_animals)
-    val supportText = stringResource(R.string.support_text_count_sale_animals, count, suffix)
-
+    val error = isError || isErrorCountZero || isErrorCountMore
 
     CardField(
         modifier = Modifier.toOutlinedText(),
         row = false
     ) {
-        OutlinedTextField(
+        BaseOutlinedText(
             value = value,
-            onValueChange = {
-                onValueChange(it.toConvertOnlyInt())
-            },
-            label = { Text(stringResource(intRes)) },
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(drawableRes),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 5.dp)
-                )
-            },
-            supportingText = {
-                ErrorSupportAnimal(
-                    isError = isError,
-                    isErrorAnimal = isErrorCountMore,
-                    isErrorCountZero = isErrorCountZero,
-                    errorText = errorText,
-                    errorCountAllText = errorCountAllText,
-                    errorCountZeroText = errorCountZeroText,
-                    supportText = supportText,
-                )
-            },
-            suffix = {
-                Text(text = suffix)
-            },
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            isError = isError || isErrorCountMore || isErrorCountZero
+            onValueChange = { onValueChange(it) },
+            countAnimal = countAnimalAll,
+            suffix = suffix,
+            isAnimal = true,
+            leadingIconRes = R.drawable.baseline_spoke_24,
+            labelIntRes = intRes,
+            isError = error,
+            intResSup = R.string.is_empty,
+            intResError = errorText,
         )
     }
 }

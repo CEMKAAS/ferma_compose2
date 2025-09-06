@@ -46,7 +46,7 @@ import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNoCard
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
@@ -129,7 +129,7 @@ fun ExpensesEntryContainerProduct(
             readOnly = state.isIndicatorsValue,
             enable = !state.isIndicatorsValue
         )
-        OutlinedTextCount(
+        OutlinedTextCountAnimal(
             value = state.count,
             onValueChange = {
                 onIntent(ExpensesEntryIntent.CountChanged(it))
