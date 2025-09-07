@@ -1,19 +1,13 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalCard
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.base.state.BaseState
-import com.zaroslikov.fermacompose2.base.state.EntryState
-import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.SaleAnimal.Error
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class AnimalCardState(
@@ -31,34 +25,25 @@ data class AnimalCardState(
     val age: String = "",
     val price: Double? = 0.0,
     val buyerList: List<String> = emptyList(),
-    val writeOffAnimal: WriteOffAnimal = WriteOffAnimal(),
-    val addAnimal: AddAnimal = AddAnimal(),
-    val saleAnimal: SaleAnimal = SaleAnimal(),
+    val actionAnimal: CountAnimal = CountAnimal(),
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null
 ) : BaseState {
 
-    data class AddAnimal(
-        val count: String = "",
-        val countSuffix: String = "",
+    data class CountAnimal(
+        val countAnimal: String = "",
+        val suffixAnimal: String = "",
         val isAutoPrice: Boolean = false,
         val price: String = "",
         val priceAll: String = "",
-        val note: String = "",
-        val isErrorCount: Boolean = false
-    )
-
-    data class SaleAnimal(
-        val countAnimal: String = " ",
-        val countSuffix: String = "",
-        val price: String = "",
-        val priceAll: String = "",
-        val isAutoPrice: Boolean = false,
         val buyer: String = "",
-        val error: Error = Error()
+        val note: String = "",
+        val actionWithAnimal: ActionWithAnimal = ActionWithAnimal.ADD_ANIMAL,
+        val productKill: List<ProductKill> = listOf(ProductKill()),
+        val error: Error = Error(),
     ) {
         val hasAnyError: Boolean
-            get() = error.hasAnyError
+            get() = error.hasAnyError(actionWithAnimal)
 
         data class Error(
             val isErrorPrice: Boolean = false,
@@ -66,54 +51,38 @@ data class AnimalCardState(
             val isErrorCountMore: Boolean = false,
             val isErrorCountZero: Boolean = false
         ) {
-            val hasAnyError: Boolean
-                get() = isErrorPrice || isErrorCountMore || isErrorCount || isErrorCountZero
+            fun hasAnyError(actionWithAnimal: ActionWithAnimal): Boolean {
+                return when (actionWithAnimal) {
+                    ActionWithAnimal.ADD_ANIMAL -> isErrorCount
+                    ActionWithAnimal.SALE_ANIMAL -> isErrorPrice || isErrorCountMore || isErrorCount || isErrorCountZero
+                    ActionWithAnimal.WRITE_OFF_ANIMAL -> isErrorCountMore || isErrorCount
+                    ActionWithAnimal.KILL_ANIMAL -> isErrorCountMore || isErrorCount
+                }
+            }
         }
-    }
 
-    data class WriteOffAnimal(
-        val countAnimal: String = "",
-        val countSuffix: String = "",
-        val price: String = "",
-        val priceAll: String = "",
-        val isAutoPrice: Boolean = false,
-        val note: String = "",
-        val error: Error = Error()
-    ) {
-        val hasAnyError: Boolean
-            get() = error.hasAnyError
-
-        data class Error(
-            val isErrorCount: Boolean = false,
-            val isErrorCountMore: Boolean = false,
+        data class ProductKill(
+            val title: String = "",
+            val countProduct: String = "",
+            val suffixProduct: String = "",
+            val countWarehouse: Double = 0.0,
+            val suffixWarehouse: String = "",
+            val warehouseList: List<DomainCountSuffix> = emptyList(),
+            val titleList: List<TitleAndSuffixDomain> = emptyList(),
+            val error: Error = Error()
         ) {
-            val hasAnyError: Boolean
-                get() = isErrorCountMore || isErrorCount
+            data class Error(
+                val isError: Boolean = false,
+                val isErrorSlash: Boolean = false,
+                val isErrorCount: Boolean = false,
+            )
         }
     }
-
-    data class KillAnimal(
-        val countAnimal: String = "",
-        val countSuffix: String = "",
-        val price: String = "",
-        val error: Error = Error()
-    ) {
-        val hasAnyError: Boolean
-            get() = error.hasAnyError
-
-        data class Error(
-            val isErrorCount: Boolean = false,
-            val isErrorCountMore: Boolean = false,
-            val isErrorCountZero: Boolean = false
-        ) {
-            val hasAnyError: Boolean
-                get() = isErrorCountMore || isErrorCount
-        }
-    }
-
-
 }
 
+enum class ActionWithAnimal {
+    ADD_ANIMAL, SALE_ANIMAL, WRITE_OFF_ANIMAL, KILL_ANIMAL
+}
 
 /*fun AnimalCardState.saveAddAnimal() {
     if (isErrorAddAnimal(count = countAnimal, isErrorCount = { isErrorCount = it })

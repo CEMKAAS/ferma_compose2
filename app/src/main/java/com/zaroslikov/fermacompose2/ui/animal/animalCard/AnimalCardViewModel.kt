@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainExpensesTable
@@ -33,10 +32,10 @@ import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 import com.zaroslikov.fermacompose2.supportFun.isAnimalCountDifference
 import com.zaroslikov.fermacompose2.supportFun.isAnimalCountIncrease
 import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
-import com.zaroslikov.fermacompose2.supportFun.isError
-import com.zaroslikov.fermacompose2.supportFun.isErrorAnimalSale
+import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.CountAnimal.ProductKill
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -91,11 +90,11 @@ class AnimalCardViewModel @Inject constructor(
                     size = data.size,
                     vaccination = data.vacc,
                     weight = data.weight,
-                    saleAnimal = it.saleAnimal.copy(
-                        countAnimal = if (data.animal.group) "" else "1"
-                    ),
-                    writeOffAnimal = it.writeOffAnimal.copy(
-                        countAnimal = if (data.animal.group) "" else "1"
+                    actionAnimal = it.actionAnimal.copy(
+                        countAnimal = if (data.animal.group) "" else "1",
+                        /*productSuffix = (data.weight
+                            ?: resourceProvider.getString(R.string.suffix_kilogram)).toString()
+                  */
                     )
                 )
             }
@@ -115,92 +114,38 @@ class AnimalCardViewModel @Inject constructor(
 
             // Add-Expenses Count Animal
             is AnimalCardIntent.DialogAddClicked -> updateState { it.copy(openAddDialog = intent.value) }
-            is AnimalCardIntent.CountAddChanged -> updateCount(intent.count)
-            is AnimalCardIntent.AutoPriceAddClicked -> updateAutoPrice(intent.isAutoPrice)
-            is AnimalCardIntent.PriceAddChanged -> updatePrice(intent.price)
-            is AnimalCardIntent.NoteAddChanged -> updateAddCountNote(intent.note)
+            is AnimalCardIntent.CountAddChanged -> updateCountAdd(intent.count)
+            is AnimalCardIntent.PriceAddChanged -> updatePriceActionAnimal(intent.price)
+            is AnimalCardIntent.AutoPriceAddClicked -> updateAutoPriceActionAnimal(intent.isAutoPrice)
+            is AnimalCardIntent.NoteAddChanged -> updateNoteActionAnimal(intent.note)
             AnimalCardIntent.SaveAddPressed -> saveAddAnimal()
 
             // Sale Count Animal
             is AnimalCardIntent.DialogSaleClicked -> updateSaleDialog(intent.value)
-            is AnimalCardIntent.CountSaleChanged -> updateCountSale(intent.value)
+            is AnimalCardIntent.CountSaleChanged -> updateCountActionAnimal(intent.value)
             is AnimalCardIntent.PriceSaleChanged -> updatePriceSale(intent.value)
-            is AnimalCardIntent.AutoPriceSaleClicked -> updateAutoCalculateSale(intent.value)
+            is AnimalCardIntent.AutoPriceSaleClicked -> updateAutoPriceActionAnimal(intent.value)
             is AnimalCardIntent.BuyerSaleChanged -> updateBuyerSale(intent.value)
             AnimalCardIntent.SaveSalePressed -> saveSaleAnimal()
 
             // WriteOff Count Animal
-            is AnimalCardIntent.DialogWriteOffClicked -> TODO()
-            is AnimalCardIntent.CountWriteOffChanged -> TODO()
-            is AnimalCardIntent.PriceWriteOffChanged -> TODO()
-            is AnimalCardIntent.AutoPriceWriteOffClicked -> TODO()
-            is AnimalCardIntent.NoteWriteOffChanged -> TODO()
+            is AnimalCardIntent.DialogWriteOffClicked -> updateState { it.copy(openWriteOffDialog = intent.value) }
+            is AnimalCardIntent.CountWriteOffChanged -> updateCountActionAnimal(intent.value)
+            is AnimalCardIntent.PriceWriteOffChanged -> updatePriceActionAnimal(intent.value)
+            is AnimalCardIntent.AutoPriceWriteOffClicked -> updateAutoPriceActionAnimal(intent.value)
+            is AnimalCardIntent.NoteWriteOffChanged -> updateNoteActionAnimal(intent.value)
             AnimalCardIntent.SaveWriteOffPressed -> TODO()
-        }
-    }
 
-    // Add-Expenses Count Animal
-    private fun updateCount(count: String) {
-        updateState { state ->
-            state.copy(
-                addAnimal = state.addAnimal.copy(
-                    count = count,
-                    isErrorCount = count.isBlank()
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updatePrice(price: String) {
-        updateState { state ->
-            state.copy(
-                addAnimal = state.addAnimal.copy(
-                    count = price
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updateAutoPrice(isAutoPrice: Boolean) {
-        updateState { state ->
-            state.copy(
-                addAnimal = state.addAnimal.copy(
-                    isAutoPrice = isAutoPrice
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updateAddCountNote(note: String) {
-        updateState { state ->
-            state.copy(
-                addAnimal = state.addAnimal.copy(
-                    note = note
-                )
-            )
-        }
-    }
-
-    private fun updatePriceAll() {
-        updateState {
-            it.copy(
-                addAnimal = it.addAnimal.copy(
-                    priceAll = if (it.addAnimal.isAutoPrice) (it.addAnimal.price.toConvertZeroDouble() * it.addAnimal.count.toConvertZeroDouble()).formatNumber() else "0",
-                )
-            )
-        }
-    }
-
-    private fun validationSaveAddAnimal() {
-        updateState { state ->
-            state.copy(
-                addAnimal = state.addAnimal.copy(
-                    isErrorCount = state.addAnimal.count.isBlank()
-                )
-            )
+            // Kill Count Animal
+            is AnimalCardIntent.DialogKillClicked -> updateKillDialog(intent.value)
+            is AnimalCardIntent.CountKillChanged -> TODO()
+            is AnimalCardIntent.TitleProductKillChanged -> updateTitleProductKill()
+            is AnimalCardIntent.TitleAndSuffixKillClicked -> TODO()
+            is AnimalCardIntent.CountProductKillChanged -> TODO()
+            is AnimalCardIntent.SuffixProductKillChanged -> TODO()
+            AnimalCardIntent.AddProductKillChanged -> TODO()
+            is AnimalCardIntent.RemoveProductKillChanged -> TODO()
+            AnimalCardIntent.SaveKillChanged -> TODO()
         }
     }
 
@@ -217,11 +162,100 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
+    // Action Animal
+    private fun updateCountActionAnimal(countAnimal: String) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    countAnimal = countAnimal,
+                    error = state.actionAnimal.error.copy(
+                        isErrorCount = countAnimal.isBlank(),
+                        isErrorCountMore = isAnimalCountIncrease(
+                            countAnimal,
+                            getState().countAnimal.count
+                        ),
+                        isErrorCountZero = isAnimalCountZero(countAnimal)
+                    )
+                )
+            )
+        }
+        updatePriceAllActionAnimal()
+    }
+
+    private fun updatePriceActionAnimal(price: String) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    price = price
+                )
+            )
+        }
+        updatePriceAllActionAnimal()
+    }
+
+    private fun updateAutoPriceActionAnimal(isAutoPrice: Boolean) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    isAutoPrice = isAutoPrice
+                )
+            )
+        }
+        updatePriceAllActionAnimal()
+    }
+
+    private fun updateNoteActionAnimal(note: String) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    note = note
+                )
+            )
+        }
+    }
+
+    private fun updatePriceAllActionAnimal() {
+        updateState {
+            it.copy(
+                actionAnimal = it.actionAnimal.copy(
+                    priceAll = if (it.actionAnimal.isAutoPrice) (it.actionAnimal.price.toConvertZeroDouble() * it.actionAnimal.countAnimal.toConvertZeroDouble()).formatNumber() else "0",
+                )
+            )
+        }
+    }
+
+    // Add-Expenses Count Animal
+    private fun updateCountAdd(countAnimal: String) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    countAnimal = countAnimal,
+                    error = state.actionAnimal.error.copy(
+                        isErrorCount = countAnimal.isBlank()
+                    )
+                )
+            )
+        }
+        updatePriceAllActionAnimal()
+    }
+
+    private fun validationSaveAddAnimal() {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    error = state.actionAnimal.error.copy(
+                        isErrorCount = state.actionAnimal.countAnimal.isBlank()
+                    )
+                )
+            )
+        }
+    }
+
     fun saveAddAnimal() {
         viewModelScope.launch {
-            val state = getState().addAnimal
+            val state = getState().actionAnimal
             validationSaveAddAnimal()
-            if (state.isErrorCount) {
+            if (state.error.isErrorCount) {
                 val reasonNote = resourceProvider.getString(
                     if (state.note.isBlank())
                         R.string.animal_card_screen_add_no_note_reason
@@ -230,8 +264,8 @@ class AnimalCardViewModel @Inject constructor(
                 ).format(state.note)
 
                 val domainCountAnimal = DomainAnimalCount(
-                    count = state.count,
-                    suffix = state.countSuffix,
+                    count = state.countAnimal,
+                    suffix = state.suffixAnimal,
                     date = dateToday(),
                     idAnimal = itemIdPT,
                     note = reasonNote,
@@ -247,13 +281,13 @@ class AnimalCardViewModel @Inject constructor(
                         DomainExpensesTable(
                             id = 0,
                             title = getState().animal.name,
-                            count = state.count.toConvertDbDouble(),
+                            count = state.countAnimal.toConvertDbDouble(),
                             day = dateTodayArray()[0],
                             month = dateTodayArray()[1],
                             year = dateTodayArray()[2],
                             price = state.price.toConvertDbDouble(),
                             priceAll = if (state.isAutoPrice) state.priceAll.toConvertDbDouble() else null,
-                            countSuffix = state.countSuffix,
+                            countSuffix = state.suffixAnimal,
                             category = TODO(),
                             note = TODO(),
                             isShowFood = false,
@@ -283,51 +317,25 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
-    private fun updateCountSale(countAnimal: String) {
-        updateState { state ->
-            state.copy(
-                saleAnimal = state.saleAnimal.copy(
-                    countAnimal = countAnimal,
-                    error = state.saleAnimal.error.copy(
-                        isErrorCount = countAnimal.isBlank(),
-                        isErrorCountMore = isAnimalCountIncrease(
-                            countAnimal,
-                            getState().countAnimal.count
-                        ),// текущее кол-во животных
-                        isErrorCountZero = isAnimalCountZero(countAnimal)
-                    )
-                )
-            )
-        }
-    }
 
     private fun updatePriceSale(price: String) {
         updateState { state ->
             state.copy(
-                saleAnimal = state.saleAnimal.copy(
+                actionAnimal = state.actionAnimal.copy(
                     price = price,
-                    error = state.saleAnimal.error.copy(
+                    error = state.actionAnimal.error.copy(
                         isErrorPrice = price.isBlank()
                     )
                 )
             )
         }
-    }
-
-    private fun updateAutoCalculateSale(isAutoPrice: Boolean) {
-        updateState { state ->
-            state.copy(
-                saleAnimal = state.saleAnimal.copy(
-                    isAutoPrice = isAutoPrice
-                )
-            )
-        }
+        updatePriceAllActionAnimal()
     }
 
     private fun updateBuyerSale(buyer: String) {
         updateState { state ->
             state.copy(
-                saleAnimal = state.saleAnimal.copy(
+                actionAnimal = state.actionAnimal.copy(
                     buyer = buyer
                 )
             )
@@ -336,14 +344,14 @@ class AnimalCardViewModel @Inject constructor(
 
     fun saveSaleAnimal() {
         viewModelScope.launch {
-            val state = getState().saleAnimal
+            val state = getState().actionAnimal
             // TODO validation
-            if (state.error.hasAnyError) {
+            if (state.hasAnyError) {
 
                 val countId = animalCountRepository.insertAnimalCountTable(
                     DomainAnimalCount(
                         count = state.countAnimal,
-                        suffix = state.countSuffix,
+                        suffix = state.suffixAnimal,
                         date = dateToday(),
                         idAnimal = itemId,
                         note = "",
@@ -355,7 +363,7 @@ class AnimalCardViewModel @Inject constructor(
                     DomainSaleTable(
                         title = getState().animal.name,
                         count = state.countAnimal.toConvertDbDouble(),
-                        countSuffix = state.countSuffix,
+                        countSuffix = state.suffixAnimal,
                         price = state.price.toConvertDbDouble(),
                         priceAll = if (state.isAutoPrice) state.priceAll.toConvertDbDouble() else null,
                         day = dateTodayArray()[0],
@@ -387,60 +395,11 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
-    // WriteOff Animal
-
-    private fun updateCountWriteOff(count: String) {
-        updateState { state ->
-            state.copy(
-                writeOffAnimal = state.writeOffAnimal.copy(
-                    countAnimal = count,
-                    error = state.writeOffAnimal.error.copy(
-                        isErrorCount = count.isBlank(),
-                        isErrorCountMore = isAnimalCountIncrease(
-                            count,
-                            getState().countAnimal.count
-                        )
-                    )
-                )
-            )
-        }
-    }
-
-    private fun updatePriceWriteOff(price: String) {
-        updateState { state ->
-            state.copy(
-                writeOffAnimal = state.writeOffAnimal.copy(
-                    price = price,
-                )
-            )
-        }
-    }
-
-    private fun updateAutoCalculateWriteOff(isAutoPrice: Boolean) {
-        updateState { state ->
-            state.copy(
-                writeOffAnimal = state.writeOffAnimal.copy(
-                    isAutoPrice = isAutoPrice
-                )
-            )
-        }
-    }
-
-    private fun updateNoteWriteOff(note: String) {
-        updateState { state ->
-            state.copy(
-                writeOffAnimal = state.writeOffAnimal.copy(
-                    note = note
-                )
-            )
-        }
-    }
-
-    fun saveSaleAnimal() {
+    fun saveWriteOffAnimal() {
         viewModelScope.launch {
-            val state = getState().writeOffAnimal
+            val state = getState().actionAnimal
             // TODO validation
-            if (state.error.hasAnyError) {
+            if (state.hasAnyError) {
 
                 val reasonNote = resourceProvider.getString(
                     if (state.note.isBlank())
@@ -452,7 +411,7 @@ class AnimalCardViewModel @Inject constructor(
                 val countId = animalCountRepository.insertAnimalCountTable(
                     DomainAnimalCount(
                         count = state.countAnimal,
-                        suffix = state.countSuffix,
+                        suffix = state.suffixAnimal,
                         date = dateToday(),
                         idAnimal = itemId,
                         note = reasonNote,
@@ -465,7 +424,7 @@ class AnimalCardViewModel @Inject constructor(
                     DomainWriteOffTable(
                         title = getState().animal.name,
                         count = state.countAnimal.toConvertDbDouble(),
-                        countSuffix = state.countSuffix,
+                        countSuffix = state.suffixAnimal,
                         price = if (state.price.isNotBlank()) state.price.toConvertDbDouble() else null,
                         priceAll = if (state.isAutoPrice) state.priceAll.toConvertDbDouble() else null,
                         day = dateTodayArray()[0],
@@ -498,11 +457,142 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
+    // Kill Animal Count
+    private fun updateKillDialog(openDialog: Boolean) {
+        viewModelScope.launch {
+            val buyer =
+                if (openDialog) saleRepository.getItemsBuyerSaleList(itemIdPT)
+                    .first() else getState().buyerList
 
+            updateState { state ->
+                state.copy(openKillDialog = openDialog)
+            }
+        }
+    }
+
+    private fun updateTitleProductKill(index: Int, newTitle: String) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    productKill = state.actionAnimal.productKill.mapIndexed { i, item ->
+                        if (i == index)
+                            item.copy(
+                                title = newTitle,
+                                error = item.error.copy(
+                                    isError = newTitle.isBlank(),
+                                    isErrorSlash = newTitle.isSlash()
+                                )
+                            )
+                        else item
+                    }
+                )
+            )
+        }
+        //TODO Warehouse
+//        coroutineScope.launch {
+//            val countAndSuffix = onUpdateCountWarehouse(
+//                newTitle
+//            )
+//            textFields[index] =
+//                textFields[index].copy(
+//                    countWarehouse = countAndSuffix.first,
+//                    countWarehouseSuffix = countAndSuffix.second
+//                )
+//        }
+    }
+
+    private fun updateCountProductKill() {
+        /* newCount ->
+                             val current = textFields[index]
+                             textFields[index] = current.copy(
+                                 count = newCount,
+                                 isErrorCount = newCount.isError()
+                             )*/
+    }
+
+    private fun updateSuffixProductKill() {
+//                                textFields[index] = textFields[index].copy(suffix = it)
+    }
+
+
+    private fun saleKillAnimal() {
+        val animalCategory = stringResource(R.string.animal_card_screen_category_kill)
+        val note = stringResource(R.string.animal_card_screen_note_kill)
+        val reasonNote = stringResource(
+            R.string.animal_card_screen_kill_add_product,
+        )
+        if (isErrorKillAnimal(
+                countAnimal = countAnimal,
+                countAnimalAll = countAnimalAll,
+                isAnimalGroup = isAnimalGroup,
+                textFields = textFields,
+                isErrorCount = { isErrorCount = it },
+                isErrorCountMore = { isErrorCountMore = it },
+                isErrorCountZero = { isErrorCountZero = it }
+            )
+        ) {
+            val count = if (isAnimalGroup) isAnimalCountDifference(
+                countAnimal,
+                countAnimalAll
+            ) else countAnimalAll
+
+            val resultText = textFields.mapIndexed { index, it ->
+                "${index + 1}. ${it.title} - ${it.count} ${it.suffix}"
+            }.joinToString("\n")
+
+            textFields.forEach {
+                onSaveProductClick(
+                    AddTable(
+                        title = it.title,
+                        count = it.count.toConvertZeroDouble(),
+                        day = dateTodayArray()[0],
+                        mount = dateTodayArray()[1],
+                        year = dateTodayArray()[2],
+                        countSuffix = it.suffix,
+                        category = animalCategory,
+                        animalId = idPT.toLong(),
+                        note = note,
+                        price = 0.0,
+                        idPT = idPT.toLong()
+                    )
+                )
+            }
+            onSaveCountClick(
+                Triple(
+                    first = DomainIndicatorsVM(
+                        //                                        weight = count,
+                        weight = countAnimal,
+                        suffix = countSuffix,
+                        date = dateToday(),
+                        idAnimal = idAnimal.toInt(),
+                        note = resultText,
+                        version = 2
+                    ),
+                    second = WriteOffTable(
+                        title = title,
+                        count = countAnimal.toConvertDbDouble(),
+                        day = dateTodayArray()[0],
+                        mount = dateTodayArray()[1],
+                        year = dateTodayArray()[2],
+                        status = false,
+                        priceAll = 0.0,
+                        countSuffix = countSuffix,
+                        note = reasonNote + resultText,
+                        idPT = idPT.toLong(),
+                        id = TODO(),
+                        price = TODO(),
+                        animalCountId = TODO()
+                    ),
+                    third = count.toInt() == 0
+                )
+            )
+            if (count.toInt() == 1 && isAnimalGroup) openDialogGroup = true
+            else onConfirmation()
+        }
+    }
 
 
     // Animal Card
-
     private fun updateSoloDialog(openDialog: Boolean) {
         updateState {
             it.copy(
@@ -673,7 +763,14 @@ sealed class AnimalCardIntent : BaseIntent {
 
     // Kill Count Animal
     data class DialogKillClicked(val value: Boolean) : AnimalCardIntent()
-
+    data class CountKillChanged(val value: String) : AnimalCardIntent()
+    data class TitleProductKillChanged(val value: String) : AnimalCardIntent()
+    data class TitleAndSuffixKillClicked(val pair: Pair<String, String>) : AnimalCardIntent()
+    data class CountProductKillChanged(val value: String) : AnimalCardIntent()
+    data class SuffixProductKillChanged(val value: String) : AnimalCardIntent()
+    data object AddProductKillChanged : AnimalCardIntent()
+    data class RemoveProductKillChanged(val value: ProductKill) : AnimalCardIntent()
+    data object SaveKillChanged : AnimalCardIntent()
 }
 
 

@@ -10,16 +10,15 @@ import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardIntent
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 
 
 @Composable
 fun AlertDialogAddAnimal(
-    state: AnimalCardState.AddAnimal,
+    state: AnimalCardState.CountAnimal,
     onIntent: (AnimalCardIntent) -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
-
     val (titleText, titlePaint, titleButton) =
         if (state.price.isBlank())
             Triple(
@@ -40,15 +39,13 @@ fun AlertDialogAddAnimal(
         titleButton = titleButton,
         onDismissClick = { onIntent(AnimalCardIntent.DialogAddClicked(false)) },
         content = {
-            OutlinedTextCountAnimal(
-                value = state.count,
-                onValueChange = { onIntent(AnimalCardIntent.CountAddChanged(it)) },
-                isError = state.isErrorCount,
-                intRes = R.string.outlined_text_field_quantity,
-                drawableRes = R.drawable.baseline_spoke_24,
-                count = state.price,
-                suffix = state.countSuffix,
-                focusManager = focusManager
+            OutlinedTextCountAnimal2(
+                value = state.countAnimal,
+                onValueChange = {
+                    onIntent(AnimalCardIntent.CountAddChanged(it))
+                },
+                isError = state.error.isErrorCount,
+                suffix = state.suffixAnimal
             )
             OutlinedPriceInput(
                 price = state.price,

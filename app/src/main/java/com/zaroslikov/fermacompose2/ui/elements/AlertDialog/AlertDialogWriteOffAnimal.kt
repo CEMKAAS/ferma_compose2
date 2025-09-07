@@ -38,7 +38,7 @@ import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryIntent
 
 @Composable
 fun AlertDialogWriteOffAnimal(
-    state: AnimalCardState.WriteOffAnimal,
+    state: AnimalCardState.CountAnimal,
     onIntent: (AnimalCardIntent) -> Unit,
     isAnimalGroup: Boolean,
     countAll: String,

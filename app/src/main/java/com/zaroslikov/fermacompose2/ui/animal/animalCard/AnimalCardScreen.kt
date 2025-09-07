@@ -217,15 +217,7 @@ fun AnimalCardContainer(
 //                openArchiveDialog = !openArchiveDialog
             }
         )
-        if (state.openSaleDialog)
-            AlertDialogSaleAnimal(
-                state = state.saleAnimal,
-                onIntent = onIntent,
-                isAnimalGroup = state.animal.group,
-                countAll = state.countAnimal.count,
-                countSuffix = state.countAnimal.suffix,
-                buyerList = state.buyerList
-            )
+
 
         if (state.openKillDialog)
             AlertDialogKillAnimal(
@@ -250,19 +242,26 @@ fun AnimalCardContainer(
                         onConfirmation = { openArchiveDialog = !openArchiveDialog },
                         onArchiveClick = updateArchive
                     )*/
-
+        if (state.openSaleDialog)
+            AlertDialogSaleAnimal(
+                state = state.actionAnimal,
+                onIntent = onIntent,
+                isAnimalGroup = state.animal.group,
+                countAll = state.countAnimal.count,
+                countSuffix = state.countAnimal.suffix,
+                buyerList = state.buyerList
+            )
         if (state.openWriteOffDialog)
             AlertDialogWriteOffAnimal(
-                state = state.writeOffAnimal,
+                state = state.actionAnimal,
                 onIntent = onIntent,
                 isAnimalGroup = state.animal.group,
                 countAll = state.countAnimal.count,
                 countSuffix = state.countAnimal.suffix
             )
-
         if (state.openAddDialog)
             AlertDialogAddAnimal(
-                state = state.addAnimal,
+                state = state.actionAnimal,
                 onIntent = onIntent
             )
         if (state.openSoloDialog)
@@ -271,7 +270,6 @@ fun AnimalCardContainer(
                 onUpdateSex = { onIntent(AnimalCardIntent.SexClicked(it)) },
                 onConfirmation = { onIntent(AnimalCardIntent.DialogSoloClicked(false)) }
             )
-
     }
 }
 

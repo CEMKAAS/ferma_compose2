@@ -527,7 +527,7 @@ fun OutlinedTextCountAnimal2(
     isError: Boolean,
     isErrorCountMore: Boolean = false,
     isErrorCountZero: Boolean = false,
-    countAnimalAll: String,
+    countAnimalAll: String = "",
     suffix: String,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
 ) {

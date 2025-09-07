@@ -13,7 +13,7 @@ import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 
 @Composable
 fun AlertDialogSaleAnimal(
-    state: AnimalCardState.SaleAnimal,
+    state: AnimalCardState.CountAnimal,
     onIntent: (AnimalCardIntent) -> Unit,
     isAnimalGroup: Boolean,
     countAll: String,
