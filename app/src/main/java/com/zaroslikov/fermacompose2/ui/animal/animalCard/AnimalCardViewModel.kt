@@ -139,13 +139,13 @@ class AnimalCardViewModel @Inject constructor(
             // Kill Count Animal
             is AnimalCardIntent.DialogKillClicked -> updateKillDialog(intent.value)
             is AnimalCardIntent.CountKillChanged -> TODO()
-            is AnimalCardIntent.TitleProductKillChanged -> updateTitleProductKill()
+            is AnimalCardIntent.TitleProductKillChanged -> updateTitleProductKill(intent.index, intent.value)
             is AnimalCardIntent.TitleAndSuffixKillClicked -> TODO()
-            is AnimalCardIntent.CountProductKillChanged -> TODO()
-            is AnimalCardIntent.SuffixProductKillChanged -> TODO()
-            AnimalCardIntent.AddProductKillChanged -> TODO()
-            is AnimalCardIntent.RemoveProductKillChanged -> TODO()
-            AnimalCardIntent.SaveKillChanged -> TODO()
+            is AnimalCardIntent.CountProductKillChanged -> updateCountProductKill(intent.index, intent.value)
+            is AnimalCardIntent.SuffixProductKillChanged -> updateSuffixProductKill(intent.index, intent.value)
+            AnimalCardIntent.AddProductKillChanged -> addProductKill()
+            is AnimalCardIntent.RemoveProductKillChanged -> removeProductKill(intent.index)
+            AnimalCardIntent.SaveKillChanged -> saleKillAnimal()
         }
     }
 
@@ -501,17 +501,58 @@ class AnimalCardViewModel @Inject constructor(
 //        }
     }
 
-    private fun updateCountProductKill() {
-        /* newCount ->
-                             val current = textFields[index]
-                             textFields[index] = current.copy(
-                                 count = newCount,
-                                 isErrorCount = newCount.isError()
-                             )*/
+    private fun updateCountProductKill(index: Int, newCount: String) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    productKill = state.actionAnimal.productKill.mapIndexed { i, item ->
+                        if (i == index)
+                            item.copy(
+                                countProduct = newCount,
+                                error = item.error.copy(
+                                    isErrorCount = newCount.isBlank(),
+                                )
+                            )
+                        else item
+                    }
+                )
+            )
+        }
     }
 
-    private fun updateSuffixProductKill() {
-//                                textFields[index] = textFields[index].copy(suffix = it)
+    private fun updateSuffixProductKill(index: Int, newCount: String) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    productKill = state.actionAnimal.productKill.mapIndexed { i, item ->
+                        if (i == index) item.copy(suffixProduct = newCount)
+                        else item
+                    }
+                )
+            )
+        }
+    }
+
+    private fun addProductKill() {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    productKill = state.actionAnimal.productKill + ProductKill()
+                )
+            )
+        }
+    }
+
+    private fun removeProductKill(index: Int) {
+        updateState { state ->
+            state.copy(
+                actionAnimal = state.actionAnimal.copy(
+                    productKill = state.actionAnimal.productKill.toMutableList().also {
+                        if (index in it.indices) it.removeAt(index)
+                    }
+                )
+            )
+        }
     }
 
 
@@ -764,12 +805,12 @@ sealed class AnimalCardIntent : BaseIntent {
     // Kill Count Animal
     data class DialogKillClicked(val value: Boolean) : AnimalCardIntent()
     data class CountKillChanged(val value: String) : AnimalCardIntent()
-    data class TitleProductKillChanged(val value: String) : AnimalCardIntent()
+    data class TitleProductKillChanged(val index: Int, val value: String) : AnimalCardIntent()
     data class TitleAndSuffixKillClicked(val pair: Pair<String, String>) : AnimalCardIntent()
-    data class CountProductKillChanged(val value: String) : AnimalCardIntent()
-    data class SuffixProductKillChanged(val value: String) : AnimalCardIntent()
+    data class CountProductKillChanged(val index: Int, val value: String) : AnimalCardIntent()
+    data class SuffixProductKillChanged(val index: Int, val value: String) : AnimalCardIntent()
     data object AddProductKillChanged : AnimalCardIntent()
-    data class RemoveProductKillChanged(val value: ProductKill) : AnimalCardIntent()
+    data class RemoveProductKillChanged(val index: Int) : AnimalCardIntent()
     data object SaveKillChanged : AnimalCardIntent()
 }
 
