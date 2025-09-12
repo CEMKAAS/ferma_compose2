@@ -24,7 +24,7 @@ interface AnimalWeightDao {
                 " WHERE idAnimal=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
-    fun getWeightAnimalLimit(id: Long): Flow<AnimalWeightTable>
+    fun getWeightAnimalLimit(id: Long): Flow<AnimalWeightTable?>
 
     @Query(
         "SELECT  * FROM AnimalWeightTable" +

@@ -12,6 +12,8 @@ import androidx.navigation.navArgument
 import com.zaroslikov.fermacompose2.ui.add.AddProject
 import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardDestination
+import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
 //import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardDestination
 //import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalDestination
@@ -595,37 +597,37 @@ fun InventoryNavHost(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() })
         }
-
-        /* composable(
-             route = AnimalDestination.routeWithArgs,
-             arguments = listOf(navArgument(AnimalDestination.itemIdArg) {
-                 type = NavType.IntType
-             })
-         ) {
-             AnimalScreen(
-                 drawerState = drawerState, navigateToStart = {
-                     navController.navigate(StartDestination.route)
-                 }, navigateToModalSheet = {
-                     navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-                 }, navigateToItemAdd = {
-                     navController.navigate(
-                         navNull(
-                             AnimalEntryDestination.route,
-                             AnimalEntryDestination.itemIdPT,
-                             it.toString()
-                         )
-                     )
-                 }, navigateToItemCard = {
-                     navController.navigate(
-                         navNull(
-                             route = AnimalCardDestination.route,
-                             itemOne = it.first.toString(),
-                             itemTwo = it.second.toString()
-                         )
-                     )
-                 }, isFirstStart = isFirstStart
-             )
-         }*/
+        // Animal
+        composable(
+            route = AnimalDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalScreen(
+                drawerState = drawerState, navigateToStart = {
+                    navController.navigate(StartDestination.route)
+                }, navigateToModalSheet = {
+                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                }, navigateToItemAdd = {
+                    navController.navigate(
+                        navNull(
+                            AnimalEntryDestination.route,
+                            AnimalEntryDestination.itemIdPT,
+                            it.toString()
+                        )
+                    )
+                }, navigateToItemCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                }, isFirstStart = isFirstStart
+            )
+        }
 
         composable(
             route = AnimalEntryDestination.routeWithArgs,
@@ -643,7 +645,7 @@ fun InventoryNavHost(
                 onNavigateUp = { navController.navigateUp() })
         }
 
-        /*composable(
+        composable(
             route = AnimalCardDestination.routeWithArgs,
             arguments = listOf(navArgument(AnimalCardDestination.itemIdPT) {
                 type = NavType.LongType
@@ -662,28 +664,30 @@ fun InventoryNavHost(
                         )
                     )
                 },
-                onNavigateIndicators = { navController.navigate("${AnimalIndicatorsDestination.route}/${it.first}/${it.second}/${it.third}") })
+                onNavigateIndicators = {
+//                    navController.navigate("${AnimalIndicatorsDestination.route}/${it.first}/${it.second}/${it.third}")
+                })
         }
-
-        composable(
-            route = AnimalIndicatorsDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(AnimalIndicatorsDestination.itemIdArg) {
-                    type = NavType.IntType
-                },
-                navArgument(AnimalIndicatorsDestination.itemIdArgTwo) {
-                    type = NavType.IntType
-                },
-                navArgument(AnimalIndicatorsDestination.itemIdArgTree) {
-                    type = NavType.LongType
-                }
-            )) {
-            AnimalIndicatorsScreen(
-                navigateBack = { navController.popBackStack() },
-                navigateSection = { navController.navigate(it) }
-            )
-        }
-*/
+        /*
+               composable(
+                   route = AnimalIndicatorsDestination.routeWithArgs,
+                   arguments = listOf(
+                       navArgument(AnimalIndicatorsDestination.itemIdArg) {
+                           type = NavType.IntType
+                       },
+                       navArgument(AnimalIndicatorsDestination.itemIdArgTwo) {
+                           type = NavType.IntType
+                       },
+                       navArgument(AnimalIndicatorsDestination.itemIdArgTree) {
+                           type = NavType.LongType
+                       }
+                   )) {
+                   AnimalIndicatorsScreen(
+                       navigateBack = { navController.popBackStack() },
+                       navigateSection = { navController.navigate(it) }
+                   )
+               }
+       */
         /*composable(
             route = AnimalEditDestination.routeWithArgs,
             arguments = listOf(

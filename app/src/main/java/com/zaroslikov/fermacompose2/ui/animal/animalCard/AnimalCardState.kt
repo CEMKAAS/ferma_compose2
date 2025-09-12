@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
+import android.util.Log
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
@@ -18,10 +19,10 @@ data class AnimalCardState(
     val openArchiveDialog: Boolean = false,
     val openSoloDialog: Boolean = false,
     val animal: DomainAnimalTable = DomainAnimalTable(),
-    val weight: DomainAnimalWeight = DomainAnimalWeight(),
-    val size: DomainAnimalSize = DomainAnimalSize(),
+    val weight: DomainAnimalWeight? = DomainAnimalWeight(),
+    val size: DomainAnimalSize? = DomainAnimalSize(),
     val countAnimal: DomainAnimalCount = DomainAnimalCount(),
-    val vaccination: DomainAnimalVaccination = DomainAnimalVaccination(),
+    val vaccination: DomainAnimalVaccination? = DomainAnimalVaccination(),
     val age: String = "",
     val price: Double? = 0.0,
     val buyerList: List<String> = emptyList(),
@@ -43,7 +44,10 @@ data class AnimalCardState(
         val error: Error = Error(),
     ) {
         val hasAnyError: Boolean
-            get() = error.hasAnyError(actionWithAnimal)
+            get() = !error.hasAnyError(actionWithAnimal)
+
+        val hasFieldError: Boolean
+            get() = !productKill.any { it.hasError }
 
         data class Error(
             val isErrorPrice: Boolean = false,
@@ -54,9 +58,9 @@ data class AnimalCardState(
             fun hasAnyError(actionWithAnimal: ActionWithAnimal): Boolean {
                 return when (actionWithAnimal) {
                     ActionWithAnimal.ADD_ANIMAL -> isErrorCount
-                    ActionWithAnimal.SALE_ANIMAL -> isErrorPrice || isErrorCountMore || isErrorCount || isErrorCountZero
-                    ActionWithAnimal.WRITE_OFF_ANIMAL -> isErrorCountMore || isErrorCount
-                    ActionWithAnimal.KILL_ANIMAL -> isErrorCountMore || isErrorCount
+                    ActionWithAnimal.SALE_ANIMAL -> isErrorPrice || isErrorCount || isErrorCountMore || isErrorCountZero
+                    ActionWithAnimal.WRITE_OFF_ANIMAL -> isErrorCount || isErrorCountMore || isErrorCountZero
+                    ActionWithAnimal.KILL_ANIMAL -> isErrorCount || isErrorCountMore || isErrorCountZero
                 }
             }
         }
@@ -71,10 +75,27 @@ data class AnimalCardState(
             val titleList: List<TitleAndSuffixDomain> = emptyList(),
             val error: Error = Error()
         ) {
+            val hasError: Boolean
+                get() = error.isError || error.isErrorSlash || error.isErrorCount
+
             data class Error(
                 val isError: Boolean = false,
                 val isErrorSlash: Boolean = false,
                 val isErrorCount: Boolean = false,
+            )
+        }
+
+        fun reset(): CountAnimal {
+            return this.copy(
+                countAnimal = this.countAnimal,
+                suffixAnimal = this.suffixAnimal,
+                isAutoPrice = false,
+                price = "",
+                priceAll = "",
+                buyer = "",
+                note = "",
+                productKill = listOf(ProductKill()),
+                error = Error()
             )
         }
     }

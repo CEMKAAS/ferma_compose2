@@ -162,7 +162,7 @@ fun ExpensesEntryContainerProduct(
             onPriceChange = {
                 onIntent(ExpensesEntryIntent.PriceChanged(it))
             },
-            count = state.priceAll,
+            priceAll = state.priceAll,
             isError = state.error.isErrorPrice,
             isAutoCalculate = state.isAutoPrice,
             onAutoCalculate = {

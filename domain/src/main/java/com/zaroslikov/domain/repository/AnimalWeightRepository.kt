@@ -7,6 +7,6 @@ interface AnimalWeightRepository {
     suspend fun insertAnimalWeightTable(animalWeightTable: DomainAnimalWeight)
     suspend fun updateAnimalWeightTable(animalWeightTable:  DomainAnimalWeight)
     suspend fun deleteAnimalWeightTable(animalWeightTable:  DomainAnimalWeight)
-    fun getWeightAnimalLimit(id: Long): Flow< DomainAnimalWeight>
+    fun getWeightAnimalLimit(id: Long): Flow< DomainAnimalWeight?>
     fun getWeightAnimal(id: Long): Flow<List< DomainAnimalWeight>>
 }

@@ -146,7 +146,7 @@ fun AnimalEntryContainer(
                 onPriceChange = {
                     onIntent(AnimalEntryIntent.PriceChanged(it))
                 },
-                count = state.priceAll,
+                priceAll = state.priceAll,
                 isAutoCalculate = state.isAutoPrice,
                 onAutoCalculate = {
                     onIntent(AnimalEntryIntent.AutoPriceClicked(it))

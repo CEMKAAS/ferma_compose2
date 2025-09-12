@@ -47,15 +47,16 @@ fun AlertDialogSaleAnimal(
                 onPriceChange = {
                     onIntent(AnimalCardIntent.PriceSaleChanged(it))
                 },
-                count = state.countAnimal,
+                priceAll = state.priceAll,
                 isAutoCalculate = state.isAutoPrice,
                 onAutoCalculate = {
                     onIntent(AnimalCardIntent.AutoPriceSaleClicked(it))
                 },
-                isManyCount = state.isAutoPrice,
+                isManyCount = isAnimalGroup,
                 isError = state.error.isErrorPrice,
                 supportTextRes = if (isAnimalGroup) R.string.support_text_price_animals else R.string.support_text_price_animal,
                 supportTextResAutoCal = R.string.support_text_price_one_animals,
+                isNecessarily = true
             )
             OutlinedTextBuyer(
                 value = state.buyer,

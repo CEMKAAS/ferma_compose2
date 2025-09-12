@@ -17,7 +17,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.dto.PairData
 import com.zaroslikov.fermacompose2.supportFun.animalCountWeightComposition
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.infoTextKillAnimal
@@ -52,6 +51,7 @@ fun AlertDialogKillAnimal(
         title = textTitle,
         titleButton = stringResource(R.string.button_text_add),
         onDismissClick = { onIntent(AnimalCardIntent.DialogKillClicked(false)) },
+        isScroll = false,
         content = {
             CardTotal(
                 textFields = state.productKill,
@@ -87,15 +87,27 @@ fun AlertDialogKillAnimal(
                                 title = textPosition,
                                 iconResEnd = Icons.Default.Close,
                                 onClickIconEnd = {
-                                    onIntent(AnimalCardIntent.RemoveProductKillChanged(product))
+                                    onIntent(
+                                        AnimalCardIntent.RemoveProductKillChanged(
+                                            index
+                                        )
+                                    )
                                 }
                             )
                         OutlinedTextTitleAdd2(
                             value = product.title,
-                            onValueChange = { onIntent(AnimalCardIntent.TitleProductKillChanged(it)) },
+                            onValueChange = {
+                                onIntent(
+                                    AnimalCardIntent.TitleProductKillChanged(
+                                        index,
+                                        it
+                                    )
+                                )
+                            },
                             onValueChangeSuffix = {
                                 onIntent(
                                     AnimalCardIntent.TitleAndSuffixKillClicked(
+                                        index,
                                         it
                                     )
                                 )
@@ -103,18 +115,32 @@ fun AlertDialogKillAnimal(
                             titleList = product.titleList,
                             isErrorTitle = product.error.isError,
                             isErrorSlash = product.error.isErrorSlash,
+                            cardBorder = false
                         )
                         OutlinedTextCount2(
                             value = product.countProduct,
                             onValueChange = {
-                                onIntent(AnimalCardIntent.CountProductKillChanged(it))
+                                onIntent(
+                                    AnimalCardIntent.CountProductKillChanged(
+                                        index,
+                                        it
+                                    )
+                                )
                             },
-                            onSuffixChange = { onIntent(AnimalCardIntent.SuffixProductKillChanged(it)) },
+                            onSuffixChange = {
+                                onIntent(
+                                    AnimalCardIntent.SuffixProductKillChanged(
+                                        index,
+                                        it
+                                    )
+                                )
+                            },
                             isError = product.error.isErrorCount,
                             suffix = product.suffixProduct,
                             intResSup = R.string.support_text_count_product,
                             isWarehouseShow = product.title.isNotBlank() && product.warehouseList.isNotEmpty(),
-                            warehouseList = product.warehouseList
+                            warehouseList = product.warehouseList,
+                            cardBorder = false
                         )
                     }
                 }

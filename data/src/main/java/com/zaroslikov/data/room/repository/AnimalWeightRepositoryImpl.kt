@@ -24,8 +24,8 @@ class AnimalWeightRepositoryImpl @Inject constructor(private val animalWeightDao
         return animalWeightDao.deleteAnimalWeightTable(animalWeightTable.toAnimalWeightTable())
     }
 
-    override fun getWeightAnimalLimit(id: Long): Flow<DomainAnimalWeight> {
-        return animalWeightDao.getWeightAnimalLimit(id).map { it.toDomainAnimalWeight() }
+    override fun getWeightAnimalLimit(id: Long): Flow<DomainAnimalWeight?> {
+        return animalWeightDao.getWeightAnimalLimit(id).map { it?.toDomainAnimalWeight() }
     }
 
     override fun getWeightAnimal(id: Long): Flow<List<DomainAnimalWeight>> {

@@ -23,9 +23,9 @@ class AnimalVaccinationRepositoryImpl @Inject constructor(private val animalVacc
         return animalVaccinationDao.deleteAnimalVaccinationTable(animalVaccinationTable.toAnimalVaccinationTable())
     }
 
-    override fun getVaccinationAnimalLimit(id: Long): Flow<DomainAnimalVaccination> {
+    override fun getVaccinationAnimalLimit(id: Long): Flow<DomainAnimalVaccination?> {
         return animalVaccinationDao.getVaccinationAnimalLimit(id)
-            .map { it.toDomainAnimalVaccination() }
+            .map { it?.toDomainAnimalVaccination() }
     }
 
     override fun getVaccinationAnimal(id: Long): Flow<List<DomainAnimalVaccination>> {

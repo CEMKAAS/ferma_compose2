@@ -476,14 +476,10 @@ fun OutlinedTextCount2(
     onWeightSuffixChance: (String) -> Unit = {},
     isAutoCalculate: Boolean = true,
     onAutoCalculate: (Boolean) -> Unit = {},
+    cardBorder: Boolean = true
 ) {
-    CardField(
-        modifier = Modifier
-            .toOutlinedText()
-            .padding(bottom = animatedErrorPadding(isAutoCalculate)),
-        row = false,
-        isNecessarily = true
-    ) {
+
+    val textField: @Composable () -> Unit = {
         BaseOutlinedText(
             modifier = modifier,
             value = value,
@@ -517,6 +513,17 @@ fun OutlinedTextCount2(
                 tooltipTextResAutoCal = tooltipTextResAutoCal
             )
     }
+    if (cardBorder) {
+        CardField(
+            modifier = Modifier
+                .toOutlinedText()
+                .padding(bottom = animatedErrorPadding(isAutoCalculate)),
+            row = false,
+            isNecessarily = true
+        ) {
+            textField()
+        }
+    } else textField()
 }
 
 
@@ -532,8 +539,8 @@ fun OutlinedTextCountAnimal2(
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
 ) {
     val errorText = when {
-        isErrorCountZero -> R.string.error_count_sale_animals
-        isErrorCountMore -> R.string.error_count_zero_animals
+        isErrorCountZero -> R.string.error_count_zero_animals
+        isErrorCountMore -> R.string.error_count_sale_animals
         else -> R.string.error_no_count_product
     }
 
@@ -541,7 +548,8 @@ fun OutlinedTextCountAnimal2(
 
     CardField(
         modifier = Modifier.toOutlinedText(),
-        row = false
+        row = false,
+        isNecessarily = true
     ) {
         BaseOutlinedText(
             value = value,
@@ -613,13 +621,11 @@ fun OutlinedTextTitleAdd2(
     titleList: List<TitleAndSuffixDomain>,
     isErrorTitle: Boolean,
     isErrorSlash: Boolean,
+    cardBorder: Boolean = false
 ) {
     val focusManager = LocalFocusManager.current
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false,
-        isNecessarily = true
-    ) {
+
+    val textField: @Composable () -> Unit = {
         ExposedDropdownMenuProduct2(
             title = value,
             setTitle = {
@@ -644,6 +650,17 @@ fun OutlinedTextTitleAdd2(
             )
         }
     }
+
+    if (cardBorder)
+        CardField(
+            modifier = Modifier
+                .toOutlinedText(),
+            row = false,
+            isNecessarily = true
+        ) {
+            textField()
+        }
+    else textField()
 }
 
 @Composable
@@ -693,7 +710,7 @@ fun OutlinedTextPrice(
 fun OutlinedPriceInput(
     price: String,
     onPriceChange: (String) -> Unit,
-    count: String = "",
+    priceAll: String = "",
     isAutoCalculate: Boolean,
     onAutoCalculate: (Boolean) -> Unit,
     isManyCount: Boolean = false,
@@ -742,7 +759,7 @@ fun OutlinedPriceInput(
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
                 tooltipTextResAutoCal = tooltipTextResAutoCal,
-                price = count,
+                price = priceAll,
             )
         }
     }
@@ -1117,6 +1134,7 @@ fun BaseOutlinedText(
                 countAnimals = countAnimal,
                 intRes = intResSup,
                 intResError = intResError,
+                suffix = suffix ?: ""
             )
         },
         trailingIcon = trailingIcon,

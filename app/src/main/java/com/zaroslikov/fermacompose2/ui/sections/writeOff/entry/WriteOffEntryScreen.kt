@@ -109,7 +109,7 @@ fun WriteOffEntryContainerProduct(
             onPriceChange = {
                 onIntent(WriteOffIntent.PriceChanged(it))
             },
-            count = state.priceAll,
+            priceAll = state.priceAll,
             supportTextRes = R.string.support_text_price_write_off_all,
             supportTextResAutoCal = R.string.support_text_price_write_off_one,
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,

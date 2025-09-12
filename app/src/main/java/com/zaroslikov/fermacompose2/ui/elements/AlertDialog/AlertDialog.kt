@@ -11,10 +11,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
@@ -102,7 +98,7 @@ fun AlertDialogGroupToSolo(
                 TextButton(
                     onClick = {
                         focusManager.clearFocus()
-                        onUpdateClick(sex)
+//                        onUpdateClick(sex)
                         onConfirmation()
                     }
                 ) {
@@ -165,6 +161,7 @@ fun AlertDialogAni(
     onDismissClick: () -> Unit,
     onConfirmationClick: () -> Unit,
     content: @Composable () -> Unit,
+    isScroll: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current
     AlertDialog(
@@ -181,7 +178,7 @@ fun AlertDialogAni(
             )
         },
         text = {
-            Column(modifier = Modifier.modifierDialogScreen()) {
+            Column(modifier = Modifier.modifierDialogScreen(isScroll)) {
                 content()
             }
         },

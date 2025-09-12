@@ -61,12 +61,12 @@ fun DrawerSheet(
         DrawerItems(
             R.drawable.baseline_arrow_back_24, "Вернуться к проектам", StartDestination.route
         ),
-//        DrawerItems(
-//            R.drawable.baseline_warehouse_24, "Мой Склад", WarehouseDestination.route
-//        ),
-//        DrawerItems(
-//            R.drawable.baseline_currency_ruble_24, "Мои Финансы", FinanceDestination.route
-//        ),
+        DrawerItems(
+            R.drawable.baseline_warehouse_24, "Мой Склад", HomeDestination.route //WarehouseDestination.route
+        ),
+        DrawerItems(
+            R.drawable.baseline_currency_ruble_24, "Мои Финансы", HomeDestination.route // FinanceDestination.route
+        ),
         DrawerItems(
             R.drawable.baseline_add_circle_outline_24, "Моя Продукция", HomeDestination.route
         ),

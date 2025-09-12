@@ -7,6 +7,6 @@ interface AnimalVaccinationRepository {
     suspend fun insertAnimalVaccinationTable(animalVaccinationTable: DomainAnimalVaccination): Long
     suspend fun updateAnimalVaccinationTable(animalVaccinationTable: DomainAnimalVaccination)
     suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: DomainAnimalVaccination)
-    fun getVaccinationAnimalLimit(id: Long): Flow<DomainAnimalVaccination>
+    fun getVaccinationAnimalLimit(id: Long): Flow<DomainAnimalVaccination?>
     fun getVaccinationAnimal(id: Long): Flow<List<DomainAnimalVaccination>>
 }

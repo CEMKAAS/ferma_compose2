@@ -23,8 +23,8 @@ class AnimalSizeRepositoryImpl @Inject constructor(private val animalSizeDao: An
         return animalSizeDao.deleteAnimalSizeTable(animalSizeTable.toAnimalSizeTable())
     }
 
-    override fun getSizeAnimalLimit(id: Long): Flow<DomainAnimalSize> {
-        return animalSizeDao.getSizeAnimalLimit(id).map { it.toDomainAnimalSize() }
+    override fun getSizeAnimalLimit(id: Long): Flow<DomainAnimalSize?> {
+        return animalSizeDao.getSizeAnimalLimit(id).map { it?.toDomainAnimalSize() }
     }
 
     override fun getSizeAnimal(id: Long): Flow<List<DomainAnimalSize>> {

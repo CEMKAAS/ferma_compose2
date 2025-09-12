@@ -407,6 +407,7 @@
     <string name="animal_card_screen_animal_card_info_weight_all">Общий вес:</string>
     <string name="animal_card_screen_note_kill">Товар был добавлен через "Забой" животного</string>
     <string name="animal_card_screen_note_sale">Товар был продан через "Продажу" животного</string>
+    <string name="animal_card_screen_note_expenses">Товар был куплен через "Покупку" животных</string>
     <string name="animal_card_screen_category_kill">Забой</string>
     <string name="animal_card_screen_category_sale">Продажа животных</string>
     <string name="animal_card_screen_add_category_expenses">Покупка животных</string>

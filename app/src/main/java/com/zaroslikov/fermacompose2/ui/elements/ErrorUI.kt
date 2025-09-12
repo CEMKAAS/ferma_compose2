@@ -38,6 +38,7 @@ fun ErrorSupportTextSlash(
     isErrorSlash: Boolean = false,
     warehouseList: List<DomainCountSuffix> = emptyList(),
     countAnimals: String = "",
+    suffix: String = "",
     @StringRes intRes: Int,
     @StringRes intResError: Int
 ) {
@@ -75,7 +76,7 @@ fun ErrorSupportTextSlash(
 
         isAnimal -> Text(
             text = stringResource(
-                R.string.support_text_count_sale_animals, countAnimals.toFormatNumber(), "todo"
+                R.string.support_text_count_sale_animals, countAnimals.toFormatNumber(), suffix
             )
         )
 

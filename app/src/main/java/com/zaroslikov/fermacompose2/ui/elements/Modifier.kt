@@ -45,7 +45,8 @@ fun Modifier.modifierScreen(
             detectTapGestures(onTap = {
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
             })
-        }.padding(bottom = 8.dp)
+        }
+        .padding(bottom = 8.dp)
 }
 
 @Composable
@@ -68,11 +69,14 @@ fun Modifier.modifierScreenLazy(
 }
 
 @Composable
-fun Modifier.modifierDialogScreen(
-): Modifier {
+fun Modifier.modifierDialogScreen(isScroll: Boolean): Modifier {
     val focusManager = LocalFocusManager.current
     return this
-        .verticalScroll(rememberScrollState())
+        .then(
+            if (isScroll)
+                Modifier.verticalScroll(rememberScrollState())
+            else Modifier
+        )
         .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
