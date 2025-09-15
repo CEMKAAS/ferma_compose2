@@ -37,6 +37,7 @@ import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.CountAnimal.ProductKill
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -513,7 +514,7 @@ class AnimalCardViewModel @Inject constructor(
                         animalCountId = countId
                     )
                 )
-                endSave(state.countAnimal, updateSaleDialog(false))
+                endSave(state.countAnimal) { updateSaleDialog(false) }
             }
         }
     }
@@ -556,7 +557,7 @@ class AnimalCardViewModel @Inject constructor(
                         animalCountId = countId
                     )
                 )
-                endSave(state.countAnimal, updateWriteOffDialog(false))
+                endSave(state.countAnimal) { updateWriteOffDialog(false) }
             }
         }
     }
@@ -615,21 +616,29 @@ class AnimalCardViewModel @Inject constructor(
                         )
                     )
                 }
-                endSave(state.countAnimal, updateKillDialog(false))
+                endSave(state.countAnimal) { updateKillDialog(false) }
             }
         }
     }
 
-    private suspend fun endSave(countAnimal: String, dialog: Unit) {
+    private suspend fun endSave(countAnimal: String, updateDialog: () -> Unit) {
         val isAnimalGroup = animalGroup(countAnimal)
         val count = countAnimal(countAnimal)
         animalRepository.updateAnimalTable(getState().animal.copy(group = isAnimalGroup))
 
-        // TODO при нуле мы уехоидим со страницы
-        //  count.toInt() == 0
+        if (count.toInt() == 0)
+            nextUpdate("")
+        else {
+            updateDialog()
+            updateSoloDialog(count.toInt() == 1 && isAnimalGroup)
+        }
+    }
 
-        dialog
-        updateSoloDialog(count.toInt() == 1 && isAnimalGroup)
+    private fun nextUpdate(message: String) {
+        navigateTo(UiEvent.NavigateBack)
+        /* showMessage(
+             message//Todo Обновить название
+         )*/
     }
 
     // Kill Animal Count

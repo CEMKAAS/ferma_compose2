@@ -142,7 +142,7 @@ class AnimalEntryViewModel @Inject constructor(
         }
     }
 
-    fun nextUpdate(message: String) {
+    private fun nextUpdate(message: String) {
         navigateTo(UiEvent.NavigateBack)
         showMessage(
             message//Todo Обновить название
