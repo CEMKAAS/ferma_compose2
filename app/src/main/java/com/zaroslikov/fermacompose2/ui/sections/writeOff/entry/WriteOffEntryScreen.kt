@@ -18,7 +18,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleSale
 import com.zaroslikov.fermacompose2.ui.elements.RadioButtonWriteOff
@@ -119,7 +119,7 @@ fun WriteOffEntryContainerProduct(
             },
             isManyCount = true,
         )
-        OutlinedTextDateEdit(
+        OutlinedTextDate(
             value = state.date,
             onValueChange = {
                 onIntent(WriteOffIntent.DateClicked(it))

@@ -48,7 +48,7 @@ import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNoCard
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
 import com.zaroslikov.fermacompose2.ui.elements.Suffix
@@ -127,7 +127,8 @@ fun ExpensesEntryContainerProduct(
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
             readOnly = state.isIndicatorsValue,
-            enable = !state.isIndicatorsValue
+            enable = !state.isIndicatorsValue,
+            cardBorder = true
         )
         OutlinedTextCountAnimal(
             value = state.count,
@@ -183,7 +184,7 @@ fun ExpensesEntryContainerProduct(
                 titleList = state.pickList.categoryList
             )
         if (!state.isIndicatorsValue)
-            OutlinedTextDateEdit(
+            OutlinedTextDate(
                 value = state.date,
                 onValueChange = {
                     onIntent(ExpensesEntryIntent.DateClicked(it))

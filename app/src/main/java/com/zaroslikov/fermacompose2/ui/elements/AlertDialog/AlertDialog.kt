@@ -55,6 +55,7 @@ fun AlertDialogInfo(
 fun AlertDialogGroupToSolo(
     sex: Boolean,
     onConfirmation: () -> Unit,
+    onSave: () -> Unit,
     onUpdateSex: (Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -98,7 +99,7 @@ fun AlertDialogGroupToSolo(
                 TextButton(
                     onClick = {
                         focusManager.clearFocus()
-//                        onUpdateClick(sex)
+                        onSave()
                         onConfirmation()
                     }
                 ) {

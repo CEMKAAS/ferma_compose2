@@ -210,68 +210,12 @@ fun OutlinedTextAnimal(
 @Composable
 fun OutlinedTextDate(
     value: String,
-    initialSelectedDateMilli: Long? = Instant.now().toEpochMilli(),
     @StringRes intRes: Int = R.string.outlined_text_date,
     @StringRes intResSup: Int = R.string.support_text_date,
     drawableRes: Int = R.drawable.baseline_calendar_month_24,
     onValueChange: (String) -> Unit,
+    enable: Boolean = true,
     cardBorder: Boolean = true
-) {
-    var openDialog by remember { mutableStateOf(false) }
-    val state = rememberDatePickerState(
-        selectableDates = PastOrPresentSelectableDates,
-        initialSelectedDateMillis = initialSelectedDateMilli
-    )
-    if (openDialog) {
-        DatePickerDialogSample(state, value) {
-            onValueChange(it)
-            openDialog = !openDialog
-        }
-    }
-
-    val textField: @Composable () -> Unit = {
-        OutlinedTextField(
-            value = value,
-            onValueChange = {
-                openDialog = !openDialog
-            },
-            readOnly = true,
-            label = { Text(stringResource(intRes)) },
-            supportingText = {
-                Text(stringResource(intResSup))
-            },
-            leadingIcon = {
-                IconButton(onClick = { openDialog = !openDialog }) {
-                    Icon(
-                        painter = painterResource(drawableRes),
-                        contentDescription = stringResource(R.string.content_description_show_calendary)
-                    )
-                }
-            },
-            modifier = Modifier
-                .toOutlinedText()
-                .clickable { openDialog = !openDialog }
-        )
-    }
-    if (cardBorder) {
-        CardField(
-            modifier = Modifier
-                .toOutlinedText(),
-            row = false
-        ) {
-            textField()
-        }
-    } else textField()
-}
-
-@Composable
-fun OutlinedTextDateEdit(
-    value: String,
-    @StringRes intRes: Int = R.string.outlined_text_date,
-    @StringRes intResSup: Int = R.string.support_text_date,
-    drawableRes: Int = R.drawable.baseline_calendar_month_24,
-    onValueChange: (String) -> Unit,
-    enable: Boolean = true
 ) {
     var openDialog by remember { mutableStateOf(false) }
     if (openDialog) {
@@ -284,12 +228,7 @@ fun OutlinedTextDateEdit(
             openDialog = !openDialog
         }
     }
-    CardField(
-        modifier = Modifier
-            .toOutlinedText()
-            .clickable(onClick = { openDialog = !openDialog }),
-        row = false,
-    ) {
+    val textField: @Composable () -> Unit = {
         BaseOutlinedText(
             value = value,
             onValueChange = { openDialog = !openDialog },
@@ -301,6 +240,16 @@ fun OutlinedTextDateEdit(
             leadingIconClick = { openDialog = !openDialog }
         )
     }
+    if (cardBorder)
+    CardField(
+        modifier = Modifier
+            .toOutlinedText()
+            .clickable(onClick = { openDialog = !openDialog }),
+        row = false,
+    ) {
+        textField()
+    }
+        else textField()
 }
 
 @Composable
@@ -467,7 +416,7 @@ fun OutlinedTextCount2(
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_weight,
-    warehouseList: List<DomainCountSuffix>,
+    warehouseList: List<DomainCountSuffix> = emptyList(),
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     isWeightCalculate: Boolean = false,
     weightValue: String = "",
@@ -732,7 +681,7 @@ fun OutlinedPriceInput(
             stiffness = Spring.StiffnessLow
         )
     )
-    val supportText = if (isAutoCalculate) supportTextRes else supportTextResAutoCal
+    val supportText = if (isAutoCalculate) supportTextResAutoCal else supportTextRes
     CardField(
         modifier = Modifier.toOutlinedText(),
         row = false,

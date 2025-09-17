@@ -8,34 +8,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.DomainIndicatorsVM
-import com.zaroslikov.domain.models.DomainPairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart
-import com.zaroslikov.data.room.table.ferma.AddTable
-import com.zaroslikov.data.room.table.ferma.ExpensesTable
-import com.zaroslikov.data.room.table.ferma.SaleTable
-import com.zaroslikov.data.room.table.ferma.WriteOffTable
-import com.zaroslikov.data.room.dto.PairData
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
-import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogAddAnimal
+import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogAddAnimal
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
-import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogKillAnimal
-import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogSaleAnimal
-import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogWriteOffAnimal
+import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogKillAnimal
+import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogSaleAnimal
+import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogWriteOffAnimal
 import com.zaroslikov.fermacompose2.ui.elements.ButtonArchive
 import com.zaroslikov.fermacompose2.ui.elements.ButtonCustom
 import com.zaroslikov.fermacompose2.ui.elements.CardField
@@ -48,6 +41,7 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 //import com.zaroslikov.fermacompose2.ui.finance.PullOutCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 
@@ -63,17 +57,27 @@ object AnimalCardDestination : NavigationDestination {
 fun AnimalCardProduct(
     navigateBack: () -> Unit,
     onNavigateSetting: (Pair<Long, Long>) -> Unit,
-    onNavigateIndicators: (Triple<Int, Int, Long>) -> Unit,
+    onNavigateSize: (Pair<Long, Long>) -> Unit,
     viewModel: AnimalCardViewModel = hiltViewModel()
 ) {
+    val eventFlow = viewModel.navigation
     val state by viewModel.state.collectAsStateWithLifecycle()
+//    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    LaunchedEffect(Unit) {
+        eventFlow.collect { event ->
+            when (event) {
+                is UiEvent.NavigateBack -> navigateBack()
+            }
+        }
+    }
 
     Scaffold(topBar = {
         TopAppBarStart(
             title = stringResource(R.string.animal_card_screen_animal_card),
             true,
             navigateUp = navigateBack,
-            settingUp = { onNavigateSetting(viewModel.itemIdPT to viewModel.itemId) }
+            settingUp = { onNavigateSetting(state.itemIdPT to state.itemId) }
         )
     }) { innerPadding ->
         if (state.isLoading)
@@ -85,68 +89,18 @@ fun AnimalCardProduct(
                 modifier = Modifier
                     .modifierScreen(innerPadding),
                 state = state,
-//                    countWarehouse = viewModel.countInWarehouse,
-                onNavigateIndicators = {
-                    onNavigateIndicators(
-                        Triple(
-                            it.first,
-                            it.second,
-                            viewModel.itemIdPT
-                        )
-                    )
-                },
+                onNavigateSize = { onNavigateSize(state.itemIdPT to state.itemId) },
                 onIntent = viewModel::onIntent
             )
-        /*                onSaleClick = {
-            viewModel.insertSaleAnimal(
-                Triple(
-                    it.first,
-                    it.second,
-                    it.third
-                )
-            )
-            if (it.third) navigateBack()
-        },
-        onSaleProductClick = {
-            viewModel.saveAddAnimal(it)
-        },
-        onSaleCountClick = {
-            viewModel.saveCountAnimal(it)
-            if (it.third) navigateBack() // возможно баг(возвращение редактор или вакцину)
-        },
-        onAddAnimalClick = {
-            cor.launch {
-//                        viewModel.insertAddAnimal()
-            }
-        },
-        onAddWriteOffClick = {
-            cor.launch {
-                viewModel.insertWriteOffAnimal(it)
-                if (it.third) navigateBack()
-            }
-        },
-        onUpdateCountWarehouse = {
-            viewModel.updateUiState(it)
-        },
-        onUpdateAnimalGroupClick = viewModel::updateAnimalGroup,
-        onValueChange = viewModel::update,
-        updateArchive = {
-            viewModel.updateArchive()
-            navigateBack()
-        },
-        viewModel = viewModel
-    )*/
-
     }
 }
-
 
 @Composable
 fun AnimalCardContainer(
     modifier: Modifier,
     state: AnimalCardState,
     onIntent: (AnimalCardIntent) -> Unit,
-    onNavigateIndicators: (Pair<Int, Int>) -> Unit,
+    onNavigateSize: () -> Unit,
 ) {
 
     Column(modifier = modifier) {
@@ -157,7 +111,8 @@ fun AnimalCardContainer(
             weight = state.weight,
             vaccination = state.vaccination,
             count = state.countAnimal,
-            onNavigateIndicators = { onNavigateIndicators(Pair(0, it)) } // TODO Id navigation
+            onNavigateSize = onNavigateSize,
+            onNavigateIndicators = { } // TODO Id navigation
         )
         NoteWidget(state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
         /*   PullOutCard(
@@ -239,7 +194,8 @@ fun AnimalCardContainer(
             AlertDialogGroupToSolo(
                 sex = state.animal.sex,
                 onUpdateSex = { onIntent(AnimalCardIntent.SexClicked(it)) },
-                onConfirmation = { onIntent(AnimalCardIntent.DialogSoloClicked(false)) }
+                onConfirmation = { onIntent(AnimalCardIntent.DialogSoloClicked(false)) },
+                onSave = { onIntent(AnimalCardIntent.SaveGroupPressed) }
             )
     }
 }
@@ -303,6 +259,7 @@ private fun DataCardTwo(
     weight: DomainAnimalWeight?,
     vaccination: DomainAnimalVaccination?,
     count: DomainAnimalCount,
+    onNavigateSize: () -> Unit,
     onNavigateIndicators: (Int) -> Unit
 ) {
     CardField(
@@ -312,19 +269,18 @@ private fun DataCardTwo(
             text = stringResource(R.string.animal_card_screen_animal_card_two),
             style = textBold_18
         )
-        if (isGroup)
-            IconAndTextMore(
-                iconRes = R.drawable.baseline_spoke_24,
-                valueString = stringResource(R.string.card_pieces_s, count.count.toString()),
-                onClick = { onNavigateIndicators(2) }
-            )
-        else
-            IconAndTextMore(
-                iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
-                valueString = if (size == null) stringResource(R.string.animal_card_screen_animal_card_no_height)
-                else "${size.size} ${size.suffix}",
-                onClick = { onNavigateIndicators(1) }
-            )
+
+        IconAndTextMore(
+            iconRes = R.drawable.baseline_spoke_24,
+            valueString = stringResource(R.string.card_pieces_s, count.count.toString()),
+            onClick = { onNavigateIndicators(2) }
+        )
+        IconAndTextMore(
+            iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
+            valueString = if (size == null) stringResource(R.string.animal_card_screen_animal_card_no_height)
+            else "${size.size} ${size.suffix}",
+            onClick = { onNavigateSize() }
+        )
         IconAndTextMore(
             iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
             valueString = if (weight == null) stringResource(R.string.animal_card_screen_animal_card_no_weight)

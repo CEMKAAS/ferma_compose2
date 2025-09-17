@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.elements.AlertDialog
+package com.zaroslikov.fermacompose2.ui.animal.animal_dialog
 
 
 import android.util.Log
@@ -8,6 +8,7 @@ import androidx.compose.ui.res.stringResource
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardIntent
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogAni
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
@@ -55,6 +56,8 @@ fun AlertDialogAddAnimal(
                 isManyCount = true,
                 isAutoCalculate = state.isAutoPrice,
                 onAutoCalculate = { onIntent(AnimalCardIntent.AutoPriceAddClicked(it)) },
+                supportTextRes = R.string.support_text_price_animals,
+                supportTextResAutoCal = R.string.support_text_price_one_animals,
             )
             OutlinedTextNote(
                 value = state.note,

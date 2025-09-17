@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.utils.SnackbarController
+import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +38,16 @@ abstract class BaseViewModel<STATE : BaseState, INTENT : BaseIntent>(
     protected fun navigateTo(event: UiEvent) {
         viewModelScope.launch {
             _navigation .emit(event)
+        }
+    }
+
+    protected fun showMessage(message: String) {
+        viewModelScope.launch {
+            SnackbarController.sendEvent(
+                event = SnackbarEvent(
+                    message = message
+                )
+            )
         }
     }
 }

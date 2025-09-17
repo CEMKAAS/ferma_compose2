@@ -18,7 +18,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimal
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
@@ -101,7 +101,7 @@ fun AddEntryContainerProduct(
             onValueChange = { onIntent(AddEntryIntent.CategoryChanged(it)) },
             titleList = state.pickList.categoryList,
         )
-        OutlinedTextDateEdit(
+        OutlinedTextDate(
             value = state.date,
             onValueChange = { onIntent(AddEntryIntent.Date(it)) }
         )

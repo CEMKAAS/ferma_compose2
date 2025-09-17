@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.fermacompose2.R
@@ -76,9 +77,8 @@ fun ExpensesScreen(
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Long) -> Unit,
     drawerState: DrawerState,
-    viewModel: ExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: ExpensesViewModel = hiltViewModel()
 ) {
-
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()

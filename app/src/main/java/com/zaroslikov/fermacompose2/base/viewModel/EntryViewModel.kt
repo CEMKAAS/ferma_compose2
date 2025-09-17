@@ -20,15 +20,7 @@ abstract class EntryViewModel<STATE : EntryState, INTENT : BaseIntent>(
     protected abstract fun delete()
     abstract fun onIntent(intent: INTENT)
 
-   protected fun showMessage(message: String) {
-        viewModelScope.launch {
-            SnackbarController.sendEvent(
-                event = SnackbarEvent(
-                    message = message
-                )
-            )
-        }
-    }
+
 
     protected abstract fun validation()
     protected fun isError(): Boolean {

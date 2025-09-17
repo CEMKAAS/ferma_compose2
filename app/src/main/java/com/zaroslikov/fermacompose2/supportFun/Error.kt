@@ -216,17 +216,6 @@ fun isAnimalCountZero(
     return count.toConvertZeroString().toConvertDbOnlyInt() == 0
 }
 
-fun isAnimalCountZero(
-    count: String,
-    countAll: String
-): Boolean {
-    Log.i("weight", "isAnimalCount:${countAll.toConvertZeroString().toConvertDbOnlyInt()} isAnimalCount: ${count.toConvertZeroString()
-        .toConvertDbOnlyInt()}")
-
-    return (countAll.toConvertZeroString().toConvertDbOnlyInt() - count.toConvertZeroString()
-        .toConvertDbOnlyInt()) == 0
-}
-
 fun isAnimalCountDifference(
     count: String,
     countAll: String

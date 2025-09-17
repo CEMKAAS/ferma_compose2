@@ -19,7 +19,7 @@ import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextBuyer
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateEdit
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleSale
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
@@ -130,7 +130,7 @@ fun SaleEntryContainerProduct(
             },
             titleList = state.pickList.categoryList,
         )
-        OutlinedTextDateEdit(
+        OutlinedTextDate(
             value = state.date,
             onValueChange = {
                 onIntent(SaleEntryIntent.DateClicked(it))

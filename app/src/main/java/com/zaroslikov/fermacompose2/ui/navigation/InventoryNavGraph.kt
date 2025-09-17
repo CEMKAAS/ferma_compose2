@@ -19,6 +19,8 @@ import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryDestination
 import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryProduct
+import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeDestination
+import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeScreen
 //import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsDestination
 //import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsScreen
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalScreen
@@ -664,10 +666,35 @@ fun InventoryNavHost(
                         )
                     )
                 },
-                onNavigateIndicators = {
+                onNavigateSize = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalSizeDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
+/*                onNavigateIndicators = {
 //                    navController.navigate("${AnimalIndicatorsDestination.route}/${it.first}/${it.second}/${it.third}")
-                })
+                }*/
+            )
         }
+
+        composable(
+            route = AnimalSizeDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalSizeDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalSizeDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalSizeScreen(
+                navigateBack = { navController.popBackStack() },
+            )
+        }
+
+
         /*
                composable(
                    route = AnimalIndicatorsDestination.routeWithArgs,

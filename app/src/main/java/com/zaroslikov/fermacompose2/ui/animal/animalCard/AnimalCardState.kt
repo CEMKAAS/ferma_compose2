@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
-import android.util.Log
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
@@ -27,6 +26,8 @@ data class AnimalCardState(
     val price: Double? = 0.0,
     val buyerList: List<String> = emptyList(),
     val actionAnimal: CountAnimal = CountAnimal(),
+    val itemIdPT : Long = 0,
+    val itemId: Long = 0,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null
 ) : BaseState {
@@ -41,6 +42,7 @@ data class AnimalCardState(
         val note: String = "",
         val actionWithAnimal: ActionWithAnimal = ActionWithAnimal.ADD_ANIMAL,
         val productKill: List<ProductKill> = listOf(ProductKill()),
+        val titleList: List<TitleAndSuffixDomain> = emptyList(),
         val error: Error = Error(),
     ) {
         val hasAnyError: Boolean
@@ -72,7 +74,6 @@ data class AnimalCardState(
             val countWarehouse: Double = 0.0,
             val suffixWarehouse: String = "",
             val warehouseList: List<DomainCountSuffix> = emptyList(),
-            val titleList: List<TitleAndSuffixDomain> = emptyList(),
             val error: Error = Error()
         ) {
             val hasError: Boolean
@@ -85,7 +86,10 @@ data class AnimalCardState(
             )
         }
 
-        fun reset(): CountAnimal {
+        fun reset(
+            titleList: List<TitleAndSuffixDomain> = emptyList(),
+            suffixProduct: String = ""
+        ): CountAnimal {
             return this.copy(
                 countAnimal = this.countAnimal,
                 suffixAnimal = this.suffixAnimal,
@@ -94,7 +98,8 @@ data class AnimalCardState(
                 priceAll = "",
                 buyer = "",
                 note = "",
-                productKill = listOf(ProductKill()),
+                titleList = titleList,
+                productKill = listOf(ProductKill(suffixProduct = suffixProduct)),
                 error = Error()
             )
         }
@@ -104,51 +109,3 @@ data class AnimalCardState(
 enum class ActionWithAnimal {
     ADD_ANIMAL, SALE_ANIMAL, WRITE_OFF_ANIMAL, KILL_ANIMAL
 }
-
-/*fun AnimalCardState.saveAddAnimal() {
-    if (isErrorAddAnimal(count = countAnimal, isErrorCount = { isErrorCount = it })
-    ) {
-        val count =
-            (countAnimal.toConvertOnlyInt().toInt() + countAll.toInt()).toString()
-                .toConvertOnlyInt()
-        onSaveClick(
-            Pair(
-                first = DomainIndicatorsVM(
-//                                    weight = count,
-                    weight = countAnimal,
-                    suffix = countSuffix,
-                    date = dateToday(),
-                    idAnimal = idPT,
-                    note = reasonNote,
-                    version = if (priceInDB.isBlank() || priceInDB == "0") 4 else 1
-                ),
-                second = if (priceInDB.isBlank() || priceInDB == "0") null else {
-                    ExpensesTable(
-                        title = title,
-                        count = countAnimal.toConvertDbDouble(),
-                        day = dateTodayArray()[0],
-                        mount = dateTodayArray()[1],
-                        year = dateTodayArray()[2],
-                        price = priceInDB.toConvertDbDouble(),
-                        countSuffix = countSuffix,
-                        category = category,
-                        note = reasonNote,
-                        isShowFood = false,
-                        isShowWarehouse = false,
-                        isShowAnimals = false,
-                        isShowFoodHand = false,
-                        feedFood = 0.0,
-                        countAnimal = 0,
-                        foodDesignedDay = 0,
-                        lastDayFood = "",
-                        idPT = idPT.toLong(),
-                        priceAll = 0.0,
-                        feedFoodSuffix = "",
-                        weight = 0.0,
-                        weightSuffix = "",
-                    )
-                }
-            )
-        )
-    }
-}*/
