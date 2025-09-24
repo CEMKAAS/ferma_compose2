@@ -5,6 +5,7 @@ import com.zaroslikov.data.room.dto.PairDataDoubleSting
 import com.zaroslikov.data.room.dto.SaleTitleData
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -18,7 +19,7 @@ import kotlin.text.trim
 data class WriteOffEntryState(
     val title: String = "",
     val count: String = "",
-    val countSuffix: String = "",
+    val countSuffix: Suffix = Suffix.PIECES,
     val date: String = dateToday(),
     val isAutoPrice: Boolean = false,
     val price: String = "",
@@ -49,6 +50,9 @@ data class WriteOffEntryState(
 
 
 fun WriteOffEntryState.updateFromDomain(domain: DomainWriteOffTable): WriteOffEntryState {
+    val isIndicatorsValue =
+        setOf(domain.animalCountId)
+            .any { it != null }
     return copy(
         title = domain.title,
         count = domain.count.formatNumber(false),
@@ -64,6 +68,7 @@ fun WriteOffEntryState.updateFromDomain(domain: DomainWriteOffTable): WriteOffEn
         status = domain.status,
         note = domain.note,
         animalCountId = domain.animalCountId,
+        isIndicatorsValue = isIndicatorsValue
     )
 }
 

@@ -20,11 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.elements.AnimalNameOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
+import com.zaroslikov.fermacompose2.ui.elements.DropdownMenu
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
@@ -127,7 +129,7 @@ fun AnimalEntryContainer(
                 },
                 drawableRes = R.drawable.baseline_spoke_24,
                 isError = state.error.isErrorCount,
-                suffix = stringResource(R.string.suffix_pieces),
+                suffix = Suffix.RUBLE,
                 intRes = R.string.outlined_text_field_quantity,
                 intResSup = R.string.support_text_count_animals,
                 isWarehouseShow = false,
@@ -183,7 +185,7 @@ fun AnimalEntryContainer(
             suffix = state.foodDaySuffix,
             isWarehouseShow = false,
             isDropMenuShow = true,
-            versionDropMenu = 0,
+            versionDropMenu = DropdownMenu.WEIGHT,
             isNecessarily = false
         )
         if (state.isEntry)
@@ -263,7 +265,7 @@ private fun DateFactoryCard(
                 intResSup = if (!isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
                 drawableRes = R.drawable.baseline_event_24,
                 onValueChange = { dateFactoryChanged(it) },
-                cardBorder = false
+                isCardBorder = false
             )
         }
     }

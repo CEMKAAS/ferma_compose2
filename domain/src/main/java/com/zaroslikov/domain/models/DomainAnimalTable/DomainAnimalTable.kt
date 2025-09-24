@@ -1,5 +1,7 @@
 package com.zaroslikov.domain.models.DomainAnimalTable
 
+import com.zaroslikov.domain.models.enums.Suffix
+
 data class DomainAnimalTable(
     val id: Long = 0,
     val name: String = "",
@@ -12,6 +14,6 @@ data class DomainAnimalTable(
     val image: String? = null,
     val archive: Boolean = false,
     val foodDay: Double = 0.0,
-    val foodDaySuffix: String = "",
+    val foodDaySuffix: Suffix = Suffix.GRAM,
     val idPT: Long = 0
 )

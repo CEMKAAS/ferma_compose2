@@ -177,7 +177,6 @@
 
     <string name="support_text_weight_animal">Укажите вес животного</string>
     <string name="support_text_height_animal">Укажите размер животного</string>
-    <string name="support_text_vaccination_animals">Укажите название прививки</string>
 
     <string name="support_text_count_sale_animals">Всего животных: %s %s</string>
     <string name="support_text_add_animal_reason">Укажите причину добавления</string>
@@ -452,6 +451,13 @@
     <string name="animal_indicators_animals_count_reduced_note">Вы уменьшили кол-во животных на %s %s</string>
     <string name="animal_indicators_animals_count_not_changed_note">Кол-во животных не изменилось</string>
 
+    // AnimalVaccinationScreen
+    <string name="animal_vaccination_price">Укажите стоимость одной прививки</string>
+    <string name="animal_vaccination_price_all">Укажите общую стоимость прививок</string>
+    <string name="animal_vaccination_auto_calculate_tool">В случае активации этой опции необходимо указать стоимость не за всё прививки, а только за одну.</string>
+    <string name="support_text_vaccination_animals">Укажите название прививки</string>
+    <string name="animal_vaccination_count_vaccination">Колличество прививок</string>
+    <string name="animal_vaccination_title">Прививка</string>
 
     //ExpensesEntryScreen
     <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма:</string>

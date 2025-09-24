@@ -1,5 +1,7 @@
 package com.zaroslikov.domain.models
 
+import com.zaroslikov.domain.models.enums.Suffix
+
 
 data class DomainExpensesTable(
     val id: Long = 0,
@@ -10,7 +12,7 @@ data class DomainExpensesTable(
     val year: Int, // время
     val price: Double,
     val priceAll: Double? = null,
-    val countSuffix: String,
+    val countSuffix: Suffix,
     val category: String,
     val note: String,
     val isShowFood: Boolean, // Показывать на складе еду
@@ -18,12 +20,12 @@ data class DomainExpensesTable(
     val isShowWarehouse: Boolean, // Показывать на складе (Перекупство)
     val isShowAnimals: Boolean, // Связывает животных
     val feedFood: Double? = null, // Ежедневный расход еды
-    val feedFoodSuffix: String? = null, // Суффикс ежедневного расхода
+    val feedFoodSuffix: Suffix? = null, // Суффикс ежедневного расхода
     val countAnimal: Int? = null, // Кол-во животных
     val foodDesignedDay: Int? = null, // Кол-во дней
     val lastDayFood: String? = null, //Последний день еды
     val weight: Double? = null,
-    val weightSuffix: String? = null,
+    val weightSuffix: Suffix? = null,
     val idPT: Long,
     val animalId: Long? = null,
     val animalVaccinationId: Long? = null,

@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.animalCountWeightComposition
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
@@ -22,6 +23,7 @@ import com.zaroslikov.fermacompose2.supportFun.infoTextKillAnimal
 import com.zaroslikov.fermacompose2.supportFun.isAnimalWeightIncrease
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardIntent
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.CountAnimal.ProductKill
@@ -30,9 +32,7 @@ import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
-import com.zaroslikov.fermacompose2.ui.elements.Suffix
 import com.zaroslikov.fermacompose2.ui.elements.TextAndIconRow
-import com.zaroslikov.fermacompose2.ui.elements.toResId
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 @Composable
@@ -41,9 +41,9 @@ fun AlertDialogKillAnimal(
     onIntent: (AnimalCardIntent) -> Unit,
     isAnimalGroup: Boolean,
     countAnimalAll: String,
-    countSuffix: String,
+    countSuffix: Suffix,
     weight: String?,
-    weightSuffix: String?
+    weightSuffix: Suffix?
 ) {
     val textTitle =
         stringResource(if (isAnimalGroup) R.string.alert_dialog_info_kill_animals else R.string.alert_dialog_info_kill_animal)
@@ -167,15 +167,15 @@ private fun CardTotal(
     productList: List<ProductKill>,
     countAnimal: String,
     weight: String?,
-    weightSuffix: String?,
+    weightSuffix: Suffix?,
     isAnimalGroup: Boolean
 ) {
     val suffixList = setOf(
-        stringResource(R.string.suffix_kilogram),
-        stringResource(R.string.suffix_tons),
-        stringResource(R.string.suffix_gram)
+        Suffix.GRAM,
+        Suffix.KILOGRAM,
+        Suffix.TONS
     )
-    val weightSuffixNotNull = weightSuffix ?: stringResource(Suffix.KILOGRAM.toResId())
+    val weightSuffixNotNull = weightSuffix ?: Suffix.KILOGRAM
     val totalWeight = productList.sumOf { product ->
         if (product.suffixProduct in suffixList)
             product.countProduct.toConvertZeroDouble()
@@ -220,7 +220,7 @@ private fun CardTotal(
                 title = "${index + 1}. $productTitle",
                 value = infoTextKillAnimal(
                     count = product.countProduct,
-                    suffix = product.suffixProduct
+                    suffix = stringResource(product.suffixProduct.toResId())
                 )
             )
         }

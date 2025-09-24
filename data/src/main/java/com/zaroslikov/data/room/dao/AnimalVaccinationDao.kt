@@ -20,18 +20,27 @@ interface AnimalVaccinationDao {
     suspend fun deleteAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable)
 
     @Query(
-        "SELECT * FROM AnimalVaccinationTable" +
-                " WHERE idAnimal=:id" +
+        "SELECT * FROM animal_vaccination_table" +
+                " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getVaccinationAnimalLimit(id: Long): Flow<AnimalVaccinationTable?>
 
 
     @Query(
-        "SELECT * FROM AnimalVaccinationTable" +
-                " WHERE idAnimal=:id" +
+        "SELECT * FROM animal_vaccination_table" +
+                " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getVaccinationAnimal(id: Long): Flow<List<AnimalVaccinationTable>>
+
+    @Query(
+        "SELECT vaccination FROM animal_vaccination_table" +
+                " WHERE animal_id=:id" +
+                " GROUP BY vaccination"
+    )
+    fun getTitleVaccinationAnimalList(id: Long): Flow<List<String>>
+
+
 
 }

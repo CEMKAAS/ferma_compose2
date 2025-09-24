@@ -13,6 +13,7 @@ import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
@@ -75,7 +76,7 @@ class WriteOffEntryViewModel @Inject constructor(
             updateState {
                 it.copy(
                     isEntry = isEntry,
-                    countSuffix = resourceProvider.getString(R.string.suffix_pieces),
+                    countSuffix = Suffix.PIECES,
                     titleList = titleList
                 )
             }
@@ -177,7 +178,7 @@ class WriteOffEntryViewModel @Inject constructor(
         }
     }
 
-    private fun updateTitleAndSuffix(title: String, suffix: String) {
+    private fun updateTitleAndSuffix(title: String, suffix: Suffix) {
         updateState {
             it.copy(
                 title = title,
@@ -259,7 +260,7 @@ class WriteOffEntryViewModel @Inject constructor(
 }
 
 sealed class WriteOffIntent : BaseIntent {
-    data class TitleAndSuffix(val title: String, val suffix: String) : WriteOffIntent()
+    data class TitleAndSuffix(val title: String, val suffix: Suffix) : WriteOffIntent()
     data class CountChanged(val value: String) : WriteOffIntent()
     data class PriceChanged(val value: String) : WriteOffIntent()
     data class AutoPriceClicked(val value: Boolean) : WriteOffIntent()

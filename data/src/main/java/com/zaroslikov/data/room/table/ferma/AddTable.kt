@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.zaroslikov.domain.models.enums.Suffix
 
 
 @Entity(
@@ -34,7 +35,7 @@ data class AddTable(
     @ColumnInfo(name = "price")
     val price: Double,
     @ColumnInfo(name = "count_suffix")
-    val countSuffix: String,
+    val countSuffix: Suffix,
     val category: String,
     @ColumnInfo(name = "animal_id")
     val animalId: Long?,

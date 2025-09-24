@@ -9,14 +9,14 @@ fun AnimalVaccinationTable.toDomainAnimalVaccination(): DomainAnimalVaccination 
         vaccination = this.vaccination,
         date = this.date,
         nextVaccination = this.nextVaccination,
-        idAnimal = this.idAnimal,
+        idAnimal = this.animalId,
         note = this.note,
     )
 }
 
 fun DomainAnimalVaccination.toAnimalVaccinationTable(): AnimalVaccinationTable {
     return AnimalVaccinationTable(
-        idAnimal = this.idAnimal,
+        animalId = this.idAnimal,
         id = this.id,
         nextVaccination = this.nextVaccination,
         note = this.note,

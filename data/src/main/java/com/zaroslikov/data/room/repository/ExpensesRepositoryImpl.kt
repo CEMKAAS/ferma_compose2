@@ -34,8 +34,8 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: Expens
         return expensesDao.getItemExpensesIdAnimalCount(id).map { it.toDomainMap() }
     }
 
-    override fun getItemExpensesForVaccination(id: Long): Flow<DomainExpensesTable> {
-        return expensesDao.getItemExpensesForVaccination(id).map { it.toDomainMap() }
+    override fun getItemExpensesForVaccination(id: Long): Flow<DomainExpensesTable?> {
+        return expensesDao.getItemExpensesForVaccination(id).map { it?.toDomainMap() }
     }
 
     override fun getBrieflyItemExpenses(id: Long): Flow<List<BrieflyExpensesDomain>> {

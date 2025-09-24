@@ -5,16 +5,123 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("ALTER TABLE AnimalWeightTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'кг.'")
         db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'ед.'")
-        db.execSQL("ALTER TABLE AnimalSizeTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'м.'")
 
-        db.execSQL("ALTER TABLE AnimalWeightTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
         db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
-        db.execSQL("ALTER TABLE AnimalSizeTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
-        db.execSQL("ALTER TABLE AnimalVaccinationTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
-
         db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN version INTEGER")
+
+        //==================== Миграция AnimalCountTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS animal_count_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                count TEXT NOT NULL,
+                suffix INTEGER NOT NULL,
+                date TEXT NOT NULL,
+                note TEXT NOT NULL,
+                version INTEGER,
+                animal_id INTEGER NOT NULL,
+                FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE CASCADE,
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO animal_vaccination_table(
+                id, count, suffix, date, note, version, animal_id
+            )
+            SELECT
+                id, count, 'ед.', date, '', NULL, animal_id
+            FROM AnimalCountTable
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_animal_count_table_animal_id ON animal_count_table(animal_id")
+        db.execSQL("DROP TABLE AnimalCountTable")
+
+        //==================== Миграция AnimalVaccinationTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS animal_vaccination_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                vaccination TEXT NOT NULL,
+                date TEXT NOT NULL,
+                next_vaccination TEXT NOT NULL,
+                animal_id INTEGER NOT NULL,
+                note TEXT NOT NULL,
+                FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE CASCADE,
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO animal_vaccination_table(
+                id, vaccination, date, next_vaccination, animal_id, note
+            )
+            SELECT
+                id, vaccination, date, nextVaccination, idAnimal, ''
+            FROM AnimalVaccinationTable
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_animal_vaccination_table_animal_id ON animal_vaccination_table(animal_id")
+        db.execSQL("DROP TABLE AnimalVaccinationTable")
+
+        //==================== Миграция AnimalWeightTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS animal_weight_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                weight TEXT NOT NULL,
+                suffix INTEGER NOT NULL,
+                date TEXT NOT NULL,
+                animal_id INTEGER NOT NULL,
+                note TEXT NOT NULL,
+                FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE CASCADE,
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO animal_weight_table(
+                id, size, suffix, date, animal_id, note
+            )
+            SELECT
+                id, size, 'кг.', date, idAnimal, ''
+            FROM AnimalWeightTable
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_animal_weight_table_animal_id ON animal_weight_table(animal_id")
+        db.execSQL("DROP TABLE AnimalWeightTable")
+
+        //==================== Миграция AnimalSizeTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS animal_size_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                size TEXT NOT NULL,
+                suffix INTEGER NOT NULL,
+                date TEXT NOT NULL,
+                animal_id INTEGER NOT NULL,
+                note TEXT NOT NULL,
+                FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE CASCADE,
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO animal_size_table(
+                id, size, suffix, date, animal_id, note
+            )
+            SELECT
+                id, size, 'м.', date, idAnimal, ''
+            FROM AnimalSizeTable
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_animal_size_table_animal_id ON animal_size_table(animal_id")
+        db.execSQL("DROP TABLE AnimalSizeTable")
 
         //==================== Миграция AnimalTable ====================
         db.execSQL(
@@ -65,7 +172,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 month INTEGER NOT NULL,
                 year INTEGER NOT NULL,
                 price REAL NOT NULL,
-                count_suffix TEXT NOT NULL,
+                count_suffix INTEGER NOT NULL,
                 category TEXT NOT NULL,
                 animal_id INTEGER,
                 note TEXT NOT NULL,
@@ -97,7 +204,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 title TEXT NOT NULL,
                 count REAL NOT NULL,
-                count_suffix TEXT NOT NULL,
+                count_suffix INTEGER NOT NULL,
                 price REAL,
                 price_all REAL,
                 day INTEGER NOT NULL,
@@ -140,7 +247,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 title TEXT NOT NULL,
                 count REAL NOT NULL,
-                count_suffix TEXT NOT NULL,
+                count_suffix INTEGER NOT NULL,
                 price REAL NOT NULL,
                 price_all REAL,
                 day INTEGER NOT NULL,
@@ -188,7 +295,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 year INTEGER NOT NULL,
                 price REAL NOT NULL,
                 price_all REAL,
-                count_suffix TEXT NOT NULL,
+                count_suffix INTEGER NOT NULL,
                 category TEXT NOT NULL,
                 note TEXT NOT NULL,
                 is_show_food INTEGER NOT NULL,

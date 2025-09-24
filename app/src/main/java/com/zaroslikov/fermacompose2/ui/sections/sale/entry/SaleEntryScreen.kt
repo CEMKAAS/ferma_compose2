@@ -92,7 +92,9 @@ fun SaleEntryContainerProduct(
             },
             titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
-            isErrorSlash = state.error.isErrorSlash
+            isErrorSlash = state.error.isErrorSlash,
+            readOnly = state.isIndicatorsValue,
+            enable = !state.isIndicatorsValue,
         )
         OutlinedTextCount2(
             value = state.count,
@@ -129,6 +131,8 @@ fun SaleEntryContainerProduct(
                 onIntent(SaleEntryIntent.CategoryChanged(it))
             },
             titleList = state.pickList.categoryList,
+            readOnly = state.isIndicatorsValue,
+            enable = !state.isIndicatorsValue,
         )
         OutlinedTextDate(
             value = state.date,

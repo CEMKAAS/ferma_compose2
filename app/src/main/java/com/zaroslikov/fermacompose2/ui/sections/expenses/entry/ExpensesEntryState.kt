@@ -5,6 +5,7 @@ import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -22,7 +23,7 @@ data class ExpensesEntryState(
     val date: String = dateToday(),
     val price: String = "",
     val priceAll: String = "",
-    val countSuffix: String = "",
+    val countSuffix: Suffix = Suffix.PIECES,
     val category: String = "",
     val note: String = "",
     val isShowFood: Boolean = false,
@@ -31,18 +32,18 @@ data class ExpensesEntryState(
     val isShowAnimals: Boolean = false,
 
     val feedFoodChip: String = "",
-    val feedFoodChipSuffix: String = "",
+    val feedFoodChipSuffix: Suffix = Suffix.GRAM,
     val countAnimalChip: String = "",
 
     val feedFoodInput: String = "",
-    val feedFoodInputSuffix: String = "",
+    val feedFoodInputSuffix: Suffix = Suffix.GRAM,
     val countAnimalInput: String = "",
 
     val daysFood: Int = 0,
     val dateEndFood: String = "",
 
     val weight: String = "",
-    val weightSuffix: String = "",
+    val weightSuffix: Suffix = Suffix.KILOGRAM,
     val isAutoWeight: Boolean = false,
     val isAutoPrice: Boolean = false,
 

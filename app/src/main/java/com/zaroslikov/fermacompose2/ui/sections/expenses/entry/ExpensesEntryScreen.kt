@@ -37,13 +37,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
+import com.zaroslikov.fermacompose2.ui.elements.DropdownMenu
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
@@ -51,10 +54,8 @@ import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNoCard
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
-import com.zaroslikov.fermacompose2.ui.elements.Suffix
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
-import com.zaroslikov.fermacompose2.ui.elements.toResId
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatter
@@ -146,7 +147,7 @@ fun ExpensesEntryContainerProduct(
                 onIntent(ExpensesEntryIntent.WeightChanged(it))
             },
             isWarehouseShow = false,
-            versionDropMenu = if (state.isIndicatorsValue) 2 else 5,
+            versionDropMenu = if (state.isIndicatorsValue) DropdownMenu.COUNT else DropdownMenu.ALL,
             weightValue = state.weight,
             weightSuffix = state.weightSuffix,
             onWeightSuffixChance = {
@@ -267,7 +268,7 @@ private fun Food(
     onShowFoodHandClick: (Boolean) -> Unit,
     onAnimalChipClick: (AnimalExpensesDomain) -> Unit,
     onFeedFoodChanged: (String) -> Unit,
-    onFeedFoodSuffixClick: (String) -> Unit,
+    onFeedFoodSuffixClick: (Suffix) -> Unit,
     onCountAnimalChanged: (String) -> Unit,
 ) {
     CardField(
@@ -477,9 +478,9 @@ private fun Checkbox(
     }
     val suffixSet =
         setOf(
-            stringResource(Suffix.GRAM.toResId()),
-            stringResource(Suffix.KILOGRAM.toResId()),
-            stringResource(Suffix.TONS.toResId())
+            Suffix.GRAM,
+            Suffix.KILOGRAM,
+            Suffix.TONS
         )
     CheckboxTextIcon(
         checked = expensesTable.isShowFood,
@@ -539,7 +540,7 @@ fun ChoiceAnimal(
 private fun InputText(
     state: ExpensesEntryState,
     onFeedFoodChanged: (String) -> Unit,
-    onFeedFoodSuffixClick: (String) -> Unit,
+    onFeedFoodSuffixClick: (Suffix) -> Unit,
     onCountAnimalChanged: (String) -> Unit,
 ) {
     var suffixCountAnimal by rememberSaveable { mutableStateOf(state.countSuffix) }
@@ -547,7 +548,7 @@ private fun InputText(
     OutlinedTextCountNoCard(
         value = state.feedFoodInput,
         onValueChange = { onFeedFoodChanged(it) },
-        versionDropMenu = 0,
+        versionDropMenu = DropdownMenu.WEIGHT,
         intRes = R.string.outlined_food_day_animals,
         intResSup = R.string.support_text_food_day,
         intResError = R.string.error_no_count_animals,
@@ -558,7 +559,7 @@ private fun InputText(
     OutlinedTextCountNoCard(
         value = state.countAnimalInput,
         onValueChange = { onCountAnimalChanged },
-        versionDropMenu = 2,
+        versionDropMenu = DropdownMenu.COUNT,
         intRes = R.string.outlined_text_field_quantity,
         intResSup = R.string.support_text_count_animals,
         intResError = R.string.error_no_count_product,

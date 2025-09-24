@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -259,7 +261,7 @@ fun BrieflyCountCard(
                 )
                 IconAndText(
                     iconRes = R.drawable.baseline_shopping_basket_24,
-                    valueString = "${product.count.formatNumber()} ${product.suffix}",
+                    valueString = "${product.count.formatNumber()} ${stringResource(product.suffix.toResId())}",
                 )
             }
 
@@ -349,7 +351,7 @@ fun AddProductCard(
                     )
             }
             Text(
-                text = "${addProduct.count.formatNumber()} ${addProduct.countSuffix}",
+                text = "${addProduct.count.formatNumber()} ${stringResource(addProduct.countSuffix.toResId())}",
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()

@@ -32,4 +32,8 @@ class AnimalVaccinationRepositoryImpl @Inject constructor(private val animalVacc
         return animalVaccinationDao.getVaccinationAnimal(id)
             .map { it -> it.map { it.toDomainAnimalVaccination() } }
     }
+
+    override fun getTitleVaccinationAnimalList(id: Long): Flow<List<String>> {
+        return animalVaccinationDao.getTitleVaccinationAnimalList(id)
+    }
 }

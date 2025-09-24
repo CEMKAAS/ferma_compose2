@@ -800,7 +800,7 @@
 //                        )
 //
 //                        2 -> textBuildIndicatorsAnnotated(
-//                            intRes = R.string.animal_card_screen_kill_note,
+//                            intRes = R.string.animal_card_screen_kill_note ,
 //                            totalValue = totalValue,
 //                            suffix = suffix,
 //                            isPlus = true,

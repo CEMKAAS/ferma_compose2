@@ -1,10 +1,12 @@
 package com.zaroslikov.domain.models
 
+import com.zaroslikov.domain.models.enums.Suffix
+
 data class DomainSaleTable(
     val id: Long = 0,
     val title: String,
     val count: Double,
-    val countSuffix: String,
+    val countSuffix: Suffix,
     val price: Double,
     val priceAll: Double? = null,
     val day: Int,

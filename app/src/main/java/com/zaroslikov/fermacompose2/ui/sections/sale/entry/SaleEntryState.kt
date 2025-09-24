@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.sections.sale.entry
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -15,7 +16,7 @@ import kotlin.text.trim
 data class SaleEntryState(
     val title: String = "",
     val count: String = "",
-    val countSuffix: String = "",
+    val countSuffix: Suffix = Suffix.PIECES,
     val date: String = dateToday(),
     val category: String = "",
     val isAutoPrice: Boolean = false,
@@ -55,6 +56,10 @@ data class SaleEntryState(
 }
 
 fun SaleEntryState.updateFromDomain(domain: DomainSaleTable): SaleEntryState {
+    val isIndicatorsValue =
+        setOf(domain.animalId, domain.animalCountId)
+            .any { it != null }
+
     return copy(
         title = domain.title,
         count = domain.count.formatNumber(false),
@@ -72,6 +77,7 @@ fun SaleEntryState.updateFromDomain(domain: DomainSaleTable): SaleEntryState {
         note = domain.note,
         animalId = domain.animalId,
         animalCountId = domain.animalCountId,
+        isIndicatorsValue = isIndicatorsValue
     )
 }
 

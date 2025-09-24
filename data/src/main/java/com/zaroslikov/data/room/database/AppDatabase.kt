@@ -3,6 +3,9 @@ package com.zaroslikov.data.room.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.zaroslikov.data.room.converter.AnimalCountVersionConverter
+import com.zaroslikov.data.room.converter.CategoryConverter
+import com.zaroslikov.data.room.converter.SuffixConverter
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.dao.AnimalCountDao
 import com.zaroslikov.data.room.dao.AnimalDao
@@ -51,7 +54,11 @@ import com.zaroslikov.data.room.table.ferma.WriteOffTable
     version = 4,
     exportSchema = false
 )
-//@TypeConverters(CategoryConverter::class)
+@TypeConverters(
+    CategoryConverter::class,
+    SuffixConverter::class,
+    AnimalCountVersionConverter::class
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun addDao(): AddDao
     abstract fun animalCountDao(): AnimalCountDao
@@ -59,7 +66,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun animalSizeDao(): AnimalSizeDao
     abstract fun animalVaccinationDao(): AnimalVaccinationDao
     abstract fun animalWeightDao(): AnimalWeightDao
-    abstract fun expensesAnimalDao() : ExpensesAnimalDao
+    abstract fun expensesAnimalDao(): ExpensesAnimalDao
     abstract fun expensesDao(): ExpensesDao
     abstract fun financeDao(): FinanceDao
     abstract fun incubatorDao(): IncubatorDao

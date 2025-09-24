@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.animal.AnimalVaccinationTable
+import com.zaroslikov.domain.models.enums.Suffix
 
 @Entity(
     tableName = "expenses_table",
@@ -57,7 +58,7 @@ data class ExpensesTable(
     @ColumnInfo(name = "price_all")
     val priceAll: Double?,
     @ColumnInfo(name = "count_suffix")
-    val countSuffix: String,
+    val countSuffix: Suffix,
     val category: String,
     val note: String,
     @ColumnInfo(name = "is_show_food")
@@ -71,7 +72,7 @@ data class ExpensesTable(
     @ColumnInfo(name = "feed_food")
     val feedFood: Double?,
     @ColumnInfo(name = "feed_food_suffix")
-    val feedFoodSuffix: String?,
+    val feedFoodSuffix: Suffix?,
     @ColumnInfo(name = "count_animal")
     val countAnimal: Int?,
     @ColumnInfo(name = "food_designed_day")
@@ -80,7 +81,7 @@ data class ExpensesTable(
     val lastDayFood: String?, //Последний день еды
     val weight: Double?,
     @ColumnInfo(name = "weight_suffix")
-    val weightSuffix: String?,
+    val weightSuffix: Suffix?,
     @ColumnInfo(name = "idPT")
     val idPT: Long,
     @ColumnInfo(name = "animalId")

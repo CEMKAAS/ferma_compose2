@@ -4,6 +4,7 @@ import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -17,7 +18,7 @@ data class AddEntryState(
     val title: String = "",
     val count: String = "",
     val date: String = dateToday(),
-    val countSuffix: String = "",
+    val countSuffix: Suffix = Suffix.PIECES,
     val category: String = "",
     val selectedAnimalIndex: Long = 0,
     val animalId: Long? = null,

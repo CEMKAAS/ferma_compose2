@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.animal.animal_dialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardIntent
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState
@@ -17,7 +18,7 @@ fun AlertDialogWriteOffAnimal(
     onIntent: (AnimalCardIntent) -> Unit,
     isAnimalGroup: Boolean,
     countAll: String,
-    countSuffix: String,
+    countSuffix: Suffix,
 ) {
     AlertDialogAni(
         icon = painterResource(R.drawable.baseline_edit_note_24),

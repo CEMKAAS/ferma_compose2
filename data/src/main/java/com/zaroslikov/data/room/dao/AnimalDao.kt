@@ -22,10 +22,10 @@ interface AnimalDao {
                 "ac.count AS count, " +
                 "ac.suffix AS suffix " +
                 "FROM animal_table an " +
-                "LEFT JOIN AnimalCountTable ac ON ac.id = ( " +
+                "LEFT JOIN ANIMAL_COUNT_TABLE ac ON ac.id = ( " +
                 "   SELECT MAX(id) " +
-                "   FROM AnimalCountTable " +
-                "   WHERE idAnimal = an.id " +
+                "   FROM ANIMAL_COUNT_TABLE " +
+                "   WHERE animal_id = an.id " +
                 ") " +
                 "WHERE an.idPT = :id AND an.archive = 0 " +
                 "ORDER BY an.id DESC"

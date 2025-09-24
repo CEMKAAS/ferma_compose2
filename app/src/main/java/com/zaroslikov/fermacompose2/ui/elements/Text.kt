@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
+import android.content.Context
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -37,9 +38,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.theme.errorLight
 import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
@@ -303,13 +306,14 @@ fun TextBuildAnnotated(
     priceAll: String,
     count: String,
     @StringRes intRes: Int,
-    suffix: String = stringResource(R.string.currency_ruble)
+    suffix: Suffix = Suffix.RUBLE
 ) {
     val amount = (priceAll.toConvertZeroDouble() * count.toConvertZero()).formatNumber()
     Text(
         text = buildAnnotatedString {
+            val suffixText = stringResource(suffix.toResId())
             val fullText =
-                stringResource(intRes).format(amount, suffix)
+                stringResource(intRes).format(amount, suffixText)
 
             val startIndex = fullText.indexOf(amount)
             val endIndex = startIndex + amount.length
@@ -388,3 +392,71 @@ fun textBuildIndicatorsAnnotated(
     }
 }
 
+
+fun textBuildIndicatorsAnnotated2(
+    context: Context,
+    @StringRes intRes: Int,
+    totalValue: String,
+    suffix: Suffix,
+    isPlus: Boolean,
+    note: String
+): AnnotatedString {
+    return buildAnnotatedString {
+        val suffixText = context.getString(suffix.toResId())
+        val fullText = context.getString(intRes).format(totalValue, suffixText) + note
+
+        val startIndex = fullText.indexOf(totalValue)
+        val endIndex = startIndex + totalValue.length
+
+        append(fullText)
+        addStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                color = if (isPlus) tertiaryLight else errorLight
+            ),
+            start = startIndex,
+            end = endIndex
+        )
+    }
+}
+
+fun textBuildIndicatorsAnnotated3(
+    context: Context,
+    @StringRes intRes: Int,
+    totalValue: String,
+    suffix: Suffix,
+    price: Double? = null,
+    buyer: String? = null,
+    isPlus: Boolean,
+    note: String
+): AnnotatedString {
+    return buildAnnotatedString {
+        val suffixText = context.getString(suffix.toResId())
+        val fullText = when {
+            price != null && buyer != null -> context.getString(intRes).format(
+                totalValue,
+                suffixText,
+                price.formatNumber(),
+                buyer
+            )
+
+            price != null -> context.getString(intRes)
+                .format(totalValue, suffixText, price.formatNumber())
+
+            else -> context.getString(intRes).format(totalValue, suffixText)
+        } + note
+
+        val startIndex = fullText.indexOf(totalValue)
+        val endIndex = startIndex + totalValue.length
+
+        append(fullText)
+        addStyle(
+            style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                color = if (isPlus) tertiaryLight else errorLight
+            ),
+            start = startIndex,
+            end = endIndex
+        )
+    }
+}

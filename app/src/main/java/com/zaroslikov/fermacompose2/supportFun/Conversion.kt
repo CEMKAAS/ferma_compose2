@@ -1,30 +1,31 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 
 
-fun Double.convertSize(from: String, to: String): Double {
+fun Double.convertSize(from: Suffix, to: Suffix): Double {
 
     val result = when (from) {
-        "мм." -> when (to) {
-            "мм." -> this
-            "см." -> (this / 10)
-            "м." -> (this / 1000)
+        Suffix.MILLIMETERS -> when (to) {
+            Suffix.MILLIMETERS -> this
+            Suffix.CENTIMETERS -> (this / 10)
+            Suffix.METERS -> (this / 1000)
             else -> this
         }
 
-        "см." -> when (to) {
-            "мм." -> this * 10
-            "см." -> this
-            "м." -> this / 100
+        Suffix.CENTIMETERS -> when (to) {
+            Suffix.MILLIMETERS -> this * 10
+            Suffix.CENTIMETERS -> this
+            Suffix.METERS -> this / 100
             else -> this
         }
 
-        "м." -> when (to) {
-            "мм." -> this * 1000
-            "см." -> this * 100
-            "м." -> this
+        Suffix.METERS -> when (to) {
+            Suffix.MILLIMETERS -> this * 1000
+            Suffix.CENTIMETERS -> this * 100
+            Suffix.METERS -> this
             else -> this
         }
 
@@ -33,27 +34,27 @@ fun Double.convertSize(from: String, to: String): Double {
     return result
 }
 
-fun Double.convertWeight(from: String, to: String): Double {
+fun Double.convertWeight(from: Suffix, to: Suffix): Double {
 
     val result = when (from) {
-        "г." -> when (to) {
-            "г." -> this
-            "кг." -> (this / 1000)
-            "тн." -> (this / 1000000)
+        Suffix.GRAM -> when (to) {
+            Suffix.GRAM -> this
+            Suffix.KILOGRAM -> (this / 1000)
+            Suffix.TONS -> (this / 1000000)
             else -> this
         }
 
-        "кг." -> when (to) {
-            "г." -> this*1000
-            "кг." -> this
-            "тн." -> (this / 1000)
+        Suffix.KILOGRAM -> when (to) {
+            Suffix.GRAM -> this * 1000
+            Suffix.KILOGRAM -> this
+            Suffix.TONS -> (this / 1000)
             else -> this
         }
 
-        "тн." -> when (to) {
-            "г." -> (this * 1000000)
-            "кг." -> (this * 1000)
-            "тн." -> this
+        Suffix.TONS -> when (to) {
+            Suffix.GRAM -> (this * 1000000)
+            Suffix.KILOGRAM -> (this * 1000)
+            Suffix.TONS -> this
             else -> this
         }
 
@@ -92,18 +93,5 @@ fun Double.convertVolume(from: String, to: String): Double {
     return result
 }
 
-fun Category.toDrawRes() : Int{
-    return when(this) {
-        Category.ADD ->  R.drawable.baseline_add_circle_outline_24
-        Category.EXPENSES -> R.drawable.baseline_add_shopping_cart_24
-        Category.SALE -> R.drawable.baseline_add_card_24
-    }
-}
 
-fun Category.toResInt(): Int{
-    return when (this) {
-        Category.ADD -> R.string.add_screen_title
-        Category.EXPENSES -> R.string.expenses_screen_title
-        Category.SALE  -> R.string.sale_screen_title
-    }
-}
+

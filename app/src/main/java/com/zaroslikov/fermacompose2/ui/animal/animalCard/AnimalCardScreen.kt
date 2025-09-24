@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogAddAnimal
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
 import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogKillAnimal
@@ -58,6 +60,9 @@ fun AnimalCardProduct(
     navigateBack: () -> Unit,
     onNavigateSetting: (Pair<Long, Long>) -> Unit,
     onNavigateSize: (Pair<Long, Long>) -> Unit,
+    onNavigateCount: (Pair<Long, Long>) -> Unit,
+    onNavigateWeight: (Pair<Long, Long>) -> Unit,
+    onNavigateVaccination: (Pair<Long, Long>) -> Unit,
     viewModel: AnimalCardViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.navigation
@@ -90,6 +95,9 @@ fun AnimalCardProduct(
                     .modifierScreen(innerPadding),
                 state = state,
                 onNavigateSize = { onNavigateSize(state.itemIdPT to state.itemId) },
+                onNavigateCount = { onNavigateCount(state.itemIdPT to state.itemId)},
+                onNavigateWeight = { onNavigateWeight(state.itemIdPT to state.itemId) },
+                onNavigateVaccination = { onNavigateVaccination(state.itemIdPT to state.itemId) },
                 onIntent = viewModel::onIntent
             )
     }
@@ -101,6 +109,9 @@ fun AnimalCardContainer(
     state: AnimalCardState,
     onIntent: (AnimalCardIntent) -> Unit,
     onNavigateSize: () -> Unit,
+    onNavigateCount: () -> Unit,
+    onNavigateWeight: () -> Unit,
+    onNavigateVaccination: () -> Unit,
 ) {
 
     Column(modifier = modifier) {
@@ -112,7 +123,9 @@ fun AnimalCardContainer(
             vaccination = state.vaccination,
             count = state.countAnimal,
             onNavigateSize = onNavigateSize,
-            onNavigateIndicators = { } // TODO Id navigation
+            onNavigateCount = onNavigateCount,
+            onNavigateWeight = onNavigateWeight,
+            onNavigateVaccination = onNavigateVaccination
         )
         NoteWidget(state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
         /*   PullOutCard(
@@ -260,7 +273,9 @@ private fun DataCardTwo(
     vaccination: DomainAnimalVaccination?,
     count: DomainAnimalCount,
     onNavigateSize: () -> Unit,
-    onNavigateIndicators: (Int) -> Unit
+    onNavigateCount: () -> Unit,
+    onNavigateWeight: () -> Unit,
+    onNavigateVaccination: () -> Unit
 ) {
     CardField(
         row = false
@@ -269,29 +284,28 @@ private fun DataCardTwo(
             text = stringResource(R.string.animal_card_screen_animal_card_two),
             style = textBold_18
         )
-
         IconAndTextMore(
             iconRes = R.drawable.baseline_spoke_24,
-            valueString = stringResource(R.string.card_pieces_s, count.count.toString()),
-            onClick = { onNavigateIndicators(2) }
+            valueString = "${count.count} ${stringResource(count.suffix.toResId())}",
+            onClick = { onNavigateCount() }
         )
         IconAndTextMore(
             iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
             valueString = if (size == null) stringResource(R.string.animal_card_screen_animal_card_no_height)
-            else "${size.size} ${size.suffix}",
+            else "${size.size} ${stringResource(size.suffix.toResId())}",
             onClick = { onNavigateSize() }
         )
         IconAndTextMore(
             iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
             valueString = if (weight == null) stringResource(R.string.animal_card_screen_animal_card_no_weight)
-            else "${weight.weight} ${weight.suffix}",
-            onClick = { onNavigateIndicators(0) }
+            else "${weight.weight} ${stringResource(weight.suffix.toResId())}",
+            onClick = { onNavigateWeight() }
         )
         IconAndTextMore(
             iconRes = R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
             valueString = if (vaccination == null) stringResource(R.string.animal_card_screen_animal_card_no_vaccination)
             else "${vaccination.vaccination} ${vaccination.date}",
-            onClick = { onNavigateIndicators(3) }
+            onClick = { onNavigateVaccination() }
         )
     }
 }

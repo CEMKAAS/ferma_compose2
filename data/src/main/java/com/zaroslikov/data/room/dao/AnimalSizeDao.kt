@@ -21,16 +21,15 @@ interface AnimalSizeDao {
     suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
 
     @Query(
-        "SELECT * FROM AnimalSizeTable" +
-                " WHERE idAnimal=:id" +
+        "SELECT * FROM animal_size_table" +
+                " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getSizeAnimalLimit(id: Long): Flow<AnimalSizeTable?>
 
     @Query(
-        "SELECT id, size, suffix, date, idAnimal, note" +
-                " FROM AnimalSizeTable" +
-                " WHERE idAnimal=:id" +
+        "SELECT * FROM animal_size_table" +
+                " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getSizeAnimal(id: Long): Flow<List<AnimalSizeTable>>

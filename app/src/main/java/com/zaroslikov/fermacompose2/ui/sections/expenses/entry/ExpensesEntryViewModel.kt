@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainExpensesAnimal
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
@@ -14,8 +15,6 @@ import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.elements.Suffix
-import com.zaroslikov.fermacompose2.ui.elements.toResId
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
@@ -86,9 +85,9 @@ class ExpensesEntryViewModel @Inject constructor(
 
     val suffixSet =
         setOf(
-            resourceProvider.getString(Suffix.GRAM.toResId()),
-            resourceProvider.getString(Suffix.KILOGRAM.toResId()),
-            resourceProvider.getString(Suffix.TONS.toResId())
+           Suffix.GRAM,
+            Suffix.KILOGRAM,
+            Suffix.TONS
         )
 
     init {
@@ -107,11 +106,11 @@ class ExpensesEntryViewModel @Inject constructor(
         updateState {
             it.copy(
                 isEntry = isEntry,
-                feedFoodChipSuffix = resourceProvider.getString(R.string.suffix_kilogram),
-                feedFoodInputSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+                feedFoodChipSuffix = Suffix.GRAM,
+                feedFoodInputSuffix = Suffix.GRAM,
                 category = resourceProvider.getString(R.string.support_text_no_category),
-                countSuffix = resourceProvider.getString(R.string.suffix_pieces),
-                weightSuffix = resourceProvider.getString(R.string.suffix_kilogram),
+                countSuffix = Suffix.PIECES,
+                weightSuffix = Suffix.KILOGRAM,
                 pickList = it.pickList.copy(
                     titleList = titleList,
                     categoryList = categoryList,
@@ -209,7 +208,6 @@ class ExpensesEntryViewModel @Inject constructor(
         val isErrorAnimal =
             if (getState().isShowAnimals) getState().pickList.animalList2.none { it.ps == true } else false
 
-
         val newError = ExpensesEntryState.ValidationError(
             isErrorTitle = getState().title.isBlank(),
             isErrorSlash = getState().title.isSlash(),
@@ -299,7 +297,7 @@ class ExpensesEntryViewModel @Inject constructor(
 
     private fun updateTitleAndSuffix(
         title: String,
-        suffix: String
+        suffix: Suffix
     ) {
         updateState {
             it.copy(
@@ -329,7 +327,7 @@ class ExpensesEntryViewModel @Inject constructor(
 
 
     private fun updateCountSuffix(
-        suffix: String
+        suffix: Suffix
     ) {
         updateState {
             it.copy(
@@ -420,7 +418,7 @@ class ExpensesEntryViewModel @Inject constructor(
         }
     }
 
-    private fun updateFeedFoodInputSuffix(feedFoodSuffix: String) {
+    private fun updateFeedFoodInputSuffix(feedFoodSuffix: Suffix) {
         updateState {
             it.copy(
                 feedFoodInputSuffix = feedFoodSuffix,
@@ -475,7 +473,6 @@ class ExpensesEntryViewModel @Inject constructor(
             }
             .toString()
 
-
         updateState { state ->
             state.copy(
                 feedFoodChip = updatedDailyFood,
@@ -521,7 +518,6 @@ class ExpensesEntryViewModel @Inject constructor(
             )
         }
     }
-
 
     // Хелпер: Обновить ps у одного животного
     private fun updateAnimalSelectionById(animalId: Long) {
@@ -633,13 +629,13 @@ class ExpensesEntryViewModel @Inject constructor(
 
 sealed class ExpensesEntryIntent : BaseIntent {
     data class TitleChanged(val value: String) : ExpensesEntryIntent()
-    data class TitleAndSuffixClicked(val title: String, val suffix: String) :
+    data class TitleAndSuffixClicked(val title: String, val suffix: Suffix) :
         ExpensesEntryIntent()
 
     data class CountChanged(val value: String) : ExpensesEntryIntent()
-    data class SuffixClicked(val value: String) : ExpensesEntryIntent()
+    data class SuffixClicked(val value: Suffix) : ExpensesEntryIntent()
     data class WeightChanged(val value: String) : ExpensesEntryIntent()
-    data class WeightSuffixChanged(val value: String) : ExpensesEntryIntent()
+    data class WeightSuffixChanged(val value: Suffix) : ExpensesEntryIntent()
     data class AutoWeightClicked(val value: Boolean) : ExpensesEntryIntent()
     data class PriceChanged(val value: String) : ExpensesEntryIntent()
     data class AutoPriceClicked(val value: Boolean) : ExpensesEntryIntent()
@@ -651,7 +647,7 @@ sealed class ExpensesEntryIntent : BaseIntent {
     data class ShowFoodHandClicked(val value: Boolean) : ExpensesEntryIntent()
     data class AnimalChipClicked(val value: AnimalExpensesDomain) : ExpensesEntryIntent()
     data class FeedFoodChanged(val value: String) : ExpensesEntryIntent()
-    data class FeedFoodSuffixClicked(val value: String) : ExpensesEntryIntent()
+    data class FeedFoodSuffixClicked(val value: Suffix) : ExpensesEntryIntent()
     data class CountAnimalChanged(val value: String) : ExpensesEntryIntent()
     data class ShowWarehouseClicked(val value: Boolean) : ExpensesEntryIntent()
     data class ShowAnimalClicked(val value: Boolean) : ExpensesEntryIntent()

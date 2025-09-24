@@ -29,7 +29,8 @@ interface ExpensesDao {
     fun getItemExpensesIdAnimalCount(id: Long): Flow<ExpensesTable>
 
     @Query("SELECT * FROM expenses_table WHERE animal_vaccination_id=:id")
-    fun getItemExpensesForVaccination(id: Long): Flow<ExpensesTable>
+    fun getItemExpensesForVaccination
+                (id: Long): Flow<ExpensesTable?>
 
     @Query(
         "SELECT title, SUM(count) AS count," +
@@ -64,13 +65,13 @@ interface ExpensesDao {
                 " case when e.idAnimal NOT NULL  Then 1 else 0 end as ps," +
                 " case when  e.percentExpenses NOT NULL Then e.percentExpenses else 0 end as presentException " +
                 " from animal_table a JOIN (" +
-                "    SELECT idAnimal, count" +
-                "    FROM animalcounttable" +
+                "    SELECT animal_id, count" +
+                "    FROM animal_count_table" +
                 "    WHERE id IN (" +
                 "        SELECT MAX(id)" +
-                "        FROM animalcounttable " +
-                "    GROUP by idAnimal)" +
-                ") t ON a.id = t.idAnimal Left Join ExpensesAnimalTable e On e.idAnimal = a.id and e.idExpenses =:idExpenses Where a.idPT=:id ORDER By ps Desc"
+                "        FROM animal_count_table " +
+                "    GROUP by animal_id)" +
+                ") t ON a.id = t.animal_id Left Join ExpensesAnimalTable e On e.idAnimal = a.id and e.idExpenses =:idExpenses Where a.idPT=:id ORDER By ps Desc"
     )
      fun getItemsAnimalExpensesList2(
         id: Long,

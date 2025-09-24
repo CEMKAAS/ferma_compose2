@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +48,7 @@ import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
@@ -55,14 +57,10 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsEnter
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toConvertDb
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSampleNoLimit
+import com.zaroslikov.fermacompose2.ui.add.MinDateSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
-//import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
-//import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSampleNoLimit
-//import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
-import java.time.Instant
-
 
 @Composable
 fun OutlinedText(
@@ -210,17 +208,25 @@ fun OutlinedTextAnimal(
 @Composable
 fun OutlinedTextDate(
     value: String,
+    onValueChange: (String) -> Unit,
     @StringRes intRes: Int = R.string.outlined_text_date,
     @StringRes intResSup: Int = R.string.support_text_date,
     drawableRes: Int = R.drawable.baseline_calendar_month_24,
-    onValueChange: (String) -> Unit,
     enable: Boolean = true,
-    cardBorder: Boolean = true
+    isLimit: Boolean = true,
+    isCardBorder: Boolean = true,
+    isNecessarily: Boolean = false,
+    minDate: String? = null
 ) {
     var openDialog by remember { mutableStateOf(false) }
     if (openDialog) {
+        val selectableDates = when {
+            minDate != null -> MinDateSelectableDates(formatDateToLong(minDate))
+            isLimit -> PastOrPresentSelectableDates
+            else -> DatePickerDefaults.AllDates
+        }
         val datePickerState = rememberDatePickerState(
-            selectableDates = PastOrPresentSelectableDates,
+            selectableDates = selectableDates,
             initialSelectedDateMillis = formatDateToLong(value)
         )
         DatePickerDialogSample(datePickerState, value) {
@@ -240,60 +246,17 @@ fun OutlinedTextDate(
             leadingIconClick = { openDialog = !openDialog }
         )
     }
-    if (cardBorder)
-    CardField(
-        modifier = Modifier
-            .toOutlinedText()
-            .clickable(onClick = { openDialog = !openDialog }),
-        row = false,
-    ) {
-        textField()
-    }
-        else textField()
-}
-
-@Composable
-fun OutlinedTextDateNoLimit(
-    value: String,
-    initialSelectedDateMilli: Long? = Instant.now().toEpochMilli(),
-    @StringRes intRes: Int = R.string.outlined_text_date,
-    @StringRes intResSup: Int = R.string.support_text_date,
-    drawableRes: Int = R.drawable.baseline_calendar_month_24,
-    onValueChange: (String) -> Unit,
-) {
-    var openDialog by remember { mutableStateOf(false) }
-    val datePickerStateNoLimit =
-        rememberDatePickerState(initialSelectedDateMillis = initialSelectedDateMilli)
-
-    if (openDialog) {
-        DatePickerDialogSampleNoLimit(datePickerStateNoLimit, value) {
-            onValueChange(it)
-            openDialog = !openDialog
+    if (isCardBorder)
+        CardField(
+            modifier = Modifier
+                .toOutlinedText()
+                .clickable(onClick = { openDialog = !openDialog }),
+            row = false,
+            isNecessarily = isNecessarily
+        ) {
+            textField()
         }
-    }
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            openDialog = !openDialog
-        },
-        readOnly = true,
-        label = { Text(stringResource(intRes)) },
-        supportingText = {
-            Text(stringResource(intResSup))
-        },
-        leadingIcon = {
-            IconButton(onClick = { openDialog = !openDialog }) {
-                Icon(
-                    painter = painterResource(drawableRes),
-                    contentDescription = stringResource(R.string.content_description_show_calendary)
-                )
-            }
-        },
-        modifier = Modifier
-            .toOutlinedText()
-            .clickable { openDialog = !openDialog }
-    )
+    else textField()
 }
 
 @Composable
@@ -334,13 +297,13 @@ fun OutlinedTextCountAnimal(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    onSuffixChange: ((String) -> Unit)? = null,
+    onSuffixChange: ((Suffix) -> Unit)? = null,
     isError: Boolean,
-    suffix: String,
+    suffix: Suffix,
     isAnimal: Boolean = false,
     isWarehouseShow: Boolean = true,
     isDropMenuShow: Boolean = true,
-    versionDropMenu: Int = 5,
+    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     drawableRes: Int = R.drawable.baseline_shopping_basket_24,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
@@ -352,8 +315,8 @@ fun OutlinedTextCountAnimal(
     isWeightCalculate: Boolean = false,
     weightValue: String = "",
     onWeightChange: (String) -> Unit = {},
-    weightSuffix: String = stringResource(R.string.suffix_kilogram),
-    onWeightSuffixChance: (String) -> Unit = {},
+    weightSuffix: Suffix = Suffix.KILOGRAM,
+    onWeightSuffixChance: (Suffix) -> Unit = {},
     isNecessarily: Boolean = true,
     isAutoCalculate: Boolean = true,
     onAutoCalculate: (Boolean) -> Unit = {},
@@ -381,9 +344,9 @@ fun OutlinedTextCountAnimal(
             keyboardOptions = keyboardOptions,
         )
         if (isWeightCalculate && suffix !in setOf(
-                stringResource(R.string.suffix_kilogram),
-                stringResource(R.string.suffix_tons),
-                stringResource(R.string.suffix_gram)
+                Suffix.KILOGRAM,
+                Suffix.GRAM,
+                Suffix.TONS
             )
         )
             AutoWeightCheckbox(
@@ -404,13 +367,13 @@ fun OutlinedTextCount2(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    onSuffixChange: ((String) -> Unit)? = null,
+    suffix: Suffix,
+    onSuffixChange: ((Suffix) -> Unit)? = null,
     isError: Boolean,
-    suffix: String,
     isAnimal: Boolean = false,
     isWarehouseShow: Boolean = true,
     isDropMenuShow: Boolean = true,
-    versionDropMenu: Int = 5,
+    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     drawableRes: Int = R.drawable.baseline_shopping_basket_24,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
@@ -421,8 +384,8 @@ fun OutlinedTextCount2(
     isWeightCalculate: Boolean = false,
     weightValue: String = "",
     onWeightChange: (String) -> Unit = {},
-    weightSuffix: String = stringResource(R.string.suffix_kilogram),
-    onWeightSuffixChance: (String) -> Unit = {},
+    weightSuffix: Suffix = Suffix.KILOGRAM,
+    onWeightSuffixChance: (Suffix) -> Unit = {},
     isAutoCalculate: Boolean = true,
     onAutoCalculate: (Boolean) -> Unit = {},
     cardBorder: Boolean = true
@@ -446,9 +409,9 @@ fun OutlinedTextCount2(
             keyboardOptions = keyboardOptions,
         )
         if (isWeightCalculate && suffix !in setOf(
-                stringResource(R.string.suffix_kilogram),
-                stringResource(R.string.suffix_tons),
-                stringResource(R.string.suffix_gram)
+                Suffix.KILOGRAM,
+                Suffix.GRAM,
+                Suffix.TONS
             )
         )
             AutoWeightCheckbox(
@@ -484,7 +447,7 @@ fun OutlinedTextCountAnimal2(
     isErrorCountMore: Boolean = false,
     isErrorCountZero: Boolean = false,
     countAnimalAll: String = "",
-    suffix: String,
+    suffix: Suffix,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
 ) {
     val errorText = when {
@@ -560,7 +523,7 @@ fun OutlinedTextTitleAdd(
 fun OutlinedTextTitleAdd2(
     value: String,
     onValueChange: (String) -> Unit,
-    onValueChangeSuffix: (Pair<String, String>) -> Unit,
+    onValueChangeSuffix: (Pair<String, Suffix>) -> Unit,
     @StringRes intRes: Int = R.string.outlined_text_product,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_product,
@@ -694,7 +657,7 @@ fun OutlinedPriceInput(
             intResSup = supportText,
             intResError = R.string.error_no_count_sale,
             isError = isError,
-            suffix = stringResource(R.string.currency_ruble),
+            suffix = Suffix.RUBLE,
             modifier = Modifier
                 .padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
             leadingIconRes = R.drawable.baseline_add_card_24,
@@ -833,6 +796,7 @@ fun OutlinedTextTitleSale(
                 intResSup = R.string.support_text_product,
                 intResError = R.string.error_no_product,
                 readOnly = readOnly,
+                enable = enable,
                 modifier = it,
                 keyboardOptions = keyboardOptionsNext()
             )
@@ -929,13 +893,13 @@ fun OutlinedTextCountNoCard(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    suffix: String,
-    onSuffixChance: (String) -> Unit = {},
+    suffix: Suffix,
+    onSuffixChance: (Suffix) -> Unit = {},
     isError: Boolean,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
-    versionDropMenu: Int = 5,
+    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     drawableRes: Int = R.drawable.baseline_shopping_basket_24,
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
@@ -962,8 +926,8 @@ fun WeightOutlinedText(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    suffix: String,
-    onSuffixChance: (String) -> Unit,
+    suffix: Suffix,
+    onSuffixChance: (Suffix) -> Unit,
 ) {
     BaseOutlinedText(
         modifier = modifier,
@@ -971,7 +935,7 @@ fun WeightOutlinedText(
         onValueChange = onValueChange,
         suffix = suffix,
         onSuffixChance = onSuffixChance,
-        versionDropMenu = 0,
+        versionDropMenu = DropdownMenu.WEIGHT,
         isError = false,
         leadingIconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
         labelIntRes = R.string.weight_screen_title,
@@ -1010,11 +974,11 @@ fun BaseOutlinedText(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    suffix: String? = null,
-    onSuffixChance: ((String) -> Unit)? = null,
+    suffix: Suffix? = null,
+    onSuffixChance: ((Suffix) -> Unit)? = null,
     trailingIcon: Int? = null,
     onTrailingChance: (() -> Unit)? = null,
-    versionDropMenu: Int = 5,
+    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     isError: Boolean = false,
     isErrorSlash: Boolean = false,
     isWarehouseShow: Boolean = false,
@@ -1043,7 +1007,10 @@ fun BaseOutlinedText(
             }
         }
     } else null
-    val suffixValue: @Composable (() -> Unit)? = suffix?.let { { Text(text = it) } }
+
+    val suffixValue: @Composable (() -> Unit)? =
+        suffix?.let { { Text(text = stringResource(it.toResId())) } }
+
     val trailingIcon: @Composable (() -> Unit)? = when {
         onSuffixChance != null -> {
             { GetDropDownMenu(versionDropMenu) { onSuffixChance(it) } }
@@ -1083,7 +1050,7 @@ fun BaseOutlinedText(
                 countAnimals = countAnimal,
                 intRes = intResSup,
                 intResError = intResError,
-                suffix = suffix ?: ""
+                suffix = suffix ?: Suffix.PIECES
             )
         },
         trailingIcon = trailingIcon,

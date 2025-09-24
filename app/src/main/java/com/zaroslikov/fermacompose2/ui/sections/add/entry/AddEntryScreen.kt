@@ -89,7 +89,7 @@ fun AddEntryContainerProduct(
             onValueChange = {
                 onIntent(AddEntryIntent.CountChanged(it))
             },
-            onSuffixChange = { onIntent(AddEntryIntent.Suffix(it)) },
+            onSuffixChange = { onIntent(AddEntryIntent.SuffixClicked(it)) },
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product,

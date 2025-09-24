@@ -9,6 +9,8 @@ import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
@@ -35,8 +37,6 @@ import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardState.CountAnimal.ProductKill
-import com.zaroslikov.fermacompose2.ui.elements.Suffix
-import com.zaroslikov.fermacompose2.ui.elements.toResId
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -159,7 +159,9 @@ class AnimalCardViewModel @Inject constructor(
                     actionAnimal = animal.actionAnimal.copy(
                         countAnimal = if (data.animal.group) "" else "1",
                         suffixAnimal = data.count.suffix,
-                    )
+                    ),
+                    itemId = itemId,
+                    itemIdPT = itemIdPT
                 )
             }
         }
@@ -230,7 +232,7 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
-    private fun updatePriceAllActionAnimal() {
+    private fun  updatePriceAllActionAnimal() {
         updateState {
             it.copy(
                 actionAnimal = it.actionAnimal.copy(
@@ -349,7 +351,7 @@ class AnimalCardViewModel @Inject constructor(
                     date = dateToday(),
                     idAnimal = itemId,
                     note = reasonNote,
-                    version = if (state.price.isBlank()) 4 else 1
+                    version = if (state.price.isBlank()) AnimalCountVersion.ADD else AnimalCountVersion.EXPENSES
                 )
 
                 val countId = animalCountRepository.insertAnimalCountTable(domainCountAnimal)
@@ -425,7 +427,7 @@ class AnimalCardViewModel @Inject constructor(
                 emptyList()
 
             val suffixProduct =
-                getState().weight?.weight ?: resourceProvider.getString(Suffix.KILOGRAM.toResId())
+                getState().weight?.suffix ?: Suffix.KILOGRAM
 
 
             updateState { state ->
@@ -474,7 +476,7 @@ class AnimalCardViewModel @Inject constructor(
                         date = dateToday(),
                         idAnimal = itemId,
                         note = "",
-                        version = 0
+                        version = AnimalCountVersion.SALE
                     )
                 )
                 saleRepository.insertSale(
@@ -523,7 +525,7 @@ class AnimalCardViewModel @Inject constructor(
                         date = dateToday(),
                         idAnimal = itemId,
                         note = reasonNote,
-                        version = 3
+                        version = AnimalCountVersion.WRITE_OFF
                     )
                 )
                 writeOffRepository.insertWriteOff(
@@ -569,14 +571,14 @@ class AnimalCardViewModel @Inject constructor(
                         date = dateToday(),
                         idAnimal = itemId,
                         note = resultText,
-                        version = 2
+                        version = AnimalCountVersion.KILL
                     )
                 )
                 writeOffRepository.insertWriteOff(
                     DomainWriteOffTable(
                         title = getState().animal.name,
                         count = state.countAnimal.toConvertDbDouble(),
-                        countSuffix = state.countAnimal,
+                        countSuffix = state.suffixAnimal,
                         day = dateTodayArray()[0],
                         month = dateTodayArray()[1],
                         year = dateTodayArray()[2],
@@ -657,7 +659,7 @@ class AnimalCardViewModel @Inject constructor(
 
     private fun updateTitleAndSuffixProductKill(
         index: Int,
-        newTitleAndSuffix: Pair<String, String>
+        newTitleAndSuffix: Pair<String, Suffix>
     ) {
         viewModelScope.launch {
             val warehouseList = updateWarehouseUiStateSync(newTitleAndSuffix.first)
@@ -705,12 +707,12 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
-    private fun updateSuffixProductKill(index: Int, newCount: String) {
+    private fun updateSuffixProductKill(index: Int, newSuffix: Suffix) {
         updateState { state ->
             state.copy(
                 actionAnimal = state.actionAnimal.copy(
                     productKill = state.actionAnimal.productKill.mapIndexed { i, item ->
-                        if (i == index) item.copy(suffixProduct = newCount)
+                        if (i == index) item.copy(suffixProduct = newSuffix)
                         else item
                     }
                 )
@@ -723,9 +725,7 @@ class AnimalCardViewModel @Inject constructor(
             state.copy(
                 actionAnimal = state.actionAnimal.copy(
                     productKill = state.actionAnimal.productKill + ProductKill(
-                        suffixProduct = getState().weight?.weight ?: resourceProvider.getString(
-                            Suffix.KILOGRAM.toResId()
-                        ),
+                        suffixProduct = getState().weight?.suffix ?: Suffix.KILOGRAM
                     )
                 )
             )
@@ -808,11 +808,11 @@ sealed class AnimalCardIntent : BaseIntent {
     data class DialogKillClicked(val value: Boolean) : AnimalCardIntent()
     data class CountKillChanged(val value: String) : AnimalCardIntent()
     data class TitleProductKillChanged(val index: Int, val value: String) : AnimalCardIntent()
-    data class TitleAndSuffixKillClicked(val index: Int, val pair: Pair<String, String>) :
+    data class TitleAndSuffixKillClicked(val index: Int, val pair: Pair<String, Suffix>) :
         AnimalCardIntent()
 
     data class CountProductKillChanged(val index: Int, val value: String) : AnimalCardIntent()
-    data class SuffixProductKillChanged(val index: Int, val value: String) : AnimalCardIntent()
+    data class SuffixProductKillChanged(val index: Int, val value: Suffix) : AnimalCardIntent()
     data object AddProductKillChanged : AnimalCardIntent()
     data class RemoveProductKillChanged(val index: Int) : AnimalCardIntent()
     data object SaveKillChanged : AnimalCardIntent()

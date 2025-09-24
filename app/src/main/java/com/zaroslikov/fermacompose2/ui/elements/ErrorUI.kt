@@ -11,7 +11,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 
@@ -38,7 +40,7 @@ fun ErrorSupportTextSlash(
     isErrorSlash: Boolean = false,
     warehouseList: List<DomainCountSuffix> = emptyList(),
     countAnimals: String = "",
-    suffix: String = "",
+    suffix: Suffix = Suffix.PIECES,
     @StringRes intRes: Int,
     @StringRes intResError: Int
 ) {
@@ -76,7 +78,9 @@ fun ErrorSupportTextSlash(
 
         isAnimal -> Text(
             text = stringResource(
-                R.string.support_text_count_sale_animals, countAnimals.toFormatNumber(), suffix
+                R.string.support_text_count_sale_animals,
+                countAnimals.toFormatNumber(),
+                stringResource(suffix.toResId())
             )
         )
 

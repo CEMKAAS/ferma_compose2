@@ -1,8 +1,10 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.AnimalCountDao
+import com.zaroslikov.data.room.mapper.dto.animal.toDomainAnimalCountPrice
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
+import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import kotlinx.coroutines.flow.Flow
@@ -27,8 +29,9 @@ class AnimalCountRepositoryImpl @Inject constructor(private val animalCountDao: 
         return animalCountDao.getCountAnimalLimit(id).map { it.toDomainMap() }
     }
 
-    override fun getCountAnimal(id: Long): Flow<List<DomainAnimalCount>> {
-        return animalCountDao.getCountAnimal(id).map { it -> it.map { it.toDomainMap() } }
+    override fun getCountAnimal(id: Long): Flow<List<DomainAnimalCountPrice>> {
+        return animalCountDao.getCountAnimal(id)
+            .map { it -> it.map { it.toDomainAnimalCountPrice() } }
     }
 
 }

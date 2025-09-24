@@ -20,15 +20,15 @@ interface AnimalWeightDao {
     suspend fun deleteAnimalWeightTable(animalWeightTable: AnimalWeightTable)
 
     @Query(
-        "SELECT * FROM AnimalWeightTable" +
-                " WHERE idAnimal=:id" +
+        "SELECT * FROM animal_weight_table" +
+                " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getWeightAnimalLimit(id: Long): Flow<AnimalWeightTable?>
 
     @Query(
-        "SELECT  * FROM AnimalWeightTable" +
-                " WHERE idAnimal=:id" +
+        "SELECT * FROM animal_weight_table" +
+                " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getWeightAnimal(id: Long): Flow<List<AnimalWeightTable>>

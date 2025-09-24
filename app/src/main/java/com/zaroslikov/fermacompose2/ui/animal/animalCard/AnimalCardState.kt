@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.animal.animalCard
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
@@ -26,7 +27,7 @@ data class AnimalCardState(
     val price: Double? = 0.0,
     val buyerList: List<String> = emptyList(),
     val actionAnimal: CountAnimal = CountAnimal(),
-    val itemIdPT : Long = 0,
+    val itemIdPT: Long = 0,
     val itemId: Long = 0,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null
@@ -34,7 +35,7 @@ data class AnimalCardState(
 
     data class CountAnimal(
         val countAnimal: String = "",
-        val suffixAnimal: String = "",
+        val suffixAnimal: Suffix = Suffix.PIECES,
         val isAutoPrice: Boolean = false,
         val price: String = "",
         val priceAll: String = "",
@@ -70,7 +71,7 @@ data class AnimalCardState(
         data class ProductKill(
             val title: String = "",
             val countProduct: String = "",
-            val suffixProduct: String = "",
+            val suffixProduct: Suffix = Suffix.PIECES,
             val countWarehouse: Double = 0.0,
             val suffixWarehouse: String = "",
             val warehouseList: List<DomainCountSuffix> = emptyList(),
@@ -88,7 +89,7 @@ data class AnimalCardState(
 
         fun reset(
             titleList: List<TitleAndSuffixDomain> = emptyList(),
-            suffixProduct: String = ""
+            suffixProduct: Suffix = Suffix.PIECES
         ): CountAnimal {
             return this.copy(
                 countAnimal = this.countAnimal,

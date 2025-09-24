@@ -45,7 +45,7 @@ fun String.toConvertZeroString(): String {
 }
 
 fun String.toConvertZeroDouble(): Double {
-    return if (this == "") 0.0 else this.replace(",", ".").toDouble()
+    return if (this == "") 0.0 else this.replace(",", ".").replace(Regex("[^\\d.]"), "").trim().toDouble()
 }
 
 fun String.toConvertZeroTooOneDouble(): Double {
@@ -68,17 +68,7 @@ fun getImageWriteOff(
         R.drawable.baseline_delete_24
 }
 
-fun getImageAnimalCount(
-    version: Int
-): Int {
-    return when (version) {
-        0 -> R.drawable.baseline_add_card_24
-        1 -> R.drawable.baseline_add_shopping_cart_24
-        2 -> R.drawable.icons8__meat60
-        3 -> R.drawable.baseline_edit_note_24
-        else -> R.drawable.baseline_add_circle_outline_24
-    }
-}
+
 
 fun calculatePriceAll(price: String, count: String): String {
     return (price.toConvertZeroString().toConvertDbDouble() * count.toConvertZeroString()

@@ -384,7 +384,7 @@ fun SelectableImageWithIcon(
 fun DatePickerDialogSample(
     datePickerState: DatePickerState,
     dateToday: String,
-    onDateSelected: (String) -> Unit
+    onDateSelected: (String) -> Unit,
 ) {
     DatePickerDialog(
         onDismissRequest = {
@@ -414,40 +414,6 @@ fun DatePickerDialogSample(
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialogSampleNoLimit(
-    datePickerState: DatePickerState,
-    dateToday: String,
-    onDateSelected: (String) -> Unit
-) {
-    DatePickerDialog(
-        onDismissRequest = {
-            onDateSelected(dateToday)
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val format = SimpleDateFormat("dd.MM.yyyy")
-                    val formattedDate: String =
-                        format.format(datePickerState.selectedDateMillis)
-                    onDateSelected(formattedDate)
-                },
-            ) { Text("Выбрать") }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDateSelected(dateToday)
-                }
-            ) { Text("Назад") }
-        }
-    ) {
-        DatePicker(state = datePickerState)
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 object PastOrPresentSelectableDates : SelectableDates {
     override fun isSelectableDate(utcTimeMillis: Long): Boolean {
         return utcTimeMillis <= System.currentTimeMillis()
@@ -455,6 +421,22 @@ object PastOrPresentSelectableDates : SelectableDates {
 
     override fun isSelectableYear(year: Int): Boolean {
         return year <= LocalDate.now().year
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+class MinDateSelectableDates(
+    private val minDateMillis: Long
+) : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+        return utcTimeMillis >= minDateMillis
+    }
+
+    override fun isSelectableYear(year: Int): Boolean {
+        // Можно ограничить и года (чтобы не проматывали слишком далеко назад)
+        val minYear = java.time.Instant.ofEpochMilli(minDateMillis)
+            .atZone(java.time.ZoneId.systemDefault()).year
+        return year >= minYear
     }
 }
 //

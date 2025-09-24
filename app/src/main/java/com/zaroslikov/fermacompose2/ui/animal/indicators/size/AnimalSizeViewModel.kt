@@ -1,10 +1,14 @@
 package com.zaroslikov.fermacompose2.ui.animal.indicators.size
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -26,6 +30,24 @@ class AnimalSizeViewModel @Inject constructor(
         }
     }
 
+    override fun onIntent(intent: AnimalSizeIntent) {
+        return when (intent) {
+            is AnimalSizeIntent.OpenDialogClicked -> updateOpenDialog(
+                intent.isEntry,
+                intent.domainAnimalSize
+            )
+
+            AnimalSizeIntent.EndDialogClicked -> updateEndDialog()
+            is AnimalSizeIntent.SizeChanged -> updateSize(intent.value)
+            is AnimalSizeIntent.DateClicked -> updateDate(intent.value)
+            is AnimalSizeIntent.NoteChanged -> updateNote(intent.value)
+            is AnimalSizeIntent.SuffixClicked -> updateSuffix(intent.value)
+            AnimalSizeIntent.InsertPressed -> insert()
+            AnimalSizeIntent.UpdatePressed -> update()
+            AnimalSizeIntent.DeletePressed -> delete()
+        }
+    }
+
     suspend fun loadData() {
         updateState { it.copy(isLoading = true) }
         animalSizeRepository.getSizeAnimal(itemId).collectLatest { sizeList ->
@@ -40,52 +62,71 @@ class AnimalSizeViewModel @Inject constructor(
     }
 
     override fun insert() {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            if (!isError()) {
+                Log.i("Size", "insert: ${getState().domainAnimalSize.copy(idAnimal = itemId)}")
+                animalSizeRepository.insertAnimalSizeTable(getState().domainAnimalSize.copy(idAnimal = itemId))
+                updateEndDialog()
+                showMessage("Добавлен размер")
+            }
+        }
     }
 
     override fun update() {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            if (!isError()) {
+                animalSizeRepository.updateAnimalSizeTable(getState().domainAnimalSize)
+                updateEndDialog()
+                showMessage("Редактировать размер")
+            }
+        }
     }
 
     override fun delete() {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            animalSizeRepository.deleteAnimalSizeTable(getState().domainAnimalSize)
+            updateEndDialog()
+            showMessage("Удалить размер")
+        }
     }
 
     override fun validation() {
-        TODO("Not yet implemented")
-    }
-
-    override fun onIntent(intent: AnimalSizeIntent) {
-        return when (intent) {
-            is AnimalSizeIntent.AddOpenDialogClicked -> updateAddOpenDialog(intent.value)
-            is AnimalSizeIntent.EditOpenDialogClicked -> updateEditOpenDialog(intent.value)
-            is AnimalSizeIntent.SizeChanged -> updateSize(intent.value)
-            is AnimalSizeIntent.DateClicked -> updateDate(intent.value)
-            is AnimalSizeIntent.NoteChanged -> updateNote(intent.value)
-            is AnimalSizeIntent.SuffixClicked -> updateSuffix(intent.value)
-        }
-    }
-
-    private fun updateAddOpenDialog(openDialog: Boolean) {
-        updateState {
-            it.copy(
-                isAddOpenDialog = openDialog
+        updateState { state ->
+            state.copy(
+                error = state.error.copy(
+                    isErrorSize = state.domainAnimalSize.size.isBlank()
+                )
             )
         }
     }
 
-    private fun updateEditOpenDialog(openDialog: Boolean) {
+    private fun updateOpenDialog(
+        isEntry: Boolean,
+        domainAnimalSize: DomainAnimalSize
+    ) {
         updateState {
             it.copy(
-                isEditOpenDialog = openDialog
+                isOpenDialog = true,
+                isEntry = isEntry,
+                domainAnimalSize = domainAnimalSize
             )
         }
     }
 
-    private fun updateSuffix(suffix: String) {
+    private fun updateEndDialog() {
         updateState {
             it.copy(
-                suffix = suffix
+                isOpenDialog = false
+            )
+        }
+    }
+
+    private fun updateSuffix(suffix: Suffix) {
+        updateState {
+            it.copy(
+                domainAnimalSize = it.domainAnimalSize.copy(
+                    suffix = suffix
+                )
             )
         }
     }
@@ -93,7 +134,9 @@ class AnimalSizeViewModel @Inject constructor(
     private fun updateSize(size: String) {
         updateState {
             it.copy(
-                size = size
+                domainAnimalSize = it.domainAnimalSize.copy(
+                    size = size
+                )
             )
         }
     }
@@ -101,7 +144,9 @@ class AnimalSizeViewModel @Inject constructor(
     private fun updateDate(date: String) {
         updateState {
             it.copy(
-                date = date
+                domainAnimalSize = it.domainAnimalSize.copy(
+                    date = date
+                )
             )
         }
     }
@@ -109,18 +154,30 @@ class AnimalSizeViewModel @Inject constructor(
     private fun updateNote(note: String) {
         updateState {
             it.copy(
-                note = note
+                domainAnimalSize = it.domainAnimalSize.copy(
+                    note = note
+                )
             )
         }
     }
-
 }
 
 sealed class AnimalSizeIntent : BaseIntent {
-    data class AddOpenDialogClicked(val value: Boolean) : AnimalSizeIntent()
-    data class EditOpenDialogClicked(val value: Boolean) : AnimalSizeIntent()
+    data class OpenDialogClicked(
+        val isEntry: Boolean,
+        val domainAnimalSize: DomainAnimalSize = DomainAnimalSize(
+            date = dateToday(),
+            suffix = Suffix.MILLIMETERS
+        )
+    ) :
+        AnimalSizeIntent()
+
+    data object EndDialogClicked : AnimalSizeIntent()
     data class SizeChanged(val value: String) : AnimalSizeIntent()
-    data class SuffixClicked(val value: String) : AnimalSizeIntent()
+    data class SuffixClicked(val value: Suffix) : AnimalSizeIntent()
     data class DateClicked(val value: String) : AnimalSizeIntent()
     data class NoteChanged(val value: String) : AnimalSizeIntent()
+    data object InsertPressed : AnimalSizeIntent()
+    data object UpdatePressed : AnimalSizeIntent()
+    data object DeletePressed : AnimalSizeIntent()
 }

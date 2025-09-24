@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
+import com.zaroslikov.domain.models.enums.Suffix
 
 @Entity(
     tableName = "write_off_table",
@@ -32,7 +33,7 @@ data class WriteOffTable(
     @ColumnInfo(name = "count")
     val count: Double, // Кол-во
     @ColumnInfo(name = "count_suffix")
-    val countSuffix: String,
+    val countSuffix: Suffix,
     @ColumnInfo(name = "price")
     val price: Double?,
     @ColumnInfo(name = "price_all")

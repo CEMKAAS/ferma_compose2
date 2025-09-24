@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
@@ -41,6 +42,7 @@ class SaleEntryViewModel @Inject constructor(
                 intent.title,
                 intent.suffix
             )
+
             is SaleEntryIntent.SuffixClicked -> updateState { it.copy(countSuffix = intent.value) }
             is SaleEntryIntent.CountChanged -> updateCount(intent.value)
             is SaleEntryIntent.AutoPriceClicked -> updateIsAutoPrice(intent.value)
@@ -73,7 +75,7 @@ class SaleEntryViewModel @Inject constructor(
                 it.copy(
                     isEntry = isEntry,
                     category = resourceProvider.getString(R.string.support_text_no_category),
-                    countSuffix = resourceProvider.getString(R.string.suffix_pieces),
+                    countSuffix = Suffix.PIECES,
                     buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
                     pickList = it.pickList.copy(
                         titleList = titleList,
@@ -192,7 +194,7 @@ class SaleEntryViewModel @Inject constructor(
         }
     }
 
-    private fun updateTitleAndSuffix(title: String, suffix: String) {
+    private fun updateTitleAndSuffix(title: String, suffix: Suffix) {
         updateState {
             it.copy(
                 title = title,
@@ -259,11 +261,11 @@ class SaleEntryViewModel @Inject constructor(
 
 sealed class SaleEntryIntent : BaseIntent {
     data class TitleChanged(val value: String) : SaleEntryIntent()
-    data class TitleAndSuffixClicked(val title: String, val suffix: String) :
+    data class TitleAndSuffixClicked(val title: String, val suffix: Suffix) :
         SaleEntryIntent()
 
     data class CountChanged(val value: String) : SaleEntryIntent()
-    data class SuffixClicked(val value: String) : SaleEntryIntent()
+    data class SuffixClicked(val value: Suffix) : SaleEntryIntent()
     data class PriceChanged(val value: String) : SaleEntryIntent()
     data class AutoPriceClicked(val value: Boolean) : SaleEntryIntent()
     data class CategoryChanged(val value: String) : SaleEntryIntent()

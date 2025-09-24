@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.animal.entry
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.repository.AnimalRepository
@@ -65,8 +66,8 @@ class AnimalEntryViewModel @Inject constructor(
         updateState {
             it.copy(
                 isEntry = isEntry,
-                countSuffix = resourceProvider.getString(R.string.suffix_pieces),
-                foodDaySuffix = resourceProvider.getString(R.string.suffix_kilogram),
+                countSuffix = Suffix.PIECES,
+                foodDaySuffix = Suffix.GRAM,
                 category = resourceProvider.getString(R.string.animal_card_screen_add_category_expenses),
                 typeList = typeList
             )
@@ -244,7 +245,7 @@ sealed class AnimalEntryIntent : BaseIntent {
     data class DateFactoryClicked(val value: Boolean) : AnimalEntryIntent()
     data class DateFactoryChanged(val value: String) : AnimalEntryIntent()
     data class FoodDayChanged(val value: String) : AnimalEntryIntent()
-    data class FoodDaySuffixClicked(val value: String) : AnimalEntryIntent()
+    data class FoodDaySuffixClicked(val value: Suffix) : AnimalEntryIntent()
     data class NoteChanged(val value: String) : AnimalEntryIntent()
     data object Insert : AnimalEntryIntent()
     data object Update : AnimalEntryIntent()

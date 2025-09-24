@@ -19,8 +19,14 @@ import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryDestination
 import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryProduct
+import com.zaroslikov.fermacompose2.ui.animal.indicators.count.AnimalCountDestination
+import com.zaroslikov.fermacompose2.ui.animal.indicators.count.AnimalCountScreen
 import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeDestination
 import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeScreen
+import com.zaroslikov.fermacompose2.ui.animal.indicators.vaccination.AnimalVaccinationDestination
+import com.zaroslikov.fermacompose2.ui.animal.indicators.vaccination.AnimalVaccinationScreen
+import com.zaroslikov.fermacompose2.ui.animal.indicators.weight.AnimalWeightDestination
+import com.zaroslikov.fermacompose2.ui.animal.indicators.weight.AnimalWeightScreen
 //import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsDestination
 //import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsScreen
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalScreen
@@ -675,9 +681,33 @@ fun InventoryNavHost(
                         )
                     )
                 },
-/*                onNavigateIndicators = {
-//                    navController.navigate("${AnimalIndicatorsDestination.route}/${it.first}/${it.second}/${it.third}")
-                }*/
+                onNavigateWeight = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalWeightDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
+                onNavigateCount = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalCountDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
+                onNavigateVaccination = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalVaccinationDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                }
             )
         }
 
@@ -693,7 +723,43 @@ fun InventoryNavHost(
                 navigateBack = { navController.popBackStack() },
             )
         }
-
+        composable(
+            route = AnimalWeightDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalWeightDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalWeightDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalWeightScreen(
+                navigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = AnimalVaccinationDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalVaccinationDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalVaccinationDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalVaccinationScreen(
+                navigateBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            route = AnimalCountDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalCountDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalCountDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalCountScreen(
+                navigateBack = { navController.popBackStack() },
+                navigate = {  navController.navigate(it)}
+            )
+        }
 
         /*
                composable(
@@ -715,21 +781,6 @@ fun InventoryNavHost(
                    )
                }
        */
-        /*composable(
-            route = AnimalEditDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(AnimalEditDestination.itemIdArg) {
-                    type = NavType.IntType
-                }
-            )) {
-            AnimalEditProduct(
-                navigateBack = { navController.popBackStack() },
-                navigateEdit = { navController.navigateUp() },
-                navigateDelete = { navController.navigate("${AnimalDestination.route}/${it}") }
-            )
-        }*/
-
-
         /* composable(
              route = FinanceArhivDestination.routeWithArgs,
              arguments = listOf(

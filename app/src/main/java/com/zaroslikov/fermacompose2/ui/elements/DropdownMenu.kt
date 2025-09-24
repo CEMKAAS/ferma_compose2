@@ -32,69 +32,26 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
-import com.zaroslikov.fermacompose2.supportFun.toResInt
-
-
-enum class Suffix {
-    PIECES,
-    GRAM,
-    KILOGRAM,
-    TONS,
-    LITERS,
-    CUBIC_METERS,
-    METERS
-}
-
-
-fun Suffix.toResId(): Int {
-    return when (this) {
-        Suffix.PIECES -> R.string.suffix_pieces
-        Suffix.GRAM -> R.string.suffix_gram
-        Suffix.KILOGRAM -> R.string.suffix_kilogram
-        Suffix.TONS -> R.string.suffix_tons
-        Suffix.LITERS -> R.string.suffix_liters
-        Suffix.CUBIC_METERS -> R.string.suffix_cubic_meters
-        Suffix.METERS -> R.string.suffix_meters
-    }
-}
-
-
-/*enum class Category {
-    ADD, EXPENSES, SALE;
-
-    fun toDrawer(): Int {
-        return when (this) {
-            ADD -> R.drawable.baseline_add_circle_outline_24
-            EXPENSES -> R.drawable.baseline_add_shopping_cart_24
-            SALE -> R.drawable.baseline_add_card_24
-        }
-    }
-
-    fun toResInt(): Int {
-        return when (this) {
-            ADD -> R.string.add_screen_title
-            EXPENSES -> R.string.expenses_screen_title
-            SALE -> R.string.sale_screen_title
-        }
-    }
-}*/
+import com.zaroslikov.fermacompose2.supportFun.toResId
 
 
 @Composable
 fun DropdownMenuIconProductSuffix(
-    setSuffix: (String) -> Unit
+    setSuffix: (Suffix) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val piecesSuffix = stringResource(id = R.string.suffix_pieces)
-    val gramSuffix = stringResource(id = R.string.suffix_gram)
-    val kilogramSuffix = stringResource(id = R.string.suffix_kilogram)
-    val tonsSuffix = stringResource(id = R.string.suffix_tons)
-    val litersSuffix = stringResource(id = R.string.suffix_liters)
-    val cubicMetersSuffix = stringResource(id = R.string.suffix_cubic_meters)
-    val metersSuffix = stringResource(id = R.string.suffix_meters)
+    val suffixList = listOf(
+        Suffix.PIECES,
+        Suffix.GRAM,
+        Suffix.KILOGRAM,
+        Suffix.TONS,
+        Suffix.LITERS,
+        Suffix.CUBIC_METERS,
+        Suffix.METERS
+    )
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
@@ -105,70 +62,32 @@ fun DropdownMenuIconProductSuffix(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded },
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(piecesSuffix)
-                    expanded = !expanded
-                },
-                text = {
-                    Text(text = piecesSuffix)
-                }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(gramSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = gramSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(kilogramSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = kilogramSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(tonsSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = tonsSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(litersSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = litersSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(cubicMetersSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = cubicMetersSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(metersSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = metersSuffix) }
-            )
+            suffixList.forEach { suffix ->
+                DropdownMenuItem(
+                    onClick = {
+                        setSuffix(suffix)
+                        expanded = !expanded
+                    },
+                    text = {
+                        Text(text = stringResource(suffix.toResId()))
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
 fun DropdownMenuIconWeightSuffix(
-    setSuffix: (String) -> Unit
+    setSuffix: (Suffix) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val gramSuffix = stringResource(id = R.string.suffix_gram)
-    val kilogramSuffix = stringResource(id = R.string.suffix_kilogram)
-    val tonsSuffix = stringResource(id = R.string.suffix_tons)
+    val suffixWeightList = listOf(
+        Suffix.GRAM,
+        Suffix.KILOGRAM,
+        Suffix.TONS
+    )
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
@@ -179,43 +98,32 @@ fun DropdownMenuIconWeightSuffix(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded },
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(gramSuffix)
-                    expanded = !expanded
-                },
-                text = {
-                    Text(text = gramSuffix)
-                }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(kilogramSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = kilogramSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(tonsSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = tonsSuffix) }
-            )
+            suffixWeightList.forEach { suffix ->
+                DropdownMenuItem(
+                    onClick = {
+                        setSuffix(suffix)
+                        expanded = !expanded
+                    },
+                    text = {
+                        Text(text = stringResource(suffix.toResId()))
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
 fun DropdownMenuIconHeightSuffix(
-    setSuffix: (String) -> Unit
+    setSuffix: (Suffix) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-
-    val millimetersSuffix = stringResource(id = R.string.suffix_millimeters)
-    val centimetersSuffix = stringResource(id = R.string.suffix_centimetre)
-    val metersSuffix = stringResource(id = R.string.suffix_meters)
+    val suffixSizeList = listOf(
+        Suffix.MILLIMETERS,
+        Suffix.CENTIMETERS,
+        Suffix.METERS
+    )
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
@@ -226,42 +134,32 @@ fun DropdownMenuIconHeightSuffix(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded },
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(millimetersSuffix)
-                    expanded = !expanded
-                },
-                text = {
-                    Text(text = millimetersSuffix)
-                }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(centimetersSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = centimetersSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(metersSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = metersSuffix) }
-            )
+            suffixSizeList.forEach { suffix ->
+                DropdownMenuItem(
+                    onClick = {
+                        setSuffix(suffix)
+                        expanded = !expanded
+                    },
+                    text = {
+                        Text(text = stringResource(suffix.toResId()))
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
 fun DropdownMenuIconCountSuffix(
-    setSuffix: (String) -> Unit
+    setSuffix: (Suffix) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val piecesSuffix = stringResource(id = R.string.suffix_pieces)
-    val headSuffix = stringResource(id = R.string.suffix_head)
-    val unitsSuffix = stringResource(id = R.string.suffix_units)
+    val suffixCountList = listOf(
+        Suffix.PIECES,
+        Suffix.HEADS,
+        Suffix.UNITS
+    )
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
@@ -272,29 +170,17 @@ fun DropdownMenuIconCountSuffix(
             expanded = expanded,
             onDismissRequest = { expanded = !expanded },
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(piecesSuffix)
-                    expanded = !expanded
-                },
-                text = {
-                    Text(text = piecesSuffix)
-                }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(headSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = headSuffix) }
-            )
-            DropdownMenuItem(
-                onClick = {
-                    setSuffix(unitsSuffix)
-                    expanded = !expanded
-                },
-                text = { Text(text = unitsSuffix) }
-            )
+            suffixCountList.forEach { suffix ->
+                DropdownMenuItem(
+                    onClick = {
+                        setSuffix(suffix)
+                        expanded = !expanded
+                    },
+                    text = {
+                        Text(text = stringResource(suffix.toResId()))
+                    }
+                )
+            }
         }
     }
 }
@@ -354,7 +240,7 @@ fun ExposedDropdownMenuProduct(
 @Composable
 fun ExposedDropdownMenuProduct2(
     title: String,
-    setTitle: (Pair<String, String>) -> Unit,
+    setTitle: (Pair<String, Suffix>) -> Unit,
     titleList: List<TitleAndSuffixDomain>,
     enableDropMenu: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
@@ -409,7 +295,7 @@ fun ExposedDropdownMenuProduct2(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "${item.title}, ${item.suffix}",
+                                    text = "${item.title}, ${stringResource(item.suffix.toResId())}",
                                     fontWeight = if (item.title == title) FontWeight.Bold else null
                                 )
                             },
@@ -591,7 +477,7 @@ fun ExposedDropdownMenuPair(
                             },
                             text = {
                                 Text(
-                                    text = "${item.title}, ${item.suffix} - ${stringResource(item.category.toResInt())}",
+                                    text = "${item.title}, ${item.suffix} - ${stringResource(item.category.toResId())}",
                                     fontWeight = if (item.title == title) FontWeight.Bold else null
                                 )
                             },
@@ -662,12 +548,15 @@ fun ExposedDropdownMenuIcon(
 
 
 @Composable
-fun GetDropDownMenu(version: Int, onClick: (String) -> Unit) {
+fun GetDropDownMenu(version: DropdownMenu, onClick: (Suffix) -> Unit) {
     return when (version) {
-        0 -> DropdownMenuIconWeightSuffix(setSuffix = { onClick(it) })
-        1 -> DropdownMenuIconHeightSuffix(setSuffix = { onClick(it) })
-        2 -> DropdownMenuIconCountSuffix(setSuffix = { onClick(it) })
-        3 -> {}
-        else -> DropdownMenuIconProductSuffix(setSuffix = { onClick(it) })
+        DropdownMenu.WEIGHT -> DropdownMenuIconWeightSuffix(setSuffix = { onClick(it) })
+        DropdownMenu.HEIGHT -> DropdownMenuIconHeightSuffix(setSuffix = { onClick(it) })
+        DropdownMenu.COUNT -> DropdownMenuIconCountSuffix(setSuffix = { onClick(it) })
+        DropdownMenu.ALL -> DropdownMenuIconProductSuffix(setSuffix = { onClick(it) })
     }
+}
+
+enum class DropdownMenu {
+    WEIGHT, HEIGHT, COUNT, ALL
 }

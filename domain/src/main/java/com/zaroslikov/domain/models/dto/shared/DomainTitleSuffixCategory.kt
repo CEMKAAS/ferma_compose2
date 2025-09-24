@@ -1,9 +1,10 @@
 package com.zaroslikov.domain.models.dto.shared
 
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.Suffix
 
 data class DomainTitleSuffixCategory(
     val title : String,
-    val suffix: String,
+    val suffix: Suffix,
     val category: Category
 )

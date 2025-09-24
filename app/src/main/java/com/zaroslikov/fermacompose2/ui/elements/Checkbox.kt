@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
@@ -169,8 +170,8 @@ fun AutoWeightCheckbox(
     count: String,
     weight: String,
     onWeightChange: (String) -> Unit,
-    suffix: String,
-    onSuffixChance: (String) -> Unit,
+    suffix: Suffix,
+    onSuffixChance: (Suffix) -> Unit,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     @StringRes tooltipTextResAutoCal: Int,

@@ -12,7 +12,7 @@ interface ExpensesRepository {
     fun getAllExpensesItems(id: Long): Flow<List<DomainExpensesTable>>
     fun getItemExpenses(id: Long): Flow<DomainExpensesTable>
     fun getItemExpensesIdAnimalCount(id: Long): Flow<DomainExpensesTable>
-    fun getItemExpensesForVaccination(id: Long): Flow<DomainExpensesTable>
+    fun getItemExpensesForVaccination(id: Long): Flow<DomainExpensesTable?>
     fun getBrieflyItemExpenses(id: Long): Flow<List<BrieflyExpensesDomain>>
     fun getBrieflyDetailsItemExpenses(id: Long, name: String): Flow<List<DomainExpensesTable>>
     fun getItemsTitleExpensesList(id: Long): Flow<List<TitleAndSuffixDomain>>

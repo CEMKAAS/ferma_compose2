@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.zaroslikov.data.room.dto.animal.AnimalCountPriceDto
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import kotlinx.coroutines.flow.Flow
 
@@ -23,8 +24,8 @@ interface AnimalCountDao {
         """
     WITH FirstRow AS (
         SELECT *
-        FROM AnimalCountTable
-        WHERE idAnimal = :id
+        FROM animal_count_table
+        WHERE animal_id = :id
         ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC
         LIMIT 1
     ),
@@ -40,7 +41,7 @@ interface AnimalCountDao {
                             WHEN version IN (0, 2, 3) THEN -count
                             ELSE 0
                         END
-                    ) FROM AnimalCountTable WHERE idAnimal = :id)
+                    ) FROM animal_count_table WHERE animal_id = :id)
         END AS calculatedCount
     )
     SELECT 
@@ -48,7 +49,7 @@ interface AnimalCountDao {
         (SELECT calculatedCount FROM Calculation) AS count,
         suffix,
         date,
-        idAnimal,
+        animal_id,
         note,
         version
     FROM FirstRow
@@ -57,14 +58,14 @@ interface AnimalCountDao {
     fun getCountAnimalLimit(id: Long): Flow<AnimalCountTable>
 
     @Query(
-        "SELECT id, count, suffix, date, idAnimal, note, version," +
+        "SELECT id, count, suffix, date, animal_id, note, version," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)" +
                 "        WHEN version = 1 THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT price FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS price," +
-                " CASE" +
+                "  CASE" +
                 "        WHEN version = 0 THEN (SELECT buyer FROM sale_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS buyer," +
@@ -73,17 +74,17 @@ interface AnimalCountDao {
                 "        WHEN version = 1 THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT _id FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
-                "    END AS _id," +
+                "    END AS table_id," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT idPT FROM sale_table WHERE animal_count_id = id)" +
                 "        WHEN version = 1 THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS idPT" +
-                " FROM AnimalCountTable" +
-                " WHERE idAnimal=:id" +
+                " FROM animal_count_table" +
+                " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
-    fun getCountAnimal(id: Long): Flow<List<AnimalCountTable>>
+    fun getCountAnimal(id: Long): Flow<List<AnimalCountPriceDto>>
 
 }

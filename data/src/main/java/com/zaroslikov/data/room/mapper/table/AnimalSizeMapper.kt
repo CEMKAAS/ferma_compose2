@@ -9,14 +9,14 @@ fun AnimalSizeTable.toDomainAnimalSize(): DomainAnimalSize {
         size = this.size,
         suffix = this.suffix,
         date = this.date,
-        idAnimal = this.idAnimal,
+        idAnimal = this.animalId,
         note = this.note,
     )
 }
 
 fun DomainAnimalSize.toAnimalSizeTable(): AnimalSizeTable {
     return AnimalSizeTable(
-        idAnimal = this.idAnimal,
+        animalId = this.idAnimal,
         id = this.id,
         note = this.note,
         suffix = this.suffix,

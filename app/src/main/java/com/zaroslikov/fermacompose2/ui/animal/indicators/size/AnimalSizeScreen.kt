@@ -2,14 +2,18 @@
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators.size
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -31,18 +35,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.DomainIndicatorsVM
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.supportFun.convertSize
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
-//import com.zaroslikov.fermacompose2.ui.animal.HeadingIndicators
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.DropdownMenu
 import com.zaroslikov.fermacompose2.ui.elements.FloatButton
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
@@ -52,7 +62,13 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
+import com.zaroslikov.fermacompose2.ui.elements.textBold_18
+import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated2
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import kotlin.math.absoluteValue
 
 
 object AnimalSizeDestination : NavigationDestination {
@@ -83,8 +99,8 @@ fun AnimalSizeScreen(
         floatingActionButton = {
             FloatButton {
                 viewModel.onIntent(
-                    AnimalSizeIntent.AddOpenDialogClicked(
-                        true
+                    AnimalSizeIntent.OpenDialogClicked(
+                        isEntry = true
                     )
                 )
             }
@@ -101,16 +117,18 @@ fun AnimalSizeScreen(
                 onIntent = viewModel::onIntent
             )
 
-        if (state.value.isAddOpenDialog)
-            IndicatorsBottomSheet(
-                state = state.value,
-                onIntent = viewModel::onIntent
+        if (state.value.isOpenDialog)
+            SizeBottomSheet(
+                state = state.value.domainAnimalSize,
+                onIntent = viewModel::onIntent,
+                error = state.value.error,
+                isEntry = state.value.isEntry,
             )
     }
 }
 
 @Composable
-fun AnimalSizeContainer(
+private fun AnimalSizeContainer(
     modifier: Modifier = Modifier,
     state: AnimalSizeState,
     onIntent: (AnimalSizeIntent) -> Unit
@@ -118,18 +136,13 @@ fun AnimalSizeContainer(
     if (state.sizeList.isNotEmpty())
         VaccinationList2(
             modifier = modifier,
-            onValueChange = {
-//                onValueChange(it.first)
-//                isLastCount = it.second
-//                isFirstCount = it.third
-            },
-            onAddClick = { onIntent(AnimalSizeIntent.EditOpenDialogClicked(true)) },
-            indicatorsList = state.sizeList
+            indicatorsList = state.sizeList,
+            onEditChange = { onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = false, it)) }
         )
     else MessageNoData(
         modifier = modifier,
-        onClick = { onIntent(AnimalSizeIntent.AddOpenDialogClicked(true)) },
-        titleRes = R.string.message_no_date_title_weight,
+        onClick = { onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true)) },
+        titleRes = R.string.message_no_date_title_height,
         messageRes = R.string.message_no_date_message_height,
         supportRes = R.string.message_no_date_support_height,
         buttonRes = R.string.button_sale_message_no_height
@@ -137,38 +150,29 @@ fun AnimalSizeContainer(
 }
 
 @Composable
-fun VaccinationList2(
+private fun VaccinationList2(
     modifier: Modifier,
-    onAddClick: () -> Unit,
     indicatorsList: List<DomainAnimalSize>,
-    onValueChange: (Triple<DomainIndicatorsVM, Boolean, Boolean>) -> Unit = {},
+    onEditChange: (DomainAnimalSize) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
     ) {
-//        item { HeadingIndicators(2) }
+        item { HeadingIndicators(R.string.height_screen_title) }
         itemsIndexed(items = indicatorsList, key = { index, _ -> index }) { index, item ->
-            /* val previousItem =
-                 if (index < cumulativeList.size - 1) cumulativeList[index + 1] else null*/
+            val previousItem =
+                if (index < indicatorsList.size - 1) indicatorsList[index + 1] else null
             SizeCard(
-                modifier = Modifier,
+                modifier = Modifier.clickable { onEditChange(item) },
                 domainAnimalSize = item,
-                previousDomainAnimalSize = item
-
-
-                /*Modifier
-                    .clickable {
-                        onValueChange(
-//                            Triple(item, index == (cumulativeList.size - 1), index == 0)
-                        )
-                    },*/
+                previousDomainAnimalSize = previousItem
             )
         }
     }
 }
 
 @Composable
-fun SizeCard(
+private fun SizeCard(
     modifier: Modifier = Modifier,
     domainAnimalSize: DomainAnimalSize,
     previousDomainAnimalSize: DomainAnimalSize?
@@ -193,7 +197,7 @@ fun SizeCard(
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "${domainAnimalSize.size.toFormatNumber()} ${domainAnimalSize.suffix}",
+                text = "${domainAnimalSize.size.toFormatNumber()} ${stringResource(domainAnimalSize.suffix.toResId())}",
                 style = textBold_16,
                 textAlign = TextAlign.Center
             )
@@ -203,41 +207,98 @@ fun SizeCard(
                 style = textBold_16,
                 textAlign = TextAlign.Center
             )
-            IconButton(
-                modifier = Modifier.weight(0.25f),
-                onClick = { details = !details }) {
-                Icon(
-                    imageVector = if (details) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null
-                )
-            }
+            if (previousDomainAnimalSize != null)
+                IconButton(
+                    modifier = Modifier.weight(0.25f),
+                    onClick = { details = !details }) {
+                    Icon(
+                        imageVector = if (details) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null
+                    )
+                }
+            else Spacer(
+                modifier = Modifier
+                    .weight(0.25f)
+                    .size(44.dp)
+            )
         }
-        /*if (details)
-            Row {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = lastValue(
-                        version = version,
-                        domainIndicatorsVM,
-                        previousDomainIndicatorsVM
-                    ),
-                    style = text_16,
-                    textAlign = TextAlign.Start
-                )
-            }*/
+        if (details && previousDomainAnimalSize != null)
+            DetailsCount(
+                domainAnimalSize,
+                previousDomainAnimalSize
+            )
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IndicatorsBottomSheet(
-    state: AnimalSizeState,
+private fun DetailsCount(
+    domainAnimalSize: DomainAnimalSize,
+    previousDomainAnimalSize: DomainAnimalSize
+) {
+    val context = LocalContext.current
+
+    val size = domainAnimalSize.size.toConvertZeroDouble()
+    val previousSize = previousDomainAnimalSize.size.toConvertZeroDouble()
+
+    val suffix = domainAnimalSize.suffix
+    val suffixPrevious = previousDomainAnimalSize.suffix
+
+    val note = if (domainAnimalSize.note != "") "\n${domainAnimalSize.note}" else ""
+
+    val sizeConverted = size.convertSize(suffix, to = Suffix.MILLIMETERS)
+    val previousCountConverted = previousSize.convertSize(suffixPrevious, to = Suffix.MILLIMETERS)
+
+    val totalValue = (sizeConverted - previousCountConverted).convertSize(
+        Suffix.MILLIMETERS,
+        suffix
+    ).absoluteValue.formatNumber()
+
+    Row {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = when {
+                size > previousSize ->
+                    textBuildIndicatorsAnnotated2(
+                        context = context,
+                        intRes = R.string.animal_indicators_size_increased_s,
+                        totalValue = totalValue,
+                        suffix = suffix,
+                        isPlus = true,
+                        note = note
+                    )
+
+                size == previousSize ->
+                    buildAnnotatedString {
+                        append(stringResource(R.string.animal_indicators_size_not_changed_s))
+                        append(note)
+                    }
+
+                else ->
+                    textBuildIndicatorsAnnotated2(
+                        context = context,
+                        intRes = R.string.animal_indicators_size_decreased_s,
+                        totalValue = totalValue,
+                        suffix = suffix,
+                        isPlus = false,
+                        note = note
+                    )
+            },
+            style = text_16,
+            textAlign = TextAlign.Start
+        )
+    }
+}
+
+@Composable
+private fun SizeBottomSheet(
+    state: DomainAnimalSize,
+    error: AnimalSizeState.Error,
+    isEntry: Boolean,
     onIntent: (AnimalSizeIntent) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
-        onDismissRequest = { onIntent(AnimalSizeIntent.AddOpenDialogClicked(false)) },
+        onDismissRequest = { onIntent(AnimalSizeIntent.EndDialogClicked) },
         sheetState = sheetState
     ) {
         Column(modifier = Modifier.modifierBottomSheet()) {
@@ -250,158 +311,67 @@ fun IndicatorsBottomSheet(
                 onSuffixChange = {
                     onIntent(AnimalSizeIntent.SuffixClicked(it))
                 },
-                isError = state.error.isError,
+                isError = error.isErrorSize,
                 drawableRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
                 intRes = R.string.height_screen_title,
                 intResSup = R.string.support_text_height_animal,
-                intResError = R.string.error_no_count_product,
+                intResError = R.string.error_no_height_animal,
                 keyboardOptions = keyboardOptionsNextNumber(),
+                versionDropMenu = DropdownMenu.HEIGHT,
+                isWarehouseShow = false,
                 cardBorder = false
             )
             OutlinedTextDate(
                 value = state.date,
-//                initialSelectedDateMilli = indicationUiState?.let { formatDateToLong(it.date) },
                 onValueChange = { onIntent(AnimalSizeIntent.DateClicked(it)) },
-                cardBorder = false
+                isCardBorder = false
             )
             OutlinedTextNote(
                 value = state.note,
                 onValueChange = { onIntent(AnimalSizeIntent.NoteChanged(it)) },
                 cardBorder = false
             )
+            ButtonPanel(
+                isEntry = isEntry,
+                entryButton = R.string.button_add,
+                onClickInsert = { onIntent(AnimalSizeIntent.InsertPressed) },
+                onClickUpdate = { onIntent(AnimalSizeIntent.UpdatePressed) },
+                onClickDelete = { onIntent(AnimalSizeIntent.DeletePressed) }
+            )
         }
-        /*      if (openDialogGroup)
-                  AlertDialogGroupToSolo(
-                      onConfirmation = {
-                          openDialogGroup = !openDialogGroup
-                          scope.launch {
-                              sheetState.hide()
-                              addBottomSheet.value = false
-                          }
-                      },
-                      onUpdateClick = { onUpdateAnimalGroupClick(it) }
-                  )*/
     }
 }
 
-/*
 @Composable
-private fun ButtonPanel() {
-    if (indicationUiState == null) {
-        ButtonStandart(
-            intRes = R.string.button_insert,
-            onClick = {
-                if (isErrorVersion(
-                        version = version,
-                        title = count,
-                        countAll = countAnimal,
-                        isAnimalGroup = animalUiState?.group == true,
-                        isErrorTitle = { isErrorCount = it },
-                        isErrorCountAnimal = { isErrorCountAnimal = it }
-                    )
-                ) {
-                    focusManager.clearFocus()
-                    val (countAnimalForDb, priceForDb, noteForDb) = prepareForDb(
-                        version = version,
-                        price = price,
-                        countAnimal = count,
-                        countAnimalVaccination = countAnimal,
-                        suffix = suffix,
-                        note = note,
-                        isAutoCalculate = isAutoCalculate,
-                        isAnimalGroup = animalUiState?.group ?: false,
-                        context = context,
-                        animalCountUiState = animalCountUiState,
-                        previousItem = previousItem,
-                    )
-                    println("id: ${idAnimal.toInt()}")
-                    onSaveClick(
-                        Triple(
-                            DomainIndicatorsVM(
-                                weight = count,
-                                date = date,
-                                suffix = if (version == 3) dateNext else suffix,
-                                idAnimal = idAnimal.toInt(),
-                                note = noteForDb
-                            ),
-                            priceForDb,
-                            countAnimalForDb
-                        )
-                    )
-                    if (version == 2 && count.toConvertZeroDouble() == 1.0) {
-                        openDialogGroup = true
-
-                    } else {
-                        scope.launch {
-                            sheetState.hide()
-                            addBottomSheet.value = false
-                        }
-                    }
-                }
-            }
+fun HeadingIndicators(
+    @StringRes titleRes: Int,
+    isVaccination: Boolean = false
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = stringResource(titleRes),
+            style = textBold_18,
+            textAlign = TextAlign.Center
         )
-    } else {
-        ButtonRefresh {
-            if (isErrorVersion(
-                    version = version,
-                    title = count,
-                    countAll = countAnimal,
-                    isAnimalGroup = animalUiState?.group == true,
-                    isErrorTitle = { isErrorCount = it },
-                    isErrorCountAnimal = { isErrorCountAnimal = it }
-                )
-            ) {
-                focusManager.clearFocus()
-                val (countAnimalForDb, priceForDb, noteForDb) = prepareForDb(
-                    version = version,
-                    price = price,
-                    countAnimal = count,
-                    countAnimalVaccination = countAnimal,
-                    suffix = suffix,
-                    note = note,
-                    isAutoCalculate = isAutoCalculate,
-                    isAnimalGroup = animalUiState?.group ?: false,
-                    context = context,
-                    animalCountUiState = animalCountUiState,
-                    previousItem = previousItem,
-                )
-                onUpdateClick(
-                    Triple(
-                        indicationUiState.copy(
-                            weight = count,
-                            date = date,
-                            suffix = if (version == 3) dateNext else suffix,
-                            note = noteForDb
-                        ),
-                        priceForDb,
-                        countAnimalForDb
-                    )
-                )
-                println("version: $version")
-                println("isFirstCount : $isFirstCount")
-                println("count: ${count.toConvertZeroDouble()}")
-                println(count.toConvertZeroDouble() == 1.0)
-                println(version == 2 && isFirstCount && count.toConvertZeroDouble() == 1.0)
-
-                if (version == 2 && isFirstCount && count.toConvertZeroDouble() == 1.0) {
-                    openDialogGroup = true
-                } else {
-                    scope.launch {
-                        sheetState.hide()
-                        addBottomSheet.value = false
-                    }
-                }
-            }
-        }
-        println("isLastCount: $isLastCount")
-        if (!(version == 2 && isLastCount))
-            ButtonDelete {
-                onDeleteClick(indicationUiState)
-                scope.launch {
-                    sheetState.hide()
-                    addBottomSheet.value = false
-                }
-            }
+        Text(
+            modifier = Modifier.weight(1f),
+            text = stringResource(R.string.outlined_text_date),
+            style = textBold_18,
+            textAlign = TextAlign.Center
+        )
+        if (isVaccination)
+            Text(
+                modifier = Modifier.weight(1f),
+                text = stringResource(R.string.support_text_data_next_vaccination),
+                style = textBold_18,
+                textAlign = TextAlign.Center
+            )
+        Spacer(modifier = Modifier.weight(0.25f))
     }
 }
-*/

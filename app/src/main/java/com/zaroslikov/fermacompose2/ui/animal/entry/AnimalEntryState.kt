@@ -3,6 +3,8 @@ package com.zaroslikov.fermacompose2.ui.animal.entry
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainExpensesTable
+import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -19,7 +21,7 @@ data class AnimalEntryState(
     val isAnimalGroup: Boolean = false, // true group
     val count: String = "",
 
-    val countSuffix: String = "",
+    val countSuffix: Suffix = Suffix.PIECES,
     val isAutoPrice: Boolean = false,
 
     val price: String = "",
@@ -30,7 +32,7 @@ data class AnimalEntryState(
     val dateFactory: String = dateToday(),
     val foodDay: String = "",
 
-    val foodDaySuffix: String = "",
+    val foodDaySuffix: Suffix = Suffix.GRAM,
     val note: String = "",
 
     val category: String = "",
@@ -112,7 +114,7 @@ fun AnimalEntryState.updateForSave(
         date = if (!isDateFactory) dateFactory else dateBorn,
         idAnimal = idAnimal,
         note = "",
-        version = 1
+        version = AnimalCountVersion.ADD
     ) to
             if (price.isNotBlank())
                 DomainExpensesTable(

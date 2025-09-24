@@ -22,7 +22,7 @@ interface FinanceDao {
                 " SELECT title,count, count_suffix, -price AS minusPriceAll, day, month, year from expenses_table" +
                 " Where idPT=:id and DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) " +
                 " UNION All " +
-                " SELECT name, (Select Count From AnimalCountTable Where idAnimal = a.id ORDER BY count DESC LIMIT 1 ), 'Шт.', -0 AS minusPriceAll,substr(date, 1, 2) AS day,  substr(date, 4, 2) AS month,  substr(date, 7, 4) AS year from animal_table a " +
+                " SELECT name, (Select Count From animal_count_table Where animal_id = a.id ORDER BY count DESC LIMIT 1 ), 'Шт.', -0 AS minusPriceAll,substr(date, 1, 2) AS day,  substr(date, 4, 2) AS month,  substr(date, 7, 4) AS year from animal_table a " +
                 " Where idPT=:id and DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)) " +
                 " combined_table ORDER BY date DESC"
     )//0 = price
