@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,9 +20,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +36,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,16 +47,22 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeIntent
 import com.zaroslikov.fermacompose2.ui.animal.indicators.size.HeadingIndicators
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
+import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated2
 import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated3
 import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.navNull
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryDestination
@@ -98,40 +106,60 @@ fun AnimalCountScreen(
             AnimalCountContainer(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
                 state = state.value,
-                navigate = { navigate(navigate2(it)) }
+                navigate = { navigate(navigate2(it)) },
+                onIntent = viewModel::onIntent
+            )
+        if (state.value.isOpenDialog)
+            CountBottomSheet(
+                state = state.value.domainAnimalCountPrice,
+                onIntent = viewModel::onIntent,
+                error = state.value.error,
+                isEntry = state.value.isEntry,
             )
     }
 }
 
-private fun navigate2(countPrice: DomainAnimalCountPrice): String {
-    val idPT = countPrice.idPT.toString()
-    val id = countPrice.tableId.toString()
-    val version = countPrice.version
-    Log.i("count", "navigate2: idPT: $idPT, id: $id version: $version")
-    return when (version) {
-        AnimalCountVersion.SALE -> navNull(
-            route = SaleEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
-        )
-
-        AnimalCountVersion.EXPENSES -> navNull(
-            route = ExpensesEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
-        )
-
-        AnimalCountVersion.WRITE_OFF -> navNull(
-            route = WriteOffEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
-        )
-
-        else -> navNull(
-            route = WriteOffEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
-        )
+@Composable
+private fun CountBottomSheet(
+    state: DomainAnimalCountPrice,
+    error: AnimalCountState.Error,
+    isEntry: Boolean,
+    onIntent: (AnimalCountIntent) -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
+        sheetState = sheetState
+    ) {
+        Column(modifier = Modifier.modifierBottomSheet()) {
+            OutlinedTextCountAnimal2(
+                value = state.count,
+                onValueChange = {
+                    onIntent(AnimalCountIntent.CountChanged(it))
+                },
+                suffix = state.suffix,
+                isError = error.isErrorCount,
+                isErrorCountZero = error.isErrorCountZero,
+                intRes = R.string.count_screen_title,
+            )
+            OutlinedTextDate(
+                value = state.date,
+                onValueChange = { onIntent(AnimalCountIntent.DateClicked(it)) },
+                isCardBorder = false
+            )
+            OutlinedTextNote(
+                value = state.note,
+                onValueChange = { onIntent(AnimalCountIntent.NoteChanged(it)) },
+                cardBorder = false
+            )
+            ButtonPanel(
+                isEntry = isEntry,
+                entryButton = R.string.button_add,
+                onClickInsert = { onIntent(AnimalCountIntent.InsertPressed) },
+                onClickUpdate = { onIntent(AnimalCountIntent.UpdatePressed) },
+                onClickDelete = { onIntent(AnimalCountIntent.DeletePressed) }
+            )
+        }
     }
 }
 
@@ -139,13 +167,15 @@ private fun navigate2(countPrice: DomainAnimalCountPrice): String {
 private fun AnimalCountContainer(
     modifier: Modifier = Modifier,
     state: AnimalCountState,
-    navigate: (DomainAnimalCountPrice) -> Unit
+    navigate: (DomainAnimalCountPrice) -> Unit,
+    onIntent: (AnimalCountIntent) -> Unit
 ) {
     if (state.countList.isNotEmpty())
         VaccinationList2(
             modifier = modifier,
             indicatorsList = state.countList,
-            navigate = navigate
+            navigate = navigate,
+            onEditClick = { onIntent(AnimalCountIntent.OpenDialogClicked(it)) }
         )
     else MessageNoData(
         modifier = modifier,
@@ -160,7 +190,8 @@ private fun AnimalCountContainer(
 private fun VaccinationList2(
     modifier: Modifier,
     indicatorsList: List<DomainAnimalCountPrice>,
-    navigate: (DomainAnimalCountPrice) -> Unit
+    navigate: (DomainAnimalCountPrice) -> Unit,
+    onEditClick: (DomainAnimalCountPrice) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -170,7 +201,10 @@ private fun VaccinationList2(
             val previousItem =
                 if (index < indicatorsList.size - 1) indicatorsList[index + 1] else null
             CountCard(
-                modifier = Modifier.clickable { navigate(item) },
+                modifier = Modifier.clickable {
+                    if (item.version == AnimalCountVersion.ADD) onEditClick(item)
+                    else navigate(item)
+                },
                 domainAnimalCount = item,
                 previousDomainAnimalCount = previousItem
             )
@@ -224,7 +258,8 @@ private fun CountCard(
             )
             IconButton(
                 modifier = Modifier.weight(0.25f),
-                onClick = { details = !details }) {
+                onClick = { details = !details }
+            ) {
                 Icon(
                     imageVector = if (details) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null
@@ -264,11 +299,7 @@ private fun DetailsCount(
         Text(
             modifier = Modifier.weight(1f),
             text = when (domainAnimalCount.version) {
-                AnimalCountVersion.SALE -> {
-                    Log.i(
-                        "count",
-                        "DetailsCount: totalValue: $totalValue, price: $price, suffix: $suffix, buyer: $buyer, note: $note"
-                    )
+                AnimalCountVersion.SALE ->
                     textBuildIndicatorsAnnotated3(
                         context = context,
                         intRes = R.string.animal_card_screen_sale_note_expenses,
@@ -280,7 +311,6 @@ private fun DetailsCount(
                         isPlus = false,
                         note = note
                     )
-                }
 
                 AnimalCountVersion.KILL -> textBuildIndicatorsAnnotated2(
                     context = context,
@@ -332,6 +362,37 @@ private fun DetailsCount(
             },
             style = text_16,
             textAlign = TextAlign.Start
+        )
+    }
+}
+
+private fun navigate2(countPrice: DomainAnimalCountPrice): String {
+    val idPT = countPrice.idPT.toString()
+    val id = countPrice.tableId.toString()
+    val version = countPrice.version
+    return when (version) {
+        AnimalCountVersion.SALE -> navNull(
+            route = SaleEntryDestination.route,
+            itemOne = idPT,
+            itemTwo = id
+        )
+
+        AnimalCountVersion.EXPENSES -> navNull(
+            route = ExpensesEntryDestination.route,
+            itemOne = idPT,
+            itemTwo = id
+        )
+
+        AnimalCountVersion.WRITE_OFF -> navNull(
+            route = WriteOffEntryDestination.route,
+            itemOne = idPT,
+            itemTwo = id
+        )
+
+        else -> navNull(
+            route = WriteOffEntryDestination.route,
+            itemOne = idPT,
+            itemTwo = id
         )
     }
 }

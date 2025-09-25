@@ -4,15 +4,15 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
 
 data class DomainAnimalCountPrice(
-    val id: Long,
-    val count: String,
-    val suffix: Suffix,
-    val date: String,
-    val animalId: Long,
-    val note: String,
-    val version: AnimalCountVersion?,
-    val price: Double?,
-    val buyer: String?,
-    val tableId: Long?,
-    val idPT: Long?
+    val id: Long = 0,
+    val count: String = "",
+    val suffix: Suffix = Suffix.PIECES,
+    val date: String = "",
+    val animalId: Long = 0,
+    val note: String = "",
+    val version: AnimalCountVersion? = AnimalCountVersion.ADD,
+    val price: Double? = null,
+    val buyer: String? = null,
+    val tableId: Long? = null,
+    val idPT: Long? = null
 )

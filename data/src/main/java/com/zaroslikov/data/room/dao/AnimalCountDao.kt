@@ -17,8 +17,8 @@ interface AnimalCountDao {
     @Update
     suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
 
-    @Delete
-    suspend fun deleteAnimalCountTable(animalCountTable: AnimalCountTable)
+    @Query("DELETE FROM animal_count_table WHERE id =:id")
+    suspend fun deleteAnimalCountTable(id: Long)
 
     @Query(
         """

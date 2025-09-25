@@ -21,8 +21,8 @@ class AnimalCountRepositoryImpl @Inject constructor(private val animalCountDao: 
         return animalCountDao.updateAnimalCountTable(animalCountTable.toRoomMap())
     }
 
-    override suspend fun deleteAnimalCountTable(animalCountTable: DomainAnimalCount) {
-        return animalCountDao.deleteAnimalCountTable(animalCountTable.toRoomMap())
+    override suspend fun deleteAnimalCountTable(id: Long) {
+        return animalCountDao.deleteAnimalCountTable(id)
     }
 
     override fun getCountAnimalLimit(id: Long): Flow<DomainAnimalCount> {

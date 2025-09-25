@@ -92,6 +92,8 @@ fun WriteOffEntryContainerProduct(
             titleList = state.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
+            readOnly = state.isIndicatorsValue,
+            enable = !state.isIndicatorsValue,
         )
         OutlinedTextCount2(
             value = state.count,

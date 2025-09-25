@@ -163,7 +163,7 @@ fun CardOutlined(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
+
 @Composable
 fun CardFinance(
     modifier: Modifier = Modifier,
@@ -183,7 +183,6 @@ fun CardFinance(
     }
 }
 
-@SuppressLint("NewApi")
 @Composable
 fun CardFinance(
     modifier: Modifier = Modifier,
