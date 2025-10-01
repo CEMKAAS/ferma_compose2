@@ -1,7 +1,7 @@
 package com.zaroslikov.domain.models.dto.shared
 
 data class DomainTitleSuffixPrice(
-    val title: String,
-    val suffix: String,
-    val price: Double
+    val title: String = "",
+    val suffix: String = "",
+    val price: Double = 0.0
 )

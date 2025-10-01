@@ -10,7 +10,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zaroslikov.fermacompose2.ui.add.AddProject
-import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
 import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardDestination
 import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
@@ -30,6 +29,10 @@ import com.zaroslikov.fermacompose2.ui.animal.indicators.weight.AnimalWeightScre
 //import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsDestination
 //import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsScreen
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalScreen
+import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
+import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
+import com.zaroslikov.fermacompose2.ui.finance.income_expenses.FinanceIncomeExpensesDestination
+import com.zaroslikov.fermacompose2.ui.finance.income_expenses.FinanceIncomeExpensesScreen
 //import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivDestination
 //import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivScreen
 //import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivDestination
@@ -274,95 +277,112 @@ fun InventoryNavHost(
                  navigateToStart = { navController.navigate(StartDestination.route) })
 
          }
-
-         composable(
-             route = FinanceDestination.routeWithArgs,
-             arguments = listOf(navArgument(FinanceDestination.itemIdArg) {
-                 type = NavType.IntType
-             })
-         ) {
-             FinanceScreen(
-                 drawerState = drawerState,
-                 navigateToStart = { navController.navigate(StartDestination.route) },
-                 navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
-                 navigateToIncomeExpenses = {
-                     navController.navigate(
-                         "${FinanceIncomeExpensesDestination.route}/${it.first}/${it.second}"
-                     )
-                 },
-                 navigateToFinaceMount = {
-                     navController.navigate(
+*/
+        composable(
+            route = FinanceDestination.routeWithArgs,
+            arguments = listOf(navArgument(FinanceDestination.itemIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            FinanceScreen(
+                drawerState = drawerState,
+                navigateToStart = { navController.navigate(StartDestination.route) },
+                navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
+                navigateToIncomeExpenses = {
+                    navController.navigate(
+                        navNull(
+                            FinanceIncomeExpensesDestination.route,
+                            FinanceIncomeExpensesDestination.itemIdArg,
+                            it.first.toString(),
+                            FinanceIncomeExpensesDestination.itemIdArgTwo,
+                            it.second.toString()
+                        )
+                    )
+                },
+                navigateToFinanceMonth = {
+                    /* navController.navigate(
+                         navNull(
+                             FinanceIncomeExpensesDestination.route,
+                             AddEntryDestination.itemIdPT,
+                             it.first.toString(),
+                             AddEntryDestination.itemId,
+                             it.second.toString()
+                         )
                          "${FinanceMountDestination.route}/${it}"
+                    )*/
+                })
+        }
+        /*
+                 composable(
+                     route = FinanceMountDestination.routeWithArgs,
+                     arguments = listOf(navArgument(FinanceMountDestination.itemIdArg) {
+                         type = NavType.IntType
+                     })
+                 ) {
+                     FinanceMountScreen(
+                         navigateBack = { navController.popBackStack() },
+                         navigateToCategory = {
+                             navController.navigate(
+                                 "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}/${it.dateBegin}/${it.dateEnd}"
+                             )
+                         })
+                 }
+
+                 composable(
+                     route = FinanceCategoryDestination.routeWithArgs,
+                     arguments = listOf(
+                         navArgument(FinanceCategoryDestination.itemIdArg) {
+                             type = NavType.IntType
+                         },
+                         navArgument(FinanceCategoryDestination.itemIdArgTwo) {
+                             type = NavType.StringType
+                         },
+                         navArgument(FinanceCategoryDestination.itemIdArgThree) {
+                             type = NavType.BoolType
+                         },
+                         navArgument(FinanceCategoryDestination.itemIdArgFour) {
+                             type = NavType.StringType
+                         },
+                         navArgument(FinanceCategoryDestination.itemIdArgFive) {
+                             type = NavType.StringType
+                         })
+                 ) {
+                     FinanceCategoryScreen(
+                         navigateBack = { navController.popBackStack() },
+                         navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
                      )
-                 })
-         }
-
-         composable(
-             route = FinanceMountDestination.routeWithArgs,
-             arguments = listOf(navArgument(FinanceMountDestination.itemIdArg) {
-                 type = NavType.IntType
-             })
-         ) {
-             FinanceMountScreen(
-                 navigateBack = { navController.popBackStack() },
-                 navigateToCategory = {
-                     navController.navigate(
-                         "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}/${it.dateBegin}/${it.dateEnd}"
-                     )
-                 })
-         }
-
-         composable(
-             route = FinanceCategoryDestination.routeWithArgs,
-             arguments = listOf(
-                 navArgument(FinanceCategoryDestination.itemIdArg) {
-                     type = NavType.IntType
-                 },
-                 navArgument(FinanceCategoryDestination.itemIdArgTwo) {
-                     type = NavType.StringType
-                 },
-                 navArgument(FinanceCategoryDestination.itemIdArgThree) {
-                     type = NavType.BoolType
-                 },
-                 navArgument(FinanceCategoryDestination.itemIdArgFour) {
-                     type = NavType.StringType
-                 },
-                 navArgument(FinanceCategoryDestination.itemIdArgFive) {
-                     type = NavType.StringType
-                 })
-         ) {
-             FinanceCategoryScreen(
-                 navigateBack = { navController.popBackStack() },
-                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
-             )
-         }
-
-         composable(
-             route = FinanceIncomeExpensesDestination.routeWithArgs,
-             arguments = listOf(navArgument(FinanceIncomeExpensesDestination.itemIdArg) {
-                 type = NavType.IntType
-             }, navArgument(FinanceIncomeExpensesDestination.itemIdArgTwo) {
-                 type = NavType.BoolType
-             })
-         ) {
-             FinanceIncomeExpensesScreen(
-                 navigateBack = { navController.popBackStack() },
-                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.first}/${it.second}") },
-             )
-
-         }
-
-         composable(
-             route = FinanceAnalysisDestination.routeWithArgs,
-             arguments = listOf(navArgument(FinanceAnalysisDestination.itemIdArg) {
-                 type = NavType.IntType
-             }, navArgument(FinanceAnalysisDestination.itemIdArgTwo) {
-                 type = NavType.StringType
-             })
-         ) {
-             FinanceAnalysisProduct(navigateBack = { navController.popBackStack() })
-         }
- */
+                 }
+*/
+        composable(
+            route = FinanceIncomeExpensesDestination.routeWithArgs,
+            arguments = listOf(navArgument(FinanceIncomeExpensesDestination.itemIdArg) {
+                type = NavType.LongType
+            }, navArgument(FinanceIncomeExpensesDestination.itemIdArgTwo) {
+                type = NavType.BoolType
+            })
+        ) {
+            FinanceIncomeExpensesScreen(
+                navigateBack = { navController.popBackStack() },
+                navigationToAnalysis = {
+                    /*
+                    navController.navigate(
+                        "${FinanceAnalysisDestination.route}/${it.first}/${it.second}"
+                    )*/
+                },
+            )
+        }
+        /*
+                         composable(
+                             route = FinanceAnalysisDestination.routeWithArgs,
+                             arguments = listOf(navArgument(FinanceAnalysisDestination.itemIdArg) {
+                                 type = NavType.IntType
+                             }, navArgument(FinanceAnalysisDestination.itemIdArgTwo) {
+                                 type = NavType.StringType
+                             })
+                         ) {
+                             FinanceAnalysisProduct(navigateBack = { navController.popBackStack() })
+                         }
+                 */
 
         //Add
         composable(
@@ -757,7 +777,7 @@ fun InventoryNavHost(
         ) {
             AnimalCountScreen(
                 navigateBack = { navController.popBackStack() },
-                navigate = {  navController.navigate(it)}
+                navigate = { navController.navigate(it) }
             )
         }
 

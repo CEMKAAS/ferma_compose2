@@ -22,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,13 +33,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CardFinance
 import com.zaroslikov.fermacompose2.ui.elements.CardFinanceOutlined
@@ -48,7 +46,7 @@ import com.zaroslikov.fermacompose2.ui.elements.CardFinanceOutlinedRow
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.TextAndIcon
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_14
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_28
@@ -61,7 +59,6 @@ import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.theme.errorLight
 import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appmetrica.analytics.AppMetrica
 
 object FinanceDestination : NavigationDestination {
@@ -76,15 +73,15 @@ object FinanceDestination : NavigationDestination {
 fun FinanceScreen(
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToFinaceMount: (Int) -> Unit,
-    navigateToIncomeExpenses: (Pair<Int, Boolean>) -> Unit,
+    navigateToFinanceMonth: (Long) -> Unit,
+    navigateToIncomeExpenses: (Pair<Long, Boolean>) -> Unit,
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: FinanceViewModel = hiltViewModel()
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val idProject = state.idPT
 
     ModalNavigationDrawer(
@@ -118,7 +115,7 @@ fun FinanceScreen(
             else
                 FinanceBody(
                     modifier = modifier
-                        .modifierScreen(innerPadding),
+                        .modifierScreenLazy(innerPadding),
                     currentBalance = state.currentBalance,
                     income = state.income,
                     expenses = state.expenses,
@@ -127,9 +124,8 @@ fun FinanceScreen(
                     incomeMount = state.incomeMount,
                     expensesMount = state.expensesMount,
                     incomeExpensesList = state.domainIncomeExpenseList,
-                    navigateToFinaceMount = navigateToFinaceMount,
-                    navigateToIncomeExpenses = navigateToIncomeExpenses,
-                    idPT = idProject
+                    navigateToFinanceMonth = { navigateToFinanceMonth(idProject) },
+                    navigateToIncomeExpenses = { navigateToIncomeExpenses(idProject to it) },
                 )
         }
     }
@@ -137,6 +133,7 @@ fun FinanceScreen(
 
 @Composable
 private fun FinanceBody(
+    modifier: Modifier = Modifier,
     currentBalance: Double,
     income: Double,
     expenses: Double,
@@ -145,10 +142,8 @@ private fun FinanceBody(
     incomeMount: Double,
     expensesMount: Double,
     incomeExpensesList: List<DomainIncomeExpenses>,
-    navigateToFinaceMount: (Int) -> Unit,
-    navigateToIncomeExpenses: (Pair<Int, Boolean>) -> Unit,
-    idPT: Long,
-    modifier: Modifier = Modifier,
+    navigateToFinanceMonth: () -> Unit,
+    navigateToIncomeExpenses: (Boolean) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
@@ -162,141 +157,198 @@ private fun FinanceBody(
         modifier = modifier,
         verticalArrangement = Arrangement.Top
     ) {
-        Text(
-            text = stringResource(R.string.card_ruble_s, currentBalance.formatNumber()),
-            textAlign = TextAlign.Start,
-            style = textBold_28,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(2.dp),
-        )
-        Text(
-            text = stringResource(R.string.support_text_current_balance),
-            textAlign = TextAlign.Start,
-            style = text_10,
-            color = Color.Gray,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-                .padding(2.dp),
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            CardFinance(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    navigateToIncomeExpenses(Pair(idPT, true))
-                    AppMetrica.reportEvent("Финансы Доход")
-                },
-                titleRes = R.string.card_income,
-                value = income
+        CurrentBalance(currentBalance)
+        IncomeExpensesCards(
+            income = income,
+            expenses = expenses
+        ) { navigateToIncomeExpenses(it) }
+        if (expanded)
+            GroupDetailsCards(
+                scrap = scrap,
+                income = income,
+                ownNeed = ownNeed,
+                expenses = expenses,
+                extraPadding = extraPadding,
             )
-            CardFinance(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    navigateToIncomeExpenses(Pair(idPT, true))
-                    AppMetrica.reportEvent("Финансы Доход")
-                },
-                titleRes = R.string.card_expenditure,
-                value = expenses
-            )
+        DetailsCard(expanded) {
+            expanded = !expanded
         }
+        CurrentMonthCard(
+            incomeMount = incomeMount,
+            expensesMount = expensesMount,
+        ) { navigateToFinanceMonth() }
+        TransactionList(incomeExpensesList)
+    }
+}
 
-        if (expanded) {
-            CardFinanceOutlinedRow(
-                modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-                oneIntRes = R.string.card_own_need,
-                twoIntRes = R.string.card_scrap,
-                oneValue = ownNeed,
-                twoValue = scrap
-            )
-            CardFinanceOutlinedRow(
-                modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-                oneIntRes = R.string.card_all_income,
-                twoIntRes = R.string.card_all_expenditure,
-                oneValue = ownNeed + income,
-                twoValue = scrap + expenses
-            )
-            CardFinanceOutlined(
-                modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-                titleRes = R.string.card_all,
-                value = (ownNeed + income) - (scrap + expenses),
-            )
-        }
-        CardField(
-            modifier = Modifier
-                .clickable {
-                    expanded = !expanded
-                    AppMetrica.reportEvent("Финансы Подробно")
-                },
-            horizontalArrangement = Arrangement.Center
-        ) {
-            TextAndIcon(
-                intRes = if (expanded) R.string.widget_briefly else R.string.widget_detail,
-                iconRes = if (expanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-            )
-        }
-        CardField(
-            modifier = Modifier.clickable {
-                navigateToFinaceMount(idPT)
-                AppMetrica.reportEvent("Финансы Месяц")
+@Composable
+private fun CurrentBalance(
+    currentBalance: Double
+) {
+    Text(
+        text = stringResource(R.string.card_ruble_s, currentBalance.formatNumber()),
+        textAlign = TextAlign.Start,
+        style = textBold_28,
+        modifier = Modifier
+            .padding(2.dp),
+    )
+    Text(
+        text = stringResource(R.string.support_text_current_balance),
+        textAlign = TextAlign.Start,
+        style = text_10,
+        color = Color.Gray,
+        modifier = Modifier
+            .padding(bottom = 10.dp)
+            .padding(2.dp),
+    )
+}
+
+@Composable
+private fun IncomeExpensesCards(
+    income: Double,
+    expenses: Double,
+    navigateToIncomeExpenses: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        CardFinance(
+            modifier = Modifier.weight(1f),
+            onClick = {
+                navigateToIncomeExpenses(true)
+                AppMetrica.reportEvent("Финансы Доход")
             },
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.card_now_month),
-                    style = textBold_16
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                ) {
-                    Text(
-                        text = stringResource(R.string.card_ruble_s, incomeMount.formatNumber()),
-                        style = textBold_16
-                    )
-                    Text(
-                        text = stringResource(R.string.card_ruble_s, expensesMount.formatNumber()),
-                        style = textBold_16
-                    )
-                }
-            }
-        }
-
-        if (incomeExpensesList.isNotEmpty()) {
-            Text(
-                text = stringResource(R.string.support_text_transactions_now_month),
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp)
-                    .padding(2.dp),
-                style = textBold_16
-            )
-            LazyColumn {
-                items(items = incomeExpensesList) {
-                    TransactionRow(it)
-                }
-            }
-        } else Text(
-            text = stringResource(R.string.no_item_finance),
-            style = textBold_16,
-            modifier = modifier,
+            titleRes = R.string.card_income,
+            value = income
+        )
+        CardFinance(
+            modifier = Modifier.weight(1f),
+            onClick = {
+                navigateToIncomeExpenses(false)
+                AppMetrica.reportEvent("Финансы Доход")
+            },
+            titleRes = R.string.card_expenditure,
+            value = expenses
         )
     }
 }
 
 @Composable
+private fun GroupDetailsCards(
+    extraPadding: Dp,
+    ownNeed: Double,
+    scrap: Double,
+    income: Double,
+    expenses: Double
+) {
+    CardFinanceOutlinedRow(
+        modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
+        oneIntRes = R.string.card_own_need,
+        twoIntRes = R.string.card_scrap,
+        oneValue = ownNeed,
+        twoValue = scrap
+    )
+    CardFinanceOutlinedRow(
+        modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
+        oneIntRes = R.string.card_all_income,
+        twoIntRes = R.string.card_all_expenditure,
+        oneValue = ownNeed + income,
+        twoValue = scrap + expenses
+    )
+    CardFinanceOutlined(
+        modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
+        titleRes = R.string.card_all,
+        value = (ownNeed + income) - (scrap + expenses),
+    )
+}
+
+@Composable
+private fun DetailsCard(
+    expanded: Boolean,
+    onClick: () -> Unit
+) {
+    CardField(
+        modifier = Modifier
+            .clickable {
+                onClick()
+                AppMetrica.reportEvent("Финансы Подробно")
+            },
+        horizontalArrangement = Arrangement.Center
+    ) {
+        TextAndIcon(
+            intRes = if (expanded) R.string.widget_briefly else R.string.widget_detail,
+            iconRes = if (expanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+        )
+    }
+}
+
+@Composable
+private fun CurrentMonthCard(
+    incomeMount: Double,
+    expensesMount: Double,
+    navigateToFinanceMonth: () -> Unit
+) {
+    CardField(
+        modifier = Modifier.clickable {
+            navigateToFinanceMonth()
+            AppMetrica.reportEvent("Финансы Месяц")
+        },
+        row = false,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.card_now_month),
+            style = textBold_16
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+        ) {
+            Text(
+                text = stringResource(R.string.card_ruble_s, incomeMount.formatNumber()),
+                style = textBold_16
+            )
+            Text(
+                text = stringResource(R.string.card_ruble_s, expensesMount.formatNumber()),
+                style = textBold_16
+            )
+        }
+    }
+}
+
+@Composable
+private fun TransactionList(
+    incomeExpensesList: List<DomainIncomeExpenses>,
+) {
+    if (incomeExpensesList.isNotEmpty()) {
+        Text(
+            text = stringResource(R.string.support_text_transactions_now_month),
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp)
+                .padding(2.dp),
+            style = textBold_16
+        )
+        LazyColumn {
+            items(items = incomeExpensesList) {
+                TransactionRow(it)
+            }
+        }
+    } else Text(
+        text = stringResource(R.string.no_item_finance),
+        style = textBold_16,
+        modifier = Modifier,
+    )
+}
+
+
+@Composable
 fun TransactionRow(
-    incomeExpensesDetails: IncomeExpensesDetails
+    incomeExpensesDetails: DomainIncomeExpenses
 ) {
     Row(
         modifier = Modifier
@@ -320,14 +372,14 @@ fun TransactionRow(
         Text(
             text = stringResource(
                 R.string.card_ruble_s,
-                incomeExpensesDetails.priceAll.formatNumber()
+                incomeExpensesDetails.price.formatNumber()
             ),
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.3f),
             style = textBold_16,
-            color = if (!incomeExpensesDetails.priceAll.toString()
+            color = if (!incomeExpensesDetails.price.toString()
                     .contains("-")
             ) tertiaryLight else errorLight
         )
@@ -338,22 +390,3 @@ fun TransactionRow(
         modifier = Modifier.padding(vertical = 5.dp)
     )
 }
-
-
-data class Fin(
-    val title: String?, // может быть категория, название или суффикс
-    val priceAll: Double
-)
-
-data class FinUiState(
-    val title: String = "",
-    val priceAll: Double = 0.0
-)
-
-data class FinanceCategoryDataNav(
-    val idPT: Int,
-    val category: String,
-    val incomeBoolean: Boolean,
-    val dateBegin: String,
-    val dateEnd: String
-)

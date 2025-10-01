@@ -8,14 +8,14 @@ import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
+import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
+import com.zaroslikov.fermacompose2.supportFun.firstDayOfMonth
+import com.zaroslikov.fermacompose2.supportFun.todayOfMonth
 import com.zaroslikov.fermacompose2.ui.finance.main_screen.FinanceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.TimeZone
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,32 +29,15 @@ class FinanceViewModel @Inject constructor(
 
     private val itemId: Long = checkNotNull(savedStateHandle[FinanceDestination.itemIdArg])
 
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    val month = calendar[Calendar.MONTH] + 1
-    val year = calendar[Calendar.YEAR]
-
-    private fun calBegin(): String {
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        calendar.set(year, month, 1)
-        val format = SimpleDateFormat("yyyy-MM-dd")
-        return format.format(calendar.timeInMillis)
-    }
-
-
-    private fun calEnd(): String {
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        val format = SimpleDateFormat("yyyy-MM-dd")
-        return format.format(calendar.timeInMillis)
-    }
-
     init {
         loadData()
     }
 
     private fun loadData() {
         viewModelScope.launch {
+            val month = dateTodayArray()[1]
+            val year = dateTodayArray()[2]
+
             updateState { it.copy(isLoading = true) }
             val currentBalance = financeRepository.getCurrentBalance(itemId)
                 .filterNotNull()
@@ -81,16 +64,17 @@ class FinanceViewModel @Inject constructor(
                 .first().toDouble()
 
             val expensesMount =
-                expensesRepository.getExpensesMountFin(itemId, month, year, "$year-$month")
+                expensesRepository.getExpensesMountFin(itemId, month, year /*"$year-$month"*/)
                     .filterNotNull()
                     .first().toDouble()
 
             val domainIncomeExpenseList =
-                financeRepository.getIncomeExpensesCurrentMonth(itemId, calBegin(), calEnd())
+                financeRepository.getIncomeExpensesCurrentMonth(itemId, firstDayOfMonth().first, todayOfMonth().first)
                     .first()
 
             updateState { state ->
                 state.copy(
+                    isLoading = false,
                     idPT = itemId,
                     currentBalance = currentBalance,
                     income = income,
@@ -107,14 +91,3 @@ class FinanceViewModel @Inject constructor(
 }
 
 sealed class FinanceIntent() : BaseIntent
-
-data class IncomeCategoryUiState(val itemList: List<Fin> = listOf())
-data class IncomeExpensesCategoryUiState(val itemList: List<IncomeExpensesDetails> = listOf())
-
-data class IncomeExpensesDetails(
-    val title: String,
-    val count: Double,
-    val suffix: String,
-    val priceAll: Double,
-    val date: String
-)

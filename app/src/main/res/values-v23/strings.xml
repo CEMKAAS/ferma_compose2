@@ -389,6 +389,9 @@
     <string name="animal_entry_screen_sex_man">Мужской</string>
     <string name="animal_entry_screen_sex_woman">Женский</string>
 
+    //FinanceIncomeExpenses
+    <string name="finance_income_expenses_category">Категории</string>
+    <string name="finance_income_expenses_product">Продукция</string>
 
     //AnimalCardScreen
     <string name="animal_card_screen_animal_card">Карточка животного</string>
