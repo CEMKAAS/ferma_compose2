@@ -41,17 +41,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
+import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeIntent
 import com.zaroslikov.fermacompose2.ui.animal.indicators.size.HeadingIndicators
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.IconAndText
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextBuyer
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
@@ -59,6 +63,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
+import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated2
 import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated3
 import com.zaroslikov.fermacompose2.ui.elements.text_16
@@ -96,6 +101,9 @@ fun AnimalCountScreen(
                 scrollBehavior = scrollBehavior,
                 navigateUp = navigateBack
             )
+        },
+        floatingActionButton = {
+
         }
     ) { innerPadding ->
         if (state.value.isLoading)
@@ -115,23 +123,96 @@ fun AnimalCountScreen(
                 onIntent = viewModel::onIntent,
                 error = state.value.error,
                 isEntry = state.value.isEntry,
+                buyerList = emptyList() // TODO заменить на нормальный лист
             )
     }
 }
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun MyFabMenu(
+    onAction1: () -> Unit,
+    onAction2: () -> Unit,
+    onAction3: () -> Unit
+) {
+    var fabExpanded by rememberSaveable { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        FloatingActionButtonMenu(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            expanded = fabExpanded,
+            button = {
+                ToggleFloatingActionButton(
+                    checked = fabExpanded,
+                    onCheckedChange = { fabExpanded = it },
+                    containerSize = ToggleFloatingActionButtonDefaults.containerSizeLarge()
+                ) {
+                    val icon = if (fabExpanded) Icons.Default.Close else Icons.Default.Add
+                    Icon(
+                        painter = rememberVectorPainter(icon),
+                        contentDescription = null,
+                        modifier = Modifier.animateIcon({ checkedProgress })
+                    )
+                }
+            }
+        ) {
+            FloatingActionButtonMenuItem(
+                onClick = {
+                    fabExpanded = false
+                    onAction1()
+                },
+                icon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                text = { Text("Edit") }
+            )
+            FloatingActionButtonMenuItem(
+                onClick = {
+                    fabExpanded = false
+                    onAction2()
+                },
+                icon = { Icon(Icons.Default.Delete, contentDescription = null) },
+                text = { Text("Delete") }
+            )
+            FloatingActionButtonMenuItem(
+                onClick = {
+                    fabExpanded = false
+                    onAction3()
+                },
+                icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
+                text = { Text("Sell") }
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun CountBottomSheet(
     state: DomainAnimalCountPrice,
     error: AnimalCountState.Error,
+    buyerList: List<String>,
     isEntry: Boolean,
     onIntent: (AnimalCountIntent) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val priceShowList = setOf(
+        AnimalCountVersion.SALE,
+        AnimalCountVersion.EXPENSES,
+        AnimalCountVersion.WRITE_OFF
+    )
     ModalBottomSheet(
         onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
         sheetState = sheetState
     ) {
         Column(modifier = Modifier.modifierBottomSheet()) {
+            IconAndText(
+                modifier = Modifier.fillMaxWidth(),
+                iconRes = state.version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
+                valueString = stringResource(
+                    state.version?.toResId() ?: AnimalCountVersion.ADD.toResId()
+                ),
+                horizontalArrangement = Arrangement.Center,
+                textStyle = textBold_18
+            )
             OutlinedTextCountAnimal2(
                 value = state.count,
                 onValueChange = {
@@ -142,6 +223,33 @@ private fun CountBottomSheet(
                 isErrorCountZero = error.isErrorCountZero,
                 intRes = R.string.count_screen_title,
             )
+            if (state.price != null && state.version in priceShowList)
+                OutlinedPriceInput(
+                    price = state.price.toString(),
+                    onPriceChange = {
+                        onIntent(AnimalCountIntent.PriceClicked(it))
+                    },
+                    priceAll = state.priceAll.toString(),
+                    isError = error.isErrorPrice,
+                    isAutoCalculate = state.priceAll != null,
+                    onAutoCalculate = {
+                        onIntent(AnimalCountIntent.AutoPriceClicked(it))
+                    },
+                    tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
+                    isManyCount = true,
+                    isNecessarily = true
+                )
+            if (state.buyer != null && state.version == AnimalCountVersion.SALE)
+                OutlinedTextBuyer(
+                    value = state.buyer.toString(),
+                    onValueChange = {
+                        onIntent(AnimalCountIntent.BuyerChanged(it))
+                    },
+                    onTrailingChance = {
+                        onIntent(AnimalCountIntent.BuyerClearClicked)
+                    },
+                    list = buyerList
+                )
             OutlinedTextDate(
                 value = state.date,
                 onValueChange = { onIntent(AnimalCountIntent.DateClicked(it)) },
@@ -202,8 +310,7 @@ private fun VaccinationList2(
                 if (index < indicatorsList.size - 1) indicatorsList[index + 1] else null
             CountCard(
                 modifier = Modifier.clickable {
-                    if (item.version == AnimalCountVersion.ADD) onEditClick(item)
-                    else navigate(item)
+                    onEditClick(item)
                 },
                 domainAnimalCount = item,
                 previousDomainAnimalCount = previousItem

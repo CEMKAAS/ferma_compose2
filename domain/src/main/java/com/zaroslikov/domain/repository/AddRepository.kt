@@ -23,8 +23,8 @@ interface AddRepository {
     suspend fun deleteAddById(id: Long)
 
     fun getFastAddProduct(id: Long): Flow<List<DomainFastAddProduct>>
-    fun getAnalysisAddAllTime(id: Long, name: String): Flow<DomainCountSuffix>
-    fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<DomainCountSuffix>
+    fun getAnalysisAddAllTime(id: Long, name: String): Flow<DomainCountSuffix?>
+    fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<DomainCountSuffix?>
     fun getAnalysisAddAnimalAllTime(
         id: Long,
         name: String
@@ -35,14 +35,14 @@ interface AddRepository {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainCountSuffix>
+    ): Flow<DomainCountSuffix?>
 
     fun getAnalysisAddAverageValueAllTimeRange(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainCountSuffix>
+    ): Flow<DomainCountSuffix?>
 
     fun getAnalysisAddAnimalAllTimeRange(
         id: Long,
@@ -52,15 +52,15 @@ interface AddRepository {
     ): Flow<List<DomainAnimalCountSuffix>>
 
     fun getProductAnimal(name: String): Flow<List<DomainAnimalCountSuffix>>
-  /*  fun getAnalysisAddProductNewYearProject(
-        id: Long,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
+    /*  fun getAnalysisAddProductNewYearProject(
+          id: Long,
+          dateBegin: String,
+          dateEnd: String
+      ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
 
-    fun getAnalysisAddProductNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
-*/
+      fun getAnalysisAddProductNewYear(
+          dateBegin: String,
+          dateEnd: String
+      ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
+  */
 }

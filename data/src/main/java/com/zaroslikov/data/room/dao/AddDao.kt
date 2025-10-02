@@ -91,12 +91,14 @@ interface AddDao {
     fun getFastAddProduct(id: Long): Flow<List<FastAddProductDto>>
 
     @Query(
-        "SELECT COALESCE(SUM(count), 0) AS count," +
+        "SELECT SUM(count) AS count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
-                " WHERE idPT=:id AND title=:name"
+                " WHERE idPT=:id AND title=:name" +
+                " GROUP BY count_suffix" +
+                " HAVING SUM(count) IS NOT NULL"
     )
-    fun getAnalysisAddAllTime(id: Long, name: String): Flow<CountSuffixDto>
+    fun getAnalysisAddAllTime(id: Long, name: String): Flow<CountSuffixDto?>
 
     @Query(
         "SELECT" +
@@ -107,7 +109,7 @@ interface AddDao {
                 " FROM add_table" +
                 " WHERE idPT=:id AND title=:name"
     )
-    fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<CountSuffixDto>
+    fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<CountSuffixDto?>
 
     @Query(
         "SELECT" +

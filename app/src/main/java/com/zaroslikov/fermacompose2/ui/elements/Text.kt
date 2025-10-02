@@ -75,13 +75,16 @@ fun TitleAndText(
 fun IconAndText(
     modifier: Modifier = Modifier,
     iconRes: Int,
-    valueString: String
+    valueString: String,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    textStyle: TextStyle= text_14
 ) {
     Row(
         modifier = modifier
 //            .fillMaxWidth()
             .padding(bottom = 5.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = horizontalArrangement
     ) {
         Icon(
             painter = painterResource(iconRes), contentDescription = null,
@@ -91,7 +94,8 @@ fun IconAndText(
 //            modifier = Modifier.fillMaxWidth(),
             text = valueString,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            style = textStyle
         )
     }
 }

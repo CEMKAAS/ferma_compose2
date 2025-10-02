@@ -223,12 +223,11 @@ fun AnalysisCardOne(
                 title = stringResource(R.string.analysis_screen_product_until),
                 value = "${analysisWriteOffScrapAllTime.count.formatNumber()} ${analysisWriteOffScrapAllTime.suffix}",
             )
-            if (text == stringResource(R.string.support_text_all_time)) {
+            if (text == stringResource(R.string.support_text_all_time))
                 TextAndIconRow(
                     title = stringResource(R.string.analysis_screen_product_warehouse),
                     value = "${(analysisAddAllTime.count - analysisSaleAllTime.price - analysisWriteOffAllTime.count).formatNumber()} ${analysisAddAllTime.suffix}"
                 )
-            }
             /*
             Text(
                 text = "В среднем за текущий год: ${formatter(analysisAddAverageValueAllTime.priceAll)} ${analysisAddAverageValueAllTime.title} за день",
@@ -272,9 +271,7 @@ fun AnalysisCardTwo(
                 style = textBold_18
             )
             TextAndIconRow(
-                title = stringResource(
-                    R.string.analysis_screen_income
-                ),
+                title = stringResource(R.string.analysis_screen_income),
                 value = stringResource(
                     R.string.card_ruble_s,
                     analysisSaleSoldAllTime.formatNumber()

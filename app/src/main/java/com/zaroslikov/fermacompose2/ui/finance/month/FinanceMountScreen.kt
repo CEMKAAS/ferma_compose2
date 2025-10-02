@@ -5,7 +5,6 @@ package com.zaroslikov.fermacompose2.ui.finance.month
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -18,11 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardFinance
 import com.zaroslikov.fermacompose2.ui.elements.CardFinanceOutlined
@@ -31,22 +29,23 @@ import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
+import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryDestination
 import io.appmetrica.analytics.AppMetrica
 
 
 object FinanceMonthDestination : NavigationDestination {
-    override val route = "FinanceMount"
+    override val route = "finance_month"
     override val titleRes = R.string.app_name
-    const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+    const val itemIdPT = "itemIdPT"
+    val routeWithArgs = "$route?$itemIdPT={$itemIdPT}"
 }
 
 @Composable
 fun FinanceMonthScreen(
     navigateBack: () -> Unit,
-//    navigateToCategory: (FinanceCategoryDataNav) -> Unit,
+//     navigateToCategory: (FinanceCategoryDataNav) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FinanceMonthViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: FinanceMonthViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

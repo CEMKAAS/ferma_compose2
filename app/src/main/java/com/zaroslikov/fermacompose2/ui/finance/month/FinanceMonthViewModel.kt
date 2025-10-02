@@ -27,7 +27,7 @@ class FinanceMonthViewModel @Inject constructor(
     private val resourceProvider: ResourceProvider
 ) : ListViewModel<FinanceMonthState, FinanceMonthIntent>(FinanceMonthState()) {
 
-    private val itemId: Long = checkNotNull(savedStateHandle[FinanceDestination.itemIdArg])
+    private val itemId: Long = checkNotNull(savedStateHandle[FinanceMonthDestination.itemIdPT])
 
     init {
         loadData()

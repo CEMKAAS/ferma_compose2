@@ -75,15 +75,15 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
     override fun getAnalysisAddAllTime(
         id: Long,
         name: String
-    ): Flow<DomainCountSuffix> {
-        return addDao.getAnalysisAddAllTime(id, name).map { it.toDomainCountSuffix() }
+    ): Flow<DomainCountSuffix?> {
+        return addDao.getAnalysisAddAllTime(id, name).map { it?.toDomainCountSuffix() }
     }
 
     override fun getAnalysisAddAverageValueAllTime(
         id: Long,
         name: String
-    ): Flow<DomainCountSuffix> {
-        return addDao.getAnalysisAddAverageValueAllTime(id, name).map { it.toDomainCountSuffix() }
+    ): Flow<DomainCountSuffix?> {
+        return addDao.getAnalysisAddAverageValueAllTime(id, name).map { it?.toDomainCountSuffix() }
     }
 
     override fun getAnalysisAddAnimalAllTime(

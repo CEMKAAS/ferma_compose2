@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -36,5 +37,16 @@ fun Category.toResId(): Int {
         Category.ADD -> R.string.add_screen_title
         Category.EXPENSES -> R.string.expenses_screen_title
         Category.SALE -> R.string.sale_screen_title
+    }
+}
+
+fun AnimalCountVersion.toResId(): Int {
+    return when (this) {
+        AnimalCountVersion.SALE -> R.string.button_sale
+        AnimalCountVersion.EXPENSES -> R.string.button_expenses
+        AnimalCountVersion.KILL -> R.string.button_kill
+        AnimalCountVersion.WRITE_OFF -> R.string.button_write_off
+        AnimalCountVersion.ADD -> R.string.button_add
+        AnimalCountVersion.INCUBATOR -> R.string.button_add
     }
 }

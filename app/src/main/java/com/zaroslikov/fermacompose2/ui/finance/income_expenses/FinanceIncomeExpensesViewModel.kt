@@ -21,7 +21,6 @@ class FinanceIncomeExpensesViewModel @Inject constructor(
 ) : ListViewModel<FinanceIncomeExpensesState, FinanceIncomeExpensesIntent>(
     FinanceIncomeExpensesState()
 ) {
-
     private val itemId: Long =
         checkNotNull(savedStateHandle[FinanceIncomeExpensesDestination.itemIdArg])
     private val isIncome: Boolean =

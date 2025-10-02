@@ -12,6 +12,7 @@ data class DomainAnimalCountPrice(
     val note: String = "",
     val version: AnimalCountVersion? = AnimalCountVersion.ADD,
     val price: Double? = null,
+    val priceAll: Double? = null,
     val buyer: String? = null,
     val tableId: Long? = null,
     val idPT: Long? = null

@@ -38,12 +38,11 @@ object FinanceIncomeExpensesDestination : NavigationDestination {
     val routeWithArgs = "${route}?$itemIdArg={$itemIdArg}&$itemIdArgTwo={$itemIdArgTwo}"
 }
 
-
 @Composable
 fun FinanceIncomeExpensesScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    navigationToAnalysis: (Pair<Int, String>) -> Unit,
+    navigationToAnalysis: (Pair<Long, String>) -> Unit,
     viewModel: FinanceIncomeExpensesViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -74,11 +73,7 @@ fun FinanceIncomeExpensesScreen(
                 categoryList = financeCategoryState,
                 productList = financeProductState,
 //                animalList = financeAnimalState.itemList,
-                navigationToAnalysis = {
-                    /* navigationToAnalysis(
-                         Pair(viewModel.itemId, it)
-                     )*/
-                }
+                navigationToAnalysis = { navigationToAnalysis(state.idPT to it) }
             )
     }
 }
@@ -141,7 +136,7 @@ private fun FinanceIncomeExpensesInventoryList(
             titleProvider = { it.title },
             valueProvider = { it.price },
             isIncome = boolean,
-            onClickAnalysis = {}
+            onClickAnalysis = { navigationToAnalysis(it) }
         )
         /*if (!boolean) {
             if (animalList.isNotEmpty()) {
@@ -171,7 +166,7 @@ private fun <T> LazyListScope.List3(
     isIncome: Boolean,
     isDetails: Boolean,
     onClickDetails: () -> Unit,
-    onClickAnalysis: () -> Unit={},
+    onClickAnalysis: (String) -> Unit = {},
     titleProvider: (T) -> String,
     valueProvider: (T) -> Double
 ) {
@@ -186,7 +181,7 @@ private fun <T> LazyListScope.List3(
         if (isDetails)
             items(items = list) { item ->
                 CardFinanceRow(
-                    modifier = Modifier.clickable { if (isIncome) onClickAnalysis() },// Navigate to title navigationToAnalysis(it.title)
+                    modifier = Modifier.clickable { if (isIncome) onClickAnalysis(titleProvider(item)) },// Navigate to title navigationToAnalysis(it.title)
                     title = titleProvider(item),
                     value = valueProvider(item),
                 )

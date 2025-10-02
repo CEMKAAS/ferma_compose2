@@ -62,7 +62,7 @@ import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
 import io.appmetrica.analytics.AppMetrica
 
 object FinanceDestination : NavigationDestination {
-    override val route = "Finance"
+    override val route = "finance"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
