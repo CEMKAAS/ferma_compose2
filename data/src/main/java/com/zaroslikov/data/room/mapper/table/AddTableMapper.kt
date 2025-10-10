@@ -16,6 +16,8 @@ fun DomainAddTable.toAddRoomMap(): AddTable = AddTable(
     animalId = animalId,
     note = note,
     idPT = idPT,
+    animalCountId = animalCountId
+
 )
 
 fun AddTable.toAddDomainMap(): DomainAddTable = DomainAddTable(
@@ -30,5 +32,6 @@ fun AddTable.toAddDomainMap(): DomainAddTable = DomainAddTable(
     category = category,
     animalId = animalId,
     note = note,
-    idPT = idPT
+    idPT = idPT,
+    animalCountId = animalCountId
 )

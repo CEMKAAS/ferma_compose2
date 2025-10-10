@@ -85,8 +85,7 @@ fun Modifier.modifierDialogScreen(isScroll: Boolean): Modifier {
 }
 
 @Composable
-fun Modifier.modifierBottomSheet(
-): Modifier {
+fun Modifier.modifierBottomSheet(): Modifier {
     val focusManager = LocalFocusManager.current
     return this
         .padding(
@@ -96,7 +95,6 @@ fun Modifier.modifierBottomSheet(
             top = dimensionResource(R.dimen.padding_small),
             bottom = dimensionResource(R.dimen.padding_extra_large)
         )
-        .verticalScroll(rememberScrollState())
         .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область

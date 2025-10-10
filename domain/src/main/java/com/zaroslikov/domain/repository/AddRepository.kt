@@ -52,6 +52,7 @@ interface AddRepository {
     ): Flow<List<DomainAnimalCountSuffix>>
 
     fun getProductAnimal(name: String): Flow<List<DomainAnimalCountSuffix>>
+    fun getProductKillList(id: Long): Flow<List<DomainAddTable>>
     /*  fun getAnalysisAddProductNewYearProject(
           id: Long,
           dateBegin: String,

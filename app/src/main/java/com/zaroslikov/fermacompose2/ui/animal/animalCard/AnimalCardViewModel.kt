@@ -232,7 +232,7 @@ class AnimalCardViewModel @Inject constructor(
         }
     }
 
-    private fun  updatePriceAllActionAnimal() {
+    private fun updatePriceAllActionAnimal() {
         updateState {
             it.copy(
                 actionAnimal = it.actionAnimal.copy(
@@ -615,7 +615,7 @@ class AnimalCardViewModel @Inject constructor(
         countAnimalAll: String,
         updateDialog: () -> Unit
     ) {
-        val count = isAnimalCountDifference(countAnimal, countAnimalAll).toInt()
+        val count = isAnimalCountDifference(countAnimalAll, countAnimal).toInt()
         val isAnimalGroup = getState().animal.group
 
         if (count == 0)

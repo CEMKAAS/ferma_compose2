@@ -2,32 +2,40 @@
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
-import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,38 +49,25 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
-import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
-import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.indicators.size.HeadingIndicators
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.IconAndText
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextBuyer
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
-import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated2
 import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated3
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.navigation.navNull
-import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import kotlin.math.absoluteValue
 
@@ -87,185 +82,262 @@ object AnimalCountDestination : NavigationDestination {
 @Composable
 fun AnimalCountScreen(
     navigateBack: () -> Unit,
-    navigate: (String) -> Unit,
     viewModel: AnimalCountViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = R.string.height_screen_title,
+                intRes = R.string.count_screen_title,
                 scrollBehavior = scrollBehavior,
                 navigateUp = navigateBack
             )
         },
         floatingActionButton = {
-
+            FabMenu(
+                onAddClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DialogClicked(
+                            true,
+                            DomainAnimalCountPrice(
+                                version = AnimalCountVersion.ADD,
+                                date = dateToday()
+                            )
+                        )
+                    )
+                },
+                onWriteOffClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DialogClicked(
+                            true,
+                            DomainAnimalCountPrice(
+                                version = AnimalCountVersion.WRITE_OFF,
+                                date = dateToday()
+                            )
+                        )
+                    )
+                },
+                onSellClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DialogClicked(
+                            true,
+                            DomainAnimalCountPrice(
+                                version = AnimalCountVersion.SALE,
+                                date = dateToday()
+                            )
+                        )
+                    )
+                },
+                onExpensesClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DialogClicked(
+                            true,
+                            DomainAnimalCountPrice(
+                                version = AnimalCountVersion.EXPENSES,
+                                date = dateToday()
+                            )
+                        )
+                    )
+                },
+                onKillClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DialogClicked(
+                            true,
+                            DomainAnimalCountPrice(
+                                version = AnimalCountVersion.KILL,
+                                date = dateToday()
+                            )
+                        )
+                    )
+                }
+            )
         }
     ) { innerPadding ->
-        if (state.value.isLoading)
+        if (state.isLoading)
             CircularProgress(
                 modifier = Modifier.padding(innerPadding),
             )
         else
             AnimalCountContainer(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
-                state = state.value,
-                navigate = { navigate(navigate2(it)) },
+                state = state,
                 onIntent = viewModel::onIntent
             )
-        if (state.value.isOpenDialog)
-            CountBottomSheet(
-                state = state.value.domainAnimalCountPrice,
-                onIntent = viewModel::onIntent,
-                error = state.value.error,
-                isEntry = state.value.isEntry,
-                buyerList = emptyList() // TODO заменить на нормальный лист
+
+        if (state.isOpenDialog) {
+            when (state.domainAnimalCountPrice.version) {
+                AnimalCountVersion.SALE ->
+                    BottomSheetSaleAnimal(
+                        state = state.domainAnimalCountPrice,
+                        errorState = state.error,
+                        onIntent = viewModel::onIntent,
+                        isEntry = state.isEntry,
+                        isAnimalGroup = state.animal.group,
+                        isAutoPrice = state.isAutoPrice,
+                        countAllAnimal = state.currentAnimal.count,
+                        buyerList = state.buyerList,
+                    )
+
+                AnimalCountVersion.EXPENSES ->
+                    BottomSheetExpensesAnimal(
+                        state = state.domainAnimalCountPrice,
+                        errorState = state.error,
+                        isEntry = state.isEntry,
+                        isAnimalGroup = state.animal.group,
+                        isAutoPrice = state.isAutoPrice,
+                        countAllAnimal = state.currentAnimal.count,
+                        countSuffix = state.currentAnimal.suffix,
+                        onIntent = viewModel::onIntent
+                    )
+
+                AnimalCountVersion.KILL ->
+                    BottomSheetKillAnimal(
+                        state = state.domainAnimalCountPrice,
+                        onIntent = viewModel::onIntent,
+                        errorState = state.error,
+                        productKill = state.productKill,
+                        titleList = state.titleList,
+                        isAnimalGroup = true,
+                        countAnimalAll = state.currentAnimal.count,
+                        countSuffix = state.currentAnimal.suffix,
+                        weight = state.weight,
+                        isEntry = state.isEntry
+                    )
+
+                AnimalCountVersion.WRITE_OFF ->
+                    BottomSheetWriteOffAnimal(
+                        state = state.domainAnimalCountPrice,
+                        errorState = state.error,
+                        isEntry = state.isEntry,
+                        isAnimalGroup = state.animal.group,
+                        isAutoPrice = state.isAutoPrice,
+                        countAllAnimal = state.currentAnimal.count,
+                        countSuffix = state.currentAnimal.suffix,
+                        onIntent = viewModel::onIntent
+                    )
+
+                AnimalCountVersion.ADD ->
+                    BottomSheetAddAnimal(
+                        state = state.domainAnimalCountPrice,
+                        errorState = state.error,
+                        isEntry = state.isEntry,
+                        countAllAnimal = state.currentAnimal.count,
+                        onIntent = viewModel::onIntent
+                    )
+
+
+                AnimalCountVersion.INCUBATOR -> {
+                    TODO()
+                }
+
+                null -> {
+                    TODO()
+                }
+            }
+        }
+        if (state.openSoloDialog)
+            AlertDialogGroupToSolo(
+                sex = state.animal.sex,
+                onUpdateSex = { viewModel.onIntent(AnimalCountIntent.SexClicked(it)) },
+                onConfirmation = { viewModel.onIntent(AnimalCountIntent.DialogSoloClicked(false)) },
+                onSave = { viewModel.onIntent(AnimalCountIntent.SaveGroupPressed) }
             )
+        if (state.openWarningDialog) {
+            val textWarning = stringResource(
+                when (state.openWarningDeleteAllDialog) {
+                    true -> R.string.animal_count_screen_warning_minus_and_delete_text
+                    false -> R.string.animal_count_screen_warning_product_delete_all_text
+                    null -> R.string.animal_count_screen_warning_text
+                }
+            )
+            AlertDialogWarningAnimal(
+                textWarning = textWarning,
+                onConfirmationClick = { viewModel.onIntent(AnimalCountIntent.WarningConrPressed) },
+                onDismissClick = { viewModel.onIntent(AnimalCountIntent.WarningEndDialogClicked) }
+            )
+        }
+//        if (state.openWarningDeleteDialog) {
+//            AlertDialogWarningAnimal(
+//                textWarning = stringResource(R.string.animal_count_screen_warning_product_delete_text),
+//                onConfirmationClick = { viewModel.onIntent(AnimalCountIntent.WarningDeleteConrPressed) },
+//                onDismissClick = { viewModel.onIntent(AnimalCountIntent.WarningDeleteEndDialogClicked) }
+//            )
+//        }
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun MyFabMenu(
-    onAction1: () -> Unit,
-    onAction2: () -> Unit,
-    onAction3: () -> Unit
+fun FabMenu(
+    onAddClick: () -> Unit = {},
+    onWriteOffClick: () -> Unit = {},
+    onSellClick: () -> Unit = {},
+    onKillClick: () -> Unit = {},
+    onExpensesClick: () -> Unit = {}
 ) {
-    var fabExpanded by rememberSaveable { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        FloatingActionButtonMenu(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            expanded = fabExpanded,
-            button = {
-                ToggleFloatingActionButton(
-                    checked = fabExpanded,
-                    onCheckedChange = { fabExpanded = it },
-                    containerSize = ToggleFloatingActionButtonDefaults.containerSizeLarge()
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        // Кнопки-меню
+        Column(
+            Modifier.padding(bottom = 72.dp, end = 16.dp),
+            Arrangement.spacedBy(12.dp),
+            Alignment.End
+        ) {
+            AnimatedVisibility(visible = expanded) {
+                SmallFloatingActionButton(
+                    onClick = onAddClick,
+                ) { Icon(Icons.Default.Add, contentDescription = "Добавить") }
+            }
+
+            AnimatedVisibility(visible = expanded) {
+                SmallFloatingActionButton(
+                    onClick = onWriteOffClick,
+                ) { Icon(Icons.Default.Edit, contentDescription = "Cписать") }
+            }
+
+            AnimatedVisibility(visible = expanded) {
+                SmallFloatingActionButton(
+                    onClick = onSellClick,
+                ) { Icon(Icons.Default.ShoppingCart, contentDescription = "Продать") }
+            }
+
+            AnimatedVisibility(visible = expanded) {
+                SmallFloatingActionButton(
+                    onClick = onExpensesClick,
                 ) {
-                    val icon = if (fabExpanded) Icons.Default.Close else Icons.Default.Add
                     Icon(
-                        painter = rememberVectorPainter(icon),
-                        contentDescription = null,
-                        modifier = Modifier.animateIcon({ checkedProgress })
+                        painterResource(R.drawable.baseline_add_card_24),
+                        contentDescription = "Покупать"
                     )
                 }
             }
-        ) {
-            FloatingActionButtonMenuItem(
-                onClick = {
-                    fabExpanded = false
-                    onAction1()
-                },
-                icon = { Icon(Icons.Default.Edit, contentDescription = null) },
-                text = { Text("Edit") }
-            )
-            FloatingActionButtonMenuItem(
-                onClick = {
-                    fabExpanded = false
-                    onAction2()
-                },
-                icon = { Icon(Icons.Default.Delete, contentDescription = null) },
-                text = { Text("Delete") }
-            )
-            FloatingActionButtonMenuItem(
-                onClick = {
-                    fabExpanded = false
-                    onAction3()
-                },
-                icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
-                text = { Text("Sell") }
-            )
+
+            AnimatedVisibility(visible = expanded) {
+                SmallFloatingActionButton(
+                    onClick = onKillClick,
+                ) {
+                    Icon(
+                        painterResource(R.drawable.icons8__meat100),
+                        contentDescription = "Забой"
+                    )
+                }
+            }
         }
-    }
-}
 
-
-@Composable
-private fun CountBottomSheet(
-    state: DomainAnimalCountPrice,
-    error: AnimalCountState.Error,
-    buyerList: List<String>,
-    isEntry: Boolean,
-    onIntent: (AnimalCountIntent) -> Unit
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val priceShowList = setOf(
-        AnimalCountVersion.SALE,
-        AnimalCountVersion.EXPENSES,
-        AnimalCountVersion.WRITE_OFF
-    )
-    ModalBottomSheet(
-        onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
-        sheetState = sheetState
-    ) {
-        Column(modifier = Modifier.modifierBottomSheet()) {
-            IconAndText(
-                modifier = Modifier.fillMaxWidth(),
-                iconRes = state.version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
-                valueString = stringResource(
-                    state.version?.toResId() ?: AnimalCountVersion.ADD.toResId()
-                ),
-                horizontalArrangement = Arrangement.Center,
-                textStyle = textBold_18
-            )
-            OutlinedTextCountAnimal2(
-                value = state.count,
-                onValueChange = {
-                    onIntent(AnimalCountIntent.CountChanged(it))
-                },
-                suffix = state.suffix,
-                isError = error.isErrorCount,
-                isErrorCountZero = error.isErrorCountZero,
-                intRes = R.string.count_screen_title,
-            )
-            if (state.price != null && state.version in priceShowList)
-                OutlinedPriceInput(
-                    price = state.price.toString(),
-                    onPriceChange = {
-                        onIntent(AnimalCountIntent.PriceClicked(it))
-                    },
-                    priceAll = state.priceAll.toString(),
-                    isError = error.isErrorPrice,
-                    isAutoCalculate = state.priceAll != null,
-                    onAutoCalculate = {
-                        onIntent(AnimalCountIntent.AutoPriceClicked(it))
-                    },
-                    tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
-                    isManyCount = true,
-                    isNecessarily = true
-                )
-            if (state.buyer != null && state.version == AnimalCountVersion.SALE)
-                OutlinedTextBuyer(
-                    value = state.buyer.toString(),
-                    onValueChange = {
-                        onIntent(AnimalCountIntent.BuyerChanged(it))
-                    },
-                    onTrailingChance = {
-                        onIntent(AnimalCountIntent.BuyerClearClicked)
-                    },
-                    list = buyerList
-                )
-            OutlinedTextDate(
-                value = state.date,
-                onValueChange = { onIntent(AnimalCountIntent.DateClicked(it)) },
-                isCardBorder = false
-            )
-            OutlinedTextNote(
-                value = state.note,
-                onValueChange = { onIntent(AnimalCountIntent.NoteChanged(it)) },
-                cardBorder = false
-            )
-            ButtonPanel(
-                isEntry = isEntry,
-                entryButton = R.string.button_add,
-                onClickInsert = { onIntent(AnimalCountIntent.InsertPressed) },
-                onClickUpdate = { onIntent(AnimalCountIntent.UpdatePressed) },
-                onClickDelete = { onIntent(AnimalCountIntent.DeletePressed) }
+        // Основная FAB
+        FloatingActionButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Icon(
+                if (expanded) Icons.Default.Close else Icons.Default.Menu,
+                contentDescription = "Меню"
             )
         }
     }
@@ -275,15 +347,13 @@ private fun CountBottomSheet(
 private fun AnimalCountContainer(
     modifier: Modifier = Modifier,
     state: AnimalCountState,
-    navigate: (DomainAnimalCountPrice) -> Unit,
     onIntent: (AnimalCountIntent) -> Unit
 ) {
     if (state.countList.isNotEmpty())
         VaccinationList2(
             modifier = modifier,
             indicatorsList = state.countList,
-            navigate = navigate,
-            onEditClick = { onIntent(AnimalCountIntent.OpenDialogClicked(it)) }
+            onEditClick = { onIntent(AnimalCountIntent.DialogClicked(false, it)) }
         )
     else MessageNoData(
         modifier = modifier,
@@ -298,7 +368,6 @@ private fun AnimalCountContainer(
 private fun VaccinationList2(
     modifier: Modifier,
     indicatorsList: List<DomainAnimalCountPrice>,
-    navigate: (DomainAnimalCountPrice) -> Unit,
     onEditClick: (DomainAnimalCountPrice) -> Unit
 ) {
     LazyColumn(
@@ -402,6 +471,15 @@ private fun DetailsCount(
         else -> (count - previousCount).absoluteValue.formatNumber()
     }
 
+    //TODO Примечание для животных
+    /* val reasonNote = resourceProvider.getString(
+         if (state.note.isBlank())
+             R.string.animal_card_screen_add_no_note_reason
+         else
+             R.string.animal_card_screen_add_note_reason
+     ).format(state.note)
+     */
+
     Row {
         Text(
             modifier = Modifier.weight(1f),
@@ -469,37 +547,6 @@ private fun DetailsCount(
             },
             style = text_16,
             textAlign = TextAlign.Start
-        )
-    }
-}
-
-private fun navigate2(countPrice: DomainAnimalCountPrice): String {
-    val idPT = countPrice.idPT.toString()
-    val id = countPrice.tableId.toString()
-    val version = countPrice.version
-    return when (version) {
-        AnimalCountVersion.SALE -> navNull(
-            route = SaleEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
-        )
-
-        AnimalCountVersion.EXPENSES -> navNull(
-            route = ExpensesEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
-        )
-
-        AnimalCountVersion.WRITE_OFF -> navNull(
-            route = WriteOffEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
-        )
-
-        else -> navNull(
-            route = WriteOffEntryDestination.route,
-            itemOne = idPT,
-            itemTwo = id
         )
     }
 }

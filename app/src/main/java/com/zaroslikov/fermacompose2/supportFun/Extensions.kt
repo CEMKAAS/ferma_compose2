@@ -32,6 +32,10 @@ fun String.toConvertDbOnlyInt(): Int {
     return this.replace(",", "").replace(".", "").replace(Regex("[^\\d.]"), "").trim().toInt()
 }
 
+fun String.toConvertOnlyInt2(): Int {
+    return this.replace(",", "").replace(".", "").trim().toInt()
+}
+
 fun String.toConvertOnlyInt(): String {
     return this.replace(",", "").replace(".", "").replace(Regex("[^\\d.]"), "").trim()
 }
@@ -45,7 +49,8 @@ fun String.toConvertZeroString(): String {
 }
 
 fun String.toConvertZeroDouble(): Double {
-    return if (this == "") 0.0 else this.replace(",", ".").replace(Regex("[^\\d.]"), "").trim().toDouble()
+    return if (this == "") 0.0 else this.replace(",", ".").replace(Regex("[^\\d.]"), "").trim()
+        .toDouble()
 }
 
 fun String.toConvertZeroTooOneDouble(): Double {
@@ -67,7 +72,6 @@ fun getImageWriteOff(
     else
         R.drawable.baseline_delete_24
 }
-
 
 
 fun calculatePriceAll(price: String, count: String): String {

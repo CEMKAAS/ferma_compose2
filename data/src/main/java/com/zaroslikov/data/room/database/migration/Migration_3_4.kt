@@ -160,7 +160,6 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("CREATE INDEX index_animal_table_idPT ON animal_table(idPT)")
         db.execSQL("DROP TABLE AnimalTable")
 
-
         //==================== Миграция AddTable ====================
         db.execSQL(
             """
@@ -177,7 +176,10 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 animal_id INTEGER,
                 note TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
+                animal_count_id INTEGER,
                 FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_id) REFERENCES animal_table(_id) ON DELETE SET NULL,
+                FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
@@ -194,7 +196,9 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             FROM MyFerma
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_add_table_idPT ON add_table(idPT)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_add_table_idPT ON add_table(idPT)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_add_table_animal_id ON add_table(animal_id)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_add_table_animal_count_id ON add_table(animal_count_id)")
         db.execSQL("DROP TABLE MyFerma")
 
         //==================== Миграция WriteOffTable ====================
@@ -215,7 +219,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 idPT INTEGER NOT NULL,
                 animal_count_id INTEGER,
                 FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
-                FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE
+                FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
@@ -260,8 +264,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 animal_id INTEGER,
                 animal_count_id INTEGER,
                 FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
-                FOREIGN KEY(animal_id) REFERENCES AnimalTable(id) ON DELETE CASCADE
-                FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE
+                FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE CASCADE
+                FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
@@ -280,7 +284,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
         db.execSQL("CREATE INDEX index_sale_table_idPT ON sale_table(idPT)")
         db.execSQL("CREATE INDEX index_sale_table_animalId ON sale_table(animal_id)")
-        db.execSQL("CREATE INDEX index_sale_table_animalId ON sale_table(animal_count_id)")
+        db.execSQL("CREATE INDEX index_sale_table_animal_count_id ON sale_table(animal_count_id)")
         db.execSQL("DROP TABLE MyFermaSale")
 
         //==================== Миграция ExpensesTable ====================
@@ -316,7 +320,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
                 FOREIGN KEY(animalId) REFERENCES AnimalTable(id) ON DELETE CASCADE,
                 FOREIGN KEY(animal_vaccination_id) REFERENCES AnimalVaccinationTable(id) ON DELETE CASCADE,
-                FOREIGN KEY(animal_count_id) REFERENCES AnimalCountTable(id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE,
             )""".trimIndent()
         )
         db.execSQL(
@@ -339,8 +343,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_idPT ON MyFermaEXPENSES_new(idPT)")
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animalId)")
-        db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animal_vaccination_id)")
-        db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animal_count_id)")
+        db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animal_vaccination_id ON MyFermaEXPENSES_new(animal_vaccination_id)")
+        db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animal_count_id ON MyFermaEXPENSES_new(animal_count_id)")
         db.execSQL("DROP TABLE MyFermaEXPENSES")
         db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO expenses_table")
 

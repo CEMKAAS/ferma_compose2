@@ -198,8 +198,14 @@ fun isAnimalCountIncrease(
     count: String,
     countAll: String
 ): Boolean {
-    return count.toConvertZeroString().toConvertDbOnlyInt() > countAll.toConvertZeroString()
-        .toConvertDbOnlyInt()
+    Log.i(
+        "count23", "isAnimalCountIncrease:" +
+                "countAll =  ${countAll.toConvertZeroString()}" +
+                " ${count.toConvertZeroString().toConvertDbOnlyInt()} > " +
+                "${countAll.toConvertZeroString().toConvertOnlyInt2()}"
+    )
+    return count.toConvertZeroString().toConvertOnlyInt2() > countAll.toConvertZeroString()
+        .toConvertOnlyInt2()
 }
 
 fun isAnimalWeightIncrease(
@@ -217,11 +223,31 @@ fun isAnimalCountZero(
 }
 
 fun isAnimalCountDifference(
-    count: String,
-    countAll: String
+    countAll: String,
+    count: String
 ): String {
     return (countAll.toConvertZeroString().toConvertDbOnlyInt() - count.toConvertZeroString()
         .toConvertDbOnlyInt()).toString()
+}
+
+fun isAnimalCountDifference2(
+    countAll: String,
+    oldCount: String,
+    newCount: String
+): Int {
+    return countAll.toConvertZeroString().toConvertOnlyInt2() + oldCount.toConvertZeroString()
+        .toConvertOnlyInt2() - newCount.toConvertZeroString()
+        .toConvertOnlyInt2()
+}
+
+fun isAnimalCountDifference3(
+    countAll: String,
+    oldCount: String,
+    newCount: String
+): Int {
+    return countAll.toConvertZeroString().toConvertOnlyInt2() + oldCount.toConvertZeroString()
+        .toConvertOnlyInt2() - newCount.toConvertZeroString()
+        .toConvertOnlyInt2()
 }
 
 fun animalCountWeightComposition(

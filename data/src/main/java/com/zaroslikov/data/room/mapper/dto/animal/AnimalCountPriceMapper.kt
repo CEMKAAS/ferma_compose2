@@ -13,6 +13,7 @@ fun AnimalCountPriceDto.toDomainAnimalCountPrice(): DomainAnimalCountPrice {
         note = this.note,
         version = this.version,
         price = this.price,
+        priceAll = this.priceAll,
         buyer = this.buyer,
         tableId = this.tableId,
         idPT = this.idPT,

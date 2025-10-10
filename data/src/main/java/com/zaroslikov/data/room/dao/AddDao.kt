@@ -190,36 +190,40 @@ interface AddDao {
     )
     fun getProductAnimal(name: String): Flow<List<AnimalCountSuffixDto>>
 
-/*    @Query(
-        "SELECT title AS buyer," +
-                " COALESCE(SUM(count),0) AS resultPrice," +
-                " 0 AS resultCount," +
-                " count_suffix AS suffix" +
-                " FROM add_table" +
-                " WHERE idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
-                " GROUP BY title" +
-                " ORDER BY resultPrice DESC Limit 3"
-    )
-    fun getAnalysisAddProductNewYearProject(
-        id: Long,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
 
-    @Query(
-        "SELECT title AS buyer," +
-                " COALESCE(SUM(count),0) AS resultPrice," +
-                " 0 AS resultCount," +
-                " count_suffix AS suffix" +
-                " FROM add_table" +
-                " WHERE DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
-                " GROUP BY title" +
-                " ORDER BY resultPrice DESC Limit 3"
-    )
-    fun getAnalysisAddProductNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title*/
+    @Query("SELECT * FROM add_table WHERE animal_count_id =:id")
+    fun getProductKillList(id: Long): Flow<List<AddTable>>
+
+    /*    @Query(
+            "SELECT title AS buyer," +
+                    " COALESCE(SUM(count),0) AS resultPrice," +
+                    " 0 AS resultCount," +
+                    " count_suffix AS suffix" +
+                    " FROM add_table" +
+                    " WHERE idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                    " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                    " GROUP BY title" +
+                    " ORDER BY resultPrice DESC Limit 3"
+        )
+        fun getAnalysisAddProductNewYearProject(
+            id: Long,
+            dateBegin: String,
+            dateEnd: String
+        ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title
+
+        @Query(
+            "SELECT title AS buyer," +
+                    " COALESCE(SUM(count),0) AS resultPrice," +
+                    " 0 AS resultCount," +
+                    " count_suffix AS suffix" +
+                    " FROM add_table" +
+                    " WHERE DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                    " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                    " GROUP BY title" +
+                    " ORDER BY resultPrice DESC Limit 3"
+        )
+        fun getAnalysisAddProductNewYear(
+            dateBegin: String,
+            dateEnd: String
+        ): Flow<List<AnalysisSaleBuyerAllTime>> //TODO Buyer -> Title*/
 }

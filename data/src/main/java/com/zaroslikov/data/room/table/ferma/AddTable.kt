@@ -5,18 +5,33 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.zaroslikov.data.room.table.animal.AnimalCountTable
+import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.domain.models.enums.Suffix
 
 
 @Entity(
     tableName = "add_table",
-    foreignKeys = [ForeignKey(
-        entity = ProjectTable::class,
-        parentColumns = arrayOf("_id"),
-        childColumns = arrayOf("idPT"),
-        onDelete = ForeignKey.CASCADE
-    )],
-    indices = [Index("idPT")]
+    foreignKeys = [
+        ForeignKey(
+            entity = ProjectTable::class,
+            parentColumns = arrayOf("_id"),
+            childColumns = arrayOf("idPT"),
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = AnimalTable::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("animal_id"),
+            onDelete = ForeignKey.SET_NULL
+        ),
+        ForeignKey(
+            entity = AnimalCountTable::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("animal_count_id"),
+            onDelete = ForeignKey.CASCADE
+        )],
+    indices = [Index("idPT"), Index("animal_id"), Index("animal_count_id")]
 )
 data class AddTable(
     @PrimaryKey(autoGenerate = true)
@@ -42,4 +57,6 @@ data class AddTable(
     val note: String,
     @ColumnInfo(name = "idPT")
     val idPT: Long,
+    @ColumnInfo(name = "animal_count_id")
+    val animalCountId: Long? = null
 )

@@ -11,12 +11,13 @@ import com.zaroslikov.domain.models.enums.Suffix
 
 @Entity(
     tableName = "sale_table",
-    foreignKeys = [ForeignKey(
-        entity = ProjectTable::class,
-        parentColumns = arrayOf("_id"),
-        childColumns = arrayOf("idPT"),
-        onDelete = ForeignKey.CASCADE
-    ),
+    foreignKeys = [
+        ForeignKey(
+            entity = ProjectTable::class,
+            parentColumns = arrayOf("_id"),
+            childColumns = arrayOf("idPT"),
+            onDelete = ForeignKey.CASCADE
+        ),
         ForeignKey(
             entity = AnimalTable::class,
             parentColumns = arrayOf("id"),

@@ -773,8 +773,7 @@ fun InventoryNavHost(
             })
         ) {
             AnimalCountScreen(
-                navigateBack = { navController.popBackStack() },
-                navigate = { navController.navigate(it) }
+                navigateBack = { navController.popBackStack() }
             )
         }
 

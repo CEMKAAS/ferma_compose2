@@ -128,18 +128,22 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
         return addDao.getProductAnimal(name).map { it -> it.map { it.toDomainAnimalCountSuffix() } }
     }
 
-   /* override fun getAnalysisAddProductNewYearProject(
-        id: Long,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> {
-        return addDao.getAnalysisAddProductNewYearProject(id, dateBegin, dateEnd)
+    override fun getProductKillList(id: Long): Flow<List<DomainAddTable>> {
+        return addDao.getProductKillList(id).map { it -> it.map { it.toAddDomainMap() } }
     }
 
-    override fun getAnalysisAddProductNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> {
-        return addDao.getAnalysisAddProductNewYear(dateBegin, dateEnd)
-    }*/
+    /* override fun getAnalysisAddProductNewYearProject(
+         id: Long,
+         dateBegin: String,
+         dateEnd: String
+     ): Flow<List<AnalysisSaleBuyerAllTime>> {
+         return addDao.getAnalysisAddProductNewYearProject(id, dateBegin, dateEnd)
+     }
+
+     override fun getAnalysisAddProductNewYear(
+         dateBegin: String,
+         dateEnd: String
+     ): Flow<List<AnalysisSaleBuyerAllTime>> {
+         return addDao.getAnalysisAddProductNewYear(dateBegin, dateEnd)
+     }*/
 }

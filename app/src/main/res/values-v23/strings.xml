@@ -116,6 +116,7 @@
     <string name="button_text_cancel">Отмена</string>
     <string name="button_text_edit">Изменить!</string>
     <string name="button_text_write_off">Списать!</string>
+    <string name="button_text_take">Принять</string>
 
     //widget
     <string name="widget_briefly">Кратко</string>
@@ -419,16 +420,16 @@
     <string name="animal_card_screen_add_note_reason">По причине: %s </string>
     <string name="animal_card_screen_add_no_note_reason">Без указания причины</string>
     <string name="animal_card_screen_add_note_expenses">Было куплено животных: %s %s\nОбщая стоимость составила: %s</string>
-<!--    <string name="animal_card_screen_add_note_expenses">Было куплено животных: %s %s</string>-->
+    <!--    <string name="animal_card_screen_add_note_expenses">Было куплено животных: %s %s</string>-->
 
     <string name="animal_card_screen_write_off_note_count">Было списано животных: %s %s</string>
     <string name="animal_card_screen_write_off_note_expenses">Было списано животных: %s %s\nОбщая стоимость составила: %s </string>
 
     <string name="animal_card_screen_sale_note_expenses">Было продано животных: %s %s\nОбщая стоимость составила: %s \nПокупатель: %s </string>
     <string name="animal_card_screen_sale_note_no_buyer">Неизвестный</string>
-<!--    <string name="animal_card_screen_sale_note_expenses">Было продано животных: %s %s\</string>-->
+    <!--    <string name="animal_card_screen_sale_note_expenses">Было продано животных: %s %s\</string>-->
     <string name="animal_card_screen_kill_note">Было забито животных: %s %s\nБыло получено продукции:</string>
-    <string name="animal_card_screen_kill_add_product">Было получено продукции:</string>
+    <string name="animal_card_screen_kill_add_product">Было получено продукции: </string>
 
     //AnimalIndicatorsScreen
     <string name="animal_indicators_screen_no_note">Примечание не указано</string>
@@ -461,6 +462,14 @@
     <string name="support_text_vaccination_animals">Укажите название прививки</string>
     <string name="animal_vaccination_count_vaccination">Колличество прививок</string>
     <string name="animal_vaccination_title">Прививка</string>
+
+    // AnimalCountScreen
+    <string name="animal_count_screen_warning_title">Внимание</string>
+    <string name="animal_count_screen_warning_text">Если вы продолжите данную операцию, количество животных уйдет в минус, вы согласны на применить данные изменения?</string>
+    <string name="animal_count_screen_warning_product_delete_text">Если вы удалите данную продукцию она также удалится в разделе мои продукция, вы действительно хотите удалить?</string>
+    <string name="animal_count_screen_warning_minus_and_delete_text">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удалится, вся  внесенная раняя продукция, вы действительно хотите удалить?</string>
+    <string name="animal_count_screen_warning_product_delete_all_text">Если вы удалите данную запись, вся  внесенная раняя продукция тоже удалится, вы действительно хотите удалить?</string>
+
 
     //ExpensesEntryScreen
     <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма:</string>

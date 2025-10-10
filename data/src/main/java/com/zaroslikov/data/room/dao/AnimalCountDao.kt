@@ -66,6 +66,12 @@ interface AnimalCountDao {
                 "        ELSE NULL" +
                 "    END AS price," +
                 "  CASE" +
+                "        WHEN version = 0 THEN (SELECT price_all FROM sale_table WHERE animal_count_id = id)" +
+                "        WHEN version = 1 THEN (SELECT price_all FROM expenses_table WHERE animal_count_id = id)" +
+                "        WHEN version IN (2, 3) THEN (SELECT price_all FROM write_off_table WHERE animal_count_id = id)" +
+                "        ELSE NULL" +
+                "    END AS price_all," +
+                "  CASE" +
                 "        WHEN version = 0 THEN (SELECT buyer FROM sale_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS buyer," +
@@ -86,5 +92,7 @@ interface AnimalCountDao {
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getCountAnimal(id: Long): Flow<List<AnimalCountPriceDto>>
+
+
 
 }

@@ -15,5 +15,6 @@ data class DomainAddTable(
     val category: String,
     val animalId: Long? = null,
     val note: String,
-    val idPT: Long
+    val idPT: Long,
+    val animalCountId: Long? = null
 )

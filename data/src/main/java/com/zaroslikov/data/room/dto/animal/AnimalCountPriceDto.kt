@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.dto.animal
 
 import androidx.room.ColumnInfo
+import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
 
@@ -14,6 +15,8 @@ data class AnimalCountPriceDto(
     val note: String,
     val version: AnimalCountVersion?,
     val price: Double?,
+    @ColumnInfo(name = "price_all")
+    val priceAll: Double?,
     val buyer: String?,
     @ColumnInfo(name = "table_id")
     val tableId: Long?,
