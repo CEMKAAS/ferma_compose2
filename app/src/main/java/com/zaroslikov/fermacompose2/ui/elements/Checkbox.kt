@@ -8,8 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
@@ -72,7 +72,7 @@ fun CheckboxTextIcon(
                 modifier = Modifier.weight(0.2f, fill = false),
                 onClick = onClick
             ) {
-                Icon(Icons.Default.Info, contentDescription = "Показать меню")
+                Icon(painterResource(R.drawable.icon_info), contentDescription = "Показать меню")
             }
         }
 
@@ -91,7 +91,10 @@ fun CheckboxTextIcon(
                 state = tooltipState
             ) {
                 IconButton(onClick = { scope.launch { tooltipState.show() } }) {
-                    Icon(Icons.Default.Info, contentDescription = "Показать меню")
+                    Icon(
+                        painterResource(R.drawable.icon_info),
+                        contentDescription = "Показать меню"
+                    )
                 }
             }
         }

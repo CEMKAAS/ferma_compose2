@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -29,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -387,7 +385,7 @@ private fun ShowAnimal(
                             label = { Text(animal.name) },
                             leadingIcon = {
                                 Icon(
-                                    imageVector = if (animal.ps) Icons.Filled.Done else Icons.Filled.Add,
+                                    painterResource(if (animal.ps) R.drawable.icon_check else R.drawable.icon_add),
                                     contentDescription = null,
                                     modifier = Modifier.size(FilterChipDefaults.IconSize)
                                 )
@@ -523,7 +521,7 @@ fun ChoiceAnimal(
                     leadingIcon = if (selected) {
                         {
                             Icon(
-                                imageVector = if (selected) Icons.Filled.Done else Icons.Filled.Add,
+                                painterResource(if (selected) R.drawable.icon_check else R.drawable.icon_add),
                                 contentDescription = "Done icon",
                                 modifier = Modifier.size(FilterChipDefaults.IconSize)
                             )

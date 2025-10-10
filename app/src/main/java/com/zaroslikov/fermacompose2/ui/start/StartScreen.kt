@@ -16,10 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -137,7 +133,7 @@ fun StartScreen(
                         ProjectAddDestination.route
                     )
                 },
-                icon = { Icon(Icons.Filled.Add, "Localized description") },
+                icon = { Icon(painterResource(R.drawable.icon_add), "Localized description") },
                 text = { Text(text = "Добавить") },
             )
         }
@@ -349,7 +345,7 @@ fun CardFerma(
                     fontSize = 26.sp
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.Default.DateRange, contentDescription = "Дата")
+                    Icon(painterResource(R.drawable.icon_date_range), contentDescription = "Дата")
                     Text(
                         text = if (projectTable.arhive == "0") projectTable.data else "Завершен",
                         modifier = Modifier
@@ -465,7 +461,10 @@ fun InfoBottomSheet(
                 },
                 trailingIcon = {
                     IconButton(onClick = clearTime) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Удалить")
+                        Icon(
+                            painterResource(R.drawable.baseline_clear_24),
+                            contentDescription = "Удалить"
+                        )
                     }
                 },
                 modifier = Modifier

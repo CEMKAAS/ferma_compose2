@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -77,7 +75,7 @@ fun IconAndText(
     iconRes: Int,
     valueString: String,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    textStyle: TextStyle= text_14
+    textStyle: TextStyle = text_14
 ) {
     Row(
         modifier = modifier
@@ -139,11 +137,11 @@ fun TextAndIconRow(
     @StringRes intRes: Int? = null,
     value: String = "",
     color: Color = Color.Unspecified,
-    iconRes: ImageVector = Icons.Default.Info,
+    iconRes: Int = R.drawable.icon_info,
     isShowIcon: Boolean = false,
     isShowValue: Boolean = true,
     onClick: () -> Unit = {},
-    iconResEnd: ImageVector? = null,
+    iconResEnd: Int? = null,
     onClickIconEnd: () -> Unit = {},
     isTooltipShow: Boolean = false
 ) {
@@ -167,7 +165,7 @@ fun TextAndIconRow(
             )
             if (isShowIcon) {
                 Icon(
-                    imageVector = iconRes, contentDescription = null,
+                    painterResource(iconRes), contentDescription = null,
                     modifier =
                         Modifier
                             .size(18.dp)
@@ -193,7 +191,7 @@ fun TextAndIconRow(
                 ) {
                     IconButton(onClick = { scope.launch { tooltipState.show() } }) {
                         Icon(
-                            imageVector = iconRes, contentDescription = null
+                            painterResource(iconRes), contentDescription = null
                         )
                     }
                 }
@@ -213,7 +211,7 @@ fun TextAndIconRow(
         }
         if (iconResEnd != null) {
             Icon(
-                imageVector = iconResEnd, contentDescription = null,
+                painterResource(iconResEnd), contentDescription = null,
                 modifier =
                     Modifier
                         .size(18.dp)
@@ -227,7 +225,7 @@ fun TextAndIconRow(
 @Composable
 fun TextAndIcon(
     modifier: Modifier = Modifier,
-    iconRes: ImageVector,
+    iconRes: Int,
     title: String = "",
     @StringRes intRes: Int? = null
 ) {
@@ -238,7 +236,7 @@ fun TextAndIcon(
         style = textBold_16
     )
     Icon(
-        imageVector = iconRes, contentDescription = null,
+        painterResource(iconRes), contentDescription = null,
         modifier = Modifier.padding(end = 5.dp)
     )
 }

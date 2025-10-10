@@ -21,11 +21,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -602,7 +598,7 @@ fun TextButtonWarehouse(
                 modifier = Modifier.weight(1f) // линия слева занимает свободное место
             )
             Icon(
-                if (boolean) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                painterResource(if (boolean) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
                 contentDescription = "Показать меню",
                 modifier = Modifier.padding(horizontal = 4.dp)
             )

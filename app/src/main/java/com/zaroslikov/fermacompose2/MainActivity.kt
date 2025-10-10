@@ -10,8 +10,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -22,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -37,7 +36,7 @@ import com.yandex.mobile.ads.common.MobileAds
 import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
-import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
+//import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
 //import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,12 +59,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-        val startBoolean = isFirstLaunch(this)
+//        val startBoolean = isFirstLaunch(this)
 
-        if (startBoolean) {
-            WorkManagerWaterRepository(this).setupDailyReminder()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
-        }
+//        if (startBoolean) {
+//            WorkManagerWaterRepository(this).setupDailyReminder()
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
+//        }
 
 
         setContent {
@@ -77,11 +76,12 @@ class MainActivity : ComponentActivity() {
                     )
                     ProcessLifecycleOwner.get().lifecycle.addObserver(processLifecycleObserver)
                 }
-                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
+//                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
 
                 InventoryApp(
-                    isFirstStart = openFirstDialog,
-                    isFirstEnd = { openFirstDialog = false })
+//                    isFirstStart = openFirstDialog,
+//                    isFirstEnd = { openFirstDialog = false }
+                )
 
             }
         }
@@ -104,6 +104,7 @@ class MainActivity : ComponentActivity() {
                         ), REQUEST_CODE_NOTIFICATION_PERMISSIONS
                     )
                 }
+
                 else -> Log.d(TAG, "Notification Permissions : previously granted successfully")
             }
         } catch (e: Exception) {
@@ -111,30 +112,30 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    /* override fun onRequestPermissionsResult(
+         requestCode: Int,
+         permissions: Array<out String>,
+         grantResults: IntArray
+     ) {
+         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        when (requestCode) {
-            REQUEST_CODE_NOTIFICATION_PERMISSIONS -> {
-                val hasAccessNotificationPolicyPermission =
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED
-                val hasPostNotificationsPermission =
-                    grantResults[1] == PackageManager.PERMISSION_GRANTED
-                when {
-                    !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
-                        getNotificationPermissions()
-                    }
-                    else -> {
-                        Log.d(TAG, "Notification Permissions : Granted successfully")
-                    }
-                }
-            }
-        }
-    }
+         when (requestCode) {
+             REQUEST_CODE_NOTIFICATION_PERMISSIONS -> {
+                 val hasAccessNotificationPolicyPermission =
+                     grantResults[0] == PackageManager.PERMISSION_GRANTED
+                 val hasPostNotificationsPermission =
+                     grantResults[1] == PackageManager.PERMISSION_GRANTED
+                 when {
+                     !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
+                         getNotificationPermissions()
+                     }
+                     else -> {
+                         Log.d(TAG, "Notification Permissions : Granted successfully")
+                     }
+                 }
+             }
+         }
+     }*/
 
     //Реклама при клике
     private fun loadInterstitialAd() {
@@ -230,7 +231,7 @@ class MainActivity : ComponentActivity() {
 }
 
 // Функция для проверки первого запуска приложения
-fun isFirstLaunch(context: Context): Boolean {
+/*fun isFirstLaunch(context: Context): Boolean {
     val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 //    val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", true)
@@ -247,15 +248,15 @@ fun isFirstLaunch(context: Context): Boolean {
     }
 
     return isFirstLaunch
-}
-private fun getCurrentAppVersion(context: Context): String {
+}*/
+/*private fun getCurrentAppVersion(context: Context): String {
     return try {
         val packageInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
         packageInfo.versionName
     } catch (e: PackageManager.NameNotFoundException) {
         "unknown"
     }
-}
+}*/
 
 @Composable
 fun AlterDialigStart(
@@ -264,18 +265,24 @@ fun AlterDialigStart(
     dialogText: String,
     textAppMetrica: String,
     boolean: Boolean = false,
-    isFirstEndConfig: () -> Unit ={},
+    isFirstEndConfig: () -> Unit = {},
 ) {
     var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
 
     if (openFirstDialog) {
         AlertDialog(
-            icon = { Icon(Icons.Default.Info, contentDescription = "Example Icon") },
+            icon = {
+                Icon(
+                    painterResource(R.drawable.icon_info), contentDescription =
+                        "Example Icon"
+                )
+            },
             title = { Text(text = dialogTitle) },
             text = { Text(text = dialogText, textAlign = TextAlign.Justify) },
-            onDismissRequest = { openFirstDialog = false
-                AppMetrica.reportEvent("-"+textAppMetrica)
-                               },
+            onDismissRequest = {
+                openFirstDialog = false
+                AppMetrica.reportEvent("-" + textAppMetrica)
+            },
             confirmButton = {
                 TextButton(onClick = {
                     if (!boolean) isFirstEndConfig()

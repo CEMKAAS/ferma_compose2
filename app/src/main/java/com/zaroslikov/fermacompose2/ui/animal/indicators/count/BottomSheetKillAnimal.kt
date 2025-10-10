@@ -3,8 +3,7 @@
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
@@ -91,7 +91,7 @@ fun BottomSheetKillAnimal(
                 if (productKill.size > 1)
                     TextAndIconRow(
                         title = textPosition,
-                        iconResEnd = Icons.Default.Close,
+                        iconResEnd = R.drawable.baseline_clear_24,
                         onClickIconEnd = {
                             onIntent(AnimalCountIntent.RemoveProductKillChanged(index))
                         }

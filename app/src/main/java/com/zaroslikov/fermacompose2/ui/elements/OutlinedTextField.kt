@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -736,7 +734,7 @@ fun OutlinedTextPriceCount(
             trailingIcon = {
                 IconButton(onClick = { expanded.value = true }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
+                        painterResource(R.drawable.baseline_arrow_back_24),
                         contentDescription = null
                     )
                 }

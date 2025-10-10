@@ -8,13 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.Icons.Filled
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -58,8 +51,8 @@ import kotlinx.coroutines.launch
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    isFirstStart: Boolean,
-    isFirstEnd: () -> Unit
+    isFirstStart: Boolean = false,
+    isFirstEnd: () -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -128,7 +121,7 @@ fun InventoryTopAppBar(
             if (canNavigateBack) {
                 IconButton(onClick = navigateUp) {
                     Icon(
-                        imageVector = Filled.ArrowBack,
+                        painterResource(R.drawable.baseline_arrow_back_24),
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
@@ -165,7 +158,7 @@ fun TopAppBarFermaFilter(
                 }
             }) {
                 Icon(
-                    imageVector = Icons.Filled.Menu,
+                    painterResource(R.drawable.icon_menu),
                     contentDescription = "Меню"
                 )
             }
@@ -182,7 +175,7 @@ fun TopAppBarFermaFilter(
                     )
                 } else {
                     Icon(
-                        imageVector = Icons.Filled.Settings,
+                        painterResource(R.drawable.icon_setting),
                         contentDescription = "Настройка"
                     )
                 }
@@ -216,7 +209,7 @@ fun TopAppBarFerma(
                 }
             }) {
                 Icon(
-                    imageVector = Icons.Filled.Menu,
+                    painterResource(R.drawable.icon_menu),
                     contentDescription = "Меню"
                 )
             }
@@ -250,7 +243,7 @@ fun TopAppBarFermaWarehouse(
                 }
             }) {
                 Icon(
-                    imageVector = Icons.Filled.Menu,
+                    painterResource(R.drawable.icon_menu),
                     contentDescription = "Меню"
                 )
             }
@@ -260,7 +253,7 @@ fun TopAppBarFermaWarehouse(
                 onClick = navigateToEdit
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Settings,
+                    painterResource(R.drawable.icon_setting),
                     contentDescription = "Настройка"
                 )
             }
@@ -287,7 +280,7 @@ fun TopAppBarStart(
         navigationIcon = {
             IconButton(onClick = navigateUp) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    painterResource(R.drawable.baseline_arrow_back_24),
                     contentDescription = "Назад"
                 )
             }
@@ -296,7 +289,7 @@ fun TopAppBarStart(
             if (settingBoolean) {
                 IconButton(onClick = settingUp) {
                     Icon(
-                        imageVector = Icons.Filled.Settings,
+                        painterResource(R.drawable.icon_setting),
                         contentDescription = "Настройка"
                     )
                 }
@@ -329,7 +322,7 @@ fun TopAppBarStart2(
             }
             IconButton(onClick = infoBottomSheet) {
                 Icon(
-                    imageVector = Icons.Filled.Info,
+                    painterResource(R.drawable.icon_info),
                     contentDescription = "Информация"
                 )
             }
@@ -355,7 +348,7 @@ fun TopAppBarCalendar(
         navigationIcon = {
             IconButton(onClick = navigateUp) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    painterResource(R.drawable.icon_setting),
                     contentDescription = "Назад"
                 )
             }
@@ -364,7 +357,7 @@ fun TopAppBarCalendar(
             if (settingBoolean) {
                 IconButton(onClick = settingUp) {
                     Icon(
-                        imageVector = Icons.Filled.DateRange,
+                        painterResource(R.drawable.icon_date_range),
                         contentDescription = "Настройка"
                     )
                 }
@@ -389,7 +382,7 @@ fun TopAppBarEdit(
         navigationIcon = {
             IconButton(onClick = navigateUp) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    painterResource(R.drawable.icon_setting),
                     contentDescription = "Назад"
                 )
             }

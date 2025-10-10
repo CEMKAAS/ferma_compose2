@@ -3,8 +3,6 @@ package com.zaroslikov.fermacompose2.ui.animal.animal_dialog
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -87,7 +85,7 @@ fun AlertDialogKillAnimal(
                         if (state.productKill.size > 1)
                             TextAndIconRow(
                                 title = textPosition,
-                                iconResEnd = Icons.Default.Close,
+                                iconResEnd = R.drawable.baseline_clear_24,
                                 onClickIconEnd = {
                                     onIntent(
                                         AnimalCardIntent.RemoveProductKillChanged(

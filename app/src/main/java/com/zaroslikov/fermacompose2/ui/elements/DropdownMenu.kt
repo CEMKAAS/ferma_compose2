@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,7 +53,7 @@ fun DropdownMenuIconProductSuffix(
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
-            Icons.Default.MoreVert,
+            painterResource(R.drawable.icon_more_vert),
             contentDescription = stringResource(R.string.content_description_show_menu)
         )
         DropdownMenu(
@@ -91,7 +89,7 @@ fun DropdownMenuIconWeightSuffix(
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
-            Icons.Default.MoreVert,
+            painterResource(R.drawable.icon_more_vert),
             contentDescription = stringResource(R.string.content_description_show_menu)
         )
         DropdownMenu(
@@ -127,7 +125,7 @@ fun DropdownMenuIconHeightSuffix(
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
-            Icons.Default.MoreVert,
+            painterResource(R.drawable.icon_more_vert),
             contentDescription = stringResource(R.string.content_description_show_menu)
         )
         DropdownMenu(
@@ -163,7 +161,7 @@ fun DropdownMenuIconCountSuffix(
 
     IconButton(onClick = { expanded = !expanded }) {
         Icon(
-            Icons.Default.MoreVert,
+            painterResource(R.drawable.icon_more_vert),
             contentDescription = stringResource(R.string.content_description_show_menu)
         )
         DropdownMenu(

@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.0"
+agp = "8.10.1"
 coilCompose = "3.0.4"
 hiltCompiler = "2.56.2"
 hiltAndroid = "2.56.2"
@@ -13,6 +13,9 @@ kotlinxCoroutinesCore = "1.10.2"
 lifecycleRuntimeKtx = "2.8.0"
 activityCompose = "1.9.0"
 composeBom = "2023.08.00"
+material3 = "1.4.0"
+material3AdaptiveNavigationSuite = "1.5.0-alpha06"
+material3WindowSizeClass = "1.4.0"
 mobileads = "7.8.0"
 uiDesktop = "1.6.8"
 lifecycleProcess = "2.8.3"
@@ -24,6 +27,8 @@ jetbrainsKotlinJvm = "2.1.10"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3AdaptiveNavigationSuite" }
+androidx-material3-window-size-class1 = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3WindowSizeClass" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
@@ -45,6 +50,7 @@ androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", vers
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 mobileads = { module = "com.yandex.android:mobileads", version.ref = "mobileads" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }

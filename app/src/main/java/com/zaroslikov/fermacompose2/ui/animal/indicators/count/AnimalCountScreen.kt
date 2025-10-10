@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -16,23 +17,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,10 +40,26 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -79,6 +95,7 @@ object AnimalCountDestination : NavigationDestination {
     val routeWithArgs = "$route?$itemIdPT={$itemIdPT}&$itemId={$itemId}"
 }
 
+@ExperimentalMaterial3ExpressiveApi
 @Composable
 fun AnimalCountScreen(
     navigateBack: () -> Unit,
@@ -97,63 +114,152 @@ fun AnimalCountScreen(
             )
         },
         floatingActionButton = {
-            FabMenu(
-                onAddClick = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.DialogClicked(
-                            true,
-                            DomainAnimalCountPrice(
-                                version = AnimalCountVersion.ADD,
-                                date = dateToday()
-                            )
+            val items =
+                listOf(
+                    R.drawable.icon_add to "add",
+                    R.drawable.baseline_edit_note_24 to "edit",
+                    R.drawable.icons8__meat30 to "meat",
+                    R.drawable.baseline_add_shopping_cart_24 to "expenses",
+                    R.drawable.baseline_add_card_24 to "sale"
+                )
+            var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
+            FloatingActionButtonMenu(
+                expanded = fabMenuExpanded,
+                button = {
+                    ToggleFloatingActionButton(
+                        modifier =
+                            Modifier
+                                .semantics {
+                                    traversalIndex = -1f
+                                    stateDescription = if (fabMenuExpanded) "Expanded" else "Collapsed"
+                                    contentDescription = "Toggle menu"
+                                }
+                                .animateFloatingActionButton(
+                                    visible = fabMenuExpanded,
+                                    alignment = Alignment.BottomEnd,
+                                ) ,
+                        checked = fabMenuExpanded,
+                        onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
+                    ) {
+                        val imageVector by remember {
+                            derivedStateOf {
+                                if (checkedProgress > 0.5f) R.drawable.baseline_clear_24 else R.drawable.icon_add
+
+                            }
+                        }
+                        Icon(
+                            painter = painterResource(imageVector),
+                            contentDescription = null,
+                            modifier = Modifier.animateIcon({ checkedProgress }),
                         )
-                    )
+                    }
                 },
-                onWriteOffClick = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.DialogClicked(
-                            true,
-                            DomainAnimalCountPrice(
-                                version = AnimalCountVersion.WRITE_OFF,
-                                date = dateToday()
-                            )
+                content = {
+                    items.forEachIndexed { i, item ->
+                        FloatingActionButtonMenuItem(
+                            modifier =
+                                Modifier
+                                    .semantics {
+                                        isTraversalGroup = true
+                                        // Add a custom a11y action to allow closing the menu when focusing
+                                        // the last menu item, since the close button comes before the first
+                                        // menu item in the traversal order.
+                                        if (i == items.size - 1) {
+                                            customActions =
+                                                listOf(
+                                                    CustomAccessibilityAction(
+                                                        label = "Close menu",
+                                                        action = {
+                                                            fabMenuExpanded = false
+                                                            true
+                                                        },
+                                                    )
+                                                )
+                                        }
+                                    }
+                                    .then(
+                                        if (i == 0) {
+                                            Modifier.onKeyEvent {
+                                                // Navigating back from the first item should go back to the
+                                                // FAB menu button.
+                                                if (
+                                                    it.type == KeyEventType.KeyDown &&
+                                                    (it.key == Key.DirectionUp ||
+                                                            (it.isShiftPressed && it.key == Key.Tab))
+                                                ) {
+//                                                    focusRequester.requestFocus()
+                                                    return@onKeyEvent true
+                                                }
+                                                return@onKeyEvent false
+                                            }
+                                        } else {
+                                            Modifier
+                                        }
+                                    ),
+                            onClick = { fabMenuExpanded = false },
+                            icon = { Icon(painterResource(item.first), contentDescription = null) },
+                            text = { Text(text = item.second) },
                         )
-                    )
-                },
-                onSellClick = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.DialogClicked(
-                            true,
-                            DomainAnimalCountPrice(
-                                version = AnimalCountVersion.SALE,
-                                date = dateToday()
-                            )
-                        )
-                    )
-                },
-                onExpensesClick = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.DialogClicked(
-                            true,
-                            DomainAnimalCountPrice(
-                                version = AnimalCountVersion.EXPENSES,
-                                date = dateToday()
-                            )
-                        )
-                    )
-                },
-                onKillClick = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.DialogClicked(
-                            true,
-                            DomainAnimalCountPrice(
-                                version = AnimalCountVersion.KILL,
-                                date = dateToday()
-                            )
-                        )
-                    )
+                    }
                 }
             )
+            /*   FabMenu(
+                   onAddClick = {
+                       viewModel.onIntent(
+                           AnimalCountIntent.DialogClicked(
+                               true,
+                               DomainAnimalCountPrice(
+                                   version = AnimalCountVersion.ADD,
+                                   date = dateToday()
+                               )
+                           )
+                       )
+                   },
+                   onWriteOffClick = {
+                       viewModel.onIntent(
+                           AnimalCountIntent.DialogClicked(
+                               true,
+                               DomainAnimalCountPrice(
+                                   version = AnimalCountVersion.WRITE_OFF,
+                                   date = dateToday()
+                               )
+                           )
+                       )
+                   },
+                   onSellClick = {
+                       viewModel.onIntent(
+                           AnimalCountIntent.DialogClicked(
+                               true,
+                               DomainAnimalCountPrice(
+                                   version = AnimalCountVersion.SALE,
+                                   date = dateToday()
+                               )
+                           )
+                       )
+                   },
+                   onExpensesClick = {
+                       viewModel.onIntent(
+                           AnimalCountIntent.DialogClicked(
+                               true,
+                               DomainAnimalCountPrice(
+                                   version = AnimalCountVersion.EXPENSES,
+                                   date = dateToday()
+                               )
+                           )
+                       )
+                   },
+                   onKillClick = {
+                       viewModel.onIntent(
+                           AnimalCountIntent.DialogClicked(
+                               true,
+                               DomainAnimalCountPrice(
+                                   version = AnimalCountVersion.KILL,
+                                   date = dateToday()
+                               )
+                           )
+                       )
+                   }
+               )*/
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -269,7 +375,14 @@ fun AnimalCountScreen(
     }
 }
 
+@SuppressLint("RememberInComposition")
+@ExperimentalMaterial3ExpressiveApi
 @Composable
+fun FabMenu2() {
+
+}
+
+/*@Composable
 fun FabMenu(
     onAddClick: () -> Unit = {},
     onWriteOffClick: () -> Unit = {},
@@ -341,7 +454,7 @@ fun FabMenu(
             )
         }
     }
-}
+}*/
 
 @Composable
 private fun AnimalCountContainer(
@@ -437,7 +550,7 @@ private fun CountCard(
                 onClick = { details = !details }
             ) {
                 Icon(
-                    imageVector = if (details) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    painterResource(if (details) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
                     contentDescription = null
                 )
             }

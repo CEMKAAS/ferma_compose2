@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.zaroslikov.fermacompose2"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.zaroslikov.fermacompose2"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 12
         versionName = "v1.17bG"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -34,17 +34,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.1.1"
     }
     packaging {
         resources {
@@ -58,16 +58,20 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
 
+    implementation(libs.material3)
+    implementation(libs.androidx.material3.window.size.class1)
+    implementation(libs.androidx.material3.adaptive.navigation.suite)
+
     // Import the Compose BOM
-    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
-    implementation("androidx.activity:activity-compose:1.8.1")
-    implementation("androidx.compose.material3:material3:1.2.0-beta01")
+    implementation(platform("androidx.compose:compose-bom:2025.10.00"))
+    implementation("androidx.activity:activity-compose:1.11.0")
+
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
+    implementation("androidx.navigation:navigation-compose:2.9.5")
 
     //Room
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
@@ -91,8 +95,8 @@ dependencies {
 
 
     // AppMetrica SDK.
-    implementation("io.appmetrica.analytics:analytics:7.2.2")
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation("io.appmetrica.analytics:analytics:7.12.0")
+    implementation("androidx.work:work-runtime-ktx:2.10.5")
 
     // Hilt
     implementation(libs.androidx.hilt.navigation.compose)

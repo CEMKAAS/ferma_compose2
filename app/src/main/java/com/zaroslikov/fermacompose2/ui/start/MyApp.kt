@@ -5,8 +5,6 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
@@ -63,7 +61,9 @@ fun DrawerSheet(
             R.drawable.baseline_arrow_back_24, "Вернуться к проектам", StartDestination.route
         ),
         DrawerItems(
-            R.drawable.baseline_warehouse_24, "Мой Склад", HomeDestination.route //WarehouseDestination.route
+            R.drawable.baseline_warehouse_24,
+            "Мой Склад",
+            HomeDestination.route //WarehouseDestination.route
         ),
         DrawerItems(
             R.drawable.baseline_currency_ruble_24, "Мои Финансы", FinanceDestination.route
@@ -198,7 +198,7 @@ fun AlertDialogInfo(
 ) {
     AlertDialog(
         icon = {
-            Icon(Icons.Default.Info, contentDescription = "Example Icon")
+            Icon(painterResource(R.drawable.icon_info), contentDescription = "Example Icon")
         },
         title = {
             Text(text = dialogTitle)

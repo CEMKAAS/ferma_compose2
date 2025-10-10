@@ -11,7 +11,7 @@ import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 
 @HiltAndroidApp
-class InventoryApplication: Application(), Configuration.Provider  {
+class InventoryApplication : Application()/*, Configuration.Provider*/ {
 
     lateinit var container: AppContainer
 
@@ -24,8 +24,11 @@ class InventoryApplication: Application(), Configuration.Provider  {
         container = AppDataContainer(this)
     }
 
-    override fun getWorkManagerConfiguration() = Configuration.Builder()
-        .setMinimumLoggingLevel(android.util.Log.INFO)
-        .build()
-    }
+//    fun getWorkManagerConfiguration() = Configuration.Builder()
+//        .setMinimumLoggingLevel(android.util.Log.INFO)
+//        .build()
+//
+//    override val workManagerConfiguration: Configuration
+//        get() = getWorkManagerConfiguration()
+}
 

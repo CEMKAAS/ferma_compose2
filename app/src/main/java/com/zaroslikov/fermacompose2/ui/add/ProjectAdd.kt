@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -321,7 +319,7 @@ fun ImageLazyRow(
                 else painterResource(image),
                 icon = {
                     Icon(
-                        Icons.Default.CheckCircle,
+                        painterResource(R.drawable.icon_check),
                         contentDescription = "Selected",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
@@ -439,6 +437,7 @@ class MinDateSelectableDates(
         return year >= minYear
     }
 }
+
 //
 fun getByteArrayFromDrawable(context: Context, drawableResId: Int): ByteArray {
     // Загружаем ресурс как Bitmap
