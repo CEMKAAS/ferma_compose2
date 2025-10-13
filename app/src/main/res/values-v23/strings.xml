@@ -466,10 +466,11 @@
     // AnimalCountScreen
     <string name="animal_count_screen_warning_title">Внимание</string>
     <string name="animal_count_screen_warning_text">Если вы продолжите данную операцию, количество животных уйдет в минус, вы согласны на применить данные изменения?</string>
-    <string name="animal_count_screen_warning_product_delete_text">Если вы удалите данную продукцию она также удалится в разделе мои продукция, вы действительно хотите удалить?</string>
     <string name="animal_count_screen_warning_minus_and_delete_text">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удалится, вся  внесенная раняя продукция, вы действительно хотите удалить?</string>
     <string name="animal_count_screen_warning_product_delete_all_text">Если вы удалите данную запись, вся  внесенная раняя продукция тоже удалится, вы действительно хотите удалить?</string>
 
+    <string name="animal_count_screen_warning_product_update_text">Если вы удалите или измените продукцию она также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
+    <string name="animal_count_screen_warning_product_update_minus_text">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удаленная или измененная продукцию, также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
 
     //ExpensesEntryScreen
     <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма:</string>

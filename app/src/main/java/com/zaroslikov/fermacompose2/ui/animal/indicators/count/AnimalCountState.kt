@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
+import android.opengl.Visibility
 import android.util.Log
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
@@ -18,7 +19,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 data class AnimalCountState(
     val openWarningDialog: Boolean = false,
     val openWarningDeleteDialog: Boolean = false,
-    val openWarningDeleteAllDialog: Boolean? =  null,
+    val openWarningDeleteAllDialog: WarningAnimalCount = WarningAnimalCount.MINUS,
     val openArchiveDialog: Boolean = false,
     val openSoloDialog: Boolean = false,
     val ignoreWarning: Boolean = false,
@@ -31,6 +32,8 @@ data class AnimalCountState(
     val buyerList: List<String> = emptyList(),
     val productKill: List<ProductKill> = listOf(ProductKill()),
     val titleList: List<TitleAndSuffixDomain> = emptyList(),
+    val price: String = "",
+    val priceAll: String = "",
     val isAutoPrice: Boolean = false,
     val isOpenDialog: Boolean = false,
     override val idPT: Long = 0,
@@ -43,7 +46,7 @@ data class AnimalCountState(
         get() = !error.hasAnyError(domainAnimalCountPrice.version)
 
     val hasFieldError: Boolean
-        get() = !productKill.any { it.hasError }
+        get() = !productKill.filter { it.isVisibility == true }.any { it.hasError }
 
     data class Error(
         val isErrorPrice: Boolean = false,
@@ -77,7 +80,8 @@ data class AnimalCountState(
         val countWarehouse: Double = 0.0,
         val suffixWarehouse: String = "",
         val warehouseList: List<DomainCountSuffix> = emptyList(),
-        val error: Error = Error()
+        val error: Error = Error(),
+        val isVisibility: Boolean = true
     ) {
         val hasError: Boolean
             get() = error.isError || error.isErrorSlash || error.isErrorCount

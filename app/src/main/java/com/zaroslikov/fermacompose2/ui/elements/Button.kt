@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.elements
 
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -58,6 +59,7 @@ fun ButtonDelete(
         onClick = onClick,
         modifier = Modifier.toButton(),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+        border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.error)
     ) {
         Icon(
             modifier = Modifier.padding(end = 3.dp),

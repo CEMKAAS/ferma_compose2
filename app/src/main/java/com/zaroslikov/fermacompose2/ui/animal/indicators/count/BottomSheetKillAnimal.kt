@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
@@ -81,12 +80,11 @@ fun BottomSheetKillAnimal(
             value = state.date,
             onValueChange = { onIntent(AnimalCountIntent.DateClicked(it)) },
         )
-        productKill.forEachIndexed { index, product ->
+        productKill.filter { it.isVisibility == true }.forEachIndexed { index, product ->
             CardField(
                 row = false
             ) {
-                val textPosition =
-                    stringResource(R.string.support_text_position_s, index + 1)
+                val textPosition = stringResource(R.string.support_text_position_s, index + 1)
 
                 if (productKill.size > 1)
                     TextAndIconRow(

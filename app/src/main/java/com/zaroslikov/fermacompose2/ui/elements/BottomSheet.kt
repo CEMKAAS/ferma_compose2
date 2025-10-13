@@ -49,7 +49,6 @@ fun CountBottomSheet2(
             topContent()
             Column(
                 modifier = Modifier
-
                     .weight(1f, fill = false)
                     .verticalScroll(rememberScrollState())
             ) {

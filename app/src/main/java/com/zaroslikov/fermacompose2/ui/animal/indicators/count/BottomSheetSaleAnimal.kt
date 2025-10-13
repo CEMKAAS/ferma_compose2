@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.elements.CountBottomSheet2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextBuyer
@@ -21,7 +22,8 @@ fun BottomSheetSaleAnimal(
     errorState: AnimalCountState.Error,
     onIntent: (AnimalCountIntent) -> Unit,
     isEntry: Boolean,
-    isAnimalGroup: Boolean,
+    price: String,
+    priceAll: String,
     isAutoPrice: Boolean,
     countAllAnimal: String,
     buyerList: List<String>,
@@ -48,18 +50,18 @@ fun BottomSheetSaleAnimal(
             suffix = state.suffix,
         )
         OutlinedPriceInput(
-            price = state.price?.formatNumber(false) ?: "",
+            price = price,
             onPriceChange = {
                 onIntent(AnimalCountIntent.PriceChanged(it))
             },
-            priceAll = state.priceAll?.formatNumber(false) ?: "",
+            priceAll = priceAll,
             isAutoCalculate = isAutoPrice,
             onAutoCalculate = {
                 onIntent(AnimalCountIntent.AutoPriceClicked(it))
             },
             isManyCount = true,
             isError = errorState.isErrorPrice,
-            supportTextRes = if (isAnimalGroup) R.string.support_text_price_animals else R.string.support_text_price_animal,
+            supportTextRes = R.string.support_text_price_animals,
             supportTextResAutoCal = R.string.support_text_price_one_animals,
             isNecessarily = true
         )
@@ -76,9 +78,7 @@ fun BottomSheetSaleAnimal(
         )
         OutlinedTextNote(
             value = state.note,
-            onValueChange = { onIntent(AnimalCountIntent.NoteChanged(it)) },
-            label = R.string.outlined_text_reason,
-            supportingText = R.string.support_text_add_animal_reason
+            onValueChange = { onIntent(AnimalCountIntent.NoteChanged(it)) }
         )
     }
 }

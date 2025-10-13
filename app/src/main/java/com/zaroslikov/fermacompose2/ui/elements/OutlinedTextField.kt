@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.elements
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -447,6 +448,7 @@ fun OutlinedTextCountAnimal2(
     countAnimalAll: String = "",
     suffix: Suffix,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
 ) {
     val errorText = when {
         isErrorCountZero -> R.string.error_count_zero_animals
@@ -462,6 +464,7 @@ fun OutlinedTextCountAnimal2(
         isNecessarily = true
     ) {
         BaseOutlinedText(
+            modifier = modifier,
             value = value,
             onValueChange = { onValueChange(it) },
             countAnimal = countAnimalAll,

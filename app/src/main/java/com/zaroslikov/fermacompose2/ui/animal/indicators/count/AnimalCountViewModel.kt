@@ -30,6 +30,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.animal.indicators.count.AnimalCountState.ProductKill
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CompletableDeferred
@@ -74,7 +75,12 @@ class AnimalCountViewModel @Inject constructor(
             AnimalCountIntent.SaveGroupPressed -> saveSoloAnimal()
 
             // Open Bottom Sheet Animal
-            is AnimalCountIntent.DialogClicked -> updateOpenDialog(intent.isEntry, intent.item)
+            is AnimalCountIntent.DialogClicked -> updateOpenDialog(
+                intent.isEntry,
+                intent.isKillAnimalSheet,
+                intent.item
+            )
+
             AnimalCountIntent.EndDialogClicked -> updateEndDialog()
 
             // Warning Alert Dialog
@@ -170,36 +176,47 @@ class AnimalCountViewModel @Inject constructor(
     // Open Dialog
     private fun updateOpenDialog(
         isEntry: Boolean,
+        isKillAnimalSheet: Boolean = false,
         domainAnimalCountPrice: DomainAnimalCountPrice
     ) {
         viewModelScope.launch {
             val oldCount = if (isEntry) "" else domainAnimalCountPrice.count
+            val price = domainAnimalCountPrice.price?.formatNumber(false) ?: ""
+            val priceAll = domainAnimalCountPrice.priceAll?.formatNumber(false) ?: ""
             val isAutoPrice = domainAnimalCountPrice.priceAll != null
-            val productList = addRepository.getProductKillList(domainAnimalCountPrice.id).first()
-            val mappedProducts = productList.map { add ->
-                ProductKill(
-                    idProduct = add.id,
-                    title = add.title,
-                    countProduct = add.count.toString(), // Double -> String
-                    suffixProduct = add.countSuffix
-                )
-            }
+            val finalProductKill =
+                if (isKillAnimalSheet) updateOpenKillDialog(domainAnimalCountPrice.id) else emptyList()
             Log.i(
                 "count23",
                 "updateOpenDialog: isAutoPrice: $isAutoPrice, priceAll: ${domainAnimalCountPrice.priceAll}," +
-                        " productList: $productList, mapperProducts: $mappedProducts"
+                        " finalProductKill: $finalProductKill, isKillAnimalSheet: $isKillAnimalSheet"
             )
             updateState {
                 it.copy(
                     isOpenDialog = true,
                     isEntry = isEntry,
+                    price = price,
+                    priceAll = priceAll,
                     isAutoPrice = isAutoPrice,
                     domainAnimalCountPrice = domainAnimalCountPrice,
                     oldCount = oldCount,
-                    productKill = mappedProducts
+                    productKill = finalProductKill
                 )
             }
         }
+    }
+
+    private suspend fun updateOpenKillDialog(idCount: Long): List<ProductKill> {
+        val productList = addRepository.getProductKillList(idCount).first()
+        val mappedProducts = productList.map { add ->
+            ProductKill(
+                idProduct = add.id,
+                title = add.title,
+                countProduct = add.count.toString(), // Double -> String
+                suffixProduct = add.countSuffix
+            )
+        }
+        return if (mappedProducts.isEmpty()) listOf(ProductKill()) else mappedProducts
     }
 
     private fun updateEndDialog() {
@@ -208,8 +225,10 @@ class AnimalCountViewModel @Inject constructor(
                 isOpenDialog = false,
                 domainAnimalCountPrice = DomainAnimalCountPrice(date = dateToday()),
                 error = AnimalCountState.Error(),
+                price = "",
+                priceAll = "",
                 isAutoPrice = false,
-                openWarningDeleteAllDialog = false
+                openWarningDeleteAllDialog = WarningAnimalCount.MINUS
             )
         }
     }
@@ -239,9 +258,7 @@ class AnimalCountViewModel @Inject constructor(
     private fun updatePriceActionAnimal(price: String) {
         updateState { state ->
             state.copy(
-                domainAnimalCountPrice = state.domainAnimalCountPrice.copy(
-                    price = price.toConvertZeroDouble()
-                ),
+                price = price,
                 error = state.error.copy(
                     isErrorPrice = price.isBlank()
                 )
@@ -282,10 +299,8 @@ class AnimalCountViewModel @Inject constructor(
     private fun updatePriceAllActionAnimal() {
         updateState {
             it.copy(
-                domainAnimalCountPrice = it.domainAnimalCountPrice.copy(
-                    priceAll = if (it.isAutoPrice) (it.domainAnimalCountPrice.price
-                        ?: 0.00) * it.domainAnimalCountPrice.count.toConvertZeroDouble() else 0.00
-                )
+                priceAll = if (it.isAutoPrice) (it.price.toConvertZeroDouble() * it.domainAnimalCountPrice.count.toConvertZeroDouble()).formatNumber()
+                else "0"
             )
         }
     }
@@ -352,7 +367,7 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun insertSaleAnimal() {
         validation(
-            validation = { validationSale() },
+            validation = { validationSaleExpenses() },
             transaction = Transaction.INSERT,
             mainAction = {
                 val countId = animalCountRepository.insertAnimalCountTable(domainAnimalCount())
@@ -363,7 +378,7 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun editSaleAnimal() {
         validation(
-            validation = { validationSale() },
+            validation = { validationSaleExpenses() },
             transaction = Transaction.UPDATE,
             mainAction = {
                 animalCountRepository.updateAnimalCountTable(domainAnimalCount())
@@ -398,7 +413,7 @@ class AnimalCountViewModel @Inject constructor(
     //Expenses Animal
     private fun insertExpensesAnimal() {
         validation(
-            validation = { validationSale() },
+            validation = { validationSaleExpenses() },
             transaction = Transaction.INSERT
         ) {
             val countId = animalCountRepository.insertAnimalCountTable(domainAnimalCount())
@@ -409,7 +424,7 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun editExpensesAnimal() {
         validation(
-            validation = { validationSale() },
+            validation = { validationSaleExpenses() },
             transaction = Transaction.UPDATE
         ) {
             animalCountRepository.updateAnimalCountTable(domainAnimalCount())
@@ -422,7 +437,7 @@ class AnimalCountViewModel @Inject constructor(
         validation(
             validation = { validationKill() },
             transaction = Transaction.INSERT,
-            isKill = true
+            isDeleteKill = true
         ) {
             val productList = getState().productKill
             val countId =
@@ -441,14 +456,27 @@ class AnimalCountViewModel @Inject constructor(
         validation(
             validation = { validationKill() },
             transaction = Transaction.UPDATE,
-            isKill = true
+            isDeleteKill = false,
         ) {
             val productList = getState().productKill
             animalCountRepository.updateAnimalCountTable(domainAnimalCount())
             writeOffRepository.updateWriteOff(domainWriteOff(note = reasonNote(productList)))
             productList.forEach { product ->
-                if (product.idProduct == 0L) addRepository.insertAdd(domainAdd(product)) else
-                    addRepository.updateAdd(domainAdd(product))
+                when {
+                    product.idProduct == 0L && product.isVisibility -> addRepository.insertAdd(
+                        domainAdd(product)
+                    )
+
+                    product.idProduct != 0L && !product.isVisibility -> addRepository.deleteAddById(
+                        product.idProduct
+                    )
+
+                    product.idProduct != 0L && product.isVisibility -> addRepository.updateAdd(
+                        domainAdd(product)
+                    )
+
+                    else -> {}
+                }
             }
         }
     }
@@ -549,24 +577,16 @@ class AnimalCountViewModel @Inject constructor(
     }
 
     private fun removeProductKill(index: Int) {
-        viewModelScope.launch {
-            val currentList = getState().productKill.toMutableList()
-            if (index in currentList.indices) {
-                val itemToDelete = currentList[index]
-                if (itemToDelete.idProduct != 0L) {
-                    updateOpenWarningDeleteDialog(true, true)
-                    val confirmed = awaitConfirmationIfNeeded(true)
-                    if (confirmed) {
-                        addRepository.deleteAddById(itemToDelete.idProduct)
-                        updateState { state ->
-                            state.copy(productKill = currentList.apply { removeAt(index) })
-                        }
-                    }
-                } else
-                    updateState { state ->
-                        state.copy(productKill = currentList.apply { removeAt(index) })
-                    }
-            }
+        updateState { state ->
+            state.copy(
+                productKill = state.productKill.mapIndexed { i, item ->
+                    if (i == index)
+                        item.copy(
+                            isVisibility = false
+                        )
+                    else item
+                }
+            )
         }
     }
 
@@ -600,15 +620,15 @@ class AnimalCountViewModel @Inject constructor(
     private fun validation(
         validation: suspend () -> Unit,
         transaction: Transaction,
-        isKill: Boolean = false,
+        isDeleteKill: Boolean? = null,
         mainAction: suspend () -> Unit
     ) {
-        val hasAnyError =
-            if (isKill) getState().hasAnyError && getState().hasFieldError else getState().hasAnyError
         viewModelScope.launch {
             validation()
+            val hasAnyError =
+                if (isDeleteKill == false) getState().hasAnyError && getState().hasFieldError else getState().hasAnyError
             if (hasAnyError) {
-                val isError = validation2(transaction)
+                val isError = validation2(transaction, isDeleteKill)
                 val confirmed = awaitConfirmationIfNeeded(isError)
                 if (confirmed) {
                     mainAction()
@@ -640,11 +660,15 @@ class AnimalCountViewModel @Inject constructor(
         }
     }
 
-    private fun validationSale() {
+    private fun validationSaleExpenses() {
+        Log.i(
+            "count23",
+            "validationSaleExpenses: isErrorPrice: ${getState().domainAnimalCountPrice.price}"
+        )
         updateState { state ->
             state.copy(
                 error = state.error.copy(
-                    isErrorPrice = false, //TODO
+                    isErrorPrice = state.price.isBlank(), //TODO
                     isErrorCount = state.domainAnimalCountPrice.count.isBlank(),
                     isErrorCountZero = isAnimalCountZero(state.domainAnimalCountPrice.count)
                 )
@@ -740,8 +764,8 @@ class AnimalCountViewModel @Inject constructor(
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
-            price = state.price ?: 0.0,
-            priceAll = if (getState().isAutoPrice) state.priceAll else null,
+            price = getState().price.toConvertZeroDouble(),
+            priceAll = if (getState().isAutoPrice) getState().priceAll.toConvertDbDouble() else null,
             countSuffix = state.suffix,
             category = resourceProvider.getString(R.string.animal_card_screen_add_category_expenses),
             note = resourceProvider.getString(R.string.animal_card_screen_note_expenses),
@@ -763,8 +787,8 @@ class AnimalCountViewModel @Inject constructor(
             title = getState().animal.name,
             count = state.count.toConvertDbDouble(),
             countSuffix = state.suffix,
-            price = state.price ?: 0.0,
-            priceAll = if (getState().isAutoPrice) state.priceAll else null,
+            price = getState().price.toConvertZeroDouble(),
+            priceAll = if (getState().isAutoPrice) getState().priceAll.toConvertDbDouble() else null,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
@@ -791,15 +815,15 @@ class AnimalCountViewModel @Inject constructor(
     private fun updateOpenWarningDialog(
         isOpenWarningsDialog: Boolean,
         wait: Boolean,
-        delete: Boolean? = false
+        warningAnimalCount: WarningAnimalCount = WarningAnimalCount.MINUS
     ) {
         updateState {
             it.copy(
                 openWarningDialog = isOpenWarningsDialog,
-                openWarningDeleteAllDialog = delete
+                openWarningDeleteAllDialog = warningAnimalCount
             )
         }
-        Log.i("count23", "updateOpenWarningDialog: $delete ")
+        Log.i("count23", "updateOpenWarningDialog: $warningAnimalCount ")
         confirmDelete.complete(wait)
     }
 
@@ -840,9 +864,11 @@ class AnimalCountViewModel @Inject constructor(
             "transaction: $transaction version: ${getState().domainAnimalCountPrice.version}"
         )
         val delete2 = when {
-            isError && delete == true -> true
-            !isError && delete == true -> false
-            else -> null
+            isError && delete == true -> WarningAnimalCount.DELETE_MINUS
+            !isError && delete == true -> WarningAnimalCount.DELETE
+            isError && delete == false -> WarningAnimalCount.UPDATE_MINUS
+            !isError && delete == false -> WarningAnimalCount.UPDATE
+            else -> WarningAnimalCount.MINUS
         }
         if (isError || delete != null)
             updateOpenWarningDialog(true, true, delete2)
@@ -924,7 +950,11 @@ sealed class AnimalCountIntent : BaseIntent {
     data object SaveGroupPressed : AnimalCountIntent()
 
     // Open Bottom Sheet Animal
-    data class DialogClicked(val isEntry: Boolean, val item: DomainAnimalCountPrice) :
+    data class DialogClicked(
+        val isEntry: Boolean,
+        val item: DomainAnimalCountPrice,
+        val isKillAnimalSheet: Boolean = false
+    ) :
         AnimalCountIntent()
 
     data object EndDialogClicked : AnimalCountIntent()
@@ -978,4 +1008,8 @@ sealed class AnimalCountIntent : BaseIntent {
 
 enum class Transaction {
     INSERT, UPDATE, DELETE
+}
+
+enum class WarningAnimalCount {
+    MINUS, DELETE, DELETE_MINUS, UPDATE, UPDATE_MINUS
 }

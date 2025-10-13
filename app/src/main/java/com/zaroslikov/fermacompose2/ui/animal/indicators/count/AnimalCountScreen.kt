@@ -1,8 +1,9 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Icon
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -95,7 +96,6 @@ object AnimalCountDestination : NavigationDestination {
     val routeWithArgs = "$route?$itemIdPT={$itemIdPT}&$itemId={$itemId}"
 }
 
-@ExperimentalMaterial3ExpressiveApi
 @Composable
 fun AnimalCountScreen(
     navigateBack: () -> Unit,
@@ -103,7 +103,6 @@ fun AnimalCountScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -114,152 +113,21 @@ fun AnimalCountScreen(
             )
         },
         floatingActionButton = {
-            val items =
-                listOf(
-                    R.drawable.icon_add to "add",
-                    R.drawable.baseline_edit_note_24 to "edit",
-                    R.drawable.icons8__meat30 to "meat",
-                    R.drawable.baseline_add_shopping_cart_24 to "expenses",
-                    R.drawable.baseline_add_card_24 to "sale"
-                )
-            var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
-            FloatingActionButtonMenu(
-                expanded = fabMenuExpanded,
-                button = {
-                    ToggleFloatingActionButton(
-                        modifier =
-                            Modifier
-                                .semantics {
-                                    traversalIndex = -1f
-                                    stateDescription = if (fabMenuExpanded) "Expanded" else "Collapsed"
-                                    contentDescription = "Toggle menu"
-                                }
-                                .animateFloatingActionButton(
-                                    visible = fabMenuExpanded,
-                                    alignment = Alignment.BottomEnd,
-                                ) ,
-                        checked = fabMenuExpanded,
-                        onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
-                    ) {
-                        val imageVector by remember {
-                            derivedStateOf {
-                                if (checkedProgress > 0.5f) R.drawable.baseline_clear_24 else R.drawable.icon_add
-
-                            }
-                        }
-                        Icon(
-                            painter = painterResource(imageVector),
-                            contentDescription = null,
-                            modifier = Modifier.animateIcon({ checkedProgress }),
+            FabMenu2(
+                isListEmpty = state.countList.isNotEmpty(),
+                onClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DialogClicked(
+                            true,
+                            DomainAnimalCountPrice(
+                                version = it.first,
+                                date = dateToday()
+                            ),
+                            isKillAnimalSheet = it.second
                         )
-                    }
-                },
-                content = {
-                    items.forEachIndexed { i, item ->
-                        FloatingActionButtonMenuItem(
-                            modifier =
-                                Modifier
-                                    .semantics {
-                                        isTraversalGroup = true
-                                        // Add a custom a11y action to allow closing the menu when focusing
-                                        // the last menu item, since the close button comes before the first
-                                        // menu item in the traversal order.
-                                        if (i == items.size - 1) {
-                                            customActions =
-                                                listOf(
-                                                    CustomAccessibilityAction(
-                                                        label = "Close menu",
-                                                        action = {
-                                                            fabMenuExpanded = false
-                                                            true
-                                                        },
-                                                    )
-                                                )
-                                        }
-                                    }
-                                    .then(
-                                        if (i == 0) {
-                                            Modifier.onKeyEvent {
-                                                // Navigating back from the first item should go back to the
-                                                // FAB menu button.
-                                                if (
-                                                    it.type == KeyEventType.KeyDown &&
-                                                    (it.key == Key.DirectionUp ||
-                                                            (it.isShiftPressed && it.key == Key.Tab))
-                                                ) {
-//                                                    focusRequester.requestFocus()
-                                                    return@onKeyEvent true
-                                                }
-                                                return@onKeyEvent false
-                                            }
-                                        } else {
-                                            Modifier
-                                        }
-                                    ),
-                            onClick = { fabMenuExpanded = false },
-                            icon = { Icon(painterResource(item.first), contentDescription = null) },
-                            text = { Text(text = item.second) },
-                        )
-                    }
+                    )
                 }
             )
-            /*   FabMenu(
-                   onAddClick = {
-                       viewModel.onIntent(
-                           AnimalCountIntent.DialogClicked(
-                               true,
-                               DomainAnimalCountPrice(
-                                   version = AnimalCountVersion.ADD,
-                                   date = dateToday()
-                               )
-                           )
-                       )
-                   },
-                   onWriteOffClick = {
-                       viewModel.onIntent(
-                           AnimalCountIntent.DialogClicked(
-                               true,
-                               DomainAnimalCountPrice(
-                                   version = AnimalCountVersion.WRITE_OFF,
-                                   date = dateToday()
-                               )
-                           )
-                       )
-                   },
-                   onSellClick = {
-                       viewModel.onIntent(
-                           AnimalCountIntent.DialogClicked(
-                               true,
-                               DomainAnimalCountPrice(
-                                   version = AnimalCountVersion.SALE,
-                                   date = dateToday()
-                               )
-                           )
-                       )
-                   },
-                   onExpensesClick = {
-                       viewModel.onIntent(
-                           AnimalCountIntent.DialogClicked(
-                               true,
-                               DomainAnimalCountPrice(
-                                   version = AnimalCountVersion.EXPENSES,
-                                   date = dateToday()
-                               )
-                           )
-                       )
-                   },
-                   onKillClick = {
-                       viewModel.onIntent(
-                           AnimalCountIntent.DialogClicked(
-                               true,
-                               DomainAnimalCountPrice(
-                                   version = AnimalCountVersion.KILL,
-                                   date = dateToday()
-                               )
-                           )
-                       )
-                   }
-               )*/
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -281,10 +149,11 @@ fun AnimalCountScreen(
                         errorState = state.error,
                         onIntent = viewModel::onIntent,
                         isEntry = state.isEntry,
-                        isAnimalGroup = state.animal.group,
                         isAutoPrice = state.isAutoPrice,
                         countAllAnimal = state.currentAnimal.count,
                         buyerList = state.buyerList,
+                        price = state.price,
+                        priceAll = state.priceAll
                     )
 
                 AnimalCountVersion.EXPENSES ->
@@ -292,11 +161,12 @@ fun AnimalCountScreen(
                         state = state.domainAnimalCountPrice,
                         errorState = state.error,
                         isEntry = state.isEntry,
-                        isAnimalGroup = state.animal.group,
                         isAutoPrice = state.isAutoPrice,
                         countAllAnimal = state.currentAnimal.count,
                         countSuffix = state.currentAnimal.suffix,
-                        onIntent = viewModel::onIntent
+                        onIntent = viewModel::onIntent,
+                        price = state.price,
+                        priceAll = state.priceAll
                     )
 
                 AnimalCountVersion.KILL ->
@@ -318,11 +188,12 @@ fun AnimalCountScreen(
                         state = state.domainAnimalCountPrice,
                         errorState = state.error,
                         isEntry = state.isEntry,
-                        isAnimalGroup = state.animal.group,
                         isAutoPrice = state.isAutoPrice,
                         countAllAnimal = state.currentAnimal.count,
                         countSuffix = state.currentAnimal.suffix,
-                        onIntent = viewModel::onIntent
+                        onIntent = viewModel::onIntent,
+                        price = state.price,
+                        priceAll = state.priceAll
                     )
 
                 AnimalCountVersion.ADD ->
@@ -354,9 +225,11 @@ fun AnimalCountScreen(
         if (state.openWarningDialog) {
             val textWarning = stringResource(
                 when (state.openWarningDeleteAllDialog) {
-                    true -> R.string.animal_count_screen_warning_minus_and_delete_text
-                    false -> R.string.animal_count_screen_warning_product_delete_all_text
-                    null -> R.string.animal_count_screen_warning_text
+                    WarningAnimalCount.DELETE_MINUS -> R.string.animal_count_screen_warning_minus_and_delete_text
+                    WarningAnimalCount.DELETE -> R.string.animal_count_screen_warning_product_delete_all_text
+                    WarningAnimalCount.UPDATE -> R.string.animal_count_screen_warning_product_update_text
+                    WarningAnimalCount.UPDATE_MINUS -> R.string.animal_count_screen_warning_product_update_minus_text
+                    WarningAnimalCount.MINUS -> R.string.animal_count_screen_warning_text
                 }
             )
             AlertDialogWarningAnimal(
@@ -365,96 +238,110 @@ fun AnimalCountScreen(
                 onDismissClick = { viewModel.onIntent(AnimalCountIntent.WarningEndDialogClicked) }
             )
         }
-//        if (state.openWarningDeleteDialog) {
-//            AlertDialogWarningAnimal(
-//                textWarning = stringResource(R.string.animal_count_screen_warning_product_delete_text),
-//                onConfirmationClick = { viewModel.onIntent(AnimalCountIntent.WarningDeleteConrPressed) },
-//                onDismissClick = { viewModel.onIntent(AnimalCountIntent.WarningDeleteEndDialogClicked) }
-//            )
-//        }
     }
 }
 
 @SuppressLint("RememberInComposition")
-@ExperimentalMaterial3ExpressiveApi
 @Composable
-fun FabMenu2() {
-
-}
-
-/*@Composable
-fun FabMenu(
-    onAddClick: () -> Unit = {},
-    onWriteOffClick: () -> Unit = {},
-    onSellClick: () -> Unit = {},
-    onKillClick: () -> Unit = {},
-    onExpensesClick: () -> Unit = {}
+fun FabMenu2(
+    isListEmpty: Boolean,
+    onClick: (Pair<AnimalCountVersion, Boolean>) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    val items =
+        listOf(
+            Triple(R.drawable.icons8__meat60, R.string.button_kill, AnimalCountVersion.KILL),
+            Triple(
+                R.drawable.baseline_add_shopping_cart_24, R.string.button_expenses,
+                AnimalCountVersion.EXPENSES
+            ),
+            Triple(
+                R.drawable.baseline_edit_note_24, R.string.button_write_off,
+                AnimalCountVersion.WRITE_OFF
+            ),
+            Triple(R.drawable.baseline_add_card_24, R.string.button_sale, AnimalCountVersion.SALE),
+            Triple(R.drawable.icon_add, R.string.button_add, AnimalCountVersion.ADD)
+        )
+    var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    val focusRequester = FocusRequester()
+    FloatingActionButtonMenu(
+        expanded = fabMenuExpanded,
+        button = {
+            ToggleFloatingActionButton(
+                modifier =
+                    Modifier
+                        .semantics {
+                            traversalIndex = -1f
+                            stateDescription =
+                                if (fabMenuExpanded) "Expanded" else "Collapsed"
+                            contentDescription = "Toggle menu"
+                        }
+                        .animateFloatingActionButton(
+                            visible = isListEmpty || fabMenuExpanded,
+                            alignment = Alignment.BottomEnd,
+                        )
+                        .focusRequester(focusRequester),
+                checked = fabMenuExpanded,
+                onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
+            ) {
+                val imageVector by remember {
+                    derivedStateOf {
+                        if (checkedProgress > 0.5f) R.drawable.baseline_clear_24 else R.drawable.icon_add
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        // Кнопки-меню
-        Column(
-            Modifier.padding(bottom = 72.dp, end = 16.dp),
-            Arrangement.spacedBy(12.dp),
-            Alignment.End
-        ) {
-            AnimatedVisibility(visible = expanded) {
-                SmallFloatingActionButton(
-                    onClick = onAddClick,
-                ) { Icon(Icons.Default.Add, contentDescription = "Добавить") }
-            }
-
-            AnimatedVisibility(visible = expanded) {
-                SmallFloatingActionButton(
-                    onClick = onWriteOffClick,
-                ) { Icon(Icons.Default.Edit, contentDescription = "Cписать") }
-            }
-
-            AnimatedVisibility(visible = expanded) {
-                SmallFloatingActionButton(
-                    onClick = onSellClick,
-                ) { Icon(Icons.Default.ShoppingCart, contentDescription = "Продать") }
-            }
-
-            AnimatedVisibility(visible = expanded) {
-                SmallFloatingActionButton(
-                    onClick = onExpensesClick,
-                ) {
-                    Icon(
-                        painterResource(R.drawable.baseline_add_card_24),
-                        contentDescription = "Покупать"
-                    )
+                    }
                 }
+                Icon(
+                    painter = painterResource(imageVector),
+                    contentDescription = null,
+                    modifier = Modifier.animateIcon({ checkedProgress }),
+                )
             }
-
-            AnimatedVisibility(visible = expanded) {
-                SmallFloatingActionButton(
-                    onClick = onKillClick,
-                ) {
-                    Icon(
-                        painterResource(R.drawable.icons8__meat100),
-                        contentDescription = "Забой"
-                    )
-                }
+        },
+        content = {
+            items.forEachIndexed { i, item ->
+                FloatingActionButtonMenuItem(
+                    modifier =
+                        Modifier
+                            .semantics {
+                                isTraversalGroup = true
+                                if (i == items.size - 1) {
+                                    customActions =
+                                        listOf(
+                                            CustomAccessibilityAction(
+                                                label = "Close menu",
+                                                action = {
+                                                    fabMenuExpanded = false
+                                                    true
+                                                }
+                                            )
+                                        )
+                                }
+                            }
+                            .then(
+                                if (i == 0) {
+                                    Modifier.onKeyEvent {
+                                        if (
+                                            it.type == KeyEventType.KeyDown &&
+                                            (it.key == Key.DirectionUp ||
+                                                    (it.isShiftPressed && it.key == Key.Tab))
+                                        ) {
+                                            focusRequester.requestFocus()
+                                            return@onKeyEvent true
+                                        }
+                                        return@onKeyEvent false
+                                    }
+                                } else Modifier
+                            ),
+                    onClick = {
+                        onClick(item.third to (i == 0))
+                        fabMenuExpanded = false
+                    },
+                    icon = { Icon(painterResource(item.first), contentDescription = null) },
+                    text = { Text(stringResource(item.second)) },
+                )
             }
         }
-
-        // Основная FAB
-        FloatingActionButton(
-            onClick = { expanded = !expanded },
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Icon(
-                if (expanded) Icons.Default.Close else Icons.Default.Menu,
-                contentDescription = "Меню"
-            )
-        }
-    }
-}*/
+    )
+}
 
 @Composable
 private fun AnimalCountContainer(
@@ -466,7 +353,7 @@ private fun AnimalCountContainer(
         VaccinationList2(
             modifier = modifier,
             indicatorsList = state.countList,
-            onEditClick = { onIntent(AnimalCountIntent.DialogClicked(false, it)) }
+            onEditClick = { onIntent(AnimalCountIntent.DialogClicked(false, it.first, it.second)) }
         )
     else MessageNoData(
         modifier = modifier,
@@ -481,7 +368,7 @@ private fun AnimalCountContainer(
 private fun VaccinationList2(
     modifier: Modifier,
     indicatorsList: List<DomainAnimalCountPrice>,
-    onEditClick: (DomainAnimalCountPrice) -> Unit
+    onEditClick: (Pair<DomainAnimalCountPrice, Boolean>) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -492,7 +379,7 @@ private fun VaccinationList2(
                 if (index < indicatorsList.size - 1) indicatorsList[index + 1] else null
             CountCard(
                 modifier = Modifier.clickable {
-                    onEditClick(item)
+                    onEditClick(item to (item.version == AnimalCountVersion.KILL))
                 },
                 domainAnimalCount = item,
                 previousDomainAnimalCount = previousItem

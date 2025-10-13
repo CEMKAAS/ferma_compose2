@@ -61,6 +61,10 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.material3.window.size.class1)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
+    implementation("androidx.compose.material:material:1.9.3")
+    // Icon
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     // Import the Compose BOM
     implementation(platform("androidx.compose:compose-bom:2025.10.00"))

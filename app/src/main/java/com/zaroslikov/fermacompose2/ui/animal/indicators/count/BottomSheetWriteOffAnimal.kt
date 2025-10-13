@@ -7,20 +7,21 @@ import androidx.compose.runtime.Composable
 import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.elements.CountBottomSheet2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 @Composable
 fun BottomSheetWriteOffAnimal(
     state: DomainAnimalCountPrice,
     errorState: AnimalCountState.Error,
     isEntry: Boolean,
-    isAnimalGroup: Boolean,
     isAutoPrice: Boolean,
+    price: String,
+    priceAll: String,
     countAllAnimal: String,
     countSuffix: Suffix,
     onIntent: (AnimalCountIntent) -> Unit
@@ -45,17 +46,17 @@ fun BottomSheetWriteOffAnimal(
             suffix = countSuffix,
         )
         OutlinedPriceInput(
-            price = state.price?.formatNumber(false) ?: "",
+            price = price,
             onPriceChange = {
                 onIntent(AnimalCountIntent.PriceChanged(it))
             },
-            priceAll = state.priceAll?.formatNumber(false) ?: "",
+            priceAll = priceAll,
             isAutoCalculate = isAutoPrice,
             onAutoCalculate = {
                 onIntent(AnimalCountIntent.AutoPriceClicked(it))
             },
             isManyCount = true,
-            supportTextRes = if (isAnimalGroup) R.string.support_text_price_animals else R.string.support_text_price_animal,
+            supportTextRes = R.string.support_text_price_animals,
             supportTextResAutoCal = R.string.support_text_price_one_animals,
         )
         OutlinedTextDate(
@@ -66,9 +67,7 @@ fun BottomSheetWriteOffAnimal(
             value = state.note,
             onValueChange = {
                 onIntent(AnimalCountIntent.NoteChanged(it))
-            },
-            label = R.string.outlined_text_reason,
-            supportingText = R.string.support_text_write_off_animal_reason,
+            }
         )
     }
 }
