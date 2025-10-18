@@ -1,10 +1,12 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -26,13 +28,8 @@ import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogAddAnimal
-import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
-import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogKillAnimal
-import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogSaleAnimal
-import com.zaroslikov.fermacompose2.ui.animal.animal_dialog.AlertDialogWriteOffAnimal
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogArchiveAnimal
 import com.zaroslikov.fermacompose2.ui.elements.ButtonArchive
-import com.zaroslikov.fermacompose2.ui.elements.ButtonCustom
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.IconAndText
@@ -41,7 +38,7 @@ import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNoteWidget
 import com.zaroslikov.fermacompose2.ui.elements.TextAndIconRow
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
-//import com.zaroslikov.fermacompose2.ui.finance.PullOutCard
+import com.zaroslikov.fermacompose2.ui.finance.analysis.PullOutCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
@@ -67,7 +64,7 @@ fun AnimalCardProduct(
 ) {
     val eventFlow = viewModel.navigation
     val state by viewModel.state.collectAsStateWithLifecycle()
-//    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
@@ -82,7 +79,8 @@ fun AnimalCardProduct(
             title = stringResource(R.string.animal_card_screen_animal_card),
             true,
             navigateUp = navigateBack,
-            settingUp = { onNavigateSetting(state.itemIdPT to state.itemId) }
+            settingUp = { onNavigateSetting(state.itemIdPT to state.itemId) },
+            scrollBehavior = scrollBehavior
         )
     }) { innerPadding ->
         if (state.isLoading)
@@ -94,11 +92,11 @@ fun AnimalCardProduct(
                 modifier = Modifier
                     .modifierScreen(innerPadding),
                 state = state,
+                onIntent = viewModel::onIntent,
                 onNavigateSize = { onNavigateSize(state.itemIdPT to state.itemId) },
-                onNavigateCount = { onNavigateCount(state.itemIdPT to state.itemId)},
+                onNavigateCount = { onNavigateCount(state.itemIdPT to state.itemId) },
                 onNavigateWeight = { onNavigateWeight(state.itemIdPT to state.itemId) },
-                onNavigateVaccination = { onNavigateVaccination(state.itemIdPT to state.itemId) },
-                onIntent = viewModel::onIntent
+                onNavigateVaccination = { onNavigateVaccination(state.itemIdPT to state.itemId) }
             )
     }
 }
@@ -128,24 +126,22 @@ fun AnimalCardContainer(
             onNavigateVaccination = onNavigateVaccination
         )
         NoteWidget(state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
-        /*   PullOutCard(
-               modifier = Modifier,
-               intRes = R.string.animal_card_screen_animal_card_product,
-               intTitleText = R.string.alert_dialog_info_title_product_add,
-               intText = R.string.alert_dialog_info_text_product_add,
-               list = animalProductTable
-           ) {
-               Pair(it.title, "${it.priceAll} ${it.suffix}")
-           }
-           PullOutCard(
-               modifier = Modifier,
-               intRes = R.string.animal_card_screen_animal_card_product_sale,
-               intTitleText = R.string.alert_dialog_info_title_product_sale,
-               intText = R.string.alert_dialog_info_text_product_sale,
-               list = animalProductTable
-           ) {
-               Pair(it.title, "${it.priceAll} ${it.suffix}")
-           }
+        PullOutCard(
+            intRes = R.string.animal_card_screen_animal_card_product,
+            intTitleText = R.string.alert_dialog_info_title_product_add,
+            intText = R.string.alert_dialog_info_text_product_add,
+            list = state.productList
+        ) {
+            it.title to "${it.count.formatNumber()} ${stringResource(it.suffix.toResId())}"
+        }
+        /*PullOutCard(
+            intRes = R.string.animal_card_screen_animal_card_product_sale,
+            intTitleText = R.string.alert_dialog_info_title_product_sale,
+            intText = R.string.alert_dialog_info_text_product_sale,
+            list = animalProductTable
+        ) {
+            Pair(it.title, "${it.priceAll} ${it.suffix}")
+        }
            PullOutCard(
                modifier = Modifier,
                intRes = R.string.animal_card_screen_animal_card_product_expenses,
@@ -155,60 +151,11 @@ fun AnimalCardContainer(
            ) {
                Pair(it.title, "${it.priceAll} ${it.suffix}")
            }*/
-        ButtonPanel(
-            onKillClick = { onIntent(AnimalCardIntent.DialogKillClicked(true)) },
-            onAddClick = { onIntent(AnimalCardIntent.DialogAddClicked(true)) },
-            onSaleClick = { onIntent(AnimalCardIntent.DialogSaleClicked(true)) },
-            onWriteOffClick = { onIntent(AnimalCardIntent.DialogWriteOffClicked(true)) },
-            onArchiveClick = {
-//                openArchiveDialog = !openArchiveDialog
-            }
-        )
-
-        if (state.openKillDialog)
-            AlertDialogKillAnimal(
-                state = state.actionAnimal,
-                onIntent = onIntent,
-                isAnimalGroup = state.animal.group,
-                countAnimalAll = state.countAnimal.count,
-                countSuffix = state.countAnimal.suffix,
-                weight = state.weight?.weight,
-                weightSuffix = state.weight?.suffix,
-            )
-        if (state.openSaleDialog)
-            AlertDialogSaleAnimal(
-                state = state.actionAnimal,
-                onIntent = onIntent,
-                isAnimalGroup = state.animal.group,
-                countAll = state.countAnimal.count,
-                countSuffix = state.countAnimal.suffix,
-                buyerList = state.buyerList
-            )
-        if (state.openWriteOffDialog)
-            AlertDialogWriteOffAnimal(
-                state = state.actionAnimal,
-                onIntent = onIntent,
-                isAnimalGroup = state.animal.group,
-                countAll = state.countAnimal.count,
-                countSuffix = state.countAnimal.suffix
-            )
-        if (state.openAddDialog)
-            AlertDialogAddAnimal(
-                state = state.actionAnimal,
-                onIntent = onIntent,
-                countAllAnimal = state.countAnimal.count
-            )
-        /*    if (openArchiveDialog)
-                     AlertDialogArchiveAnimal(
-                         onConfirmation = { openArchiveDialog = !openArchiveDialog },
-                         onArchiveClick = updateArchive
-                     )*/
-        if (state.openSoloDialog)
-            AlertDialogGroupToSolo(
-                sex = state.animal.sex,
-                onUpdateSex = { onIntent(AnimalCardIntent.SexClicked(it)) },
-                onConfirmation = { onIntent(AnimalCardIntent.DialogSoloClicked(false)) },
-                onSave = { onIntent(AnimalCardIntent.SaveGroupPressed) }
+        ButtonArchive { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(true)) }
+        if (state.isOpenArchiveDialog)
+            AlertDialogArchiveAnimal(
+                onConfirmation = { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(false)) },
+                onArchiveClick = { onIntent(AnimalCardIntent.ArchiveAnimalPressed) }
             )
     }
 }
@@ -334,46 +281,3 @@ private fun NoteWidget(
     }
 }
 
-
-@Composable
-private fun ButtonPanel(
-    onSaleClick: () -> Unit,
-    onKillClick: () -> Unit,
-    onAddClick: () -> Unit,
-    onWriteOffClick: () -> Unit,
-    onArchiveClick: () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ButtonCustom(
-                modifier = Modifier.weight(1f),
-                onClick = onSaleClick,
-                intRes = R.string.button_sale,
-                drawableRes = R.drawable.baseline_add_card_24
-            )
-            ButtonCustom(
-                modifier = Modifier.weight(1f),
-                onClick = onKillClick,
-                intRes = R.string.button_kill,
-                drawableRes = R.drawable.icons8__meat60
-            )
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ButtonCustom(
-                modifier = Modifier.weight(1f),
-                onClick = onAddClick,
-                intRes = R.string.button_add,
-                drawableRes = R.drawable.baseline_add_circle_outline_24
-            )
-            ButtonCustom(
-                modifier = Modifier.weight(1f),
-                onClick = onWriteOffClick,
-                intRes = R.string.button_write_off,
-                drawableRes = R.drawable.baseline_edit_note_24
-            )
-        }
-        ButtonArchive { onArchiveClick() }
-    }
-}

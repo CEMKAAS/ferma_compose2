@@ -13,6 +13,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
+import com.zaroslikov.fermacompose2.supportFun.toFormatNumber2
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
@@ -79,7 +80,7 @@ fun ErrorSupportTextSlash(
         isAnimal -> Text(
             text = stringResource(
                 R.string.support_text_count_sale_animals,
-                countAnimals.toFormatNumber(),
+                countAnimals.toFormatNumber2(),
                 stringResource(suffix.toResId())
             )
         )

@@ -159,6 +159,7 @@ class AnimalCountViewModel @Inject constructor(
         ) { animal, count, countList ->
             Triple(animal, count, countList)
         }.collectLatest { data ->
+            Log.i("count23", "loadData: ${data.second}")
             updateState {
                 it.copy(
                     idPT = itemIdPT,
@@ -247,7 +248,6 @@ class AnimalCountViewModel @Inject constructor(
                 ),
                 error = state.error.copy(
                     isErrorCount = countAnimal.isBlank(),
-//                    isErrorCountMore = isErrorCountMore,
                     isErrorCountZero = isAnimalCountZero(countAnimal)
                 )
             )
@@ -437,7 +437,8 @@ class AnimalCountViewModel @Inject constructor(
         validation(
             validation = { validationKill() },
             transaction = Transaction.INSERT,
-            isDeleteKill = true
+            isWarningMinus = null,
+            isKillValidation = true
         ) {
             val productList = getState().productKill
             val countId =
@@ -456,7 +457,8 @@ class AnimalCountViewModel @Inject constructor(
         validation(
             validation = { validationKill() },
             transaction = Transaction.UPDATE,
-            isDeleteKill = false,
+            isWarningMinus = false,
+            isKillValidation = true
         ) {
             val productList = getState().productKill
             animalCountRepository.updateAnimalCountTable(domainAnimalCount())
@@ -620,15 +622,16 @@ class AnimalCountViewModel @Inject constructor(
     private fun validation(
         validation: suspend () -> Unit,
         transaction: Transaction,
-        isDeleteKill: Boolean? = null,
+        isWarningMinus: Boolean? = null,
+        isKillValidation: Boolean = false,
         mainAction: suspend () -> Unit
     ) {
         viewModelScope.launch {
             validation()
             val hasAnyError =
-                if (isDeleteKill == false) getState().hasAnyError && getState().hasFieldError else getState().hasAnyError
+                if (isKillValidation == false) getState().hasAnyError else getState().hasAnyError && getState().hasFieldError
             if (hasAnyError) {
-                val isError = validation2(transaction, isDeleteKill)
+                val isError = validation2(transaction, isWarningMinus)
                 val confirmed = awaitConfirmationIfNeeded(isError)
                 if (confirmed) {
                     mainAction()
@@ -828,13 +831,7 @@ class AnimalCountViewModel @Inject constructor(
     }
 
     private fun updateWarning() {
-        updateState {
-            it.copy(
-                openWarningDialog = false,
-                error = it.error.copy(
-                    isErrorCountDifference = false
-                )
-            )
+        updateState { it.copy(openWarningDialog = false,)
         }
         updateOpenWarningDialog(false, true)
     }
@@ -853,15 +850,17 @@ class AnimalCountViewModel @Inject constructor(
         val countAll = getState().currentAnimal.count.toInt()
         val count = getState().domainAnimalCountPrice.count.toConvertZero()
         val countOld = getState().oldCount.toConvertZero()
-        val isError = when (transaction) {
-            Transaction.INSERT -> insert2(countAll, countOld)
+        val isError = if (countAll >= 0) when (transaction) {
+            Transaction.INSERT -> insert2(countAll, count)
             Transaction.UPDATE -> edit2(countAll, countOld, count)
             Transaction.DELETE -> delete2(countAll, countOld)
-        }
+        } else false
         Log.i("count23", "isError: $isError ")
         Log.i(
             "count23",
-            "transaction: $transaction version: ${getState().domainAnimalCountPrice.version}"
+            "countAll Boolean: ${countAll >= 0} " +
+                    "countAll: $countAll, transaction: $transaction version: ${getState().domainAnimalCountPrice.version}" +
+                    " isError: ${isError}"
         )
         val delete2 = when {
             isError && delete == true -> WarningAnimalCount.DELETE_MINUS
@@ -892,6 +891,10 @@ class AnimalCountViewModel @Inject constructor(
     }
 
     private fun insert2(countAll: Int, count: Int): Boolean {
+        Log.i(
+            "count23",
+            "edit2: countAll: $countAll, count: $count total Add: ${false} total Sale: ${0 > countAll - count}"
+        )
         return when (getState().domainAnimalCountPrice.version) {
             AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR, null -> {
                 false
@@ -972,7 +975,7 @@ sealed class AnimalCountIntent : BaseIntent {
     data class NoteChanged(val value: String) : AnimalCountIntent()
     data class PriceChanged(val value: String) : AnimalCountIntent()
     data class AutoPriceClicked(val value: Boolean) : AnimalCountIntent()
-    data class DeleteCountPressed(val value: Long, val delete: Boolean = false) :
+    data class DeleteCountPressed(val value: Long, val delete: Boolean? = null) :
         AnimalCountIntent()
 
     // Add Count Animal

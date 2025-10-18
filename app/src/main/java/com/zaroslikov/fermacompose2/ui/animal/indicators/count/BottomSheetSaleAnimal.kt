@@ -43,8 +43,7 @@ fun BottomSheetSaleAnimal(
                 onIntent(AnimalCountIntent.CountChanged(it))
             },
             isError = errorState.isErrorCount,
-//            isErrorCountMore = error.isErrorCountMore,
-//            isErrorCountZero = error.isErrorCountZero,
+            isErrorCountZero = errorState.isErrorCountZero,
             intRes = R.string.outlined_text_field_quantity,
             countAnimalAll = countAllAnimal,
             suffix = state.suffix,

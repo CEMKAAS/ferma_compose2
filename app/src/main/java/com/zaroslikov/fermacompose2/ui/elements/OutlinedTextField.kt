@@ -3,6 +3,7 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -455,6 +456,7 @@ fun OutlinedTextCountAnimal2(
         isErrorCountMore -> R.string.error_count_sale_animals
         else -> R.string.error_no_count_product
     }
+    Log.i("count23", "OutlinedTextCountAnimal2: $countAnimalAll ")
 
     val error = isError || isErrorCountZero || isErrorCountMore
 

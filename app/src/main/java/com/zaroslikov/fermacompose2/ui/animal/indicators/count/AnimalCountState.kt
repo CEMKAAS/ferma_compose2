@@ -51,21 +51,19 @@ data class AnimalCountState(
     data class Error(
         val isErrorPrice: Boolean = false,
         val isErrorCount: Boolean = false,
-        val isErrorCountMore: Boolean = false,
         val isErrorCountZero: Boolean = false,
-        val isErrorCountDifference: Boolean = false,
     ) : BaseError {
         fun hasAnyError(animalCountVersion: AnimalCountVersion?): Boolean {
             Log.i(
                 "count23",
-                "hasAnyError: isErrorPrice: ${isErrorPrice}, isErrorCount: $isErrorCount, isErrorCountMore: $isErrorCountMore, isErrorCountZero: $isErrorCountZero, isErrorCountDifference: $isErrorCountDifference"
+                "hasAnyError: isErrorPrice: ${isErrorPrice}, isErrorCount: $isErrorCount, isErrorCountZero: $isErrorCountZero"
             )
             return when (animalCountVersion) {
-                AnimalCountVersion.SALE -> isErrorPrice || isErrorCount || isErrorCountMore || isErrorCountZero
-                AnimalCountVersion.EXPENSES -> isErrorPrice || isErrorCount || isErrorCountMore || isErrorCountZero
-                AnimalCountVersion.KILL -> isErrorCount || isErrorCountMore || isErrorCountZero
-                AnimalCountVersion.WRITE_OFF -> isErrorCount || isErrorCountMore || isErrorCountZero || isErrorCountDifference
-                AnimalCountVersion.ADD -> isErrorCount || isErrorCountDifference
+                AnimalCountVersion.SALE -> isErrorPrice || isErrorCount ||  isErrorCountZero
+                AnimalCountVersion.EXPENSES -> isErrorPrice || isErrorCount || isErrorCountZero
+                AnimalCountVersion.KILL -> isErrorCount || isErrorCountZero
+                AnimalCountVersion.WRITE_OFF -> isErrorCount || isErrorCountZero
+                AnimalCountVersion.ADD -> isErrorCount  || isErrorCountZero
                 AnimalCountVersion.INCUBATOR -> TODO()
                 null -> TODO()
             }

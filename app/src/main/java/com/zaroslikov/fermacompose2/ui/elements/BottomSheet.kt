@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
-
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 
 @ExperimentalMaterial3Api
@@ -34,9 +33,10 @@ fun CountBottomSheet2(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
-    ) {
-        Column(modifier = Modifier.modifierBottomSheet()) {
+        sheetState = sheetState,
+
+        ) {
+        Column(modifier = Modifier.modifierBottomSheet(false)) {
             IconAndText(
                 modifier = Modifier.fillMaxWidth(),
                 iconRes = version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
@@ -61,6 +61,7 @@ fun CountBottomSheet2(
                 onClickUpdate = onUpdate,
                 onClickDelete = onDelete
             )
+
         }
     }
 }

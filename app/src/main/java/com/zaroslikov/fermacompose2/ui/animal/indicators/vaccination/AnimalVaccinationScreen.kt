@@ -255,7 +255,7 @@ private fun VaccinationBottomSheet(
         onDismissRequest = { onIntent(AnimalVaccinationIntent.EndDialogClicked) },
         sheetState = sheetState
     ) {
-        Column(modifier = Modifier.modifierBottomSheet()) {
+        Column(modifier = Modifier.modifierBottomSheet(true)) {
             OutlinedTextTitleAdd(
                 value = state.domainAnimalVaccination.vaccination,
                 onValueChange = { onIntent(AnimalVaccinationIntent.VaccinationChanged(it)) },

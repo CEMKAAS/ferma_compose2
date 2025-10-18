@@ -24,6 +24,7 @@ import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.infoTextKillAnimal
 import com.zaroslikov.fermacompose2.supportFun.isAnimalWeightIncrease
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble2
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.CardField
@@ -59,7 +60,7 @@ fun BottomSheetKillAnimal(
         topContent = {
             CardTotal(
                 productList = productKill,
-                countAnimal = countAnimalAll,
+                countAnimal = state.count,
                 weightAnimal = weight,
                 isAnimalGroup = isAnimalGroup
             )
@@ -71,8 +72,7 @@ fun BottomSheetKillAnimal(
                 onIntent(AnimalCountIntent.CountChanged(it))
             },
             isError = errorState.isErrorCount,
-//                        isErrorCountMore = error.isErrorCountMore,
-//                        isErrorCountZero = error.isErrorCountZero,
+            isErrorCountZero = errorState.isErrorCountZero,
             countAnimalAll = countAnimalAll,
             suffix = countSuffix,
         )
@@ -160,7 +160,8 @@ private fun CardTotal(
     weightAnimal: DomainAnimalWeight?,
     isAnimalGroup: Boolean
 ) {
-    val weight = weightAnimal?.weight
+    val weight =
+        if (weightAnimal?.weight != null && countAnimal.toConvertZeroDouble2() > 0) weightAnimal.weight else null
     val weightSuffixNotNull = weightAnimal?.suffix ?: Suffix.KILOGRAM
     val suffixList = setOf(
         Suffix.GRAM,

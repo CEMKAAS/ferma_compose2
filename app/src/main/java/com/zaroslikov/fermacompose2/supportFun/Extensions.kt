@@ -53,6 +53,11 @@ fun String.toConvertZeroDouble(): Double {
         .toDouble()
 }
 
+fun String.toConvertZeroDouble2(): Double {
+    return if (this == "") 0.0 else this.replace(",", ".").trim()
+        .toDouble()
+}
+
 fun String.toConvertZeroTooOneDouble(): Double {
     return if (this == "") 1.0 else this.toDouble()
 }
@@ -62,6 +67,14 @@ fun String.toFormatNumber(): String {
     numberFormat.minimumFractionDigits = 0
     numberFormat.maximumFractionDigits = 2
     return numberFormat.format(this.toConvertZeroDouble()).toString()
+}
+
+
+fun String.toFormatNumber2(): String {
+    val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
+    numberFormat.minimumFractionDigits = 0
+    numberFormat.maximumFractionDigits = 2
+    return numberFormat.format(this.toConvertZeroDouble2()).toString()
 }
 
 fun getImageWriteOff(

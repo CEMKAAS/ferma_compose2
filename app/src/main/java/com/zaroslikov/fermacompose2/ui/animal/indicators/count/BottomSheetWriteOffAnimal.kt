@@ -41,7 +41,7 @@ fun BottomSheetWriteOffAnimal(
                 onIntent(AnimalCountIntent.CountChanged(it))
             },
             isError = errorState.isErrorCount,
-            isErrorCountMore = errorState.isErrorCountMore,
+            isErrorCountZero = errorState.isErrorCountZero,
             countAnimalAll = countAllAnimal,
             suffix = countSuffix,
         )

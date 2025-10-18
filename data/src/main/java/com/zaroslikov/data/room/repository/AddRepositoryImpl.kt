@@ -124,8 +124,8 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
             .map { it -> it.map { it.toDomainAnimalCountSuffix() } }
     }
 
-    override fun getProductAnimal(name: String): Flow<List<DomainAnimalCountSuffix>> {
-        return addDao.getProductAnimal(name).map { it -> it.map { it.toDomainAnimalCountSuffix() } }
+    override fun getProductAnimal(idAnimal: Long): Flow<List<DomainAnimalCountSuffix>> {
+        return addDao.getProductAnimal(idAnimal).map { it -> it.map { it.toDomainAnimalCountSuffix() } }
     }
 
     override fun getProductKillList(id: Long): Flow<List<DomainAddTable>> {

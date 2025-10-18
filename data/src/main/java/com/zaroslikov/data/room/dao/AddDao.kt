@@ -113,7 +113,7 @@ interface AddDao {
 
     @Query(
         "SELECT" +
-                " (SELECT name FROM animal_table WHERE id = animal_id) as animalName," +
+                " (SELECT name FROM animal_table WHERE id = animal_id) as title," +
                 " COALESCE(SUM(count),0) AS count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
@@ -161,7 +161,7 @@ interface AddDao {
 
     @Query(
         "SELECT" +
-                " (SELECT name FROM animal_table WHERE id = animal_id) as animalName," +
+                " (SELECT name FROM animal_table WHERE id = animal_id) as title," +
                 " COALESCE(SUM(count),0) AS count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
@@ -180,15 +180,28 @@ interface AddDao {
 
     @Query(
         "SELECT" +
+                " title," +
+                " COALESCE(SUM(count), 0.0) AS count," +
+                " count_suffix AS suffix" +
+                " FROM add_table" +
+                " WHERE animal_id=:idAnimal" +
+                " GROUP BY title" +
+                " ORDER BY count DESC"
+    )
+    fun getProductAnimal(idAnimal: Long): Flow<List<AnimalCountSuffixDto>>
+
+
+    /*@Query(
+        "SELECT" +
                 " (SELECT name FROM animal_table WHERE id = animal_id) as animalName," +
                 " COALESCE(SUM(count), 0.0) AS count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
-                " WHERE title=:name" +
+                " WHERE animal_id=:idAnimal" +
                 " GROUP BY title" +
                 " ORDER BY count DESC"
     )
-    fun getProductAnimal(name: String): Flow<List<AnimalCountSuffixDto>>
+    fun getProductAnimal(idAnimal: Long): Flow<List<AnimalCountSuffixDto>>*/
 
 
     @Query("SELECT * FROM add_table WHERE animal_count_id =:id")

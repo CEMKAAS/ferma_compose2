@@ -3,6 +3,14 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Attachment
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Snooze
+import androidx.compose.material.icons.outlined.MarkEmailUnread
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AppBarRow
 
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -24,6 +32,7 @@ import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.window.core.layout.WindowSizeClass
 import com.zaroslikov.fermacompose2.R
 import kotlinx.coroutines.CoroutineScope
@@ -38,9 +47,6 @@ fun TopAppBarNavigation(
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
         title = {
             Text(text = stringResource(title))
         },
@@ -72,11 +78,12 @@ fun TopAppBarBack(
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     CenterAlignedTopAppBar(
-//        colors = TopAppBarDefaults.largeTopAppBarColors(
-//            titleContentColor = MaterialTheme.colorScheme.primary,
-//        ),
+        colors = TopAppBarDefaults.largeTopAppBarColors(
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
         title = {
-            Text(text = if (intRes != null) stringResource(intRes) else title)
+            Text(text = if (intRes != null) stringResource(intRes) else title,   maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
         },
         navigationIcon = {
             IconButton(onClick = navigateUp) {
@@ -127,9 +134,6 @@ fun TopAppBarBack2(
         )
     val items = listOf("Attachment", "Edit", "Star", "Snooze", "Mark unread")
     TopAppBar(
-//        colors = TopAppBarDefaults.largeTopAppBarColors(
-//            titleContentColor = MaterialTheme.colorScheme.primary,
-//        ),
         title = {
             Text(text = if (intRes != null) stringResource(intRes) else title)
         },
@@ -141,6 +145,7 @@ fun TopAppBarBack2(
                 )
             }
         },
+        windowInsets = WindowInsets(),
         scrollBehavior = scrollBehavior,
         actions = {
             AppBarRow(

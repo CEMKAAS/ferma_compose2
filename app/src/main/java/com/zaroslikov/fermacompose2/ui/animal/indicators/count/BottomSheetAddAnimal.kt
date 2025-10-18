@@ -51,6 +51,7 @@ fun BottomSheetAddAnimal(
             countAnimalAll = countAllAnimal,
             suffix = state.suffix,
             isError = errorState.isErrorCount,
+            isErrorCountZero = errorState.isErrorCountZero,
             modifier = Modifier.focusRequester(focusRequester)
         )
         OutlinedTextDate(

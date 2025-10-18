@@ -302,7 +302,7 @@ private fun SizeBottomSheet(
         onDismissRequest = { onIntent(AnimalWeightIntent.EndDialogClicked) },
         sheetState = sheetState
     ) {
-        Column(modifier = Modifier.modifierBottomSheet()) {
+        Column(modifier = Modifier.modifierBottomSheet(true)) {
             OutlinedTextCount2(
                 value = state.weight,
                 onValueChange = {

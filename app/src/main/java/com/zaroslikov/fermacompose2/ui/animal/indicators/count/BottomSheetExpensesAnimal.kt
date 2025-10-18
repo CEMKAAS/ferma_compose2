@@ -30,7 +30,7 @@ fun BottomSheetExpensesAnimal(
     CountBottomSheet2(
         version = state.version,
         isEntry = isEntry,
-        intEntryButton = R.string.button_text_write_off,
+        intEntryButton = R.string.button_text_expenses,
         onDismiss = { onIntent(AnimalCountIntent.EndDialogClicked) },
         onInsert = { onIntent(AnimalCountIntent.InsertExpensesPressed) },
         onUpdate = { onIntent(AnimalCountIntent.UpdateExpensesPressed) },
@@ -42,7 +42,7 @@ fun BottomSheetExpensesAnimal(
                 onIntent(AnimalCountIntent.CountChanged(it))
             },
             isError = errorState.isErrorCount,
-            isErrorCountMore = errorState.isErrorCountMore,
+            isErrorCountZero = errorState.isErrorCountZero,
             countAnimalAll = countAllAnimal,
             suffix = countSuffix,
         )

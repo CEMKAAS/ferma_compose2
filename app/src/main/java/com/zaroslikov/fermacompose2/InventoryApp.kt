@@ -268,7 +268,8 @@ fun TopAppBarStart(
     title: String,
     settingBoolean: Boolean,
     navigateUp: () -> Unit = {},
-    settingUp: () -> Unit = {}
+    settingUp: () -> Unit = {},
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -277,6 +278,7 @@ fun TopAppBarStart(
         title = {
             Text(text = title)
         },
+        scrollBehavior = scrollBehavior,
         navigationIcon = {
             IconButton(onClick = navigateUp) {
                 Icon(

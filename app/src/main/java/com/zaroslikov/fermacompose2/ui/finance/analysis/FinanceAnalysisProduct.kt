@@ -7,6 +7,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -358,7 +361,7 @@ fun <T> PullOutCard(
         if (list.size > 3)
             IconButton(onClick = { expanded = !expanded }) {
                 Icon(
-                    painterResource(if (expanded ) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down ),
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = "Показать меню"
                 )
             }

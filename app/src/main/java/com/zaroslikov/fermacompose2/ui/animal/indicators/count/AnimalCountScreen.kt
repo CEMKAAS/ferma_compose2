@@ -3,30 +3,24 @@
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Icon
-import androidx.compose.animation.AnimatedVisibility
+import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
@@ -43,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
@@ -86,7 +79,6 @@ import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated3
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import kotlin.math.absoluteValue
 
 object AnimalCountDestination : NavigationDestination {
     override val route = "animalCount"
@@ -142,6 +134,7 @@ fun AnimalCountScreen(
             )
 
         if (state.isOpenDialog) {
+            Log.i("count23", "AnimalCountScreen: ${state.currentAnimal.count} ")
             when (state.domainAnimalCountPrice.version) {
                 AnimalCountVersion.SALE ->
                     BottomSheetSaleAnimal(
@@ -205,14 +198,8 @@ fun AnimalCountScreen(
                         onIntent = viewModel::onIntent
                     )
 
-
-                AnimalCountVersion.INCUBATOR -> {
-                    TODO()
-                }
-
-                null -> {
-                    TODO()
-                }
+                AnimalCountVersion.INCUBATOR -> TODO()
+                null -> TODO()
             }
         }
         if (state.openSoloDialog)
@@ -225,8 +212,8 @@ fun AnimalCountScreen(
         if (state.openWarningDialog) {
             val textWarning = stringResource(
                 when (state.openWarningDeleteAllDialog) {
-                    WarningAnimalCount.DELETE_MINUS -> R.string.animal_count_screen_warning_minus_and_delete_text
                     WarningAnimalCount.DELETE -> R.string.animal_count_screen_warning_product_delete_all_text
+                    WarningAnimalCount.DELETE_MINUS -> R.string.animal_count_screen_warning_minus_and_delete_text
                     WarningAnimalCount.UPDATE -> R.string.animal_count_screen_warning_product_update_text
                     WarningAnimalCount.UPDATE_MINUS -> R.string.animal_count_screen_warning_product_update_minus_text
                     WarningAnimalCount.MINUS -> R.string.animal_count_screen_warning_text
@@ -457,28 +444,20 @@ private fun DetailsCount(
 ) {
     val context = LocalContext.current
 
-    val count = domainAnimalCount.count.toConvertZeroDouble()
-    val previousCount = previousDomainAnimalCount?.count?.toConvertZeroDouble()
+    val totalValue = domainAnimalCount.count.toConvertZeroDouble().formatNumber()
+//    val previousCount = previousDomainAnimalCount?.count?.toConvertZeroDouble()
 
     val price = domainAnimalCount.price
     val buyer = domainAnimalCount.buyer
 
     val suffix = domainAnimalCount.suffix
-    val note = if (domainAnimalCount.note != "") "\n${domainAnimalCount.note}" else ""
+    val note =
+        if (domainAnimalCount.note != "") "\n${stringResource(R.string.card_note)} ${domainAnimalCount.note}" else ""
 
-    val totalValue = when {
+    /*val totalValue = when {
         count == previousCount || previousCount == null -> count.formatNumber()
-        else -> (count - previousCount).absoluteValue.formatNumber()
-    }
-
-    //TODO Примечание для животных
-    /* val reasonNote = resourceProvider.getString(
-         if (state.note.isBlank())
-             R.string.animal_card_screen_add_no_note_reason
-         else
-             R.string.animal_card_screen_add_note_reason
-     ).format(state.note)
-     */
+        else -> count.absoluteValue.formatNumber()
+    }*/
 
     Row {
         Text(
@@ -502,7 +481,7 @@ private fun DetailsCount(
                     intRes = R.string.animal_card_screen_kill_note,
                     totalValue = totalValue,
                     suffix = suffix,
-                    isPlus = true,
+                    isPlus = false,
                     note = note
                 )
 

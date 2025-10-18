@@ -2,9 +2,13 @@ package com.zaroslikov.fermacompose2.ui.elements
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -85,9 +89,14 @@ fun Modifier.modifierDialogScreen(isScroll: Boolean): Modifier {
 }
 
 @Composable
-fun Modifier.modifierBottomSheet(): Modifier {
+fun Modifier.modifierBottomSheet(isScroll: Boolean): Modifier {
     val focusManager = LocalFocusManager.current
     return this
+        .then(
+            if (isScroll)
+                Modifier.verticalScroll(rememberScrollState())
+            else Modifier
+        )
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium)
         )
@@ -100,4 +109,5 @@ fun Modifier.modifierBottomSheet(): Modifier {
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
             })
         }
+
 }
