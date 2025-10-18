@@ -9,8 +9,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -40,22 +47,31 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
+import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.FloatButton
 import com.zaroslikov.fermacompose2.ui.elements.IconAndText
+import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextLine
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_20
+import com.zaroslikov.fermacompose2.ui.elements.text_12
+import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
+import com.zaroslikov.fermacompose2.white
 import io.appmetrica.analytics.AppMetrica
 
 object HomeDestination : NavigationDestination {
@@ -189,7 +205,7 @@ fun InventoryList(
 
     LazyColumn(
         modifier = modifier,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
             TextButtonWarehouse(
@@ -200,7 +216,7 @@ fun InventoryList(
         }
         if (details)
             items(items = itemList, key = { it.id }) { item ->
-                AddProductCard(
+                AddProductCardNew(
                     addProduct = item,
                     modifier = Modifier
                         .clickable { onItemClick(item) }
@@ -281,7 +297,7 @@ fun BrieflyCountCard(
     if (expanded) {
         val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
         products.value.forEach {
-            AddProductCard(
+            AddProductCardNew(
                 addProduct = it,
                 modifier = Modifier
                     .graphicsLayer {
@@ -358,3 +374,92 @@ fun AddProductCard(
         }
     }
 }
+
+
+@Composable
+fun AddProductCardNew(
+    addProduct: DomainAddTable,
+    modifier: Modifier = Modifier
+) {
+    CardFieldNew(modifier = modifier, row = false) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = addProduct.title,
+                        style = textBold_16,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = green_shamrock
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "${addProduct.count.formatNumber()} ${stringResource(addProduct.countSuffix.toResId())}",
+                            style = text_12,
+                            modifier = Modifier.padding(vertical = 2.dp, horizontal = 8.dp),
+                            color = white
+                        )
+                    }
+                }
+                IconButton(onClick = {}, modifier = Modifier.size(18.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More"
+                    )
+                }
+            }
+
+            IconAndTextNew(
+                iconRes = R.drawable.baseline_calendar_month_24,
+                valueString = dateBuilder(
+                    addProduct.day,
+                    addProduct.month,
+                    addProduct.year
+                )
+            )
+            addProduct.category.takeUnless { it == "Без категории" || it.isEmpty() }
+                ?.let { category ->
+                    IconAndTextNew(
+                        iconRes = R.drawable.baseline_format_list_bulleted_24,
+                        valueString = category
+                    )
+                }
+
+//                if (addProduct.animal != "")
+//                    IconAndText(
+//                        iconRes = R.drawable.baseline_pets_24,
+//                        valueString = addProduct.animal
+//                    )
+
+            if (addProduct.note != "") {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = ghostly_white
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    IconAndTextNew(
+                        iconRes = R.drawable.baseline_sticky_note_2_24,
+                        valueString = addProduct.note,
+                        modifier = Modifier.padding(12.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+

@@ -1,17 +1,15 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.white
 
 
 @Composable
@@ -74,6 +74,50 @@ fun CardField(
     }
 }
 
+
+@Composable
+fun CardFieldNew(
+    modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
+    row: Boolean = true,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable () -> Unit,
+) {
+    val modifierCard = Modifier
+        .fillMaxWidth()
+        .padding(20.dp)
+
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = white
+        ),
+        shape = RoundedCornerShape(14.dp),
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation( // Добавляем тень
+            defaultElevation = 5.dp
+        ),
+    ) {
+        if (row) {
+            Row(
+                modifier = modifierCard,
+                horizontalArrangement = horizontalArrangement,
+                verticalAlignment = verticalAlignment
+            ) {
+                content()
+            }
+        } else {
+            Column(
+                modifier = modifierCard,
+                horizontalAlignment = horizontalAlignment,
+                verticalArrangement = verticalArrangement
+            ) {
+                content()
+            }
+        }
+    }
+}
 //@RequiresApi(Build.VERSION_CODES.S)
 //@Composable
 //fun CardField(

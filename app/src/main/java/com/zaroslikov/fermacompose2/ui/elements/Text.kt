@@ -38,6 +38,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -97,6 +99,35 @@ fun IconAndText(
         )
     }
 }
+
+@Composable
+fun IconAndTextNew(
+    modifier: Modifier = Modifier,
+    iconRes: Int,
+    valueString: String,
+    textStyle: TextStyle = text_14
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(
+            painter = painterResource(iconRes), contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = green_shamrock
+        )
+        Text(
+//            modifier = Modifier.fillMaxWidth(),
+            text = valueString,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = textStyle,
+            color = marengo
+        )
+    }
+}
+
 
 @Composable
 fun IconAndTextMore(

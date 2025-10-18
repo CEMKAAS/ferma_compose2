@@ -16,7 +16,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="35cfaaea-37a9-4a28-bf38-7617cc438d50" name="Changes" comment="pre-update gradle add icon">
+    <list default="true" id="35cfaaea-37a9-4a28-bf38-7617cc438d50" name="Changes" comment="Begin new desing 3.0">
       <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/checksums/checksums.lock" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/checksums/md5-checksums.bin" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/checksums/sha1-checksums.bin" beforeDir="false" />
@@ -32,42 +32,8 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InventoryApp.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InventoryApp.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Extensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Extensions.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animal_dialog/AlertDialogAddAnimal.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animal_dialog/AlertDialogKillAnimal.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animal_dialog/AlertDialogSaleAnimal.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animal_dialog/AlertDialogWriteOffAnimal.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/AnimalIndicatorsScreen.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/AnimalIndicatorsViewModel.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetAddAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetAddAnimal.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetExpensesAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetExpensesAnimal.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetKillAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetKillAnimal.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetSaleAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetSaleAnimal.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetWriteOffAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetWriteOffAnimal.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/size/AnimalSizeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/size/AnimalSizeScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/weight/AnimalWeightScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/weight/AnimalWeightScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/AppBar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/AppBar.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/BottomSheet.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/BottomSheet.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/ErrorUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/ErrorUI.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Modifier.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Modifier.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/OutlinedTextField.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/OutlinedTextField.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/analysis/FinanceAnalysisProduct.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/analysis/FinanceAnalysisProduct.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/AddDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/AddDao.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dto/add/AnimalCountSuffixDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dto/add/AnimalCountSuffixDto.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/mapper/dto/shared/AnimalCountSuffixMapper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/mapper/dto/shared/AnimalCountSuffixMapper.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/repository/AddRepositoryImpl.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/repository/AddRepositoryImpl.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/dto/add/DomainAnimalCountSuffix.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/dto/add/DomainAnimalCountSuffix.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/repository/AddRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/repository/AddRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Card.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Card.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/list_screen/AddScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/list_screen/AddScreen.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,7 +110,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="devel" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -179,50 +145,50 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Android App.app.executor&quot;: &quot;Run&quot;,
-    &quot;ApkExportedModule&quot;: &quot;FermaCompose2.app&quot;,
-    &quot;BundleExportedModule&quot;: &quot;FermaCompose2.app&quot;,
-    &quot;ExportApk.ApkPathForFermaCompose2.app&quot;: &quot;D:\\release&quot;,
-    &quot;ExportBundle.BundlePathForFermaCompose2.app&quot;: &quot;D:\\release&quot;,
-    &quot;PROJECT_TRUSTED_KEY&quot;: &quot;true&quot;,
-    &quot;ResourceManagerPrefKey.ResourceType&quot;: &quot;DRAWABLE&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ScreenshotViewer.SavePath&quot;: &quot;C:/Users/zaros/OneDrive/Desktop/Scrin&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;devel&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/zaros/OneDrive/Desktop/Scrin&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.17&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Android Logcat&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Android App.app.executor": "Run",
+    "ApkExportedModule": "FermaCompose2.app",
+    "BundleExportedModule": "FermaCompose2.app",
+    "ExportApk.ApkPathForFermaCompose2.app": "D:\\release",
+    "ExportBundle.BundlePathForFermaCompose2.app": "D:\\release",
+    "PROJECT_TRUSTED_KEY": "true",
+    "ResourceManagerPrefKey.ResourceType": "DRAWABLE",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ScreenshotViewer.SavePath": "C:/Users/zaros/OneDrive/Desktop/Scrin",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "git-widget-placeholder": "new__desing",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/zaros/OneDrive/Desktop/Scrin",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.17",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.Android Logcat"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;ExportApk.BuildVariants&quot;: [
-      &quot;release&quot;
+  "keyToStringList": {
+    "ExportApk.BuildVariants": [
+      "release"
     ],
-    &quot;com.android.tools.idea.sqlite.queryhistory&quot;: [
-      &quot;SELECT * FROM add_table WHERE animal_count_id ='1'&quot;,
-      &quot;SELECT id, count, suffix, date, animal_id, note, version,  CASE        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT price FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS price,  CASE        WHEN version = 0 THEN (SELECT price_all FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT price_all FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT price_all FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS price_all,  CASE        WHEN version = 0 THEN (SELECT buyer FROM sale_table WHERE animal_count_id = id)        ELSE NULL    END AS buyer,  CASE        WHEN version = 0 THEN (SELECT _id FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT _id FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS table_id,  CASE        WHEN version = 0 THEN (SELECT idPT FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS idPT FROM animal_count_table WHERE animal_id='3' ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC&quot;,
-      &quot;SELECT id, count, suffix, date, animal_id, note, version,  CASE        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT price FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS price,  CASE        WHEN version = 0 THEN (SELECT buyer FROM sale_table WHERE animal_count_id = id)        ELSE NULL    END AS buyer,  CASE        WHEN version = 0 THEN (SELECT _id FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT _id FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS table_id,  CASE        WHEN version = 0 THEN (SELECT idPT FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS idPT FROM animal_count_table WHERE animal_id='3' ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC&quot;,
-      &quot;\n    WITH FirstRow AS (\n        SELECT *\n        FROM animal_count_table\n        WHERE animal_id = '3'\n        ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC\n        LIMIT 1\n    ),\n    Calculation AS (\n        SELECT\n            CASE\n                WHEN (SELECT version FROM FirstRow) IS NULL THEN\n                    (SELECT count FROM FirstRow)\n                ELSE\n                    (SELECT SUM(\n                        CASE\n                            WHEN version IN (1, 4) THEN count\n                            WHEN version IN (0, 2, 3) THEN -count\n                            ELSE 0\n                        END\n                    ) FROM animal_count_table WHERE animal_id = '3')\n        END AS calculatedCount\n    )\n    SELECT \n        id,\n        (SELECT calculatedCount FROM Calculation) AS count,\n        suffix,\n        date,\n        animal_id,\n        note,\n        version\n    FROM FirstRow\n&quot;,
-      &quot;\n    WITH FirstRow AS (\n        SELECT *\n        FROM animal_count_table\n        WHERE animal_id = '1'\n        ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC\n        LIMIT 1\n    ),\n    Calculation AS (\n        SELECT\n            CASE\n                WHEN (SELECT version FROM FirstRow) IS NULL THEN\n                    (SELECT count FROM FirstRow)\n                ELSE\n                    (SELECT SUM(\n                        CASE\n                            WHEN version IN (1, 4) THEN count\n                            WHEN version IN (0, 2, 3) THEN -count\n                            ELSE 0\n                        END\n                    ) FROM animal_count_table WHERE animal_id = '1')\n        END AS calculatedCount\n    )\n    SELECT \n        id,\n        (SELECT calculatedCount FROM Calculation) AS count,\n        suffix,\n        date,\n        animal_id,\n        note,\n        version\n    FROM FirstRow\n&quot;
+    "com.android.tools.idea.sqlite.queryhistory": [
+      "SELECT * FROM add_table WHERE animal_count_id ='1'",
+      "SELECT id, count, suffix, date, animal_id, note, version,  CASE        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT price FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS price,  CASE        WHEN version = 0 THEN (SELECT price_all FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT price_all FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT price_all FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS price_all,  CASE        WHEN version = 0 THEN (SELECT buyer FROM sale_table WHERE animal_count_id = id)        ELSE NULL    END AS buyer,  CASE        WHEN version = 0 THEN (SELECT _id FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT _id FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS table_id,  CASE        WHEN version = 0 THEN (SELECT idPT FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS idPT FROM animal_count_table WHERE animal_id='3' ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC",
+      "SELECT id, count, suffix, date, animal_id, note, version,  CASE        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT price FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS price,  CASE        WHEN version = 0 THEN (SELECT buyer FROM sale_table WHERE animal_count_id = id)        ELSE NULL    END AS buyer,  CASE        WHEN version = 0 THEN (SELECT _id FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT _id FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS table_id,  CASE        WHEN version = 0 THEN (SELECT idPT FROM sale_table WHERE animal_count_id = id)        WHEN version = 1 THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)        ELSE NULL    END AS idPT FROM animal_count_table WHERE animal_id='3' ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC",
+      "\n    WITH FirstRow AS (\n        SELECT *\n        FROM animal_count_table\n        WHERE animal_id = '3'\n        ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC\n        LIMIT 1\n    ),\n    Calculation AS (\n        SELECT\n            CASE\n                WHEN (SELECT version FROM FirstRow) IS NULL THEN\n                    (SELECT count FROM FirstRow)\n                ELSE\n                    (SELECT SUM(\n                        CASE\n                            WHEN version IN (1, 4) THEN count\n                            WHEN version IN (0, 2, 3) THEN -count\n                            ELSE 0\n                        END\n                    ) FROM animal_count_table WHERE animal_id = '3')\n        END AS calculatedCount\n    )\n    SELECT \n        id,\n        (SELECT calculatedCount FROM Calculation) AS count,\n        suffix,\n        date,\n        animal_id,\n        note,\n        version\n    FROM FirstRow\n",
+      "\n    WITH FirstRow AS (\n        SELECT *\n        FROM animal_count_table\n        WHERE animal_id = '1'\n        ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC\n        LIMIT 1\n    ),\n    Calculation AS (\n        SELECT\n            CASE\n                WHEN (SELECT version FROM FirstRow) IS NULL THEN\n                    (SELECT count FROM FirstRow)\n                ELSE\n                    (SELECT SUM(\n                        CASE\n                            WHEN version IN (1, 4) THEN count\n                            WHEN version IN (0, 2, 3) THEN -count\n                            ELSE 0\n                        END\n                    ) FROM animal_count_table WHERE animal_id = '1')\n        END AS calculatedCount\n    )\n    SELECT \n        id,\n        (SELECT calculatedCount FROM Calculation) AS count,\n        suffix,\n        date,\n        animal_id,\n        note,\n        version\n    FROM FirstRow\n"
     ],
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;KND&quot;
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "KND"
     ]
   }
-}</component>
+}]]></component>
   <component name="PsdUISettings">
     <option name="MODULE_TAB" value="Signing Configs" />
     <option name="LAST_EDITED_SIGNING_CONFIG" value="debug" />
@@ -533,13 +499,26 @@
       <option name="project" value="LOCAL" />
       <updated>1760356585216</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Begin new desing 3.0">
+      <option name="closed" value="true" />
+      <created>1760819313356</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1760819313356</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="485fe2a0-b8e4-40ca-a967-2dc1294c118a" value="TOOL_WINDOW" />
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
-        <entry key="MAIN">
+        <entry key="485fe2a0-b8e4-40ca-a967-2dc1294c118a">
           <value>
             <State>
               <option name="FILTERS">
@@ -556,11 +535,27 @@
             </State>
           </value>
         </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="new_desing" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="update Animate AddScreen" />
     <MESSAGE value="begin fix AddEntryScreen" />
     <MESSAGE value="begin fix ExpensesEntryScreen" />
     <MESSAGE value="fun to killAnimal" />
@@ -585,7 +580,8 @@
     <MESSAGE value="Validation Count Animal" />
     <MESSAGE value="update gradle" />
     <MESSAGE value="pre-update gradle add icon" />
-    <option name="LAST_COMMIT_MESSAGE" value="pre-update gradle add icon" />
+    <MESSAGE value="Begin new desing 3.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Begin new desing 3.0" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
