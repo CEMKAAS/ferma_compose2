@@ -42,6 +42,8 @@
     <string name="outlined_text_date_born">Дата рождения</string>
     <string name="outlined_text_date_next">Следующая дата</string>
     <string name="outlined_text_out_of">%s из %s</string>
+    <string name="outlined_text_suffix">Единица</string>
+    <string name="outlined_text_count">0</string>
 
 
     //Cadrs
@@ -66,6 +68,10 @@
     <string name="card_kilogram_s">%s кг.</string>
     <string name="card_size_s">%s м.</string>
 
+    // Search
+    <string name="search_section">Поиск продукции...</string>
+
+
     //Button
     <string name="button_add">Добавить</string>
     <string name="button_sale">Продать</string>
@@ -77,6 +83,8 @@
     <string name="button_delete">Удалить</string>
     <string name="button_write_off">Списать</string>
     <string name="button_note">Записать</string>
+    <string name="button_cancel">Отмена</string>
+    <string name="button_save">Сохранить</string>
     <string name="button_add_message_no_data">Добавить Продукцию!</string>
     <string name="button_sale_message_no_data">Добавить Продажу!</string>
     <string name="button_expenses_message_no_data">Добавить Покупку!</string>
@@ -492,6 +500,22 @@
     //SnackBar
     <string name="snack_bar_delete_item">Продукт удаления</string>
 
+    //Month
+    <!-- Month -->
+    <string name="month_yan">Январь</string>
+    <string name="month_feb">Февраль</string>
+    <string name="month_mar">Март</string>
+    <string name="month_apr">Апрель</string>
+    <string name="month_may">Май</string>
+    <string name="month_jun">Июнь</string>
+    <string name="month_jul">Июль</string>
+    <string name="month_aug">Август</string>
+    <string name="month_sep">Сентябрь</string>
+    <string name="month_oct">Октябрь</string>
+    <string name="month_nov">Ноябрь</string>
+    <string name="month_dec">Декабрь</string>
+
+
 
     <string name="app_name">Мое Хозяйство 2</string>
     <string name="attention">Attention</string>
@@ -533,6 +557,8 @@
     <string name="one_month">1 month</string>
     <string name="water">Water</string>
     <string name="time_to_water">It\'s time to water your %s.</string>
+
+
 
     <string name="lithop">Lithop</string>
     <string name="carrot">Carrot</string>

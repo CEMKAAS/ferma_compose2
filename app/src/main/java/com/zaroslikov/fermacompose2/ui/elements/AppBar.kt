@@ -3,6 +3,12 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Attachment
@@ -19,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
@@ -30,6 +37,14 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +83,19 @@ fun TopAppBarNavigation(
     )
 }
 
+@Composable
+fun TopAppBarNavigationNew(
+    @StringRes title: Int,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(text = stringResource(title))
+        },
+        scrollBehavior = scrollBehavior
+    )
+}
+
 
 @Composable
 fun TopAppBarBack(
@@ -82,8 +110,10 @@ fun TopAppBarBack(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
-            Text(text = if (intRes != null) stringResource(intRes) else title,   maxLines = 1,
-                overflow = TextOverflow.Ellipsis)
+            Text(
+                text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         },
         navigationIcon = {
             IconButton(onClick = navigateUp) {

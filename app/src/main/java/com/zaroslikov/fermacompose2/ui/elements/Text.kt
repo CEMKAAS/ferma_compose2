@@ -280,12 +280,12 @@ fun TextLine(
     valueString: String
 ) {
     Text(
-        modifier = modifier
-            .padding(bottom = 5.dp),
+        modifier = modifier,
         text = valueString,
         style = textStyle,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Start
 
     )
 }

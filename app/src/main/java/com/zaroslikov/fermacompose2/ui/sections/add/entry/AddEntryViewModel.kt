@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
@@ -10,8 +11,11 @@ import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.isSlash
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filterNotNull
@@ -216,6 +220,44 @@ class AddEntryViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    fun AddEntryState.toUiMap(domain: DomainAddTable): AddEntryState {
+        return copy(
+            title = domain.title,
+            count = domain.count.formatNumber(false),
+            date = formatDateToString(
+                domain.day,
+                domain.month,
+                domain.year
+            ),
+            countSuffix = domain.countSuffix,
+            category = domain.category,
+            selectedAnimalIndex = domain.animalId ?: 0,
+            animalId = domain.animalId,
+            note = domain.note
+        )
+    }
+
+    fun AddEntryState.toDomainMap(
+        id: Long = 0,
+        itemIdPT: Long
+    ): DomainAddTable {
+        val dateList = date.split(".")
+        return DomainAddTable(
+            id = id,
+            title = title.trim(),
+            count = count.toConvertDbDouble(),
+            day = dateList[0].toInt(),
+            month = dateList[1].toInt(),
+            year = dateList[2].toInt(),
+            countSuffix = countSuffix,
+            category = category.trim(),
+            animalId = animalId,
+            note = note.trim(),
+            price = 0.0,
+            idPT = itemIdPT
+        )
     }
 }
 

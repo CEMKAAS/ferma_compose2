@@ -5,6 +5,7 @@ import android.graphics.Shader
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -15,11 +16,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,26 +75,31 @@ fun FloatButton(
 
 @Composable
 fun NeonGlowFab(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    val glowColor = Color(0xFF00A63E)
     val gradient = Brush.linearGradient(
         colors = listOf(Color(0xFF009966), Color(0xFF00A63E)),
         start = Offset(0f, 0f),
-        end = Offset(Float.POSITIVE_INFINITY, 0f) // слева направо
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
     )
 
     Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(72.dp)
-            .shadow(
-                elevation = 16.dp,
-                shape = CircleShape,
-                ambientColor = Color(0xFF00A63E).copy(alpha = 0.6f),
-                spotColor = Color(0xFF00A63E).copy(alpha = 0.6f)
-            )
-            .background(brush = gradient, shape = CircleShape)
-            .clickable(onClick = onClick)
+        modifier = modifier
+            .size(64.dp)
+            .graphicsLayer {
+                // имитация неонового свечения
+                shadowElevation = 20f
+                shape = CircleShape
+                clip = false
+                ambientShadowColor = glowColor.copy(alpha = 0.8f)
+                spotShadowColor = glowColor.copy(alpha = 0.8f)
+            }
+            .clip(CircleShape)
+            .background(brush = gradient)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = Icons.Default.Add,

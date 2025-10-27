@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.sections.add.entry
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -11,19 +12,30 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.elements.CloseButton
+import com.zaroslikov.fermacompose2.ui.elements.GradientButton
+import com.zaroslikov.fermacompose2.ui.elements.GradientMaterialButton
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimal
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimalNew
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategoryNew
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNew
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAddNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 object AddEntryDestination : NavigationDestination {
@@ -75,16 +87,21 @@ fun AddEntryContainerProduct(
     state: AddEntryState,
     onIntent: (AddEntryIntent) -> Unit
 ) {
-    Column(modifier = modifier) {
-        OutlinedTextTitleAdd2(
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+
+        OutlinedTextTitleAddNew(
             value = state.title,
             onValueChange = { onIntent(AddEntryIntent.TitleChanged(it)) },
             onValueChangeSuffix = { onIntent(AddEntryIntent.TitleAndSuffix(it)) },
             titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
+            drawableRes = R.drawable.icon_add_product
         )
-        OutlinedTextCount2(
+        OutlinedTextCountNew(
             value = state.count,
             onValueChange = {
                 onIntent(AddEntryIntent.CountChanged(it))
@@ -93,20 +110,20 @@ fun AddEntryContainerProduct(
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product,
-            isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
-            warehouseList = state.warehouseList
+//            isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
+//            warehouseList = state.warehouseList
         )
-        OutlinedTextCategory(
+        OutlinedTextCategoryNew(
             value = state.category,
             onValueChange = { onIntent(AddEntryIntent.CategoryChanged(it)) },
             titleList = state.pickList.categoryList,
         )
-        OutlinedTextDate(
+        OutlinedTextDateNew(
             value = state.date,
             onValueChange = { onIntent(AddEntryIntent.Date(it)) }
         )
         if (state.pickList.animalList.isNotEmpty()) {
-            OutlinedTextAnimal(
+            OutlinedTextAnimalNew(
                 value = state.animal,
                 onValueChange = { onIntent(AddEntryIntent.Animal(it)) },
                 selectedAnimalIndex = state.selectedAnimalIndex,
@@ -114,17 +131,25 @@ fun AddEntryContainerProduct(
                 animalList = state.pickList.animalList,
             )
         }
-        OutlinedTextNote(
+        OutlinedTextNoteNew(
             value = state.note,
             onValueChange = { onIntent(AddEntryIntent.NoteChanged(it)) },
         )
-        ButtonPanel(
-            isEntry = state.isEntry,
+        /*ButtonPanelNew(
+            modifier = Modifier,
+            isEntry = true,
             entryButton = R.string.button_add,
             onClickInsert = { onIntent(AddEntryIntent.Insert) },
-            onClickUpdate = { onIntent(AddEntryIntent.Update) },
-            onClickDelete = { onIntent(AddEntryIntent.Delete) }
-        )
+            onClickClose = { TODO() },
+            enable = false
+        )*/
+        /* ButtonPanel(
+             isEntry = state.isEntry,
+             entryButton = R.string.button_add,
+             onClickInsert = { onIntent(AddEntryIntent.Insert) },
+             onClickUpdate = { onIntent(AddEntryIntent.Update) },
+             onClickDelete = { onIntent(AddEntryIntent.Delete) }
+         )*/
     }
 }
 

@@ -39,7 +39,7 @@ import androidx.compose.ui.res.stringResource
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.zaroslikov.fermacompose2.ui.Banner
+//import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
 import com.zaroslikov.fermacompose2.utils.SnackbarController
@@ -86,11 +86,11 @@ fun InventoryApp(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            Banner(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            )
+//            Banner(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//            )
         }
     ) {
         InventoryNavHost(

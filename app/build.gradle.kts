@@ -90,7 +90,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
-    implementation (libs.mobileads)
+//    implementation (libs.mobileads)
 
 
     //Coil
@@ -99,7 +99,7 @@ dependencies {
 
 
     // AppMetrica SDK.
-    implementation("io.appmetrica.analytics:analytics:7.12.0")
+    implementation("io.appmetrica.analytics:analytics:7.13.0")
     implementation("androidx.work:work-runtime-ktx:2.10.5")
 
     // Hilt

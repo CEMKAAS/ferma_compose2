@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.fermacompose2.ui.Banner
+//import com.zaroslikov.fermacompose2.ui.Banner
 
 //import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 //import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorDestination

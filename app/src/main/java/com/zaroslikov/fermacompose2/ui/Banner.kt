@@ -1,3 +1,4 @@
+/*
 package com.zaroslikov.fermacompose2.ui
 
 
@@ -58,3 +59,4 @@ fun Banner(modifier: Modifier = Modifier) {
 
 
 
+*/

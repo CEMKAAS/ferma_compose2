@@ -170,6 +170,28 @@ fun dateBuilder(day: Int, month: Int, year: Int): String {
     return "%02d.%02d.%04d".format(day, month, year)
 }
 
+fun dateBuilder(day: Int, month: String, year: Int): String {
+    return "%02d %s %04d".format(day, month, year)
+}
+
+fun monthToResString(month: Int): Int {
+    return when (month) {
+        1 -> R.string.month_yan
+        2 -> R.string.month_feb
+        3 -> R.string.month_mar
+        4 -> R.string.month_apr
+        5 -> R.string.month_may
+        6 -> R.string.month_jun
+        7 -> R.string.month_jul
+        8 -> R.string.month_aug
+        9 -> R.string.month_sep
+        10 -> R.string.month_oct
+        11 -> R.string.month_nov
+        12 -> R.string.month_dec
+        else -> R.string.month_yan //TODO
+    }
+}
+
 fun formatterTime(hour: Int, minute: Int): String {
     val formattedHour = hour.toString().padStart(2, '0')
     val formattedMinute = minute.toString().padStart(2, '0')

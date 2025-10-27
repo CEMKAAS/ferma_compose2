@@ -24,7 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.yandex.mobile.ads.appopenad.AppOpenAd
+/*import com.yandex.mobile.ads.appopenad.AppOpenAd
 import com.yandex.mobile.ads.appopenad.AppOpenAdEventListener
 import com.yandex.mobile.ads.appopenad.AppOpenAdLoadListener
 import com.yandex.mobile.ads.appopenad.AppOpenAdLoader
@@ -35,7 +35,7 @@ import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.common.MobileAds
 import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
-import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoader*/
 //import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
 //import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
@@ -50,11 +50,11 @@ class MainActivity : ComponentActivity() {
         const val REQUEST_CODE_NOTIFICATION_PERMISSIONS = 11
     }
 
-    private var appOpenAd: AppOpenAd? = null
+   /* private var appOpenAd: AppOpenAd? = null
     private var isAdShownOnColdStart = false
 
     private var interstitialAd: InterstitialAd? = null
-    private var interstitialAdLoader: InterstitialAdLoader? = null
+    private var interstitialAdLoader: InterstitialAdLoader? = null*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,13 +69,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             FermaCompose2Theme {
-                MobileAds.initialize(this) {
+                /*MobileAds.initialize(this) {
                     loadAppOpenAd()
                     val processLifecycleObserver = DefaultProcessLifecycleObserver(
                         onProcessCaneForeground = ::showAppOpenAd
                     )
                     ProcessLifecycleOwner.get().lifecycle.addObserver(processLifecycleObserver)
-                }
+                }*/
 //                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
 
                 InventoryApp(
@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity() {
          }
      }*/
 
-    //Реклама при клике
+    /*//Реклама при клике
     private fun loadInterstitialAd() {
         val adRequestConfiguration =
             AdRequestConfiguration.Builder("R-M-12224806-2").build()
@@ -226,7 +226,7 @@ class MainActivity : ComponentActivity() {
         val adRequestConfiguration = AdRequestConfiguration.Builder(AD_UNIT_ID).build()
         appOpenAdLoader.loadAd(adRequestConfiguration)
         appOpenAdLoader.loadAd(adRequestConfiguration)
-    }
+    }*/
 
 }
 

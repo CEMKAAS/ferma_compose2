@@ -32,7 +32,8 @@ interface AddDao {
     @Query(
         "SELECT title," +
                 " SUM(count) as count," +
-                " count_suffix AS suffix" +
+                " count_suffix AS suffix," +
+                " COUNT(*) AS row_count " +
                 " FROM add_table " +
                 " WHERE idPT=:id" +
                 " GROUP BY title" +

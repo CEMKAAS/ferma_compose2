@@ -4,12 +4,22 @@ package com.zaroslikov.fermacompose2.ui.elements
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType.Companion.PrimaryEditable
+import androidx.compose.material3.ExposedDropdownMenuAnchorType.Companion.PrimaryNotEditable
+import androidx.compose.material3.ExposedDropdownMenuAnchorType.Companion.SecondaryEditable
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -22,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,8 +42,10 @@ import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.gray_5
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.white
 
 
 @Composable
@@ -72,6 +85,87 @@ fun DropdownMenuIconProductSuffix(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DropdownMenuEdit(
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { expanded = !expanded }, modifier = Modifier.size(18.dp)) {
+        Icon(
+            imageVector = Icons.Default.MoreVert,
+            contentDescription = "More"
+        )
+        BaseDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = !expanded },
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    onEditClick()
+                    expanded = !expanded
+                },
+                text = {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.icon_edit),
+                            contentDescription = null,
+                            tint = Color(0xFF155DFC)
+                        )
+                        Text(text = "Редактировать")
+                    }
+                }
+            )
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = gray_5
+            )
+            DropdownMenuItem(
+                onClick = {
+                    onDeleteClick()
+                    expanded = !expanded
+                },
+                text = {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.icon_trash),
+                            contentDescription = null,
+                            tint = Color(0xFFEC003F)
+                        )
+                        Text(text = "Удалить")
+                    }
+                }
+            )
+        }
+    }
+}
+
+
+@Composable
+fun BaseDropdownMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(14.dp),
+        containerColor = white
+    ) {
+        content()
     }
 }
 
@@ -193,34 +287,52 @@ fun ExposedDropdownMenuProduct(
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showAllOnOpen by remember { mutableStateOf(false) } // показать весь список при первом открытии
+    var lastTitle by remember { mutableStateOf(title) }
+
+    // Если пользователь меняет текст, при открытом меню снова включаем фильтрацию
+    LaunchedEffect(title) {
+        if (title != lastTitle) {
+            lastTitle = title
+            if (expanded) showAllOnOpen = false
+        }
+    }
 
     Box {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
-                if (enableDropMenu) {
-                    expanded = !expanded
+                if (!enableDropMenu) return@ExposedDropdownMenuBox
+                val opening = !expanded
+                expanded = !expanded
+                if (opening) {
+                    showAllOnOpen = title.isNotBlank()
                 }
             }
         ) {
             content(
                 Pair(
                     Modifier
-                        .menuAnchor()
+                        .menuAnchor(PrimaryEditable)
                         .fillMaxWidth(), expanded
                 )
             )
             val filteredOptions =
-                titleList.filter { it.contains(title, ignoreCase = true) }
+                if (showAllOnOpen) titleList
+                else titleList.filter { it.contains(title, ignoreCase = true) }
+
 
             if (filteredOptions.isNotEmpty()) {
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = {
                         expanded = false
-                    }
+                        showAllOnOpen = false
+                    },
+                    shape = RoundedCornerShape(14.dp),
+                    containerColor = white
                 ) {
-                    filteredOptions.forEach { item ->
+                    filteredOptions.forEachIndexed { index, item ->
                         DropdownMenuItem(
                             text = { Text(text = item) },
                             onClick = {
@@ -228,6 +340,11 @@ fun ExposedDropdownMenuProduct(
                                 expanded = !expanded
                             }
                         )
+                        if (index != filteredOptions.lastIndex)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = gray_5
+                            )
                     }
                 }
             }
@@ -270,16 +387,14 @@ fun ExposedDropdownMenuProduct2(
             content(
                 Pair(
                     Modifier
-                        .menuAnchor()
+                        .menuAnchor(type = PrimaryEditable)
                         .fillMaxWidth(), expanded
                 )
             )
 
-            val options = if (showAllOnOpen) {
-                titleList
-            } else {
-                titleList.filter { it.title.contains(title, ignoreCase = true) }
-            }
+            val options = if (showAllOnOpen) titleList
+            else titleList.filter { it.title.contains(title, ignoreCase = true) }
+
 
             if (titleList.isNotEmpty()) {
                 ExposedDropdownMenu(
@@ -287,9 +402,11 @@ fun ExposedDropdownMenuProduct2(
                     onDismissRequest = {
                         expanded = false
                         showAllOnOpen = false
-                    }
+                    },
+                    shape = RoundedCornerShape(14.dp),
+                    containerColor = white
                 ) {
-                    options.forEach { item ->
+                    options.forEachIndexed { index, item ->
                         DropdownMenuItem(
                             text = {
                                 Text(
@@ -304,6 +421,11 @@ fun ExposedDropdownMenuProduct2(
                                 showAllOnOpen = false
                             }
                         )
+                        if (index != options.lastIndex)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = gray_5
+                            )
                     }
                 }
             }
@@ -311,6 +433,69 @@ fun ExposedDropdownMenuProduct2(
     }
 }
 
+
+@Composable
+fun ExposedDropdownMenuSuffix(
+    suffix: Suffix,
+    setSuffix: (Suffix) -> Unit,
+    enableDropMenu: Boolean = true,
+    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    val suffixList = listOf(
+        Suffix.PIECES,
+        Suffix.GRAM,
+        Suffix.KILOGRAM,
+        Suffix.TONS,
+        Suffix.LITERS,
+        Suffix.CUBIC_METERS,
+        Suffix.METERS
+    )
+
+    Box {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            content(
+                Pair(
+                    Modifier
+                        .menuAnchor(type = PrimaryNotEditable)
+                        .fillMaxWidth(), expanded
+                )
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {
+                    expanded = false
+                },
+                shape = RoundedCornerShape(14.dp),
+                containerColor = white
+            ) {
+                suffixList.forEachIndexed { index, item ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = stringResource(item.toResId()),
+                                fontWeight = if (item == suffix) FontWeight.Bold else null
+                            )
+                        },
+                        onClick = {
+                            setSuffix(item)
+                            expanded = false
+                        }
+                    )
+                    if (index != suffixList.lastIndex)
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = gray_5
+                        )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun ExposedDropdownMenuSex(
@@ -394,7 +579,9 @@ fun ExposedDropdownMenuAnimals(
             )
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = !expanded }
+                onDismissRequest = { expanded = !expanded },
+                shape = RoundedCornerShape(14.dp),
+                containerColor = white
             ) {
                 animalList.forEachIndexed { index, item ->
                     DropdownMenuItem(
@@ -409,6 +596,11 @@ fun ExposedDropdownMenuAnimals(
                             expanded = !expanded
                         }
                     )
+                    if (index != animalList.lastIndex)
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = gray_5
+                        )
                 }
             }
         }

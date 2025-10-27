@@ -4,13 +4,10 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,21 +37,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
+import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.alabaster
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.FloatButton
+import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
+import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew2
 import com.zaroslikov.fermacompose2.ui.elements.IconAndText
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextLine
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_20
+import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
+import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
+import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.BrieflyBottomSheetAdd
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object SaleDestination : NavigationDestination {
     override val route = "Sale"
@@ -102,249 +107,161 @@ fun SaleScreen(
                     scrollBehavior = scrollBehavior
                 )
             },
-            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
+            floatingActionButton = {
+                NeonGlowFab {
+//                    viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true))
+                }
+            }
         ) { innerPadding ->
-            if (state.isLoading) {
+            if (state.isLoading)
                 CircularProgress(
                     modifier = modifier.padding(innerPadding),
                 )
-            } else {
-                SaleBody(
-                    modifier = Modifier
+            else
+                Column {  }
+               /* SaleContainer(
+                    modifier = modifier
                         .modifierScreenLazy(innerPadding),
-                    viewModel = viewModel,
+                    searchText = state.textSearch,
                     itemList = state.list,
-                    brieflyList = state.briefly,
-                    onItemClick = navigateToItemUpdate,
-                    navigateToItemAdd = { navigateToItemAdd(idProject) }
-                )
-            }
+                    searchList = searchList,
+                    brieflyList = searchList2,
+                    onInsertClick = {
+                        viewModel.onIntent(
+                            AddListIntent.OpenBottomSheetEntry(true)
+                        )
+                    },
+                    onEditClick = {
+                        viewModel.onIntent(
+                            AddListIntent.OpenBottomSheetEntry(true, it)
+                        )
+                    },
+                    onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
+                    onSearchChange = { viewModel.onIntent(AddListIntent.SearchChanged(it)) },
+                    onDetailsClick = {
+                        viewModel.onIntent(
+                            AddListIntent.OpenBottomSheetGroup(true, it)
+                        )
+                    }
+                )*/
+/*
+            if (state.openBottomSheetGroup)
+                BrieflyBottomSheetAdd(
+                    list = state.list,
+                    titleProduct = state.currentBriefly.title,
+                    count = state.currentBriefly.count,
+                    suffix = state.currentBriefly.suffix,
+                    countEntry = state.currentBriefly.rowCount,
+                    onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
+                    onEditClick = {
+                        viewModel.onIntent(
+                            AddListIntent.OpenBottomSheetEntry(true, it)
+                        )
+                    },
+                    onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
+                )*/
         }
     }
 }
 
-
+/*
 @Composable
-fun SaleBody(
+fun SaleContainer(
     modifier: Modifier = Modifier,
-    viewModel: SaleViewModel,
+    searchText: String,
     itemList: List<DomainSaleTable>,
+    searchList: List<DomainSaleTable>,
     brieflyList: List<BrieflySaleDomain>,
-    onItemClick: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: () -> Unit
+    onInsertClick: () -> Unit,
+    onEditClick: (DomainSaleTable) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onSearchChange: (String) -> Unit,
+    onDetailsClick: (BrieflySaleDomain) -> Unit
 ) {
-    if (itemList.isNotEmpty())
-        InventoryList(
-            itemList = itemList,
-            brieflyList = brieflyList,
-            viewModel = viewModel,
-            onItemClick = { onItemClick(it.idPT to it.id) },
-            modifier = modifier
-        )
-    else MessageNoData(
+    InventoryBody(
         modifier = modifier,
-        onClick = navigateToItemAdd,
+        searchText = searchText,
+        itemList = itemList,
+        searchList = searchList,
+        brieflyList = brieflyList,
+        onInsertClick = onInsertClick,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        onSearchChange = onSearchChange,
+        onDetailsClick = onDetailsClick,
+        detailCard = { item ->
+            DetailProductCardNew(
+                title = item.title,
+                count = item.count,
+                suffix = item.countSuffix,
+                category = item.category,
+                note = item.note,
+                animal = "Murka",
+                color = green_shamrock,
+                day = item.day,
+                month = item.month,
+                year = item.year,
+                onClick = { },
+                onEditClick = { onEditClick(item) },
+                onDeleteClick = { onDeleteClick(item.id) },
+            )
+        },
+        brieflyCard = { item ->
+            BrieflyCountCardNew(
+                modifier = Modifier,
+                titleProduct = item.title,
+                count = item.count,
+                suffix = item.suffix,
+                countEntry = item.rowCount,
+                color = green_shamrock,
+                colorSecondary = alabaster,
+                onClick = { onDetailsClick(item) }
+            )
+        },
         titleRes = R.string.message_no_date_title_sale,
         messageRes = R.string.message_no_date_message_sale,
         supportRes = R.string.message_no_date_support_text_sale,
         buttonRes = R.string.button_sale_message_no_data
     )
 }
+*/
+
 
 @Composable
-private fun InventoryList(
-    viewModel: SaleViewModel,
-    itemList: List<DomainSaleTable>,
-    brieflyList: List<BrieflySaleDomain>,
-    onItemClick: (DomainSaleTable) -> Unit,
-    modifier: Modifier = Modifier
+fun BrieflyBottomSheetSale(
+    list: List<DomainSaleTable>,
+    titleProduct: String,
+    count: Double,
+    suffix: Suffix,
+    countEntry: Long,
+    onEditClick: (DomainSaleTable) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onDismissRequest: () -> Unit,
 ) {
-    var details by rememberSaveable { mutableStateOf(true) }
-
-    val extraPadding by animateDpAsState(
-        if (details) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-    val extraPaddingResd by animateDpAsState(
-        if (!details) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
-    LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Top
-    ) {
-        item {
-            TextButtonWarehouse(
-                boolean = details,
-                onClick = { details = !details },
-                intRes = if (details) R.string.widget_briefly else R.string.widget_detail
+    BrieflyBottomSheetUniversal(
+        list = list,
+        titleProduct = titleProduct,
+        count = count,
+        suffix = suffix,
+        countEntry = countEntry,
+        onDismissRequest = onDismissRequest,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        itemCard = { product ->
+            DetailProductCardNew2(
+                modifier = Modifier,
+                count = product.count,
+                suffix = product.countSuffix,
+                category = product.category,
+                note = product.note,
+                animal = "Mas",
+                color = green_shamrock,
+                day = product.day,
+                month = product.month,
+                year = product.year,
+                onDeleteClick = { onDeleteClick(product.id) },
+                onEditClick = { onEditClick(product) }
             )
         }
-        if (details) {
-            items(items = itemList, key = { it.id }) { item ->
-                SaleProductCard(
-                    saleTable = item,
-                    modifier = Modifier
-                        .clickable { onItemClick(item) }
-                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
-                )
-            }
-        } else {
-            items(items = brieflyList) { item ->
-                BrieflyPriceCard(
-                    product = item,
-                    viewModel = viewModel,
-                    onItemClick = onItemClick,
-                    modifier = Modifier
-                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun BrieflyPriceCard(
-    viewModel: SaleViewModel,
-    product: BrieflySaleDomain,
-    onItemClick: (DomainSaleTable) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    val extraPadding by animateDpAsState(
-        if (expanded) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
     )
-
-    CardField(modifier = modifier.clickable {
-        expanded = !expanded
-    }) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(0.7f)) {
-                TextLine(
-                    modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
-                    valueString = product.title,
-                    textStyle = textBold_20
-                )
-                IconAndText(
-                    iconRes = R.drawable.baseline_shopping_basket_24,
-                    valueString = stringResource(
-                        R.string.card_count_briefly_s,
-                        "${product.count.formatNumber()} ${product.suffix}",
-                        product.price.formatNumber(),
-                        stringResource(R.string.currency_ruble),
-                    )
-                )
-
-            }
-            IconButton(onClick = {
-                expanded = !expanded
-            }) {
-                Icon(
-                    painterResource(if (expanded) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
-                    contentDescription = "Показать меню"
-                )
-            }
-        }
-    }
-
-    if (expanded) {
-        val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
-        products.value.forEach {
-            SaleProductCard(
-                saleTable = it,
-                modifier = Modifier
-                    .graphicsLayer {
-                        scaleX = 0.95f
-                    }
-                    .clickable { onItemClick(it) }
-                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
-        }
-    }
-}
-
-
-@Composable
-fun SaleProductCard(
-    saleTable: DomainSaleTable,
-    modifier: Modifier = Modifier
-) {
-    CardField(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f)
-            ) {
-                Text(
-                    modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    text = saleTable.title,
-                    style = textBold_20,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                IconAndText(
-                    iconRes = R.drawable.baseline_calendar_month_24,
-                    valueString = dateBuilder(
-                        saleTable.day,
-                        saleTable.month,
-                        saleTable.year
-                    )
-                )
-                saleTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
-                    ?.let { category ->
-                        IconAndText(
-                            iconRes = R.drawable.baseline_format_list_bulleted_24,
-                            valueString = category
-                        )
-                    }
-                saleTable.buyer.takeUnless { it == "Неизвестный" }
-                    ?.let { buyer ->
-                        IconAndText(
-                            iconRes = R.drawable.baseline_person_24,
-                            valueString = buyer
-                        )
-                    }
-                if (saleTable.note != "")
-                    IconAndText(
-                        iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = saleTable.note
-                    )
-            }
-            Text(
-                text = stringResource(
-                    R.string.card_count_briefly_s,
-                    "${saleTable.count.formatNumber()} ${saleTable.countSuffix}",
-                    saleTable.price.formatNumber(),
-                    stringResource(R.string.currency_ruble)
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.3f),
-                style = textBold_20
-            )
-        }
-    }
 }

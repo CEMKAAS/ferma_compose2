@@ -15,18 +15,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -66,9 +68,10 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_3
-import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
@@ -82,7 +85,33 @@ import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.MinDateSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 
+
 @Composable
+fun SearchBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes intRes: Int = R.string.search_section
+) {
+    BorderCard {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                tint = grey
+            )
+            BaseOutlinedTextNew2(
+                value = value,
+                onValueChange = onValueChange,
+                intResSup = intRes
+            )
+        }
+    }
+}
+
+/*@Composable
 fun OutlinedText(
     value: String,
     onValueChange: (String) -> Unit,
@@ -113,39 +142,31 @@ fun OutlinedText(
     }
 }
 
-
+*/
 @Composable
-fun OutlinedTextNote(
+fun OutlinedTextNoteNew(
     value: String,
     onValueChange: (String) -> Unit,
     cardBorder: Boolean = true,
     @StringRes label: Int = R.string.outlined_text_note,
     @StringRes supportingText: Int = R.string.support_text_note,
 ) {
-
-    val outlined: @Composable () -> Unit = {
-        BaseOutlinedText(
+    BorderCard {
+        BaseOutlinedTextNew(
             value = value,
             onValueChange = { onValueChange(it) },
             leadingIconRes = R.drawable.baseline_sticky_note_2_24,
             labelIntRes = label,
             intResSup = supportingText,
+            singleLine = false,
             keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = KeyboardActionFocus.CLEAN
+            keyboardActions = KeyboardActionFocus.CLEAN,
+            minLines = 3
         )
     }
-
-    if (cardBorder) {
-        CardField(
-            modifier = Modifier
-                .toOutlinedText(),
-            row = false
-        ) {
-            outlined()
-        }
-    } else outlined()
 }
 
+/*
 @Composable
 fun OutlinedTextNoteWidget(
     value: String,
@@ -185,9 +206,9 @@ fun OutlinedTextNoteWidget(
         keyboardActions = keyboardActionsEnter()
     )
 }
-
+*/
 @Composable
-fun OutlinedTextAnimal(
+fun OutlinedTextAnimalNew(
     value: String,
     onValueChange: (Pair<Long, String>) -> Unit,
     onClickClear: (String) -> Unit,
@@ -195,10 +216,7 @@ fun OutlinedTextAnimal(
     animalList: List<AnimalForAddDomain>,
 ) {
     val focusManager = LocalFocusManager.current
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false
-    ) {
+    BorderCard {
         ExposedDropdownMenuAnimals(
             selectedItemIndex = selectedAnimalIndex,
             setTitle = {
@@ -207,7 +225,7 @@ fun OutlinedTextAnimal(
             },
             animalList = animalList
         ) {
-            BaseOutlinedText(
+            BaseOutlinedTextNew(
                 modifier = it,
                 value = value,
                 onValueChange = {},
@@ -226,7 +244,7 @@ fun OutlinedTextAnimal(
 }
 
 @Composable
-fun OutlinedTextDate(
+fun OutlinedTextDateNew(
     value: String,
     onValueChange: (String) -> Unit,
     @StringRes intRes: Int = R.string.outlined_text_date,
@@ -254,8 +272,12 @@ fun OutlinedTextDate(
             openDialog = !openDialog
         }
     }
-    val textField: @Composable () -> Unit = {
-        BaseOutlinedText(
+    BorderCard(
+        modifier = Modifier
+            .toOutlinedText()
+            .clickable(onClick = { openDialog = !openDialog })
+    ) {
+        BaseOutlinedTextNew(
             value = value,
             onValueChange = { openDialog = !openDialog },
             readOnly = true,
@@ -266,21 +288,10 @@ fun OutlinedTextDate(
             leadingIconClick = { openDialog = !openDialog }
         )
     }
-    if (isCardBorder)
-        CardField(
-            modifier = Modifier
-                .toOutlinedText()
-                .clickable(onClick = { openDialog = !openDialog }),
-            row = false,
-            isNecessarily = isNecessarily
-        ) {
-            textField()
-        }
-    else textField()
 }
 
 @Composable
-fun OutlinedTextCategory(
+fun OutlinedTextCategoryNew(
     value: String,
     onValueChange: (String) -> Unit,
     titleList: List<String>,
@@ -303,12 +314,12 @@ fun OutlinedTextCategory(
                 intResSup = R.string.support_text_category,
                 keyboardOptions = keyboardOptionsNext(),
                 enable = enable,
-                readOnly = readOnly
+                readOnly = readOnly, isMore = true
             )
         }
     }
 }
-
+/*
 @Composable
 fun OutlinedTextCountAnimal(
     modifier: Modifier = Modifier,
@@ -378,84 +389,88 @@ fun OutlinedTextCountAnimal(
             )
     }
 }
+*/
 
 @Composable
-fun OutlinedTextCount2(
+fun OutlinedTextCountNew(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     suffix: Suffix,
     onSuffixChange: ((Suffix) -> Unit)? = null,
     isError: Boolean,
-    isAnimal: Boolean = false,
-    isWarehouseShow: Boolean = true,
-    isDropMenuShow: Boolean = true,
-    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
+//    isAnimal: Boolean = false,
+//    isWarehouseShow: Boolean = true,
+//    isDropMenuShow: Boolean = true,
+//    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     drawableRes: Int = R.drawable.baseline_shopping_basket_24,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_weight,
-    warehouseList: List<DomainCountSuffix> = emptyList(),
+//    warehouseList: List<DomainCountSuffix> = emptyList(),
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
-    isWeightCalculate: Boolean = false,
-    weightValue: String = "",
-    onWeightChange: (String) -> Unit = {},
-    weightSuffix: Suffix = Suffix.KILOGRAM,
-    onWeightSuffixChance: (Suffix) -> Unit = {},
-    isAutoCalculate: Boolean = true,
-    onAutoCalculate: (Boolean) -> Unit = {},
-    cardBorder: Boolean = true
+//    isWeightCalculate: Boolean = false,
+//    weightValue: String = "",
+//    onWeightChange: (String) -> Unit = {},
+//    weightSuffix: Suffix = Suffix.KILOGRAM,
+//    onWeightSuffixChance: (Suffix) -> Unit = {},
+//    isAutoCalculate: Boolean = true,
+//    onAutoCalculate: (Boolean) -> Unit = {},
+//    cardBorder: Boolean = true
 ) {
-
-    val textField: @Composable () -> Unit = {
-        BaseOutlinedText(
-            modifier = modifier,
-            value = value,
-            onValueChange = onValueChange,
-            suffix = suffix,
-            onSuffixChance = onSuffixChange,
-            versionDropMenu = versionDropMenu,
-            isError = isError,
-            isWarehouseShow = isWarehouseShow,
-            warehouseList = warehouseList,
-            leadingIconRes = drawableRes,
-            labelIntRes = intRes,
-            intResSup = intResSup,
-            intResError = intResError,
-            keyboardOptions = keyboardOptions,
-        )
-        if (isWeightCalculate && suffix !in setOf(
-                Suffix.KILOGRAM,
-                Suffix.GRAM,
-                Suffix.TONS
+    val focusManager = LocalFocusManager.current
+    val suffixText = stringResource(suffix.toResId())
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        BorderCard(modifier = Modifier.weight(1f)) {
+            BaseOutlinedTextNew(
+                modifier = modifier,
+                value = value,
+                onValueChange = onValueChange,
+                suffix = suffix,
+                onSuffixChance = onSuffixChange,
+//                versionDropMenu = versionDropMenu,
+                isError = isError,
+//                isWarehouseShow = isWarehouseShow,
+//                warehouseList = warehouseList,
+                leadingIconRes = drawableRes,
+                labelIntRes = intRes,
+                intResSup = R.string.outlined_text_count,
+                intResError = intResError,
+                keyboardOptions = keyboardOptions,
             )
-        )
-            AutoWeightCheckbox(
-                count = value,
-                weight = weightValue,
-                onWeightChange = onWeightChange,
-                suffix = weightSuffix,
-                onSuffixChance = onWeightSuffixChance,
-                isChecked = isAutoCalculate,
-                onCheckedChange = onAutoCalculate,
-                tooltipTextResAutoCal = tooltipTextResAutoCal
-            )
-    }
-    if (cardBorder) {
-        CardField(
-            modifier = Modifier
-                .toOutlinedText()
-                .padding(bottom = animatedErrorPadding(isAutoCalculate)),
-            row = false,
-            isNecessarily = true
-        ) {
-            textField()
         }
-    } else textField()
+        BorderCard(modifier = Modifier.weight(1f)) {
+            ExposedDropdownMenuSuffix(
+                suffix = suffix,
+                setSuffix = {
+                    onSuffixChange?.let { it1 ->
+                        it1(it)
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                },
+            ) {
+                BaseOutlinedTextNew(
+                    modifier = it.first,
+                    value = suffixText,
+                    onValueChange = {},
+//                    versionDropMenu = versionDropMenu,
+                    leadingIconRes = R.drawable.baseline_edit_document_24,
+                    labelIntRes = R.string.outlined_text_suffix,
+                    intResSup = R.string.outlined_text_suffix,
+                    keyboardOptions = keyboardOptions,
+                    isMore = true,
+                    readOnly = true
+                )
+            }
+        }
+    }
 }
 
-
+/*
 @Composable
 fun OutlinedTextCountAnimal2(
     value: String,
@@ -537,10 +552,10 @@ fun OutlinedTextTitleAdd(
             )
         }
     }
-}
+}*/
 
 @Composable
-fun OutlinedTextTitleAdd2(
+fun OutlinedTextTitleAddNew(
     value: String,
     onValueChange: (String) -> Unit,
     onValueChangeSuffix: (Pair<String, Suffix>) -> Unit,
@@ -553,11 +568,11 @@ fun OutlinedTextTitleAdd2(
     titleList: List<TitleAndSuffixDomain>,
     isErrorTitle: Boolean,
     isErrorSlash: Boolean,
-    cardBorder: Boolean = false
+    cardBorder: Boolean = true,
+    isMore: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current
-
-    val textField: @Composable () -> Unit = {
+    BorderCard {
         ExposedDropdownMenuProduct2(
             title = value,
             setTitle = {
@@ -567,7 +582,7 @@ fun OutlinedTextTitleAdd2(
             titleList = titleList,
             enableDropMenu = enable
         ) {
-            BaseOutlinedText(
+            BaseOutlinedTextNew(
                 modifier = it.first,
                 value = value,
                 onValueChange = { onValueChange(it) },
@@ -577,23 +592,13 @@ fun OutlinedTextTitleAdd2(
                 labelIntRes = intRes,
                 intResError = intResError,
                 intResSup = intResSup,
-                readOnly = readOnly, enable = enable,
+                readOnly = readOnly, enable = enable, isMore = isMore,
                 keyboardOptions = keyboardOptionsNext()
             )
         }
     }
-
-    if (cardBorder)
-        CardField(
-            modifier = Modifier
-                .toOutlinedText(),
-            row = false,
-            isNecessarily = true
-        ) {
-            textField()
-        }
-    else textField()
 }
+/*
 
 @Composable
 fun OutlinedTextPrice(
@@ -1082,5 +1087,200 @@ fun BaseOutlinedText(
         isError = isError
     )
 }
+*/
 
+@Composable
+fun BaseOutlinedTextNew(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    suffix: Suffix? = null,
+    onSuffixChance: ((Suffix) -> Unit)? = null,
+    trailingIcon: Int? = null,
+    onTrailingChance: (() -> Unit)? = null,
+    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
+    isError: Boolean = false,
+    isErrorSlash: Boolean = false,
+    isWarehouseShow: Boolean = false,
+    warehouseList: List<DomainCountSuffix> = emptyList(),
+    isAnimal: Boolean = false,
+    countAnimal: String = "",
+    leadingIconRes: Int? = null,
+    leadingIconClick: () -> Unit = {},
+    readOnly: Boolean = false,
+    enable: Boolean = true,
+    @StringRes labelIntRes: Int,
+    @StringRes intResSup: Int,
+    @StringRes intResError: Int = R.string.error_no_count_product,
+    isMore: Boolean = false,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    focusManager: FocusManager = LocalFocusManager.current,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
+) {
+    val leadingIcon: @Composable (() -> Unit)? = if (leadingIconRes != null) {
+        {
+            IconButton(onClick = { leadingIconClick() }) {
+                Icon(
+                    painter = painterResource(leadingIconRes),
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 5.dp)
+                )
+            }
+        }
+    } else null
 
+    val suffixValue: @Composable (() -> Unit)? =
+        suffix?.let { { Text(text = stringResource(it.toResId())) } }
+
+    val trailingIcon: @Composable (() -> Unit)? = when {
+        onSuffixChance != null -> {
+            { GetDropDownMenu(versionDropMenu) { onSuffixChance(it) } }
+        }
+
+        onTrailingChance != null -> {
+            {
+                IconButton(onClick = { onTrailingChance() }) {
+                    trailingIcon?.let {
+                        Icon(
+                            painter = painterResource(it),
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+        }
+
+        else -> null
+    }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            leadingIconRes?.let {
+                Icon(
+                    painter = painterResource(it), contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = green_shamrock
+                )
+            }
+            Text(
+                text = stringResource(labelIntRes),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = text_16,
+                color = dark
+            )
+        }
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(
+                    color = if (isError) Color(0xFFFFEAEA) else Color(0xFFF6F6F6),
+                    shape = RoundedCornerShape(14.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start // не SpaceBetween — контролируем ширины явно
+            ) {
+                // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier
+                        .weight(1f)           // <-- ключ: занимает свободное место
+                        .padding(end = if (isMore) 8.dp else 0.dp) // отступ перед иконкой
+                        .defaultMinSize(minHeight = (minLines * 26).dp)
+                        .align(Alignment.CenterVertically),
+                    textStyle = TextStyle(
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        lineHeight = 26.sp
+                    ),
+                    cursorBrush = SolidColor(Color(0xFF007AFF)),
+                    singleLine = singleLine,
+                    readOnly = readOnly,
+                    enabled = enable,
+
+                    decorationBox = { innerTextField ->
+                        Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {
+                            if (value.isEmpty()) {
+                                Text(
+                                    text = stringResource(intResSup),
+                                    color = Color(0xFF9A9A9A),
+                                    style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
+                                )
+                            }
+                            // Обязательно делаем innerTextField заполняющим ширину своего контейнера
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                innerTextField()
+                            }
+                        }
+                    }
+                )
+                // ИКОНКА: фиксированного размера, не будет ужиматься
+                if (isMore)
+                    Icon(
+                        modifier = Modifier
+                            .size(20.dp)            // фиксированный размер
+                            .wrapContentWidth(),    // не растягиваться
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = Color(0xFF9A9A9A)
+                    )
+            }
+        }
+    }
+}
+
+@Composable
+fun BaseOutlinedTextNew2(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes intResSup: Int,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    focusManager: FocusManager = LocalFocusManager.current,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
+) {
+    // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier,
+        textStyle = TextStyle(
+            color = Color.Black,
+            fontSize = 16.sp,
+            lineHeight = 26.sp
+        ),
+        cursorBrush = SolidColor(Color(0xFF007AFF)),
+        singleLine = singleLine,
+        decorationBox = { innerTextField ->
+            Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {
+                if (value.isEmpty()) {
+                    Text(
+                        text = stringResource(intResSup),
+                        color = Color(0xFF9A9A9A),
+                        style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
+                    )
+                }
+                // Обязательно делаем innerTextField заполняющим ширину своего контейнера
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    innerTextField()
+                }
+            }
+        }
+    )
+}

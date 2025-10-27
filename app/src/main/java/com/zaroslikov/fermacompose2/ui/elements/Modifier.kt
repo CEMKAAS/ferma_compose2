@@ -102,7 +102,7 @@ fun Modifier.modifierBottomSheet(isScroll: Boolean): Modifier {
         )
         .padding(
             top = dimensionResource(R.dimen.padding_small),
-            bottom = dimensionResource(R.dimen.padding_extra_large)
+            bottom = 100.dp
         )
         .pointerInput(Unit) {
             detectTapGestures(onTap = {

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ import javax.inject.Inject
 class SaleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val saleRepository: SaleRepository
-) : ListViewModel<SaleListState, SaleListIntent>(SaleListState()) {
+) : EntryNewViewModel<SaleListState, SaleListIntent>(SaleListState()) {
 
     private val itemIdPT: Long = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
 
@@ -43,6 +44,26 @@ class SaleViewModel @Inject constructor(
 
     fun getDetailsName(name: String): Flow<List<DomainSaleTable>> {
         return saleRepository.getBrieflyDetailsItemSale(itemIdPT, name)
+    }
+
+    override fun insert() {
+        TODO("Not yet implemented")
+    }
+
+    override fun update() {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(id: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun validation() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onIntent(intent: SaleListIntent) {
+        TODO("Not yet implemented")
     }
 }
 

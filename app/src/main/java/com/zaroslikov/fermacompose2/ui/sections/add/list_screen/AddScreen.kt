@@ -1,78 +1,70 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.sections.add.list_screen
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
-import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.alabaster
 import com.zaroslikov.fermacompose2.green_shamrock
-import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.elements.CardField
-import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.FloatButton
-import com.zaroslikov.fermacompose2.ui.elements.IconAndText
-import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
+import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimalNew
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategoryNew
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNew
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAddNew
 import com.zaroslikov.fermacompose2.ui.elements.TextLine
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
+import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_20
-import com.zaroslikov.fermacompose2.ui.elements.text_12
-import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
+import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
+import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
-import com.zaroslikov.fermacompose2.ui.start.dateBuilder
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
-import com.zaroslikov.fermacompose2.white
-import io.appmetrica.analytics.AppMetrica
+import com.zaroslikov.fermacompose2.ui.start.monthToResString
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -84,382 +76,315 @@ object HomeDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
-    modifier: Modifier = Modifier,
+/*    modifier: Modifier = Modifier,
     navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Long) -> Unit,
     navigationToAnalysis: (Pair<Long, String>) -> Unit,
     drawerState: DrawerState,
-    viewModel: AddViewModel = hiltViewModel()
+    viewModel: AddViewModel = hiltViewModel()*/
+    state: AddListState,
+    onIntent: (AddListIntent) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+//    val state by viewModel.state.collectAsStateWithLifecycle()
     val idProject = state.idPT
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerSheet(
-                scope = coroutineScope,
-                navigateToStart = navigateToStart,
-                navigateToModalSheet = navigateToModalSheet,
-                drawerState = drawerState,
-                3,
-                idProject.toString()
+    val query = state.textSearch.trim().lowercase()
+
+    val searchList = if (query.isBlank() && !state.isGroup) state.list
+    else
+        state.list.filter { item ->
+            item.title.lowercase().contains(query) ||
+                    item.note.lowercase().contains(query) ||
+                    item.category.lowercase().contains(query) ||
+                    item.count.toString().lowercase().contains(query) ||
+                    item.countSuffix.name.lowercase().contains(query) ||
+                    "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
+                        .contains(query)
+        }
+
+
+    val searchList2 = if (query.isBlank() && state.isGroup) state.briefly
+    else
+        state.briefly.filter { item ->
+            item.title.lowercase().contains(query) ||
+                    item.count.toString().lowercase().contains(query)
+        }
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBarNavigationNew(
+                title = R.string.add_screen_title,
+                scrollBehavior = scrollBehavior
             )
         },
-    ) {
-        Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBarNavigation(
-                    title = R.string.add_screen_title,
-                    scope = coroutineScope,
-                    drawerState = drawerState,
-                    scrollBehavior = scrollBehavior
-                )
-            },
-            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } }
-
-        ) { innerPadding ->
-            if (state.isLoading)
-                CircularProgress(
-                    modifier = modifier.padding(innerPadding),
-                )
-            else
-                AddContainer(
-                    modifier = modifier
-                        .modifierScreenLazy(innerPadding),
-                    itemList = state.list,
-                    brieflyList = state.briefly,
-                    viewModel = viewModel,
-                    onItemClick = navigateToItemUpdate,
-                    navigateToItemAdd = { navigateToItemAdd(idProject) },
-                    navigationToAnalysis = {
-                        navigationToAnalysis(idProject to it)
-                        AppMetrica.reportEvent("Анализ через Продукцию")
-                    }
-                )
+        floatingActionButton = {
+            NeonGlowFab {
+                onIntent(AddListIntent.OpenBottomSheetEntry(true))
+            }
         }
+    ) { innerPadding ->
+        if (state.isLoading)
+            CircularProgress(
+                modifier = Modifier.padding(innerPadding),
+            )
+        else
+            AddContainer2(
+                modifier = Modifier
+                    .modifierScreenLazy(innerPadding),
+                searchText = state.textSearch,
+                itemList = state.list,
+                searchList = searchList,
+                brieflyList = searchList2,
+                onInsertClick = {
+                   onIntent(
+                        AddListIntent.OpenBottomSheetEntry(true)
+                    )
+                },
+                onEditClick = {
+                    onIntent(
+                        AddListIntent.OpenBottomSheetEntry(true, it)
+                    )
+                },
+                onDeleteClick = { onIntent(AddListIntent.Delete(it)) },
+                onSearchChange = { onIntent(AddListIntent.SearchChanged(it)) },
+                onDetailsClick = {
+                    onIntent(
+                        AddListIntent.OpenBottomSheetGroup(true, it)
+                    )
+                }
+            )
+
+        if (state.openBottomSheetEntry)
+            EntryBottomSheet(
+                onDismissRequest = {
+                    onIntent(
+                        AddListIntent.OpenBottomSheetEntry(false)
+                    )
+                },
+                modifier = Modifier,
+                state = state.currentProduct,
+                onIntent = onIntent
+            )
+        if (state.openBottomSheetGroup)
+            BrieflyBottomSheetAdd(
+                list = state.list,
+                titleProduct = state.currentBriefly.title,
+                count = state.currentBriefly.count,
+                suffix = state.currentBriefly.suffix,
+                countEntry = state.currentBriefly.rowCount,
+                onDismissRequest = { onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
+                onEditClick = {
+                    onIntent(
+                        AddListIntent.OpenBottomSheetEntry(true, it)
+                    )
+                },
+                onDeleteClick = {onIntent(AddListIntent.Delete(it)) },
+            )
     }
 }
 
 
 @Composable
-fun AddContainer(
+fun AddContainer2(
     modifier: Modifier = Modifier,
-    viewModel: AddViewModel,
+    searchText: String,
     itemList: List<DomainAddTable>,
+    searchList: List<DomainAddTable>,
     brieflyList: List<BrieflyAddDomain>,
-    onItemClick: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: () -> Unit,
-    navigationToAnalysis: (String) -> Unit,
+    onInsertClick: () -> Unit,
+    onEditClick: (DomainAddTable) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onSearchChange: (String) -> Unit,
+    onDetailsClick: (BrieflyAddDomain) -> Unit
 ) {
-    if (itemList.isNotEmpty())
-        InventoryList(
-            itemList = itemList,
-            brieflyList = brieflyList,
-            viewModel = viewModel,
-            onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
-            modifier = modifier,
-            navigationToAnalysis = navigationToAnalysis
-        )
-    else MessageNoData(
+    InventoryBody(
         modifier = modifier,
-        onClick = navigateToItemAdd,
+        searchText = searchText,
+        itemList = itemList,
+        searchList = searchList,
+        brieflyList = brieflyList,
+        onInsertClick = onInsertClick,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        onSearchChange = onSearchChange,
+        onDetailsClick = onDetailsClick,
+        detailCard = { item ->
+            DetailProductCardNew(
+                title = item.title,
+                count = item.count,
+                suffix = item.countSuffix,
+                category = item.category,
+                note = item.note,
+                animal = "Murka",
+                color = green_shamrock,
+                day = item.day,
+                month = item.month,
+                year = item.year,
+                onClick = { },
+                onEditClick = { onEditClick(item) },
+                onDeleteClick = { onDeleteClick(item.id) },
+            )
+        },
+        brieflyCard = { item ->
+            BrieflyCountCardNew(
+                modifier = Modifier,
+                titleProduct = item.title,
+                count = item.count,
+                suffix = item.suffix,
+                countEntry = item.rowCount,
+                color = green_shamrock,
+                colorSecondary = alabaster,
+                onClick = { onDetailsClick(item) }
+            )
+        },
         titleRes = R.string.message_no_date_title_add,
         messageRes = R.string.message_no_date_message_add,
         supportRes = R.string.message_no_date_support_text_add,
-        buttonRes = R.string.button_add_message_no_data
+        buttonRes = R.string.button_add_message_no_data,
     )
 }
 
+@Composable
+fun BrieflyBottomSheetAdd(
+    list: List<DomainAddTable>,
+    titleProduct: String,
+    count: Double,
+    suffix: Suffix,
+    countEntry: Long,
+    onEditClick: (DomainAddTable) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    BrieflyBottomSheetUniversal(
+        list = list,
+        titleProduct = titleProduct,
+        count = count,
+        suffix = suffix,
+        countEntry = countEntry,
+        onDismissRequest = onDismissRequest,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        itemCard = { product ->
+            DetailProductCardNew2(
+                modifier = Modifier,
+                count = product.count,
+                suffix = product.countSuffix,
+                category = product.category,
+                note = product.note,
+                animal = "Mas",
+                color = green_shamrock,
+                day = product.day,
+                month = product.month,
+                year = product.year,
+                onDeleteClick = { onDeleteClick(product.id) },
+                onEditClick = { onEditClick(product) }
+            )
+        }
+    )
+}
 
 @Composable
-fun InventoryList(
-    modifier: Modifier = Modifier,
-    viewModel: AddViewModel,
-    itemList: List<DomainAddTable>,
-    brieflyList: List<BrieflyAddDomain>,
-    onItemClick: (DomainAddTable) -> Unit,
-    navigationToAnalysis: (String) -> Unit,
+fun EntryBottomSheet(
+    modifier: Modifier,
+    state: AddEntryState2,
+    onDismissRequest: () -> Unit,
+    onIntent: (AddListIntent) -> Unit
 ) {
-    var details by rememberSaveable { mutableStateOf(true) }
-
-    val extraPadding by animateDpAsState(
-        if (details) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-    val extraPaddingResd by animateDpAsState(
-        if (!details) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-
-    LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
     ) {
-        item {
-            TextButtonWarehouse(
-                boolean = details,
-                onClick = { details = !details },
-                intRes = if (details) R.string.widget_briefly else R.string.widget_detail
-            )
-        }
-        if (details)
-            items(items = itemList, key = { it.id }) { item ->
-                AddProductCardNew(
-                    addProduct = item,
-                    modifier = Modifier
-                        .clickable { onItemClick(item) }
-                        .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
-            }
-        else
-            items(items = brieflyList) { item ->
-                BrieflyCountCard(
-                    product = item,
-                    viewModel = viewModel,
-                    onItemClick = onItemClick,
-                    navigationToAnalysis = navigationToAnalysis,
-                    modifier = Modifier
-                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
-                )
-            }
-    }
-}
-
-@Composable
-fun BrieflyCountCard(
-    modifier: Modifier = Modifier,
-    viewModel: AddViewModel,
-    product: BrieflyAddDomain,
-    onItemClick: (DomainAddTable) -> Unit,
-    navigationToAnalysis: (String) -> Unit = {}
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    val extraPadding by animateDpAsState(
-        if (expanded) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-    CardField(modifier = modifier.clickable {
-        expanded = !expanded
-    }) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .fillMaxHeight()
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f)
+                modifier = Modifier.modifierBottomSheet(true),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                TextLine(
-                    modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
-                    valueString = product.title,
-                    textStyle = textBold_20
-                )
-                IconAndText(
-                    iconRes = R.drawable.baseline_shopping_basket_24,
-                    valueString = "${product.count.formatNumber()} ${stringResource(product.suffix.toResId())}",
-                )
-            }
-
-            IconButton(onClick = { navigationToAnalysis(product.title) }) {
-                Icon(
-                    painterResource(id = R.drawable.baseline_analytics_24),
-                    contentDescription = "Анализ",
-                )
-            }
-            IconButton(onClick = {
-                expanded = !expanded
-            }) {
-                Icon(
-                    painterResource(if (expanded) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
-                    contentDescription = "Показать меню"
-                )
-            }
-        }
-    }
-    if (expanded) {
-        val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
-        products.value.forEach {
-            AddProductCardNew(
-                addProduct = it,
-                modifier = Modifier
-                    .graphicsLayer {
-                        scaleX = 0.95f
-                    }
-                    .clickable { onItemClick(it) }
-                    .padding(bottom = extraPadding.coerceAtLeast(0.dp))
-            )
-        }
-    }
-}
-
-
-@Composable
-fun AddProductCard(
-    addProduct: DomainAddTable,
-    modifier: Modifier = Modifier
-) {
-    CardField(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f)
-            ) {
-                Text(
-                    modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    text = addProduct.title,
-                    style = textBold_20,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                IconAndText(
-                    iconRes = R.drawable.baseline_calendar_month_24,
-                    valueString = dateBuilder(
-                        addProduct.day,
-                        addProduct.month,
-                        addProduct.year
-                    )
-                )
-                addProduct.category.takeUnless { it == "Без категории" || it.isEmpty() }
-                    ?.let { category ->
-                        IconAndText(
-                            iconRes = R.drawable.baseline_format_list_bulleted_24,
-                            valueString = category
-                        )
-                    }
-
-//                if (addProduct.animal != "")
-//                    IconAndText(
-//                        iconRes = R.drawable.baseline_pets_24,
-//                        valueString = addProduct.animal
-//                    )
-
-                if (addProduct.note != "")
-                    IconAndText(
-                        iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = addProduct.note
-                    )
-            }
-            Text(
-                text = "${addProduct.count.formatNumber()} ${stringResource(addProduct.countSuffix.toResId())}",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.3f),
-                style = textBold_20
-            )
-        }
-    }
-}
-
-
-@Composable
-fun AddProductCardNew(
-    addProduct: DomainAddTable,
-    modifier: Modifier = Modifier
-) {
-    CardFieldNew(modifier = modifier, row = false) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = addProduct.title,
-                        style = textBold_16,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = green_shamrock
-                        ),
-                        shape = RoundedCornerShape(8.dp)
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = "${addProduct.count.formatNumber()} ${stringResource(addProduct.countSuffix.toResId())}",
-                            style = text_12,
-                            modifier = Modifier.padding(vertical = 2.dp, horizontal = 8.dp),
-                            color = white
+                        TextLine(
+                            modifier = Modifier.weight(1f),
+                            valueString = "Добавить продуцию",
+                            textStyle = textBold_20
                         )
+                        IconButton(onClick = onDismissRequest) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Close"
+                            )
+                        }
                     }
+                    Text(text = "Введите информацию о новой продукции")
                 }
-                IconButton(onClick = {}, modifier = Modifier.size(18.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More"
-                    )
-                }
-            }
-
-            IconAndTextNew(
-                iconRes = R.drawable.baseline_calendar_month_24,
-                valueString = dateBuilder(
-                    addProduct.day,
-                    addProduct.month,
-                    addProduct.year
+                OutlinedTextTitleAddNew(
+                    value = state.title,
+                    onValueChange = { onIntent(AddListIntent.TitleChanged(it)) },
+                    onValueChangeSuffix = { onIntent(AddListIntent.TitleAndSuffix(it)) },
+                    titleList = state.pickList.titleList,
+                    isErrorTitle = state.error.isErrorTitle,
+                    isErrorSlash = state.error.isErrorSlash,
+                    drawableRes = R.drawable.icon_add_product
                 )
-            )
-            addProduct.category.takeUnless { it == "Без категории" || it.isEmpty() }
-                ?.let { category ->
-                    IconAndTextNew(
-                        iconRes = R.drawable.baseline_format_list_bulleted_24,
-                        valueString = category
+                OutlinedTextCountNew(
+                    value = state.count,
+                    onValueChange = {
+                        onIntent(AddListIntent.CountChanged(it))
+                    },
+                    onSuffixChange = { onIntent(AddListIntent.SuffixClicked(it)) },
+                    isError = state.error.isErrorCount,
+                    suffix = state.countSuffix,
+                    intResSup = R.string.support_text_count_product,
+//                    isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
+//                    warehouseList = state.warehouseList
+                )
+                OutlinedTextCategoryNew(
+                    value = state.category,
+                    onValueChange = { onIntent(AddListIntent.CategoryChanged(it)) },
+                    titleList = state.pickList.categoryList,
+                )
+                OutlinedTextDateNew(
+                    value = state.date,
+                    onValueChange = { onIntent(AddListIntent.Date(it)) }
+                )
+                if (state.pickList.animalList.isNotEmpty())
+                    OutlinedTextAnimalNew(
+                        value = state.animal,
+                        onValueChange = { onIntent(AddListIntent.Animal(it)) },
+                        selectedAnimalIndex = state.selectedAnimalIndex,
+                        onClickClear = { onIntent(AddListIntent.AnimalClear(it)) },
+                        animalList = state.pickList.animalList,
                     )
-                }
-
-//                if (addProduct.animal != "")
-//                    IconAndText(
-//                        iconRes = R.drawable.baseline_pets_24,
-//                        valueString = addProduct.animal
-//                    )
-
-            if (addProduct.note != "") {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = ghostly_white
-                    ),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    IconAndTextNew(
-                        iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = addProduct.note,
-                        modifier = Modifier.padding(12.dp),
-                    )
-                }
+                OutlinedTextNoteNew(
+                    value = state.note,
+                    onValueChange = { onIntent(AddListIntent.NoteChanged(it)) },
+                )
             }
+            ButtonPanelNew(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(),
+                isEntry = state.isEntry,// todo
+                onClickInsert = { onIntent(AddListIntent.Insert) },
+                onClickUpdate = { onIntent(AddListIntent.Update) },
+                onClickClose = onDismissRequest,
+                enable = state.enabledButton()
+            )
         }
     }
 }
 
+enum class Page {
+    ADD, SALE, WRITE_OFF, EXPENSES
+}
