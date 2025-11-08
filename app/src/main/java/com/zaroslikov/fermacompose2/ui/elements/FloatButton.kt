@@ -76,15 +76,15 @@ fun FloatButton(
 @Composable
 fun NeonGlowFab(
     modifier: Modifier = Modifier,
+    colors: List<Color>,
     onClick: () -> Unit,
 ) {
     val glowColor = Color(0xFF00A63E)
     val gradient = Brush.linearGradient(
-        colors = listOf(Color(0xFF009966), Color(0xFF00A63E)),
+        colors = colors,
         start = Offset(0f, 0f),
         end = Offset(Float.POSITIVE_INFINITY, 0f)
     )
-
     Box(
         modifier = modifier
             .size(64.dp)

@@ -63,7 +63,7 @@ fun Modifier.modifierScreenLazy(
         .padding(innerPadding)
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
-            vertical = dimensionResource(R.dimen.padding_small)
+//            vertical = dimensionResource(R.dimen.padding_small)
         )
 //        .pointerInput(Unit) {
 //            detectTapGestures(onTap = {

@@ -16,6 +16,7 @@ import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.sections.HomeDestination
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,23 +40,7 @@ class AddViewModel @Inject constructor(
     private val itemIdPT: Long = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
     init {
-        viewModelScope.launch {
-            combine(
-                addRepository.getAllItems(itemIdPT),
-                addRepository.getBrieflyItemAdd(itemIdPT)
-            ) { addList, briefly ->
-                addList to briefly
-            }.collectLatest { (addList, briefly) ->
-                updateState {
-                    it.copy(
-                        idPT = itemIdPT,
-                        list = addList,
-                        briefly = briefly,
-                        isLoading = false
-                    )
-                }
-            }
-        }
+        loadData()
     }
 
     override fun onIntent(intent: AddListIntent) {
@@ -89,68 +74,23 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    private fun updateGroup(isGroup: Boolean) {
-        updateState {
-            it.copy(
-                isGroup = isGroup
-            )
-        }
-    }
-
-
-    private fun updateSuffix(suffix: Suffix) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(countSuffix = suffix)
-            )
-        }
-    }
-
-    private fun updateCategory(category: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(category = category)
-            )
-        }
-    }
-
-    private fun updateDate(date: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(date = date)
-            )
-        }
-    }
-
-    private fun updateNote(note: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(note = note)
-            )
-        }
-    }
-
-    private fun updateAnimal(animal: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(animal = animal)
-            )
-        }
-    }
-
-    private fun updateWarehouse(warehouseList: List<DomainCountSuffix>) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(warehouseList = warehouseList)
-            )
-        }
-    }
-
-    private fun updateSearch(search: String) {
-        updateState {
-            it.copy(
-                textSearch = search
-            )
+    private fun loadData() {
+        viewModelScope.launch {
+            combine(
+                addRepository.getAllItems(itemIdPT),
+                addRepository.getBrieflyItemAdd(itemIdPT)
+            ) { addList, briefly ->
+                addList to briefly
+            }.collectLatest { (addList, briefly) ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        list = addList,
+                        briefly = briefly,
+                        isLoading = false
+                    )
+                }
+            }
         }
     }
 
@@ -158,12 +98,20 @@ class AddViewModel @Inject constructor(
         openBottomSheetGroup: Boolean,
         currentBriefly: BrieflyAddDomain
     ) {
-        updateState {
-            it.copy(
-                openBottomSheetGroup = openBottomSheetGroup,
-                currentBriefly = currentBriefly
-            )
+        viewModelScope.launch {
+            val listBriefly = getDetailsName(name = currentBriefly.title)
+            updateState {
+                it.copy(
+                    openBottomSheetGroup = openBottomSheetGroup,
+                    currentBriefly = currentBriefly,
+                    listBriefly = listBriefly
+                )
+            }
         }
+    }
+
+    private suspend fun getDetailsName(name: String): List<DomainAddTable> {
+        return addRepository.getBrieflyDetailsItemAdd(itemIdPT, name).first()
     }
 
     private fun openBottomSheetEntry(
@@ -178,7 +126,7 @@ class AddViewModel @Inject constructor(
 
                 updateState {
                     it.copy(
-                        openBottomSheetEntry = openBottomSheetEntry,
+                        openBottomSheetEntry = true,
                         currentProduct = AddEntryState2(
                             itemIdPT = itemIdPT,
                             category = resourceProvider.getString(R.string.support_text_no_category),
@@ -213,11 +161,7 @@ class AddViewModel @Inject constructor(
                     }
                 }
             }
-        else updateState { it.copy(openBottomSheetEntry = openBottomSheetEntry) }
-    }
-
-    fun getDetailsName(name: String): Flow<List<DomainAddTable>> {
-        return addRepository.getBrieflyDetailsItemAdd(itemIdPT, name)
+        else updateState { it.copy(openBottomSheetEntry = false) }
     }
 
     private fun updateWarehouseUiState(name: String) {
@@ -292,6 +236,70 @@ class AddViewModel @Inject constructor(
                         getState().currentProduct.count,
                         getState().currentProduct.countSuffix
                     )
+            )
+        }
+    }
+
+    private fun updateGroup(isGroup: Boolean) {
+        updateState {
+            it.copy(
+                isGroup = isGroup
+            )
+        }
+    }
+
+    private fun updateSuffix(suffix: Suffix) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(countSuffix = suffix)
+            )
+        }
+    }
+
+    private fun updateCategory(category: String) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(category = category)
+            )
+        }
+    }
+
+    private fun updateDate(date: String) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(date = date)
+            )
+        }
+    }
+
+    private fun updateNote(note: String) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(note = note)
+            )
+        }
+    }
+
+    private fun updateAnimal(animal: String) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(animal = animal)
+            )
+        }
+    }
+
+    private fun updateWarehouse(warehouseList: List<DomainCountSuffix>) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(warehouseList = warehouseList)
+            )
+        }
+    }
+
+    private fun updateSearch(search: String) {
+        updateState {
+            it.copy(
+                textSearch = search
             )
         }
     }

@@ -85,6 +85,7 @@ fun ButtonPanelNew(
     modifier: Modifier,
     isEntry: Boolean,
     enable: Boolean,
+    colors: List<Color>,
     onClickInsert: () -> Unit,
     onClickUpdate: () -> Unit,
     onClickClose: () -> Unit
@@ -115,7 +116,8 @@ fun ButtonPanelNew(
                 text = stringResource(text),
                 onClick = onClick,
                 enable = enable,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = colors
             )
         }
     }

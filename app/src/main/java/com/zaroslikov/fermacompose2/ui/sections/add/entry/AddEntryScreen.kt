@@ -16,26 +16,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.elements.CloseButton
-import com.zaroslikov.fermacompose2.ui.elements.GradientButton
-import com.zaroslikov.fermacompose2.ui.elements.GradientMaterialButton
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimal
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimalNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategory
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategoryNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNoteNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAddNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 object AddEntryDestination : NavigationDestination {

@@ -50,7 +50,7 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.indicators.size.HeadingIndicators
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.DropdownMenu
+import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
 import com.zaroslikov.fermacompose2.ui.elements.FloatButton
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2

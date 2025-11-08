@@ -80,6 +80,10 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: Expens
         return expensesDao.deleteExpenses(item.toExpensesRoomMap())
     }
 
+    override suspend fun deleteExpensesById(id: Long) {
+        return expensesDao.deleteExpensesById(id)
+    }
+
     override fun getExpenses(id: Long): Flow<Double> {
         return expensesDao.getExpenses(id)
     }

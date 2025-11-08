@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 interface ExpensesDao {
     @Query(
         "SELECT * FROM expenses_table " +
-                "Where idPT=:id ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC"
+                "WHERE idPT=:id ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC"
     )
     fun getAllExpensesItems(id: Long): Flow<List<ExpensesTable>>
 
@@ -29,13 +29,13 @@ interface ExpensesDao {
     fun getItemExpensesIdAnimalCount(id: Long): Flow<ExpensesTable>
 
     @Query("SELECT * FROM expenses_table WHERE animal_vaccination_id=:id")
-    fun getItemExpensesForVaccination
-                (id: Long): Flow<ExpensesTable?>
+    fun getItemExpensesForVaccination(id: Long): Flow<ExpensesTable?>
 
     @Query(
         "SELECT title, SUM(count) AS count," +
                 " SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END) AS price," +
-                " count_suffix AS suffix" +
+                " count_suffix AS suffix," +
+                " COUNT(*) AS row_count" +
                 " FROM expenses_table" +
                 " WHERE idPT=:id" +
                 " GROUP BY title" +
@@ -45,7 +45,6 @@ interface ExpensesDao {
 
     @Query("SELECT * FROM expenses_table WHERE idPT=:id AND title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC")
     fun getBrieflyDetailsItemExpenses(id: Long, name: String): Flow<List<ExpensesTable>>
-
 
     @Query(
         "SELECT title, count_suffix AS suffix FROM expenses_table" +
@@ -57,7 +56,6 @@ interface ExpensesDao {
 
     @Query("SELECT category FROM expenses_table WHERE idPT=:id GROUP BY category")
     fun getItemsCategoryExpensesList(id: Long): Flow<List<String>>
-
 
     @Query(
         "SELECT a.id, a.name as name, a.foodDay as foodDay, a.food_day_suffix as foodDaySuffix, t.count as countAnimal," +
@@ -86,6 +84,9 @@ interface ExpensesDao {
 
     @Delete
     suspend fun deleteExpenses(item: ExpensesTable)
+
+    @Query("DELETE FROM expenses_table WHERE _id = :id")
+    suspend fun deleteExpensesById(id: Long)
 
     @Query("SELECT COALESCE(SUM(count), 0) AS ResultCount FROM expenses_table WHERE idPT=:id")
     fun getExpenses(id: Long): Flow<Double>

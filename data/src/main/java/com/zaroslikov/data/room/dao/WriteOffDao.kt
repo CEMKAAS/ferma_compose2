@@ -23,8 +23,13 @@ interface WriteOffDao {
     fun getItemWriteOffIdAnimalCount(id: Long): Flow<WriteOffTable>
 
     @Query(
-        "SELECT title, SUM(count) as count, count_suffix as suffix from write_off_table" +
-                " Where idPT=:id group by title ORDER BY count DESC"
+        "SELECT title," +
+                " SUM(count) AS count," +
+                " count_suffix AS suffix," +
+                " SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END) AS price," +
+                " COUNT(*) AS row_count" +
+                " FROM write_off_table" +
+                " WHERE idPT=:id GROUP BY title ORDER BY count DESC"
     )
     fun getBrieflyItemWriteOff(id: Long): Flow<List<BrieflyWriteOffDto>>
 

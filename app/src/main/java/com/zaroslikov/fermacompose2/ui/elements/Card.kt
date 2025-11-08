@@ -7,17 +7,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,19 +28,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zaroslikov.domain.models.DomainAddTable
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
-import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
+import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.supportFun.toColor
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.AddViewModel
+import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
 
 
@@ -341,31 +340,29 @@ fun CardFinanceRow(
 @Composable
 fun DetailProductCardNew(
     modifier: Modifier = Modifier,
-    title: String,
+    title: String? = null,
     count: Double,
     suffix: Suffix,
-    category: String?,
+    price: Double? = null,
+    priceSuffix: Suffix = Suffix.PIECES,
+    category: String? = null,
+    statusWriteOff: Boolean? = null,
     note: String,
-    animal: String?,
+    animal: String? = null,
     color: Color,
     day: Int,
     month: Int,
     year: Int,
+    buyer: String? = null,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    isCardField: Boolean = true
 ) {
     val monthText = stringResource(id = monthToResString(month))
     val date = dateBuilder(day, monthText, year)
 
-    CardFieldNew(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            },
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+    val cardField: @Composable () -> Unit = {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -375,92 +372,80 @@ fun DetailProductCardNew(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = title,
-                    style = textBold_16,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                CountColorCard(count, suffix, green_shamrock)
+                title?.let {
+                    Text(
+                        text = it,
+                        style = textBold_16,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                CountColorCard(count, suffix, color)
+                price?.let {
+                    CountColorCard(it, priceSuffix, price_green)
+                }
             }
             DropdownMenuEdit(
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick
             )
         }
-        IconAndTextNew(
-            iconRes = R.drawable.baseline_calendar_month_24,
-            valueString = date
-        )
+        statusWriteOff?.let { status ->
+            val (iconRes, valueString) = if (status)
+                R.drawable.baseline_cottage_24 to R.string.ration_button_own_needs
+            else
+                R.drawable.baseline_delete_24 to R.string.ration_button_disposal
+            IconAndTextNew(
+                iconRes = iconRes,
+                valueString = stringResource(valueString),
+                color = if (status) violet_1 else error_base,
+            )
+        }
         category.takeUnless { it == "Без категории" /*|| it.isEmpty()*/ }
             ?.let { category ->
                 IconAndTextNew(
                     iconRes = R.drawable.baseline_format_list_bulleted_24,
-                    valueString = category
+                    valueString = category,
+                    color = color
                 )
             }
-//                if (addProduct.animal != "")
-//                    IconAndText(
-//                        iconRes = R.drawable.baseline_pets_24,
-//                        valueString = addProduct.animal
-//                    )
-        if (note != "") NoteColorCard(note)
-    }
-}
-
-@Composable
-fun DetailProductCardNew2(
-    modifier: Modifier = Modifier,
-    count: Double,
-    suffix: Suffix,
-    category: String?,
-    note: String,
-    animal: String?,
-    color: Color,
-    day: Int,
-    month: Int,
-    year: Int,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    val monthText = stringResource(id = monthToResString(month))
-    val date = dateBuilder(day, monthText, year)
-    BorderCard {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            CountColorCard(count, suffix, green_shamrock)
-            DropdownMenuEdit(
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick
+        buyer?.let {
+            IconAndTextNew(
+                iconRes = R.drawable.baseline_person_24,
+                valueString = it,
+                color = color
             )
         }
         IconAndTextNew(
             iconRes = R.drawable.baseline_calendar_month_24,
-            valueString = date
+            valueString = date,
+            color = color
         )
-        category.takeUnless { it == "Без категории" /*|| it.isEmpty()*/ }
-            ?.let { category ->
-                IconAndTextNew(
-                    iconRes = R.drawable.baseline_format_list_bulleted_24,
-                    valueString = category
-                )
-            }
+
 //                if (addProduct.animal != "")
 //                    IconAndText(
 //                        iconRes = R.drawable.baseline_pets_24,
 //                        valueString = addProduct.animal
 //                    )
-        if (note != "") NoteColorCard(note)
+        if (note != "") NoteColorCard(note, color)
     }
-}
 
+    if (isCardField) CardFieldNew(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            },
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) { cardField() } else BorderCard { cardField() }
+}
 
 @Composable
 fun BorderCard(
     modifier: Modifier = Modifier,
+    padding: Dp = 20.dp,
+    borderWidth: Dp = 1.dp,
+    borderColor: Color = grey_2,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
@@ -470,14 +455,14 @@ fun BorderCard(
             containerColor = white
         ),
         border = BorderStroke(
-            width = 1.dp,
-            color = grey_2
+            width = borderWidth,
+            color = borderColor
         )
     ) {
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(padding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             content()
@@ -492,8 +477,11 @@ fun BrieflyCountCardNew(
     count: Double,
     suffix: Suffix,
     countEntry: Long,
+    price: Double? = null,
+    priceSuffix: Suffix = Suffix.PIECES,
     color: Color,
     colorSecondary: Color,
+    icon: Int,
     onClick: () -> Unit
 ) {
     CardFieldNew(
@@ -509,7 +497,7 @@ fun BrieflyCountCardNew(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Icon(
-                    painterResource(R.drawable.icon_add_product),
+                    painterResource(icon),
                     contentDescription = null,
                     tint = color,
                     modifier = Modifier.padding(8.dp),
@@ -525,6 +513,9 @@ fun BrieflyCountCardNew(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     CountColorCard(count, suffix, color)
+                    price?.let {
+                        CountColorCard(it, priceSuffix, price_green)
+                    }
                     Text(text = "$countEntry Записи", style = text_12)
                 }
                 IconButton(onClick = onClick) {
@@ -564,7 +555,8 @@ fun CountColorCard(
 
 @Composable
 fun NoteColorCard(
-    note: String
+    note: String,
+    color: Color
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -577,7 +569,29 @@ fun NoteColorCard(
             iconRes = R.drawable.baseline_sticky_note_2_24,
             valueString = note,
             modifier = Modifier.padding(12.dp),
+            color = color
         )
     }
 }
 
+@Composable
+fun WarehouseCountCard(
+    title: String,
+    warehouseList: List<DomainCountSuffix>
+) {
+    if (title.isNotBlank() && warehouseList.isNotEmpty())
+        BorderCard {
+            Text(
+                text = stringResource(R.string.support_text_count_warehouse_s)
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                warehouseList.forEachIndexed { index, item ->
+                    CountColorCard(item.count, item.suffix, item.suffix.toColor())
+                }
+            }
+        }
+}

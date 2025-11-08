@@ -16,4 +16,39 @@ val gray_5 = Color(0xFFE5E7EB)
 val gray_6 = Color(0xFFF3F4F6)
 
 
+val green_1 = Color(0xFFA4F4CF)
+
+
+// Color Suffix
+val price_green = Color(0xFF00A63E)
+val gram_color = Color(0xFF00A63E)
+val kilogram_color = Color(0xFF00A63E)
+val tons_color = Color(0xFF00A63E)
+val liters_color = Color(0xFF00A63E)
+val cubic_meters = Color(0xFF00A63E)
+val millimeters_color = Color(0xFF00A63E)
+val centimeters_color = Color(0xFF00A63E)
+val meters_color = Color(0xFF00A63E)
+val pieces_color = Color(0xFF00A63E)
+val heads_color = Color(0xFF00A63E)
+val units_color = Color(0xFF00A63E)
+
+
+// ColorGradiend
+val blue_1 = Color(0xFF155DFC)
+val blue_2 = Color(0xFF4F39F6)
+
+val orang_1 = Color(0xFFF54900)
+val orang_2 = Color(0xFFE17100)
+
+val violet_1 = Color(0xFF9810FA)
+val violet_2 = Color(0xFF4F39F6)
+
+val green_g_1 = Color(0xFFECFDF5)
+val green_g_2 = Color(0xFFF0FDF4)
+
+// Error
+
+val error_base = Color(0xFFE7000B)
+
 val black = Color(0xFF0A0A0A)

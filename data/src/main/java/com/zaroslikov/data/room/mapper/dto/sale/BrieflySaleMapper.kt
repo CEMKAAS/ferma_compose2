@@ -9,5 +9,6 @@ fun BrieflySaleDto.toBrieflySaleDomain(): BrieflySaleDomain {
         count = this.count,
         suffix = this.suffix,
         price = this.price,
+        rowCount = this.rowCount
     )
 }

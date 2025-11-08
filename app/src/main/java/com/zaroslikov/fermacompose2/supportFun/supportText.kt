@@ -4,6 +4,7 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.Page
 
 fun infoTextKillAnimal(count: String, suffix: String): String {
     return "${count.toConvertZeroString().toFormatNumber()} " +
@@ -48,5 +49,15 @@ fun AnimalCountVersion.toResId(): Int {
         AnimalCountVersion.WRITE_OFF -> R.string.button_write_off
         AnimalCountVersion.ADD -> R.string.button_add
         AnimalCountVersion.INCUBATOR -> R.string.button_add
+    }
+}
+
+fun Page.toResId(): Int {
+    return when (this) {
+        Page.ADD -> R.string.add_screen_title2
+        Page.SALE -> R.string.sale_screen_title2
+        Page.EXPENSES -> R.string.expenses_screen_title2
+        Page.WRITE_OFF -> R.string.write_off_screen_title2
+        Page.ANIMAL -> R.string.animal_screen_title2
     }
 }

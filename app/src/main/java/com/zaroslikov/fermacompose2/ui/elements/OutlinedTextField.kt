@@ -9,24 +9,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,7 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
@@ -50,14 +38,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
@@ -65,10 +49,6 @@ import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.fermacompose2.dark
-import com.zaroslikov.fermacompose2.green_shamrock
-import com.zaroslikov.fermacompose2.grey_3
-import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
@@ -81,6 +61,15 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.MinDateSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.elements.TextField.BaseOutlinedTextNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
+import com.zaroslikov.fermacompose2.ui.elements.TextField.ExposedDropdownMenuAnimals
+import com.zaroslikov.fermacompose2.ui.elements.TextField.ExposedDropdownMenuIcon
+import com.zaroslikov.fermacompose2.ui.elements.TextField.ExposedDropdownMenuPair
+import com.zaroslikov.fermacompose2.ui.elements.TextField.ExposedDropdownMenuCategoryBuyer
+import com.zaroslikov.fermacompose2.ui.elements.TextField.ExposedDropdownMenuProduct
+import com.zaroslikov.fermacompose2.ui.elements.TextField.ExposedDropdownMenuSex
+import com.zaroslikov.fermacompose2.ui.elements.TextField.GetDropDownMenu
 
 @Composable
 fun OutlinedText(
@@ -208,7 +197,7 @@ fun OutlinedTextAnimal(
             animalList = animalList
         ) {
             BaseOutlinedText(
-                modifier = it,
+                modifier = it.first,
                 value = value,
                 onValueChange = {},
                 leadingIconRes = R.drawable.baseline_pets_24,
@@ -288,7 +277,7 @@ fun OutlinedTextCategory(
     readOnly: Boolean = false,
 ) {
     BorderCard {
-        ExposedDropdownMenuProduct(
+        ExposedDropdownMenuCategoryBuyer(
             title = value,
             setTitle = { onValueChange(it) },
             titleList = titleList
@@ -517,7 +506,7 @@ fun OutlinedTextTitleAdd(
         row = false,
         isNecessarily = true
     ) {
-        ExposedDropdownMenuProduct(
+        ExposedDropdownMenuCategoryBuyer(
             title = value,
             setTitle = { onValueChange(it) },
             titleList = titleList,
@@ -558,7 +547,7 @@ fun OutlinedTextTitleAdd2(
     val focusManager = LocalFocusManager.current
 
     val textField: @Composable () -> Unit = {
-        ExposedDropdownMenuProduct2(
+        ExposedDropdownMenuProduct(
             title = value,
             setTitle = {
                 onValueChangeSuffix(it)
@@ -687,12 +676,12 @@ fun OutlinedPriceInput(
             modifier = Modifier.fillMaxWidth(),
             visible = isManyCount
         ) {
-            AutoCalculateCheckbox(
+            /*AutoCalculateCheckbox(
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
                 tooltipTextResAutoCal = tooltipTextResAutoCal,
                 price = priceAll,
-            )
+            )*/
         }
     }
 }
@@ -744,7 +733,7 @@ fun OutlinedTextPriceCount(
                 onValueChange(it)
             },
             label = { Text(stringResource(R.string.outlined_text_price)) },
-            modifier = modifier
+            modifier = modifier.first
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
             leadingIcon = {
@@ -817,7 +806,7 @@ fun OutlinedTextTitleSale(
                 intResError = R.string.error_no_product,
                 readOnly = readOnly,
                 enable = enable,
-                modifier = it,
+                modifier = it.first,
                 keyboardOptions = keyboardOptionsNext()
             )
         }
@@ -836,7 +825,7 @@ fun OutlinedTextBuyer(
         modifier = Modifier.toOutlinedText(),
         row = false
     ) {
-        ExposedDropdownMenuProduct(
+        ExposedDropdownMenuCategoryBuyer(
             title = value,
             setTitle = { onValueChange(it) },
             titleList = list

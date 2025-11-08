@@ -19,6 +19,12 @@
     <string name="count_screen_title">Количество</string>
     <string name="vaccination_screen_title">Прививки</string>
 
+    <string name="add_screen_title2">Продукция</string>
+    <string name="sale_screen_title2">Продажи</string>
+    <string name="expenses_screen_title2">Покупки</string>
+    <string name="write_off_screen_title2">Списания</string>
+    <string name="animal_screen_title2">Животные</string>
+
     <string name="is_empty"></string>
 
     //OutlinedTextField
@@ -44,6 +50,7 @@
     <string name="outlined_text_out_of">%s из %s</string>
     <string name="outlined_text_suffix">Единица</string>
     <string name="outlined_text_count">0</string>
+    <string name="outlined_text_status_write_off">Тип списания</string>
 
 
     //Cadrs
@@ -221,7 +228,7 @@
     <string name="support_text_no_income_category">Доходов за %s не было :(</string>
     <string name="support_text_no_expenses_category">"Расходов за %s не было (Это хорошо)</string>
     <string name="support_text_data_next_vaccination">Дата следующей прививки</string>
-    <string name="support_text_all_price">Общая сумма составить: %s %s</string>
+    <string name="support_text_all_price">Общая стоимость:</string>
     <string name="support_text_all_weight">Общий вес составит: %s %s</string>
     <string name="support_text_empty">Не указано</string>
 
@@ -516,7 +523,6 @@
     <string name="month_dec">Декабрь</string>
 
 
-
     <string name="app_name">Мое Хозяйство 2</string>
     <string name="attention">Attention</string>
     <string name="back_button">Back</string>
@@ -557,7 +563,6 @@
     <string name="one_month">1 month</string>
     <string name="water">Water</string>
     <string name="time_to_water">It\'s time to water your %s.</string>
-
 
 
     <string name="lithop">Lithop</string>

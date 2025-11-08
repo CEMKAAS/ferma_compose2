@@ -15,7 +15,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class AddListState(
     val textSearch: String = "",
-    val isGroup: Boolean = false,
+    val isGroup: Boolean = true,
     val idPT: Long = 0,
     val openBottomSheetGroup: Boolean = false,
     val openBottomSheetEntry: Boolean = false,

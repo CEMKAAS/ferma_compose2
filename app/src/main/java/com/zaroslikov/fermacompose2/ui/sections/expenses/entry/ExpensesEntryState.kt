@@ -48,7 +48,7 @@ data class ExpensesEntryState(
     val isAutoPrice: Boolean = false,
 
     val pickList: PickList = PickList(),
-    val countInWarehouse: DomainCountSuffix = DomainCountSuffix(0.0, ""),
+    val countInWarehouse: DomainCountSuffix = DomainCountSuffix(0.0, Suffix.PIECES),
 
     override val isEntry: Boolean = false,
     val isIndicatorsValue: Boolean = false,

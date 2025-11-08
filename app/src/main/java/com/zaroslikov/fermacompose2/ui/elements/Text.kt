@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.elements
 import android.content.Context
 import android.util.Log
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,7 +29,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -38,8 +41,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.green_1
+import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -105,6 +110,7 @@ fun IconAndTextNew(
     modifier: Modifier = Modifier,
     iconRes: Int,
     valueString: String,
+    color: Color,
     textStyle: TextStyle = text_14
 ) {
     Row(
@@ -115,7 +121,7 @@ fun IconAndTextNew(
         Icon(
             painter = painterResource(iconRes), contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = green_shamrock
+            tint = color
         )
         Text(
 //            modifier = Modifier.fillMaxWidth(),
@@ -362,28 +368,60 @@ fun TextBuildAnnotated(
 }
 
 @Composable
-fun TextBuildAnnotated2(
+fun CardAllPrice(
+    count: String,
+    countSuffix: Suffix,
+    price: String,
+    priceSuffix: Suffix,
     priceAll: String,
-    @StringRes intRes: Int,
-    suffix: String = stringResource(R.string.currency_ruble)
 ) {
-    val amount = priceAll
-    Text(
-        text = buildAnnotatedString {
-            val fullText =
-                stringResource(intRes).format(amount, suffix)
+    /* val gradient = Brush.linearGradient(
+         colors = listOf(green_g_1, green_g_2),
+         start = Offset(0f, 0f),
+         end = Offset(Float.POSITIVE_INFINITY, 0f)
+     )
+ */
+    val countText = count.ifBlank { "-" }
+    val priceText = price.ifBlank { "-" }
 
-            val startIndex = fullText.indexOf(amount)
-            val endIndex = startIndex + amount.length
-
-            append(fullText)
-            addStyle(
-                style = SpanStyle(fontWeight = FontWeight.Bold),
-                start = startIndex,
-                end = endIndex
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = green_g_2
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = green_1
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.support_text_all_price),
+                    style = text_14.copy(color = Color(0xFF364153))
+                )
+                Text(
+                    text = "$priceAll ${stringResource(priceSuffix.toResId())}",
+                    style = text_16.copy(color = Color(0xFF007A55))
+                )
+            }
+            Text(
+                text = "$countText ${stringResource(countSuffix.toResId())} " +
+                        "× $priceText ${stringResource(priceSuffix.toResId())}",
+                style = text_12.copy(color = Color(0xFF6A7282))
             )
         }
-    )
+    }
 }
 
 @Composable

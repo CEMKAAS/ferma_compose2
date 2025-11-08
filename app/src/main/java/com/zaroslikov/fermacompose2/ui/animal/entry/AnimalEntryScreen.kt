@@ -26,7 +26,7 @@ import com.zaroslikov.fermacompose2.ui.elements.AnimalNameOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
-import com.zaroslikov.fermacompose2.ui.elements.DropdownMenu
+import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate

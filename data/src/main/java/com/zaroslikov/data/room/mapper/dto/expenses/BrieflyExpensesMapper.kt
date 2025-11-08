@@ -9,6 +9,7 @@ fun BrieflyExpensesDomain.toBrieflyExpensesDto(): BrieflyExpensesDto {
         count = this.count,
         title = this.title,
         suffix = this.suffix,
+        rowCount = this.rowCount
     )
 }
 
@@ -18,5 +19,6 @@ fun BrieflyExpensesDto.toBrieflyExpensesDomain(): BrieflyExpensesDomain {
         count = this.count,
         price = this.price,
         suffix = this.suffix,
+        rowCount = this.rowCount
     )
 }

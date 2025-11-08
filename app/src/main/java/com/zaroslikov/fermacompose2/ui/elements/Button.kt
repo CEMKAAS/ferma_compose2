@@ -151,12 +151,13 @@ fun GradientMaterialButton(
 @Composable
 fun GradientButton(
     modifier: Modifier = Modifier,
+    colors: List<Color>,
     text: String,
     enable: Boolean,
     onClick: () -> Unit,
 ) {
     val gradient = Brush.linearGradient(
-        colors = listOf(Color(0xFF009966), Color(0xFF00A63E)),
+        colors = colors,
         start = Offset(0f, 0f),
         end = Offset(300f, 0f)
     )

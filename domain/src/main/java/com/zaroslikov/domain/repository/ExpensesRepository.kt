@@ -25,6 +25,7 @@ interface ExpensesRepository {
     suspend fun insertExpenses(item: DomainExpensesTable): Long
     suspend fun updateExpenses(item: DomainExpensesTable)
     suspend fun deleteExpenses(item: DomainExpensesTable)
+    suspend fun deleteExpensesById(id: Long)
 
     fun getExpenses(id: Long): Flow<Double> //Finance
     fun getExpensesMountFin(
@@ -32,10 +33,12 @@ interface ExpensesRepository {
         mount: Int,
         year: Int,
     ): Flow<Double>
+
     fun getExpensesMount(id: Long, dateBegin: String, dateEnd: String): Flow<Double>
     fun getExpensesAllList(id: Long): Flow<List<DomainTitleSuffixPrice>>
     fun getExpensesCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>>  //maybe
-    fun getCategoryExpensesCurrentMonth(id: Long, dateBegin: String, dateEnd: String
+    fun getCategoryExpensesCurrentMonth(
+        id: Long, dateBegin: String, dateEnd: String
     ): Flow<List<DomainCategoryPrice>> //maybe
 
     fun getProductLisCategoryExpensesCurrentMonth(
@@ -52,20 +55,20 @@ interface ExpensesRepository {
         dateEnd: String
     ): Flow<Double>
 
-   /* fun getAnalysisExpensesProductNewYearProject(
-        id: Long,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>>
+    /* fun getAnalysisExpensesProductNewYearProject(
+         id: Long,
+         dateBegin: String,
+         dateEnd: String
+     ): Flow<List<AnalysisSaleBuyerAllTime>>
 
-    fun getAnalysisExpensesNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<Double>
+     fun getAnalysisExpensesNewYear(
+         dateBegin: String,
+         dateEnd: String
+     ): Flow<Double>
 
-    fun getAnalysisExpensesProductNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>>*/
+     fun getAnalysisExpensesProductNewYear(
+         dateBegin: String,
+         dateEnd: String
+     ): Flow<List<AnalysisSaleBuyerAllTime>>*/
 
 }

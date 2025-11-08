@@ -4,5 +4,11 @@ import com.zaroslikov.data.room.dto.write_off.BrieflyWriteOffDto
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
 
 fun BrieflyWriteOffDto.toBrieflyWriteOffDomain(): BrieflyWriteOffDomain {
-    return BrieflyWriteOffDomain(title = this.title, count = this.count, suffix = this.suffix,)
+    return BrieflyWriteOffDomain(
+        title = this.title,
+        count = this.count,
+        suffix = this.suffix,
+        price = this.price,
+        rowCount = this.rowCount
+    )
 }

@@ -37,6 +37,8 @@ import com.zaroslikov.fermacompose2.ui.finance.income_expenses.FinanceIncomeExpe
 import com.zaroslikov.fermacompose2.ui.finance.income_expenses.FinanceIncomeExpensesScreen
 import com.zaroslikov.fermacompose2.ui.finance.month.FinanceMonthDestination
 import com.zaroslikov.fermacompose2.ui.finance.month.FinanceMonthScreen
+import com.zaroslikov.fermacompose2.ui.sections.HomeDestination
+import com.zaroslikov.fermacompose2.ui.sections.SectionWorkspaceScreen
 //import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivDestination
 //import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivScreen
 //import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivDestination
@@ -57,8 +59,6 @@ import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesScr
 //import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
 import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryProduct
-import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.AddScreen
-import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.HomeDestination
 //import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreen
 //import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreenDestination
 //import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopDestination
@@ -78,7 +78,6 @@ import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteScreen
 import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryProduct
-import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleScreen
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import com.zaroslikov.fermacompose2.ui.start.StartScreen
 //import com.zaroslikov.fermacompose2.ui.add.AddProject
@@ -388,45 +387,46 @@ fun InventoryNavHost(
                 type = NavType.LongType
             })
         ) {
-            AddScreen(
-                drawerState = drawerState,
-                navigateToStart = {
-                    navController.navigate(StartDestination.route)
-                },
-                navigateToModalSheet = {
-                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-                },
-                navigateToItemAdd = {
-                    navController.navigate(
-                        navNull(
-                            AddEntryDestination.route,
-                            AddEntryDestination.itemIdPT,
-                            it.toString()
-                        )
-                    )
-                },
-                navigateToItemUpdate = {
-                    navController.navigate(
-                        navNull(
-                            AddEntryDestination.route,
-                            AddEntryDestination.itemIdPT,
-                            it.first.toString(),
-                            AddEntryDestination.itemId,
-                            it.second.toString()
-                        )
-                    )
-                },
-                navigationToAnalysis = {
-//                    navController.navigate(
-//                        nav(
-//                            FinanceAnalysisDestination.route,
-//                            it.first.toString(),
-//                            it.second
-//                        )
-//                    )
-//                    "${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}")
-                },
-            )
+            SectionWorkspaceScreen()
+            /* AddScreen(
+                 drawerState = drawerState,
+                 navigateToStart = {
+                     navController.navigate(StartDestination.route)
+                 },
+                 navigateToModalSheet = {
+                     navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                 },
+                 navigateToItemAdd = {
+                     navController.navigate(
+                         navNull(
+                             AddEntryDestination.route,
+                             AddEntryDestination.itemIdPT,
+                             it.toString()
+                         )
+                     )
+                 },
+                 navigateToItemUpdate = {
+                     navController.navigate(
+                         navNull(
+                             AddEntryDestination.route,
+                             AddEntryDestination.itemIdPT,
+                             it.first.toString(),
+                             AddEntryDestination.itemId,
+                             it.second.toString()
+                         )
+                     )
+                 },
+                 navigationToAnalysis = {
+ //                    navController.navigate(
+ //                        nav(
+ //                            FinanceAnalysisDestination.route,
+ //                            it.first.toString(),
+ //                            it.second
+ //                        )
+ //                    )
+ //                    "${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}")
+                 },
+             )*/
         }
         composable(
             route = AddEntryDestination.routeWithArgs,
@@ -449,7 +449,7 @@ fun InventoryNavHost(
                 type = NavType.IntType
             })
         ) {
-            SaleScreen(drawerState = drawerState, navigateToStart = {
+            /*SaleScreen(drawerState = drawerState, navigateToStart = {
                 navController.navigate(StartDestination.route)
             }, navigateToModalSheet = {
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
@@ -468,7 +468,7 @@ fun InventoryNavHost(
                         itemTwo = it.second.toString()
                     )
                 )
-            })
+            })*/
         }
         composable(
             route = SaleEntryDestination.routeWithArgs,
@@ -487,7 +487,7 @@ fun InventoryNavHost(
         }
 
         //Expenses
-        composable(
+        /*composable(
             route = ExpensesDestination.routeWithArgs,
             arguments = listOf(navArgument(ExpensesDestination.itemIdArg) {
                 type = NavType.LongType
@@ -516,7 +516,7 @@ fun InventoryNavHost(
                     )
                 }
             )
-        }
+        }*/
 
         composable(
             route = ExpensesEntryDestination.routeWithArgs,
@@ -535,7 +535,7 @@ fun InventoryNavHost(
 
 
         //WriteOff
-        composable(
+        /*composable(
             route = WriteOffDestination.routeWithArgs,
             arguments = listOf(navArgument(WriteOffDestination.itemIdArg) {
                 type = NavType.IntType
@@ -564,7 +564,7 @@ fun InventoryNavHost(
                     )
                 )
             })
-        }
+        }*/
         composable(
             route = WriteOffEntryDestination.routeWithArgs,
             arguments = listOf(
@@ -630,7 +630,7 @@ fun InventoryNavHost(
             })
         ) {
             AnimalScreen(
-                drawerState = drawerState, navigateToStart = {
+             /*   drawerState = drawerState, navigateToStart = {
                     navController.navigate(StartDestination.route)
                 }, navigateToModalSheet = {
                     navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
@@ -650,7 +650,7 @@ fun InventoryNavHost(
                             itemTwo = it.second.toString()
                         )
                     )
-                }, isFirstStart = isFirstStart
+                }, isFirstStart = isFirstStart*/
             )
         }
 

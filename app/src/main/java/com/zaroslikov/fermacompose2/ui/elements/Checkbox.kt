@@ -5,11 +5,15 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,30 +58,40 @@ fun CheckboxTextIcon(
         modifier = modifier
             .clickable(enabled = enabled) { // клик по всей строке
                 onCheckedChange(!checked)
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = { onCheckedChange(it) },
-            enabled = enabled
-        )
-
-        Text(
-            text = stringResource(id = intTitle),
-            modifier = Modifier.weight(1f)
-        )
-
-        if (onClick != null) {
-            IconButton(
-                modifier = Modifier.weight(0.2f, fill = false),
-                onClick = onClick
-            ) {
-                Icon(painterResource(R.drawable.icon_info), contentDescription = "Показать меню")
             }
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Checkbox(
+                modifier = Modifier.size(24.dp),
+                checked = checked,
+                onCheckedChange = { onCheckedChange(it) },
+                enabled = enabled,
+                colors = CheckboxDefaults.colors().copy(
+                    checkedBoxColor = Color(0xFF030213),
+                    checkedBorderColor = Color(0xFF030213)
+                )
+            )
+            Text(
+                text = stringResource(id = intTitle),
+            )
+            if (onClick != null)
+                IconButton(
+                    onClick = onClick
+                ) {
+                    Icon(
+                        painterResource(R.drawable.icon_info),
+                        contentDescription = "Показать меню"
+                    )
+                }
         }
 
-        if (isTooltipShow) {
+        if (isTooltipShow)
             TooltipBox(
                 modifier = Modifier.weight(0.2f, fill = false),
                 positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
@@ -97,7 +112,6 @@ fun CheckboxTextIcon(
                     )
                 }
             }
-        }
     }
 }
 
@@ -147,7 +161,11 @@ fun AutoCalculateCheckbox(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     @StringRes tooltipTextResAutoCal: Int,
+    count: String,
+    countSuffix: Suffix,
     price: String,
+    priceSuffix: Suffix,
+    priceAll: String,
 ) {
     Column {
         CheckboxTextIcon(
@@ -158,12 +176,14 @@ fun AutoCalculateCheckbox(
             isTooltipShow = true,
             intTooltip = tooltipTextResAutoCal
         )
-        if (isChecked) {
-            TextBuildAnnotated2(
-                intRes = R.string.support_text_all_price,
-                priceAll = price
+        if (isChecked)
+            CardAllPrice(
+                count = count,
+                countSuffix = countSuffix,
+                price = price,
+                priceSuffix = priceSuffix,
+                priceAll = priceAll,
             )
-        }
     }
 }
 

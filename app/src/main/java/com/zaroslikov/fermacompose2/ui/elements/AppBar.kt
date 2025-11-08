@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Attachment
@@ -45,11 +46,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -85,16 +89,61 @@ fun TopAppBarNavigation(
 
 @Composable
 fun TopAppBarNavigationNew(
+    value: String,
+    isGroup: Boolean,
+    onValueChange: (String) -> Unit,
+    onClick: (Boolean) -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+    TopAppBar(
+        contentPadding = PaddingValues(
+            end = dimensionResource(id = R.dimen.padding_medium),
+            top = 16.dp,
+            bottom = 8.dp
+        ),
+        title = {
+            SearchBar(
+                value = value,
+                onValueChange = onValueChange,
+                onClick = onClick,
+                isGroup = isGroup,
+                iconRes = if (isGroup) R.drawable.icon_group else R.drawable.icon_list
+            )
+        },
+        windowInsets = WindowInsets(0),
+        scrollBehavior = scrollBehavior
+    )
+}
+
+/*
+@Composable
+fun TopAppBarNavigationNew2(
     @StringRes title: Int,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    CenterAlignedTopAppBar(
+    (
         title = {
-            Text(text = stringResource(title))
+            */
+/* Text(text = stringResource(title))*//*
+
+            SearchBar(
+                value = "searchText",
+                onValueChange = { */
+/*onSearchChange*//*
+ },
+                onClick = { */
+/*details = !details*//*
+ },
+                iconRes = if (true*/
+/*details*//*
+) R.drawable.icon_group else R.drawable.icon_list
+            )
         },
         scrollBehavior = scrollBehavior
     )
 }
+*/
+
 
 
 @Composable

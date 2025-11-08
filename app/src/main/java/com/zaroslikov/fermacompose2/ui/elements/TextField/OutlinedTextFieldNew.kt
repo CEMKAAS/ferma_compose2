@@ -1,43 +1,30 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.elements
+package com.zaroslikov.fermacompose2.ui.elements.TextField
 
-import android.annotation.SuppressLint
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,69 +34,202 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.fermacompose2.dark
-import com.zaroslikov.fermacompose2.ghostly_white
-import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.grey
-import com.zaroslikov.fermacompose2.grey_3
-import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
-import com.zaroslikov.fermacompose2.supportFun.keyboardActionsDown
-import com.zaroslikov.fermacompose2.supportFun.keyboardActionsEnter
-import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsEnter
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
-import com.zaroslikov.fermacompose2.supportFun.toConvertDb
+import com.zaroslikov.fermacompose2.supportFun.toColor
+import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.MinDateSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
-
+import com.zaroslikov.fermacompose2.ui.elements.AutoCalculateCheckbox
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
+import com.zaroslikov.fermacompose2.ui.elements.toOutlinedText
+import com.zaroslikov.fermacompose2.ui.start.dateBuilder
+import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.violet_1
 
 @Composable
 fun SearchBar(
     value: String,
     onValueChange: (String) -> Unit,
-    @StringRes intRes: Int = R.string.search_section
+    isGroup: Boolean,
+    onClick: (Boolean) -> Unit,
+    @StringRes intRes: Int = R.string.search_section,
+    iconRes: Int
 ) {
-    BorderCard {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val borderWidth = when {
+        isFocused -> 2.dp//green_g_2 //green_1
+        else -> 1.dp
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        BorderCard(
+            modifier = Modifier
+                .height(62.dp)
+                .weight(1f),
+            borderWidth = borderWidth
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = grey
+                )
+                BaseOutlinedTextNew2(
+                    value = value,
+                    onValueChange = onValueChange,
+                    intResSup = intRes,
+                    interactionSource = interactionSource
+                )
+            }
+        }
+        BorderCard(
+            modifier = Modifier
+                .size(62.dp)
+                .wrapContentWidth()
+                .clickable { onClick(!isGroup) },
         ) {
             Icon(
-                imageVector = Icons.Default.Search,
+                painterResource(iconRes),
                 contentDescription = null,
-                tint = grey
-            )
-            BaseOutlinedTextNew2(
-                value = value,
-                onValueChange = onValueChange,
-                intResSup = intRes
+                modifier = Modifier.size(48.dp)
             )
         }
     }
 }
+
+
+@Composable
+fun OutlinedTextNoteNew(
+    value: String,
+    onValueChange: (String) -> Unit,
+    cardBorder: Boolean = true,
+    @StringRes label: Int = R.string.outlined_text_note,
+    @StringRes supportingText: Int = R.string.support_text_note,
+) {
+    BorderCard {
+        BaseOutlinedTextNew(
+            value = value,
+            onValueChange = { onValueChange(it) },
+            leadingIconRes = R.drawable.baseline_sticky_note_2_24,
+            labelIntRes = label,
+            intResSup = supportingText,
+            singleLine = false,
+            keyboardOptions = keyboardOptionsNext(),
+            keyboardActions = KeyboardActionFocus.CLEAN,
+            minLines = 3
+        )
+    }
+}
+
+
+@Composable
+fun OutlinedTextAnimalNew(
+    value: String,
+    onValueChange: (Pair<Long, String>) -> Unit,
+    onClickClear: (String) -> Unit,
+    selectedAnimalIndex: Long,
+    animalList: List<AnimalForAddDomain>,
+) {
+    val focusManager = LocalFocusManager.current
+    BorderCard {
+        ExposedDropdownMenuAnimals(
+            selectedItemIndex = selectedAnimalIndex,
+            setTitle = {
+                onValueChange(it)
+                focusManager.clearFocus()
+            },
+            animalList = animalList
+        ) {
+            BaseOutlinedTextNew(
+                modifier = it.first,
+                value = value,
+                onValueChange = {},
+                onClear = {
+                    onClickClear("")
+                    focusManager.clearFocus()
+                },
+                leadingIconRes = R.drawable.baseline_pets_24,
+                readOnly = true, isMore = value.isBlank(),
+                labelIntRes = R.string.outlined_text_animals,
+                intResSup = R.string.support_text_animal,
+                trailingIcon = R.drawable.baseline_clear_24
+            )
+        }
+    }
+}
+
+@Composable
+fun OutlinedTextTitleAddNew(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onValueChangeSuffix: (Pair<String, Suffix>) -> Unit,
+    @StringRes intRes: Int = R.string.outlined_text_product,
+    @StringRes intResSup: Int = R.string.support_text_product,
+    @StringRes intResError: Int = R.string.error_no_product,
+    drawableRes: Int? = null,
+    readOnly: Boolean = false,
+    enable: Boolean = true,
+    titleList: List<TitleAndSuffixDomain>,
+    isErrorTitle: Boolean,
+    isErrorSlash: Boolean,
+    cardBorder: Boolean = true,
+    isMore: Boolean = true
+) {
+    val focusManager = LocalFocusManager.current
+    BorderCard {
+        ExposedDropdownMenuProduct(
+            title = value,
+            setTitle = {
+                onValueChangeSuffix(it)
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            titleList = titleList,
+            enableDropMenu = enable
+        ) {
+            BaseOutlinedTextNew(
+                modifier = it.first,
+                value = value,
+                onValueChange = { onValueChange(it) },
+                onClear = { onValueChange("") },
+                leadingIconRes = drawableRes,
+                isError = isErrorTitle,
+                isErrorSlash = isErrorSlash,
+                labelIntRes = intRes,
+                intResError = intResError,
+                intResSup = intResSup,
+                readOnly = readOnly, enable = enable, isMore = value.isBlank(),
+                keyboardOptions = keyboardOptionsNext()
+            )
+        }
+    }
+}
+
 
 /*@Composable
 fun OutlinedText(
@@ -143,28 +263,7 @@ fun OutlinedText(
 }
 
 */
-@Composable
-fun OutlinedTextNoteNew(
-    value: String,
-    onValueChange: (String) -> Unit,
-    cardBorder: Boolean = true,
-    @StringRes label: Int = R.string.outlined_text_note,
-    @StringRes supportingText: Int = R.string.support_text_note,
-) {
-    BorderCard {
-        BaseOutlinedTextNew(
-            value = value,
-            onValueChange = { onValueChange(it) },
-            leadingIconRes = R.drawable.baseline_sticky_note_2_24,
-            labelIntRes = label,
-            intResSup = supportingText,
-            singleLine = false,
-            keyboardOptions = keyboardOptionsNext(),
-            keyboardActions = KeyboardActionFocus.CLEAN,
-            minLines = 3
-        )
-    }
-}
+
 
 /*
 @Composable
@@ -207,41 +306,7 @@ fun OutlinedTextNoteWidget(
     )
 }
 */
-@Composable
-fun OutlinedTextAnimalNew(
-    value: String,
-    onValueChange: (Pair<Long, String>) -> Unit,
-    onClickClear: (String) -> Unit,
-    selectedAnimalIndex: Long,
-    animalList: List<AnimalForAddDomain>,
-) {
-    val focusManager = LocalFocusManager.current
-    BorderCard {
-        ExposedDropdownMenuAnimals(
-            selectedItemIndex = selectedAnimalIndex,
-            setTitle = {
-                onValueChange(it)
-                focusManager.clearFocus()
-            },
-            animalList = animalList
-        ) {
-            BaseOutlinedTextNew(
-                modifier = it,
-                value = value,
-                onValueChange = {},
-                leadingIconRes = R.drawable.baseline_pets_24,
-                readOnly = true,
-                labelIntRes = R.string.outlined_text_animals,
-                intResSup = R.string.support_text_animal,
-                trailingIcon = R.drawable.baseline_clear_24,
-                onTrailingChance = {
-                    onClickClear("")
-                    focusManager.clearFocus()
-                }
-            )
-        }
-    }
-}
+
 
 @Composable
 fun OutlinedTextDateNew(
@@ -256,6 +321,13 @@ fun OutlinedTextDateNew(
     isNecessarily: Boolean = false,
     minDate: String? = null
 ) {
+    val dateList = value.split(".")
+    val date =
+        dateBuilder(
+            dateList[0].toInt(),
+            stringResource(monthToResString(dateList[1].toInt())),
+            dateList[2].toInt()
+        )
     var openDialog by remember { mutableStateOf(false) }
     if (openDialog) {
         val selectableDates = when {
@@ -278,7 +350,7 @@ fun OutlinedTextDateNew(
             .clickable(onClick = { openDialog = !openDialog })
     ) {
         BaseOutlinedTextNew(
-            value = value,
+            value = date,
             onValueChange = { openDialog = !openDialog },
             readOnly = true,
             enable = enable,
@@ -299,7 +371,7 @@ fun OutlinedTextCategoryNew(
     readOnly: Boolean = false,
 ) {
     BorderCard {
-        ExposedDropdownMenuProduct(
+        ExposedDropdownMenuCategoryBuyer(
             title = value,
             setTitle = { onValueChange(it) },
             titleList = titleList
@@ -308,13 +380,14 @@ fun OutlinedTextCategoryNew(
                 modifier = it.first,
                 value = value,
                 onValueChange = { onValueChange(it) },
+                onClear = { onValueChange("") },
                 leadingIconRes = R.drawable.baseline_format_list_bulleted_24,
                 isError = false,
                 labelIntRes = R.string.outlined_text_field_category,
                 intResSup = R.string.support_text_category,
                 keyboardOptions = keyboardOptionsNext(),
                 enable = enable,
-                readOnly = readOnly, isMore = true
+                readOnly = readOnly, isMore = value.isBlank()
             )
         }
     }
@@ -554,50 +627,8 @@ fun OutlinedTextTitleAdd(
     }
 }*/
 
-@Composable
-fun OutlinedTextTitleAddNew(
-    value: String,
-    onValueChange: (String) -> Unit,
-    onValueChangeSuffix: (Pair<String, Suffix>) -> Unit,
-    @StringRes intRes: Int = R.string.outlined_text_product,
-    @StringRes intResSup: Int = R.string.support_text_product,
-    @StringRes intResError: Int = R.string.error_no_product,
-    drawableRes: Int? = null,
-    readOnly: Boolean = false,
-    enable: Boolean = true,
-    titleList: List<TitleAndSuffixDomain>,
-    isErrorTitle: Boolean,
-    isErrorSlash: Boolean,
-    cardBorder: Boolean = true,
-    isMore: Boolean = true
-) {
-    val focusManager = LocalFocusManager.current
-    BorderCard {
-        ExposedDropdownMenuProduct2(
-            title = value,
-            setTitle = {
-                onValueChangeSuffix(it)
-                focusManager.moveFocus(FocusDirection.Down)
-            },
-            titleList = titleList,
-            enableDropMenu = enable
-        ) {
-            BaseOutlinedTextNew(
-                modifier = it.first,
-                value = value,
-                onValueChange = { onValueChange(it) },
-                leadingIconRes = drawableRes,
-                isError = isErrorTitle,
-                isErrorSlash = isErrorSlash,
-                labelIntRes = intRes,
-                intResError = intResError,
-                intResSup = intResSup,
-                readOnly = readOnly, enable = enable, isMore = isMore,
-                keyboardOptions = keyboardOptionsNext()
-            )
-        }
-    }
-}
+
+
 /*
 
 @Composable
@@ -642,17 +673,20 @@ fun OutlinedTextPrice(
         )
     }
 }
-
+*/
 @Composable
-fun OutlinedPriceInput(
+fun OutlinedPriceInputNew(
     price: String,
     onPriceChange: (String) -> Unit,
-    priceAll: String = "",
     isAutoCalculate: Boolean,
     onAutoCalculate: (Boolean) -> Unit,
     isManyCount: Boolean = false,
     isError: Boolean = false,
     isNecessarily: Boolean = false,
+    count: String,
+    countSuffix: Suffix,
+    priceAll: String,
+    priceSuffix: Suffix,
     @StringRes supportTextRes: Int = R.string.support_text_count_product_sale,
     @StringRes supportTextResAutoCal: Int = R.string.support_text_count_product_sale,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_price,
@@ -670,12 +704,8 @@ fun OutlinedPriceInput(
         )
     )
     val supportText = if (isAutoCalculate) supportTextResAutoCal else supportTextRes
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false,
-        isNecessarily = isNecessarily
-    ) {
-        BaseOutlinedText(
+    BorderCard {
+        BaseOutlinedTextNew(
             value = price,
             onValueChange = { onPriceChange(it) },
             labelIntRes = R.string.outlined_text_price,
@@ -696,12 +726,17 @@ fun OutlinedPriceInput(
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
                 tooltipTextResAutoCal = tooltipTextResAutoCal,
-                price = priceAll,
+                price = price,
+                count = count,
+                countSuffix = countSuffix,
+                priceSuffix = priceSuffix,
+                priceAll = priceAll,
             )
         }
     }
 }
 
+/*
 @Composable
 fun OutlinedTextPriceCount(
     value: String,
@@ -784,45 +819,49 @@ fun OutlinedTextPriceCount(
     }
 
 }
-
+*/
 @Composable
-fun OutlinedTextTitleSale(
+fun OutlinedTextTitleSaleNew(
     value: String,
     onValueChange: (String) -> Unit = {},
     onValueChoice: (DomainTitleSuffixCategory) -> Unit = {},
     readOnly: Boolean = false,
     enable: Boolean = true,
     titleList: List<DomainTitleSuffixCategory>,
+    isMore: Boolean = value.isBlank(),
     isErrorTitle: Boolean = false,
-    isErrorSlash: Boolean = false
+    isErrorSlash: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
-    var leadingIconRes by rememberSaveable { mutableStateOf<Int?>(null) }
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false,
-        isNecessarily = true
-    ) {
+    var category by rememberSaveable { mutableStateOf<Category?>(null) }
+
+    BorderCard {
         ExposedDropdownMenuPair(
             title = value,
             setTitle = {
                 onValueChoice(it)
-                leadingIconRes = it.category.ordinal
+                category = it.category
                 focusManager.moveFocus(FocusDirection.Down)
             },
             list = titleList
         ) {
-            BaseOutlinedText(
+            BaseOutlinedTextNew(
                 value = value,
                 onValueChange = { text -> onValueChange(text) },
-                leadingIconRes = leadingIconRes,
+                onClear = {
+                    onValueChange("")
+                    category = null
+                },
+                leadingIconRes2 = category?.toDrawRes(),
+                leadingIconColor2 = category?.toColor() ?: Category.ADD.toColor(),
                 labelIntRes = R.string.outlined_text_product,
                 isError = isErrorTitle, isErrorSlash = isErrorSlash,
                 intResSup = R.string.support_text_product,
                 intResError = R.string.error_no_product,
                 readOnly = readOnly,
                 enable = enable,
-                modifier = it,
+                modifier = it.first,
+                isMore = isMore,
                 keyboardOptions = keyboardOptionsNext()
             )
         }
@@ -830,25 +869,60 @@ fun OutlinedTextTitleSale(
 }
 
 @Composable
-fun OutlinedTextBuyer(
+fun OutlinedWriteOffStatus(
+    value: Boolean,
+    onValueChange: (Boolean) -> Unit = {}
+) {
+    val focusManager = LocalFocusManager.current
+    var selectedItemIndex by remember { mutableIntStateOf(if (value) 0 else 1) }
+    val statusList = listOf(
+        Triple(R.drawable.baseline_cottage_24, R.string.ration_button_own_needs, true),
+        Triple(R.drawable.baseline_delete_24, R.string.ration_button_disposal, false)
+    )
+    BorderCard {
+        ExposedDropdownMenuStatusWriteOff(
+            status = value,
+            setStatus = {
+                onValueChange(it.first)
+                selectedItemIndex = it.second
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            statusList = statusList
+        ) {
+            BaseOutlinedTextNew(
+                value = stringResource(statusList[selectedItemIndex].second),
+                onValueChange = { },
+                leadingIconRes2 = statusList[selectedItemIndex].first,
+                leadingIconColor2 = if (selectedItemIndex == 0) violet_1 else error_base,
+                labelIntRes = R.string.outlined_text_status_write_off,
+                intResSup = R.string.support_text_product,
+                readOnly = true,
+                modifier = it.first,
+                isMore = true,
+                keyboardOptions = keyboardOptionsNext()
+            )
+        }
+    }
+}
+
+@Composable
+fun OutlinedTextBuyerNew(
     value: String,
     onValueChange: (String) -> Unit,
     onTrailingChance: () -> Unit = {},
     list: List<String>,
 ) {
     val focusManager = LocalFocusManager.current
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false
-    ) {
-        ExposedDropdownMenuProduct(
+    BorderCard {
+        ExposedDropdownMenuCategoryBuyer(
             title = value,
             setTitle = { onValueChange(it) },
             titleList = list
         ) {
-            BaseOutlinedText(
+            BaseOutlinedTextNew(
                 value = value,
                 onValueChange = { onValueChange(it) },
+                onClear = { onValueChange("") },
                 labelIntRes = R.string.outlined_text_buyer,
                 intResSup = R.string.support_text_buyer,
                 modifier = it.first,
@@ -859,11 +933,12 @@ fun OutlinedTextBuyer(
                     focusManager.clearFocus()
                 },
                 keyboardOptions = keyboardOptionsNext(),
+                isMore = value.isBlank()
             )
         }
     }
 }
-
+/*
 @Composable
 fun OutlinedTextSex(
     value: Boolean,
@@ -1089,198 +1164,4 @@ fun BaseOutlinedText(
 }
 */
 
-@Composable
-fun BaseOutlinedTextNew(
-    modifier: Modifier = Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
-    suffix: Suffix? = null,
-    onSuffixChance: ((Suffix) -> Unit)? = null,
-    trailingIcon: Int? = null,
-    onTrailingChance: (() -> Unit)? = null,
-    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
-    isError: Boolean = false,
-    isErrorSlash: Boolean = false,
-    isWarehouseShow: Boolean = false,
-    warehouseList: List<DomainCountSuffix> = emptyList(),
-    isAnimal: Boolean = false,
-    countAnimal: String = "",
-    leadingIconRes: Int? = null,
-    leadingIconClick: () -> Unit = {},
-    readOnly: Boolean = false,
-    enable: Boolean = true,
-    @StringRes labelIntRes: Int,
-    @StringRes intResSup: Int,
-    @StringRes intResError: Int = R.string.error_no_count_product,
-    isMore: Boolean = false,
-    singleLine: Boolean = true,
-    minLines: Int = 1,
-    focusManager: FocusManager = LocalFocusManager.current,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
-) {
-    val leadingIcon: @Composable (() -> Unit)? = if (leadingIconRes != null) {
-        {
-            IconButton(onClick = { leadingIconClick() }) {
-                Icon(
-                    painter = painterResource(leadingIconRes),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 5.dp)
-                )
-            }
-        }
-    } else null
 
-    val suffixValue: @Composable (() -> Unit)? =
-        suffix?.let { { Text(text = stringResource(it.toResId())) } }
-
-    val trailingIcon: @Composable (() -> Unit)? = when {
-        onSuffixChance != null -> {
-            { GetDropDownMenu(versionDropMenu) { onSuffixChance(it) } }
-        }
-
-        onTrailingChance != null -> {
-            {
-                IconButton(onClick = { onTrailingChance() }) {
-                    trailingIcon?.let {
-                        Icon(
-                            painter = painterResource(it),
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        }
-
-        else -> null
-    }
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            leadingIconRes?.let {
-                Icon(
-                    painter = painterResource(it), contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = green_shamrock
-                )
-            }
-            Text(
-                text = stringResource(labelIntRes),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = text_16,
-                color = dark
-            )
-        }
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(
-                    color = if (isError) Color(0xFFFFEAEA) else Color(0xFFF6F6F6),
-                    shape = RoundedCornerShape(14.dp)
-                )
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start // не SpaceBetween — контролируем ширины явно
-            ) {
-                // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
-                BasicTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    modifier = Modifier
-                        .weight(1f)           // <-- ключ: занимает свободное место
-                        .padding(end = if (isMore) 8.dp else 0.dp) // отступ перед иконкой
-                        .defaultMinSize(minHeight = (minLines * 26).dp)
-                        .align(Alignment.CenterVertically),
-                    textStyle = TextStyle(
-                        color = Color.Black,
-                        fontSize = 16.sp,
-                        lineHeight = 26.sp
-                    ),
-                    cursorBrush = SolidColor(Color(0xFF007AFF)),
-                    singleLine = singleLine,
-                    readOnly = readOnly,
-                    enabled = enable,
-
-                    decorationBox = { innerTextField ->
-                        Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {
-                            if (value.isEmpty()) {
-                                Text(
-                                    text = stringResource(intResSup),
-                                    color = Color(0xFF9A9A9A),
-                                    style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
-                                )
-                            }
-                            // Обязательно делаем innerTextField заполняющим ширину своего контейнера
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                innerTextField()
-                            }
-                        }
-                    }
-                )
-                // ИКОНКА: фиксированного размера, не будет ужиматься
-                if (isMore)
-                    Icon(
-                        modifier = Modifier
-                            .size(20.dp)            // фиксированный размер
-                            .wrapContentWidth(),    // не растягиваться
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = null,
-                        tint = Color(0xFF9A9A9A)
-                    )
-            }
-        }
-    }
-}
-
-@Composable
-fun BaseOutlinedTextNew2(
-    modifier: Modifier = Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
-    @StringRes intResSup: Int,
-    singleLine: Boolean = true,
-    minLines: Int = 1,
-    focusManager: FocusManager = LocalFocusManager.current,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
-) {
-    // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
-    BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier,
-        textStyle = TextStyle(
-            color = Color.Black,
-            fontSize = 16.sp,
-            lineHeight = 26.sp
-        ),
-        cursorBrush = SolidColor(Color(0xFF007AFF)),
-        singleLine = singleLine,
-        decorationBox = { innerTextField ->
-            Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {
-                if (value.isEmpty()) {
-                    Text(
-                        text = stringResource(intResSup),
-                        color = Color(0xFF9A9A9A),
-                        style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
-                    )
-                }
-                // Обязательно делаем innerTextField заполняющим ширину своего контейнера
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    innerTextField()
-                }
-            }
-        }
-    )
-}

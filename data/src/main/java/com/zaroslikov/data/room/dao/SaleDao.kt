@@ -25,8 +25,12 @@ interface SaleDao {
     @Query("SELECT * from sale_table Where animal_count_id=:id")
     fun getItemSaleIdCountAnimal(id: Long): Flow<SaleTable>
 
-    @Query("SELECT title, SUM(count) as count, count_suffix as suffix, SUM(price) as price" +
-            " from sale_table Where idPT=:id group by title ORDER BY price DESC")
+    @Query("SELECT title," +
+            " SUM(count) as count," +
+            " count_suffix as suffix," +
+            " SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END) AS price," +
+            " COUNT(*) AS row_count" +
+            " FROM sale_table WHERE idPT=:id GROUP BY title ORDER BY price DESC")
     fun getBrieflyItemSale(id: Long): Flow<List<BrieflySaleDto>>
 
     @Query("SELECT * from sale_table Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC")

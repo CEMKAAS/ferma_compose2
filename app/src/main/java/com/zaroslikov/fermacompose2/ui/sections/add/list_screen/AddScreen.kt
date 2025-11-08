@@ -3,33 +3,18 @@
 package com.zaroslikov.fermacompose2.ui.sections.add.list_screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,54 +26,52 @@ import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.alabaster
 import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.supportFun.toColor
+import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
-import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextAnimalNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCategoryNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDateNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNoteNew
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAddNew
-import com.zaroslikov.fermacompose2.ui.elements.TextLine
-import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
-import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.elements.textBold_20
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
+import com.zaroslikov.fermacompose2.ui.sections.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
-import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
-import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
 
-object HomeDestination : NavigationDestination {
+/*object HomeDestination : NavigationDestination {
     override val route = "home"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     val routeWithArgs = "$route/{$itemIdArg}"
-}
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
-/*    modifier: Modifier = Modifier,
-    navigateToStart: () -> Unit,
-    navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: (Long) -> Unit,
-    navigationToAnalysis: (Pair<Long, String>) -> Unit,
-    drawerState: DrawerState,
-    viewModel: AddViewModel = hiltViewModel()*/
-    state: AddListState,
-    onIntent: (AddListIntent) -> Unit
+    /*    modifier: Modifier = Modifier,
+        navigateToStart: () -> Unit,
+        navigateToModalSheet: (DrawerNavigation) -> Unit,
+        navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
+        navigateToItemAdd: (Long) -> Unit,
+        navigationToAnalysis: (Pair<Long, String>) -> Unit,
+        drawerState: DrawerState,*/
+    /*state: AddListState,
+    onIntent: (AddListIntent) -> Unit,*/
+    viewModel: AddViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-//    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val colors = listOf(Color(0xFF009966), Color(0xFF00A63E))
     val idProject = state.idPT
 
     val query = state.textSearch.trim().lowercase()
@@ -100,7 +83,7 @@ fun AddScreen(
                     item.note.lowercase().contains(query) ||
                     item.category.lowercase().contains(query) ||
                     item.count.toString().lowercase().contains(query) ||
-                    item.countSuffix.name.lowercase().contains(query) ||
+                    stringResource(item.countSuffix.toResId()).lowercase().contains(query) ||
                     "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
                         .contains(query)
         }
@@ -117,13 +100,16 @@ fun AddScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarNavigationNew(
-                title = R.string.add_screen_title,
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                value = state.textSearch,
+                isGroup = state.isGroup,
+                onValueChange = { viewModel.onIntent(AddListIntent.SearchChanged(it)) },
+                onClick = { viewModel.onIntent(AddListIntent.GroupClicked(it)) }
             )
         },
         floatingActionButton = {
-            NeonGlowFab {
-                onIntent(AddListIntent.OpenBottomSheetEntry(true))
+            NeonGlowFab(colors = colors) {
+                viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true))
             }
         }
     ) { innerPadding ->
@@ -140,49 +126,44 @@ fun AddScreen(
                 searchList = searchList,
                 brieflyList = searchList2,
                 onInsertClick = {
-                   onIntent(
+                    viewModel.onIntent(
                         AddListIntent.OpenBottomSheetEntry(true)
                     )
                 },
                 onEditClick = {
-                    onIntent(
+                    viewModel.onIntent(
                         AddListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
-                onDeleteClick = { onIntent(AddListIntent.Delete(it)) },
-                onSearchChange = { onIntent(AddListIntent.SearchChanged(it)) },
+                onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
                 onDetailsClick = {
-                    onIntent(
+                    viewModel.onIntent(
                         AddListIntent.OpenBottomSheetGroup(true, it)
                     )
-                }
-            )
-
-        if (state.openBottomSheetEntry)
-            EntryBottomSheet(
-                onDismissRequest = {
-                    onIntent(
-                        AddListIntent.OpenBottomSheetEntry(false)
-                    )
                 },
+                details = state.isGroup
+            )
+        if (state.openBottomSheetEntry)
+            AddEntryBottomSheet(
                 modifier = Modifier,
                 state = state.currentProduct,
-                onIntent = onIntent
+                colors = colors,
+                onIntent = viewModel::onIntent
             )
         if (state.openBottomSheetGroup)
             BrieflyBottomSheetAdd(
-                list = state.list,
+                list = state.listBriefly,
                 titleProduct = state.currentBriefly.title,
                 count = state.currentBriefly.count,
                 suffix = state.currentBriefly.suffix,
                 countEntry = state.currentBriefly.rowCount,
-                onDismissRequest = { onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
+                onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
                 onEditClick = {
-                    onIntent(
+                    viewModel.onIntent(
                         AddListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
-                onDeleteClick = {onIntent(AddListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
             )
     }
 }
@@ -191,6 +172,7 @@ fun AddScreen(
 @Composable
 fun AddContainer2(
     modifier: Modifier = Modifier,
+    details: Boolean,
     searchText: String,
     itemList: List<DomainAddTable>,
     searchList: List<DomainAddTable>,
@@ -198,19 +180,16 @@ fun AddContainer2(
     onInsertClick: () -> Unit,
     onEditClick: (DomainAddTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
-    onSearchChange: (String) -> Unit,
     onDetailsClick: (BrieflyAddDomain) -> Unit
 ) {
     InventoryBody(
         modifier = modifier,
-        searchText = searchText,
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList,
         onInsertClick = onInsertClick,
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
-        onSearchChange = onSearchChange,
         onDetailsClick = onDetailsClick,
         detailCard = { item ->
             DetailProductCardNew(
@@ -236,15 +215,17 @@ fun AddContainer2(
                 count = item.count,
                 suffix = item.suffix,
                 countEntry = item.rowCount,
+                icon = R.drawable.icon_add_product,
                 color = green_shamrock,
                 colorSecondary = alabaster,
-                onClick = { onDetailsClick(item) }
+                onClick = { onDetailsClick(item) },
             )
         },
         titleRes = R.string.message_no_date_title_add,
         messageRes = R.string.message_no_date_message_add,
         supportRes = R.string.message_no_date_support_text_add,
         buttonRes = R.string.button_add_message_no_data,
+        details = details
     )
 }
 
@@ -269,8 +250,9 @@ fun BrieflyBottomSheetAdd(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         itemCard = { product ->
-            DetailProductCardNew2(
+            DetailProductCardNew(
                 modifier = Modifier,
+                isCardField = false,
                 count = product.count,
                 suffix = product.countSuffix,
                 category = product.category,
@@ -281,110 +263,83 @@ fun BrieflyBottomSheetAdd(
                 month = product.month,
                 year = product.year,
                 onDeleteClick = { onDeleteClick(product.id) },
-                onEditClick = { onEditClick(product) }
+                onEditClick = { onEditClick(product) },
+                onClick = { }
             )
         }
     )
 }
 
 @Composable
-fun EntryBottomSheet(
+fun AddEntryBottomSheet(
     modifier: Modifier,
     state: AddEntryState2,
-    onDismissRequest: () -> Unit,
+    colors: List<Color>,
     onIntent: (AddListIntent) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+    EntryBottomSheet(
+        modifier = Modifier,
+        isEntry = state.isEntry,
+        enabledButton = state.enabledButton(),
+        colors = colors,
+        onDismissRequest = {
+            onIntent(
+                AddListIntent.OpenBottomSheetEntry(false)
+            )
+        },
+        onInsertClick = { onIntent(AddListIntent.Insert) },
+        onUpdateClick = { onIntent(AddListIntent.Update) },
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .fillMaxHeight()
-        ) {
-            Column(
-                modifier = Modifier.modifierBottomSheet(true),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TextLine(
-                            modifier = Modifier.weight(1f),
-                            valueString = "Добавить продуцию",
-                            textStyle = textBold_20
-                        )
-                        IconButton(onClick = onDismissRequest) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close"
-                            )
-                        }
-                    }
-                    Text(text = "Введите информацию о новой продукции")
-                }
-                OutlinedTextTitleAddNew(
-                    value = state.title,
-                    onValueChange = { onIntent(AddListIntent.TitleChanged(it)) },
-                    onValueChangeSuffix = { onIntent(AddListIntent.TitleAndSuffix(it)) },
-                    titleList = state.pickList.titleList,
-                    isErrorTitle = state.error.isErrorTitle,
-                    isErrorSlash = state.error.isErrorSlash,
-                    drawableRes = R.drawable.icon_add_product
-                )
-                OutlinedTextCountNew(
-                    value = state.count,
-                    onValueChange = {
-                        onIntent(AddListIntent.CountChanged(it))
-                    },
-                    onSuffixChange = { onIntent(AddListIntent.SuffixClicked(it)) },
-                    isError = state.error.isErrorCount,
-                    suffix = state.countSuffix,
-                    intResSup = R.string.support_text_count_product,
+        OutlinedTextTitleAddNew(
+            value = state.title,
+            onValueChange = { onIntent(AddListIntent.TitleChanged(it)) },
+            onValueChangeSuffix = { onIntent(AddListIntent.TitleAndSuffix(it)) },
+            titleList = state.pickList.titleList,
+            isErrorTitle = state.error.isErrorTitle,
+            isErrorSlash = state.error.isErrorSlash,
+            drawableRes = R.drawable.icon_add_product
+        )
+        OutlinedTextCountNew(
+            value = state.count,
+            onValueChange = {
+                onIntent(AddListIntent.CountChanged(it))
+            },
+            onSuffixChange = { onIntent(AddListIntent.SuffixClicked(it)) },
+            isError = state.error.isErrorCount,
+            suffix = state.countSuffix,
+            intResSup = R.string.support_text_count_product,
 //                    isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
 //                    warehouseList = state.warehouseList
-                )
-                OutlinedTextCategoryNew(
-                    value = state.category,
-                    onValueChange = { onIntent(AddListIntent.CategoryChanged(it)) },
-                    titleList = state.pickList.categoryList,
-                )
-                OutlinedTextDateNew(
-                    value = state.date,
-                    onValueChange = { onIntent(AddListIntent.Date(it)) }
-                )
-                if (state.pickList.animalList.isNotEmpty())
-                    OutlinedTextAnimalNew(
-                        value = state.animal,
-                        onValueChange = { onIntent(AddListIntent.Animal(it)) },
-                        selectedAnimalIndex = state.selectedAnimalIndex,
-                        onClickClear = { onIntent(AddListIntent.AnimalClear(it)) },
-                        animalList = state.pickList.animalList,
-                    )
-                OutlinedTextNoteNew(
-                    value = state.note,
-                    onValueChange = { onIntent(AddListIntent.NoteChanged(it)) },
-                )
-            }
-            ButtonPanelNew(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-                isEntry = state.isEntry,// todo
-                onClickInsert = { onIntent(AddListIntent.Insert) },
-                onClickUpdate = { onIntent(AddListIntent.Update) },
-                onClickClose = onDismissRequest,
-                enable = state.enabledButton()
+        )
+        WarehouseCountCard(
+            title = state.title,
+            warehouseList = state.warehouseList
+        )
+        OutlinedTextCategoryNew(
+            value = state.category,
+            onValueChange = { onIntent(AddListIntent.CategoryChanged(it)) },
+            titleList = state.pickList.categoryList,
+        )
+        OutlinedTextDateNew(
+            value = state.date,
+            onValueChange = { onIntent(AddListIntent.Date(it)) }
+        )
+        if (state.pickList.animalList.isNotEmpty())
+            OutlinedTextAnimalNew(
+                value = state.animal,
+                onValueChange = { onIntent(AddListIntent.Animal(it)) },
+                selectedAnimalIndex = state.selectedAnimalIndex,
+                onClickClear = { onIntent(AddListIntent.AnimalClear(it)) },
+                animalList = state.pickList.animalList,
             )
-        }
+        OutlinedTextNoteNew(
+            value = state.note,
+            onValueChange = { onIntent(AddListIntent.NoteChanged(it)) },
+        )
     }
 }
 
+
 enum class Page {
-    ADD, SALE, WRITE_OFF, EXPENSES
+    WRITE_OFF, SALE, ADD, EXPENSES, ANIMAL
 }

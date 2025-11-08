@@ -28,9 +28,11 @@ import com.zaroslikov.fermacompose2.ui.elements.FloatButton
 import com.zaroslikov.fermacompose2.ui.elements.IconAndText
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffListIntent
 import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
 import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 
@@ -44,45 +46,32 @@ object AnimalDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalScreen(
-    navigateToStart: () -> Unit,
+   /* navigateToStart: () -> Unit,
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemCard: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Long) -> Unit,
-    drawerState: DrawerState,
+    drawerState: DrawerState,*/
     modifier: Modifier = Modifier,
-    isFirstStart: Boolean,
+ /*   isFirstStart: Boolean,*/
     viewModel: AnimalViewModel = hiltViewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val idProject = state.idPT
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerSheet(
-                scope = coroutineScope,
-                navigateToStart = navigateToStart,
-                navigateToModalSheet = navigateToModalSheet,
-                drawerState = drawerState,
-                7,
-                idProject.toString()
-            )
-        },
-    ) {
         Scaffold(
             modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBarNavigation(
-                    title = R.string.animals_screen_title,
-                    scope = coroutineScope,
-                    drawerState = drawerState,
-                    scrollBehavior = scrollBehavior
+                TopAppBarNavigationNew(
+                    scrollBehavior = scrollBehavior,
+                    value = "state.textSearch",
+                    isGroup = /*state.isGroup,*/ true,
+                    onClick = { /*viewModel.onIntent(WriteOffListIntent.GroupClicked(it))*/ },
+                    onValueChange = {/* viewModel.onIntent(WriteOffListIntent.SearchChanged(it)) */}
                 )
             },
             floatingActionButton = {
-                FloatButton { navigateToItemAdd(idProject) }
+               /* FloatButton { navigateToItemAdd(idProject) }*/
             }
         ) { innerPadding ->
             if (state.isLoading)
@@ -94,12 +83,11 @@ fun AnimalScreen(
                     modifier = Modifier
                         .modifierScreenLazy(innerPadding),
                     itemList = state.list,
-                    onItemClick = { navigateToItemCard(Pair(idProject, it)) },
-                    navigateToItemAdd = { navigateToItemAdd(idProject) }
+                    onItemClick = { /*navigateToItemCard(Pair(idProject, it)) */},
+                    navigateToItemAdd = { /*navigateToItemAdd(idProject)*/ }
                 )
         }
     }
-}
 
 @Composable
 private fun AnimalBody(
