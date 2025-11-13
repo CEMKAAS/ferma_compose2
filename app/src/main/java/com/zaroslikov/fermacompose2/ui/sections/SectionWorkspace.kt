@@ -80,6 +80,7 @@ object HomeDestination : NavigationDestination {
 
 @Composable
 fun SectionWorkspaceScreen(
+    navigateToItemCard: (Pair<Long, Long>) -> Unit,
     viewModel: AddViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -175,7 +176,7 @@ fun SectionWorkspaceScreen(
                 Page.SALE -> SaleScreen()
                 Page.EXPENSES -> ExpensesScreen()
                 Page.WRITE_OFF -> WriteOffScreen()
-                Page.ANIMAL -> AnimalScreen()
+                Page.ANIMAL -> AnimalScreen(navigateToItemCard = navigateToItemCard)
             }
         }
     }

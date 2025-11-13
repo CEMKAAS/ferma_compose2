@@ -3,8 +3,11 @@ package com.zaroslikov.fermacompose2.ui.elements
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
@@ -12,7 +15,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -23,7 +30,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -440,6 +451,7 @@ fun DetailProductCardNew(
     ) { cardField() } else BorderCard { cardField() }
 }
 
+
 @Composable
 fun BorderCard(
     modifier: Modifier = Modifier,
@@ -552,6 +564,38 @@ fun CountColorCard(
         )
     }
 }
+
+@Composable
+fun CountColorGradientCard(
+    modifier: Modifier = Modifier,
+    sex: Boolean
+) {
+    val (colorGradient, icon) = if (sex)
+        listOf(Color(0xFF2B7FFF), Color(0xFF615FFF)) to R.drawable.baseline_male_24
+    else listOf(Color(0xFFF6339A), Color(0xFFFF2056)) to R.drawable.baseline_female_24
+
+    val gradient = Brush.linearGradient(
+        colors = colorGradient,
+        start = Offset(0f, 0f),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+    Box(
+        modifier = modifier
+            .background(brush = gradient, shape = RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painterResource(icon),
+            contentDescription = "Пол",
+            tint = Color.White,
+            modifier = Modifier
+                .size(12.dp),
+            /*.padding(8.dp)*/
+        )
+    }
+}
+
 
 @Composable
 fun NoteColorCard(

@@ -12,7 +12,10 @@ enum class Suffix(val code: Int) {
     MILLIMETERS(9),
     CENTIMETERS(10),
     METERS(11),
-    RUBLE(12);
+    RUBLE(12),
+    GRAM_DAY(13),
+    KILOGRAM_DAY(14),
+    TONS_DAY(15);
 
     companion object {
         fun fromCode(code: Int): Suffix = entries.first { it.code == code }

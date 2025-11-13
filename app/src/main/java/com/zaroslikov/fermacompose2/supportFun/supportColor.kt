@@ -51,5 +51,8 @@ fun Suffix.toColor(): Color {
 
         // --- Валюта ---
         Suffix.RUBLE -> price_green
+        Suffix.GRAM_DAY -> Color(0xFFA5D6A7)
+        Suffix.KILOGRAM_DAY -> Color(0xFF66BB6A)
+        Suffix.TONS_DAY -> Color(0xFF2E7D32)
     }
 }

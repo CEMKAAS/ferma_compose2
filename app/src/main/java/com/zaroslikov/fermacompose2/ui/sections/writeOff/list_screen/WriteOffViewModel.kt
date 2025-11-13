@@ -437,5 +437,4 @@ sealed class WriteOffListIntent : BaseIntent {
     data class CountWarehouse(val value: List<DomainCountSuffix>) : WriteOffListIntent()
     data class GroupClicked(val value: Boolean) : WriteOffListIntent()
     data class SearchChanged(val value: String) : WriteOffListIntent()
-
 }

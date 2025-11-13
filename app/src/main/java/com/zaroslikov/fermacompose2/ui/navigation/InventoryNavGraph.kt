@@ -387,7 +387,17 @@ fun InventoryNavHost(
                 type = NavType.LongType
             })
         ) {
-            SectionWorkspaceScreen()
+            SectionWorkspaceScreen(
+                navigateToItemCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                }
+            )
             /* AddScreen(
                  drawerState = drawerState,
                  navigateToStart = {
@@ -630,11 +640,20 @@ fun InventoryNavHost(
             })
         ) {
             AnimalScreen(
-             /*   drawerState = drawerState, navigateToStart = {
-                    navController.navigate(StartDestination.route)
-                }, navigateToModalSheet = {
-                    navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-                }, navigateToItemAdd = {
+                /*   drawerState = drawerState, navigateToStart = {
+                       navController.navigate(StartDestination.route)
+                   }, navigateToModalSheet = {
+                       navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+                   }, , navigateToItemCard = {
+                       navController.navigate(
+                           navNull(
+                               route = AnimalCardDestination.route,
+                               itemOne = it.first.toString(),
+                               itemTwo = it.second.toString()
+                           )
+                       )
+                   }, isFirstStart = isFirstStart*/
+              /*  navigateToItemAdd = {
                     navController.navigate(
                         navNull(
                             AnimalEntryDestination.route,
@@ -642,15 +661,7 @@ fun InventoryNavHost(
                             it.toString()
                         )
                     )
-                }, navigateToItemCard = {
-                    navController.navigate(
-                        navNull(
-                            route = AnimalCardDestination.route,
-                            itemOne = it.first.toString(),
-                            itemTwo = it.second.toString()
-                        )
-                    )
-                }, isFirstStart = isFirstStart*/
+                }*/
             )
         }
 

@@ -1,11 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.elements.TextField
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,17 +26,20 @@ import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.error_base
-import com.zaroslikov.fermacompose2.gray_5
+import com.zaroslikov.fermacompose2.grey_3
 import com.zaroslikov.fermacompose2.supportFun.toColor
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.IconDone
+import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.violet_1
 
 
 @Composable
 fun DropdownMenuEdit(
+    color: Color = grey_3,
     onEditClick: () -> Unit,
+    onArchiveClick: (() -> Unit)? = null,
     onDeleteClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -46,45 +49,60 @@ fun DropdownMenuEdit(
             imageVector = Icons.Default.MoreVert,
             contentDescription = "More"
         )
+
         BaseDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = !expanded },
+            onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem(
-                text = { Text(text = "Редактировать") },
-                leadingIcon = {
-                    Icon(
-                        painterResource(R.drawable.icon_edit),
-                        contentDescription = null,
-                        tint = Color(0xFF155DFC)
+            val items = buildList {
+                add(
+                    MenuItemData(
+                        "Редактировать",
+                        R.drawable.outline_edit_square_24,
+                        color,
+                        onEditClick
                     )
-                },
-                onClick = {
-                    onEditClick()
-                    expanded = !expanded
+                )
+                onArchiveClick?.let {
+                    add(MenuItemData("Архивировать", R.drawable.baseline_archive_24, color, it))
                 }
-            )
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = gray_5
-            )
-            DropdownMenuItem(
-                text = { Text(text = "Удалить") },
-                leadingIcon = {
-                    Icon(
-                        painterResource(R.drawable.icon_trash),
-                        contentDescription = null,
-                        tint = Color(0xFFEC003F)
-                    )
-                },
-                onClick = {
-                    onDeleteClick()
-                    expanded = !expanded
-                }
-            )
+                add(MenuItemData("Удалить", R.drawable.icon_trash, error_base, onDeleteClick))
+            }
+
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = item.title,
+                            style = text_14,
+                            color = if (item.color == error_base) error_base else Color.Unspecified
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            painter = painterResource(item.icon),
+                            contentDescription = null,
+                            tint = color
+                        )
+                    },
+                    onClick = {
+                        item.onClick()
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
+
+private data class MenuItemData(
+    val title: String,
+    @DrawableRes val icon: Int,
+    val color: Color,
+    val onClick: () -> Unit
+)
+
 
 @Composable
 fun ExposedDropdownMenuCategoryBuyer(
@@ -150,18 +168,10 @@ fun ExposedDropdownMenuProduct(
 fun ExposedDropdownMenuSuffix(
     suffix: Suffix,
     setSuffix: (Suffix) -> Unit,
+    suffixList: List<Suffix>,
     enableDropMenu: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
-    val suffixList = listOf(
-        Suffix.PIECES,
-        Suffix.GRAM,
-        Suffix.KILOGRAM,
-        Suffix.TONS,
-        Suffix.LITERS,
-        Suffix.CUBIC_METERS,
-        Suffix.METERS
-    )
     BaseExposedDropdownMenu(
         list = suffixList,
         content = content

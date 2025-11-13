@@ -152,6 +152,9 @@
     <string name="suffix_millimeters">мм.</string>
     <string name="suffix_centimetre">см.</string>
     <string name="suffix_meters">м.</string>
+    <string name="suffix_gram_day">г./день</string>
+    <string name="suffix_kilogram_day">кг./день</string>
+    <string name="suffix_tons_day">тн./день</string>
 
 
     //ContentDescription
@@ -402,12 +405,20 @@
     //AnimalEntryScreen
     <string name="animal_entry_screen_">Вносим данные по группе или одному животному?</string>
     <string name="animal_entry_screen_info_animal">Вносим данные по группе или одному животному?</string>
+    <string name="animal_entry_screen_animal">Тип добавления</string>
     <string name="animal_entry_screen_sex_man">Мужской</string>
     <string name="animal_entry_screen_sex_woman">Женский</string>
 
     //FinanceIncomeExpenses
     <string name="finance_income_expenses_category">Категории</string>
     <string name="finance_income_expenses_product">Продукция</string>
+
+    // AnimalList
+    <string name="animal_list_age">Возраст</string>
+    <string name="animal_list_expenses">Стоимость</string>
+    <string name="animal_list_food">Расход корма</string>
+    <string name="animal_list_count">Кол-во</string>
+
 
     //AnimalCardScreen
     <string name="animal_card_screen_animal_card">Карточка животного</string>
@@ -500,8 +511,8 @@
     <string name="ration_button_own_needs">На собственные нужды</string>
     <string name="ration_button_disposal">"На утилизацию</string>
 
-    <string name="ration_button_one">Один</string>
-    <string name="ration_button_many">Группа</string>
+    <string name="ration_button_one">Одно животное</string>
+    <string name="ration_button_many">Группа животных</string>
 
 
     //SnackBar

@@ -21,6 +21,9 @@ val green_1 = Color(0xFFA4F4CF)
 
 // Color Suffix
 val price_green = Color(0xFF00A63E)
+val price_green_2 = Color(0xFFF0FDF4)
+
+
 val gram_color = Color(0xFF00A63E)
 val kilogram_color = Color(0xFF00A63E)
 val tons_color = Color(0xFF00A63E)
@@ -37,15 +40,29 @@ val units_color = Color(0xFF00A63E)
 // ColorGradiend
 val blue_1 = Color(0xFF155DFC)
 val blue_2 = Color(0xFF4F39F6)
+val blue_3 = Color(0xFFEFF6FF)
+
 
 val orang_1 = Color(0xFFF54900)
 val orang_2 = Color(0xFFE17100)
+val orang_3 = Color(0xFFFFF7ED)
+
 
 val violet_1 = Color(0xFF9810FA)
 val violet_2 = Color(0xFF4F39F6)
+val violet_3 = Color(0xFFFAF5FF)
+
 
 val green_g_1 = Color(0xFFECFDF5)
 val green_g_2 = Color(0xFFF0FDF4)
+val green_g_2 = Color(0xFF00A63E)
+
+val green_g_3 = Color(0xFFECFEFF)
+val green_g_4 = Color(0xFF96F7E4)
+
+
+val animal_1 = Color(0xFF009689)
+val animal_2 = Color(0xFF0092B8)
 
 // Error
 

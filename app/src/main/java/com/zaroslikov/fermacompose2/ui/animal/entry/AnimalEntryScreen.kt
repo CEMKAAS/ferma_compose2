@@ -4,10 +4,15 @@ package com.zaroslikov.fermacompose2.ui.animal.entry
 
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -16,12 +21,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.animal_1
+import com.zaroslikov.fermacompose2.green_1
+import com.zaroslikov.fermacompose2.green_g_2
+import com.zaroslikov.fermacompose2.green_g_3
+import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.ui.elements.AnimalNameOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardField
@@ -37,6 +48,7 @@ import com.zaroslikov.fermacompose2.ui.elements.RadioButtonRow
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
+import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.toOutlinedText
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
@@ -94,11 +106,11 @@ fun AnimalEntryContainer(
     onIntent: (AnimalEntryIntent) -> Unit
 ) {
     Column(modifier = modifier) {
-        if (state.isEntry)
-            AnimalGroupCard(
-                isAnimalGroup = state.isAnimalGroup,
-                animalGroupClicked = { onIntent(AnimalEntryIntent.AnimalGroupClicked(it)) }
-            )
+        /*   if (state.isEntry)
+             AnimalGroupCard(
+                  isAnimalGroup = state.isAnimalGroup,
+                  animalGroupClicked = { onIntent(AnimalEntryIntent.AnimalGroupClicked(it)) }
+              )*/
         AnimalNameOutlinedText(
             value = state.title,
             onValueChange = {
@@ -201,32 +213,6 @@ fun AnimalEntryContainer(
             onClickInsert = { onIntent(AnimalEntryIntent.Insert) },
             onClickUpdate = { onIntent(AnimalEntryIntent.Update) },
             onClickDelete = { onIntent(AnimalEntryIntent.Delete) }
-        )
-    }
-}
-
-
-@Composable
-private fun AnimalGroupCard(
-    isAnimalGroup: Boolean,
-    animalGroupClicked: (Boolean) -> Unit
-) {
-    CardField(
-        modifier = Modifier
-            .padding(bottom = 4.dp),
-        row = false
-    ) {
-        Text(
-            text = stringResource(R.string.animal_entry_screen_info_animal),
-            style = textBold_16
-        )
-        RadioButtonRow(
-            state = isAnimalGroup,
-            onStateSelect = { animalGroupClicked(it) },
-            intResOne = R.string.ration_button_one,
-            intResTwo = R.string.ration_button_many,
-            imageOne = R.drawable.baseline_fiber_manual_record_24,
-            imageTwo = R.drawable.baseline_spoke_24
         )
     }
 }

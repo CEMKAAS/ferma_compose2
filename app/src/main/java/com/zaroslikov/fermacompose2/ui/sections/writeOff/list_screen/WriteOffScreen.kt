@@ -1,12 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen
 
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,14 +15,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
-import com.zaroslikov.fermacompose2.price_green
-import com.zaroslikov.fermacompose2.supportFun.toColor
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
@@ -35,7 +28,6 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleSaleNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedWriteOffStatus
-import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
@@ -43,7 +35,6 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.sections.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
@@ -166,7 +157,6 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             )
     }
 }
-
 
 @Composable
 private fun WriteOffContainer(
@@ -324,6 +314,7 @@ private fun WriteOffEntryBottomSheet(
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_write_off,
+            suffixList = suffixWeightDayList
             /*isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
             warehouseList = state.warehouseList,*/
         )

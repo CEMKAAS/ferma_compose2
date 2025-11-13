@@ -30,6 +30,9 @@ fun Suffix.toResId(): Int {
         Suffix.CENTIMETERS -> R.string.suffix_centimetre
         // Money
         Suffix.RUBLE -> R.string.currency_ruble
+        Suffix.GRAM_DAY -> R.string.suffix_gram_day
+        Suffix.KILOGRAM_DAY -> R.string.suffix_kilogram_day
+        Suffix.TONS_DAY -> R.string.suffix_tons_day
     }
 }
 

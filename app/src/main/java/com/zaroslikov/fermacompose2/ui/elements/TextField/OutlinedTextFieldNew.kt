@@ -45,8 +45,11 @@ import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixAllList
+import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
@@ -57,7 +60,11 @@ import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.MinDateSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.elements.AutoCalculateCheckbox
+import com.zaroslikov.fermacompose2.ui.elements.AutoWeightCheckbox
+import com.zaroslikov.fermacompose2.ui.elements.BaseOutlinedText
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
+import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.toOutlinedText
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
@@ -128,11 +135,11 @@ fun SearchBar(
 fun OutlinedTextNoteNew(
     value: String,
     onValueChange: (String) -> Unit,
-    cardBorder: Boolean = true,
+    isBorderCard: Boolean = true,
     @StringRes label: Int = R.string.outlined_text_note,
     @StringRes supportingText: Int = R.string.support_text_note,
 ) {
-    BorderCard {
+    val textField: @Composable () -> Unit = {
         BaseOutlinedTextNew(
             value = value,
             onValueChange = { onValueChange(it) },
@@ -145,6 +152,9 @@ fun OutlinedTextNoteNew(
             minLines = 3
         )
     }
+    if (isBorderCard) BorderCard {
+        textField()
+    } else CardFieldNew { textField() }
 }
 
 
@@ -392,9 +402,9 @@ fun OutlinedTextCategoryNew(
         }
     }
 }
-/*
+
 @Composable
-fun OutlinedTextCountAnimal(
+fun OutlinedTextCountAnimalNew(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
@@ -422,14 +432,8 @@ fun OutlinedTextCountAnimal(
     isAutoCalculate: Boolean = true,
     onAutoCalculate: (Boolean) -> Unit = {},
 ) {
-    CardField(
-        modifier = Modifier
-            .toOutlinedText()
-            .padding(bottom = animatedErrorPadding(isAutoCalculate)),
-        row = false,
-        isNecessarily = isNecessarily
-    ) {
-        BaseOutlinedText(
+    BorderCard {
+        BaseOutlinedTextNew(
             modifier = modifier,
             value = value,
             onValueChange = onValueChange,
@@ -462,7 +466,7 @@ fun OutlinedTextCountAnimal(
             )
     }
 }
-*/
+
 
 @Composable
 fun OutlinedTextCountNew(
@@ -471,6 +475,7 @@ fun OutlinedTextCountNew(
     onValueChange: (String) -> Unit,
     suffix: Suffix,
     onSuffixChange: ((Suffix) -> Unit)? = null,
+    suffixList: List<Suffix> = suffixAllList,
     isError: Boolean,
 //    isAnimal: Boolean = false,
 //    isWarehouseShow: Boolean = true,
@@ -525,6 +530,7 @@ fun OutlinedTextCountNew(
                         focusManager.moveFocus(FocusDirection.Down)
                     }
                 },
+                suffixList = suffixList
             ) {
                 BaseOutlinedTextNew(
                     modifier = it.first,
@@ -542,6 +548,7 @@ fun OutlinedTextCountNew(
         }
     }
 }
+
 
 /*
 @Composable
@@ -906,6 +913,43 @@ fun OutlinedWriteOffStatus(
 }
 
 @Composable
+fun OutlinedTextSexNew(
+    value: Boolean,
+    onValueChange: (Boolean) -> Unit = {}
+) {
+    val focusManager = LocalFocusManager.current
+    var selectedItemIndex by remember { mutableIntStateOf(if (value) 0 else 1) }
+    val statusList = listOf(
+        Triple(R.drawable.baseline_male_24, R.string.animal_entry_screen_sex_man, true),
+        Triple(R.drawable.baseline_female_24, R.string.animal_entry_screen_sex_woman, false)
+    )
+    BorderCard {
+        ExposedDropdownMenuStatusWriteOff(
+            status = value,
+            setStatus = {
+                onValueChange(it.first)
+                selectedItemIndex = it.second
+                focusManager.moveFocus(FocusDirection.Down)
+            },
+            statusList = statusList
+        ) {
+            BaseOutlinedTextNew(
+                value = stringResource(statusList[selectedItemIndex].second),
+                onValueChange = { },
+                leadingIconRes2 = statusList[selectedItemIndex].first,
+                leadingIconColor2 = if (selectedItemIndex == 0) violet_1 else error_base,
+                labelIntRes = R.string.outlined_text_sex,
+                intResSup = R.string.support_text_sex_animals,
+                readOnly = true,
+                modifier = it.first,
+                isMore = true,
+                keyboardOptions = keyboardOptionsNext()
+            )
+        }
+    }
+}
+
+@Composable
 fun OutlinedTextBuyerNew(
     value: String,
     onValueChange: (String) -> Unit,
@@ -936,6 +980,60 @@ fun OutlinedTextBuyerNew(
                 isMore = value.isBlank()
             )
         }
+    }
+}
+
+@Composable
+fun OutlinedTextAnimalTypeNew(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onTrailingChance: () -> Unit = {},
+    list: List<String>,
+) {
+    val focusManager = LocalFocusManager.current
+    BorderCard {
+        ExposedDropdownMenuCategoryBuyer(
+            title = value,
+            setTitle = { onValueChange(it) },
+            titleList = list
+        ) {
+            BaseOutlinedTextNew(
+                value = value,
+                onValueChange = { onValueChange(it) },
+                onClear = { onValueChange("") },
+                labelIntRes = R.string.outlined_text_type,
+                intResSup = R.string.support_text_buyer,
+                modifier = it.first,
+                leadingIconRes = R.drawable.baseline_pets_24,
+                trailingIcon = R.drawable.baseline_clear_24,
+                onTrailingChance = {
+                    onTrailingChance()
+                    focusManager.clearFocus()
+                },
+                keyboardOptions = keyboardOptionsNext(),
+                isMore = value.isBlank()
+            )
+        }
+    }
+}
+
+@Composable
+fun AnimalNameOutlinedTextNew(
+    value: String,
+    onValueChange: (String) -> Unit,
+    isAnimalGroup: Boolean,
+    isErrorTitle: Boolean
+) {
+    BorderCard {
+        BaseOutlinedTextNew(
+            value = value,
+            onValueChange = onValueChange,
+            labelIntRes = if (!isAnimalGroup) R.string.outlined_text_name_animal else R.string.outlined_text_name_animals,
+            isError = isErrorTitle,
+            intResSup = if (!isAnimalGroup) R.string.support_text_name_animal else R.string.support_text_names_animals,
+            intResError = if (!isAnimalGroup) R.string.error_no_name_animal else R.string.error_no_name_animals,
+            keyboardOptions = keyboardOptionsNext()
+        )
     }
 }
 /*
@@ -1044,29 +1142,7 @@ fun WeightOutlinedText(
     )
 }
 
-@Composable
-fun AnimalNameOutlinedText(
-    value: String,
-    onValueChange: (String) -> Unit,
-    isAnimalGroup: Boolean,
-    isErrorTitle: Boolean
-) {
-    CardField(
-        modifier = Modifier.toOutlinedText(),
-        row = false,
-        isNecessarily = true
-    ) {
-        BaseOutlinedText(
-            value = value,
-            onValueChange = onValueChange,
-            labelIntRes = if (!isAnimalGroup) R.string.outlined_text_name_animal else R.string.outlined_text_name_animals,
-            isError = isErrorTitle,
-            intResSup = if (!isAnimalGroup) R.string.support_text_name_animal else R.string.support_text_names_animals,
-            intResError = if (!isAnimalGroup) R.string.error_no_name_animal else R.string.error_no_name_animals,
-            keyboardOptions = keyboardOptionsNext()
-        )
-    }
-}
+
 
 
 @Composable
