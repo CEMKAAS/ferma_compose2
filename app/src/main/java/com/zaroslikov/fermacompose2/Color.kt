@@ -55,7 +55,7 @@ val violet_3 = Color(0xFFFAF5FF)
 
 val green_g_1 = Color(0xFFECFDF5)
 val green_g_2 = Color(0xFFF0FDF4)
-val green_g_2 = Color(0xFF00A63E)
+val green_g_5 = Color(0xFF00A63E)
 
 val green_g_3 = Color(0xFFECFEFF)
 val green_g_4 = Color(0xFF96F7E4)

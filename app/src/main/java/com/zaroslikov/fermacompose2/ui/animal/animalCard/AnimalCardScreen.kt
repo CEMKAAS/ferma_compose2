@@ -239,16 +239,20 @@ private fun DataCardOne(
                     }
                     AnimalParameter(
                         titleParameter = R.string.animal_list_age,
-                        parameter = animal.date + " (${
-                            getAgeFromDate(
-                                context,
-                                animal.dateFactory ?: animal.date
-                            )
-                        })",
+                        parameter = animal.date + " (${getAgeFromDate(context, animal.date)})",
                         icon = R.drawable.baseline_calendar_month_24,
                         iconColor = Color(0xFF009689),
                         iconColorSecond = Color(0xFFF0FDFA)
                     )
+                    animal.dateFactory?.let {
+                        AnimalParameter(
+                            titleParameter = R.string.animal_list_date_factory,
+                            parameter = it + " (${getAgeFromDate(context, it)})",
+                            icon = R.drawable.baseline_event_24,
+                            iconColor = Color(0xFF009689),
+                            iconColorSecond = Color(0xFFF0FDFA)
+                        )
+                    }
                     AnimalParameter(
                         titleParameter = R.string.animal_list_food,
                         parameter = "${animal.foodDay.formatNumber()} ${stringResource(animal.foodDaySuffix.toResId())}",
@@ -258,12 +262,13 @@ private fun DataCardOne(
                     )
                     AnimalParameter(
                         titleParameter =  R.string.search_section,
-                        parameter = oneParameter,
-                        icon = oneIcon,
+                        parameter = "$price",
+                        icon = R.drawable.baseline_add_card_24,
                         iconColor = price_green,
                         iconColorSecond = price_green_2
                     )
                 }
+
             }
 
             /*CardFieldNew(

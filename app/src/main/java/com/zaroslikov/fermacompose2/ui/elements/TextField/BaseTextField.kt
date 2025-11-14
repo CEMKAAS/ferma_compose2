@@ -45,7 +45,6 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.dark
-import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.text_16

@@ -48,6 +48,8 @@ import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.animal.indicators.AnimalIndicatorsCardNew
+import com.zaroslikov.fermacompose2.ui.animal.indicators.InventoryAnimalBody
 import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
@@ -83,7 +85,7 @@ fun AnimalSizeScreen(
     viewModel: AnimalSizeViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -104,24 +106,58 @@ fun AnimalSizeScreen(
             }
         }
     ) { innerPadding ->
-        if (state.value.isLoading)
+        if (state.isLoading)
             CircularProgress(
                 modifier = Modifier.padding(innerPadding),
             )
         else
-            AnimalSizeContainer(
+            AnimalSizeContainer2(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
-                state = state.value,
-                onIntent = viewModel::onIntent
+                itemList = state.sizeList,
+                onInsertClick = { viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true)) },
+                onEditClick = {
+                    viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = false, it))
+                },
+                onDeleteClick = { TODO() }
             )
 
-        if (state.value.isOpenDialog)
+        if (state.isOpenDialog)
             SizeBottomSheet(
-                state = state.value.domainAnimalSize,
+                state = state.domainAnimalSize,
                 onIntent = viewModel::onIntent,
-                error = state.value.error,
-                isEntry = state.value.isEntry,
+                error = state.error,
+                isEntry = state.isEntry,
             )
+    }
+}
+
+
+@Composable
+private fun AnimalSizeContainer2(
+    modifier: Modifier,
+    itemList: List<DomainAnimalSize>,
+    onInsertClick: () -> Unit,
+    onEditClick: (DomainAnimalSize) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+) {
+    InventoryAnimalBody(
+        modifier = modifier,
+        itemList = itemList,
+        onInsertClick = onInsertClick,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.message_no_date_title_height,
+        messageRes = R.string.message_no_date_message_height,
+        supportRes = R.string.message_no_date_support_height,
+        buttonRes = R.string.button_sale_message_no_height
+    ) { item, previous ->
+        AnimalIndicatorsCardNew(
+            modifier = modifier,
+            domainAnimalSize = item,
+            previousDomainAnimalSize = previous,
+            onEditClick = { onEditClick(item) },
+            onDeleteClick = { onDeleteClick(item.id) }
+        )
     }
 }
 

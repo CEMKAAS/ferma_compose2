@@ -44,7 +44,6 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.marengo
-import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId

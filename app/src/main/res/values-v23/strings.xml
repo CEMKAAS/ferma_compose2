@@ -415,6 +415,7 @@
 
     // AnimalList
     <string name="animal_list_age">Возраст</string>
+    <string name="animal_list_date_factory">В хозяйстве</string>
     <string name="animal_list_expenses">Стоимость</string>
     <string name="animal_list_food">Расход корма</string>
     <string name="animal_list_count">Кол-во</string>
