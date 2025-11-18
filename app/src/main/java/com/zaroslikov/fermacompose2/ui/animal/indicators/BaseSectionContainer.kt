@@ -2,6 +2,10 @@
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators
 
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +15,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -29,13 +38,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.green_1
+import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_g_2
+import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.supportFun.convertSize
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.indicators.size.HeadingIndicators
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
@@ -46,7 +64,12 @@ import com.zaroslikov.fermacompose2.ui.elements.TextLine
 import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_20
+import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated2
+import com.zaroslikov.fermacompose2.ui.elements.text_14
+import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import kotlin.math.absoluteValue
 
 @Composable
 fun <T> InventoryAnimalBody(
@@ -89,19 +112,22 @@ private fun <T> InventoryList(
     onDeleteClick: (Long) -> Unit,
     detailCard: @Composable (item: T, previous: T?) -> Unit
 ) {
-    HeadingIndicators(R.string.height_screen_title)
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-
+    Column(
+        modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        itemsIndexed(
-            items = itemList,
-            key = { index, _ -> index }) { index, item ->
-            val previousItem =
-                if (index < itemList.size - 1) itemList[index + 1] else null
-            detailCard(item, previousItem)
+        HeadingIndicators(R.string.height_screen_title)
+        LazyColumn(
+            contentPadding = PaddingValues(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(
+                items = itemList,
+                key = { index, _ -> index }) { index, item ->
+                val previousItem =
+                    if (index < itemList.size - 1) itemList[index + 1] else null
+                detailCard(item, previousItem)
+            }
         }
     }
 }
@@ -172,67 +198,200 @@ fun EntryBottomSheet(
 @Composable
 fun AnimalIndicatorsCardNew(
     modifier: Modifier = Modifier,
+    @DrawableRes icon: Int,
+    colors: List<Color>,
+    value: String,
+    suffix: Suffix,
+    date: String,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    domainAnimalSize: DomainAnimalSize,
     previousDomainAnimalSize: DomainAnimalSize?
 ) {
     var details by rememberSaveable { mutableStateOf(false) }
     CardFieldNew(
         modifier = modifier,
+        padding = PaddingValues()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(20.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                IconIndicatorsAnimal(
-                    icon = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
-                    colors = listOf(Color(0xFF009966), Color(0xFF00A63E))
-                )
-                Text(
-                    text = "${domainAnimalSize.size.toFormatNumber()} ${
-                        stringResource(
-                            domainAnimalSize.suffix.toResId()
-                        )
-                    }",
-                    style = textBold_16,
-                    textAlign = TextAlign.Center
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    IconIndicatorsAnimal(
+                        icon = icon,
+                        colors = colors
+                    )
+                    Text(
+                        text = "$value ${stringResource(suffix.toResId())}",
+                        style = textBold_16,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = date,
+                        style = textBold_16,
+                        textAlign = TextAlign.Center
+                    )
+                    DropdownMenuEdit(
+                        onEditClick = onEditClick,
+                        onDeleteClick = onDeleteClick
+                    )
+                    if (previousDomainAnimalSize != null)
+                        IconButton(
+                            onClick = { details = !details }) {
+                            Icon(
+                                painterResource(if (details) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
+                                contentDescription = null
+                            )
+                        }
+                }
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = domainAnimalSize.date,
-                    style = textBold_16,
-                    textAlign = TextAlign.Center
-                )
-                DropdownMenuEdit(
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick
-                )
-                if (previousDomainAnimalSize != null)
-                    IconButton(
-                        onClick = { details = !details }) {
-                        Icon(
-                            painterResource(if (details) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
-                            contentDescription = null
-                        )
-                    }
-            }
-
         }
-        /*if (details && previousDomainAnimalSize != null)
-            DetailsCount(
-                domainAnimalSize,
-                previousDomainAnimalSize
-            )*/
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxWidth(),
+            visible = details && previousDomainAnimalSize != null
+        ) {
+            BaseDetailsAnimalIndication(
+                values = "↑ Увеличился на 5.0 см.",
+                note = "Измерение после роста"
+            )
+        }
+    }
+}
+
+@Composable
+fun BaseDetailsAnimalIndication(
+    values: String,
+    note: String
+) {
+    HorizontalDivider(
+        modifier = Modifier.fillMaxWidth(),
+        thickness = 1.dp,
+        color = gray_6
+    )
+    Column(
+        modifier = Modifier
+            .background(color = Color(0xFFF9FAFB))
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(R.string.animal_indicators_changed),
+                style = text_14,
+                color = marengo
+            )
+            Card(
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = green_g_2
+                ),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = green_1
+                )
+            ) {
+                Text(text = values, color = green_2)
+            }
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 1.dp,
+                color = gray_6
+            )
+            Text(
+                text = stringResource(R.string.animal_indicators_note),
+                style = text_14,
+                color = marengo
+            )
+            Text(
+                text = note,
+                color = Color(0xFF364153),
+                style = text_14,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun DetailsCountSize(
+    domainAnimalSize: DomainAnimalSize,
+    previousDomainAnimalSize: DomainAnimalSize
+) {
+    val context = LocalContext.current
+
+    val size = domainAnimalSize.size.toConvertZeroDouble()
+    val previousSize = previousDomainAnimalSize.size.toConvertZeroDouble()
+
+    val suffix = domainAnimalSize.suffix
+    val suffixPrevious = previousDomainAnimalSize.suffix
+
+    val note = if (domainAnimalSize.note != "") "\n${domainAnimalSize.note}" else ""
+
+    val sizeConverted = size.convertSize(suffix, to = Suffix.MILLIMETERS)
+    val previousCountConverted =
+        previousSize.convertSize(suffixPrevious, to = Suffix.MILLIMETERS)
+
+    val totalValue = (sizeConverted - previousCountConverted).convertSize(
+        Suffix.MILLIMETERS,
+        suffix
+    ).absoluteValue.formatNumber()
+
+    Row {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = when {
+                size > previousSize ->
+                    textBuildIndicatorsAnnotated2(
+                        context = context,
+                        intRes = R.string.animal_indicators_size_increased_s,
+                        totalValue = totalValue,
+                        suffix = suffix,
+                        isPlus = true,
+                        note = note
+                    )
+
+                size == previousSize ->
+                    buildAnnotatedString {
+                        append(stringResource(R.string.animal_indicators_size_not_changed_s))
+                        append(note)
+                    }
+
+                else ->
+                    textBuildIndicatorsAnnotated2(
+                        context = context,
+                        intRes = R.string.animal_indicators_size_decreased_s,
+                        totalValue = totalValue,
+                        suffix = suffix,
+                        isPlus = false,
+                        note = note
+                    )
+            },
+            style = text_16,
+            textAlign = TextAlign.Start
+        )
     }
 }

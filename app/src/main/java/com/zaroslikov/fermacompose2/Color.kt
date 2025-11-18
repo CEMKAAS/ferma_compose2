@@ -14,9 +14,8 @@ val grey_3 = Color(0xFF717182)
 val gray_4 = Color(0xFFE5E5E5)
 val gray_5 = Color(0xFFE5E7EB)
 val gray_6 = Color(0xFFF3F4F6)
-
-
 val green_1 = Color(0xFFA4F4CF)
+val green_2 = Color(0xFF007A55)
 
 
 // Color Suffix

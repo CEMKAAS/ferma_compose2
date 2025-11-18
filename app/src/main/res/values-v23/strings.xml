@@ -459,6 +459,7 @@
     <string name="animal_card_screen_kill_add_product">Было получено продукции: </string>
 
     //AnimalIndicatorsScreen
+
     <string name="animal_indicators_screen_no_note">Примечание не указано</string>
     <string name="animal_indicators_screen_expenses_count">Укажите стоимость за купленное кол-во</string>
     <string name="animal_indicators_screen_sale_count">Укажите стоимость за проданное кол-во</string>
@@ -475,6 +476,8 @@
     <string name="animal_indicators_animals_vaccination_no_price_s">Было привито животных: %s %s</string>
     <string name="animal_indicators_category_expenses_vaccination">Прививки</string>
     <string name="animal_indicators_note_expenses_vaccination">Прививка была добавлена для животного: </string>
+    <string name="animal_indicators_changed">Изменение:</string>
+    <string name="animal_indicators_note">Примечание:</string>
 
     <string name="animal_indicators_vaccination_count_animals_s">Укажите количество животных, сейчас их кол-во составляет: %s</string>
     <string name="animal_indicators_animals_count_add_note">Вы добавили животных: %s %s</string>

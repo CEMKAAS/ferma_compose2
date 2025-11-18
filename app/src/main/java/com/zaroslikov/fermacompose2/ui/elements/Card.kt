@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -110,17 +111,17 @@ fun CardField(
 @Composable
 fun CardFieldNew(
     modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(20.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     contentRow: @Composable (RowScope.() -> Unit)? = null,
-
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     contentColumn: @Composable (ColumnScope.() -> Unit)? = null,
 ) {
     val modifierCard = Modifier
         .fillMaxWidth()
-        .padding(20.dp)
+        .padding(padding)
 
     Card(
         colors = CardDefaults.cardColors(

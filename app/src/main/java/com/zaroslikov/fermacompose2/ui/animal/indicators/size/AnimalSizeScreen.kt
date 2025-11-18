@@ -31,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,6 +44,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.orang_1
+import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.supportFun.convertSize
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
@@ -86,6 +89,7 @@ fun AnimalSizeScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val colors = listOf(orang_1, orang_2)
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -114,6 +118,7 @@ fun AnimalSizeScreen(
             AnimalSizeContainer2(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
                 itemList = state.sizeList,
+                colors = colors,
                 onInsertClick = { viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true)) },
                 onEditClick = {
                     viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = false, it))
@@ -135,6 +140,7 @@ fun AnimalSizeScreen(
 @Composable
 private fun AnimalSizeContainer2(
     modifier: Modifier,
+    colors: List<Color>,
     itemList: List<DomainAnimalSize>,
     onInsertClick: () -> Unit,
     onEditClick: (DomainAnimalSize) -> Unit,
@@ -152,11 +158,14 @@ private fun AnimalSizeContainer2(
         buttonRes = R.string.button_sale_message_no_height
     ) { item, previous ->
         AnimalIndicatorsCardNew(
-            modifier = modifier,
-            domainAnimalSize = item,
+            icon = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
+            value = item.size.toFormatNumber(),
+            suffix = item.suffix,
+            date = item.date,
+            colors = colors,
             previousDomainAnimalSize = previous,
             onEditClick = { onEditClick(item) },
-            onDeleteClick = { onDeleteClick(item.id) }
+            onDeleteClick = { onDeleteClick(item.id) },
         )
     }
 }
