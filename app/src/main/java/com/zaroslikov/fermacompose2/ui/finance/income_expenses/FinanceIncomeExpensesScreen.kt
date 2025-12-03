@@ -30,13 +30,7 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
-object FinanceIncomeExpensesDestination : NavigationDestination {
-    override val route = "FinanceIncomeExpenses"
-    override val titleRes = R.string.app_name
-    const val itemIdArg = "itemId"
-    const val itemIdArgTwo = "itemCategory"
-    val routeWithArgs = "${route}?$itemIdArg={$itemIdArg}&$itemIdArgTwo={$itemIdArgTwo}"
-}
+
 
 @Composable
 fun FinanceIncomeExpensesScreen(

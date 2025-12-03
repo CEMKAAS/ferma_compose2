@@ -18,6 +18,11 @@ data class AnimalSizeState(
     override val hasAnyError: Boolean
         get() = error.hasAnyError
 
+    fun enabledButton(): Boolean {
+        val isEnabled = domainAnimalSize.size.isNotBlank() && !hasAnyError
+        return !isEnabled
+    }
+
     data class Error(
         val isErrorSize: Boolean = false
     ) : BaseError {
@@ -25,3 +30,5 @@ data class AnimalSizeState(
             get() = isErrorSize
     }
 }
+
+

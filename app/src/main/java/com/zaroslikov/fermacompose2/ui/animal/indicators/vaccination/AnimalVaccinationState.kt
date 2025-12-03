@@ -1,14 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.animal.indicators.vaccination
 
+import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.fermacompose2.base.state.BaseError
-import com.zaroslikov.fermacompose2.base.state.EntryState
+import com.zaroslikov.fermacompose2.base.state.BaseProduct
+import com.zaroslikov.fermacompose2.base.state.EntryNewState
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.dateTodayNextYear
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class AnimalVaccinationState(
-    val vaccination: Vaccination = Vaccination(),
-    val vaccinationList: List<DomainAnimalVaccination> = emptyList(),
+    val vaccinationList: List<AnimalVaccinationExpensesDomain> = emptyList(),
     val titleVaccinationList: List<String> = emptyList(),
     val idPT: Long = 0,
     val isOpenDialog: Boolean = false,
@@ -16,32 +18,43 @@ data class AnimalVaccinationState(
     val countAnimalAll: String = "",
     val suffixAnimal: Suffix = Suffix.PIECES,
     override val isEntry: Boolean = false,
-    override val error: Error = Error(),
+    override val currentProduct: Vaccination = Vaccination(),
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null
-) : EntryState() {
+) : EntryNewState()
+
+data class Vaccination(
+    val id: Long = 0,
+    val vaccination: String = "",
+    val countVaccination: String = "",
+    val date: String = dateToday(),
+    val nextDate: String = dateTodayNextYear(),
+    val note: String = "",
+    val idAnimal: Long = 0,
+    //Expenses
+    val price: String = "",
+    val priceAll: String = "",
+    val isAutoCalculate: Boolean = false,
+    val isDateFactory: Boolean = true,
+    val isEntry: Boolean = true,
+    val idExpenses: Long? = null,
+    val error: ErrorVaccination = ErrorVaccination()
+) : BaseProduct() {
     override val hasAnyError: Boolean
-        get() = error.hasAnyError(isAnimalGroup)
+        get() = error.hasAnyError
 
-    data class Vaccination(
-        val domainAnimalVaccination: DomainAnimalVaccination = DomainAnimalVaccination(),
-        val price: String = "",
-        val priceAll: String = "",
-        val isAutoCalculate: Boolean = false,
-        val countAnimal: String = "",
-        val error: Error = Error()
-    )
-
-    data class Error(
-        val isErrorVaccination: Boolean = false,
-        val isErrorCount: Boolean = false,
-        val isErrorCountZero: Boolean = false
-    ) : BaseError {
-        fun hasAnyError(isAnimalGroup: Boolean): Boolean {
-            return when {
-                isAnimalGroup -> isErrorVaccination || isErrorCount || isErrorCountZero
-                else -> isErrorVaccination
-            }
-        }
+    fun enabledButton(): Boolean {
+        val isEnabled =
+            vaccination.isNotBlank() && countVaccination.isNotBlank() && !hasAnyError
+        return !isEnabled
     }
+}
+
+data class ErrorVaccination(
+    val isErrorVaccination: Boolean = false,
+    val isErrorCount: Boolean = false,
+    val isErrorCountZero: Boolean = false
+) : BaseError {
+    val hasAnyError: Boolean
+        get() = isErrorVaccination || isErrorCount || isErrorCountZero
 }

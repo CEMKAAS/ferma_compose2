@@ -6,6 +6,7 @@ import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 fun AnimalVaccinationTable.toDomainAnimalVaccination(): DomainAnimalVaccination {
     return DomainAnimalVaccination(
         id = this.id,
+        countVaccination = this.countVaccination,
         vaccination = this.vaccination,
         date = this.date,
         nextVaccination = this.nextVaccination,
@@ -16,11 +17,12 @@ fun AnimalVaccinationTable.toDomainAnimalVaccination(): DomainAnimalVaccination 
 
 fun DomainAnimalVaccination.toAnimalVaccinationTable(): AnimalVaccinationTable {
     return AnimalVaccinationTable(
-        animalId = this.idAnimal,
         id = this.id,
+        vaccination = this.vaccination,
+        countVaccination = this.countVaccination,
+        date = this.date,
         nextVaccination = this.nextVaccination,
         note = this.note,
-        vaccination = this.vaccination,
-        date = this.date,
+        animalId = this.idAnimal,
     )
 }

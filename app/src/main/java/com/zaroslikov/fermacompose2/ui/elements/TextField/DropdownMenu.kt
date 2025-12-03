@@ -27,7 +27,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.grey_3
-import com.zaroslikov.fermacompose2.supportFun.toColor
+import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.IconDone
@@ -300,7 +300,7 @@ fun ExposedDropdownMenuPair(
                 Icon(
                     painterResource(item.category.toDrawRes()),
                     null,
-                    tint = item.category.toColor()
+                    tint = item.category.toColorList()
                 )
             },
             text = {

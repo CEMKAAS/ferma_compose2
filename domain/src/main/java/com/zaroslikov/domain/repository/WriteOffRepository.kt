@@ -1,7 +1,9 @@
 package com.zaroslikov.domain.repository
 
+import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +18,11 @@ interface WriteOffRepository {
     suspend fun insertWriteOff(item: DomainWriteOffTable)
     suspend fun updateWriteOff(item: DomainWriteOffTable)
     suspend fun deleteWriteOff(id: Long)
+
+    fun getOwnNeedAllList(id: Long): Flow<List<DomainTitleSuffixPrice>> //maybe
+    fun getScrapAllList(id: Long): Flow<List<DomainTitleSuffixPrice>> //maybe
+    fun getOwnNeedAllCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>>
+    fun getScrapAllCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>>
 
     fun getOwnNeed(id: Long): Flow<Double>
     fun getScrap(id: Long): Flow<Double>

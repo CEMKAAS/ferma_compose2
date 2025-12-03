@@ -53,7 +53,6 @@ fun NoteScreen(
     navigateToModalSheet: (DrawerNavigation) -> Unit,
     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
     navigateToItemAdd: (Long) -> Unit,
-    drawerState: DrawerState,
     modifier: Modifier = Modifier,
     viewModel: NoteViewModel = hiltViewModel()
 ) {
@@ -61,45 +60,30 @@ fun NoteScreen(
     val coroutineScope = rememberCoroutineScope()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val idProject = state.idPT
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerSheet(
+    Scaffold(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+           /* TopAppBarNavigation(
+                title = R.string.note_screen_title,
                 scope = coroutineScope,
-                navigateToStart = navigateToStart,
-                navigateToModalSheet = navigateToModalSheet,
                 drawerState = drawerState,
-                8,
-                idProject.toString()
-            )
+                scrollBehavior = scrollBehavior
+            )*/
         },
-    ) {
-        Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBarNavigation(
-                    title = R.string.note_screen_title,
-                    scope = coroutineScope,
-                    drawerState = drawerState,
-                    scrollBehavior = scrollBehavior
-                )
-            },
-            floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } },
-        ) { innerPadding ->
-            if (state.isLoading)
-                CircularProgress(
-                    modifier = modifier.padding(innerPadding),
-                )
-            else
-                NoteBody(
-                    modifier = modifier
-                        .modifierScreenLazy(innerPadding),
-                    itemList = state.list,
-                    onItemClick = navigateToItemUpdate,
-                    navigateToItemAdd = { navigateToItemAdd(idProject) }
-                )
-        }
+        floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } },
+    ) { innerPadding ->
+        if (state.isLoading)
+            CircularProgress(
+                modifier = modifier.padding(innerPadding),
+            )
+        else
+            NoteBody(
+                modifier = modifier
+                    .modifierScreenLazy(innerPadding),
+                itemList = state.list,
+                onItemClick = navigateToItemUpdate,
+                navigateToItemAdd = { navigateToItemAdd(idProject) }
+            )
     }
 }
 

@@ -45,6 +45,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.gray_9
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.text_16
@@ -72,12 +73,13 @@ fun BaseOutlinedTextNew(
     leadingIconClick: () -> Unit = {},
     readOnly: Boolean = false,
     enable: Boolean = true,
-    @StringRes labelIntRes: Int,
+    @StringRes labelIntRes: Int? = null,
     @StringRes intResSup: Int,
     @StringRes intResError: Int = R.string.error_no_count_product,
     isMore: Boolean? = null,
     singleLine: Boolean = true,
     minLines: Int = 1,
+    colorTextField: Color = gray_9,
     focusManager: FocusManager = LocalFocusManager.current,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
@@ -141,19 +143,21 @@ fun BaseOutlinedTextNew(
                     tint = Color(0xFF6A7282)
                 )
             }
-            Text(
-                text = stringResource(labelIntRes),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = text_16,
-                color = dark
-            )
+            labelIntRes?.let {
+                Text(
+                    text = stringResource(it),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = text_16,
+                    color = dark
+                )
+            }
         }
         Box(
             modifier = modifier
                 .fillMaxWidth()
                 .background(
-                    color = if (isError) Color(0xFFFFEAEA) else Color(0xFFF6F6F6),
+                    color = if (isError) Color(0xFFFFEAEA) else colorTextField,
                     shape = RoundedCornerShape(14.dp)
                 )
                 .border(borderWidth, color = Color(0xFFD1D5DC), shape = RoundedCornerShape(14.dp))

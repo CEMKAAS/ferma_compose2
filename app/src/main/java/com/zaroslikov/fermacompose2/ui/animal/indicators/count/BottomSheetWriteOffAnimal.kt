@@ -4,66 +4,75 @@ package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.elements.CountBottomSheet2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.supportFun.toColorList
+import com.zaroslikov.fermacompose2.supportFun.toDrawRes
+import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountAnimalNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.sections.EntryIndicationBottomSheet
 
 @Composable
 fun BottomSheetWriteOffAnimal(
-    state: DomainAnimalCountPrice,
-    errorState: AnimalCountState.Error,
-    isEntry: Boolean,
-    isAutoPrice: Boolean,
-    price: String,
-    priceAll: String,
+    state: CountItem,
     countAllAnimal: String,
     countSuffix: Suffix,
     onIntent: (AnimalCountIntent) -> Unit
 ) {
-    CountBottomSheet2(
-        version = state.version,
-        isEntry = isEntry,
-        intEntryButton = R.string.button_text_write_off,
-        onDismiss = { onIntent(AnimalCountIntent.EndDialogClicked) },
-        onInsert = { onIntent(AnimalCountIntent.InsertWriteOffPressed) },
-        onUpdate = { onIntent(AnimalCountIntent.UpdateWriteOffPressed) },
-        onDelete = { onIntent(AnimalCountIntent.DeleteCountPressed(state.id)) },
+    val focusRequester =
+        remember { FocusRequester() } // ✅ нужно помнить, иначе при recomposition фокус сбрасывается
+    // ✅ Важно: просим фокус, когда bottom sheet появился
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+    EntryIndicationBottomSheet(
+        icon = state.version.toDrawRes(),
+        titleRes = state.version.toResId(),
+        isEntry = state.isEntry,
+        enabledButton = state.enabledButton(),
+        colors = state.version.toColorList(),
+        onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
+        onInsertClick = { onIntent(AnimalCountIntent.InsertWriteOffPressed) },
+        onUpdateClick = { onIntent(AnimalCountIntent.UpdateWriteOffPressed) }
     ) {
-        OutlinedTextCountAnimal2(
+        OutlinedTextCountAnimalNew(
             value = state.count,
             onValueChange = {
                 onIntent(AnimalCountIntent.CountChanged(it))
             },
-            isError = errorState.isErrorCount,
-            isErrorCountZero = errorState.isErrorCountZero,
-            countAnimalAll = countAllAnimal,
+            isError = state.error.isErrorCount,
+            /*isErrorCountZero = state.error.isErrorCountZero,*/
+            countAnimal = countAllAnimal,
             suffix = countSuffix,
         )
-        OutlinedPriceInput(
-            price = price,
+        OutlinedPriceInputNew(
+            price = state.price,
             onPriceChange = {
                 onIntent(AnimalCountIntent.PriceChanged(it))
             },
-            priceAll = priceAll,
-            isAutoCalculate = isAutoPrice,
+            priceAll = state.priceAll,
+            isAutoCalculate = state.isAutoCalculate,
             onAutoCalculate = {
                 onIntent(AnimalCountIntent.AutoPriceClicked(it))
             },
             isManyCount = true,
             supportTextRes = R.string.support_text_price_animals,
             supportTextResAutoCal = R.string.support_text_price_one_animals,
+            count = state.count,
+            countSuffix = countSuffix,
+            priceSuffix = Suffix.RUBLE,
         )
-        OutlinedTextDate(
+        OutlinedTextDateNew(
             value = state.date,
             onValueChange = { onIntent(AnimalCountIntent.DateClicked(it)) },
         )
-        OutlinedTextNote(
+        OutlinedTextNoteNew(
             value = state.note,
             onValueChange = {
                 onIntent(AnimalCountIntent.NoteChanged(it))

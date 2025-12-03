@@ -1,14 +1,19 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 
+import android.graphics.drawable.Icon
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -50,6 +56,22 @@ fun ButtonRefresh(
 
 @Composable
 fun ButtonArchive(
+    onClick: () -> Unit,
+) {
+    OutlinedButton(
+        onClick = onClick, modifier = Modifier.toButton()
+    ) {
+        Icon(
+            modifier = Modifier.padding(end = 3.dp),
+            painter = painterResource(R.drawable.baseline_archive_24),
+            contentDescription = stringResource(R.string.button_archive)
+        )
+        Text(text = stringResource(R.string.button_archive))
+    }
+}
+
+@Composable
+fun ButtonArchiveNew(
     onClick: () -> Unit,
 ) {
     OutlinedButton(
@@ -183,9 +205,9 @@ fun GradientButton(
 
 @Composable
 fun CloseButton(
-    text: String,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    @StringRes text: Int,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -197,10 +219,50 @@ fun CloseButton(
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            text = text,
+            text = stringResource(text),
             color = black,
             style = text_14
         )
     }
 }
+
+@Composable
+fun BigBorderButton(
+    modifier: Modifier = Modifier,
+    @DrawableRes icon: Int? = null,
+    @StringRes text: Int,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .shadow(5.dp, RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(14.dp))
+            .border(1.dp, gray_4, RoundedCornerShape(14.dp))
+            .background(white)
+            .clickable(onClick = onClick)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier.padding(vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            icon?.let {
+                Icon(
+                    painterResource(icon),
+                    contentDescription = null,
+                    tint = black,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            Text(
+                text = stringResource(text),
+                color = black,
+                style = text_14
+            )
+        }
+    }
+}
+
 

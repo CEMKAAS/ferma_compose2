@@ -2,13 +2,9 @@
 
 package com.zaroslikov.fermacompose2.ui.sections.add.list_screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -17,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
@@ -26,12 +21,10 @@ import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.alabaster
 import com.zaroslikov.fermacompose2.green_shamrock
-import com.zaroslikov.fermacompose2.supportFun.toColor
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.elements.BorderCard
+import com.zaroslikov.fermacompose2.ui.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalNew
@@ -44,7 +37,6 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
-import com.zaroslikov.fermacompose2.ui.sections.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
 

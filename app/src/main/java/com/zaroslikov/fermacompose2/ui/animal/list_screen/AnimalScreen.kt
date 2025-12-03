@@ -2,10 +2,7 @@ package com.zaroslikov.fermacompose2.ui.animal.list_screen
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Indication
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,8 +19,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -51,18 +46,17 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.dark
-import com.zaroslikov.fermacompose2.gray_4
 import com.zaroslikov.fermacompose2.green_g_3
 import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
-import com.zaroslikov.fermacompose2.ui.elements.BorderCard
+import com.zaroslikov.fermacompose2.ui.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorGradientCard
+import com.zaroslikov.fermacompose2.ui.elements.DateFactoryCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.AnimalNameOutlinedTextNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
@@ -76,9 +70,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.elements.toOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.sections.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
 
 
@@ -280,10 +272,13 @@ private fun AnimalEntryBottomSheet(
         DateFactoryCardNew(
             dateBoring = state.dateBorn,
             dateFactory = state.dateFactory,
-            isAnimalGroup = state.isAnimalGroup,
             isDateFactory = state.isDateFactory,
             dateFactoryClicked = { onIntent(AnimalListIntent.DateFactoryClicked(it)) },
             dateFactoryChanged = { onIntent(AnimalListIntent.DateFactoryChanged(it)) },
+            intTitle = if (!state.isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
+            intTooltip = R.string.tooltip_animals_born,
+            intRes = R.string.outlined_text_date_factory,
+            intResSup = if (!state.isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
         )
         OutlinedTextCountNew(
             value = state.foodDay,
@@ -375,11 +370,8 @@ fun AnimalCard(
 ) {
     val context = LocalContext.current
     CardFieldNew(
+        onClick = { onClick() },
         modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .clickable {
-                onClick()
-            }
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.Top,
@@ -721,39 +713,3 @@ fun TypeAnimalCard(
     }
 }
 
-@Composable
-private fun DateFactoryCardNew(
-    isDateFactory: Boolean,
-    isAnimalGroup: Boolean,
-    dateBoring: String,
-    dateFactory: String,
-    dateFactoryClicked: (Boolean) -> Unit,
-    dateFactoryChanged: (String) -> Unit
-) {
-    BorderCard {
-        CheckboxTextIcon(
-            modifier = if (!isDateFactory) Modifier.toOutlinedText() else Modifier,
-            checked = isDateFactory,
-            onCheckedChange = {
-                dateFactoryClicked(it)
-            },
-            intTitle = if (!isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
-            isTooltipShow = true,
-            intTooltip = R.string.tooltip_animals_born
-        )
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = !isDateFactory,
-        ) {
-            OutlinedTextDateNew(
-                value = dateFactory,
-                intRes = R.string.outlined_text_date_factory,
-                intResSup = if (!isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
-                drawableRes = R.drawable.baseline_event_24,
-                onValueChange = { dateFactoryChanged(it) },
-                isCardBorder = false,
-                minDate = dateBoring
-            )
-        }
-    }
-}

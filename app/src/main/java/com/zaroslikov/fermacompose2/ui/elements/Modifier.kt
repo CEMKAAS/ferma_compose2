@@ -4,6 +4,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -38,8 +39,7 @@ fun Modifier.modifierScreen(
 ): Modifier {
     val focusManager = LocalFocusManager.current
     return this
-        .fillMaxSize()
-        .padding(innerPadding)
+        .padding(top = innerPadding.calculateTopPadding())
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
 //            vertical = dimensionResource(R.dimen.padding_small)
@@ -50,7 +50,7 @@ fun Modifier.modifierScreen(
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
             })
         }
-        .padding(bottom = 8.dp)
+        .fillMaxHeight()
 }
 
 @Composable
@@ -59,12 +59,12 @@ fun Modifier.modifierScreenLazy(
 ): Modifier {
 //    val focusManager = LocalFocusManager.current
     return this
-        .fillMaxSize()
-        .padding(innerPadding)
+        .padding(top = innerPadding.calculateTopPadding())
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
 //            vertical = dimensionResource(R.dimen.padding_small)
         )
+        .fillMaxHeight()
 //        .pointerInput(Unit) {
 //            detectTapGestures(onTap = {
 //                focusManager.clearFocus() // Убираем фокус при тапе в любую область

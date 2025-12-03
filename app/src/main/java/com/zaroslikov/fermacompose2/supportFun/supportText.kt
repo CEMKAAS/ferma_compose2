@@ -2,8 +2,10 @@ package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
 import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.Page
 
 fun infoTextKillAnimal(count: String, suffix: String): String {
@@ -62,5 +64,22 @@ fun Page.toResId(): Int {
         Page.EXPENSES -> R.string.expenses_screen_title2
         Page.WRITE_OFF -> R.string.write_off_screen_title2
         Page.ANIMAL -> R.string.animal_screen_title2
+    }
+}
+
+fun Destination.toResId(): Int {
+    return when (this) {
+        Destination.MAGAZINE -> R.string.bottom_bar_magazine
+        Destination.WAREHOUSE -> R.string.bottom_bar_warehouse
+        Destination.FINANCE -> R.string.bottom_bar_finance
+    }
+}
+
+fun FinanceCategory.toResId(): Int {
+    return when (this) {
+        FinanceCategory.SALE -> R.string.finance_category_income_total
+        FinanceCategory.EXPENSES -> R.string.finance_category_expenses_total
+        FinanceCategory.OWN_NEED -> R.string.finance_category_onw_need_total
+        FinanceCategory.SCRAP -> R.string.finance_category_scrap_total
     }
 }

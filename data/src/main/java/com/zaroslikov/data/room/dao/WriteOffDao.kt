@@ -5,8 +5,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
+import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
 import com.zaroslikov.data.room.dto.write_off.BrieflyWriteOffDto
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import kotlinx.coroutines.flow.Flow
@@ -53,15 +55,54 @@ interface WriteOffDao {
     @Query("DELETE FROM write_off_table WHERE _id = :id")
     suspend fun deleteWriteOff(id: Long)
 
-    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount" +
+    @Query("SELECT" +
+            " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
             " FROM write_off_table" +
-            " WHERE write_off_table.idPT =:id and status=0")
+            " WHERE idPT =:id AND status= 0 AND price IS NOT NULL")
     fun getOwnNeed(id: Long): Flow<Double> //Write off Maybe
 
-    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount" +
+    @Query("SELECT COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
             " FROM write_off_table" +
-            " WHERE write_off_table.idPT =:id and status=1")
+            " WHERE idPT =:id and status = 1 AND price IS NOT NULL")
     fun getScrap(id: Long): Flow<Double> // WriteOff Maybe
+
+    @Query(
+        "SELECT title," +
+                " count_suffix AS suffix," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
+                " 2 AS category" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND status = 0 AND price IS NOT NULL" +
+                " GROUP BY title ORDER BY price DESC"
+    )
+    fun getOwnNeedAllList(id: Long): Flow<List<TitleSuffixPriceDto>> //maybe
+
+    @Query(
+        "SELECT title," +
+                " count_suffix AS suffix," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
+                " 3 AS category" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND status = 1  AND price IS NOT NULL" +
+                " GROUP BY title ORDER BY price DESC"
+    )
+    fun getScrapAllList(id: Long): Flow<List<TitleSuffixPriceDto>> //maybe
+
+    @Query("SELECT category," +
+            " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+            " FROM write_off_table" +
+            " WHERE idPT =:id AND status = 0 AND price IS NOT NULL" +
+            " GROUP BY category ORDER BY price DESC"
+    )
+     fun getOwnNeedAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
+
+     @Query("SELECT category," +
+             " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+             " FROM write_off_table" +
+             " WHERE idPT =:id and status = 1 AND price IS NOT NULL" +
+             " GROUP BY category ORDER BY price DESC"
+    )
+     fun getScrapAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
 
     @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount" +
             " FROM write_off_table" +

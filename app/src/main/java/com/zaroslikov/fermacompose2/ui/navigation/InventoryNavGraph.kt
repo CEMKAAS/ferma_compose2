@@ -11,89 +11,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zaroslikov.fermacompose2.ui.add.AddProject
 import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
-import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardDestination
-import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
-//import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardDestination
-//import com.zaroslikov.fermacompose2.ui.animal.animalCard.AnimalCardProduct
-import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalDestination
-import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryDestination
-import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryProduct
-import com.zaroslikov.fermacompose2.ui.animal.indicators.count.AnimalCountDestination
-import com.zaroslikov.fermacompose2.ui.animal.indicators.count.AnimalCountScreen
-import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeDestination
-import com.zaroslikov.fermacompose2.ui.animal.indicators.size.AnimalSizeScreen
-import com.zaroslikov.fermacompose2.ui.animal.indicators.vaccination.AnimalVaccinationDestination
-import com.zaroslikov.fermacompose2.ui.animal.indicators.vaccination.AnimalVaccinationScreen
-import com.zaroslikov.fermacompose2.ui.animal.indicators.weight.AnimalWeightDestination
-import com.zaroslikov.fermacompose2.ui.animal.indicators.weight.AnimalWeightScreen
-//import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsDestination
-//import com.zaroslikov.fermacompose2.ui.animal.AnimalIndicatorsScreen
-import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalScreen
-import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
-import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
-import com.zaroslikov.fermacompose2.ui.finance.analysis.FinanceAnalysisDestination
-import com.zaroslikov.fermacompose2.ui.finance.analysis.FinanceAnalysisProduct
-import com.zaroslikov.fermacompose2.ui.finance.income_expenses.FinanceIncomeExpensesDestination
-import com.zaroslikov.fermacompose2.ui.finance.income_expenses.FinanceIncomeExpensesScreen
-import com.zaroslikov.fermacompose2.ui.finance.month.FinanceMonthDestination
-import com.zaroslikov.fermacompose2.ui.finance.month.FinanceMonthScreen
-import com.zaroslikov.fermacompose2.ui.sections.HomeDestination
-import com.zaroslikov.fermacompose2.ui.sections.SectionWorkspaceScreen
-//import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivDestination
-//import com.zaroslikov.fermacompose2.ui.arhiv.FinanceArhivScreen
-//import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivDestination
-//import com.zaroslikov.fermacompose2.ui.arhiv.IncubatorArhivScreen
-import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesDestination
-import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryProduct
-import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesScreen
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisDestination
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceAnalysisProduct
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryDestination
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceCategoryScreen
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesDestination
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceIncomeExpensesScreen
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceMountDestination
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceMountScreen
-//import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
-import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryProduct
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreen
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorEditDayScreenDestination
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopDestination
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorOvoscopScreen
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditDestination
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditScreen
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreen
-//import com.zaroslikov.fermacompose2.ui.incubator.IncubatorScreenDestination
-//import com.zaroslikov.fermacompose2.ui.new_year.NewYearAnalysis
-//import com.zaroslikov.fermacompose2.ui.new_year.NewYearDestination
-import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteDestination
-//import com.zaroslikov.fermacompose2.ui.note.entry.NoteEditDestination
-//import com.zaroslikov.fermacompose2.ui.note.entry.NoteEditProduct
-import com.zaroslikov.fermacompose2.ui.sections.note.entry.NoteEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.note.entry.NoteEntryProduct
-import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteScreen
-import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
-import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryProduct
+import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectScreen
+import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
 import com.zaroslikov.fermacompose2.ui.start.StartScreen
-//import com.zaroslikov.fermacompose2.ui.add.AddProject
-//import com.zaroslikov.fermacompose2.ui.add.ChoiseProject
-//import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
-//import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
-//import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubator
-//import com.zaroslikov.fermacompose2.ui.add.incubator.AddIncubatorDestination
-//import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
-//import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
-//import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
-//import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseScreen
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffDestination
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryProduct
-import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,14 +32,14 @@ fun InventoryNavHost(
             StartDestination.route,
         modifier = modifier
     ) {
-
         composable(route = StartDestination.route) {
             StartScreen(
                 navController = navController,//TODO переделать на адд ADD
                 navigateToItemProject = {
                     navController.navigate(
 //                        "${WarehouseDestination.route}/${it}"
-                        "${HomeDestination.route}/${it}"
+//                        "${HomeDestination.route}/${it}"
+                        "${MainProjectsDestination.route}/${it}"
                     )
                 },
                 navigateToItemIncubator = {
@@ -138,6 +59,21 @@ fun InventoryNavHost(
                 isFirstEnd = isFirstEnd
             )
         }
+        composable(
+            route = MainProjectsDestination.routeWithArgs,
+            arguments = listOf(navArgument(MainProjectsDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments!!.getLong(MainProjectsDestination.itemIdArg)
+            MainProjectScreen(itemId)
+        }
+        composable(route = ProjectAddDestination.route) {
+            AddProject(
+                navigateBack = { navController.popBackStack() },
+                navigateToStart = { navController.navigate(StartDestination.route) },
+            )
+        }
 
         /* composable(route = ChoiseProjectDestination.route) {
              ChoiseProject(
@@ -149,13 +85,8 @@ fun InventoryNavHost(
          }
          */
 
-        composable(route = ProjectAddDestination.route) {
-            AddProject(
-                navigateBack = { navController.popBackStack() },
-                navigateToStart = { navController.navigate(StartDestination.route) },
-                isFirstStart = isFirstStart
-            )
-        }
+
+
         /*
                 composable(route = AddIncubatorDestination.route) {
                     AddIncubator(
@@ -282,14 +213,13 @@ fun InventoryNavHost(
          }
 */
         //==================== Finance ====================
-        composable(
+     /*   composable(
             route = FinanceDestination.routeWithArgs,
             arguments = listOf(navArgument(FinanceDestination.itemIdArg) {
                 type = NavType.IntType
             })
         ) {
             FinanceScreen(
-                drawerState = drawerState,
                 navigateToStart = { navController.navigate(StartDestination.route) },
                 navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
                 navigateToIncomeExpenses = {
@@ -322,11 +252,11 @@ fun InventoryNavHost(
         ) {
             FinanceMonthScreen(
                 navigateBack = { navController.popBackStack() },
-                /*  navigateToCategory = {
+                *//*  navigateToCategory = {
                 navController.navigate( "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}/${it.dateBegin}/${it.dateEnd}"
-               }*/
+               }*//*
             )
-        }
+        }*/
 
         /*composable(
             route = FinanceCategoryDestination.routeWithArgs,
@@ -352,7 +282,7 @@ fun InventoryNavHost(
                 navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
             )
         }*/
-        composable(
+        /*composable(
             route = FinanceIncomeExpensesDestination.routeWithArgs,
             arguments = listOf(navArgument(FinanceIncomeExpensesDestination.itemIdArg) {
                 type = NavType.LongType
@@ -397,7 +327,7 @@ fun InventoryNavHost(
                         )
                     )
                 }
-            )
+            )*/
             /* AddScreen(
                  drawerState = drawerState,
                  navigateToStart = {
@@ -437,7 +367,7 @@ fun InventoryNavHost(
  //                    "${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}")
                  },
              )*/
-        }
+     /*   }
         composable(
             route = AddEntryDestination.routeWithArgs,
             arguments = listOf(
@@ -459,7 +389,7 @@ fun InventoryNavHost(
                 type = NavType.IntType
             })
         ) {
-            /*SaleScreen(drawerState = drawerState, navigateToStart = {
+            *//*SaleScreen(drawerState = drawerState, navigateToStart = {
                 navController.navigate(StartDestination.route)
             }, navigateToModalSheet = {
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
@@ -478,7 +408,7 @@ fun InventoryNavHost(
                         itemTwo = it.second.toString()
                     )
                 )
-            })*/
+            })*//*
         }
         composable(
             route = SaleEntryDestination.routeWithArgs,
@@ -497,7 +427,7 @@ fun InventoryNavHost(
         }
 
         //Expenses
-        /*composable(
+        *//*composable(
             route = ExpensesDestination.routeWithArgs,
             arguments = listOf(navArgument(ExpensesDestination.itemIdArg) {
                 type = NavType.LongType
@@ -526,7 +456,7 @@ fun InventoryNavHost(
                     )
                 }
             )
-        }*/
+        }*//*
 
         composable(
             route = ExpensesEntryDestination.routeWithArgs,
@@ -545,7 +475,7 @@ fun InventoryNavHost(
 
 
         //WriteOff
-        /*composable(
+        *//*composable(
             route = WriteOffDestination.routeWithArgs,
             arguments = listOf(navArgument(WriteOffDestination.itemIdArg) {
                 type = NavType.IntType
@@ -574,7 +504,7 @@ fun InventoryNavHost(
                     )
                 )
             })
-        }*/
+        }*//*
         composable(
             route = WriteOffEntryDestination.routeWithArgs,
             arguments = listOf(
@@ -598,7 +528,7 @@ fun InventoryNavHost(
                 type = NavType.IntType
             })
         ) {
-            NoteScreen(drawerState = drawerState, navigateToStart = {
+            NoteScreen(navigateToStart = {
                 navController.navigate(StartDestination.route)
             }, navigateToModalSheet = {
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
@@ -640,7 +570,7 @@ fun InventoryNavHost(
             })
         ) {
             AnimalScreen(
-                /*   drawerState = drawerState, navigateToStart = {
+                *//*   drawerState = drawerState, navigateToStart = {
                        navController.navigate(StartDestination.route)
                    }, navigateToModalSheet = {
                        navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
@@ -652,16 +582,16 @@ fun InventoryNavHost(
                                itemTwo = it.second.toString()
                            )
                        )
-                   }, isFirstStart = isFirstStart*/
-              /*  navigateToItemAdd = {
-                    navController.navigate(
-                        navNull(
-                            AnimalEntryDestination.route,
-                            AnimalEntryDestination.itemIdPT,
-                            it.toString()
-                        )
-                    )
-                }*/
+                   }, isFirstStart = isFirstStart*//*
+                *//*  navigateToItemAdd = {
+                      navController.navigate(
+                          navNull(
+                              AnimalEntryDestination.route,
+                              AnimalEntryDestination.itemIdPT,
+                              it.toString()
+                          )
+                      )
+                  }*//*
             )
         }
 
@@ -786,7 +716,7 @@ fun InventoryNavHost(
             AnimalCountScreen(
                 navigateBack = { navController.popBackStack() }
             )
-        }
+        }*/
 
         /*
                composable(

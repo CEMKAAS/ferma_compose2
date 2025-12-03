@@ -83,11 +83,10 @@ object ProjectAddDestination : NavigationDestination {
 fun AddProject(
     navigateBack: () -> Unit,
     navigateToStart: () -> Unit,
-    isFirstStart: Boolean,
     viewModel: ProjectAddViewModel = hiltViewModel()
 ) {
     AlterDialigStart(
-        isFirstStart = isFirstStart,
+        isFirstStart = false,
         dialogTitle = "Установка проекта",
         dialogText = "Придумайте оригинальное название для вашего проекта, например: \"Козоводство\" или \"Кролиководство\". Укажите дату начала проекта и нажмите \"Начать\".",
         textAppMetrica = "Установка проекта"

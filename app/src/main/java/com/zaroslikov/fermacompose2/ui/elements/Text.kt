@@ -41,6 +41,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.black
+import com.zaroslikov.fermacompose2.black_1
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.marengo
@@ -291,8 +293,25 @@ fun TextLine(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Start
-
     )
+}
+
+@Composable
+fun TextLineProductKill(
+    number: Int,
+    title: String,
+    value: String,
+    suffix: Suffix
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Text("$number. $title", style = text_14, color = marengo)
+        Text("$value ${stringResource(suffix.toResId())}", style = text_14, color = black_1)
+    }
 }
 
 @Composable
@@ -383,17 +402,7 @@ fun CardAllPrice(
     val countText = count.ifBlank { "-" }
     val priceText = price.ifBlank { "-" }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = green_g_2
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = green_1
-        )
-    ) {
+    GreenCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

@@ -14,8 +14,16 @@ val grey_3 = Color(0xFF717182)
 val gray_4 = Color(0xFFE5E5E5)
 val gray_5 = Color(0xFFE5E7EB)
 val gray_6 = Color(0xFFF3F4F6)
+val gray_7 = Color(0xFF6A7282)
+val gray_8 = Color(0xFFD1D5DC)
+val gray_9 = Color(0xFFF6F6F6)
 val green_1 = Color(0xFFA4F4CF)
 val green_2 = Color(0xFF007A55)
+val green_3 = Color(0xFF5EE9B5)
+val green_4 = Color(0xFFD0FAE5)
+val green_5 = Color(0xFF00BC7D)
+val green_6 = Color(0xFF00C950)
+val green_7 = Color(0xFF05DF72)
 
 
 // Color Suffix
@@ -40,16 +48,32 @@ val units_color = Color(0xFF00A63E)
 val blue_1 = Color(0xFF155DFC)
 val blue_2 = Color(0xFF4F39F6)
 val blue_3 = Color(0xFFEFF6FF)
+val blue_4 = Color(0xFF2B7FFF)
+val blue_5 = Color(0xFFEEF2FF)
+val blue_6 = Color(0xFFC6D2FF)
+val blue_7 = Color(0xFF432DD7)
+val blue_8 = Color(0xFF1447E6)
+val blue_9 = Color(0xFFBEDBFF)
+val blue_10 = Color(0xFF1D293D)
+val blue_11 = Color(0xFF314158)
+val blue_12 = Color(0xFF0F172B)
 
 
 val orang_1 = Color(0xFFF54900)
 val orang_2 = Color(0xFFE17100)
 val orang_3 = Color(0xFFFFF7ED)
+val orang_4 = Color(0xFFFFFBEB)
+val orang_5 = Color(0xFFFEE685)
+val orang_6 = Color(0xFFBB4D00)
+val orang_7 = Color(0xFFFFD230)
 
 
 val violet_1 = Color(0xFF9810FA)
 val violet_2 = Color(0xFF4F39F6)
 val violet_3 = Color(0xFFFAF5FF)
+val violet_4 = Color(0xFFAD46FF)
+val violet_5 = Color(0xFFE9D4FF)
+val violet_6 = Color(0xFF8200DB)
 
 
 val green_g_1 = Color(0xFFECFDF5)
@@ -59,12 +83,24 @@ val green_g_5 = Color(0xFF00A63E)
 val green_g_3 = Color(0xFFECFEFF)
 val green_g_4 = Color(0xFF96F7E4)
 
+val red_1 = Color(0xFFC70036)
+val red_2 = Color(0xFFFFCCD3)
+val red_3 = Color(0xFFFFF1F2)
+val red_4 = Color(0xFFFF2056)
+val red_5 = Color(0xFFE60076)
+val red_6 = Color(0xFFFF637E)
+val red_7 = Color(0xFFEC003F)
+val red_8 = Color(0xFFFFE4E6)
+val red_9 = Color(0xFFFEF1F4)
+val red_10 = Color(0xFFFF6467)
+
 
 val animal_1 = Color(0xFF009689)
 val animal_2 = Color(0xFF0092B8)
 
 // Error
-
 val error_base = Color(0xFFE7000B)
 
 val black = Color(0xFF0A0A0A)
+val black_1 = Color(0xFF1E2939)
+val black_2 = Color(0xFF101828)

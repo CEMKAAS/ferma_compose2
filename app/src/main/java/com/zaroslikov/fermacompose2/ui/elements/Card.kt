@@ -1,10 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.annotation.SuppressLint
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,10 +18,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -32,6 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -43,20 +43,48 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.black_1
+import com.zaroslikov.fermacompose2.blue_3
+import com.zaroslikov.fermacompose2.blue_5
+import com.zaroslikov.fermacompose2.blue_6
+import com.zaroslikov.fermacompose2.blue_7
+import com.zaroslikov.fermacompose2.blue_8
+import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_1
+import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_g_2
+import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
+import com.zaroslikov.fermacompose2.grey_3
+import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.orang_4
+import com.zaroslikov.fermacompose2.orang_5
+import com.zaroslikov.fermacompose2.orang_6
+import com.zaroslikov.fermacompose2.orang_7
 import com.zaroslikov.fermacompose2.price_green
-import com.zaroslikov.fermacompose2.supportFun.toColor
+import com.zaroslikov.fermacompose2.red_1
+import com.zaroslikov.fermacompose2.red_2
+import com.zaroslikov.fermacompose2.red_3
+import com.zaroslikov.fermacompose2.red_4
+import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.HeadingAnimalCard
 import com.zaroslikov.fermacompose2.ui.start.dateBuilder
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
 import com.zaroslikov.fermacompose2.violet_1
+import com.zaroslikov.fermacompose2.violet_3
+import com.zaroslikov.fermacompose2.violet_5
+import com.zaroslikov.fermacompose2.violet_6
 import com.zaroslikov.fermacompose2.white
 
 
@@ -112,6 +140,7 @@ fun CardField(
 fun CardFieldNew(
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(20.dp),
+    onClick: (() -> Unit)? = null,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     contentRow: @Composable (RowScope.() -> Unit)? = null,
@@ -123,11 +152,14 @@ fun CardFieldNew(
         .fillMaxWidth()
         .padding(padding)
 
+    val shape = RoundedCornerShape(14.dp)
+
     Card(
+        onClick = { onClick?.let { it() } },
         colors = CardDefaults.cardColors(
             containerColor = white
         ),
-        shape = RoundedCornerShape(14.dp),
+        shape = shape,
         modifier = modifier,
         elevation = CardDefaults.cardElevation( // Добавляем тень
             defaultElevation = 5.dp
@@ -260,6 +292,78 @@ fun CardFinance(
             titleRes = titleRes,
             value = value
         )
+    }
+}
+
+@Composable
+fun CardFinanceNew(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    @DrawableRes icon: Int,
+    @StringRes titleRes: Int,
+    colors: List<Color>,
+    value: Double,
+    suffix: Suffix = Suffix.RUBLE,
+    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    @StringRes titleRes2: Int? = null
+) {
+    val shape2 = RoundedCornerShape(14.dp)
+    val glowColor = colors.first()
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                shadowElevation = 20f
+                shape = shape2
+                clip = false
+                ambientShadowColor = glowColor.copy(alpha = 0.8f)
+                spotShadowColor = glowColor.copy(alpha = 0.8f)
+            }
+            .clip(shape2)
+            .clickable(onClick = onClick)
+            .drawBehind {
+                val gradient = Brush.linearGradient(
+                    colors = colors,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, size.height) // диагональ
+                )
+
+                drawRoundRect(
+                    brush = gradient,
+                    cornerRadius = CornerRadius(14.dp.toPx()) // скругление здесь
+                )
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = horizontalAlignment,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            IconFinance(
+                icon = icon,
+                color = Color(0x20FFFFFF)
+            )
+            Text(
+                text = stringResource(titleRes),
+                style = text_12,
+                color = Color(0x80FFFFFF)
+            )
+            Text(
+                text = "${value.formatNumber()} ${stringResource(suffix.toResId())}",
+                style = text_18,
+                color = white
+            )
+            titleRes2?.let {
+                Text(
+                    text = stringResource(it),
+                    style = text_12,
+                    color = Color(0x70FFFFFF)
+                )
+            }
+        }
     }
 }
 
@@ -456,6 +560,7 @@ fun DetailProductCardNew(
 @Composable
 fun BorderCard(
     modifier: Modifier = Modifier,
+    containerColor: Color = white,
     padding: Dp = 20.dp,
     borderWidth: Dp = 1.dp,
     borderColor: Color = grey_2,
@@ -465,7 +570,7 @@ fun BorderCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = white
+            containerColor = containerColor
         ),
         border = BorderStroke(
             width = borderWidth,
@@ -635,8 +740,352 @@ fun WarehouseCountCard(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 warehouseList.forEachIndexed { index, item ->
-                    CountColorCard(item.count, item.suffix, item.suffix.toColor())
+                    CountColorCard(item.count, item.suffix, item.suffix.toColorList())
                 }
             }
         }
+}
+
+@Composable
+fun CardClips(
+    colorBackground: Color,
+    colorBorder: Color,
+    colorText: Color,
+    colorIcon: Color? = null,
+    @DrawableRes icon: Int? = null,
+    value: String
+) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colorBackground
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = colorBorder
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            icon?.let {
+                colorIcon?.let { contentDescription ->
+                    Icon(
+                        painterResource(it),
+                        modifier = Modifier.size(18.dp),
+                        tint = contentDescription,
+                        contentDescription = null
+                    )
+                }
+            }
+            Text(
+                text = value,
+                color = colorText,
+                style = text_12
+            )
+        }
+    }
+}
+
+
+@Composable
+fun CardIndicationChangeChoice(
+    value: String,
+    suffix: Suffix,
+    status: IndicationStatus
+) {
+    val colors = when (status) {
+        IndicationStatus.POSITIVE -> Triple(green_g_2, green_1, green_2)
+        IndicationStatus.NEGATIVE -> Triple(red_3, red_2, red_1)
+        IndicationStatus.NEUTRAL -> Triple(grey_2, grey, grey_3)
+        IndicationStatus.PRICE -> Triple(green_g_2, green_1, green_2)
+        IndicationStatus.ADD -> Triple(green_g_2, green_1, green_2)
+        IndicationStatus.WRITE_OFF -> Triple(violet_3, violet_5, violet_1)
+        IndicationStatus.SALE -> Triple(blue_3, blue_9, blue_8)
+        IndicationStatus.EXPENSES -> Triple(orang_4, orang_5, orang_6)
+        IndicationStatus.KILL -> Triple(red_3, red_2, red_1)
+        IndicationStatus.ALL_WEIGHT -> Triple(green_g_2, green_1, green_2)
+    }
+
+    val string =
+        when (status) {
+            IndicationStatus.POSITIVE -> stringResource(R.string.animal_indicators_change_increased).format(
+                value,
+                stringResource(suffix.toResId())
+            )
+
+            IndicationStatus.NEGATIVE -> stringResource(R.string.animal_indicators_change_decreased).format(
+                value,
+                stringResource(suffix.toResId())
+            )
+
+            IndicationStatus.NEUTRAL -> stringResource(R.string.animal_indicators_size_not_changed_s).format(
+                value,
+                stringResource(suffix.toResId())
+            )
+
+            else -> "$value ${stringResource(suffix.toResId())}"
+        }
+    val titleRes = stringResource(
+        when (status) {
+            IndicationStatus.PRICE -> R.string.support_text_all_price
+            IndicationStatus.ADD -> R.string.animal_count_screen_add_animal
+            IndicationStatus.WRITE_OFF -> R.string.animal_count_screen_write_off_animal
+            IndicationStatus.SALE -> R.string.animal_count_screen_sale_animal
+            IndicationStatus.KILL -> R.string.animal_count_screen_kill_animal
+            IndicationStatus.ALL_WEIGHT -> R.string.animal_card_screen_animal_card_info_weight_all
+            IndicationStatus.EXPENSES -> R.string.animal_count_screen_expenses_animal
+            else -> R.string.animal_indicators_changed
+        }
+    )
+    CardIndicationChange(titleRes, string, colors)
+}
+
+@Composable
+fun CardIndicationChange(
+    titleRes: String,
+    string: String,
+    colors: Triple<Color, Color, Color>
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = titleRes,
+            style = text_14,
+            color = marengo
+        )
+        CardClips(
+            colorBackground = colors.first,
+            colorBorder = colors.second,
+            colorText = colors.third,
+            value = string,
+        )
+    }
+}
+
+
+@Composable
+fun CardIndicationChange(
+    value: String,
+    suffix: Suffix,
+) {
+    CardClips(
+        colorBackground = green_g_2,
+        colorBorder = green_1,
+        colorText = green_2,
+        value = "$value ${stringResource(suffix.toResId())}",
+    )
+}
+
+@Composable
+fun CardVaccinationDate(
+    currentDate: Boolean,
+    date: String
+) {
+    val colors = when (currentDate) {
+        true -> Triple(violet_3, violet_5, violet_6)
+        false -> Triple(blue_5, blue_6, blue_7)
+    }
+
+    val string = stringResource(
+        when (currentDate) {
+            true -> R.string.card_date
+            false -> R.string.animal_vaccination_next_date
+        }
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            string,
+            style = text_12,
+            color = gray_7
+        )
+        CardClips(
+            colorBackground = colors.first,
+            colorBorder = colors.second,
+            colorText = colors.third,
+            value = date,
+        )
+    }
+}
+
+@Composable
+fun DateFactoryCardNew(
+    isDateFactory: Boolean,
+    @StringRes intTitle: Int,
+    @StringRes intTooltip: Int,
+    @StringRes intRes: Int,
+    @StringRes intResSup: Int,
+    dateBoring: String,
+    dateFactory: String,
+    dateFactoryClicked: (Boolean) -> Unit,
+    dateFactoryChanged: (String) -> Unit
+) {
+    BorderCard {
+        CheckboxTextIcon(
+
+            checked = isDateFactory,
+            onCheckedChange = {
+                dateFactoryClicked(it)
+            },
+            intTitle = intTitle,
+            isTooltipShow = true,
+            intTooltip = intTooltip
+        )
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxWidth(),
+            visible = !isDateFactory,
+        ) {
+            OutlinedTextDateNew(
+                value = dateFactory,
+                intRes = intRes,
+                intResSup = intResSup,
+                drawableRes = R.drawable.baseline_event_24,
+                onValueChange = { dateFactoryChanged(it) },
+                isCardBorder = false,
+                minDate = dateBoring
+            )
+        }
+    }
+}
+
+@Composable
+fun GreenCard(
+    padding: PaddingValues = PaddingValues(),
+    onClick: () -> Unit = {},
+    containerColor: Color = green_g_2,
+    borderColor: Color = green_1,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(padding),
+        onClick = onClick,
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = borderColor
+        )
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun ProductKillCard(
+    number: Int,
+    name: String,
+    value: String,
+    suffix: Suffix,
+    isEditMode: Boolean = false,
+    onClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+
+    val (containerColor, borderColor) = if (isEditMode) orang_4 to orang_7 else green_g_2 to green_1
+
+    GreenCard(
+        containerColor = containerColor,
+        borderColor = borderColor,
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("$number.", style = text_14, color = marengo)
+                Column(
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(name, style = text_14, color = black_1)
+                    Text(
+                        "$value ${stringResource(suffix.toResId())}",
+                        style = text_12,
+                        color = green_shamrock
+                    )
+                }
+            }
+
+            IconButton(
+                onClick = onDeleteClick,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_delete_24),
+                    tint = red_4,
+                    contentDescription = null
+                )
+
+            }
+        }
+    }
+}
+
+@Composable
+fun ProductKillInfoCard(
+    number: Int,
+    name: String,
+    value: String,
+    suffix: Suffix
+) {
+    BorderCard(
+        padding = 8.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                IconText(number = number.toString())
+                Text(name, style = text_14, color = black_1)
+            }
+            CountColorCard(
+                count = value.toDouble(),
+                suffix = suffix,
+                colorCard = suffix.toColorList()
+            )
+        }
+    }
+}
+
+@Composable
+fun SecondAnimalCard(
+    modifier: Modifier = Modifier,
+    @DrawableRes icon: Int,
+    @StringRes intRes: Int,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    CardFieldNew(
+        modifier = modifier
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            HeadingAnimalCard(icon, intRes)
+            content()
+        }
+    }
 }

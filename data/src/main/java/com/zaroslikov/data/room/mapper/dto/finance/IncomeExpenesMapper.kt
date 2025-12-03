@@ -10,5 +10,6 @@ fun IncomeExpensesDto.toDomainIncomeExpenses(): DomainIncomeExpenses {
         suffix = this.suffix,
         price = this.price,
         date = this.date,
+        category = this.category
     )
 }

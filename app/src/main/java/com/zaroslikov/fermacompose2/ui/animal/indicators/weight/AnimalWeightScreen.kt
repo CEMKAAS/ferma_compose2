@@ -2,70 +2,38 @@
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators.weight
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.IndicationStatus
+import com.zaroslikov.domain.models.list.suffixWeightList
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.convertWeight
+import com.zaroslikov.fermacompose2.blue_2
+import com.zaroslikov.fermacompose2.blue_4
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
-import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.animal.indicators.size.HeadingIndicators
-import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.animal.indicators.AnimalIndicatorsCardNew
+import com.zaroslikov.fermacompose2.ui.animal.indicators.InventoryAnimalBody
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
-import com.zaroslikov.fermacompose2.ui.elements.FloatButton
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCount2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.elements.textBold_16
-import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated2
-import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import kotlin.math.absoluteValue
+import com.zaroslikov.fermacompose2.ui.sections.EntryIndicationBottomSheet
 
 
 object AnimalWeightDestination : NavigationDestination {
@@ -82,19 +50,22 @@ fun AnimalWeightScreen(
     viewModel: AnimalWeightViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val state = viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val colors = listOf(blue_4, blue_2)
+    val icon = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24
+    val title = R.string.weight_screen_title
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = R.string.weight_screen_title,
+                intRes = title,
                 scrollBehavior = scrollBehavior,
                 navigateUp = navigateBack
             )
         },
         floatingActionButton = {
-            FloatButton {
+            NeonGlowFab(colors = colors) {
                 viewModel.onIntent(
                     AnimalWeightIntent.OpenDialogClicked(
                         isEntry = true
@@ -103,245 +74,116 @@ fun AnimalWeightScreen(
             }
         }
     ) { innerPadding ->
-        if (state.value.isLoading)
+        if (state.isLoading)
             CircularProgress(
                 modifier = Modifier.padding(innerPadding),
             )
         else
-            AnimalWeightContainer(
+            AnimalWeightContainer2(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
-                state = state.value,
-                onIntent = viewModel::onIntent
+                icon = icon,
+                colors = colors,
+                itemList = state.weightList,
+                onDetailClick = { viewModel.positeive(it.first, it.second) },
+                onInsertClick = { viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(isEntry = true)) },
+                onEditClick = {
+                    viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(isEntry = false, it))
+                },
+                onDeleteClick = { viewModel.onIntent(AnimalWeightIntent.DeletePressed) },
+                titleRes = title
             )
 
-        if (state.value.isOpenDialog)
-            SizeBottomSheet(
-                state = state.value.domainAnimalWeight,
+        if (state.isOpenDialog)
+            WeightBottomSheet(
+                state = state,
                 onIntent = viewModel::onIntent,
-                error = state.value.error,
-                isEntry = state.value.isEntry,
+                colors = colors,
+                icon = icon,
+                titleRes = title,
             )
     }
 }
 
-
-
 @Composable
-private fun AnimalWeightContainer(
-    modifier: Modifier = Modifier,
-    state: AnimalWeightState,
-    onIntent: (AnimalWeightIntent) -> Unit
+private fun AnimalWeightContainer2(
+    modifier: Modifier,
+    @DrawableRes icon: Int,
+    @StringRes titleRes: Int,
+    colors: List<Color>,
+    itemList: List<DomainAnimalWeight>,
+    onDetailClick: (Pair<DomainAnimalWeight, DomainAnimalWeight?>) -> Pair<String, IndicationStatus>,
+    onInsertClick: () -> Unit,
+    onEditClick: (DomainAnimalWeight) -> Unit,
+    onDeleteClick: (Long) -> Unit,
 ) {
-    if (state.weightList.isNotEmpty())
-        VaccinationList2(
-            modifier = modifier,
-            indicatorsList = state.weightList,
-            onEditChange = { onIntent(AnimalWeightIntent.OpenDialogClicked(isEntry = false, it)) }
-        )
-    else MessageNoData(
+    InventoryAnimalBody(
         modifier = modifier,
-        onClick = { onIntent(AnimalWeightIntent.OpenDialogClicked(isEntry = true)) },
+        itemList = itemList,
+        onInsertClick = onInsertClick,
         titleRes = R.string.message_no_date_title_weight,
         messageRes = R.string.message_no_date_message_weight,
         supportRes = R.string.message_no_date_support_weight,
-        buttonRes = R.string.button_sale_message_no_weight
-    )
-}
-
-@Composable
-private fun VaccinationList2(
-    modifier: Modifier,
-    indicatorsList: List<DomainAnimalWeight>,
-    onEditChange: (DomainAnimalWeight) -> Unit
-) {
-    LazyColumn(
-        modifier = modifier
-    ) {
-        item { HeadingIndicators(R.string.weight_screen_title) }
-        itemsIndexed(items = indicatorsList, key = { index, _ -> index }) { index, item ->
-            val previousItem =
-                if (index < indicatorsList.size - 1) indicatorsList[index + 1] else null
-            SizeCard(
-                modifier = Modifier.clickable { onEditChange(item) },
-                domainAnimalSize = item,
-                previousDomainAnimalSize = previousItem
-            )
-        }
-    }
-}
-
-@Composable
-private fun SizeCard(
-    modifier: Modifier = Modifier,
-    domainAnimalSize: DomainAnimalWeight,
-    previousDomainAnimalSize: DomainAnimalWeight?
-) {
-    var details by rememberSaveable { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (details) 0.dp else 2.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-    CardField(
-        modifier = modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-        row = false
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "${domainAnimalSize.weight.toFormatNumber()} ${
-                    stringResource(
-                        domainAnimalSize.suffix.toResId()
-                    )
-                }",
-                style = textBold_16,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = domainAnimalSize.date,
-                style = textBold_16,
-                textAlign = TextAlign.Center
-            )
-            if (previousDomainAnimalSize != null)
-                IconButton(
-                    modifier = Modifier.weight(0.25f),
-                    onClick = { details = !details }) {
-                    Icon(
-                        painterResource(if (details) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
-                        contentDescription = null
-                    )
-                }
-            else Spacer(
-                modifier = Modifier
-                    .weight(0.25f)
-                    .size(44.dp)
-            )
-        }
-        if (details && previousDomainAnimalSize != null)
-            DetailsCount(
-                domainAnimalSize,
-                previousDomainAnimalSize
-            )
-    }
-}
-
-@Composable
-private fun DetailsCount(
-    domainAnimalWeight: DomainAnimalWeight,
-    previousDomainAnimalWeight: DomainAnimalWeight
-) {
-    val context = LocalContext.current
-
-    val weight = domainAnimalWeight.weight.toConvertZeroDouble()
-    val previousWeight = previousDomainAnimalWeight.weight.toConvertZeroDouble()
-
-    val suffix = domainAnimalWeight.suffix
-    val suffixPrevious = previousDomainAnimalWeight.suffix
-
-    val note = if (domainAnimalWeight.note != "") "\n${domainAnimalWeight.note}" else ""
-
-    val weightConverted = weight.convertWeight(suffix, to = Suffix.GRAM)
-    val previousConverted = previousWeight.convertWeight(suffixPrevious, to = Suffix.GRAM)
-
-    val totalValue = (weightConverted - previousConverted).convertWeight(
-        Suffix.GRAM,
-        suffix
-    ).absoluteValue.formatNumber()
-
-    Row {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = when {
-                weight > previousWeight ->
-                    textBuildIndicatorsAnnotated2(
-                        context = context,
-                        intRes = R.string.animal_indicators_weight_increased_s,
-                        totalValue = totalValue,
-                        suffix = suffix,
-                        isPlus = true,
-                        note = note
-                    )
-
-                weight == previousWeight ->
-                    buildAnnotatedString {
-                        append(stringResource(R.string.animal_indicators_weight_not_changed_s))
-                        append(note)
-                    }
-
-                else ->
-                    textBuildIndicatorsAnnotated2(
-                        context = context,
-                        intRes = R.string.animal_indicators_weight_decreased_s,
-                        totalValue = totalValue,
-                        suffix = suffix,
-                        isPlus = false,
-                        note = note
-                    )
-            },
-            style = text_16,
-            textAlign = TextAlign.Start
+        buttonRes = R.string.button_sale_message_no_weight,
+        titleRes2 = titleRes
+    ) { item, previous ->
+        AnimalIndicatorsCardNew(
+            icon = icon,
+            colors = colors,
+            value = item.weight.toFormatNumber(),
+            suffix = item.suffix,
+            date = item.date,
+            note = item.note,
+            onEditClick = { onEditClick(item) },
+            onDeleteClick = { onDeleteClick(item.id) },
+            onDetailClick = { onDetailClick((item to previous)) },
         )
     }
 }
 
 @Composable
-private fun SizeBottomSheet(
-    state: DomainAnimalWeight,
-    error: AnimalWeightState.Error,
-    isEntry: Boolean,
+private fun WeightBottomSheet(
+    state: AnimalWeightState,
+    colors: List<Color>,
+    @DrawableRes icon: Int,
+    @StringRes titleRes: Int,
     onIntent: (AnimalWeightIntent) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    ModalBottomSheet(
-        onDismissRequest = { onIntent(AnimalWeightIntent.EndDialogClicked) },
-        sheetState = sheetState
+    EntryIndicationBottomSheet(
+        isEntry = state.isEntry,
+        enabledButton = state.enabledButton(),
+        colors = colors,
+        onDismissRequest = {
+            onIntent(AnimalWeightIntent.EndDialogClicked)
+        },
+        onInsertClick = { onIntent(AnimalWeightIntent.InsertPressed) },
+        onUpdateClick = { onIntent(AnimalWeightIntent.UpdatePressed) },
+        icon = icon,
+        titleRes = titleRes
     ) {
-        Column(modifier = Modifier.modifierBottomSheet(true)) {
-            OutlinedTextCount2(
-                value = state.weight,
-                onValueChange = {
-                    onIntent(AnimalWeightIntent.WeightChanged(it))
-                },
-                suffix = state.suffix,
-                onSuffixChange = {
-                    onIntent(AnimalWeightIntent.SuffixClicked(it))
-                },
-                isError = error.isErrorWeight,
-                drawableRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
-                intRes = R.string.weight_screen_title,
-                intResSup = R.string.support_text_weight_animal,
-                intResError = R.string.error_no_weight_animal,
-                keyboardOptions = keyboardOptionsNextNumber(),
-                versionDropMenu = DropdownMenu.WEIGHT,
-                isWarehouseShow = false,
-                cardBorder = false
-            )
-            OutlinedTextDate(
-                value = state.date,
-                onValueChange = { onIntent(AnimalWeightIntent.DateClicked(it)) },
-                isCardBorder = false
-            )
-            OutlinedTextNote(
-                value = state.note,
-                onValueChange = { onIntent(AnimalWeightIntent.NoteChanged(it)) },
-                cardBorder = false
-            )
-            ButtonPanel(
-                isEntry = isEntry,
-                entryButton = R.string.button_add,
-                onClickInsert = { onIntent(AnimalWeightIntent.InsertPressed) },
-                onClickUpdate = { onIntent(AnimalWeightIntent.UpdatePressed) },
-                onClickDelete = { onIntent(AnimalWeightIntent.DeletePressed) }
-            )
-        }
+        OutlinedTextCountNew(
+            value = state.domainAnimalWeight.weight,
+            onValueChange = {
+                onIntent(AnimalWeightIntent.WeightChanged(it))
+            },
+            suffix = state.domainAnimalWeight.suffix,
+            onSuffixChange = {
+                onIntent(AnimalWeightIntent.SuffixClicked(it))
+            },
+            isError = state.error.isErrorWeight,
+            drawableRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
+            intRes = R.string.weight_screen_title,
+            intResSup = R.string.support_text_weight_animal,
+            intResError = R.string.error_no_weight_animal,
+            keyboardOptions = keyboardOptionsNextNumber(),
+            suffixList = suffixWeightList
+        )
+        OutlinedTextDateNew(
+            value = state.domainAnimalWeight.date,
+            onValueChange = { onIntent(AnimalWeightIntent.DateClicked(it)) },
+        )
+        OutlinedTextNoteNew(
+            value = state.domainAnimalWeight.note,
+            onValueChange = { onIntent(AnimalWeightIntent.NoteChanged(it)) },
+        )
     }
 }
-

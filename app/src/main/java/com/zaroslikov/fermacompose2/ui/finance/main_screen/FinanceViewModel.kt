@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.finance
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.FinanceRepository
 import com.zaroslikov.domain.repository.SaleRepository
@@ -13,6 +14,7 @@ import com.zaroslikov.fermacompose2.supportFun.firstDayOfMonth
 import com.zaroslikov.fermacompose2.supportFun.todayOfMonth
 import com.zaroslikov.fermacompose2.ui.finance.main_screen.FinanceState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -30,64 +32,80 @@ class FinanceViewModel @Inject constructor(
     private val itemId: Long = checkNotNull(savedStateHandle[FinanceDestination.itemIdArg])
 
     init {
-        loadData()
+        observeData()
     }
 
-    private fun loadData() {
+    private fun observeData() {
+        val month = dateTodayArray()[1]
+        val year = dateTodayArray()[2]
+
         viewModelScope.launch {
-            val month = dateTodayArray()[1]
-            val year = dateTodayArray()[2]
-
-            updateState { it.copy(isLoading = true) }
-            val currentBalance = financeRepository.getCurrentBalance(itemId)
-                .filterNotNull()
-                .first().toDouble()
-
-            val income = saleRepository.getIncome(itemId)
-                .filterNotNull()
-                .first().toDouble()
-
-            val expenses = expensesRepository.getExpenses(itemId)
-                .filterNotNull()
-                .first().toDouble()
-
-            val ownNeed = writeOffRepository.getOwnNeed(itemId)
-                .filterNotNull()
-                .first().toDouble()
-
-            val scrap = writeOffRepository.getScrap(itemId)
-                .filterNotNull()
-                .first().toDouble()
-
-            val incomeMount = saleRepository.getIncomeMountFin(itemId, month, year)
-                .filterNotNull()
-                .first().toDouble()
-
-            val expensesMount =
-                expensesRepository.getExpensesMountFin(itemId, month, year /*"$year-$month"*/)
-                    .filterNotNull()
-                    .first().toDouble()
-
-            val domainIncomeExpenseList =
-                financeRepository.getIncomeExpensesCurrentMonth(itemId, firstDayOfMonth().first, todayOfMonth().first)
-                    .first()
-
-            updateState { state ->
-                state.copy(
-                    isLoading = false,
-                    idPT = itemId,
-                    currentBalance = currentBalance,
-                    income = income,
-                    expenses = expenses,
-                    ownNeed = ownNeed,
-                    scrap = scrap,
-                    incomeMount = incomeMount,
-                    expensesMount = expensesMount,
-                    domainIncomeExpenseList = domainIncomeExpenseList
+            combine(
+                financeRepository.getCurrentBalance(itemId),
+                saleRepository.getIncome(itemId),
+                expensesRepository.getExpenses(itemId),
+                writeOffRepository.getOwnNeed(itemId),
+                writeOffRepository.getScrap(itemId),
+                saleRepository.getIncomeMountFin(itemId, month, year),
+                expensesRepository.getExpensesMountFin(itemId, month, year),
+                financeRepository.getIncomeExpensesCurrentMonth(
+                    itemId,
+                    firstDayOfMonth().first,
+                    todayOfMonth().first
                 )
+            ) { values: Array<Any?> ->  // ← ВАЖНО: явный тип!
+                val currentBalance = (values[0] as? Double) ?: 0.0
+                val income = (values[1] as? Double) ?: 0.0
+                val expenses = (values[2] as? Double) ?: 0.0
+                val ownNeed = (values[3] as? Double) ?: 0.0
+                val scrap = (values[4] as? Double) ?: 0.0
+                val incomeMount = (values[5] as? Double) ?: 0.0
+                val expensesMount = (values[6] as? Double) ?: 0.0
+                val domainList = (values[7] as? List<DomainIncomeExpenses>) ?: emptyList<DomainIncomeExpenses>()
+
+                FinanceCombined(
+                    currentBalance,
+                    income,
+                    expenses,
+                    ownNeed,
+                    scrap,
+                    incomeMount,
+                    expensesMount,
+                    domainList
+                )
+            }.collect { combined ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        idPT = itemId,
+                        currentBalance = combined.currentBalance,
+                        income = combined.income,
+                        expenses = combined.expenses,
+                        ownNeed = combined.ownNeed,
+                        scrap = combined.scrap,
+                        incomeMount = combined.incomeMount,
+                        expensesMount = combined.expensesMount,
+                        domainIncomeExpenseList = combined.list
+                    )
+                }
             }
+
+
         }
     }
+
 }
+
+data class FinanceCombined(
+    val currentBalance: Double,
+    val income: Double,
+    val expenses: Double,
+    val ownNeed: Double,
+    val scrap: Double,
+    val incomeMount: Double,
+    val expensesMount: Double,
+    val list: List<DomainIncomeExpenses>
+)
+
 
 sealed class FinanceIntent() : BaseIntent

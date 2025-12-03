@@ -1,13 +1,17 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.WriteOffDao
+import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCountSuffix
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixCategory
+import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
 import com.zaroslikov.data.room.mapper.dto.write_off.toBrieflyWriteOffDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
+import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.WriteOffRepository
@@ -58,6 +62,27 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
 
     override suspend fun deleteWriteOff(id: Long) {
         return writeOffDao.deleteWriteOff(id)
+    }
+
+    override fun getOwnNeedAllList(id: Long): Flow<List<DomainTitleSuffixPrice>> {
+        return writeOffDao.getOwnNeedAllList(id)
+            .map { it -> it.map { it.toDomainTitleSuffixPrice() } }
+    }
+
+    override fun getScrapAllList(id: Long): Flow<List<DomainTitleSuffixPrice>> {
+        return writeOffDao.getScrapAllList(id)
+            .map { it -> it.map { it.toDomainTitleSuffixPrice() } }
+    }
+
+    override fun getOwnNeedAllCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>> {
+        return writeOffDao.getOwnNeedAllCategoryAllList(id)
+            .map { it -> it.map { it.toDomainCategoryPrice() } }
+    }
+
+    override fun getScrapAllCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>> {
+        return writeOffDao.getScrapAllCategoryAllList(id)
+            .map { it -> it.map { it.toDomainCategoryPrice() } }
+
     }
 
     override fun getOwnNeed(id: Long): Flow<Double> {

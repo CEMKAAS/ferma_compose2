@@ -93,7 +93,6 @@ fun CheckboxTextIcon(
 
         if (isTooltipShow)
             TooltipBox(
-                modifier = Modifier.weight(0.2f, fill = false),
                 positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
                 tooltip = {
                     RichTooltip {

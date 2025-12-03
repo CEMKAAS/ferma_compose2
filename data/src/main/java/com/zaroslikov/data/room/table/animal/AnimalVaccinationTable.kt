@@ -21,9 +21,11 @@ data class AnimalVaccinationTable(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val vaccination: String,
+    @ColumnInfo(name = "count_vaccination")
+    val countVaccination: Int,
     val date: String,
     @ColumnInfo(name = "next_vaccination")
-    val nextVaccination: String,
+    val nextVaccination: String?,
     @ColumnInfo(name = "animal_id")
     val animalId: Long,
     val note: String

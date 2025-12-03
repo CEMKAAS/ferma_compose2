@@ -3,17 +3,22 @@ package com.zaroslikov.fermacompose2.ui.animal.indicators.size
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.supportFun.convertSize
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 @HiltViewModel
 class AnimalSizeViewModel @Inject constructor(
@@ -160,17 +165,42 @@ class AnimalSizeViewModel @Inject constructor(
             )
         }
     }
+
+    fun positeive(
+        domainAnimalSize: DomainAnimalSize,
+        previousDomainAnimalSize: DomainAnimalSize?
+    ): Pair<String, IndicationStatus> {
+        if (previousDomainAnimalSize == null) return domainAnimalSize.size to IndicationStatus.POSITIVE
+        else {
+            val size = domainAnimalSize.size.toConvertZeroDouble()
+            val previousSize = previousDomainAnimalSize.size.toConvertZeroDouble()
+
+            val suffix = domainAnimalSize.suffix
+            val suffixPrevious = previousDomainAnimalSize.suffix
+
+            val sizeConverted = size.convertSize(suffix, to = Suffix.MILLIMETERS)
+            val previousCountConverted =
+                previousSize.convertSize(suffixPrevious, to = Suffix.MILLIMETERS)
+
+            val totalValue = (sizeConverted - previousCountConverted).convertSize(
+                Suffix.MILLIMETERS,
+                suffix
+            ).absoluteValue.formatNumber()
+            val status = when {
+                sizeConverted > previousCountConverted -> IndicationStatus.POSITIVE
+                sizeConverted == previousCountConverted -> IndicationStatus.NEUTRAL
+                else -> IndicationStatus.NEGATIVE
+            }
+            return totalValue to status
+        }
+    }
 }
 
 sealed class AnimalSizeIntent : BaseIntent {
     data class OpenDialogClicked(
         val isEntry: Boolean,
-        val domainAnimalSize: DomainAnimalSize = DomainAnimalSize(
-            date = dateToday(),
-            suffix = Suffix.MILLIMETERS
-        )
-    ) :
-        AnimalSizeIntent()
+        val domainAnimalSize: DomainAnimalSize = DomainAnimalSize(date = dateToday())
+    ) : AnimalSizeIntent()
 
     data object EndDialogClicked : AnimalSizeIntent()
     data class SizeChanged(val value: String) : AnimalSizeIntent()

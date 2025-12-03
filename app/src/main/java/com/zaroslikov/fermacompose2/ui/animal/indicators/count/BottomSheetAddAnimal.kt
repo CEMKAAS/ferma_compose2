@@ -10,55 +10,54 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
-import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.elements.CountBottomSheet2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal2
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
+import com.zaroslikov.fermacompose2.supportFun.toColorList
+import com.zaroslikov.fermacompose2.supportFun.toDrawRes
+import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountAnimalNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.sections.EntryIndicationBottomSheet
 
 
 @SuppressLint("RememberInComposition")
 @Composable
 fun BottomSheetAddAnimal(
-    state: DomainAnimalCountPrice,
-    errorState: AnimalCountState.Error,
-    isEntry: Boolean,
+    state: CountItem,
     countAllAnimal: String,
     onIntent: (AnimalCountIntent) -> Unit
 ) {
-
     val focusRequester =
         remember { FocusRequester() } // ✅ нужно помнить, иначе при recomposition фокус сбрасывается
     // ✅ Важно: просим фокус, когда bottom sheet появился
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-    CountBottomSheet2(
-        version = state.version,
-        isEntry = isEntry,
-        intEntryButton = R.string.alert_dialog_info_add_animals,
-        onDismiss = { onIntent(AnimalCountIntent.EndDialogClicked) },
-        onInsert = { onIntent(AnimalCountIntent.InsertAddPressed) },
-        onUpdate = { onIntent(AnimalCountIntent.UpdateAddPressed) },
-        onDelete = { onIntent(AnimalCountIntent.DeleteCountPressed(state.id)) },
+    EntryIndicationBottomSheet(
+        icon = state.version.toDrawRes(),
+        titleRes = state.version.toResId(),
+        isEntry = state.isEntry,
+        enabledButton = state.enabledButton(),
+        colors = state.version.toColorList(),
+        onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
+        onInsertClick = { onIntent(AnimalCountIntent.InsertAddPressed) },
+        onUpdateClick = { onIntent(AnimalCountIntent.UpdateAddPressed) }
     ) {
-        OutlinedTextCountAnimal2(
+        OutlinedTextCountAnimalNew(
             value = state.count,
             onValueChange = {
                 onIntent(AnimalCountIntent.CountAddChanged(it))
             },
-            countAnimalAll = countAllAnimal,
             suffix = state.suffix,
-            isError = errorState.isErrorCount,
-            isErrorCountZero = errorState.isErrorCountZero,
-            modifier = Modifier.focusRequester(focusRequester)
+            isError = state.error.isErrorCount,
+            /*isErrorCountZero = errorState.isErrorCountZero,*/
+            modifier = Modifier.focusRequester(focusRequester),
+            countAnimal = countAllAnimal
         )
-        OutlinedTextDate(
+        OutlinedTextDateNew(
             value = state.date,
             onValueChange = { onIntent(AnimalCountIntent.DateClicked(it)) }
         )
-        OutlinedTextNote(
+        OutlinedTextNoteNew(
             value = state.note,
             onValueChange = { onIntent(AnimalCountIntent.NoteChanged(it)) }
         )

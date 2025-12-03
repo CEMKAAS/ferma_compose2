@@ -19,6 +19,7 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -35,7 +36,6 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
-import com.zaroslikov.fermacompose2.ui.sections.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
 

@@ -24,8 +24,12 @@
     <string name="expenses_screen_title2">Покупки</string>
     <string name="write_off_screen_title2">Списания</string>
     <string name="animal_screen_title2">Животные</string>
-
     <string name="is_empty"></string>
+
+    // BottomBar
+    <string name="bottom_bar_magazine">Журнал</string>
+    <string name="bottom_bar_warehouse">Журнал</string>
+    <string name="bottom_bar_finance">Финансы</string>
 
     //OutlinedTextField
     <string name="outlined_text_product">Товар</string>
@@ -92,6 +96,7 @@
     <string name="button_note">Записать</string>
     <string name="button_cancel">Отмена</string>
     <string name="button_save">Сохранить</string>
+    <string name="button_wrap">Свернуть</string>
     <string name="button_add_message_no_data">Добавить Продукцию!</string>
     <string name="button_sale_message_no_data">Добавить Продажу!</string>
     <string name="button_expenses_message_no_data">Добавить Покупку!</string>
@@ -127,8 +132,10 @@
     <string name="button_text_sale">Продать!</string>
     <string name="button_text_expenses">Купить!</string>
     <string name="button_text_add">Добавить!</string>
-    <string name="button_text_add_title">Добавить позию!</string>
+    <string name="button_text_add_title">Добавить позию</string>
+    <string name="button_text_edit_title">Сохранить изменения</string>
     <string name="button_text_cancel">Отмена</string>
+    <string name="button_text_cancel_2">Отменить</string>
     <string name="button_text_edit">Изменить!</string>
     <string name="button_text_write_off">Списать!</string>
     <string name="button_text_take">Принять</string>
@@ -158,7 +165,7 @@
 
 
     //ContentDescription
-    <string name="content_description_show_menu">Показать меню</string>
+    <string name="content_description_show_menu">Показать ёменю</string>
     <string name="content_description_show_calendary">Показать календарь</string>
     <string name="content_description_clear">Стереть</string>
 
@@ -218,6 +225,7 @@
     <string name="support_text_more">более </string>
     <string name="support_text_transactions_now_month">Транзакции в текущем месяце</string>
     <string name="support_text_current_balance">Текущий баланс</string>
+    <string name="support_text_current_balance_">Доступно средств</string>
     <string name="support_text_now_month">Текущий месяц</string>
     <string name="support_text_all_time">все время</string>
 
@@ -409,6 +417,31 @@
     <string name="animal_entry_screen_sex_man">Мужской</string>
     <string name="animal_entry_screen_sex_woman">Женский</string>
 
+    //Finance
+    <string name="finance_income">Доходы</string>
+    <string name="finance_expenses">Расходы</string>
+    <string name="finance_height">Рост</string>
+    <string name="finance_recession">Спад</string>
+    <string name="finance_profit">Прибыль</string>
+    <string name="finance_onw_need">Собственные нужды</string>
+    <string name="finance_scrap">Списания в утиль</string>
+
+    //FinanceCategory
+    <string name="finance_category_income_total">Общий доход</string>
+    <string name="finance_category_expenses_total">Общий расход</string>
+    <string name="finance_category_onw_need_total">Общая экономия</string>
+    <string name="finance_category_scrap_total">Общие потери</string>
+    <string name="finance_category_for_category">По категориям</string>
+
+    <string name="finance_category_income_all">Все доходы</string>
+    <string name="finance_category_expenses_all">Все расходы</string>
+    <string name="finance_category_write_off_all">Общие списания</string>
+
+    <string name="finance_category_own_need_title">Собственное потребление</string>
+    <string name="finance_category_own_need_text">Эта сумма отражает стоимость продукции, которую вы взяли для собственных нужд вместо продажи. Это важная часть вашего хозяйства, которая экономит бюджет семьи.</string>
+    <string name="finance_category_scrap_title">Внимание на потери</string>
+    <string name="finance_category_scrap_text">Списания в утиль уменьшают вашу прибыль. Анализируйте причины потерь, чтобы минимизировать их в будущем. Обратите внимание на условия хранения и сроки годности.</string>
+
     //FinanceIncomeExpenses
     <string name="finance_income_expenses_category">Категории</string>
     <string name="finance_income_expenses_product">Продукция</string>
@@ -442,6 +475,7 @@
     <string name="animal_card_screen_category_sale">Продажа животных</string>
     <string name="animal_card_screen_add_category_expenses">Покупка животных</string>
     <string name="animal_card_screen_write_off_category_animal">Cписание животных</string>
+    <string name="animal_card_screen_show_product_all">Показать все (%s)</string>
 
     <string name="animal_card_screen_add_note_count">Было добавлено животных: %s %s</string>
     <string name="animal_card_screen_add_note_reason">По причине: %s </string>
@@ -456,7 +490,7 @@
     <string name="animal_card_screen_sale_note_no_buyer">Неизвестный</string>
     <!--    <string name="animal_card_screen_sale_note_expenses">Было продано животных: %s %s\</string>-->
     <string name="animal_card_screen_kill_note">Было забито животных: %s %s\nБыло получено продукции:</string>
-    <string name="animal_card_screen_kill_add_product">Было получено продукции: </string>
+    <string name="animal_card_screen_kill_add_product">Получено продукции: </string>
 
     //AnimalIndicatorsScreen
 
@@ -478,6 +512,10 @@
     <string name="animal_indicators_note_expenses_vaccination">Прививка была добавлена для животного: </string>
     <string name="animal_indicators_changed">Изменение:</string>
     <string name="animal_indicators_note">Примечание:</string>
+    <string name="animal_indicators_change_increased">↑ Увеличился на %s %s</string>
+    <string name="animal_indicators_change_decreased">↓ Уменьшился на %s %s</string>
+    <string name="animal_indicators_mode_edit">Режим редактирования</string>
+
 
     <string name="animal_indicators_vaccination_count_animals_s">Укажите количество животных, сейчас их кол-во составляет: %s</string>
     <string name="animal_indicators_animals_count_add_note">Вы добавили животных: %s %s</string>
@@ -491,9 +529,17 @@
     <string name="animal_vaccination_auto_calculate_tool">В случае активации этой опции необходимо указать стоимость не за всё прививки, а только за одну.</string>
     <string name="support_text_vaccination_animals">Укажите название прививки</string>
     <string name="animal_vaccination_count_vaccination">Колличество прививок</string>
+    <string name="animal_vaccination_support_count_vaccination">Укажите колличество прививок</string>
     <string name="animal_vaccination_title">Прививка</string>
-
+    <string name="animal_vaccination">Режим редактирования</string>
+    <string name="animal_vaccination_next_date">След:</string>
+    <string name="animal_vaccination_next_vaccination">Последующая вакцинация не предусмотрена.</string>
     // AnimalCountScreen
+    <string name="animal_count_screen_product">Продукция:</string>
+    <string name="animal_count_screen_total_weight">Итоговый вес:</string>
+    <string name="animal_count_screen_edit_mode">Редактирование</string>
+    <string name="animal_count_screen_weight_enter">Способ ввода:</string>
+    <string name="animal_count_screen_weight_individual">Индивидуально</string>
     <string name="animal_count_screen_warning_title">Внимание</string>
     <string name="animal_count_screen_warning_text">Если вы продолжите данную операцию, количество животных уйдет в минус, вы согласны на применить данные изменения?</string>
     <string name="animal_count_screen_warning_minus_and_delete_text">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удалится, вся  внесенная раняя продукция, вы действительно хотите удалить?</string>
@@ -501,6 +547,11 @@
 
     <string name="animal_count_screen_warning_product_update_text">Если вы удалите или измените продукцию она также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
     <string name="animal_count_screen_warning_product_update_minus_text">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удаленная или измененная продукцию, также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
+    <string name="animal_count_screen_kill_animal">Забито животных:</string>
+    <string name="animal_count_screen_expenses_animal">Куплено животных:</string>
+    <string name="animal_count_screen_sale_animal">Продано животных:</string>
+    <string name="animal_count_screen_write_off_animal">Списано животных:</string>
+    <string name="animal_count_screen_add_animal">Добавлено животных:</string>
 
     //ExpensesEntryScreen
     <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма:</string>
@@ -536,6 +587,32 @@
     <string name="month_oct">Октябрь</string>
     <string name="month_nov">Ноябрь</string>
     <string name="month_dec">Декабрь</string>
+
+    <string name="month_za_yan">За январь</string>
+    <string name="month_za_feb">За февраль</string>
+    <string name="month_za_mar">За март</string>
+    <string name="month_za_apr">За апрель</string>
+    <string name="month_za_may">За май</string>
+    <string name="month_za_jun">За июнь</string>
+    <string name="month_za_jul">За июль</string>
+    <string name="month_za_aug">За август</string>
+    <string name="month_za_sep">За сентябрь</string>
+    <string name="month_za_oct">За октябрь</string>
+    <string name="month_za_nov">За ноябрь</string>
+    <string name="month_za_dec">За декабрь</string>
+
+    <string name="month_yan_">янв.</string>
+    <string name="month_feb_">фев.</string>
+    <string name="month_mar_">мар.</string>
+    <string name="month_apr_">апр.</string>
+    <string name="month_may_">май</string>
+    <string name="month_jun_">июн.</string>
+    <string name="month_jul_">июл.</string>
+    <string name="month_aug_">авг.</string>
+    <string name="month_sep_">сен.</string>
+    <string name="month_oct_">окт.</string>
+    <string name="month_nov_">ноя.</string>
+    <string name="month_dec_">дек.</string>
 
 
     <string name="app_name">Мое Хозяйство 2</string>

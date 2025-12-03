@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zaroslikov.data.room.converter.AnimalCountVersionConverter
 import com.zaroslikov.data.room.converter.CategoryConverter
+import com.zaroslikov.data.room.converter.FinanceCategoryConverter
 import com.zaroslikov.data.room.converter.SuffixConverter
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.dao.AnimalCountDao
@@ -56,6 +57,7 @@ import com.zaroslikov.data.room.table.ferma.WriteOffTable
 )
 @TypeConverters(
     CategoryConverter::class,
+    FinanceCategoryConverter::class,
     SuffixConverter::class,
     AnimalCountVersionConverter::class
 )

@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
+import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 
 @Entity(
@@ -38,6 +39,8 @@ data class WriteOffTable(
     val price: Double?,
     @ColumnInfo(name = "price_all")
     val priceAll: Double?,
+    @ColumnInfo(name = "category")
+    val category: String,
     @ColumnInfo(name = "day")
     val day: Int,  // день
     @ColumnInfo(name = "month")

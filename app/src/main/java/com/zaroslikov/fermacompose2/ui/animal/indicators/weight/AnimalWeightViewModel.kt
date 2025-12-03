@@ -3,17 +3,23 @@ package com.zaroslikov.fermacompose2.ui.animal.indicators.weight
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.domain.repository.AnimalWeightRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toFormatNumber2
+import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 
 @HiltViewModel
 class AnimalWeightViewModel @Inject constructor(
@@ -164,16 +170,43 @@ class AnimalWeightViewModel @Inject constructor(
             )
         }
     }
+
+    fun positeive(
+        domainAnimalWeight: DomainAnimalWeight,
+        previousDomainAnimalWeight: DomainAnimalWeight?
+    ): Pair<String, IndicationStatus> {
+        if (previousDomainAnimalWeight == null) return domainAnimalWeight.weight.toFormatNumber2() to IndicationStatus.POSITIVE
+        else {
+            val size = domainAnimalWeight.weight.toConvertZeroDouble()
+            val previousSize = previousDomainAnimalWeight.weight.toConvertZeroDouble()
+
+            val suffix = domainAnimalWeight.suffix
+            val suffixPrevious = previousDomainAnimalWeight.suffix
+
+            val sizeConverted = size.convertWeight(suffix, to = Suffix.GRAM)
+            val previousCountConverted =
+                previousSize.convertWeight(suffixPrevious, to = Suffix.GRAM)
+
+            val totalValue = (sizeConverted - previousCountConverted).convertWeight(
+                Suffix.GRAM,
+                suffix
+            ).absoluteValue.formatNumber()
+            val status = when {
+                sizeConverted > previousCountConverted -> IndicationStatus.POSITIVE
+                sizeConverted == previousCountConverted -> IndicationStatus.NEUTRAL
+                else -> IndicationStatus.NEGATIVE
+            }
+            return totalValue to status
+        }
+    }
 }
 
 sealed class AnimalWeightIntent : BaseIntent {
     data class OpenDialogClicked(
         val isEntry: Boolean,
-        val domainAnimalWeight: DomainAnimalWeight = DomainAnimalWeight(
-            date = dateToday(),
-            suffix = Suffix.KILOGRAM
-        )
+        val domainAnimalWeight: DomainAnimalWeight = DomainAnimalWeight(date = dateToday())
     ) : AnimalWeightIntent()
+
     data object EndDialogClicked : AnimalWeightIntent()
     data class WeightChanged(val value: String) : AnimalWeightIntent()
     data class SuffixClicked(val value: Suffix) : AnimalWeightIntent()

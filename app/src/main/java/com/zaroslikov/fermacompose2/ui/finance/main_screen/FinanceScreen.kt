@@ -1,64 +1,82 @@
 package com.zaroslikov.fermacompose2.ui.finance
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-
-import androidx.compose.material3.DrawerState
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
+import com.zaroslikov.domain.models.enums.FinanceCategory
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.elements.CardField
-import com.zaroslikov.fermacompose2.ui.elements.CardFinance
-import com.zaroslikov.fermacompose2.ui.elements.CardFinanceOutlined
-import com.zaroslikov.fermacompose2.ui.elements.CardFinanceOutlinedRow
+import com.zaroslikov.fermacompose2.TopAppBarNew
+import com.zaroslikov.fermacompose2.animal_2
+import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.blue_1
+import com.zaroslikov.fermacompose2.blue_10
+import com.zaroslikov.fermacompose2.blue_11
+import com.zaroslikov.fermacompose2.blue_12
+import com.zaroslikov.fermacompose2.error_base
+import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_6
+import com.zaroslikov.fermacompose2.green_7
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.red_10
+import com.zaroslikov.fermacompose2.red_7
+import com.zaroslikov.fermacompose2.supportFun.toColor
+import com.zaroslikov.fermacompose2.supportFun.toColorList
+import com.zaroslikov.fermacompose2.supportFun.toColorFinance
+import com.zaroslikov.fermacompose2.supportFun.toDrawRes
+import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.CardClips
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
+import com.zaroslikov.fermacompose2.ui.elements.CardFinanceNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.TextAndIcon
-import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
-import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.elements.textBold_14
+import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
+import com.zaroslikov.fermacompose2.ui.elements.IconFinance
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
-import com.zaroslikov.fermacompose2.ui.elements.textBold_28
-import com.zaroslikov.fermacompose2.ui.elements.text_10
 import com.zaroslikov.fermacompose2.ui.elements.text_12
+import com.zaroslikov.fermacompose2.ui.elements.text_14
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.text_18
+import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
-import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.start.formatter
-import com.zaroslikov.fermacompose2.ui.theme.errorLight
-import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
-import io.appmetrica.analytics.AppMetrica
+import com.zaroslikov.fermacompose2.ui.start.monthToResString2
+import com.zaroslikov.fermacompose2.ui.start.monthToResString3
+import com.zaroslikov.fermacompose2.white
+import java.time.LocalDate
 
 object FinanceDestination : NavigationDestination {
     override val route = "finance"
@@ -70,63 +88,40 @@ object FinanceDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinanceScreen(
-    navigateToStart: () -> Unit,
-    navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToFinanceMonth: (Long) -> Unit,
-    navigateToIncomeExpenses: (Pair<Long, Boolean>) -> Unit,
-    drawerState: DrawerState,
-    modifier: Modifier = Modifier,
+    navigateToIncomeExpenses: (Pair<Long, FinanceCategory>) -> Unit,
     viewModel: FinanceViewModel = hiltViewModel()
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val idProject = state.idPT
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerSheet(
-                scope = coroutineScope,
-                navigateToStart = navigateToStart,
-                navigateToModalSheet = navigateToModalSheet,
-                drawerState = drawerState,
-                2,
-                idProject.toString()
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBarNew(
+                title = stringResource(R.string.finance_screen_title),
+                scrollBehavior = scrollBehavior
             )
-        },
-    ) {
-        Scaffold(
-            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBarNavigation(
-                    title = R.string.finance_screen_title,
-                    scope = coroutineScope,
-                    drawerState = drawerState,
-                    scrollBehavior = scrollBehavior
-                )
-            }
-        ) { innerPadding ->
-            if (state.isLoading)
-                CircularProgress(
-                    modifier = modifier.padding(innerPadding),
-                )
-            else
-                FinanceBody(
-                    modifier = modifier
-                        .modifierScreenLazy(innerPadding),
-                    currentBalance = state.currentBalance,
-                    income = state.income,
-                    expenses = state.expenses,
-                    ownNeed = state.ownNeed,
-                    scrap = state.scrap,
-                    incomeMount = state.incomeMount,
-                    expensesMount = state.expensesMount,
-                    incomeExpensesList = state.domainIncomeExpenseList,
-                    navigateToFinanceMonth = { navigateToFinanceMonth(idProject) },
-                    navigateToIncomeExpenses = { navigateToIncomeExpenses(idProject to it) },
-                )
         }
+    ) { innerPadding ->
+        if (state.isLoading)
+            CircularProgress(
+                modifier = Modifier.padding(innerPadding),
+            )
+        else
+            FinanceBody(
+                modifier = Modifier
+                    .modifierScreen(innerPadding),
+                currentBalance = state.currentBalance,
+                income = state.income,
+                expenses = state.expenses,
+                ownNeed = state.ownNeed,
+                scrap = state.scrap,
+                incomeMount = state.incomeMount,
+                expensesMount = state.expensesMount,
+                incomeExpensesList = state.domainIncomeExpenseList,
+                navigate = { navigateToIncomeExpenses(idProject to it) },
+            )
     }
 }
 
@@ -141,180 +136,260 @@ private fun FinanceBody(
     incomeMount: Double,
     expensesMount: Double,
     incomeExpensesList: List<DomainIncomeExpenses>,
-    navigateToFinanceMonth: () -> Unit,
-    navigateToIncomeExpenses: (Boolean) -> Unit
+    suffix: Suffix = Suffix.RUBLE,
+    navigate: (FinanceCategory) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (expanded) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        CurrentBalance(currentBalance)
+        CurrentBalance(
+            currentBalance = currentBalance,
+            expensesMount = expensesMount,
+            incomeMount = incomeMount,
+            suffix = suffix
+        )
         IncomeExpensesCards(
             income = income,
-            expenses = expenses
-        ) { navigateToIncomeExpenses(it) }
-        if (expanded)
-            GroupDetailsCards(
-                scrap = scrap,
-                income = income,
-                ownNeed = ownNeed,
-                expenses = expenses,
-                extraPadding = extraPadding,
-            )
-        DetailsCard(expanded) {
-            expanded = !expanded
-        }
-        CurrentMonthCard(
-            incomeMount = incomeMount,
-            expensesMount = expensesMount,
-        ) { navigateToFinanceMonth() }
+            expenses = expenses,
+            suffix = suffix
+        ) { navigate(it) }
+        WriteOffFinanceCards(
+            scrap = scrap,
+            ownNeed = ownNeed,
+            suffix = suffix
+        ) { navigate(it) }
         TransactionList(incomeExpensesList)
     }
 }
 
 @Composable
 private fun CurrentBalance(
-    currentBalance: Double
+    currentBalance: Double,
+    incomeMount: Double,
+    expensesMount: Double,
+    suffix: Suffix
 ) {
-    Text(
-        text = stringResource(R.string.card_ruble_s, currentBalance.formatNumber()),
-        textAlign = TextAlign.Start,
-        style = textBold_28,
+    val shape2 = RoundedCornerShape(14.dp)
+    val glowColor = blue_11
+    val positive = currentBalance >= 0
+    val month = LocalDate.now().monthValue
+    val currentBalanceMount = incomeMount - expensesMount
+    val positiveMount = currentBalanceMount > 0
+    Box(
         modifier = Modifier
-            .padding(2.dp),
-    )
-    Text(
-        text = stringResource(R.string.support_text_current_balance),
-        textAlign = TextAlign.Start,
-        style = text_10,
-        color = Color.Gray,
-        modifier = Modifier
-            .padding(bottom = 10.dp)
-            .padding(2.dp),
-    )
+            .fillMaxWidth()
+            .graphicsLayer {
+                shadowElevation = 20f
+                shape = shape2
+                clip = false
+                ambientShadowColor = glowColor.copy(alpha = 0.8f)
+                spotShadowColor = glowColor.copy(alpha = 0.8f)
+            }
+            .border(1.dp, color = Color.Black, shape = shape2)
+            .drawBehind {
+                val gradient = Brush.linearGradient(
+                    colors = listOf(blue_10, blue_11, blue_12),
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, size.height) // диагональ
+                )
+
+                drawRoundRect(
+                    brush = gradient,
+                    cornerRadius = CornerRadius(14.dp.toPx()) // скругление здесь
+                )
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IconFinance(
+                            icon = R.drawable.baseline_currency_ruble_24,
+                            color = Color(0x20FFFFFF)
+                        )
+                        Text(
+                            text = stringResource(R.string.support_text_current_balance),
+                            style = text_14,
+                            color = Color(0x70FFFFFF)
+                        )
+                    }
+                    CardClips(
+                        colorBackground = if (positive) Color(0x2000C950) else Color(0x20F17B7B),
+                        colorBorder = if (positive) Color(0x3000C950) else Color(0x30F17B7B),
+                        colorText = if (positive) Color(0xFF7BF1A8) else Color(0xFFF17B7B),
+                        colorIcon = if (positive) Color(0xFF7BF1A8) else Color(0xFFF17B7B),
+                        icon = if (positive) R.drawable.icon_arrow_up else R.drawable.icon_arrow_down,
+                        value = stringResource(if (positive) R.string.finance_height else R.string.finance_recession),
+                    )
+                }
+                Text(
+                    text = "${currentBalance.formatNumber()} ${stringResource(suffix.toResId())}",
+                    style = text_36,
+                    color = white
+                )
+                Text(
+                    text = stringResource(R.string.support_text_current_balance_),
+                    style = text_14,
+                    color = Color(0x60FFFFFF)
+                )
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                HorizontalDivider(thickness = 1.dp, color = Color(0x10FFFFFF))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Start,
+                            text = stringResource(monthToResString3(month)),
+                            style = text_12,
+                            color = Color(0x50FFFFFF)
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Start,
+                            text = stringResource(R.string.finance_income),
+                            style = text_12,
+                            color = Color(0x50FFFFFF),
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Start,
+                            text = stringResource(R.string.finance_expenses),
+                            style = text_12,
+                            color = Color(0x50FFFFFF)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Start,
+                            text = (if (positiveMount) "+" else "-") +
+                                    currentBalanceMount.formatNumber() +
+                                    " ${stringResource(suffix.toResId())}",
+                            style = text_12,
+                            color = white,
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Start,
+                            text = incomeMount.formatNumber() +
+                                    " ${stringResource(suffix.toResId())}",
+                            style = text_12,
+                            color = green_7,
+                        )
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Start,
+                            text = expensesMount.formatNumber() +
+                                    " ${stringResource(suffix.toResId())}",
+                            style = text_12,
+                            color = red_10,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun IncomeExpensesCards(
     income: Double,
     expenses: Double,
-    navigateToIncomeExpenses: (Boolean) -> Unit
+    suffix: Suffix,
+    navigate: (FinanceCategory) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        CardFinance(
+        CardFinanceNew(
             modifier = Modifier.weight(1f),
-            onClick = {
-                navigateToIncomeExpenses(true)
-                AppMetrica.reportEvent("Финансы Доход")
-            },
+            onClick = { navigate(FinanceCategory.SALE) },
             titleRes = R.string.card_income,
-            value = income
+            value = income,
+            icon = R.drawable.icon_arrow_up,
+            colors = listOf(green_6, green_shamrock),
+            suffix = suffix
         )
-        CardFinance(
+        CardFinanceNew(
             modifier = Modifier.weight(1f),
-            onClick = {
-                navigateToIncomeExpenses(false)
-                AppMetrica.reportEvent("Финансы Доход")
-            },
+            onClick = { navigate(FinanceCategory.EXPENSES) },
             titleRes = R.string.card_expenditure,
-            value = expenses
+            value = expenses,
+            icon = R.drawable.icon_arrow_down,
+            colors = listOf(Color(0xFFFB2C36), red_7),
+            suffix = suffix
+        )
+        CardFinanceNew(
+            modifier = Modifier.weight(1f),
+            onClick = { navigate(FinanceCategory.SALE) },
+            titleRes = R.string.finance_profit,
+            value = income - expenses,
+            icon = R.drawable.baseline_currency_ruble_24,
+            colors = listOf(blue_1, animal_2),
+            suffix = suffix
         )
     }
 }
 
 @Composable
-private fun GroupDetailsCards(
-    extraPadding: Dp,
+private fun WriteOffFinanceCards(
     ownNeed: Double,
     scrap: Double,
-    income: Double,
-    expenses: Double
+    suffix: Suffix,
+    navigation: (FinanceCategory) -> Unit
 ) {
-    CardFinanceOutlinedRow(
-        modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-        oneIntRes = R.string.card_own_need,
-        twoIntRes = R.string.card_scrap,
-        oneValue = ownNeed,
-        twoValue = scrap
-    )
-    CardFinanceOutlinedRow(
-        modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-        oneIntRes = R.string.card_all_income,
-        twoIntRes = R.string.card_all_expenditure,
-        oneValue = ownNeed + income,
-        twoValue = scrap + expenses
-    )
-    CardFinanceOutlined(
-        modifier = Modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-        titleRes = R.string.card_all,
-        value = (ownNeed + income) - (scrap + expenses),
-    )
-}
-
-@Composable
-private fun DetailsCard(
-    expanded: Boolean,
-    onClick: () -> Unit
-) {
-    CardField(
-        modifier = Modifier
-            .clickable {
-                onClick()
-                AppMetrica.reportEvent("Финансы Подробно")
-            },
-        horizontalArrangement = Arrangement.Center
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        TextAndIcon(
-            intRes = if (expanded) R.string.widget_briefly else R.string.widget_detail,
-            iconRes = if (expanded)  R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down,
+        CardFinanceNew(
+            modifier = Modifier.weight(1f),
+            onClick = { navigation(FinanceCategory.OWN_NEED) },
+            titleRes = R.string.card_own_need,
+            value = ownNeed,
+            icon = R.drawable.outline_savings_24,
+            colors = listOf(Color(0xFFFE9A00), Color(0xFFFF6900)),
+            suffix = suffix,
+            horizontalAlignment = Alignment.Start,
+            titleRes2 = R.string.finance_onw_need
         )
-    }
-}
-
-@Composable
-private fun CurrentMonthCard(
-    incomeMount: Double,
-    expensesMount: Double,
-    navigateToFinanceMonth: () -> Unit
-) {
-    CardField(
-        modifier = Modifier.clickable {
-            navigateToFinanceMonth()
-            AppMetrica.reportEvent("Финансы Месяц")
-        },
-        row = false,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.card_now_month),
-            style = textBold_16
+        CardFinanceNew(
+            modifier = Modifier.weight(1f),
+            onClick = { navigation(FinanceCategory.SCRAP) },
+            titleRes = R.string.card_scrap,
+            value = scrap,
+            icon = R.drawable.baseline_delete_24,
+            colors = listOf(Color(0xFF4A5565), Color(0xFF364153)),
+            suffix = suffix,
+            horizontalAlignment = Alignment.Start,
+            titleRes2 = R.string.finance_scrap
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround,
-        ) {
-            Text(
-                text = stringResource(R.string.card_ruble_s, incomeMount.formatNumber()),
-                style = textBold_16
-            )
-            Text(
-                text = stringResource(R.string.card_ruble_s, expensesMount.formatNumber()),
-                style = textBold_16
-            )
-        }
     }
 }
 
@@ -322,70 +397,115 @@ private fun CurrentMonthCard(
 private fun TransactionList(
     incomeExpensesList: List<DomainIncomeExpenses>,
 ) {
-    if (incomeExpensesList.isNotEmpty()) {
-        Text(
-            text = stringResource(R.string.support_text_transactions_now_month),
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp)
-                .padding(2.dp),
-            style = textBold_16
-        )
-        LazyColumn {
-            items(items = incomeExpensesList) {
-                TransactionRow(it)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        if (incomeExpensesList.isNotEmpty()) {
+            Text(
+                text = stringResource(R.string.support_text_transactions_now_month),
+                style = text_18,
+                color = black_2
+            )
+            Column(
+                modifier = Modifier.padding(bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                incomeExpensesList.forEach {
+                    TransactionFinanceCard(
+                        title = it.title,
+                        count = it.count,
+                        suffix = it.suffix,
+                        category = it.category,
+                        price = it.price,
+                        date = it.date,
+                        positive = it.price>0
+                    )
+                }
             }
-        }
-    } else Text(
-        text = stringResource(R.string.no_item_finance),
-        style = textBold_16,
-        modifier = Modifier,
-    )
+        } else Text(
+            text = stringResource(R.string.no_item_finance),
+            style = textBold_16,
+            modifier = Modifier,
+        )
+    }
 }
 
 
 @Composable
-fun TransactionRow(
-    incomeExpensesDetails: DomainIncomeExpenses
+fun TransactionFinanceCard(
+    title: String,
+    count: Double? = null,
+    suffix: Suffix = Suffix.PIECES,
+    category: FinanceCategory,
+    price: Double,
+    date: String? = null,
+    positive: Boolean
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(
-            modifier = Modifier.weight(0.7f),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = "${incomeExpensesDetails.title} - ${formatter(incomeExpensesDetails.count)} ${incomeExpensesDetails.suffix}",
-                style = textBold_14
-            )
-            Text(
-                text = incomeExpensesDetails.date,
-                style = text_12,
-            )
+    CardFieldNew(
+        padding = PaddingValues(16.dp),
+        contentRow = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    IconTransaction(
+                        icon = category.toDrawRes(),
+                        color = category.toColorFinance(),
+                        colorIcon = category.toColor(),
+                    )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = title,
+                            style = text_16,
+                            color = black_2
+                        )
+                        count?.let {
+                            CountColorCard(
+                                count = it,
+                                suffix = suffix,
+                                colorCard = suffix.toColorList()
+                            )
+                        }
+                    }
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "${price.formatNumber()} ${stringResource(Suffix.RUBLE.toResId())}",
+                        textAlign = TextAlign.Center,
+                        style = textBold_16,
+                        color = if (positive) price_green else error_base
+                    )
+                    date?.let {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.baseline_calendar_month_24),
+                                modifier = Modifier.size(12.dp),
+                                contentDescription = null,
+                                tint = gray_7
+                            )
+                            val dateList = it.split(".")
+                            Text(
+                                text = "${dateList[0]} ${stringResource(monthToResString2(dateList[1].toInt()))}",
+                                style = text_14,
+                                color = gray_7
+                            )
+                        }
+                    }
+                }
+            }
         }
-        Text(
-            text = stringResource(
-                R.string.card_ruble_s,
-                incomeExpensesDetails.price.formatNumber()
-            ),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.3f),
-            style = textBold_16,
-            color = if (!incomeExpensesDetails.price.toString()
-                    .contains("-")
-            ) tertiaryLight else errorLight
-        )
-    }
-    HorizontalDivider(
-        color = Color.LightGray,
-        thickness = 1.dp,
-        modifier = Modifier.padding(vertical = 5.dp)
     )
 }

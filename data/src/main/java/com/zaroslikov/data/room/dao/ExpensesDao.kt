@@ -71,7 +71,7 @@ interface ExpensesDao {
                 "    GROUP by animal_id)" +
                 ") t ON a.id = t.animal_id Left Join ExpensesAnimalTable e On e.idAnimal = a.id and e.idExpenses =:idExpenses Where a.idPT=:id ORDER By ps Desc"
     )
-     fun getItemsAnimalExpensesList2(
+    fun getItemsAnimalExpensesList2(
         id: Long,
         idExpenses: Long
     ): Flow<List<AnimalExpensesDto>>
@@ -88,9 +88,32 @@ interface ExpensesDao {
     @Query("DELETE FROM expenses_table WHERE _id = :id")
     suspend fun deleteExpensesById(id: Long)
 
-    @Query("SELECT COALESCE(SUM(count), 0) AS ResultCount FROM expenses_table WHERE idPT=:id")
+    @Query(
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0) AS ResultCount" +
+                " FROM expenses_table WHERE idPT=:id"
+    )
     fun getExpenses(id: Long): Flow<Double>
 
+    @Query(
+        "SELECT title," +
+                " count_suffix as suffix," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
+                " 1 AS category" +
+                " FROM expenses_table" +
+                " WHERE idPT =:id GROUP BY title ORDER BY price DESC"
+    )
+    fun getExpensesAllList(id: Long): Flow<List<TitleSuffixPriceDto>> //maybe
+
+    @Query(
+        "SELECT category," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+                " FROM expenses_table" +
+                " WHERE idPT =:id GROUP BY category ORDER BY price DESC"
+    )
+    fun getExpensesCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
+
+    // Фигня пока не используется
     @Query(
         "SELECT COALESCE(SUM(count), 0) AS ResultCount FROM expenses_table" +
                 " WHERE idPT =:id and month =:mount and year =:year"
@@ -110,18 +133,6 @@ interface ExpensesDao {
     fun getExpensesMount(id: Long, dateBegin: String, dateEnd: String): Flow<Double> //maybe
 
     @Query(
-        "SELECT title, count_suffix as suffix, COALESCE(SUM(price), 0.0) AS price" +
-                " FROM expenses_table WHERE idPT =:id GROUP BY title"
-    )
-    fun getExpensesAllList(id: Long): Flow<List<TitleSuffixPriceDto>> //maybe
-
-    @Query(
-        "SELECT category, COALESCE(SUM(price), 0.0) AS price FROM expenses_table" +
-                " WHERE idPT =:id group by category"
-    )//0 = price
-    fun getExpensesCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
-
-    @Query(
         "SELECT category, COALESCE(SUM(price), 0.0) AS price" +
                 " FROM expenses_table" +
                 " Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
@@ -135,7 +146,7 @@ interface ExpensesDao {
     ): Flow<List<CategoryPriceDto>> //maybe
 
     @Query(
-        "SELECT title, count_suffix as suffix, COALESCE(SUM(count), 0.0) AS price FROM expenses_table" +
+        "SELECT title, count_suffix as suffix, COALESCE(SUM(count), 0.0) AS price, 1 AS category FROM expenses_table" +
                 " Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and category=:category" +
                 " GROUP BY title ORDER BY count DESC"
@@ -163,26 +174,26 @@ interface ExpensesDao {
         dateEnd: String
     ): Flow<Double>
 
-   /* @Query(
-        "SELECT title As buyer, COALESCE(SUM(price), 0) AS resultPrice,  COALESCE(SUM(count),0) AS resultCount, count_suffix as suffix" +
-                " from expenses_table Where idPT=:id and DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY resultPrice DESC Limit 3"
-    )
-    fun getAnalysisExpensesProductNewYearProject(
-        id: Long,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<AnalysisSaleBuyerAllTime>> // TODO Byer*/
+    /* @Query(
+         "SELECT title As buyer, COALESCE(SUM(price), 0) AS resultPrice,  COALESCE(SUM(count),0) AS resultCount, count_suffix as suffix" +
+                 " from expenses_table Where idPT=:id and DATE(printf('%04d-%02d-%02d', year, month, day)) BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY resultPrice DESC Limit 3"
+     )
+     fun getAnalysisExpensesProductNewYearProject(
+         id: Long,
+         dateBegin: String,
+         dateEnd: String
+     ): Flow<List<AnalysisSaleBuyerAllTime>> // TODO Byer*/
 
-   /* @Query(
-        "SELECT COALESCE(SUM(price),0) AS price" +
-                " FROM expenses_table" +
-                " WHERE DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
-    )//0 = price
-    fun getAnalysisExpensesNewYear(
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<Double>*/
+    /* @Query(
+         "SELECT COALESCE(SUM(price),0) AS price" +
+                 " FROM expenses_table" +
+                 " WHERE DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
+     )//0 = price
+     fun getAnalysisExpensesNewYear(
+         dateBegin: String,
+         dateEnd: String
+     ): Flow<Double>*/
 
     /*@Query("SELECT title As buyer," +
             " COALESCE(SUM(price), 0) AS resultPrice," +

@@ -18,6 +18,11 @@ data class AnimalWeightState(
     override val hasAnyError: Boolean
         get() = error.hasAnyError
 
+    fun enabledButton(): Boolean {
+        val isEnabled = domainAnimalWeight.weight.isNotBlank() && !hasAnyError
+        return !isEnabled
+    }
+
     data class Error(
         val isErrorWeight: Boolean = false
     ) : BaseError {

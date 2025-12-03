@@ -3,7 +3,6 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,11 +33,10 @@ import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
+import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_3
-import com.zaroslikov.fermacompose2.dark
 import com.zaroslikov.fermacompose2.gray_4
-import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_3
@@ -47,26 +46,18 @@ import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalParameter
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.IconAnimal
-import com.zaroslikov.fermacompose2.ui.animal.list_screen.TableAnimalParameter
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogArchiveAnimal
-import com.zaroslikov.fermacompose2.ui.elements.ButtonArchive
-import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.BigBorderButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorGradientCard
-import com.zaroslikov.fermacompose2.ui.elements.IconAndText
-import com.zaroslikov.fermacompose2.ui.elements.IconAndTextMore
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNoteWidget
-import com.zaroslikov.fermacompose2.ui.elements.TextAndIconRow
-import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
+import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
+import com.zaroslikov.fermacompose2.ui.elements.SecondAnimalCard
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
-import com.zaroslikov.fermacompose2.ui.elements.textBold_18
-import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.elements.text_20
-import com.zaroslikov.fermacompose2.ui.finance.analysis.PullOutCard
+import com.zaroslikov.fermacompose2.ui.finance.analysis.PullOutCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
@@ -104,7 +95,9 @@ fun AnimalCardProduct(
         }
     }
 
-    Scaffold(topBar = {
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
         TopAppBarStart(
             title = stringResource(R.string.animal_card_screen_animal_card),
             true,
@@ -141,7 +134,6 @@ fun AnimalCardContainer(
     onNavigateWeight: () -> Unit,
     onNavigateVaccination: () -> Unit,
 ) {
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -160,13 +152,20 @@ fun AnimalCardContainer(
             onNavigateVaccination = onNavigateVaccination
         )
         NoteWidget(state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
-        PullOutCard(
+        PullOutCardNew(
+            icon = R.drawable.baseline_analytics_24,
             intRes = R.string.animal_card_screen_animal_card_product,
             intTitleText = R.string.alert_dialog_info_title_product_add,
             intText = R.string.alert_dialog_info_text_product_add,
-            list = state.productList
-        ) {
-            it.title to "${it.count.formatNumber()} ${stringResource(it.suffix.toResId())}"
+            list = state.productList,
+            primalColor = animal_1
+        ) { item, index ->
+            ProductKillInfoCard(
+                number = index + 1,
+                name = item.title,
+                value = item.count.toString(),
+                suffix = item.suffix
+            )
         }
         /*PullOutCard(
             intRes = R.string.animal_card_screen_animal_card_product_sale,
@@ -185,7 +184,10 @@ fun AnimalCardContainer(
            ) {
                Pair(it.title, "${it.priceAll} ${it.suffix}")
            }*/
-        ButtonArchive { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(true)) }
+        BigBorderButton(
+            icon = R.drawable.baseline_archive_24,
+            text = R.string.button_archive
+        ) { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(true)) }
         if (state.isOpenArchiveDialog)
             AlertDialogArchiveAnimal(
                 onConfirmation = { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(false)) },
@@ -261,7 +263,7 @@ private fun DataCardOne(
                         iconColorSecond = Color(0xFFFEFCE8)
                     )
                     AnimalParameter(
-                        titleParameter =  R.string.search_section,
+                        titleParameter = R.string.search_section,
                         parameter = "$price",
                         icon = R.drawable.baseline_add_card_24,
                         iconColor = price_green,
@@ -330,13 +332,10 @@ private fun DataCardTwo(
     onNavigateWeight: () -> Unit,
     onNavigateVaccination: () -> Unit
 ) {
-    CardFieldNew(
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+    SecondAnimalCard(
+        icon = R.drawable.baseline_pets_24,
+        intRes = R.string.animal_card_screen_animal_card_two
     ) {
-        Text(
-            text = stringResource(R.string.animal_card_screen_animal_card_two),
-            style = text_20
-        )
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -389,12 +388,18 @@ private fun NoteWidget(
     note: String,
     updateNote: (String) -> Unit
 ) {
-    OutlinedTextNoteNew(
-        value = note,
-        onValueChange = { updateNote(it) },
-        isBorderCard = false,
-        label = R.string.card_note,
-        supportingText = R.string.support_text_widget_animal_note_tooltip
-    )
+    SecondAnimalCard(
+        icon = R.drawable.baseline_sticky_note_2_24,
+        intRes = R.string.outlined_text_note,
+    ) {
+        OutlinedTextNoteNew(
+            value = note,
+            onValueChange = { updateNote(it) },
+            leadingIconRes = null,
+            labelIntRes = null,
+            supportingText = R.string.support_text_widget_animal_note_tooltip,
+            isBorderCard = false
+        )
+    }
 }
 

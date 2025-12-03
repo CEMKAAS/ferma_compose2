@@ -108,7 +108,7 @@ fun ButtonPanelNew(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             CloseButton(
-                text = stringResource(R.string.button_cancel),
+                text = R.string.button_cancel,
                 onClick = onClickClose,
                 modifier = Modifier.weight(1f)
             )

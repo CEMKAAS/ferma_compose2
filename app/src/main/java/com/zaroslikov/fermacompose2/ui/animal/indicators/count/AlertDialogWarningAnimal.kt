@@ -3,7 +3,6 @@ package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.zaroslikov.fermacompose2.R

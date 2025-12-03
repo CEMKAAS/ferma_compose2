@@ -2,83 +2,33 @@
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
-import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButtonMenu
-import androidx.compose.material3.FloatingActionButtonMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleFloatingActionButton
-import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isShiftPressed
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.CustomAccessibilityAction
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.customActions
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.traversalIndex
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.supportFun.dateToday
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
-import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
-import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.animal.indicators.size.HeadingIndicators
+import com.zaroslikov.fermacompose2.supportFun.toIndicationStatus
+import com.zaroslikov.fermacompose2.ui.animal.indicators.AnimalCountCardNew
+import com.zaroslikov.fermacompose2.ui.animal.indicators.InventoryAnimalBody
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
-import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.FabMenu2
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.elements.textBold_16
-import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated2
-import com.zaroslikov.fermacompose2.ui.elements.textBuildIndicatorsAnnotated3
-import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
 object AnimalCountDestination : NavigationDestination {
     override val route = "animalCount"
@@ -95,11 +45,13 @@ fun AnimalCountScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val title = R.string.count_screen_title
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = R.string.count_screen_title,
+                intRes = title,
                 scrollBehavior = scrollBehavior,
                 navigateUp = navigateBack
             )
@@ -107,18 +59,7 @@ fun AnimalCountScreen(
         floatingActionButton = {
             FabMenu2(
                 isListEmpty = state.countList.isNotEmpty(),
-                onClick = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.DialogClicked(
-                            true,
-                            DomainAnimalCountPrice(
-                                version = it.first,
-                                date = dateToday()
-                            ),
-                            isKillAnimalSheet = it.second
-                        )
-                    )
-                }
+                onClick = { viewModel.onIntent(AnimalCountIntent.DialogClicked(true, it)) }
             )
         }
     ) { innerPadding ->
@@ -127,79 +68,72 @@ fun AnimalCountScreen(
                 modifier = Modifier.padding(innerPadding),
             )
         else
-            AnimalCountContainer(
+            AnimalCountContainer2(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
-                state = state,
-                onIntent = viewModel::onIntent
+                titleRes = title,
+                itemList = state.countList,
+                onInsertClick = { TODO() },
+                onEditClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DialogClicked(false, item = it)
+                    )
+                },
+                onDeleteClick = {
+                    viewModel.onIntent(
+                        AnimalCountIntent.DeleteCountPressed(
+                            it.first,
+                            it.second
+                        )
+                    )
+                },
+                /*  onDetailClick = { viewModel.updateDetailCardKill(it) }*/
             )
 
         if (state.isOpenDialog) {
             Log.i("count23", "AnimalCountScreen: ${state.currentAnimal.count} ")
-            when (state.domainAnimalCountPrice.version) {
+            when (state.currentProduct.version) {
                 AnimalCountVersion.SALE ->
                     BottomSheetSaleAnimal(
-                        state = state.domainAnimalCountPrice,
-                        errorState = state.error,
+                        state = state.currentProduct,
                         onIntent = viewModel::onIntent,
-                        isEntry = state.isEntry,
-                        isAutoPrice = state.isAutoPrice,
                         countAllAnimal = state.currentAnimal.count,
-                        buyerList = state.buyerList,
-                        price = state.price,
-                        priceAll = state.priceAll
                     )
 
                 AnimalCountVersion.EXPENSES ->
                     BottomSheetExpensesAnimal(
-                        state = state.domainAnimalCountPrice,
-                        errorState = state.error,
-                        isEntry = state.isEntry,
-                        isAutoPrice = state.isAutoPrice,
+                        state = state.currentProduct,
                         countAllAnimal = state.currentAnimal.count,
                         countSuffix = state.currentAnimal.suffix,
                         onIntent = viewModel::onIntent,
-                        price = state.price,
-                        priceAll = state.priceAll
                     )
 
                 AnimalCountVersion.KILL ->
                     BottomSheetKillAnimal(
-                        state = state.domainAnimalCountPrice,
+                        state = state.currentProduct,
                         onIntent = viewModel::onIntent,
-                        errorState = state.error,
-                        productKill = state.productKill,
-                        titleList = state.titleList,
+                        productKill = state.currentProduct.productKillList,
                         isAnimalGroup = true,
                         countAnimalAll = state.currentAnimal.count,
                         countSuffix = state.currentAnimal.suffix,
                         weight = state.weight,
-                        isEntry = state.isEntry
                     )
 
                 AnimalCountVersion.WRITE_OFF ->
                     BottomSheetWriteOffAnimal(
-                        state = state.domainAnimalCountPrice,
-                        errorState = state.error,
-                        isEntry = state.isEntry,
-                        isAutoPrice = state.isAutoPrice,
+                        state = state.currentProduct,
                         countAllAnimal = state.currentAnimal.count,
                         countSuffix = state.currentAnimal.suffix,
                         onIntent = viewModel::onIntent,
-                        price = state.price,
-                        priceAll = state.priceAll
                     )
 
                 AnimalCountVersion.ADD ->
                     BottomSheetAddAnimal(
-                        state = state.domainAnimalCountPrice,
-                        errorState = state.error,
-                        isEntry = state.isEntry,
+                        state = state.currentProduct,
                         countAllAnimal = state.currentAnimal.count,
                         onIntent = viewModel::onIntent
                     )
 
                 AnimalCountVersion.INCUBATOR -> TODO()
-                null -> TODO()
             }
         }
         if (state.openSoloDialog)
@@ -228,109 +162,44 @@ fun AnimalCountScreen(
     }
 }
 
-@SuppressLint("RememberInComposition")
 @Composable
-fun FabMenu2(
-    isListEmpty: Boolean,
-    onClick: (Pair<AnimalCountVersion, Boolean>) -> Unit
+private fun AnimalCountContainer2(
+    modifier: Modifier,
+    @StringRes titleRes: Int,
+    itemList: List<DomainAnimalCountPriceUi>,
+    onInsertClick: () -> Unit,
+    onEditClick: (DomainAnimalCountPriceUi) -> Unit,
+    onDeleteClick: (Pair<Long, Boolean>) -> Unit,
 ) {
-    val items =
-        listOf(
-            Triple(R.drawable.icons8__meat60, R.string.button_kill, AnimalCountVersion.KILL),
-            Triple(
-                R.drawable.baseline_add_shopping_cart_24, R.string.button_expenses,
-                AnimalCountVersion.EXPENSES
-            ),
-            Triple(
-                R.drawable.baseline_edit_note_24, R.string.button_write_off,
-                AnimalCountVersion.WRITE_OFF
-            ),
-            Triple(R.drawable.baseline_add_card_24, R.string.button_sale, AnimalCountVersion.SALE),
-            Triple(R.drawable.icon_add, R.string.button_add, AnimalCountVersion.ADD)
+    InventoryAnimalBody(
+        modifier = modifier,
+        itemList = itemList,
+        onInsertClick = onInsertClick,
+        titleRes2 = titleRes,
+        titleRes = R.string.message_no_date_title_count,
+        messageRes = R.string.message_no_date_message_count,
+        supportRes = R.string.message_no_date_support_count,
+        buttonRes = R.string.button_sale_message_no_count
+    ) { item, previous ->
+        AnimalCountCardNew(
+            icon = item.version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
+            colors = item.version?.toColorList() ?: AnimalCountVersion.ADD.toColorList(),
+            value = item.count,
+            suffix = item.suffix,
+            price = item.priceAll ?: item.price,
+            date = item.date,
+            note = item.note,
+            onEditClick = { onEditClick(item) },
+            onDeleteClick = { onDeleteClick(item.id to (item.version == AnimalCountVersion.KILL)) },
+            indicationStatus = item.version?.toIndicationStatus()
+                ?: AnimalCountVersion.ADD.toIndicationStatus(),
+            productKill = item.productKill
         )
-    var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    val focusRequester = FocusRequester()
-    FloatingActionButtonMenu(
-        expanded = fabMenuExpanded,
-        button = {
-            ToggleFloatingActionButton(
-                modifier =
-                    Modifier
-                        .semantics {
-                            traversalIndex = -1f
-                            stateDescription =
-                                if (fabMenuExpanded) "Expanded" else "Collapsed"
-                            contentDescription = "Toggle menu"
-                        }
-                        .animateFloatingActionButton(
-                            visible = isListEmpty || fabMenuExpanded,
-                            alignment = Alignment.BottomEnd,
-                        )
-                        .focusRequester(focusRequester),
-                checked = fabMenuExpanded,
-                onCheckedChange = { fabMenuExpanded = !fabMenuExpanded },
-            ) {
-                val imageVector by remember {
-                    derivedStateOf {
-                        if (checkedProgress > 0.5f) R.drawable.baseline_clear_24 else R.drawable.icon_add
-
-                    }
-                }
-                Icon(
-                    painter = painterResource(imageVector),
-                    contentDescription = null,
-                    modifier = Modifier.animateIcon({ checkedProgress }),
-                )
-            }
-        },
-        content = {
-            items.forEachIndexed { i, item ->
-                FloatingActionButtonMenuItem(
-                    modifier =
-                        Modifier
-                            .semantics {
-                                isTraversalGroup = true
-                                if (i == items.size - 1) {
-                                    customActions =
-                                        listOf(
-                                            CustomAccessibilityAction(
-                                                label = "Close menu",
-                                                action = {
-                                                    fabMenuExpanded = false
-                                                    true
-                                                }
-                                            )
-                                        )
-                                }
-                            }
-                            .then(
-                                if (i == 0) {
-                                    Modifier.onKeyEvent {
-                                        if (
-                                            it.type == KeyEventType.KeyDown &&
-                                            (it.key == Key.DirectionUp ||
-                                                    (it.isShiftPressed && it.key == Key.Tab))
-                                        ) {
-                                            focusRequester.requestFocus()
-                                            return@onKeyEvent true
-                                        }
-                                        return@onKeyEvent false
-                                    }
-                                } else Modifier
-                            ),
-                    onClick = {
-                        onClick(item.third to (i == 0))
-                        fabMenuExpanded = false
-                    },
-                    icon = { Icon(painterResource(item.first), contentDescription = null) },
-                    text = { Text(stringResource(item.second)) },
-                )
-            }
-        }
-    )
+    }
 }
 
-@Composable
+
+/*@Composable
 private fun AnimalCountContainer(
     modifier: Modifier = Modifier,
     state: AnimalCountState,
@@ -349,9 +218,9 @@ private fun AnimalCountContainer(
         supportRes = R.string.message_no_date_support_count,
         buttonRes = R.string.button_sale_message_no_count
     )
-}
+}*/
 
-@Composable
+/*@Composable
 private fun VaccinationList2(
     modifier: Modifier,
     indicatorsList: List<DomainAnimalCountPrice>,
@@ -373,159 +242,5 @@ private fun VaccinationList2(
             )
         }
     }
-}
+}*/
 
-@Composable
-private fun CountCard(
-    modifier: Modifier = Modifier,
-    domainAnimalCount: DomainAnimalCountPrice,
-    previousDomainAnimalCount: DomainAnimalCountPrice?
-) {
-    var details by rememberSaveable { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (details) 0.dp else 2.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-    CardField(
-        modifier = modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-        row = false
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.weight(0.2f),
-                painter = painterResource(
-                    domainAnimalCount.version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes()
-                ),
-                contentDescription = null
-            )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "${domainAnimalCount.count.toFormatNumber()} " +
-                        stringResource(domainAnimalCount.suffix.toResId()),
-                style = textBold_16,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = domainAnimalCount.date,
-                style = textBold_16,
-                textAlign = TextAlign.Center
-            )
-            IconButton(
-                modifier = Modifier.weight(0.25f),
-                onClick = { details = !details }
-            ) {
-                Icon(
-                    painterResource(if (details) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
-                    contentDescription = null
-                )
-            }
-        }
-        if (details)
-            DetailsCount(
-                domainAnimalCount,
-                previousDomainAnimalCount
-            )
-    }
-}
-
-@Composable
-private fun DetailsCount(
-    domainAnimalCount: DomainAnimalCountPrice,
-    previousDomainAnimalCount: DomainAnimalCountPrice?
-) {
-    val context = LocalContext.current
-
-    val totalValue = domainAnimalCount.count.toConvertZeroDouble().formatNumber()
-//    val previousCount = previousDomainAnimalCount?.count?.toConvertZeroDouble()
-
-    val price = domainAnimalCount.price
-    val buyer = domainAnimalCount.buyer
-
-    val suffix = domainAnimalCount.suffix
-    val note =
-        if (domainAnimalCount.note != "") "\n${stringResource(R.string.card_note)} ${domainAnimalCount.note}" else ""
-
-    /*val totalValue = when {
-        count == previousCount || previousCount == null -> count.formatNumber()
-        else -> count.absoluteValue.formatNumber()
-    }*/
-
-    Row {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = when (domainAnimalCount.version) {
-                AnimalCountVersion.SALE ->
-                    textBuildIndicatorsAnnotated3(
-                        context = context,
-                        intRes = R.string.animal_card_screen_sale_note_expenses,
-                        totalValue = totalValue,
-                        price = price,
-                        suffix = suffix,
-                        buyer = buyer
-                            ?: stringResource(R.string.animal_card_screen_sale_note_no_buyer),
-                        isPlus = false,
-                        note = note
-                    )
-
-                AnimalCountVersion.KILL -> textBuildIndicatorsAnnotated2(
-                    context = context,
-                    intRes = R.string.animal_card_screen_kill_note,
-                    totalValue = totalValue,
-                    suffix = suffix,
-                    isPlus = false,
-                    note = note
-                )
-
-                AnimalCountVersion.WRITE_OFF -> textBuildIndicatorsAnnotated3(
-                    context = context,
-                    intRes = if (price == null) R.string.animal_card_screen_write_off_note_count else R.string.animal_card_screen_write_off_note_expenses,
-                    totalValue = totalValue,
-                    price = price,
-                    suffix = suffix,
-                    isPlus = false,
-                    note = note
-                )
-
-                AnimalCountVersion.EXPENSES ->
-                    textBuildIndicatorsAnnotated3(
-                        context = context,
-                        intRes = R.string.animal_card_screen_add_note_expenses,
-                        totalValue = totalValue,
-                        suffix = suffix,
-                        price = price,
-                        isPlus = true,
-                        note = note
-                    )
-
-                AnimalCountVersion.ADD -> textBuildIndicatorsAnnotated2(
-                    context = context,
-                    intRes = R.string.animal_card_screen_add_note_count,
-                    totalValue = totalValue,
-                    suffix = suffix,
-                    isPlus = true,
-                    note = note
-                )
-
-                else -> textBuildIndicatorsAnnotated2(
-                    context = context,
-                    intRes = R.string.animal_indicators_animals_count_increased_note,
-                    totalValue = totalValue,
-                    suffix = suffix,
-                    isPlus = true,
-                    note = note
-                )
-            },
-            style = text_16,
-            textAlign = TextAlign.Start
-        )
-    }
-}

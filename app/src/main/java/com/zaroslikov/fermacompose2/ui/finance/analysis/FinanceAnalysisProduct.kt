@@ -1,12 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.finance.analysis
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -14,30 +18,43 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarCalendar
+import com.zaroslikov.fermacompose2.dark
 import com.zaroslikov.fermacompose2.supportFun.dateLongToString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardField
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
+import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
+import com.zaroslikov.fermacompose2.ui.elements.SecondAnimalCard
 import com.zaroslikov.fermacompose2.ui.elements.TextAndIconRow
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
+import com.zaroslikov.fermacompose2.ui.elements.text_14
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.HeadingAnimalCard
 import com.zaroslikov.fermacompose2.ui.finance.month.FinanceMonthIntent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import io.appmetrica.analytics.AppMetrica
@@ -368,6 +385,74 @@ fun <T> PullOutCard(
     }
 }
 
+@Composable
+fun <T> PullOutCardNew(
+    modifier: Modifier = Modifier,
+    @DrawableRes icon: Int,
+    @StringRes intRes: Int,
+    @StringRes intTitleText: Int,
+    @StringRes intText: Int,
+    primalColor: Color,
+    list: List<T>,
+    detailCard: @Composable (T, Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val extraPadding by animateDpAsState(
+        if (expanded) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+
+    var openAlertDialog by remember { mutableStateOf(false) }
+    if (openAlertDialog) {
+        AlertDialogInfo(
+            onConfirmation = { openAlertDialog = false },
+            intTitleText = intTitleText,
+            intText = intText
+        )
+    }
+
+    SecondAnimalCard(
+        icon = icon,
+        intRes = intRes
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (list.isNotEmpty()) {
+                for (i in list.indices) {
+                    detailCard(list[i], i)
+                    if (i == 2 && !expanded)
+                        break
+                }
+            } else Text(text = stringResource(R.string.analysis_screen_no))
+        }
+        if (list.size > 3)
+            TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        if (expanded) stringResource(R.string.button_wrap) else
+                            stringResource(R.string.animal_card_screen_show_product_all).format(
+                                list.size
+                            ),
+                        style = text_14,
+                        color = primalColor
+                    )
+                    Icon(
+                        if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Показать меню",
+                        tint = primalColor
+                    )
+                }
+            }
+    }
+}
 
 
 

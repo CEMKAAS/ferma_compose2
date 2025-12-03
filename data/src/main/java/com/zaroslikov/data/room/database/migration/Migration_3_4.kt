@@ -45,8 +45,9 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             CREATE TABLE IF NOT EXISTS animal_vaccination_table(
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 vaccination TEXT NOT NULL,
+                count_vaccination INTEGER NOT NULL,
                 date TEXT NOT NULL,
-                next_vaccination TEXT NOT NULL,
+                next_vaccination TEXT,
                 animal_id INTEGER NOT NULL,
                 note TEXT NOT NULL,
                 FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE CASCADE,
@@ -57,10 +58,10 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             """
             INSERT INTO animal_vaccination_table(
-                id, vaccination, date, next_vaccination, animal_id, note
+                id, vaccination, count_vaccination, date, next_vaccination, animal_id, note
             )
             SELECT
-                id, vaccination, date, nextVaccination, idAnimal, ''
+                id, vaccination, 1, date, nextVaccination, idAnimal, ''
             FROM AnimalVaccinationTable
         """.trimIndent()
         )
@@ -211,6 +212,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 count_suffix INTEGER NOT NULL,
                 price REAL,
                 price_all REAL,
+                category NOT NULL,
                 day INTEGER NOT NULL,
                 month INTEGER NOT NULL,
                 year INTEGER NOT NULL,
@@ -228,10 +230,10 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             """
             INSERT INTO write_off_table (
-                _id, title, count, count_suffix, price, price_all, day, month, year,
+                _id, title, count, count_suffix, price, price_all, category, day, month, year,
                 status, note, idPT, animal_count_id
             )
-            SELECT _id, titleWRITEOFF, discWRITEOFF, suffix, priceAll, NULL, DAY, MOUNT, YEAR,
+            SELECT _id, titleWRITEOFF, discWRITEOFF, suffix, priceAll, 'Прочее' NULL, DAY, MOUNT, YEAR,
                 statusWRITEOFF, note, idPT, NUll
             FROM MyFermaWRITEOFF
         """.trimIndent()

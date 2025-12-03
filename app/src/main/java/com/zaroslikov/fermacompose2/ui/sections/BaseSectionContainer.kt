@@ -2,32 +2,32 @@
 
 package com.zaroslikov.fermacompose2.ui.sections
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,12 +35,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.black_1
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
-import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import com.zaroslikov.fermacompose2.ui.elements.TextLine
 import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.textBold_20
+import com.zaroslikov.fermacompose2.ui.elements.text_12
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
@@ -103,7 +110,7 @@ private fun <T, B> InventoryList(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(top = 8.dp),
+        contentPadding = PaddingValues(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (details)
@@ -166,15 +173,17 @@ fun <T> BrieflyBottomSheetUniversal(
 
 
 @Composable
-fun EntryBottomSheet(
+fun EntryIndicationBottomSheet(
     modifier: Modifier = Modifier,
+    @DrawableRes icon: Int,
+    @StringRes titleRes: Int,
     isEntry: Boolean,
     enabledButton: Boolean,
     colors: List<Color>,
     onDismissRequest: () -> Unit,
     onInsertClick: () -> Unit,
     onUpdateClick: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
+    scrollableContent: @Composable ColumnScope.() -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
@@ -187,30 +196,62 @@ fun EntryBottomSheet(
                 .fillMaxHeight()
         ) {
             Column(
-                modifier = Modifier.modifierBottomSheet(true),
+                modifier = Modifier.modifierBottomSheet(false),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        TextLine(
-                            modifier = Modifier.weight(1f),
-                            valueString = "Добавить продуцию",
-                            textStyle = textBold_20
+                        IconIndicatorsAnimal(
+                            icon = icon,
+                            colors = colors
                         )
-                        IconButton(onClick = onDismissRequest) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close"
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                stringResource(titleRes),
+                                style = if (isEntry) text_20 else text_16,
+                                color = black_1
                             )
+                            if (!isEntry)
+                                Text(
+                                    stringResource(R.string.animal_indicators_mode_edit),
+                                    style = text_12,
+                                    color = gray_7
+                                )
                         }
                     }
-                    Text(text = "Введите информацию о новой продукции")
+                    IconButton(
+                        onClick = onDismissRequest,
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = null,
+                            tint = marengo
+                        )
+                    }
                 }
-                content()
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = gray_6
+                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    scrollableContent()
+                }
             }
             ButtonPanelNew(
                 modifier = Modifier

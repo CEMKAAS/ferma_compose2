@@ -14,6 +14,10 @@ val textBold_28: TextStyle
         fontWeight = FontWeight.SemiBold,
         fontSize = 28.sp,
     )
+val text_36: TextStyle
+    @Composable get() = TextStyle(
+        fontSize = 36.sp,
+    )
 
 val textBold_20: TextStyle
     @Composable get() = TextStyle(
@@ -55,6 +59,11 @@ val text_20_justify: TextStyle
 val text_20: TextStyle
     @Composable get() = TextStyle(
         fontSize = 20.sp,
+    )
+
+val text_18: TextStyle
+    @Composable get() = TextStyle(
+        fontSize = 18.sp
     )
 
 val text_16: TextStyle

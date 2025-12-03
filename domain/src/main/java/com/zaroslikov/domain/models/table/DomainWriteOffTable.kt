@@ -1,5 +1,6 @@
 package com.zaroslikov.domain.models.table
 
+import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 
 
@@ -10,6 +11,7 @@ data class DomainWriteOffTable(
     val countSuffix: Suffix,
     val price: Double? = null,
     val priceAll: Double? = null,
+    val category: String = "",
     val day: Int,
     val month: Int,
     val year: Int,

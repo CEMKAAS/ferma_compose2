@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.DomainSaleTable
+import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
@@ -22,14 +23,12 @@ import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
-import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
 import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.animal.indicators.count.AnimalCountState.ProductKill
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,11 +54,25 @@ class AnimalCountViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
     private val resourceProvider: ResourceProvider,
     private val warehouseRepository: WarehouseRepository
-) : ListViewModel<AnimalCountState, AnimalCountIntent>(AnimalCountState()) {
+) : EntryNewViewModel<AnimalCountState, AnimalCountIntent>(AnimalCountState()) {
 
     private val itemId: Long = checkNotNull(savedStateHandle[AnimalCountDestination.itemId])
     private val itemIdPT: Long = checkNotNull(savedStateHandle[AnimalCountDestination.itemIdPT])
     private var confirmDelete = CompletableDeferred<Boolean?>()
+    override fun insert() {
+        TODO("Not yet implemented")
+    }
+
+    override fun update() {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(id: Long) {
+        TODO("Not yet implemented")
+    }
+    override fun validation() {
+        TODO("Not yet implemented")
+    }
 
     init {
         viewModelScope.launch {
@@ -67,7 +80,7 @@ class AnimalCountViewModel @Inject constructor(
         }
     }
 
-    fun onIntent(intent: AnimalCountIntent) {
+    override fun onIntent(intent: AnimalCountIntent) {
         return when (intent) {
             // Animal Card
             is AnimalCountIntent.DialogSoloClicked -> updateSoloDialog(intent.value)
@@ -77,7 +90,7 @@ class AnimalCountViewModel @Inject constructor(
             // Open Bottom Sheet Animal
             is AnimalCountIntent.DialogClicked -> updateOpenDialog(
                 intent.isEntry,
-                intent.isKillAnimalSheet,
+                intent.version,
                 intent.item
             )
 
@@ -123,23 +136,18 @@ class AnimalCountViewModel @Inject constructor(
             AnimalCountIntent.UpdateExpensesPressed -> editExpensesAnimal()
 
             // Kill Count Animal
-            is AnimalCountIntent.TitleProductKillChanged -> updateTitleProductKill(
-                intent.index, intent.value
-            )
+            is AnimalCountIntent.TitleProductKillChanged -> updateTitleProductKill(intent.value)
 
-            is AnimalCountIntent.TitleAndSuffixKillClicked -> updateTitleAndSuffixProductKill(
-                intent.index, intent.pair
-            )
+            is AnimalCountIntent.TitleAndSuffixKillClicked -> updateTitleAndSuffixProductKill(intent.pair)
 
-            is AnimalCountIntent.CountProductKillChanged -> updateCountProductKill(
-                intent.index, intent.value
-            )
+            is AnimalCountIntent.CountProductKillChanged -> updateCountProductKill(intent.value)
 
-            is AnimalCountIntent.SuffixProductKillChanged -> updateSuffixProductKill(
-                intent.index, intent.value
-            )
+            is AnimalCountIntent.SuffixProductKillChanged -> updateSuffixProductKill(intent.value)
 
             AnimalCountIntent.AddProductKillChanged -> addProductKill()
+            is AnimalCountIntent.ChoiceProductKillChanged -> choiceProductKill(intent.index)
+            is AnimalCountIntent.CancelProductKillChanged -> cancelProductKill()
+            is AnimalCountIntent.EditProductKillChanged -> editProductKill()
             is AnimalCountIntent.RemoveProductKillChanged -> removeProductKill(intent.index)
 
             AnimalCountIntent.InsertKillChanged -> insertKillAnimal()
@@ -147,17 +155,21 @@ class AnimalCountViewModel @Inject constructor(
         }
     }
 
-
     suspend fun loadData() {
         updateState { it.copy(isLoading = true) }
         val weight = animalWeightRepository.getWeightAnimalLimit(itemId).first()
-        val titleList = addRepository.getItemsTitleAddList(itemIdPT).firstOrNull() ?: emptyList()
         combine(
             animalRepository.getAnimal(itemId),
             animalCountRepository.getCountAnimalLimit(itemId),
             animalCountRepository.getCountAnimal(itemId)
         ) { animal, count, countList ->
-            Triple(animal, count, countList)
+
+            val uiCountList = countList.map { item ->
+                val kills = updateOpenKillDialog(item.id)
+                item.toUi(productKill = kills)
+            }
+
+            Triple(animal, count, uiCountList)
         }.collectLatest { data ->
             Log.i("count23", "loadData: ${data.second}")
             updateState {
@@ -167,7 +179,6 @@ class AnimalCountViewModel @Inject constructor(
                     currentAnimal = data.second,
                     countList = data.third,
                     weight = weight,
-                    titleList = titleList,
                     isLoading = false
                 )
             }
@@ -177,35 +188,51 @@ class AnimalCountViewModel @Inject constructor(
     // Open Dialog
     private fun updateOpenDialog(
         isEntry: Boolean,
-        isKillAnimalSheet: Boolean = false,
-        domainAnimalCountPrice: DomainAnimalCountPrice
+        version: AnimalCountVersion,
+        domainAnimalCountPrice: DomainAnimalCountPriceUi?
     ) {
         viewModelScope.launch {
-            val oldCount = if (isEntry) "" else domainAnimalCountPrice.count
-            val price = domainAnimalCountPrice.price?.formatNumber(false) ?: ""
-            val priceAll = domainAnimalCountPrice.priceAll?.formatNumber(false) ?: ""
-            val isAutoPrice = domainAnimalCountPrice.priceAll != null
-            val finalProductKill =
-                if (isKillAnimalSheet) updateOpenKillDialog(domainAnimalCountPrice.id) else emptyList()
-            Log.i(
-                "count23",
-                "updateOpenDialog: isAutoPrice: $isAutoPrice, priceAll: ${domainAnimalCountPrice.priceAll}," +
-                        " finalProductKill: $finalProductKill, isKillAnimalSheet: $isKillAnimalSheet"
-            )
-            updateState {
-                it.copy(
+            updateState { state ->
+                state.copy(
                     isOpenDialog = true,
-                    isEntry = isEntry,
-                    price = price,
-                    priceAll = priceAll,
-                    isAutoPrice = isAutoPrice,
-                    domainAnimalCountPrice = domainAnimalCountPrice,
-                    oldCount = oldCount,
-                    productKill = finalProductKill
+                    currentProduct = state.currentProduct.copy(
+                        version = version,
+                        isEntry = isEntry
+                    )
                 )
+            }
+            domainAnimalCountPrice?.let { domain ->
+                val oldCount = domain.count
+
+                val pair: Pair<List<String>, List<TitleAndSuffixDomain>> =
+                    when (domain.version) {
+                        AnimalCountVersion.KILL -> {
+                            val titles = addRepository.getItemsTitleAddList(itemIdPT).first()
+                            Pair(emptyList(), titles)
+                        }
+
+                        AnimalCountVersion.SALE -> {
+                            val buyers = saleRepository.getItemsBuyerSaleList(itemIdPT).first()
+                            Pair(buyers, emptyList())
+                        }
+
+                        else -> Pair(emptyList(), emptyList())
+                    }
+
+                updateState { state ->
+                    state.copy(
+                        currentProduct = state.currentProduct.toUiMap22(
+                            domain,
+                            productKill = domain.productKill,
+                            pair.first, pair.second
+                        ),
+                        oldCount = oldCount,
+                    )
+                }
             }
         }
     }
+
 
     private suspend fun updateOpenKillDialog(idCount: Long): List<ProductKill> {
         val productList = addRepository.getProductKillList(idCount).first()
@@ -213,27 +240,33 @@ class AnimalCountViewModel @Inject constructor(
             ProductKill(
                 idProduct = add.id,
                 title = add.title,
+                isEntry = false,
                 countProduct = add.count.toString(), // Double -> String
                 suffixProduct = add.countSuffix
             )
         }
-        return if (mappedProducts.isEmpty()) listOf(ProductKill()) else mappedProducts
+        return if (mappedProducts.isEmpty()) emptyList() else mappedProducts
     }
 
     private fun updateEndDialog() {
         updateState {
             it.copy(
                 isOpenDialog = false,
-                domainAnimalCountPrice = DomainAnimalCountPrice(date = dateToday()),
-                error = AnimalCountState.Error(),
-                price = "",
-                priceAll = "",
-                isAutoPrice = false,
+                currentProduct = CountItem(),
                 openWarningDeleteAllDialog = WarningAnimalCount.MINUS
             )
         }
     }
 
+    private fun updateWeightDialog(value: Boolean) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(
+                    isOpenWeightDialog = value
+                )
+            )
+        }
+    }
 
     // Action Animal
     private fun updateCountActionAnimal(countAnimal: String) {
@@ -243,12 +276,12 @@ class AnimalCountViewModel @Inject constructor(
         ) else false*/
         updateState { state ->
             state.copy(
-                domainAnimalCountPrice = state.domainAnimalCountPrice.copy(
-                    count = countAnimal
-                ),
-                error = state.error.copy(
-                    isErrorCount = countAnimal.isBlank(),
-                    isErrorCountZero = isAnimalCountZero(countAnimal)
+                currentProduct = state.currentProduct.copy(
+                    count = countAnimal,
+                    error = state.currentProduct.error.copy(
+                        isErrorCount = countAnimal.isBlank(),
+                        isErrorCountZero = isAnimalCountZero(countAnimal)
+                    )
                 )
             )
         }
@@ -258,9 +291,11 @@ class AnimalCountViewModel @Inject constructor(
     private fun updatePriceActionAnimal(price: String) {
         updateState { state ->
             state.copy(
-                price = price,
-                error = state.error.copy(
-                    isErrorPrice = price.isBlank()
+                currentProduct = state.currentProduct.copy(
+                    price = price,
+                    error = state.currentProduct.error.copy(
+                        isErrorPrice = price.isBlank()
+                    )
                 )
             )
         }
@@ -270,7 +305,9 @@ class AnimalCountViewModel @Inject constructor(
     private fun updateAutoPriceActionAnimal(isAutoPrice: Boolean) {
         updateState { state ->
             state.copy(
-                isAutoPrice = isAutoPrice
+                currentProduct = state.currentProduct.copy(
+                    isAutoCalculate = isAutoPrice
+                )
             )
         }
         updatePriceAllActionAnimal()
@@ -279,7 +316,7 @@ class AnimalCountViewModel @Inject constructor(
     private fun updateDateActionAnimal(date: String) {
         updateState { state ->
             state.copy(
-                domainAnimalCountPrice = state.domainAnimalCountPrice.copy(
+                currentProduct = state.currentProduct.copy(
                     date = date
                 )
             )
@@ -289,7 +326,7 @@ class AnimalCountViewModel @Inject constructor(
     private fun updateNoteActionAnimal(note: String) {
         updateState { state ->
             state.copy(
-                domainAnimalCountPrice = state.domainAnimalCountPrice.copy(
+                currentProduct = state.currentProduct.copy(
                     note = note
                 )
             )
@@ -299,8 +336,10 @@ class AnimalCountViewModel @Inject constructor(
     private fun updatePriceAllActionAnimal() {
         updateState {
             it.copy(
-                priceAll = if (it.isAutoPrice) (it.price.toConvertZeroDouble() * it.domainAnimalCountPrice.count.toConvertZeroDouble()).formatNumber()
-                else "0"
+                currentProduct = it.currentProduct.copy(
+                    priceAll = if (it.currentProduct.isAutoCalculate) (it.currentProduct.price.toConvertZeroDouble() * it.currentProduct.count.toConvertZeroDouble()).formatNumber()
+                    else "0"
+                )
             )
         }
     }
@@ -321,12 +360,12 @@ class AnimalCountViewModel @Inject constructor(
     private fun updateCountAdd(countAnimal: String) {
         updateState { state ->
             state.copy(
-                domainAnimalCountPrice = state.domainAnimalCountPrice.copy(
-                    count = countAnimal
-                ),
-                error = state.error.copy(
-                    isErrorCount = countAnimal.isBlank(),
-                    isErrorCountZero = isAnimalCountZero(countAnimal)
+                currentProduct = state.currentProduct.copy(
+                    count = countAnimal,
+                    error = state.currentProduct.error.copy(
+                        isErrorCount = countAnimal.isBlank(),
+                        isErrorCountZero = isAnimalCountZero(countAnimal)
+                    )
                 )
             )
         }
@@ -335,7 +374,7 @@ class AnimalCountViewModel @Inject constructor(
     fun insertAddAnimal() {
         viewModelScope.launch {
             validationAdd()
-            if (getState().hasAnyError) {
+            if (getState().currentProduct.hasAnyError) {
                 animalCountRepository.insertAnimalCountTable(domainAnimalCount())
                 animalRepository.updateAnimalTable(getState().animal.copy(group = true))
                 updateEndDialog()
@@ -358,7 +397,7 @@ class AnimalCountViewModel @Inject constructor(
     private fun updateBuyerSale(buyer: String) {
         updateState { state ->
             state.copy(
-                domainAnimalCountPrice = state.domainAnimalCountPrice.copy(
+                currentProduct = state.currentProduct.copy(
                     buyer = buyer
                 )
             )
@@ -370,7 +409,8 @@ class AnimalCountViewModel @Inject constructor(
             validation = { validationSaleExpenses() },
             transaction = Transaction.INSERT,
             mainAction = {
-                val countId = animalCountRepository.insertAnimalCountTable(domainAnimalCount())
+                val countId =
+                    animalCountRepository.insertAnimalCountTable(domainAnimalCount())
                 saleRepository.insertSale(domainSale(countId))
             }
         )
@@ -383,7 +423,10 @@ class AnimalCountViewModel @Inject constructor(
             mainAction = {
                 animalCountRepository.updateAnimalCountTable(domainAnimalCount())
                 saleRepository.updateSale(domainSale())
-                Log.i("count23", "editSaleAnimal: DomainAnimalCount: ${domainAnimalCount()}")
+                Log.i(
+                    "count23",
+                    "editSaleAnimal: DomainAnimalCount: ${domainAnimalCount()}"
+                )
                 Log.i("count23", "editSaleAnimal: DomainSale: ${domainSale()}")
             }
         )
@@ -438,13 +481,17 @@ class AnimalCountViewModel @Inject constructor(
             validation = { validationKill() },
             transaction = Transaction.INSERT,
             isWarningMinus = null,
-            isKillValidation = true
         ) {
-            val productList = getState().productKill
+            val productList = getState().currentProduct.productKillList
             val countId =
                 animalCountRepository.insertAnimalCountTable(domainAnimalCount())
             Log.i("count23", "insertKillAnimal: insertAnimalCountTable Yes")
-            writeOffRepository.insertWriteOff(domainWriteOff(countId, reasonNote(productList)))
+            writeOffRepository.insertWriteOff(
+                domainWriteOff(
+                    countId,
+                    reasonNote(productList)
+                )
+            )
             Log.i("count23", "insertKillAnimal: insertWriteOffAnimal Yes")
             productList.forEach { product ->
                 addRepository.insertAdd(domainAdd(product, countId))
@@ -457,10 +504,9 @@ class AnimalCountViewModel @Inject constructor(
         validation(
             validation = { validationKill() },
             transaction = Transaction.UPDATE,
-            isWarningMinus = false,
-            isKillValidation = true
+            isWarningMinus = false
         ) {
-            val productList = getState().productKill
+            val productList = getState().currentProduct.productKillList
             animalCountRepository.updateAnimalCountTable(domainAnimalCount())
             writeOffRepository.updateWriteOff(domainWriteOff(note = reasonNote(productList)))
             productList.forEach { product ->
@@ -490,45 +536,40 @@ class AnimalCountViewModel @Inject constructor(
     }
 
     // Kill Animal Count
-    private fun updateTitleProductKill(index: Int, newTitle: String) {
+    private fun updateTitleProductKill(newTitle: String) {
         viewModelScope.launch {
             val warehouseList = updateWarehouseUiStateSync(newTitle)
             updateState { state ->
                 state.copy(
-                    productKill = state.productKill.mapIndexed { i, item ->
-                        if (i == index)
-                            item.copy(
-                                title = newTitle,
-                                error = item.error.copy(
-                                    isError = newTitle.isBlank(),
-                                    isErrorSlash = newTitle.isSlash()
-                                ),
-                                warehouseList = warehouseList
-                            )
-                        else item
-                    }
+                    currentProduct = state.currentProduct.copy(
+                        currentProduct = state.currentProduct.currentProduct.copy(
+                            title = newTitle,
+                            error = state.currentProduct.currentProduct.error.copy(
+                                isError = newTitle.isBlank(),
+                                isErrorSlash = newTitle.isSlash()
+                            ),
+                            warehouseList = warehouseList
+                        )
+                    )
                 )
             }
         }
     }
 
     private fun updateTitleAndSuffixProductKill(
-        index: Int,
         newTitleAndSuffix: Pair<String, Suffix>
     ) {
         viewModelScope.launch {
             val warehouseList = updateWarehouseUiStateSync(newTitleAndSuffix.first)
             updateState { state ->
                 state.copy(
-                    productKill = state.productKill.mapIndexed { i, item ->
-                        if (i == index)
-                            item.copy(
-                                title = newTitleAndSuffix.first,
-                                suffixProduct = newTitleAndSuffix.second,
-                                warehouseList = warehouseList
-                            )
-                        else item
-                    }
+                    currentProduct = state.currentProduct.copy(
+                        currentProduct = state.currentProduct.currentProduct.copy(
+                            title = newTitleAndSuffix.first,
+                            suffixProduct = newTitleAndSuffix.second,
+                            warehouseList = warehouseList
+                        )
+                    )
                 )
             }
         }
@@ -540,30 +581,29 @@ class AnimalCountViewModel @Inject constructor(
             .firstOrNull() ?: emptyList()
     }
 
-    private fun updateCountProductKill(index: Int, newCount: String) {
+    private fun updateCountProductKill(newCount: String) {
         updateState { state ->
             state.copy(
-                productKill = state.productKill.mapIndexed { i, item ->
-                    if (i == index)
-                        item.copy(
-                            countProduct = newCount,
-                            error = item.error.copy(
-                                isErrorCount = newCount.isBlank(),
-                            )
+                currentProduct = state.currentProduct.copy(
+                    currentProduct = state.currentProduct.currentProduct.copy(
+                        countProduct = newCount,
+                        error = state.currentProduct.currentProduct.error.copy(
+                            isErrorCount = newCount.isBlank(),
                         )
-                    else item
-                }
+                    )
+                )
             )
         }
     }
 
-    private fun updateSuffixProductKill(index: Int, newSuffix: Suffix) {
+    private fun updateSuffixProductKill(newSuffix: Suffix) {
         updateState { state ->
             state.copy(
-                productKill = state.productKill.mapIndexed { i, item ->
-                    if (i == index) item.copy(suffixProduct = newSuffix)
-                    else item
-                }
+                currentProduct = state.currentProduct.copy(
+                    currentProduct = state.currentProduct.currentProduct.copy(
+                        suffixProduct = newSuffix
+                    )
+                )
             )
         }
     }
@@ -571,8 +611,56 @@ class AnimalCountViewModel @Inject constructor(
     private fun addProductKill() {
         updateState { state ->
             state.copy(
-                productKill = state.productKill + ProductKill(
-                    suffixProduct = getState().weight?.suffix ?: Suffix.KILOGRAM
+                currentProduct = state.currentProduct.copy(
+                    productKillList = state.currentProduct.productKillList + state.currentProduct.currentProduct.copy(
+                        isEntry = false
+                    ),
+                    currentProduct = ProductKill(
+                        suffixProduct = getState().weight?.suffix ?: Suffix.KILOGRAM
+                    )
+                )
+            )
+        }
+    }
+
+    private fun choiceProductKill(index: Int) {
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    productKillList = state.currentProduct.productKillList.mapIndexed { i, item ->
+                        if (i == index) item.copy(isEntry = true)
+                        else item.copy(isEntry = false)
+                    },
+                    currentProduct = state.currentProduct.productKillList[index],
+                    indexProductKill = index
+                )
+            )
+        }
+    }
+
+    private fun cancelProductKill() {
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    productKillList = state.currentProduct.productKillList.mapIndexed { i, item ->
+                        if (i == state.currentProduct.indexProductKill) item.copy(isEntry = false)
+                        else item
+                    },
+                    currentProduct = ProductKill(),
+                )
+            )
+        }
+    }
+
+    private fun editProductKill() {
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    productKillList = state.currentProduct.productKillList.mapIndexed { i, item ->
+                        if (i == state.currentProduct.indexProductKill) state.currentProduct.currentProduct
+                        else item
+                    },
+                    currentProduct = ProductKill()
                 )
             )
         }
@@ -581,13 +669,13 @@ class AnimalCountViewModel @Inject constructor(
     private fun removeProductKill(index: Int) {
         updateState { state ->
             state.copy(
-                productKill = state.productKill.mapIndexed { i, item ->
-                    if (i == index)
-                        item.copy(
-                            isVisibility = false
-                        )
-                    else item
-                }
+                currentProduct = state.currentProduct.copy(
+                    productKillList = state.currentProduct.productKillList.mapIndexed { i, item ->
+                        if (i == index) item.copy(isVisibility = false)
+                        else item.copy(isEntry = false)
+                    },
+                    currentProduct = ProductKill()
+                )
             )
         }
     }
@@ -623,13 +711,11 @@ class AnimalCountViewModel @Inject constructor(
         validation: suspend () -> Unit,
         transaction: Transaction,
         isWarningMinus: Boolean? = null,
-        isKillValidation: Boolean = false,
         mainAction: suspend () -> Unit
     ) {
         viewModelScope.launch {
             validation()
-            val hasAnyError =
-                if (isKillValidation == false) getState().hasAnyError else getState().hasAnyError && getState().hasFieldError
+            val hasAnyError = getState().currentProduct.hasAnyError
             if (hasAnyError) {
                 val isError = validation2(transaction, isWarningMinus)
                 val confirmed = awaitConfirmationIfNeeded(isError)
@@ -645,8 +731,10 @@ class AnimalCountViewModel @Inject constructor(
     private fun validationAdd() {
         updateState { state ->
             state.copy(
-                error = state.error.copy(
-                    isErrorCount = state.domainAnimalCountPrice.count.isBlank(),
+                currentProduct = state.currentProduct.copy(
+                    error = state.currentProduct.error.copy(
+                        isErrorCount = state.currentProduct.count.isBlank(),
+                    )
                 )
             )
         }
@@ -655,54 +743,75 @@ class AnimalCountViewModel @Inject constructor(
     private fun validationWriteOff() {
         updateState { state ->
             state.copy(
-                error = state.error.copy(
-                    isErrorCount = state.domainAnimalCountPrice.count.isBlank(),
-                    isErrorCountZero = isAnimalCountZero(state.domainAnimalCountPrice.count)
+                currentProduct = state.currentProduct.copy(
+                    error = state.currentProduct.error.copy(
+                        isErrorCount = state.currentProduct.count.isBlank(),
+                        isErrorCountZero = isAnimalCountZero(state.currentProduct.count)
+                    )
                 )
             )
         }
     }
 
     private fun validationSaleExpenses() {
-        Log.i(
-            "count23",
-            "validationSaleExpenses: isErrorPrice: ${getState().domainAnimalCountPrice.price}"
-        )
+        /* Log.i(
+             "count23",
+             "validationSaleExpenses: isErrorPrice: ${getState().domainAnimalCountPrice.price}"
+         )*/
         updateState { state ->
             state.copy(
-                error = state.error.copy(
-                    isErrorPrice = state.price.isBlank(), //TODO
-                    isErrorCount = state.domainAnimalCountPrice.count.isBlank(),
-                    isErrorCountZero = isAnimalCountZero(state.domainAnimalCountPrice.count)
+                currentProduct = state.currentProduct.copy(
+                    error = state.currentProduct.error.copy(
+                        isErrorPrice = state.currentProduct.price.isBlank(),
+                        isErrorCount = state.currentProduct.count.isBlank(),
+                        isErrorCountZero = isAnimalCountZero(state.currentProduct.count)
+                    )
                 )
             )
         }
     }
 
     private fun validationKill() {
-        val updatedProductKill = getState().productKill.map { product ->
-            product.copy(
-                error = product.error.copy(
-                    isError = product.title.isBlank(),
-                    isErrorSlash = product.title.isSlash(),
-                    isErrorCount = product.countProduct.isBlank()
-                )
-            )
-        }
-
         updateState { state ->
             state.copy(
-                productKill = updatedProductKill,
-                error = state.error.copy(
-                    isErrorCount = state.domainAnimalCountPrice.count.isBlank(),
-                    isErrorCountZero = isAnimalCountZero(state.domainAnimalCountPrice.count)
+                currentProduct = state.currentProduct.copy(
+                    error = state.currentProduct.error.copy(
+                        isErrorCount = state.currentProduct.count.isBlank(),
+                        isErrorCountZero = isAnimalCountZero(state.currentProduct.count)
+                    )
                 )
             )
         }
     }
 
+    private fun CountItem.toUiMap22(
+        domain: DomainAnimalCountPriceUi,
+        productKill: List<ProductKill>,
+        buyerList: List<String>,
+        titleList: List<TitleAndSuffixDomain>
+    ): CountItem {
+        return copy(
+            id = domain.id,
+            count = domain.count,
+            suffix = domain.suffix,
+            date = domain.date,
+            animalId = domain.animalId,
+            note = domain.note,
+            version = domain.version ?: AnimalCountVersion.ADD,
+            price = domain.price?.formatNumber(false) ?: "",
+            priceAll = domain.priceAll?.formatNumber() ?: "",
+            isAutoCalculate = domain.priceAll != null,
+            buyer = domain.buyer ?: "",
+            tableId = domain.tableId ?: 0,
+            idPT = domain.idPT ?: 0,
+            productKillList = productKill,
+            buyerList = buyerList,
+            titleList = titleList
+        )
+    }
+
     private fun domainAnimalCount(): DomainAnimalCount {
-        val state = getState().domainAnimalCountPrice
+        val state = getState().currentProduct
         return DomainAnimalCount(
             id = state.id,
             count = state.count,
@@ -716,7 +825,7 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun domainAdd(productKill: ProductKill, countId: Long? = null): DomainAddTable {
         val product = productKill
-        val dateList = getState().domainAnimalCountPrice.date.split(".")
+        val dateList = getState().currentProduct.date.split(".")
 
         val domain = DomainAddTable(
             id = product.idProduct,
@@ -731,34 +840,38 @@ class AnimalCountViewModel @Inject constructor(
             price = 0.0,
             idPT = itemIdPT,
             animalId = itemId,
-            animalCountId = countId ?: getState().domainAnimalCountPrice.id
+            animalCountId = countId ?: getState().currentProduct.id
         )
         Log.i("count23", "domainAdd: $domain")
         return domain
     }
 
-    private fun domainWriteOff(countId: Long? = null, note: String? = null): DomainWriteOffTable {
-        val state = getState().domainAnimalCountPrice
+    private fun domainWriteOff(
+        countId: Long? = null,
+        note: String? = null
+    ): DomainWriteOffTable {
+        val state = getState().currentProduct
         val dateList = state.date.split(".")
         return DomainWriteOffTable(
             id = state.tableId ?: 0,
             title = getState().animal.name,
             count = state.count.toConvertDbDouble(),
             countSuffix = state.suffix,
-            price = if (state.price != 0.00) state.price else null,
-            priceAll = if (getState().isAutoPrice) state.priceAll else null,
+            price = if (state.price.isBlank()) null else state.price.toConvertDbDouble(),
+            priceAll = if (state.isAutoCalculate) state.priceAll.toConvertDbDouble() else null,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
             status = true,
-            note = note ?: resourceProvider.getString(R.string.animal_card_screen_note_sale),
+            note = note
+                ?: resourceProvider.getString(R.string.animal_card_screen_note_sale),
             idPT = itemIdPT,
             animalCountId = countId ?: state.id
         )
     }
 
     private fun domainExpenses(countId: Long? = null): DomainExpensesTable {
-        val state = getState().domainAnimalCountPrice
+        val state = getState().currentProduct
         val dateList = state.date.split(".")
         return DomainExpensesTable(
             id = state.tableId ?: 0,
@@ -767,8 +880,8 @@ class AnimalCountViewModel @Inject constructor(
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
-            price = getState().price.toConvertZeroDouble(),
-            priceAll = if (getState().isAutoPrice) getState().priceAll.toConvertDbDouble() else null,
+            price = state.price.toConvertZeroDouble(),
+            priceAll = if (state.isAutoCalculate) state.priceAll.toConvertDbDouble() else null,
             countSuffix = state.suffix,
             category = resourceProvider.getString(R.string.animal_card_screen_add_category_expenses),
             note = resourceProvider.getString(R.string.animal_card_screen_note_expenses),
@@ -783,15 +896,15 @@ class AnimalCountViewModel @Inject constructor(
     }
 
     private fun domainSale(countId: Long? = null): DomainSaleTable {
-        val state = getState().domainAnimalCountPrice
+        val state = getState().currentProduct
         val dateList = state.date.split(".")
         return DomainSaleTable(
             id = state.tableId ?: 0,
             title = getState().animal.name,
             count = state.count.toConvertDbDouble(),
             countSuffix = state.suffix,
-            price = getState().price.toConvertZeroDouble(),
-            priceAll = if (getState().isAutoPrice) getState().priceAll.toConvertDbDouble() else null,
+            price = state.price.toConvertZeroDouble(),
+            priceAll = if (state.isAutoCalculate) state.priceAll.toConvertDbDouble() else null,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
@@ -801,6 +914,24 @@ class AnimalCountViewModel @Inject constructor(
             idPT = itemIdPT,
             animalId = itemId,
             animalCountId = countId ?: state.id
+        )
+    }
+
+    private fun DomainAnimalCountPrice.toUi(productKill: List<ProductKill>): DomainAnimalCountPriceUi {
+        return DomainAnimalCountPriceUi(
+            id = id,
+            count = count,
+            suffix = suffix,
+            date = date,
+            animalId = animalId,
+            note = note,
+            version = version,
+            price = price,
+            priceAll = priceAll,
+            buyer = buyer,
+            tableId = tableId,
+            idPT = idPT,
+            productKill = productKill
         )
     }
 
@@ -831,12 +962,16 @@ class AnimalCountViewModel @Inject constructor(
     }
 
     private fun updateWarning() {
-        updateState { it.copy(openWarningDialog = false,)
+        updateState {
+            it.copy(openWarningDialog = false)
         }
         updateOpenWarningDialog(false, true)
     }
 
-    private fun updateOpenWarningDeleteDialog(isOpenWarningDeleteDialog: Boolean, wait: Boolean) {
+    private fun updateOpenWarningDeleteDialog(
+        isOpenWarningDeleteDialog: Boolean,
+        wait: Boolean
+    ) {
         updateState { it.copy(openWarningDeleteDialog = isOpenWarningDeleteDialog) }
         confirmDelete.complete(wait)
     }
@@ -848,7 +983,7 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun validation2(transaction: Transaction, delete: Boolean? = null): Boolean {
         val countAll = getState().currentAnimal.count.toInt()
-        val count = getState().domainAnimalCountPrice.count.toConvertZero()
+        val count = getState().currentProduct.count.toConvertZero()
         val countOld = getState().oldCount.toConvertZero()
         val isError = if (countAll >= 0) when (transaction) {
             Transaction.INSERT -> insert2(countAll, count)
@@ -859,7 +994,7 @@ class AnimalCountViewModel @Inject constructor(
         Log.i(
             "count23",
             "countAll Boolean: ${countAll >= 0} " +
-                    "countAll: $countAll, transaction: $transaction version: ${getState().domainAnimalCountPrice.version}" +
+                    "countAll: $countAll, transaction: $transaction version: ${getState().currentProduct.version}" +
                     " isError: ${isError}"
         )
         val delete2 = when {
@@ -877,7 +1012,7 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun delete2(countAll: Int, countOld: Int): Boolean {
         Log.i("count23", "delete2: countALL: $countAll countOld: $countOld ")
-        return when (getState().domainAnimalCountPrice.version) {
+        return when (getState().currentProduct.version) {
             AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR, null -> {
                 Log.i("count23", "delete2:  ${0 > countAll - countOld} ")
                 0 > countAll - countOld
@@ -895,7 +1030,7 @@ class AnimalCountViewModel @Inject constructor(
             "count23",
             "edit2: countAll: $countAll, count: $count total Add: ${false} total Sale: ${0 > countAll - count}"
         )
-        return when (getState().domainAnimalCountPrice.version) {
+        return when (getState().currentProduct.version) {
             AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR, null -> {
                 false
             }
@@ -911,7 +1046,7 @@ class AnimalCountViewModel @Inject constructor(
             "count23",
             "edit2: countAll: $countAll, countOld: $countOld, count: $count total Add: ${countAll - (countOld - count)} total Sale: ${countAll + (countOld - count)}"
         )
-        return when (getState().domainAnimalCountPrice.version) {
+        return when (getState().currentProduct.version) {
             AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR, null -> {
                 Log.i("count23", "editAdd:  ${0 >= countAll - (countOld - count)} ")
                 0 > (countAll - (countOld - count))
@@ -955,8 +1090,8 @@ sealed class AnimalCountIntent : BaseIntent {
     // Open Bottom Sheet Animal
     data class DialogClicked(
         val isEntry: Boolean,
-        val item: DomainAnimalCountPrice,
-        val isKillAnimalSheet: Boolean = false
+        val version: AnimalCountVersion = AnimalCountVersion.ADD,
+        val item: DomainAnimalCountPriceUi? = null
     ) :
         AnimalCountIntent()
 
@@ -997,13 +1132,16 @@ sealed class AnimalCountIntent : BaseIntent {
     data object UpdateExpensesPressed : AnimalCountIntent()
 
     // Kill Count Animal
-    data class TitleProductKillChanged(val index: Int, val value: String) : AnimalCountIntent()
-    data class TitleAndSuffixKillClicked(val index: Int, val pair: Pair<String, Suffix>) :
+    data class TitleProductKillChanged(val value: String) : AnimalCountIntent()
+    data class TitleAndSuffixKillClicked(val pair: Pair<String, Suffix>) :
         AnimalCountIntent()
 
-    data class CountProductKillChanged(val index: Int, val value: String) : AnimalCountIntent()
-    data class SuffixProductKillChanged(val index: Int, val value: Suffix) : AnimalCountIntent()
+    data class CountProductKillChanged(val value: String) : AnimalCountIntent()
+    data class SuffixProductKillChanged(val value: Suffix) : AnimalCountIntent()
     data object AddProductKillChanged : AnimalCountIntent()
+    data class ChoiceProductKillChanged(val index: Int) : AnimalCountIntent()
+    data object CancelProductKillChanged : AnimalCountIntent()
+    data object EditProductKillChanged : AnimalCountIntent()
     data class RemoveProductKillChanged(val index: Int) : AnimalCountIntent()
     data object InsertKillChanged : AnimalCountIntent()
     data object EditKillChanged : AnimalCountIntent()

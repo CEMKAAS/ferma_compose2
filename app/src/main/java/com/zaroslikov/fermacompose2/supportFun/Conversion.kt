@@ -1,12 +1,9 @@
 package com.zaroslikov.fermacompose2.supportFun
 
-import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.fermacompose2.R
 
 
 fun Double.convertSize(from: Suffix, to: Suffix): Double {
-
     val result = when (from) {
         Suffix.MILLIMETERS -> when (to) {
             Suffix.MILLIMETERS -> this
@@ -16,7 +13,8 @@ fun Double.convertSize(from: Suffix, to: Suffix): Double {
         }
 
         Suffix.CENTIMETERS -> when (to) {
-            Suffix.MILLIMETERS -> this * 10
+            Suffix.MILLIMETERS ->
+                this * 10
             Suffix.CENTIMETERS -> this
             Suffix.METERS -> this / 100
             else -> this

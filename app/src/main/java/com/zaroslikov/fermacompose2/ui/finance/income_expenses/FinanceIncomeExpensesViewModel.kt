@@ -21,7 +21,7 @@ class FinanceIncomeExpensesViewModel @Inject constructor(
 ) : ListViewModel<FinanceIncomeExpensesState, FinanceIncomeExpensesIntent>(
     FinanceIncomeExpensesState()
 ) {
-    private val itemId: Long =
+    /*private val itemId: Long =
         checkNotNull(savedStateHandle[FinanceIncomeExpensesDestination.itemIdArg])
     private val isIncome: Boolean =
         checkNotNull(savedStateHandle[FinanceIncomeExpensesDestination.itemIdArgTwo])
@@ -55,7 +55,7 @@ class FinanceIncomeExpensesViewModel @Inject constructor(
             }
 
         }
-    }
+    }*/
 //    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
 //    val month = calendar[Calendar.MONTH] + 1
 //    val year = calendar[Calendar.YEAR]

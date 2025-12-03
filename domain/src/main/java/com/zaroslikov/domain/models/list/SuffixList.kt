@@ -11,15 +11,23 @@ val suffixAllList = listOf(
     Suffix.CUBIC_METERS,
     Suffix.METERS
 )
-
 val suffixPiecesList = listOf(
     Suffix.PIECES,
     Suffix.HEADS,
     Suffix.UNITS,
 )
-
 val suffixWeightDayList = listOf(
     Suffix.GRAM_DAY,
     Suffix.KILOGRAM_DAY,
     Suffix.TONS_DAY,
+)
+val suffixWeightList = listOf(
+    Suffix.GRAM,
+    Suffix.KILOGRAM,
+    Suffix.TONS,
+)
+val suffixHeightList = listOf(
+    Suffix.MILLIMETERS,
+    Suffix.CENTIMETERS,
+    Suffix.METERS,
 )

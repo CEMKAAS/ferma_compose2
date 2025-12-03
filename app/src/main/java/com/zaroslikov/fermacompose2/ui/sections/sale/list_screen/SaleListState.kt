@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.sale.list_screen
 
+import android.util.Log
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
@@ -56,6 +57,11 @@ data class SaleEntryState2(
     fun enabledButton(): Boolean {
         val isEnabled =
             title.isNotBlank() && count.isNotBlank() && price.isNotBlank() && !hasAnyError
+        Log.i("sale", "title: ${title.isNotBlank()} ")
+        Log.i("sale", "countProduct: ${count.isNotBlank()} ")
+        Log.i("sale", "countProduct: ${price.isNotBlank()} ")
+        Log.i("sale", "hasAnyError: ${!hasAnyError} ")
+        Log.i("sale", "enabledButton: $isEnabled ")
         return !isEnabled
     }
 }
