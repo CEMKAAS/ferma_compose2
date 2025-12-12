@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.WriteOffDao
+import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCountSuffix
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixCategory
@@ -8,6 +9,7 @@ import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
 import com.zaroslikov.data.room.mapper.dto.write_off.toBrieflyWriteOffDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
@@ -40,6 +42,22 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
     }
 
     override fun getBrieflyDetailsItemWriteOff(
+        id: Long,
+        name: String
+    ): Flow<List<DomainWriteOffTable>> {
+        return writeOffDao.getBrieflyDetailsItemWriteOff(id, name)
+            .map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override fun getBrieflyDetailsItemWriteOffOwnNeed(
+        id: Long,
+        name: String
+    ): Flow<List<DomainWriteOffTable>> {
+        return writeOffDao.getBrieflyDetailsItemWriteOff(id, name)
+            .map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override fun getBrieflyDetailsItemWriteOffScrap(
         id: Long,
         name: String
     ): Flow<List<DomainWriteOffTable>> {
@@ -82,7 +100,42 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
     override fun getScrapAllCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>> {
         return writeOffDao.getScrapAllCategoryAllList(id)
             .map { it -> it.map { it.toDomainCategoryPrice() } }
+    }
 
+    override fun getOwnNeedProductPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainTitleSuffixPrice>> {
+        return writeOffDao.getOwnNeedProductPeriodList(id, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainTitleSuffixPrice() } }
+    }
+
+    override fun getScrapProductPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainTitleSuffixPrice>> {
+        return writeOffDao.getScrapProductPeriodList(id, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainTitleSuffixPrice() } }
+    }
+
+    override fun getOwnNeedCategoryPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainCategoryPrice>> {
+        return writeOffDao.getOwnNeedCategoryPeriodList(id, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainCategoryPrice() } }
+    }
+
+    override fun getScrapCategoryPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainCategoryPrice>> {
+        return writeOffDao.getScrapCategoryPeriodList(id, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainCategoryPrice() } }
     }
 
     override fun getOwnNeed(id: Long): Flow<Double> {
@@ -156,14 +209,15 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
             .map { it.toDomainCountSuffix() }
     }
 
-    override fun getAnalysisWriteOffOwnNeedsAllTimeRange(
+    override fun getAnalysisOwnNeedsScrapRangeList(
         id: Long,
         name: String,
+        status: Boolean,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainCountSuffix> {
-        return writeOffDao.getAnalysisWriteOffOwnNeedsAllTimeRange(id, name, dateBegin, dateEnd)
-            .map { it.toDomainCountSuffix() }
+    ): Flow<List<DomainCountSuffixPrice>> {
+        return writeOffDao.getAnalysisOwnNeedsScrapRangeList(id, name, status, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainCountSuffixPrice() } }
     }
 
     override fun getAnalysisWriteOffScrapAllTimeRange(

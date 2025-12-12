@@ -115,6 +115,7 @@ interface AddDao {
     @Query(
         "SELECT" +
                 " (SELECT name FROM animal_table WHERE id = animal_id) as title," +
+                " (SELECT type FROM animal_table WHERE id = animal_id) as type, " +
                 " COALESCE(SUM(count),0) AS count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
@@ -128,19 +129,19 @@ interface AddDao {
     ): Flow<List<AnimalCountSuffixDto>>
 
     @Query(
-        "SELECT COALESCE(SUM(count), 0) AS count," +
+        "SELECT count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
                 " WHERE idPT=:id AND title=:name" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
-    fun getAnalysisAddAllTimeRange(
+    fun getAnalysisAddTimeRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<CountSuffixDto>
+    ): Flow<List<CountSuffixDto>>
 
     @Query(
         "SELECT" +
@@ -162,17 +163,17 @@ interface AddDao {
 
     @Query(
         "SELECT" +
-                " (SELECT name FROM animal_table WHERE id = animal_id) as title," +
-                " COALESCE(SUM(count),0) AS count," +
-                " count_suffix AS suffix" +
-                " FROM add_table" +
-                " WHERE idPT=:id AND title=:name" +
-                " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
-                " GROUP BY title" +
-                " ORDER BY count DESC "
+                " at.name AS title," +
+                " at.type AS type," +
+                " a.count," +
+                " a.count_suffix AS suffix" +
+                " FROM add_table a" +
+                " JOIN animal_table at ON at.id = a.animal_id " +
+                " WHERE a.idPT=:id AND a.title=:name" +
+                " AND DATE(printf('%04d-%02d-%02d', a.year, a.month, a.day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
-    fun getAnalysisAddAnimalAllTimeRange(
+    fun getAnalysisAddAnimalRangeList(
         id: Long,
         name: String,
         dateBegin: String,
@@ -182,6 +183,7 @@ interface AddDao {
     @Query(
         "SELECT" +
                 " title," +
+                " '' AS type," +
                 " COALESCE(SUM(count), 0.0) AS count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +

@@ -7,15 +7,16 @@ enum class Suffix(val code: Int) {
     GRAM(4),
     KILOGRAM(5),
     TONS(6),
-    LITERS(7),
-    CUBIC_METERS(8),
-    MILLIMETERS(9),
-    CENTIMETERS(10),
-    METERS(11),
-    RUBLE(12),
-    GRAM_DAY(13),
-    KILOGRAM_DAY(14),
-    TONS_DAY(15);
+    MILLILITRES(7),
+    LITERS(8),
+    CUBIC_METERS(9),
+    MILLIMETERS(10),
+    CENTIMETERS(11),
+    METERS(12),
+    RUBLE(13),
+    GRAM_DAY(14),
+    KILOGRAM_DAY(15),
+    TONS_DAY(16);
 
     companion object {
         fun fromCode(code: Int): Suffix = entries.first { it.code == code }

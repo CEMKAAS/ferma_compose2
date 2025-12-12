@@ -5,16 +5,32 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.blue_1
+import com.zaroslikov.fermacompose2.blue_10
+import com.zaroslikov.fermacompose2.blue_11
+import com.zaroslikov.fermacompose2.blue_12
+import com.zaroslikov.fermacompose2.blue_13
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.blue_3
+import com.zaroslikov.fermacompose2.blue_5
+import com.zaroslikov.fermacompose2.error_base
+import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.green_5
 import com.zaroslikov.fermacompose2.green_6
+import com.zaroslikov.fermacompose2.green_8
 import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.grey_2
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_3
+import com.zaroslikov.fermacompose2.orang_4
+import com.zaroslikov.fermacompose2.orang_8
 import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.price_green_2
+import com.zaroslikov.fermacompose2.red_11
+import com.zaroslikov.fermacompose2.red_12
 import com.zaroslikov.fermacompose2.red_4
 import com.zaroslikov.fermacompose2.red_5
 import com.zaroslikov.fermacompose2.red_7
@@ -65,6 +81,7 @@ fun Suffix.toColorList(): Color {
         Suffix.TONS -> Color(0xFF2E7D32)     // Green 800 — глубокий и "тяжёлый"
 
         // --- Объём ---
+        Suffix.MILLILITRES -> Color(0xFF64B5F6)
         Suffix.LITERS -> Color(0xFF64B5F6)   // Blue 300 — мягкий
         Suffix.CUBIC_METERS -> Color(0xFF1565C0) // Blue 800 — глубокая вода
 
@@ -104,22 +121,56 @@ fun FinanceCategory.toColorList(): List<Color> {
         FinanceCategory.EXPENSES -> listOf(Color(0xFFFB2C36), red_7)
         FinanceCategory.OWN_NEED -> listOf(Color(0xFFFE9A00), Color(0xFFFF6900))
         FinanceCategory.SCRAP -> listOf(Color(0xFF4A5565), Color(0xFF364153))
+        FinanceCategory.PROFIT -> /*listOf(blue_1, animal_2)*/ listOf(blue_10, blue_11, blue_12)
     }
 }
 
-fun FinanceCategory.toColor(): Color {
+/*fun FinanceCategory.toColor(): Color {
     return when (this) {
         FinanceCategory.SALE -> blue_1
         FinanceCategory.EXPENSES -> orang_1
-        FinanceCategory.OWN_NEED -> Color(0xFFFE9A00)
-        FinanceCategory.SCRAP -> Color(0xFF6A7282)
+        FinanceCategory.OWN_NEED -> violet_1
+        FinanceCategory.SCRAP -> violet_1
+        FinanceCategory.PROFIT -> TODO()
     }
 }
+
 fun FinanceCategory.toColorFinance(): Color {
     return when (this) {
         FinanceCategory.SALE -> blue_3
         FinanceCategory.EXPENSES -> orang_3
-        FinanceCategory.OWN_NEED -> Color(0xFFFE9A00)
-        FinanceCategory.SCRAP -> Color(0xFF6A7282)
+        FinanceCategory.OWN_NEED -> violet_3
+        FinanceCategory.SCRAP -> violet_3
+        FinanceCategory.PROFIT -> TODO()
+    }
+}*/
+
+fun FinanceCategory.toColorIconSecond(): Color {
+    return when (this) {
+        FinanceCategory.SALE -> price_green
+        FinanceCategory.EXPENSES -> error_base
+        FinanceCategory.OWN_NEED -> orang_2
+        FinanceCategory.SCRAP -> marengo
+        FinanceCategory.PROFIT -> blue_1
+    }
+}
+
+fun FinanceCategory.toColorIconBorderSecond(): Color {
+    return when (this) {
+        FinanceCategory.SALE -> price_green_2
+        FinanceCategory.EXPENSES -> red_11
+        FinanceCategory.OWN_NEED -> orang_4
+        FinanceCategory.SCRAP -> gray_6
+        FinanceCategory.PROFIT -> blue_5
+    }
+}
+
+fun FinanceCategory.toBorderCard(): Color {
+    return when (this) {
+        FinanceCategory.SALE -> green_8
+        FinanceCategory.EXPENSES -> red_12
+        FinanceCategory.OWN_NEED -> orang_8
+        FinanceCategory.SCRAP -> grey_2
+        FinanceCategory.PROFIT -> blue_13
     }
 }

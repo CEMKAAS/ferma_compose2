@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -158,7 +159,7 @@ fun BottomSheetKillAnimal(
             }
             BorderCard(
                 containerColor = ghostly_white,
-                padding = 18.dp
+                padding = PaddingValues(18.dp)
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),

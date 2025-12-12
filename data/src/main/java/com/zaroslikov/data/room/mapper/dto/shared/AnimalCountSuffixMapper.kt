@@ -6,6 +6,7 @@ import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 fun AnimalCountSuffixDto.toDomainAnimalCountSuffix(): DomainAnimalCountSuffix {
     return DomainAnimalCountSuffix(
         title = this.title,
+        type = this.type,
         count = this.count,
         suffix = this.suffix,
     )

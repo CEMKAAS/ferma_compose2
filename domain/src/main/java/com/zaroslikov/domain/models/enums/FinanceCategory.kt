@@ -4,5 +4,6 @@ enum class FinanceCategory {
     SALE,
     EXPENSES,
     OWN_NEED,
-    SCRAP;
+    SCRAP,
+    PROFIT
 }

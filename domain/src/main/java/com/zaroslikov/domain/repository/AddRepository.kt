@@ -30,12 +30,12 @@ interface AddRepository {
         name: String
     ): Flow<List<DomainAnimalCountSuffix>>
 
-    fun getAnalysisAddAllTimeRange(
+    fun getAnalysisAllTimeRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainCountSuffix?>
+    ): Flow<List<DomainCountSuffix>>
 
     fun getAnalysisAddAverageValueAllTimeRange(
         id: Long,
@@ -44,7 +44,7 @@ interface AddRepository {
         dateEnd: String
     ): Flow<DomainCountSuffix?>
 
-    fun getAnalysisAddAnimalAllTimeRange(
+    fun getAnalysisAddAnimalRangeList(
         id: Long,
         name: String,
         dateBegin: String,

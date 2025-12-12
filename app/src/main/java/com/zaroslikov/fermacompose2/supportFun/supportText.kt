@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -24,6 +25,7 @@ fun Suffix.toResId(): Int {
         Suffix.KILOGRAM -> R.string.suffix_kilogram
         Suffix.TONS -> R.string.suffix_tons
         // Liters
+        Suffix.MILLILITRES -> R.string.suffix_millilitres
         Suffix.LITERS -> R.string.suffix_liters
         Suffix.CUBIC_METERS -> R.string.suffix_cubic_meters
         // Size
@@ -35,6 +37,7 @@ fun Suffix.toResId(): Int {
         Suffix.GRAM_DAY -> R.string.suffix_gram_day
         Suffix.KILOGRAM_DAY -> R.string.suffix_kilogram_day
         Suffix.TONS_DAY -> R.string.suffix_tons_day
+
     }
 }
 
@@ -81,5 +84,37 @@ fun FinanceCategory.toResId(): Int {
         FinanceCategory.EXPENSES -> R.string.finance_category_expenses_total
         FinanceCategory.OWN_NEED -> R.string.finance_category_onw_need_total
         FinanceCategory.SCRAP -> R.string.finance_category_scrap_total
+        FinanceCategory.PROFIT -> /*R.string.finance_category_total_profit*/ R.string.support_text_current_balance
+    }
+}
+
+fun FinanceCategory.toTitleResId(): Int {
+    return when (this) {
+        FinanceCategory.SALE -> R.string.card_income
+        FinanceCategory.EXPENSES -> R.string.card_expenditure
+        FinanceCategory.OWN_NEED -> R.string.card_own_need
+        FinanceCategory.SCRAP -> R.string.card_scrap
+        FinanceCategory.PROFIT -> R.string.card_profit
+    }
+}
+
+fun FinanceCategory.toTitleSecondResId(): Int {
+    return when (this) {
+        FinanceCategory.SALE -> R.string.finance_income
+        FinanceCategory.EXPENSES -> R.string.finance_expenses
+        FinanceCategory.OWN_NEED -> R.string.card_own_need
+        FinanceCategory.SCRAP -> R.string.card_scrap
+        FinanceCategory.PROFIT -> R.string.finance_total
+    }
+}
+
+fun FilterDate.toResId(): Int {
+    return when (this) {
+        FilterDate.TODAY -> R.string.filter_date_today
+        FilterDate.WEEK -> R.string.filter_date_week
+        FilterDate.MONTH -> R.string.filter_date_month
+        FilterDate.YEAR -> R.string.filter_date_year
+        FilterDate.ALL_TIME -> R.string.filter_date_all_time
+        FilterDate.PERIOD -> R.string.filter_date_period
     }
 }

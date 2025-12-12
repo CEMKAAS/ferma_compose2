@@ -40,7 +40,7 @@ class FinanceCategoryViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = false) }
-            val financeCategory = when {
+            /*val financeCategory = when {
                 itemBoolean -> {
                     saleRepository.getProductListCategoryIncomeCurrentMonth(
                         itemId,
@@ -49,12 +49,12 @@ class FinanceCategoryViewModel @Inject constructor(
                     ).first()
                 }
 
-                /*itemCategory == " Мои Животные " -> {
+                *//*itemCategory == " Мои Животные " -> {
                     itemsRepository.getProductLisCategoryExpensesAnimalCurrentMonth(
                         itemId,
                         dateBegin, dateEnd
                     )
-                }*/
+                }*//*
 
                 else -> expensesRepository.getProductLisCategoryExpensesCurrentMonth(
                     itemId,
@@ -62,7 +62,7 @@ class FinanceCategoryViewModel @Inject constructor(
                     itemCategory
                 ).first()
             }
-            updateState { it.copy(financeCategory = financeCategory) }
+            updateState { it.copy(financeCategory = financeCategory) }*/
         }
     }
 }

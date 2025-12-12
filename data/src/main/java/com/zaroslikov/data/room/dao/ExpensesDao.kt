@@ -124,21 +124,23 @@ interface ExpensesDao {
         year: Int
     ): Flow<Double>
 
+    //Важно!
     @Query(
-        "SELECT COALESCE(SUM(count), 0) AS ResultCount" +
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0) AS ResultCount" +
                 " FROM expenses_table" +
                 " WHERE idPT =:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
-    )//0 = price
+    )
     fun getExpensesMount(id: Long, dateBegin: String, dateEnd: String): Flow<Double> //maybe
 
     @Query(
-        "SELECT category, COALESCE(SUM(price), 0.0) AS price" +
+        "SELECT category," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
                 " FROM expenses_table" +
-                " Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY category "
-    )//0 = price
-//    ORDER BY countEXPENSES DESC
+                " WHERE idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY category ORDER BY price DESC "
+    )
     fun getCategoryExpensesCurrentMonth(
         id: Long,
         dateBegin: String,
@@ -146,16 +148,19 @@ interface ExpensesDao {
     ): Flow<List<CategoryPriceDto>> //maybe
 
     @Query(
-        "SELECT title, count_suffix as suffix, COALESCE(SUM(count), 0.0) AS price, 1 AS category FROM expenses_table" +
-                " Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and category=:category" +
-                " GROUP BY title ORDER BY count DESC"
+        "SELECT title," +
+                " count_suffix as suffix," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
+                " 1 AS category" +
+                " FROM expenses_table" +
+                " WHERE idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY title ORDER BY price DESC"
     )
     fun getProductLisCategoryExpensesCurrentMonth(
         id: Long,
         dateBegin: String,
         dateEnd: String,
-        category: String
     ): Flow<List<TitleSuffixPriceDto>> //maybe
 
 

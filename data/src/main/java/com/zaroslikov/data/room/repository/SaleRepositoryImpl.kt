@@ -3,6 +3,7 @@ package com.zaroslikov.data.room.repository
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.mapper.dto.sale.toBrieflySaleDomain
 import com.zaroslikov.data.room.mapper.dto.sale.toDomainBuyerPrice
+import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixCategory
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
@@ -11,6 +12,7 @@ import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
@@ -47,7 +49,8 @@ class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : Sal
     }
 
     override fun getItemsTitleSaleList(id: Long): Flow<List<DomainTitleSuffixCategory>> {
-        return saleDao.getItemsTitleSaleList(id).map { it -> it.map { it.toDomainTitleSuffixCategory() } }
+        return saleDao.getItemsTitleSaleList(id)
+            .map { it -> it.map { it.toDomainTitleSuffixCategory() } }
     }
 
     override fun getItemsCategorySaleList(id: Long): Flow<List<String>> {
@@ -111,10 +114,9 @@ class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : Sal
     override fun getProductListCategoryIncomeCurrentMonth(
         id: Long,
         dateBegin: String,
-        dateEnd: String,
-        category: String
+        dateEnd: String
     ): Flow<List<DomainTitleSuffixPrice>> {
-        return saleDao.getProductListCategoryIncomeCurrentMonth(id, dateBegin, dateEnd, category)
+        return saleDao.getProductListCategoryIncomeCurrentMonth(id, dateBegin, dateEnd)
             .map { it -> it.map { it.toDomainTitleSuffixPrice() } }
     }
 
@@ -140,14 +142,14 @@ class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : Sal
             .map { it -> it.map { it.toDomainBuyerPrice() } }
     }
 
-    override fun getAnalysisSaleAllTimeRange(
+    override fun getAnalysisSaleRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainTitleSuffixPrice> {
-        return saleDao.getAnalysisSaleAllTimeRange(id, name, dateBegin, dateEnd)
-            .map { it.toDomainTitleSuffixPrice() }
+    ): Flow<List<DomainCountSuffixPrice>> {
+        return saleDao.getAnalysisSaleRangeList(id, name, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainCountSuffixPrice() } }
     }
 
     override fun getAnalysisSaleSoldAllTimeRange(
@@ -159,13 +161,13 @@ class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : Sal
         return saleDao.getAnalysisSaleSoldAllTimeRange(id, name, dateBegin, dateEnd)
     }
 
-    override fun getAnalysisSaleBuyerAllTimeRange(
+    override fun getAnalysisSaleBuyerRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
     ): Flow<List<DomainBuyerPrice>> {
-        return saleDao.getAnalysisSaleBuyerAllTimeRange(id, name, dateBegin, dateEnd)
+        return saleDao.getAnalysisSaleBuyerRangeList(id, name, dateBegin, dateEnd)
             .map { it -> it.map { it.toDomainBuyerPrice() } }
     }
 

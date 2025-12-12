@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.data.room.dto.sale.BrieflySaleDto
 import com.zaroslikov.data.room.dto.sale.BuyerPriceDto
+import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
@@ -15,8 +16,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SaleDao {
-    @Query("SELECT * from sale_table Where idPT=:id" +
-            " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC")
+    @Query(
+        "SELECT * from sale_table Where idPT=:id" +
+                " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC"
+    )
     fun getAllSaleItems(id: Long): Flow<List<SaleTable>>
 
     @Query("SELECT * from sale_table Where _id=:id")
@@ -25,12 +28,14 @@ interface SaleDao {
     @Query("SELECT * from sale_table Where animal_count_id=:id")
     fun getItemSaleIdCountAnimal(id: Long): Flow<SaleTable>
 
-    @Query("SELECT title," +
-            " SUM(count) as count," +
-            " count_suffix as suffix," +
-            " SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END) AS price," +
-            " COUNT(*) AS row_count" +
-            " FROM sale_table WHERE idPT=:id GROUP BY title ORDER BY price DESC")
+    @Query(
+        "SELECT title," +
+                " SUM(count) as count," +
+                " count_suffix as suffix," +
+                " SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END) AS price," +
+                " COUNT(*) AS row_count" +
+                " FROM sale_table WHERE idPT=:id GROUP BY title ORDER BY price DESC"
+    )
     fun getBrieflyItemSale(id: Long): Flow<List<BrieflySaleDto>>
 
     @Query("SELECT * from sale_table Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC")
@@ -79,22 +84,13 @@ interface SaleDao {
     fun getIncomeMountFin(id: Long, month: Int, year: Int): Flow<Double>
 
     @Query(
-        "SELECT COALESCE(SUM(price), 0.0) AS ResultCount FROM sale_table" +
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
+                " FROM sale_table" +
                 " WHERE idPT =:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
     fun getIncomeMount(id: Long, dateBegin: String, dateEnd: String): Flow<Double>
-
-    @Query(
-        "SELECT category, COALESCE(SUM(price), 0.0) AS price FROM sale_table" +
-                " Where idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) group by category ORDER BY price DESC"
-    )
-    fun getCategoryIncomeCurrentMonth(
-        id: Long,
-        dateBegin: String,
-        dateEnd: String
-    ): Flow<List<CategoryPriceDto>>
 
     @Query(
         "SELECT title," +
@@ -115,18 +111,34 @@ interface SaleDao {
     fun getIncomeCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
 
     @Query(
-        "SELECT title, count_suffix as suffix, COALESCE(SUM(price), 0.0) AS price, 0 AS category" +
+        "SELECT title," +
+                " count_suffix as suffix," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
+                " 0 AS category" +
                 " FROM sale_table" +
                 " WHERE idPT=:id and DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and category=:category" +
-                " group by title ORDER BY price DESC"
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY title ORDER BY price DESC"
     )
     fun getProductListCategoryIncomeCurrentMonth(
         id: Long,
         dateBegin: String,
-        dateEnd: String,
-        category: String
+        dateEnd: String
     ): Flow<List<TitleSuffixPriceDto>>
+
+    @Query(
+        "SELECT category," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+                " FROM sale_table" +
+                " WHERE idPT=:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY category ORDER BY price DESC"
+    )
+    fun getCategoryIncomeCurrentMonth(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<CategoryPriceDto>>
 
     @Query(
         "SELECT title," +
@@ -155,17 +167,19 @@ interface SaleDao {
     fun getAnalysisSaleBuyerAllTime(id: Long, name: String): Flow<List<BuyerPriceDto>>
 
     @Query(
-        "SELECT title, count_suffix as suffix, COALESCE(SUM(count), 0) AS price, 0 AS category" +
+        "SELECT count," +
+                " count_suffix as suffix," +
+                " CASE WHEN price_all IS NULL THEN price ELSE price_all END AS price" +
                 " FROM sale_table" +
                 " Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
-    fun getAnalysisSaleAllTimeRange(
+    fun getAnalysisSaleRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<TitleSuffixPriceDto>
+    ): Flow<List<CountSuffixPriceDto>>
 
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS priceAll from sale_table" +
@@ -182,14 +196,14 @@ interface SaleDao {
     @Query(
         "SELECT" +
                 " buyer," +
-                " COALESCE(SUM(PRICE),0) AS price," +
-                " COALESCE(SUM(count),0) AS count," +
+                " CASE WHEN price_all IS NULL THEN price ELSE price_all END AS price," +
+                " count," +
                 " count_suffix as suffix" +
                 " FROM sale_table" +
                 " Where idPT=:id  and title =:name AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) GROUP BY buyer ORDER BY price DESC"
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
-    fun getAnalysisSaleBuyerAllTimeRange(
+    fun getAnalysisSaleBuyerRangeList(
         id: Long,
         name: String,
         dateBegin: String,

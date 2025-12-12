@@ -5,10 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.WindowInsets
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -399,11 +397,22 @@ fun TopAppBarNew(
     title: String,
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    navigateBack: (() -> Unit)? = null,
 ) {
     CenterAlignedTopAppBar(
         title = { Text(title) },
         modifier = modifier,
         scrollBehavior = scrollBehavior,
         windowInsets = WindowInsets(0),
+        navigationIcon = {
+            navigateBack?.let {
+                IconButton(onClick = it) {
+                    Icon(
+                        painterResource(R.drawable.baseline_arrow_back_24),
+                        contentDescription = "Назад"
+                    )
+                }
+            }
+        }
     )
 }

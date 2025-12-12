@@ -3,6 +3,7 @@ package com.zaroslikov.domain.repository
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
@@ -35,19 +36,18 @@ interface SaleRepository {
     fun getProductListCategoryIncomeCurrentMonth(
         id: Long,
         dateBegin: String,
-        dateEnd: String,
-        category: String
+        dateEnd: String
     ): Flow<List<DomainTitleSuffixPrice>> //maybe
 
     fun getAnalysisSaleAllTime(id: Long, name: String): Flow<DomainTitleSuffixPrice>
     fun getAnalysisSaleSoldAllTime(id: Long, name: String): Flow<Double>
     fun getAnalysisSaleBuyerAllTime(id: Long, name: String): Flow<List<DomainBuyerPrice>>
-    fun getAnalysisSaleAllTimeRange(
+    fun getAnalysisSaleRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainTitleSuffixPrice>
+    ): Flow<List<DomainCountSuffixPrice>>
 
     fun getAnalysisSaleSoldAllTimeRange(
         id: Long,
@@ -56,7 +56,7 @@ interface SaleRepository {
         dateEnd: String
     ): Flow<Double>
 
-    fun getAnalysisSaleBuyerAllTimeRange(
+    fun getAnalysisSaleBuyerRangeList(
         id: Long,
         name: String,
         dateBegin: String,

@@ -51,6 +51,7 @@ fun FinanceCategory.toDrawRes(): Int {
         FinanceCategory.EXPENSES -> R.drawable.icon_arrow_down
         FinanceCategory.OWN_NEED -> R.drawable.outline_savings_24
         FinanceCategory.SCRAP -> R.drawable.baseline_delete_24
+        FinanceCategory.PROFIT -> R.drawable.baseline_currency_ruble_24
     }
 }
 
@@ -60,5 +61,6 @@ fun FinanceCategory.toTransactionDrawRes(): Int {
         FinanceCategory.EXPENSES -> R.drawable.icon_sale
         FinanceCategory.OWN_NEED -> R.drawable.outline_savings_24
         FinanceCategory.SCRAP -> R.drawable.baseline_delete_24
+        FinanceCategory.PROFIT -> R.drawable.icon_expenses
     }
 }

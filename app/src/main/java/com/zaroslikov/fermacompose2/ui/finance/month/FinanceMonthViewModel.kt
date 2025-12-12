@@ -2,6 +2,8 @@ package com.zaroslikov.fermacompose2.ui.finance.month
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.DomainSaleTable
+import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.WriteOffRepository

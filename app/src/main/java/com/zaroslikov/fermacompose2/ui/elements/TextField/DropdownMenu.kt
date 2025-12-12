@@ -24,6 +24,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.grey_3
@@ -124,6 +125,34 @@ fun ExposedDropdownMenuCategoryBuyer(
         DropdownMenuItem(
             trailingIcon = trailingIcon,
             text = { Text(text = item) },
+            onClick = {
+                setTitle(item)
+                closeMenu()
+            }
+        )
+    }
+}
+
+@Composable
+fun ExposedDropdownMenuFilterDate(
+    title: FilterDate,
+    setTitle: (FilterDate) -> Unit,
+    titleList: List<FilterDate>,
+    enableDropMenu: Boolean = true,
+    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
+) {
+    BaseExposedDropdownMenu2(
+        title = stringResource(title.toResId()),
+        labelSelector = { "" },
+        list = titleList,
+        content = content
+    ) { index, item, closeMenu ->
+        val trailingIcon: @Composable (() -> Unit)? = if (item == title) {
+            { Icon(Icons.Default.Done, contentDescription = null) }
+        } else null
+        DropdownMenuItem(
+            trailingIcon = trailingIcon,
+            text = { Text(text = stringResource(item.toResId())) },
             onClick = {
                 setTitle(item)
                 closeMenu()

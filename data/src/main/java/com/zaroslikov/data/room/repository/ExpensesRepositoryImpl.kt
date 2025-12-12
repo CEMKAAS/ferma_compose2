@@ -127,13 +127,11 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: Expens
         id: Long,
         dateBegin: String,
         dateEnd: String,
-        category: String
     ): Flow<List<DomainTitleSuffixPrice>> {
         return expensesDao.getProductLisCategoryExpensesCurrentMonth(
             id,
             dateBegin,
-            dateEnd,
-            category
+            dateEnd
         ).map { it -> it.map { it.toDomainTitleSuffixPrice() } }
     }
 

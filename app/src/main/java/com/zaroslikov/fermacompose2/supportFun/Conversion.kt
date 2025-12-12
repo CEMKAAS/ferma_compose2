@@ -2,6 +2,42 @@ package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.domain.models.enums.Suffix
 
+fun Double.conversation(suffix: Suffix, baseSuffix: Suffix): Double {
+    return when (baseSuffix) {
+        Suffix.GRAM, Suffix.KILOGRAM, Suffix.TONS -> this.convertWeight(suffix, baseSuffix)
+        Suffix.MILLILITRES, Suffix.LITERS, Suffix.CUBIC_METERS -> this.convertVolume(
+            suffix,
+            baseSuffix
+        )
+
+        Suffix.MILLIMETERS, Suffix.CENTIMETERS, Suffix.METERS -> this.convertSize(
+            suffix,
+            baseSuffix
+        )
+
+        else -> 0.0
+    }
+}
+
+fun Double.conversation2(suffix: Suffix, baseSuffix: Suffix, settingsSuffix: Suffix): Double {
+    return when (baseSuffix) {
+        Suffix.GRAM, Suffix.KILOGRAM, Suffix.TONS -> this.convertWeight(suffix, settingsSuffix)
+        Suffix.MILLILITRES, Suffix.LITERS, Suffix.CUBIC_METERS -> this.convertVolume(
+            suffix,
+            settingsSuffix
+        )
+
+        Suffix.MILLIMETERS, Suffix.CENTIMETERS, Suffix.METERS -> this.convertSize(
+            suffix,
+            settingsSuffix
+        )
+
+        Suffix.PIECES, Suffix.UNITS, Suffix.HEADS -> this
+
+        else -> 0.0
+    }
+}
+
 
 fun Double.convertSize(from: Suffix, to: Suffix): Double {
     val result = when (from) {
@@ -15,6 +51,7 @@ fun Double.convertSize(from: Suffix, to: Suffix): Double {
         Suffix.CENTIMETERS -> when (to) {
             Suffix.MILLIMETERS ->
                 this * 10
+
             Suffix.CENTIMETERS -> this
             Suffix.METERS -> this / 100
             else -> this
@@ -62,27 +99,27 @@ fun Double.convertWeight(from: Suffix, to: Suffix): Double {
 }
 
 
-fun Double.convertVolume(from: String, to: String): Double {
+fun Double.convertVolume(from: Suffix, to: Suffix): Double {
 
     val result = when (from) {
-        "м3." -> when (to) {
-            "м3." -> this
-            "л." -> this * 1000
-            "мл." -> this * 1000000
+        Suffix.CUBIC_METERS -> when (to) {
+            Suffix.CUBIC_METERS -> this
+            Suffix.LITERS -> this * 1000
+            Suffix.MILLILITRES -> this * 1000000
             else -> this
         }
 
-        "л." -> when (to) {
-            "м3." -> this * 0.001
-            "л." -> this
-            "мл." -> this * 1000
+        Suffix.LITERS -> when (to) {
+            Suffix.CUBIC_METERS -> this * 0.001
+            Suffix.LITERS -> this
+            Suffix.MILLILITRES -> this * 1000
             else -> this
         }
 
-        "мл." -> when (to) {
-            "м3." -> this * 0.000001
-            "л." -> this * 0.001
-            "мл." -> this
+        Suffix.MILLILITRES -> when (to) {
+            Suffix.CUBIC_METERS -> this * 0.000001
+            Suffix.LITERS -> this * 0.001
+            Suffix.MILLILITRES -> this
             else -> this
         }
 

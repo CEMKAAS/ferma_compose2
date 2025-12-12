@@ -44,8 +44,7 @@ interface ExpensesRepository {
     fun getProductLisCategoryExpensesCurrentMonth(
         id: Long,
         dateBegin: String,
-        dateEnd: String,
-        category: String
+        dateEnd: String
     ): Flow<List<DomainTitleSuffixPrice>> //maybe
 
     fun getCurrentFoodWarehouse(id: Long): Flow<List<DomainExpensesTable>>

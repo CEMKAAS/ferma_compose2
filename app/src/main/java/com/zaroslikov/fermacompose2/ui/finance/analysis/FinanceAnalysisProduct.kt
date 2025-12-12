@@ -1,63 +1,69 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.finance.analysis
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
+import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarCalendar
+import com.zaroslikov.fermacompose2.TopAppBarNew
+import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.dark
-import com.zaroslikov.fermacompose2.supportFun.dateLongToString
+import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_6
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.supportFun.toColorList
+import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.animal.list_screen.IconAnimal
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
-import com.zaroslikov.fermacompose2.ui.elements.BorderCard
-import com.zaroslikov.fermacompose2.ui.elements.CardField
-import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
+import com.zaroslikov.fermacompose2.ui.elements.BigColorCard
+import com.zaroslikov.fermacompose2.ui.elements.CardNewWithTitle
+import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
-import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
-import com.zaroslikov.fermacompose2.ui.elements.SecondAnimalCard
-import com.zaroslikov.fermacompose2.ui.elements.TextAndIconRow
+import com.zaroslikov.fermacompose2.ui.elements.IconCircle
+import com.zaroslikov.fermacompose2.ui.elements.IconCircleText
+import com.zaroslikov.fermacompose2.ui.elements.IconFinance
+import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
+import com.zaroslikov.fermacompose2.ui.elements.WhiteTenCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
-import com.zaroslikov.fermacompose2.ui.elements.textBold_18
+import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.HeadingAnimalCard
-import com.zaroslikov.fermacompose2.ui.finance.month.FinanceMonthIntent
+import com.zaroslikov.fermacompose2.ui.elements.text_36
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.CircleShape
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import io.appmetrica.analytics.AppMetrica
+import com.zaroslikov.fermacompose2.violet_5
+import com.zaroslikov.fermacompose2.violet_6
+import com.zaroslikov.fermacompose2.white
 
 
 object FinanceAnalysisDestination : NavigationDestination {
@@ -65,8 +71,9 @@ object FinanceAnalysisDestination : NavigationDestination {
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
     const val itemIdArgTwo = "itemProduct"
+    const val itemIdArgTree = "itemSuffix"
     val routeWithArgs =
-        "$route/{$itemIdArg}/{$itemIdArgTwo}"
+        "$route/{$itemIdArg}/{$itemIdArgTwo}/{$itemIdArgTree}"
 }
 
 @Composable
@@ -77,37 +84,23 @@ fun FinanceAnalysisProduct(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(topBar = {
-        TopAppBarCalendar(
-            title = state.currentPeriod,
-            true,
-            navigateUp = navigateBack,
-            settingUp = {
-                viewModel.onIntent(FinanceAnalysisIntent.OpenCalendarDialogClicked(true))
-                AppMetrica.reportEvent("Диапазон Анализ")
-            }
+        TopAppBarNew(
+            title = stringResource(R.string.analysis_screen_title_s, state.titleProduct),
+            navigateBack = navigateBack,
         )
     }) { innerPadding ->
         FinanceAnalysisContainer(
             modifier = Modifier
                 .modifierScreen(innerPadding),
-            text = state.currentPeriod,
-            analysisAddAllTime = state.productAdd,
-            analysisSaleAllTime = state.productSale,
-            analysisWriteOffAllTime = state.productWriteOff,
-            analysisWriteOffOwnNeedsAllTime = state.productOnwNeeds,
-            analysisWriteOffScrapAllTime = state.productScrap,
-            analysisSaleSoldAllTime = state.productSaleSold,
-            analysisWriteOffOwnNeedsMoneyAllTime = state.productWriteOffOnwNeedMoney,
-            analysisWriteOffScrapMoneyAllTime = state.productWriteOffScrapMoney,
-            analysisAddAverageValueAllTime = state.productAverage,
-            analysisSaleBuyerAllTimeState = state.saleBuyerList,
-//            analysisAddAnimalAllTimeState = state.analysisAddAnimalAllTimeState.collectAsState().value.itemList,
-//            analysisCostPriceAllTimeState = viewModel.analysisCostPriceTimeState.collectAsState().value.itemList,
+            state = state,
+            onFilterClick = {
+                viewModel.onIntent(FinanceAnalysisIntent.FilterDateClicked(it))
+            }
         )
-        if (state.isOpenCalendarDialog)
+        if (state.dateFilter.isOpenCalendarDialog)
             DateRangePickerModal(
-                dateBegin = state.dateBegin.second,
-                dateEnd = state.dateEnd.second,
+                dateBegin = state.dateFilter.dateBegin.second,
+                dateEnd = state.dateFilter.dateEnd.second,
                 onDateRangeSelected = {
                     viewModel.onIntent(FinanceAnalysisIntent.CurrentPeriodClicked(it))
                 },
@@ -121,338 +114,468 @@ fun FinanceAnalysisProduct(
 @Composable
 fun FinanceAnalysisContainer(
     modifier: Modifier,
-    text: String,
-    analysisAddAllTime: DomainCountSuffix,
-    analysisSaleAllTime: DomainTitleSuffixPrice,
-    analysisWriteOffAllTime: DomainCountSuffix,
-    analysisWriteOffOwnNeedsAllTime: DomainCountSuffix,
-    analysisWriteOffScrapAllTime: DomainCountSuffix,
-    analysisSaleSoldAllTime: Double,
-    analysisWriteOffOwnNeedsMoneyAllTime: Double,
-    analysisWriteOffScrapMoneyAllTime: Double,
-    analysisAddAverageValueAllTime: DomainCountSuffix,
-    analysisSaleBuyerAllTimeState: List<DomainBuyerPrice>,
-//    analysisAddAnimalAllTimeState: List<AnimalTitSuff>,
-//    analysisCostPriceAllTimeState: List<Fin>
+    state: FinanceAnalysisState,
+    onFilterClick: (FilterDate) -> Unit
 ) {
-    val noTitleString = stringResource(R.string.analysis_screen_no_title)
-    Column(modifier = modifier) {
-        AnalysisCardOne(
-            text = text,
-            analysisAddAllTime = analysisAddAllTime,
-            analysisSaleAllTime = analysisSaleAllTime,
-            analysisWriteOffAllTime = analysisWriteOffAllTime,
-            analysisWriteOffOwnNeedsAllTime = analysisWriteOffOwnNeedsAllTime,
-            analysisWriteOffScrapAllTime = analysisWriteOffScrapAllTime,
-            analysisSaleSoldAllTime = analysisSaleSoldAllTime,
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        FilterDateElement(
+            value = state.dateFilter.filterDate,
+            currentPeriod = state.dateFilter.currentPeriod,
+            onValueChange = { onFilterClick(it) }
         )
-        AnalysisCardTwo(
-            text = text,
-            analysisSaleSoldAllTime = analysisSaleSoldAllTime,
-            analysisWriteOffOwnNeedsMoneyAllTime = analysisWriteOffOwnNeedsMoneyAllTime,
-            analysisWriteOffScrapMoneyAllTime = analysisWriteOffScrapMoneyAllTime,
+        AnalysisMainCard(
+            currentBalance = state.countProduct,
+            stock = state.stock,
+            suffix = state.baseSuffix,
+            averagePrice = state.averagePrice,
+            priceSuffix = Suffix.RUBLE
         )
-        /*PullOutCard(
-            intRes = R.string.analysis_screen_byers,
-            list = analysisSaleBuyerAllTimeState,
-            intTitleText = R.string.alert_dialog_info_title_byers_analysis,
-            intText = R.string.alert_dialog_info_text_byers_analysis
-        ) { analysisSaleBuyerAllTimeState ->
-            Pair(
-                if (analysisSaleBuyerAllTimeState.buyer == "") noTitleString else analysisSaleBuyerAllTimeState.buyer,
-                stringResource(
-                    R.string.card_count_briefly_s,
-                    "${analysisSaleBuyerAllTimeState.count.formatNumber()} ${analysisSaleBuyerAllTimeState.suffix}",
-                    analysisSaleBuyerAllTimeState.price.formatNumber(),
-                    stringResource(R.string.currency_ruble)
-                )
-            )
-        }*/
-        /*PullOutCard(
-           intRes = R.string.analysis_screen_animals,
-           list = analysisAddAnimalAllTimeState,
-           intTitleText = R.string.alert_dialog_info_title_animals_analysis,
-           intText = R.string.alert_dialog_info_text_animals_analysis
-       ) {
-           Pair(
-               if (it.title == "") noTitleString else it.title,
-               "${it.priceAll.formatNumber()} ${it.suffix}"
-           )
-       }*/
-        /*PullOutCard(
-            intRes = R.string.analysis_screen_cost_price,
-            list = analysisCostPriceAllTimeState,
-            intTitleText = R.string.alert_dialog_info_title_cost_price,
-            intText = R.string.alert_dialog_info_text_cost_price
-        ) { analysisCostPriceAllTimeState ->
-            Pair(
-                if (analysisCostPriceAllTimeState.title == "" || analysisCostPriceAllTimeState.title == null) noTitleString else
-                    stringResource(
-                        R.string.analysis_screen_cost_price_s,
-                        analysisCostPriceAllTimeState.title
-                    ),
-                stringResource(
-                    R.string.card_ruble_s,
-                    analysisCostPriceAllTimeState.priceAll.formatNumber()
-                )
-            )
-        }*/
+        FinanceAnalysisCard(
+            financeCategory2 = state.financeAnalysis,
+            totalPrice = state.totalPrice,
+            suffixPrice = Suffix.RUBLE,
+            realizedPrice = state.realizedPrice,
+            potentialBalance = state.potentialBalance,
+            soldLost = state.soldLost
+        )
+        ProductDistribution(state.financeAnalysis)
+        AnimalProducers(state.animalProducer)
+        TopBuyers(state.buyers)
     }
 }
 
 @Composable
-fun AnalysisCardOne(
-    text: String,
-    analysisAddAllTime: DomainCountSuffix,
-    analysisSaleAllTime: DomainTitleSuffixPrice,
-    analysisWriteOffAllTime: DomainCountSuffix,
-    analysisWriteOffOwnNeedsAllTime: DomainCountSuffix,
-    analysisWriteOffScrapAllTime: DomainCountSuffix,
-    analysisSaleSoldAllTime: Double,
+private fun AnalysisMainCard(
+    currentBalance: Double,
+    stock: Double,
+    suffix: Suffix,
+    averagePrice: Double,
+    priceSuffix: Suffix
 ) {
-    CardField {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.analysis_screen_product_information, text),
-                style = textBold_18
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_product_add),
-                value = "${analysisAddAllTime.count.formatNumber()} ${analysisAddAllTime.suffix}"
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_product_sale),
-                value = "${analysisSaleAllTime.price.formatNumber()} ${analysisSaleAllTime.suffix}"
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_product_write_off),
-                value = "${analysisWriteOffAllTime.count.formatNumber()} ${analysisWriteOffAllTime.suffix}"
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_product_own_needs),
-                value = "${analysisWriteOffOwnNeedsAllTime.count.formatNumber()} ${analysisWriteOffOwnNeedsAllTime.suffix}",
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_product_until),
-                value = "${analysisWriteOffScrapAllTime.count.formatNumber()} ${analysisWriteOffScrapAllTime.suffix}",
-            )
-            if (text == stringResource(R.string.support_text_all_time))
-                TextAndIconRow(
-                    title = stringResource(R.string.analysis_screen_product_warehouse),
-                    value = "${(analysisAddAllTime.count - analysisSaleAllTime.price - analysisWriteOffAllTime.count).formatNumber()} ${analysisAddAllTime.suffix}"
-                )
-            /*
-            Text(
-                text = "В среднем за текущий год: ${formatter(analysisAddAverageValueAllTime.priceAll)} ${analysisAddAverageValueAllTime.title} за день",
-                modifier = modifierText
-            )
-           */
-        }
-    }
-}
-
-@Composable
-fun AnalysisCardTwo(
-    text: String,
-    analysisSaleSoldAllTime: Double,
-    analysisWriteOffOwnNeedsMoneyAllTime: Double,
-    analysisWriteOffScrapMoneyAllTime: Double,
-) {
-    var openAlertDialogSaved by remember { mutableStateOf(false) }
-    var openAlertDialogLost by remember { mutableStateOf(false) }
-
-    if (openAlertDialogSaved) {
-        AlertDialogInfo(
-            onConfirmation = { openAlertDialogSaved = !openAlertDialogSaved },
-            intTitleText = R.string.alert_dialog_info_title_saved,
-            intText = R.string.alert_dialog_info_text_saved,
-        )
-    }
-    if (openAlertDialogLost) {
-        AlertDialogInfo(
-            onConfirmation = { openAlertDialogLost = !openAlertDialogLost },
-            intTitleText = R.string.alert_dialog_info_title_lost,
-            intText = R.string.alert_dialog_info_text_lost,
-        )
-    }
-    CardField {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.analysis_screen_finance_information, text),
-                style = textBold_18
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_income),
-                value = stringResource(
-                    R.string.card_ruble_s,
-                    analysisSaleSoldAllTime.formatNumber()
-                )
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_saved),
-                value = stringResource(
-                    R.string.card_ruble_s,
-                    analysisWriteOffOwnNeedsMoneyAllTime.formatNumber()
-                ),
-                isShowIcon = true,
-                onClick = { openAlertDialogSaved = !openAlertDialogSaved }
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_lost),
-                value = stringResource(
-                    R.string.card_ruble_s,
-                    analysisWriteOffScrapMoneyAllTime.formatNumber()
-                ),
-                isShowIcon = true,
-                onClick = { openAlertDialogLost = !openAlertDialogLost }
-            )
-            TextAndIconRow(
-                title = stringResource(R.string.analysis_screen_total),
-                value = stringResource(
-                    R.string.card_ruble_s,
-                    (analysisSaleSoldAllTime + analysisWriteOffOwnNeedsMoneyAllTime - analysisWriteOffScrapMoneyAllTime).formatNumber()
-                )
-            )
-        }
-    }
-}
-
-
-@Composable
-fun <T> PullOutCard(
-    modifier: Modifier = Modifier,
-    @StringRes intRes: Int,
-    @StringRes intTitleText: Int,
-    @StringRes intText: Int,
-    list: List<T>,
-    itemToString: @Composable (T) -> Pair<String?, String>
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (expanded) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
-    var openAlertDialog by remember { mutableStateOf(false) }
-    if (openAlertDialog) {
-        AlertDialogInfo(
-            onConfirmation = { openAlertDialog = false },
-            intTitleText = intTitleText,
-            intText = intText
-        )
-    }
-
-    CardField(
-        modifier = modifier.padding(bottom = extraPadding.coerceAtLeast(0.dp)),
-        horizontalArrangement = Arrangement.SpaceBetween,
+    BigColorCard(
+        glowColor = price_green,
+        colors = listOf(price_green, green_2),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            TextAndIconRow(
-                intRes = intRes,
-                titleStyle = textBold_18,
-                isShowIcon = true,
-                onClick = { openAlertDialog = !openAlertDialog },
-                isShowValue = false,
-                value = ""
+            IconFinance(
+                icon = R.drawable.icon_add_product,
+                color = Color(0x20FFFFFF)
             )
-            if (list.isNotEmpty()) {
-                for (i in list.indices) {
-                    TextAndIconRow(
-                        title = "${i + 1}. ${itemToString(list[i]).first}",
-                        value = itemToString(list[i]).second
-                    )
-                    if (i == 2 && !expanded)
-                        break
-                }
-            } else Text(text = stringResource(R.string.analysis_screen_no))
+            Text(
+                text = stringResource(R.string.analysis_screen_total_produced),
+                style = text_14,
+                color = Color(0x80FFFFFF)
+            )
         }
-        if (list.size > 3)
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Показать меню"
+        Text(
+            text = "${currentBalance.formatNumber()} ${stringResource(suffix.toResId())}",
+            style = text_36,
+            color = white
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            WhiteTenCard(
+                modifier = Modifier.weight(1f),
+                titleRes = R.string.analysis_screen_in_stock,
+                value = stock,
+                suffix = suffix
+            )
+            WhiteTenCard(
+                modifier = Modifier.weight(1f),
+                titleRes = R.string.analysis_screen_average_price,
+                value = averagePrice,
+                suffix = priceSuffix
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun FinanceAnalysisCard(
+    totalPrice: Double,
+    realizedPrice: Double,
+    potentialBalance: Double,
+    soldLost: Double,
+    suffixPrice: Suffix,
+    financeCategory2: List<FinanceAnalysis>
+) {
+    CardNewWithTitle(
+        titleRes = R.string.analysis_screen_finance_analysis
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                stringResource(R.string.analysis_screen_total_price_product),
+                style = text_14,
+                color = marengo
+            )
+            Text(
+                "${totalPrice.formatNumber()} ${stringResource(suffixPrice.toResId())}",
+                style = text_16,
+                color = black_2
+            )
+        }
+        HorizontalDivider(thickness = 1.dp, color = gray_6)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            financeCategory2.forEach {
+                FinanceAnalysisRowCard(
+                    totalCount = it.totalCount,
+                    suffixCount = it.suffixCount,
+                    totalPrice = it.totalPrice,
+                    suffixPrice = it.suffixPrice,
+                    averagePrice = it.averagePrice,
+                    percent = it.percentDouble,
+                    financeAnalysis = it.financeAnalysis
                 )
             }
+        }
+        HorizontalDivider(thickness = 1.dp, color = gray_6)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val financeRow = listOf(
+                Triple(
+                    R.string.analysis_screen_realized_product, realizedPrice,
+                    FinanceAnalysisEnum.SALE.textColor
+                ),
+                Triple(
+                    R.string.analysis_screen_potential_balance, potentialBalance,
+                    FinanceAnalysisEnum.STOCK.textColor
+                ),
+                Triple(
+                    R.string.analysis_screen_sold_lost_profits, soldLost,
+                    FinanceAnalysisEnum.SCRAP.textColor
+                )
+            )
+            financeRow.forEach {
+                FinanceAnalysisRow(
+                    title = it.first,
+                    count = it.second,
+                    suffixPrice = suffixPrice,
+                    textColor = it.third,
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun <T> PullOutCardNew(
-    modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
-    @StringRes intRes: Int,
-    @StringRes intTitleText: Int,
-    @StringRes intText: Int,
-    primalColor: Color,
-    list: List<T>,
-    detailCard: @Composable (T, Int) -> Unit,
+private fun FinanceAnalysisRowCard(
+    totalCount: Double,
+    suffixCount: Suffix,
+    totalPrice: Double,
+    suffixPrice: Suffix,
+    averagePrice: Double,
+    percent: Double,
+    financeAnalysis: FinanceAnalysisEnum
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val extraPadding by animateDpAsState(
-        if (expanded) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-
-    var openAlertDialog by remember { mutableStateOf(false) }
-    if (openAlertDialog) {
-        AlertDialogInfo(
-            onConfirmation = { openAlertDialog = false },
-            intTitleText = intTitleText,
-            intText = intText
-        )
-    }
-
-    SecondAnimalCard(
-        icon = icon,
-        intRes = intRes
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = financeAnalysis.colorBackground
+        ),
+        shape = RoundedCornerShape(14.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (list.isNotEmpty()) {
-                for (i in list.indices) {
-                    detailCard(list[i], i)
-                    if (i == 2 && !expanded)
-                        break
-                }
-            } else Text(text = stringResource(R.string.analysis_screen_no))
-        }
-        if (list.size > 3)
-            TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                IconCircle(
+                    icon = financeAnalysis.icon,
+                    colorBackground = financeAnalysis.iconBackground
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
+                    Text(stringResource(financeAnalysis.title), style = text_14, color = black_2)
                     Text(
-                        if (expanded) stringResource(R.string.button_wrap) else
-                            stringResource(R.string.animal_card_screen_show_product_all).format(
-                                list.size
-                            ),
-                        style = text_14,
-                        color = primalColor
-                    )
-                    Icon(
-                        if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Показать меню",
-                        tint = primalColor
+                        totalCount.formatNumber() +
+                                " ${stringResource(suffixCount.toResId())}" + " • " +
+                                "${percent.formatNumber()}%",
+                        style = text_12,
+                        color = gray_7
                     )
                 }
             }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "${financeAnalysis.sign}${totalPrice.formatNumber()} " +
+                            stringResource(suffixPrice.toResId()),
+                    style = text_16,
+                    color = financeAnalysis.textColor
+                )
+                Text(
+                    text = "${averagePrice.formatNumber()} " +
+                            stringResource(suffixPrice.toResId()) + "/" + stringResource(suffixCount.toResId()),
+                    style = text_12,
+                    color = gray_7
+                )
+            }
+        }
     }
 }
 
+@Composable
+private fun FinanceAnalysisRow(
+    @StringRes title: Int,
+    count: Double,
+    suffixPrice: Suffix,
+    textColor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(stringResource(title), style = text_14, color = marengo)
+        Text(
+            text = "${count.formatNumber()} " +
+                    stringResource(suffixPrice.toResId()),
+            style = text_16,
+            color = textColor
+        )
+    }
+}
 
+@Composable
+private fun ProductDistribution(
+    financeAnalysis: List<FinanceAnalysis>
+) {
+    CardNewWithTitle(
+        titleRes = R.string.analysis_screen_product_distribution
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            financeAnalysis.forEach {
+                FinanceCategorySlider(
+                    count = it.totalCount,
+                    suffix = it.suffixCount,
+                    percentDouble = it.percentDouble,
+                    percentFloat = it.percentFloat,
+                    financeAnalysisEnum = it.financeAnalysis,
+                )
+            }
+        }
+    }
+}
 
+@Composable
+private fun FinanceCategorySlider(
+    count: Double,
+    suffix: Suffix,
+    percentDouble: Double,
+    percentFloat: Float,
+    financeAnalysisEnum: FinanceAnalysisEnum
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CircleShape(financeAnalysisEnum.iconBackground)
+                Text(stringResource(financeAnalysisEnum.title), style = text_14, color = dark)
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "${count.formatNumber()} ${stringResource(suffix.toResId())}",
+                    style = text_14, color = black_2
+                )
+                TextMiniCard(
+                    "${percentDouble.formatNumber()}%",
+                    textColor = financeAnalysisEnum.colorTextPercent,
+                    backgroundColor = financeAnalysisEnum.colorBackground
+                )
+            }
+        }
+        Slider(
+            percentFloat = percentFloat,
+            color = financeAnalysisEnum.iconBackground
+        )
+    }
+}
+
+@Composable
+private fun AnimalProducers(
+    animalProducer: List<AnimalProducer>
+) {
+    CardNewWithTitle(
+        titleRes = R.string.analysis_screen_animal_producers
+    ) {
+        animalProducer.forEach {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                AnimalProducerSlider(
+                    name = it.name,
+                    type = it.type,
+                    count = it.count,
+                    suffix = it.suffix,
+                    percentDouble = it.percentDouble,
+                    percentFloat = it.percentFloat
+                )
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun AnimalProducerSlider(
+    name: String,
+    type: String,
+    count: Double,
+    suffix: Suffix,
+    percentDouble: Double,
+    percentFloat: Float,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                IconAnimal(sex = true, size = 40.dp)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(name, style = text_14, color = black_2)
+                    Text(type, style = text_12, color = gray_7)
+                }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text("$count ${stringResource(suffix.toResId())}", style = text_14, color = black_2)
+                TextMiniCard(
+                    "${percentDouble.formatNumber()}%",
+                    textColor = FinanceAnalysisEnum.SALE.colorTextPercent,
+                    backgroundColor = FinanceAnalysisEnum.SALE.colorBackground
+                )
+            }
+        }
+        SliderGradient(
+            percentFloat = percentFloat,
+            colors = listOf(green_6, green_shamrock)
+        )
+    }
+}
+
+@Composable
+private fun TopBuyers(
+    buyersList: List<Buyer>
+) {
+    CardNewWithTitle(
+        titleRes = R.string.analysis_screen_byers
+    ) {
+        buyersList.forEachIndexed { index, buyer ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                BuyerCard(
+                    number = index + 1,
+                    buyer = buyer.buyer,
+                    count = buyer.count,
+                    suffix = buyer.suffix,
+                    price = buyer.price,
+                    priceSuffix = buyer.priceSuffix,
+                    countTransaction = buyer.countTransaction
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BuyerCard(
+    number: Int,
+    buyer: String,
+    count: Double,
+    suffix: Suffix,
+    price: Double,
+    priceSuffix: Suffix,
+    countTransaction: Int
+) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = ghostly_white
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                IconCircleText(
+                    number = number.toString(),
+                    colorBackground = violet_5,
+                    colorText = violet_6,
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(buyer, style = text_12, color = black_2)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        CountColorCard(count, suffix, suffix.toColorList())
+                        Text("$countTransaction ${stringResource(R.string.analysis_screen_buy)}", style = text_12, color = gray_7)
+                    }
+                }
+            }
+            Text(
+                text = "${price.formatNumber()} " +
+                        stringResource(priceSuffix.toResId()),
+                style = text_14,
+                color = price_green
+            )
+        }
+    }
+}

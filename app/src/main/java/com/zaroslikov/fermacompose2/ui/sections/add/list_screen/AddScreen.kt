@@ -59,7 +59,8 @@ fun AddScreen(
         drawerState: DrawerState,*/
     /*state: AddListState,
     onIntent: (AddListIntent) -> Unit,*/
-    viewModel: AddViewModel = hiltViewModel()
+    viewModel: AddViewModel = hiltViewModel(),
+    navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -156,6 +157,7 @@ fun AddScreen(
                     )
                 },
                 onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
+                onAnalysisClick = { navigationToAnalysis(Triple(idProject, it.first, it.second)) }
             )
     }
 }
@@ -231,6 +233,7 @@ fun BrieflyBottomSheetAdd(
     onEditClick: (DomainAddTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
+    onAnalysisClick: (Pair<String, Suffix>) -> Unit = {},
 ) {
     BrieflyBottomSheetUniversal(
         list = list,
@@ -241,6 +244,7 @@ fun BrieflyBottomSheetAdd(
         onDismissRequest = onDismissRequest,
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
+        onAnalysisClick = { onAnalysisClick(titleProduct to suffix) },
         itemCard = { product ->
             DetailProductCardNew(
                 modifier = Modifier,

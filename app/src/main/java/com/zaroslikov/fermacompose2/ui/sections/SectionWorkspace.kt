@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.grey_3
@@ -59,6 +60,7 @@ object HomeDestination : NavigationDestination {
 @Composable
 fun SectionWorkspaceScreen(
     navigateToItemCard: (Pair<Long, Long>) -> Unit,
+    navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
     viewModel: AddViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -149,7 +151,10 @@ fun SectionWorkspaceScreen(
             state = pagerState
         ) { pageIndex ->
             when (pages[pageIndex]) {
-                Page.ADD -> AddScreen()
+                Page.ADD -> AddScreen(
+                    navigationToAnalysis = { navigationToAnalysis(it) }
+                )
+
                 Page.SALE -> SaleScreen()
                 Page.EXPENSES -> ExpensesScreen()
                 Page.WRITE_OFF -> WriteOffScreen()

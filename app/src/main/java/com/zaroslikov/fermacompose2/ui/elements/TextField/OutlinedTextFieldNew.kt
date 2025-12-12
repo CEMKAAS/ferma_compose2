@@ -48,6 +48,7 @@ import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.fermacompose2.error_base
@@ -405,6 +406,34 @@ fun OutlinedTextCategoryNew(
                 readOnly = readOnly, isMore = value.isBlank()
             )
         }
+    }
+}
+
+@Composable
+fun OutlinedTextFilterNew(
+    value: FilterDate,
+    currentPeriod: String,
+    onValueChange: (FilterDate) -> Unit,
+    titleList: List<FilterDate>,
+) {
+    val valueFinal = if (value == FilterDate.PERIOD) currentPeriod
+    else stringResource(value.toResId())
+    ExposedDropdownMenuFilterDate(
+        title = value,
+        setTitle = { onValueChange(it) },
+        titleList = titleList
+    ) {
+        BaseOutlinedTextNew(
+            modifier = it.first,
+            value = valueFinal,
+            onValueChange = { },
+            isError = false,
+            leadingIconRes2 = R.drawable.baseline_filter_alt_24,
+            intResSup = R.string.support_text_category,
+            keyboardOptions = keyboardOptionsNext(),
+            readOnly = true,
+            isMore = true
+        )
     }
 }
 

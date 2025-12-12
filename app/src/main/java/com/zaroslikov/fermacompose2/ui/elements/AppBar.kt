@@ -3,8 +3,10 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Attachment
 import androidx.compose.material.icons.filled.Edit
@@ -30,6 +32,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -147,6 +150,55 @@ fun TopAppBarBack(
                 text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+        },
+        navigationIcon = {
+            IconButton(onClick = navigateUp) {
+                Icon(
+                    painterResource(R.drawable.baseline_arrow_back_24),
+                    contentDescription = "Назад"
+                )
+            }
+        },
+        windowInsets = WindowInsets(0),
+        scrollBehavior = scrollBehavior,
+        actions = {
+            if (calendarClick != null) {
+                IconButton(onClick = calendarClick) {
+                    Icon(
+                        painterResource(R.drawable.icon_date_range),
+                        contentDescription = "Date Range"
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun TopAppBarBackAndFilter(
+    @StringRes intRes: Int? = null,
+    title: String = "",
+    navigateUp: () -> Unit = {},
+    calendarClick: (() -> Unit)? = null,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.largeTopAppBarColors(
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                OutlinedTextNote(
+                    value = "TODO()",
+                    onValueChange = { TODO() }
+                )
+            }
         },
         navigationIcon = {
             IconButton(onClick = navigateUp) {

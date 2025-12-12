@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.green_2
 import com.zaroslikov.fermacompose2.green_4
+import com.zaroslikov.fermacompose2.white
 
 @Composable
 fun IconDone() {
@@ -65,7 +67,7 @@ fun IconFinance(
     Box(
         modifier = Modifier
             .size(36.dp)
-            .background(color = color, shape = RoundedCornerShape(14.dp)),
+            .background(color = color, shape = RoundedCornerShape(10.dp)), //TODO 14
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -104,14 +106,57 @@ fun IconTransaction(
 @Composable
 fun IconText(
     number: String,
+    colorBackground: Color,
+    colorText: Color,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .size(24.dp)
-            .background(color = green_4, shape = RoundedCornerShape(10.dp)),
+            .background(color = colorBackground, shape = RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {
-        Text(number, color = green_2, style = text_12)
+        Text(number, color = colorText, style = text_12)
+    }
+}
+
+
+@Composable
+fun IconCircleText(
+    number: String,
+    colorBackground: Color,
+    colorText: Color,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .background(color = colorBackground, shape = CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(number, color = colorText, style = text_16)
+    }
+}
+
+@Composable
+fun IconCircle(
+    modifier: Modifier = Modifier,
+    @DrawableRes icon: Int,
+    colorBackground: Color,
+    colorIcon: Color = white,
+    sizeBox: Dp = 40.dp
+) {
+    Box(
+        modifier = modifier
+            .size(sizeBox)
+            .background(color = colorBackground, shape = CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painterResource(icon),
+            contentDescription = null,
+            tint = colorIcon,
+            modifier = Modifier.size(sizeBox / 2)
+        )
     }
 }

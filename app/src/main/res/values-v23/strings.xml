@@ -66,6 +66,7 @@
     <string name="card_count_briefly_s">%s за %s %s</string>
     <string name="card_extra_set">Дополнительные\nнастройки</string>
     <string name="card_income">Доход</string>
+    <string name="card_profit">Прибыль</string>
     <string name="card_expenditure">Расход</string>
     <string name="card_own_need">Сэкономлено</string>
     <string name="card_scrap">Потеряно</string>
@@ -154,6 +155,7 @@
     <string name="suffix_gram">г.</string>
     <string name="suffix_kilogram">кг.</string>
     <string name="suffix_tons">тн.</string>
+    <string name="suffix_millilitres">мл.</string>
     <string name="suffix_liters">л.</string>
     <string name="suffix_cubic_meters">м3.</string>
     <string name="suffix_millimeters">мм.</string>
@@ -250,6 +252,13 @@
     //SupportText
     <string name="support_text_no_category">Без категории</string>
 
+    //FilterDate
+    <string name="filter_date_today">Сегодня</string>
+    <string name="filter_date_week">Неделя</string>
+    <string name="filter_date_month">Месяц</string>
+    <string name="filter_date_year">Год</string>
+    <string name="filter_date_all_time">Все время</string>
+    <string name="filter_date_period">Свой период</string>
     //Error
     <string name="error_no_count_product">Количество не указано!</string>
     <string name="error_no_count_sale">Стоимость не указана!</string>
@@ -388,6 +397,7 @@
 
 
     //AnalysisProductScreen
+    <string name="analysis_screen_title_s">Анализ: %s</string>
     <string name="analysis_screen_product_information">Данные по продукции за %s</string>
     <string name="analysis_screen_product_add">Получено</string>
     <string name="analysis_screen_product_sale">Проданно</string>
@@ -403,12 +413,28 @@
     <string name="analysis_screen_total">Итого</string>
 
     <string name="analysis_screen_animals">Продукция от животных</string>
-    <string name="analysis_screen_byers">Покупатели</string>
+    <string name="analysis_screen_byers">Топ покупатели</string>
     <string name="analysis_screen_cost_price">Себестоимость в расчете за 1 ед.</string>
 
     <string name="analysis_screen_no">Пока ничего нет :(</string>
     <string name="analysis_screen_no_title">Не указано</string>
     <string name="analysis_screen_cost_price_s">От %s</string>
+
+    <string name="analysis_screen_total_produced">Произведено всего</string>
+
+    <string name="analysis_screen_in_stock">В наличии</string>
+    <string name="analysis_screen_average_price">Средняя цена</string>
+
+    <string name="analysis_screen_product_distribution">Распределение продукции</string>
+    <string name="analysis_screen_animal_producers">Животные-производители</string>
+    <string name="analysis_screen_finance_analysis">Финансовый анализ</string>
+    <string name="analysis_screen_total_price_product">Общая стоимость произведенного</string>
+    <string name="analysis_screen_sold">Продано</string>
+    <string name="analysis_screen_realized_product">Реализовано (продано + использовано)</string>
+    <string name="analysis_screen_potential_balance">Потенциальный остаток</string>
+    <string name="analysis_screen_sold_lost_profits">Упущенная выгода (потери)</string>
+    <string name="analysis_screen_buy">покупок</string>
+
 
     //AnimalEntryScreen
     <string name="animal_entry_screen_">Вносим данные по группе или одному животному?</string>
@@ -422,25 +448,44 @@
     <string name="finance_expenses">Расходы</string>
     <string name="finance_height">Рост</string>
     <string name="finance_recession">Спад</string>
-    <string name="finance_profit">Прибыль</string>
+    <string name="finance_total">Итого</string>
     <string name="finance_onw_need">Собственные нужды</string>
     <string name="finance_scrap">Списания в утиль</string>
+    <string name="finance_income_sup">От продаж</string>
+    <string name="finance_expenses_sup">На закупки</string>
 
     //FinanceCategory
     <string name="finance_category_income_total">Общий доход</string>
     <string name="finance_category_expenses_total">Общий расход</string>
     <string name="finance_category_onw_need_total">Общая экономия</string>
     <string name="finance_category_scrap_total">Общие потери</string>
+    <string name="finance_category_total_profit">Чистая прибыль</string>
     <string name="finance_category_for_category">По категориям</string>
+    <string name="finance_category_balance_structure">Структура баланса</string>
 
     <string name="finance_category_income_all">Все доходы</string>
     <string name="finance_category_expenses_all">Все расходы</string>
+    <string name="finance_category_note_all">Все записи</string>
     <string name="finance_category_write_off_all">Общие списания</string>
 
     <string name="finance_category_own_need_title">Собственное потребление</string>
     <string name="finance_category_own_need_text">Эта сумма отражает стоимость продукции, которую вы взяли для собственных нужд вместо продажи. Это важная часть вашего хозяйства, которая экономит бюджет семьи.</string>
+
     <string name="finance_category_scrap_title">Внимание на потери</string>
     <string name="finance_category_scrap_text">Списания в утиль уменьшают вашу прибыль. Анализируйте причины потерь, чтобы минимизировать их в будущем. Обратите внимание на условия хранения и сроки годности.</string>
+
+    <string name="finance_category_expenses_title">О расходах</string>
+    <string name="finance_category_expenses_text">Расходы — это все покупки и затраты на содержание хозяйства: корма, ветпрепараты, инвентарь и другие необходимые вложения. Контроль расходов помогает оптимизировать прибыль.</string>
+
+    <string name="finance_category_income_title">О доходах</string>
+    <string name="finance_category_income_text">Здесь отображаются все доходы от продажи продукции вашего хозяйства. Это основной источник вашей прибыли, который формирует денежный поток и влияет на текущий баланс.</string>
+
+    <string name="finance_category_profit_title">О балансе и итоге периода</string>
+    <string name="finance_category_profit_text">Текущий баланс — это реальные средства, доступные на вашем счете прямо сейчас.\nИтог периода — это финансовый результат: Доходы минус Расходы плюс Сэкономлено минус Потеряно. Он показывает эффективность хозяйства за выбранный период и может отличаться от баланса.</string>
+
+
+    <string name="finance_category_total_sum">Общая сумма</string>
+    <string name="finance_category_total_operation">Всего операций:</string>
 
     //FinanceIncomeExpenses
     <string name="finance_income_expenses_category">Категории</string>

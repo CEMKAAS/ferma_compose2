@@ -2,9 +2,8 @@ package com.zaroslikov.domain.models.dto.sale
 
 import com.zaroslikov.domain.models.enums.Suffix
 
-data class DomainBuyerPrice(
-    val buyer: String,
-    val price: Double,
+data class DomainCountSuffixPrice(
     val count: Double,
     val suffix: Suffix,
+    val price: Double
 )

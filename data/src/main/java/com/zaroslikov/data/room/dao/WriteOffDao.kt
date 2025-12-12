@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
@@ -39,12 +40,25 @@ interface WriteOffDao {
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
 
     @Query(
+        "SELECT * FROM write_off_table" +
+                " WHERE idPT=:id AND title =:name AND status = 0 AND price IS NOT NULL" +
+                " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC"
+    )
+    fun getBrieflyDetailsItemWriteOffOwnNeed(id: Long, name: String): Flow<List<WriteOffTable>>
+
+    @Query(
+        "SELECT * FROM write_off_table" +
+                " WHERE idPT=:id AND title =:name AND status = 1 AND price IS NOT NULL" +
+                " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC"
+    )
+    fun getBrieflyDetailsItemWriteOffScrap(id: Long, name: String): Flow<List<WriteOffTable>>
+
+    @Query(
         "SELECT title, count_suffix AS suffix, 0 AS category from add_table Where idPT=:id group by title, count_suffix" +
                 " UNION ALL" +
                 " SELECT title,  count_suffix AS suffix, 1 AS category from expenses_table Where idPT=:id and is_show_warehouse = 1 group by title, count_suffix"
     )
     fun getItemsWriteOffList(id: Long): Flow<List<TitleSuffixCategoryDto>>
-
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
     suspend fun insertWriteOff(item: WriteOffTable)
@@ -55,15 +69,19 @@ interface WriteOffDao {
     @Query("DELETE FROM write_off_table WHERE _id = :id")
     suspend fun deleteWriteOff(id: Long)
 
-    @Query("SELECT" +
-            " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
-            " FROM write_off_table" +
-            " WHERE idPT =:id AND status= 0 AND price IS NOT NULL")
+    @Query(
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND status= 0 AND price IS NOT NULL"
+    )
     fun getOwnNeed(id: Long): Flow<Double> //Write off Maybe
 
-    @Query("SELECT COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
-            " FROM write_off_table" +
-            " WHERE idPT =:id and status = 1 AND price IS NOT NULL")
+    @Query(
+        "SELECT COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id and status = 1 AND price IS NOT NULL"
+    )
     fun getScrap(id: Long): Flow<Double> // WriteOff Maybe
 
     @Query(
@@ -88,40 +106,113 @@ interface WriteOffDao {
     )
     fun getScrapAllList(id: Long): Flow<List<TitleSuffixPriceDto>> //maybe
 
-    @Query("SELECT category," +
-            " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
-            " FROM write_off_table" +
-            " WHERE idPT =:id AND status = 0 AND price IS NOT NULL" +
-            " GROUP BY category ORDER BY price DESC"
+    @Query(
+        "SELECT category," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND status = 0 AND price IS NOT NULL" +
+                " GROUP BY category ORDER BY price DESC"
     )
-     fun getOwnNeedAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
+    fun getOwnNeedAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
 
-     @Query("SELECT category," +
-             " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
-             " FROM write_off_table" +
-             " WHERE idPT =:id and status = 1 AND price IS NOT NULL" +
-             " GROUP BY category ORDER BY price DESC"
+    @Query(
+        "SELECT category," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id and status = 1 AND price IS NOT NULL" +
+                " GROUP BY category ORDER BY price DESC"
     )
-     fun getScrapAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
+    fun getScrapAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
 
-    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount" +
-            " FROM write_off_table" +
-            " WHERE write_off_table.idPT =:id" +
-            " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-            " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and status=0")
+    @Query(
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) AND status=0 AND price IS NOT NULL"
+    )
     fun getOwnNeedMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double> //maybe
 
-    @Query("SELECT COALESCE(SUM(price), 0.0) AS ResultCount" +
-            " FROM write_off_table" +
-            " WHERE write_off_table.idPT =:id" +
-            " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-            " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) and status=1")
+    @Query(
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id" +
+                " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) AND status=1 AND price IS NOT NULL"
+    )
     fun getScrapMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double> //maybe
 
-    @Query("SELECT  COALESCE(SUM(count), 0) AS count," +
-            " count_suffix AS suffix" +
-            " FROM write_off_table" +
-            " WHERE idPT=:id AND title=:name")
+    @Query(
+        "SELECT title," +
+                " count_suffix AS suffix," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
+                " 2 AS category" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND status = 0 AND price IS NOT NULL" +
+                " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY title ORDER BY price DESC"
+    )
+    fun getOwnNeedProductPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<TitleSuffixPriceDto>> //maybe
+
+    @Query(
+        "SELECT title," +
+                " count_suffix AS suffix," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
+                " 3 AS category" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND status = 1  AND price IS NOT NULL" +
+                " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY title ORDER BY price DESC"
+    )
+    fun getScrapProductPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<TitleSuffixPriceDto>> //maybe
+
+    @Query(
+        "SELECT category," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id AND status = 0 AND price IS NOT NULL" +
+                " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY category ORDER BY price DESC"
+    )
+    fun getOwnNeedCategoryPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<CategoryPriceDto>>
+
+    @Query(
+        "SELECT category," +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
+                " FROM write_off_table" +
+                " WHERE idPT =:id and status = 1 AND price IS NOT NULL" +
+                " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY category ORDER BY price DESC"
+    )
+    fun getScrapCategoryPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<CategoryPriceDto>>
+
+    @Query(
+        "SELECT  COALESCE(SUM(count), 0) AS count," +
+                " count_suffix AS suffix" +
+                " FROM write_off_table" +
+                " WHERE idPT=:id AND title=:name"
+    )
     fun getAnalysisWriteOffAllTime(id: Long, name: String): Flow<CountSuffixDto>
 
     @Query(
@@ -170,19 +261,21 @@ interface WriteOffDao {
     ): Flow<CountSuffixDto>
 
     @Query(
-        "SELECT COALESCE(SUM(count), 0) AS count," +
-                " count_suffix AS suffix" +
+        "SELECT count," +
+                " count_suffix AS suffix," +
+                " COALESCE(price_all, price, 0.0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and title=:name AND status=0" +
+                " WHERE idPT=:id and title=:name AND status=:status" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
-    fun getAnalysisWriteOffOwnNeedsAllTimeRange(
+    fun getAnalysisOwnNeedsScrapRangeList(
         id: Long,
         name: String,
+        status: Boolean,
         dateBegin: String,
         dateEnd: String
-    ): Flow<CountSuffixDto>
+    ): Flow<List<CountSuffixPriceDto>>
 
     @Query(
         "SELECT COALESCE(SUM(count), 0) AS count," +

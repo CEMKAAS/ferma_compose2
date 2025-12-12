@@ -11,6 +11,7 @@ data class FinanceState(
     val expenses: Double = 0.0,
     val ownNeed: Double = 0.0,
     val scrap: Double = 0.0,
+    val profit: Double = 0.0,
     val incomeMount: Double = 0.0,
     val expensesMount: Double = 0.0,
     val domainIncomeExpenseList: List<DomainIncomeExpenses> = emptyList(),

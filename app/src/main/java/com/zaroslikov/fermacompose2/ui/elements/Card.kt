@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,7 +48,9 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.black_1
+import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_5
 import com.zaroslikov.fermacompose2.blue_6
@@ -58,6 +62,7 @@ import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_4
 import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
@@ -304,44 +309,16 @@ fun CardFinanceNew(
     colors: List<Color>,
     value: Double,
     suffix: Suffix = Suffix.RUBLE,
-    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     @StringRes titleRes2: Int? = null
 ) {
-    val shape2 = RoundedCornerShape(14.dp)
-    val glowColor = colors.first()
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .graphicsLayer {
-                shadowElevation = 20f
-                shape = shape2
-                clip = false
-                ambientShadowColor = glowColor.copy(alpha = 0.8f)
-                spotShadowColor = glowColor.copy(alpha = 0.8f)
-            }
-            .clip(shape2)
-            .clickable(onClick = onClick)
-            .drawBehind {
-                val gradient = Brush.linearGradient(
-                    colors = colors,
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, size.height) // диагональ
-                )
-
-                drawRoundRect(
-                    brush = gradient,
-                    cornerRadius = CornerRadius(14.dp.toPx()) // скругление здесь
-                )
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = horizontalAlignment,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+    BigColorCard(
+        modifier = modifier,
+        glowColor = colors.first(),
+        colors = colors,
+        padding = PaddingValues(16.dp),
+        onDetailClick = onClick,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        content = {
             IconFinance(
                 icon = icon,
                 color = Color(0x20FFFFFF)
@@ -353,7 +330,7 @@ fun CardFinanceNew(
             )
             Text(
                 text = "${value.formatNumber()} ${stringResource(suffix.toResId())}",
-                style = text_18,
+                style = text_20,
                 color = white
             )
             titleRes2?.let {
@@ -364,7 +341,7 @@ fun CardFinanceNew(
                 )
             }
         }
-    }
+    )
 }
 
 @Composable
@@ -561,14 +538,15 @@ fun DetailProductCardNew(
 fun BorderCard(
     modifier: Modifier = Modifier,
     containerColor: Color = white,
-    padding: Dp = 20.dp,
+    padding: PaddingValues = PaddingValues(20.dp),
+    shape: Shape = RoundedCornerShape(14.dp),
     borderWidth: Dp = 1.dp,
     borderColor: Color = grey_2,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        modifier = modifier,
+        shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = containerColor
         ),
@@ -579,7 +557,6 @@ fun BorderCard(
     ) {
         Column(
             Modifier
-                .fillMaxWidth()
                 .padding(padding),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -668,6 +645,19 @@ fun CountColorCard(
             modifier = Modifier.padding(vertical = 2.dp, horizontal = 8.dp),
             color = white
         )
+    }
+}
+
+@Composable
+fun CategoryBorderCard(
+    text: String
+) {
+    BorderCard(
+        modifier = Modifier,
+        padding = PaddingValues(horizontal = 8.dp, vertical = 3.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(text, style = text_12, color = black)
     }
 }
 
@@ -1046,7 +1036,7 @@ fun ProductKillInfoCard(
     suffix: Suffix
 ) {
     BorderCard(
-        padding = 8.dp
+        padding = PaddingValues(8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -1059,7 +1049,7 @@ fun ProductKillInfoCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                IconText(number = number.toString())
+                IconText(number = number.toString(), colorBackground = green_4, colorText = green_2)
                 Text(name, style = text_14, color = black_1)
             }
             CountColorCard(
@@ -1087,5 +1077,128 @@ fun SecondAnimalCard(
             HeadingAnimalCard(icon, intRes)
             content()
         }
+    }
+}
+
+@Composable
+fun BigColorCard(
+    modifier: Modifier = Modifier,
+    glowColor: Color,
+    colors: List<Color>,
+    padding: PaddingValues = PaddingValues(24.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(16.dp),
+    borderStroke: BorderStroke? = null,
+    onDetailClick: (() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val shape2 = RoundedCornerShape(14.dp)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                shadowElevation = 20f
+                shape = shape2
+                clip = false
+                ambientShadowColor = glowColor.copy(alpha = 0.8f)
+                spotShadowColor = glowColor.copy(alpha = 0.8f)
+            }
+            .then(
+                if (borderStroke != null) Modifier.border(borderStroke, shape2) else Modifier
+            )
+            .drawBehind {
+                val gradient = Brush.linearGradient(
+                    colors = colors,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, size.height) // диагональ
+                )
+                drawRoundRect(
+                    brush = gradient,
+                    cornerRadius = CornerRadius(14.dp.toPx()) // скругление здесь
+                )
+            }
+            .then(
+                if (onDetailClick != null)
+                    Modifier
+                        .clip(shape2)
+                        .clickable { onDetailClick() }
+                else Modifier
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = verticalArrangement,
+            modifier = Modifier.padding(padding)
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun WhiteTenCard(
+    modifier: Modifier,
+    @StringRes titleRes: Int,
+    value: Double,
+    suffix: Suffix
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0x10FFFFFF)
+        ),
+        shape = RoundedCornerShape(10.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(stringResource(titleRes), style = text_12, color = Color(0x70FFFFFF))
+            Text(
+                "${value.formatNumber()} ${stringResource(suffix.toResId())}",
+                style = text_20,
+                color = white
+            )
+        }
+    }
+}
+
+
+@Composable
+fun CardNewWithTitle(
+    @StringRes titleRes: Int,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    CardFieldNew {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                stringResource(titleRes),
+                style = text_16,
+                color = black_2
+            )
+            content()
+        }
+    }
+}
+
+@Composable
+fun TextMiniCard(
+    value: String,
+    textColor: Color,
+    backgroundColor: Color
+) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor,
+        ),
+    ) {
+        Text(
+            value,
+            style = text_12,
+            color = textColor,
+            modifier = Modifier.padding(vertical = 2.dp, horizontal = 8.dp)
+        )
     }
 }

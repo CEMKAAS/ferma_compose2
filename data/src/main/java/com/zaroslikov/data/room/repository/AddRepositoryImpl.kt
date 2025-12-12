@@ -94,14 +94,14 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
             .map { it -> it.map { it.toDomainAnimalCountSuffix() } }
     }
 
-    override fun getAnalysisAddAllTimeRange(
+    override fun getAnalysisAllTimeRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainCountSuffix> {
-        return addDao.getAnalysisAddAllTimeRange(id, name, dateBegin, dateEnd)
-            .map { it.toDomainCountSuffix() }
+    ): Flow<List<DomainCountSuffix>> {
+        return addDao.getAnalysisAddTimeRangeList(id, name, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainCountSuffix() } }
     }
 
     override fun getAnalysisAddAverageValueAllTimeRange(
@@ -114,18 +114,19 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
             .map { it.toDomainCountSuffix() }
     }
 
-    override fun getAnalysisAddAnimalAllTimeRange(
+    override fun getAnalysisAddAnimalRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
     ): Flow<List<DomainAnimalCountSuffix>> {
-        return addDao.getAnalysisAddAnimalAllTimeRange(id, name, dateBegin, dateEnd)
+        return addDao.getAnalysisAddAnimalRangeList(id, name, dateBegin, dateEnd)
             .map { it -> it.map { it.toDomainAnimalCountSuffix() } }
     }
 
     override fun getProductAnimal(idAnimal: Long): Flow<List<DomainAnimalCountSuffix>> {
-        return addDao.getProductAnimal(idAnimal).map { it -> it.map { it.toDomainAnimalCountSuffix() } }
+        return addDao.getProductAnimal(idAnimal)
+            .map { it -> it.map { it.toDomainAnimalCountSuffix() } }
     }
 
     override fun getProductKillList(id: Long): Flow<List<DomainAddTable>> {

@@ -61,24 +61,24 @@ fun ProjectNavHost(
         modifier = modifier
     ) {
         // Add
-        composable(
-            route = HomeDestination.routeWithArgs,
-            arguments = listOf(navArgument(HomeDestination.itemIdArg) {
-                type = NavType.LongType
-            })
-        ) {
-            SectionWorkspaceScreen(
-                navigateToItemCard = {
-                    navController.navigate(
-                        navNull(
-                            route = AnimalCardDestination.route,
-                            itemOne = it.first.toString(),
-                            itemTwo = it.second.toString()
-                        )
-                    )
-                }
-            )
-        }
+        /* composable(
+             route = HomeDestination.routeWithArgs,
+             arguments = listOf(navArgument(HomeDestination.itemIdArg) {
+                 type = NavType.LongType
+             })
+         ) {
+             SectionWorkspaceScreen(
+                 navigateToItemCard = {
+                     navController.navigate(
+                         navNull(
+                             route = AnimalCardDestination.route,
+                             itemOne = it.first.toString(),
+                             itemTwo = it.second.toString()
+                         )
+                     )
+                 }
+             )
+         }*/
 //        composable(
 //            route = WarehouseDestination.routeWithArgs,
 //            arguments = listOf(navArgument(WarehouseDestination.itemIdArg) {
@@ -209,11 +209,15 @@ fun ProjectNavHost(
         }
         composable(
             route = FinanceAnalysisDestination.routeWithArgs,
-            arguments = listOf(navArgument(FinanceAnalysisDestination.itemIdArg) {
-                type = NavType.LongType
-            }, navArgument(FinanceAnalysisDestination.itemIdArgTwo) {
-                type = NavType.StringType
-            })
+            arguments = listOf(
+                navArgument(FinanceAnalysisDestination.itemIdArg) {
+                    type = NavType.LongType
+                }, navArgument(FinanceAnalysisDestination.itemIdArgTwo) {
+                    type = NavType.StringType
+                },
+                navArgument(FinanceAnalysisDestination.itemIdArgTree) {
+                    type = NavType.StringType
+                })
         ) {
             FinanceAnalysisProduct(navigateBack = { navController.popBackStack() })
         }
@@ -231,10 +235,20 @@ fun ProjectNavHost(
                         navNull(
                             route = AnimalCardDestination.route,
                             itemOne = it.first.toString(),
-                            itemTwo = it.second.toString()
+                            itemTwo = it.second.toString(),
                         )
                     )
-                }
+                },
+                navigationToAnalysis = {
+                    navController.navigate(
+                        nav(
+                            FinanceAnalysisDestination.route,
+                            it.first.toString(),
+                            it.second,
+                            it.third.toString()
+                        )
+                    )
+                },
             )
             /* AddScreen(
                  drawerState = drawerState,

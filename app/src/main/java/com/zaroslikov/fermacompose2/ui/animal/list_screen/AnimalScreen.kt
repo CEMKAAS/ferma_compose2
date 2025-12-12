@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,6 +43,7 @@ import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.domain.models.list.suffixWeightDayList
+import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.animal_2
@@ -582,6 +584,7 @@ fun AnimalParameter(
 @Composable
 fun IconAnimal(
     modifier: Modifier = Modifier,
+    size: Dp = 64.dp,
     sex: Boolean,
 ) {
     val glowColor = Color(0xFF00A63E)
@@ -597,7 +600,7 @@ fun IconAnimal(
     )
     Box(
         modifier = modifier
-            .size(64.dp)
+            .size(size)
             /*.graphicsLayer {
                 // имитация неонового свечения
                 shadowElevation = 20f
@@ -619,7 +622,7 @@ fun IconAnimal(
             painterResource(R.drawable.baseline_pets_24),
             contentDescription = "Добавить",
             tint = Color.White,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(size / 2)
         )
     }
 }

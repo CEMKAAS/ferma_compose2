@@ -3,19 +3,32 @@
 package com.zaroslikov.fermacompose2.ui.animal.animalCard
 
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +60,7 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.AnimalParameter
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.IconAnimal
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogArchiveAnimal
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.elements.BigBorderButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -57,7 +71,6 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.finance.analysis.PullOutCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
@@ -403,3 +416,71 @@ private fun NoteWidget(
     }
 }
 
+@Composable
+fun <T> PullOutCardNew(
+    modifier: Modifier = Modifier,
+    @DrawableRes icon: Int,
+    @StringRes intRes: Int,
+    @StringRes intTitleText: Int,
+    @StringRes intText: Int,
+    primalColor: Color,
+    list: List<T>,
+    detailCard: @Composable (T, Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val extraPadding by animateDpAsState(
+        if (expanded) 2.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+
+    var openAlertDialog by remember { mutableStateOf(false) }
+    if (openAlertDialog) {
+        AlertDialogInfo(
+            onConfirmation = { openAlertDialog = false },
+            intTitleText = intTitleText,
+            intText = intText
+        )
+    }
+
+    SecondAnimalCard(
+        icon = icon,
+        intRes = intRes
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (list.isNotEmpty()) {
+                for (i in list.indices) {
+                    detailCard(list[i], i)
+                    if (i == 2 && !expanded)
+                        break
+                }
+            } else Text(text = stringResource(R.string.analysis_screen_no))
+        }
+        if (list.size > 3)
+            TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        if (expanded) stringResource(R.string.button_wrap) else
+                            stringResource(R.string.animal_card_screen_show_product_all).format(
+                                list.size
+                            ),
+                        style = text_14,
+                        color = primalColor
+                    )
+                    Icon(
+                        if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Показать меню",
+                        tint = primalColor
+                    )
+                }
+            }
+    }
+}

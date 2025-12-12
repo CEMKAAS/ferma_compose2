@@ -1,5 +1,6 @@
 package com.zaroslikov.domain.repository
 
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
@@ -14,6 +15,12 @@ interface WriteOffRepository {
     fun getItemWriteOffIdAnimalCount(id: Long): Flow<DomainWriteOffTable>
     fun getBrieflyItemWriteOff(id: Long): Flow<List<BrieflyWriteOffDomain>>
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<DomainWriteOffTable>>
+    fun getBrieflyDetailsItemWriteOffOwnNeed(
+        id: Long,
+        name: String
+    ): Flow<List<DomainWriteOffTable>>
+
+    fun getBrieflyDetailsItemWriteOffScrap(id: Long, name: String): Flow<List<DomainWriteOffTable>>
     fun getItemsWriteOffList(id: Long): Flow<List<DomainTitleSuffixCategory>>
     suspend fun insertWriteOff(item: DomainWriteOffTable)
     suspend fun updateWriteOff(item: DomainWriteOffTable)
@@ -23,6 +30,30 @@ interface WriteOffRepository {
     fun getScrapAllList(id: Long): Flow<List<DomainTitleSuffixPrice>> //maybe
     fun getOwnNeedAllCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>>
     fun getScrapAllCategoryAllList(id: Long): Flow<List<DomainCategoryPrice>>
+
+    fun getOwnNeedProductPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainTitleSuffixPrice>>
+
+    fun getScrapProductPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainTitleSuffixPrice>>
+
+    fun getOwnNeedCategoryPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainCategoryPrice>>
+
+    fun getScrapCategoryPeriodList(
+        id: Long,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainCategoryPrice>>
 
     fun getOwnNeed(id: Long): Flow<Double>
     fun getScrap(id: Long): Flow<Double>
@@ -40,12 +71,13 @@ interface WriteOffRepository {
         dateEnd: String
     ): Flow<DomainCountSuffix>
 
-    fun getAnalysisWriteOffOwnNeedsAllTimeRange(
+    fun getAnalysisOwnNeedsScrapRangeList(
         id: Long,
         name: String,
+        status: Boolean,
         dateBegin: String,
         dateEnd: String
-    ): Flow<DomainCountSuffix>
+    ): Flow<List<DomainCountSuffixPrice>>
 
     fun getAnalysisWriteOffScrapAllTimeRange(
         id: Long,
