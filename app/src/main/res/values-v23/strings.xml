@@ -245,6 +245,10 @@
     <string name="support_text_all_weight">Общий вес составит: %s %s</string>
     <string name="support_text_empty">Не указано</string>
 
+    <string name="warehouse_screen_positions">позиции</string>
+
+
+
     //SupportTextWidget
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
     <string name="support_text_widget_animal_note_tooltip">Нажмите для ввода текста, введенный текст сохранится автоматически </string>
@@ -347,6 +351,8 @@
     //Currency
     <string name="currency_ruble">₽</string>
 
+
+
     //AlertDialogInfo
     <string name="alert_dialog_info_title_food">"Что такое \"Корм\"?</string>
     <string name="alert_dialog_info_text_food">Выберите животное или укажите количество корма и его ежедневный расход, чтобы рассчитать запас на складе. Стоимость корма влияет на себестоимость продукции от животного (за 1 единицу). Данные о запасе отображаются на складе для удобства контроля.</string>
@@ -423,6 +429,7 @@
     <string name="analysis_screen_total_produced">Произведено всего</string>
 
     <string name="analysis_screen_in_stock">В наличии</string>
+    <string name="analysis_screen_produced">Произведено</string>
     <string name="analysis_screen_average_price">Средняя цена</string>
 
     <string name="analysis_screen_product_distribution">Распределение продукции</string>
@@ -434,6 +441,12 @@
     <string name="analysis_screen_potential_balance">Потенциальный остаток</string>
     <string name="analysis_screen_sold_lost_profits">Упущенная выгода (потери)</string>
     <string name="analysis_screen_buy">покупок</string>
+    <string name="analysis_screen_char_produced">График поизведеной продуции</string>
+    <string name="analysis_screen_char_sale">График проданной продуции</string>
+    <string name="analysis_screen_char_own_need">График сэкономленной продуции</string>
+    <string name="analysis_screen_char_scrap">График потеряной продуции</string>
+    <string name="analysis_screen_history_transaction">История операций</string>
+    <string name="analysis_screen_entries">запись</string>
 
 
     //AnimalEntryScreen

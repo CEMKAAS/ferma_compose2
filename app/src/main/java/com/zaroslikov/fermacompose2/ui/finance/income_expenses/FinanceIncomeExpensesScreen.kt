@@ -28,7 +28,6 @@ import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 
 
@@ -166,11 +165,11 @@ private fun <T> LazyListScope.List3(
 ) {
     if (list.isNotEmpty()) {
         item {
-            TextButtonWarehouse(
+           /* TextButtonWarehouse(
                 onClick = onClickDetails,
                 boolean = isDetails,
                 intRes = titRes
-            )
+            )*/
         }
         if (isDetails)
             items(items = list) { item ->

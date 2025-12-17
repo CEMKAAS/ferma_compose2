@@ -1,9 +1,9 @@
-package com.zaroslikov.data.room.dto.sale
+package com.zaroslikov.data.room.dto.shared
 
 import com.zaroslikov.domain.models.enums.Suffix
 
-data class CountSuffixPriceDto(
+data class CountSuffixDateDto(
     val count: Double,
     val suffix: Suffix,
-    val price: Double
+    val date: String
 )

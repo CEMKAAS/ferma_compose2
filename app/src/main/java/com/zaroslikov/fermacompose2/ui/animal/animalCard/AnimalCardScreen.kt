@@ -444,7 +444,6 @@ fun <T> PullOutCardNew(
             intText = intText
         )
     }
-
     SecondAnimalCard(
         icon = icon,
         intRes = intRes

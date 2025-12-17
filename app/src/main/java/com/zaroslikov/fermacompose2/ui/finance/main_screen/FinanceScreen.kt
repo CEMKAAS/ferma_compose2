@@ -44,10 +44,7 @@ import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.red_10
 import com.zaroslikov.fermacompose2.red_7
 import com.zaroslikov.fermacompose2.supportFun.toColorList
-import com.zaroslikov.fermacompose2.supportFun.toColorIconBorderSecond
-import com.zaroslikov.fermacompose2.supportFun.toColorIconSecond
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.supportFun.toTransactionDrawRes
 import com.zaroslikov.fermacompose2.ui.elements.BigColorCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
@@ -55,7 +52,6 @@ import com.zaroslikov.fermacompose2.ui.elements.CardFinanceNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.IconFinance
-import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.text_12
@@ -418,11 +414,7 @@ fun TransactionFinanceCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    IconTransaction(
-                        icon = category.toTransactionDrawRes(),
-                        color = category.toColorIconBorderSecond(),
-                        colorIcon = category.toColorIconSecond()
-                    )
+
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {

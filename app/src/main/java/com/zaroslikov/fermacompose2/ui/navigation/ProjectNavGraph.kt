@@ -46,6 +46,8 @@ import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryProduct
 import com.zaroslikov.fermacompose2.ui.start.StartDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen.WarehouseDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen.WarehouseScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +59,7 @@ fun ProjectNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "${HomeDestination.route}/${itemPT}",
+        startDestination = "${WarehouseDestination.route}/${itemPT}",
         modifier = modifier
     ) {
         // Add
@@ -79,23 +81,21 @@ fun ProjectNavHost(
                  }
              )
          }*/
-//        composable(
-//            route = WarehouseDestination.routeWithArgs,
-//            arguments = listOf(navArgument(WarehouseDestination.itemIdArg) {
-//                type = NavType.IntType
-//            })
-//        ) {
-//            WarehouseScreen(
-//                navigateToStart = { navController.navigate(StartDestination.route) },
-//                navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
-//                navigateToEdit = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
-//                navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") },
-//                navigationToNewYear = { navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}") },
-//                drawerState = drawerState,
-////                isFirstStart = isFirstStart,
-////                isFirstEnd = isFirstEnd
-//            )
-//        }
+        composable(
+            route = WarehouseDestination.routeWithArgs,
+            arguments = listOf(navArgument(WarehouseDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            WarehouseScreen(
+                navigateToStart = { navController.navigate(StartDestination.route) },
+                navigateToEdit = { /*navController.navigate("${WarehouseEditDestination.route}/${it}")*/ },
+          /*      navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") }*/
+                navigationToNewYear = {/* navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}")*/ },
+//                isFirstStart = isFirstStart,
+//                isFirstEnd = isFirstEnd
+            )
+        }
 
         /* composable(
              route = NewYearDestination.routeWithArgs,

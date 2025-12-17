@@ -2,10 +2,21 @@ package com.zaroslikov.fermacompose2
 
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
@@ -28,16 +39,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.dimensionResource
 
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.room.util.TableInfo
 //import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
@@ -416,3 +432,59 @@ fun TopAppBarNew(
         }
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarNewFilter(
+    title: String,
+    modifier: Modifier = Modifier,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    navigateBack: (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
+    TopAppBar(
+        modifier = modifier,
+        contentPadding = PaddingValues(
+            end = dimensionResource(id = R.dimen.padding_medium),
+            top = 16.dp,
+            bottom = 8.dp
+        ),
+        scrollBehavior = scrollBehavior,
+        windowInsets = WindowInsets(0),
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    navigateBack?.let {
+                        Icon(
+                            painterResource(R.drawable.baseline_arrow_back_24),
+                            contentDescription = "Назад",
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .clickable(onClick = it)
+                                .padding(vertical = 4.dp)
+                                .padding(end = 4.dp),
+                        )
+                    }
+                    Text(
+                        title, textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                content()
+            }
+        }
+    )
+}
+
+/*
+contentPadding = PaddingValues(
+end = dimensionResource(id = R.dimen.padding_medium),
+top = 16.dp,
+bottom = 8.dp
+),*/

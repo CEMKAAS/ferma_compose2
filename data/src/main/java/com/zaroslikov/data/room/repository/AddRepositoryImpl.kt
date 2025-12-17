@@ -2,6 +2,7 @@ package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.mapper.dto.add.toDomainFastAddProduct
+import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPriceDate
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainAnimalCountSuffix
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCountSuffix
 import com.zaroslikov.data.room.mapper.dto.toBrieflyAddDomain
@@ -13,6 +14,7 @@ import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.repository.AddRepository
 import kotlinx.coroutines.flow.Flow
@@ -94,14 +96,14 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
             .map { it -> it.map { it.toDomainAnimalCountSuffix() } }
     }
 
-    override fun getAnalysisAllTimeRangeList(
+    override fun getAnalysisAddRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<DomainCountSuffix>> {
-        return addDao.getAnalysisAddTimeRangeList(id, name, dateBegin, dateEnd)
-            .map { it -> it.map { it.toDomainCountSuffix() } }
+    ): Flow<List<DomainCountSuffixPriceDate>> {
+        return addDao.getAnalysisAddRangeList(id, name, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainCountSuffixPriceDate() } }
     }
 
     override fun getAnalysisAddAverageValueAllTimeRange(

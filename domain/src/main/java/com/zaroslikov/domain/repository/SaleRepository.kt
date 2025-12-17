@@ -3,7 +3,7 @@ package com.zaroslikov.domain.repository
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
-import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
@@ -47,7 +47,7 @@ interface SaleRepository {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<DomainCountSuffixPrice>>
+    ): Flow<List<DomainCountSuffixPriceDate>>
 
     fun getAnalysisSaleSoldAllTimeRange(
         id: Long,

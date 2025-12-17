@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDto
+import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
@@ -263,7 +263,8 @@ interface WriteOffDao {
     @Query(
         "SELECT count," +
                 " count_suffix AS suffix," +
-                " COALESCE(price_all, price, 0.0) AS price" +
+                " COALESCE(price_all, price, 0.0) AS price," +
+                " printf('%04d-%02d-%02d', year, month, day) AS date" +
                 " FROM write_off_table" +
                 " WHERE idPT=:id and title=:name AND status=:status" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
@@ -275,7 +276,7 @@ interface WriteOffDao {
         status: Boolean,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<CountSuffixPriceDto>>
+    ): Flow<List<CountSuffixPriceDateDto>>
 
     @Query(
         "SELECT COALESCE(SUM(count), 0) AS count," +

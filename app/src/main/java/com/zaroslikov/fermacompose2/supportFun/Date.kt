@@ -38,7 +38,7 @@ fun datePeriod(
             start to end
         }
 
-        FilterDate.ALL_TIME -> "1970-01-01" to today.format(formatter)
+        FilterDate.ALL_TIME -> "2020-01-01" to today.format(formatter)
         FilterDate.PERIOD -> dateStar to dateEnd
     }
 }

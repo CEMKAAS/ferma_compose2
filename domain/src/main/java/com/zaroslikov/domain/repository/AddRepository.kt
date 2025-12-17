@@ -5,7 +5,9 @@ import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffixDate
 import kotlinx.coroutines.flow.Flow
 
 interface AddRepository {
@@ -30,12 +32,12 @@ interface AddRepository {
         name: String
     ): Flow<List<DomainAnimalCountSuffix>>
 
-    fun getAnalysisAllTimeRangeList(
+    fun getAnalysisAddRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<DomainCountSuffix>>
+    ): Flow<List<DomainCountSuffixPriceDate>>
 
     fun getAnalysisAddAverageValueAllTimeRange(
         id: Long,

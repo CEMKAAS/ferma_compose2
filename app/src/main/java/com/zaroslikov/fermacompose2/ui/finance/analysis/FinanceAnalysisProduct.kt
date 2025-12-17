@@ -3,8 +3,10 @@
 package com.zaroslikov.fermacompose2.ui.finance.analysis
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,52 +17,76 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.enums.FilterDate
+import com.zaroslikov.domain.models.dto.finance.DomainTransaction
+import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarNew
+import com.zaroslikov.fermacompose2.TopAppBarNewFilter
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_2
 import com.zaroslikov.fermacompose2.green_6
+import com.zaroslikov.fermacompose2.green_9
 import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.price_green_2
+import com.zaroslikov.fermacompose2.supportFun.DomainChartPoint
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.toColorIconBorderSecond
+import com.zaroslikov.fermacompose2.supportFun.toColorIconSecond
 import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.supportFun.toTransactionDrawRes
 import com.zaroslikov.fermacompose2.ui.animal.list_screen.IconAnimal
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.BigColorCard
+import com.zaroslikov.fermacompose2.ui.elements.ButtonForGroupButtons
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CardNewWithTitle
+import com.zaroslikov.fermacompose2.ui.elements.CategoryBorderCard
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
+import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconCircle
 import com.zaroslikov.fermacompose2.ui.elements.IconCircleText
 import com.zaroslikov.fermacompose2.ui.elements.IconFinance
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
 import com.zaroslikov.fermacompose2.ui.elements.WhiteTenCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.CircleShape
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.CustomLineChart
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.start.monthToResString2
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_6
 import com.zaroslikov.fermacompose2.white
@@ -81,22 +107,40 @@ fun FinanceAnalysisProduct(
     navigateBack: () -> Unit,
     viewModel: FinanceAnalysisViewModel = hiltViewModel()
 ) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Scaffold(topBar = {
-        TopAppBarNew(
-            title = stringResource(R.string.analysis_screen_title_s, state.titleProduct),
-            navigateBack = navigateBack,
-        )
-    }) { innerPadding ->
-        FinanceAnalysisContainer(
-            modifier = Modifier
-                .modifierScreen(innerPadding),
-            state = state,
-            onFilterClick = {
-                viewModel.onIntent(FinanceAnalysisIntent.FilterDateClicked(it))
-            }
-        )
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBarNewFilter(
+                title = stringResource(R.string.analysis_screen_title_s, state.titleProduct),
+                navigateBack = navigateBack,
+                scrollBehavior = scrollBehavior,
+                content = {
+                    FilterDateElement(
+                        value = state.dateFilter.filterDate,
+                        currentPeriod = state.dateFilter.currentPeriod,
+                        onValueChange = {
+                            viewModel.onIntent(FinanceAnalysisIntent.FilterDateClicked(it))
+                        }
+                    )
+                }
+            )
+        }) { innerPadding ->
+        if (state.isLoading)
+            CircularProgress(
+                modifier = Modifier.padding(innerPadding),
+            )
+        else
+            FinanceAnalysisContainer(
+                modifier = Modifier
+                    .modifierScreen(innerPadding),
+                state = state,
+                onCharSelectionClick = {
+                    viewModel.onIntent(FinanceAnalysisIntent.CharSelectionClicked(it))
+                }
+            )
         if (state.dateFilter.isOpenCalendarDialog)
             DateRangePickerModal(
                 dateBegin = state.dateFilter.dateBegin.second,
@@ -115,14 +159,9 @@ fun FinanceAnalysisProduct(
 fun FinanceAnalysisContainer(
     modifier: Modifier,
     state: FinanceAnalysisState,
-    onFilterClick: (FilterDate) -> Unit
+    onCharSelectionClick: (FinanceAnalysisEnum) -> Unit
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        FilterDateElement(
-            value = state.dateFilter.filterDate,
-            currentPeriod = state.dateFilter.currentPeriod,
-            onValueChange = { onFilterClick(it) }
-        )
         AnalysisMainCard(
             currentBalance = state.countProduct,
             stock = state.stock,
@@ -141,6 +180,13 @@ fun FinanceAnalysisContainer(
         ProductDistribution(state.financeAnalysis)
         AnimalProducers(state.animalProducer)
         TopBuyers(state.buyers)
+        Chart(
+            state.charFilter,
+            charSelection = state.charSelection,
+            onClick = onCharSelectionClick,
+            suffix = state.baseSuffix
+        )
+        TransactionSection(R.string.analysis_screen_history_transaction, state.transactionList)
     }
 }
 
@@ -566,7 +612,11 @@ private fun BuyerCard(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         CountColorCard(count, suffix, suffix.toColorList())
-                        Text("$countTransaction ${stringResource(R.string.analysis_screen_buy)}", style = text_12, color = gray_7)
+                        Text(
+                            "$countTransaction ${stringResource(R.string.analysis_screen_buy)}",
+                            style = text_12,
+                            color = gray_7
+                        )
                     }
                 }
             }
@@ -576,6 +626,194 @@ private fun BuyerCard(
                 style = text_14,
                 color = price_green
             )
+        }
+    }
+}
+
+@Composable
+private fun Chart(
+    chartFilter: List<Pair<List<DomainChartPoint>, FinanceAnalysisEnum>>,
+    charSelection: FinanceAnalysisEnum,
+    suffix: Suffix,
+    onClick: (FinanceAnalysisEnum) -> Unit
+) {
+    val valuesList = chartFilter
+        .find { it.second == charSelection }?.first
+        ?.map { it.value } ?: emptyList()
+    val labelsList = chartFilter
+        .find { it.second == charSelection }?.first
+        ?.map { it.date.toString() } ?: emptyList()
+
+    CardNewWithTitle(
+        titleRes = charSelection.titleChar
+    ) {
+        CustomLineChart(
+            values = valuesList,
+            labels = labelsList,
+            lineColor = charSelection.iconBackground,
+            pointColor = charSelection.iconBackground,
+            fillColor = charSelection.iconBackground.copy(alpha = 0.25f),
+            suffix = stringResource(suffix.toResId()),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(bottom = 20.dp)
+        )
+        GroupButton {
+            FinanceAnalysisEnum.entries.forEach {
+                val triple = if (it == charSelection) Triple(it.iconBackground, white, 1.dp)
+                else Triple(Color.Transparent, marengo, 0.dp)
+
+                ButtonForGroupButtons(
+                    text = it.titleButton,
+                    backgroundColor = triple.first,
+                    textColor = triple.second,
+                    shadowElevation = triple.third
+                ) { onClick(it) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransactionSection(
+    @StringRes title: Int,
+    transactionList: List<DomainTransaction>
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(title),
+                style = text_16,
+                color = black_2
+            )
+            TextMiniCard(
+                "${transactionList.size} " +
+                        stringResource(R.string.analysis_screen_entries),
+                textColor = green_9,
+                backgroundColor = price_green_2
+            )
+        }
+        Column(
+            modifier = Modifier.padding(bottom = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            transactionList.forEach {
+                TransitionCard(
+                    count = it.value,
+                    suffix = it.suffix,
+                    category = it.category,
+                    price = it.price,
+                    date = it.data,
+                    priceAll = it.priceAll,
+                    priceSuffix = Suffix.RUBLE,
+                    buyer = it.buyer,
+                    animal = it.animal,
+                    categoryFinance = it.categoryFinance
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransitionCard(
+    count: Double,
+    suffix: Suffix,
+    price: Double?,
+    priceAll: Double? = null,
+    priceSuffix: Suffix = Suffix.PIECES,
+    category: String? = null,
+    animal: String? = null,
+    date: String = dateToday(),
+    buyer: String? = null,
+    categoryFinance: FinanceCategory
+) {
+    val priceFinal = priceAll ?: price
+    val categoryNoNull = category ?: stringResource(R.string.support_text_no_category)
+    val (colorPrice, positive) = when (categoryFinance) {
+        FinanceCategory.SALE -> price_green to "+"
+        FinanceCategory.OWN_NEED -> orang_2 to ""
+        else -> error_base to "-"
+    }
+    val dateList = date.split("-")
+    CardFieldNew(
+        padding = PaddingValues(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            IconTransaction(
+                icon = categoryFinance.toTransactionDrawRes(),
+                color = categoryFinance.toColorIconBorderSecond(),
+                colorIcon = categoryFinance.toColorIconSecond()
+            )
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CategoryBorderCard(categoryNoNull)
+                        CountColorCard(count, suffix, suffix.toColorList())
+                    }
+                    priceFinal?.let {
+                        Text(
+                            text = "$positive${it.formatNumber()} " +
+                                    stringResource(priceSuffix.toResId()),
+                            style = text_18,
+                            color = colorPrice
+                        )
+                    }
+                }
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    animal?.let {
+                        IconAndTextNew(
+                            iconRes = R.drawable.baseline_pets_24,
+                            valueString = it,
+                            color = grey
+                        )
+                    }
+                    price?.let {
+                        IconAndTextNew(
+                            iconRes = R.drawable.baseline_currency_ruble_24,
+                            valueString = "${it.formatNumber()} " +
+                                    "${stringResource(priceSuffix.toResId())}/" +
+                                    stringResource(suffix.toResId()),
+                            color = grey
+                        )
+                    }
+                    buyer?.let {
+                        IconAndTextNew(
+                            iconRes = R.drawable.baseline_person_24,
+                            valueString = it,
+                            color = grey
+                        )
+                    }
+                    IconAndTextNew(
+                        iconRes = R.drawable.baseline_calendar_month_24,
+                        valueString = "${dateList[2]} ${stringResource(monthToResString2(dateList[1].toInt()))} ${dateList[0]}",
+                        color = grey
+                    )
+                }
+            }
         }
     }
 }

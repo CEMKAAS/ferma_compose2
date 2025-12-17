@@ -3,7 +3,7 @@ package com.zaroslikov.data.room.repository
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.mapper.dto.sale.toBrieflySaleDomain
 import com.zaroslikov.data.room.mapper.dto.sale.toDomainBuyerPrice
-import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPrice
+import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPriceDate
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixCategory
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
@@ -12,7 +12,7 @@ import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
-import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
@@ -147,9 +147,9 @@ class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : Sal
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<DomainCountSuffixPrice>> {
+    ): Flow<List<DomainCountSuffixPriceDate>> {
         return saleDao.getAnalysisSaleRangeList(id, name, dateBegin, dateEnd)
-            .map { it -> it.map { it.toDomainCountSuffixPrice() } }
+            .map { it -> it.map { it.toDomainCountSuffixPriceDate() } }
     }
 
     override fun getAnalysisSaleSoldAllTimeRange(

@@ -34,7 +34,7 @@ import com.zaroslikov.fermacompose2.ui.sections.expenses.list_screen.ExpensesDes
 //import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.HomeDestination
 import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
-//import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseDestination
+//import com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.CoroutineScope

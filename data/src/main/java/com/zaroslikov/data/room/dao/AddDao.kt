@@ -9,6 +9,8 @@ import com.zaroslikov.data.room.dto.add.AnimalCountSuffixDto
 import com.zaroslikov.data.room.dto.add.BrieflyAddDto
 import com.zaroslikov.data.room.dto.add.FastAddProductDto
 import com.zaroslikov.data.room.dto.add.TitleAndSuffixDto
+import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
+import com.zaroslikov.data.room.dto.shared.CountSuffixDateDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
 import com.zaroslikov.data.room.table.ferma.AddTable
 import kotlinx.coroutines.flow.Flow
@@ -130,18 +132,20 @@ interface AddDao {
 
     @Query(
         "SELECT count," +
-                " count_suffix AS suffix" +
+                " count_suffix AS suffix," +
+                " 0 AS price," +
+                " printf('%04d-%02d-%02d', year, month, day) AS date" +
                 " FROM add_table" +
                 " WHERE idPT=:id AND title=:name" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
-    fun getAnalysisAddTimeRangeList(
+    fun getAnalysisAddRangeList(
         id: Long,
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<CountSuffixDto>>
+    ): Flow<List<CountSuffixPriceDateDto>>
 
     @Query(
         "SELECT" +

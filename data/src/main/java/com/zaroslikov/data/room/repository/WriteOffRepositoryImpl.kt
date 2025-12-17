@@ -1,7 +1,7 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.WriteOffDao
-import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPrice
+import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPriceDate
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCountSuffix
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixCategory
@@ -9,7 +9,7 @@ import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
 import com.zaroslikov.data.room.mapper.dto.write_off.toBrieflyWriteOffDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
-import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
@@ -215,9 +215,9 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
         status: Boolean,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<DomainCountSuffixPrice>> {
+    ): Flow<List<DomainCountSuffixPriceDate>> {
         return writeOffDao.getAnalysisOwnNeedsScrapRangeList(id, name, status, dateBegin, dateEnd)
-            .map { it -> it.map { it.toDomainCountSuffixPrice() } }
+            .map { it -> it.map { it.toDomainCountSuffixPriceDate() } }
     }
 
     override fun getAnalysisWriteOffScrapAllTimeRange(

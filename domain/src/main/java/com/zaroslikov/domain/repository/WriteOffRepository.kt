@@ -1,6 +1,6 @@
 package com.zaroslikov.domain.repository
 
-import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPrice
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
@@ -77,7 +77,7 @@ interface WriteOffRepository {
         status: Boolean,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<DomainCountSuffixPrice>>
+    ): Flow<List<DomainCountSuffixPriceDate>>
 
     fun getAnalysisWriteOffScrapAllTimeRange(
         id: Long,

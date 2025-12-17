@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WarehouseDao {
-    @Query(
+   /* @Query(
         "SELECT title," +
                 " SUM(AddCount) - COALESCE(SUM(SaleCount), 0) - COALESCE(SUM(WriteOffCount), 0) AS count," +
                 " count_suffix AS suffix " +
@@ -30,8 +30,54 @@ interface WarehouseDao {
                 ")" +
                 "  GROUP BY Title HAVING count > 0 ORDER BY count DESC "
     )
+    fun getCurrentBalanceWarehouse(id: Long): Flow<List<TitleCountSuffixDto>>*/
+
+    @Query(
+        "SELECT title, count, suffix " +
+                " FROM (  " +
+                "      SELECT title, count , suffix" +
+                " FROM ( " +
+                " SELECT title, count as count, count_suffix AS suffix" +
+                " FROM add_table" +
+                " WHERE idPT=:id" +
+
+                " UNION All " +
+                " SELECT title, -count as count, count_suffix AS suffix " +
+                " FROM sale_table" +
+                " WHERE idPT=:id" +
+
+                " UNION All" +
+                " SELECT title, -count as count, count_suffix AS suffix" +
+                " FROM write_off_table" +
+                " WHERE idPT=:id" +
+                ") " +
+                ")"
+    )
     fun getCurrentBalanceWarehouse(id: Long): Flow<List<TitleCountSuffixDto>>
 
+
+    @Query(
+        "SELECT title, count, suffix " +
+                " FROM (  " +
+                "      SELECT title, count , suffix" +
+                " FROM ( " +
+                " SELECT title, count as count, count_suffix AS suffix" +
+                " FROM expenses_table" +
+                " WHERE idPT=:id and is_show_warehouse = 1 and is_show_food != 1" +
+
+                " UNION All " +
+                " SELECT title, -count as count, count_suffix AS suffix " +
+                " FROM sale_table" +
+                " WHERE idPT=:id" +
+
+                " UNION All" +
+                " SELECT title, -count as count, count_suffix AS suffix" +
+                " FROM write_off_table" +
+                " WHERE idPT=:id" +
+                ") " +
+                ")"
+    )
+    fun getCurrentExpensesWarehouse(id: Long): Flow<List<TitleCountSuffixDto>>
 
     @Query(
         "SELECT title," +
@@ -55,7 +101,7 @@ interface WarehouseDao {
                 " ) " +
                 " GROUP BY title HAVING count > 0 ORDER BY count DESC"
     )
-    fun getCurrentExpensesWarehouse(id: Long): Flow<List<TitleCountSuffixDto>>
+    fun getCurrentExpensesWarehouse2(id: Long): Flow<List<TitleCountSuffixDto>>
 
     @Query(
         "SELECT " +
@@ -332,7 +378,6 @@ interface WarehouseDao {
             dateBegin: String,
             dateEnd: String
         ): Flow<Fin>*/
-
 
 
 }

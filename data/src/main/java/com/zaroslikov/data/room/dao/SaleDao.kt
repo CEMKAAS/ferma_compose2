@@ -7,7 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.data.room.dto.sale.BrieflySaleDto
 import com.zaroslikov.data.room.dto.sale.BuyerPriceDto
-import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDto
+import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
@@ -169,7 +169,8 @@ interface SaleDao {
     @Query(
         "SELECT count," +
                 " count_suffix as suffix," +
-                " CASE WHEN price_all IS NULL THEN price ELSE price_all END AS price" +
+                " CASE WHEN price_all IS NULL THEN price ELSE price_all END AS price," +
+                " printf('%04d-%02d-%02d', year, month, day) AS date" +
                 " FROM sale_table" +
                 " Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
@@ -179,7 +180,7 @@ interface SaleDao {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<CountSuffixPriceDto>>
+    ): Flow<List<CountSuffixPriceDateDto>>
 
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS priceAll from sale_table" +

@@ -66,7 +66,6 @@ import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.start.formatter
 import com.zaroslikov.fermacompose2.ui.start.monthToResString
-import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
 
 object ExpensesDestination : NavigationDestination {
     override val route = "expenses"
@@ -434,11 +433,11 @@ private fun AdditionalSettings2(
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
     if (!state.count.isBlank() && !state.price.isBlank() && !state.isIndicatorsValue) {
-        TextButtonWarehouse(
+      /*  TextButtonWarehouse(
             boolean = details,
             onClick = { details = !details },
             intRes = R.string.card_extra_set
-        )
+        )*/
         if (details) {
             Food(
                 modifier = Modifier.padding(bottom = animatedErrorPadding(details)),

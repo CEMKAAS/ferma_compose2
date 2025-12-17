@@ -161,7 +161,7 @@ fun FinanceCategory.toColorIconBorderSecond(): Color {
         FinanceCategory.EXPENSES -> red_11
         FinanceCategory.OWN_NEED -> orang_4
         FinanceCategory.SCRAP -> gray_6
-        FinanceCategory.PROFIT -> blue_5
+        FinanceCategory.PROFIT -> blue_3
     }
 }
 

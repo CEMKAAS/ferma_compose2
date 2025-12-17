@@ -3,9 +3,10 @@ package com.zaroslikov.fermacompose2.ui.finance.analysis
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
+import com.zaroslikov.domain.models.dto.finance.DomainTransaction
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
+import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -17,7 +18,6 @@ import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_9
-import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_6
@@ -27,6 +27,7 @@ import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.red_11
 import com.zaroslikov.fermacompose2.red_13
 import com.zaroslikov.fermacompose2.red_14
+import com.zaroslikov.fermacompose2.supportFun.DomainChartPoint
 import com.zaroslikov.fermacompose2.supportFun.firstDayOfMonth
 import com.zaroslikov.fermacompose2.supportFun.todayOfMonth
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
@@ -42,6 +43,9 @@ data class FinanceAnalysisState(
     val soldLost: Double = 0.0,
     val stock: Double = 0.0,
     val averagePrice: Double = 0.0,
+    val charSelection: FinanceAnalysisEnum = FinanceAnalysisEnum.STOCK,
+    val transactionList: List<DomainTransaction> = emptyList(),
+    val charFilter: List<Pair<List<DomainChartPoint>, FinanceAnalysisEnum>> = emptyList(),
     val buyers: List<Buyer> = emptyList(),
     val animalProducer: List<AnimalProducer> = emptyList(),
     val financeAnalysis: List<FinanceAnalysis> = emptyList(),
@@ -88,21 +92,52 @@ data class FinanceAnalysis(
     val financeAnalysis: FinanceAnalysisEnum
 )
 
+data class AnalysisUiCalculatedState(
+    val buyers: List<Buyer>,
+    val animalProducer: List<AnimalProducer>,
+    val financeAnalysis: List<FinanceAnalysis> = emptyList(),
+    val totalPrice: Double = 0.0,
+    val countProduct: Double = 0.0,
+    val realizedPrice: Double = 0.0,
+    val potentialBalance: Double = 0.0,
+    val soldLost: Double = 0.0,
+    val stock: Double = 0.0,
+    val averagePrice: Double = 0.0,
+    val transactionList: List<DomainTransaction>,
+    val charFilter: List<Pair<List<DomainChartPoint>, FinanceAnalysisEnum>> = emptyList(),
+)
+
+
 enum class FinanceAnalysisEnum(
     val colorBackground: Color,
     val iconBackground: Color,
     val textColor: Color,
     @DrawableRes val icon: Int,
     @StringRes val title: Int,
+    @StringRes val titleButton: Int,
+    @StringRes val titleChar: Int,
     val sign: String,
     val colorTextPercent: Color
 ) {
+    STOCK(
+        colorBackground = blue_3,
+        iconBackground = blue_4,
+        textColor = blue_1,
+        icon = R.drawable.icon_add_product,
+        title = R.string.analysis_screen_in_stock,
+        titleButton = R.string.analysis_screen_produced,
+        titleChar = R.string.analysis_screen_char_produced,
+        sign = "~",
+        colorTextPercent = blue_8
+    ),
     SALE(
         colorBackground = price_green_2,
         iconBackground = green_6,
         textColor = price_green,
         icon = R.drawable.icon_sale,
         title = R.string.analysis_screen_sold,
+        titleButton = R.string.analysis_screen_sold,
+        titleChar = R.string.analysis_screen_char_sale,
         sign = "",
         colorTextPercent = green_9
     ),
@@ -112,6 +147,8 @@ enum class FinanceAnalysisEnum(
         textColor = orang_2,
         icon = R.drawable.outline_savings_24,
         title = R.string.analysis_screen_saved,
+        titleButton = R.string.analysis_screen_saved,
+        titleChar = R.string.analysis_screen_char_own_need,
         sign = "",
         colorTextPercent = orang_6
     ),
@@ -121,16 +158,9 @@ enum class FinanceAnalysisEnum(
         textColor = error_base,
         icon = R.drawable.icon_trash,
         title = R.string.analysis_screen_lost,
+        titleButton = R.string.analysis_screen_lost,
+        titleChar = R.string.analysis_screen_char_scrap,
         sign = "-",
         colorTextPercent = red_14
-    ),
-    STOCK(
-        colorBackground = blue_3,
-        iconBackground = blue_4,
-        textColor = blue_1,
-        icon = R.drawable.icon_add_product,
-        title = R.string.analysis_screen_in_stock,
-        sign = "~",
-        colorTextPercent = blue_8
     )
 }

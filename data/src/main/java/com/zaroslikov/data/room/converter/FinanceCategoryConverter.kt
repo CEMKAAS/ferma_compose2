@@ -16,7 +16,8 @@ fun financeCategoryFromId(id: Int): FinanceCategory {
         0 -> FinanceCategory.SALE
         1 -> FinanceCategory.EXPENSES
         2 -> FinanceCategory.OWN_NEED
-        else -> FinanceCategory.SCRAP
+        3 -> FinanceCategory.SCRAP
+        else -> FinanceCategory.PROFIT
     }
 }
 

@@ -56,7 +56,7 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.start.formatter
-import com.zaroslikov.fermacompose2.ui.warehouse.TextButtonWarehouse
+
 
 
 object ExpensesEntryDestination : NavigationDestination {
@@ -217,11 +217,11 @@ private fun AdditionalSettings(
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
     if (!state.count.isBlank() && !state.price.isBlank() && !state.isIndicatorsValue) {
-        TextButtonWarehouse(
+      /*  TextButtonWarehouse(
             boolean = details,
             onClick = { details = !details },
             intRes = R.string.card_extra_set
-        )
+        )*/
         if (details) {
             Food(
                 modifier = Modifier.padding(bottom = animatedErrorPadding(details)),

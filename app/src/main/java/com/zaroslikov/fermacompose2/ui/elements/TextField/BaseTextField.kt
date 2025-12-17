@@ -209,7 +209,7 @@ fun BaseOutlinedTextNew(
                                 )
                             }
                             // Обязательно делаем innerTextField заполняющим ширину своего контейнера
-                            Box(modifier = Modifier.fillMaxSize()) {
+                            Box(modifier = Modifier.wrapContentWidth()) {
                                 innerTextField()
                             }
                         }
