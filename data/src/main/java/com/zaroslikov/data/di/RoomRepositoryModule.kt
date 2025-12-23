@@ -13,6 +13,7 @@ import com.zaroslikov.data.room.repository.IncubatorRepositoryImpl
 import com.zaroslikov.data.room.repository.NoteRepositoryImpl
 import com.zaroslikov.data.room.repository.ProjectRepositoryImpl
 import com.zaroslikov.data.room.repository.SaleRepositoryImpl
+import com.zaroslikov.data.room.repository.SettingsRepositoryImpl
 import com.zaroslikov.data.room.repository.WarehouseRepositoryImpl
 import com.zaroslikov.data.room.repository.WriteOffRepositoryImpl
 import com.zaroslikov.domain.repository.AddRepository
@@ -28,11 +29,11 @@ import com.zaroslikov.domain.repository.IncubatorRepository
 import com.zaroslikov.domain.repository.NoteRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -100,4 +101,8 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindWriteOffRepository(writeOffRepositoryImpl: WriteOffRepositoryImpl): WriteOffRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(settingsRepositoryImpl: SettingsRepositoryImpl): SettingsRepository
 }

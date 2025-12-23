@@ -19,8 +19,7 @@ interface NoteDao {
     fun getAllNote(id: Long): Flow<List<NoteTable>>
 
     @Query(
-        "SELECT * from NoteFerma" +
-                " Where _id=:id"
+        "SELECT * from NoteFerma  Where _id=:id"
     )
     fun getNote(id: Long): Flow<NoteTable>
 
@@ -32,4 +31,7 @@ interface NoteDao {
 
     @Delete
     suspend fun deleteNote(item: NoteTable)
+
+    @Query("DELETE FROM noteferma WHERE _id = :id")
+    suspend fun deleteNoteById(id: Long)
 }

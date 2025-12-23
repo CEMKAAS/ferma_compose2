@@ -7,13 +7,7 @@ import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class NoteEntryState(
-    val domainNoteTable: DomainNoteTable = DomainNoteTable(
-        id = 0,
-        title = "",
-        note = "",
-        date = dateToday(),
-        idPT = 0
-    ),
+
     override val error: Error = Error(),
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,

@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.ui.elements.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.elements.ButtonRefresh
@@ -118,6 +119,45 @@ fun ButtonPanelNew(
                 enable = enable,
                 modifier = Modifier.weight(1f),
                 colors = colors
+            )
+        }
+    }
+}
+
+@Composable
+fun ButtonPanelDetailNew(
+    modifier: Modifier,
+    onClickUpdate: () -> Unit,
+    onClickDelete: () -> Unit
+) {
+    Box(modifier = modifier.background(Color.White)) {
+        HorizontalDivider(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .zIndex(1f),
+            thickness = 1.dp,
+            color = gray_6
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            CloseButton(
+                iconRes = R.drawable.icon_edit,
+                text = R.string.button_edit,
+                onClick = onClickUpdate,
+                modifier = Modifier.weight(1f)
+            )
+            GradientButton(
+                text = stringResource(R.string.button_delete),
+                iconRes = R.drawable.baseline_delete_24,
+                onClick = onClickDelete,
+                enable = false,
+                modifier = Modifier.weight(1f),
+                colors = listOf(error_base, error_base)
             )
         }
     }

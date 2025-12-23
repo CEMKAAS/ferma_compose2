@@ -5,6 +5,7 @@ import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffixDate
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -39,7 +40,8 @@ fun chartFilter(
     filterDate: FilterDate,
     dateStart: String,
     dateEnd: String,
-    baseSuffix: Suffix
+    baseSuffix: Suffix,
+    domainSettings: DomainSettings
 ): List<DomainChartPoint> {
 
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -65,10 +67,10 @@ fun chartFilter(
             parseDate(it.date).toGroupKey(granularity)
         }.mapValues { (_, items) ->
             items.sumOf {
-                it.count.conversation2(
+                it.count.conversation22(
                     suffix = it.suffix,
                     baseSuffix = baseSuffix,
-                    settingsSuffix = baseSuffix
+                    settings = domainSettings
                 ).toDouble()
             }.toFloat()
         }

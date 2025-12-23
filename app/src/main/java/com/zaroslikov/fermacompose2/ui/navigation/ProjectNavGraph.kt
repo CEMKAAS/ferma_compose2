@@ -36,8 +36,6 @@ import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryProduct
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryProduct
-import com.zaroslikov.fermacompose2.ui.sections.note.entry.NoteEntryDestination
-import com.zaroslikov.fermacompose2.ui.sections.note.entry.NoteEntryProduct
 import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteScreen
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
@@ -45,7 +43,9 @@ import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryProduct
 import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.entry.WriteOffEntryProduct
-import com.zaroslikov.fermacompose2.ui.start.StartDestination
+import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 import com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen.WarehouseScreen
 
@@ -89,11 +89,29 @@ fun ProjectNavHost(
         ) {
             WarehouseScreen(
                 navigateToStart = { navController.navigate(StartDestination.route) },
-                navigateToEdit = { /*navController.navigate("${WarehouseEditDestination.route}/${it}")*/ },
-          /*      navigationToAnalysis = { navController.navigate("${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}") }*/
+                navigateToEdit = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
+                navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
+                navigationToAnalysis = {
+                    navController.navigate(
+                        nav(
+                            FinanceAnalysisDestination.route,
+                            it.first.toString(),
+                            it.second,
+                            it.third.toString()
+                        )
+                    )
+                },
                 navigationToNewYear = {/* navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}")*/ },
-//                isFirstStart = isFirstStart,
-//                isFirstEnd = isFirstEnd
+            )
+        }
+        composable(
+            route = WarehouseEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(WarehouseEditDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            WarehouseEditScreen(
+                navigateBack = navController::popBackStack
             )
         }
 
@@ -114,18 +132,7 @@ fun ProjectNavHost(
          }
 
 
-         composable(
-             route = WarehouseEditDestination.routeWithArgs,
-             arguments = listOf(navArgument(WarehouseEditDestination.itemIdArg) {
-                 type = NavType.IntType
-             })
-         ) {
-             WarehouseEditScreen(
-                 navigateBack = { navController.popBackStack() },
-                 navigateUp = { navController.navigateUp() },
-                 navigateToStart = { navController.navigate(StartDestination.route) })
 
-         }
 */
         //==================== Finance ====================
         composable(
@@ -446,29 +453,13 @@ fun ProjectNavHost(
         //Note
         composable(
             route = NoteDestination.routeWithArgs,
-            arguments = listOf(navArgument(HomeDestination.itemIdArg) {
-                type = NavType.IntType
+            arguments = listOf(navArgument(NoteDestination.itemIdArg) {
+                type = NavType.LongType
             })
         ) {
-            NoteScreen(navigateToStart = {
-                navController.navigate(StartDestination.route)
-            }, navigateToModalSheet = {
-                navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-            }, navigateToItemAdd = {
-                navController.navigate(
-                    "${NoteEntryDestination.route}/${it}"
-                )
-            }, navigateToItemUpdate = {
-                navController.navigate(
-                    navNull(
-                        route = NoteEntryDestination.route,
-                        itemOne = it.first.toString(),
-                        itemTwo = it.second.toString()
-                    )
-                )
-            })
+            NoteScreen(navigateBack = navController::popBackStack)
         }
-        composable(
+      /*  composable(
             route = NoteEntryDestination.routeWithArgs,
             arguments = listOf(
                 navArgument(NoteEntryDestination.itemIdPT) {
@@ -483,7 +474,7 @@ fun ProjectNavHost(
             NoteEntryProduct(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() })
-        }
+        }*/
         // Animal
         composable(
             route = AnimalDestination.routeWithArgs,

@@ -127,7 +127,7 @@ fun FinanceCategoryScreen2(
             TopAppBarBack(
                 title = stringResource(state.financeCategory.toTitleResId()),
                 scrollBehavior = scrollBehavior,
-                navigateUp = navigateBack
+                onNavigateBackClick = navigateBack
             )
         }
     ) { innerPadding ->
@@ -146,6 +146,7 @@ fun FinanceCategoryScreen2(
                 productList = state.financeProductList,
                 category = state.financeCategory,
                 currentPeriod = state.currentPeriod,
+                suffix = state.suffixPrice,
                 onDetailClick = {
                     viewModel.onIntent(FinanceCategoryIntent.OpenBottomSheetGroup(it))
                 },
@@ -159,6 +160,7 @@ fun FinanceCategoryScreen2(
                 category = state.financeCategory,
                 currentTitleProduct = state.currentProduct.first,
                 currentBalanceProduct = state.currentProduct.second,
+                suffixPrice = state.suffixPrice,
                 onDismissRequest = {
                     viewModel.onIntent(FinanceCategoryIntent.OpenBottomSheetGroup())
                 }
@@ -186,7 +188,7 @@ private fun FinanceCategoryBody2(
     categoryList: List<CategoryUi>,
     productList: List<ProductUi>,
     category: FinanceCategory,
-    suffix: Suffix = Suffix.RUBLE,
+    suffix: Suffix,
     colors: List<Color>,
     onDetailClick: (Pair<String, Double>) -> Unit,
     onFilterClick: (FilterDate) -> Unit
@@ -215,9 +217,10 @@ private fun FinanceCategoryBody2(
         if (categoryList.isNotEmpty()) {
             CategoryCard(
                 categoryList,
+                suffixPrice = suffix,
                 color = colors.first()
             )
-            ProductListCard(productList, onDetailClick = { onDetailClick(it) })
+            ProductListCard(productList, onDetailClick = { onDetailClick(it) }, suffix = suffix)
         }
     }
 }
@@ -225,6 +228,7 @@ private fun FinanceCategoryBody2(
 @Composable
 private fun ProductListCard(
     list: List<ProductUi>,
+    suffix: Suffix,
     onDetailClick: (Pair<String, Double>) -> Unit
 ) {
     Column(
@@ -259,7 +263,8 @@ private fun ProductListCard(
                     category = it.category,
                     price = it.price,
                     positive = it.positive,
-                    onDetailClick = { onDetailClick(it.title to it.price) }
+                    onDetailClick = { onDetailClick(it.title to it.price) },
+                    suffixCurrency = suffix
                 )
             }
         }
@@ -270,6 +275,7 @@ private fun ProductListCard(
 @Composable
 private fun CategoryCard(
     categoryList: List<CategoryUi>,
+    suffixPrice: Suffix,
     color: Color
 ) {
     CardFieldNew {
@@ -291,7 +297,7 @@ private fun CategoryCard(
                         price = item.price,
                         percentFloat = item.percentFloat,
                         percentDouble = item.percentDouble,
-                        suffix = Suffix.RUBLE,
+                        suffix = suffixPrice,
                         color = color
                     )
                 }
@@ -354,7 +360,7 @@ private fun CategorySlider(
 }
 
 @Composable
-private fun WarningCard(
+fun WarningCard(
     colorBackground: Color,
     colorBorder: Color,
     colorIcon: Color,
@@ -386,8 +392,7 @@ private fun WarningCard(
                 icon = icon,
                 color = colorIconBackground,
                 colorIcon = colorIcon,
-                sizeCard = 32.dp,
-                sizeIcon = 16.dp
+                sizeCard = 32.dp
             )
             Column(
                 horizontalAlignment = Alignment.Start,

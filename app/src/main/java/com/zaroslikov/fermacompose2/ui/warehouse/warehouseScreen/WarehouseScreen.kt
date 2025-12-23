@@ -1,39 +1,23 @@
 package com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen
 
 
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,15 +27,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,37 +39,43 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarFermaWarehouse
-import com.zaroslikov.data.room.table.ferma.ExpensesTable
-import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.blue_1
+import com.zaroslikov.fermacompose2.blue_13
+import com.zaroslikov.fermacompose2.blue_14
+import com.zaroslikov.fermacompose2.blue_15
+import com.zaroslikov.fermacompose2.blue_16
+import com.zaroslikov.fermacompose2.blue_3
+import com.zaroslikov.fermacompose2.blue_8
+import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.ghostly_white
-import com.zaroslikov.fermacompose2.green_9
-import com.zaroslikov.fermacompose2.price_green_2
+import com.zaroslikov.fermacompose2.green_1
+import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_g_1
+import com.zaroslikov.fermacompose2.green_g_3
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.elements.BorderShowAllButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
+import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
-import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseIntent
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
-import io.appmetrica.analytics.AppMetrica
-import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import java.util.Calendar
+import com.zaroslikov.fermacompose2.white
 
 object WarehouseDestination : NavigationDestination {
     override val route = "warehouse"
@@ -102,28 +88,26 @@ object WarehouseDestination : NavigationDestination {
 @Composable
 fun WarehouseScreen(
     navigateToStart: () -> Unit,
-    navigateToEdit: (Int) -> Unit,
+    navigateToEdit: (Long) -> Unit,
+    navigateToNote: (Long) -> Unit,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
+    navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
     viewModel: WarehouseViewModel = hiltViewModel()
 ) {
-
-    val context = LocalContext.current
-//    val homeUiState by viewModel.homeUiState.collectAsState()
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            /* TopAppBarFermaWarehouse(
-                 title = "Мой Склад",
-                 scope = coroutineScope,
-                 drawerState = drawerState,
-                 navigateToEdit = { navigateToEdit(idProject) },
-                 scrollBehavior = scrollBehavior
-             )*/
+            TopAppBarBack(
+                intRes = R.string.warehouse_screen_title,
+                scrollBehavior = scrollBehavior,
+                onNavigateBackClick = navigateToStart,
+                onSettingsClick = { navigateToEdit(state.idPT) },
+                onCalendarClick = { navigateToNote(state.idPT) }
+            )
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -133,7 +117,12 @@ fun WarehouseScreen(
         else
             WarehouseBody2(
                 modifier = Modifier.modifierScreen(innerPadding),
-                state = state
+                state = state,
+                onFastAddClick = { viewModel.onIntent(WarehouseIntent.FastAddClicked(it)) },
+                onShowFastAddClick = { viewModel.onIntent(WarehouseIntent.ShowFastAddClicked(it)) },
+                onAnalysisNavClick = {
+                    navigationToAnalysis(Triple(state.idPT, it.first, it.second))
+                }
             )
         /*WarehouseBody(
             itemList = homeUiState.itemList,
@@ -192,31 +181,41 @@ fun WarehouseScreen(
 @Composable
 private fun WarehouseBody2(
     modifier: Modifier = Modifier,
-    state: WarehouseState
+    state: WarehouseState,
+    onAnalysisNavClick: (Pair<String, Suffix>) -> Unit,
+    onShowFastAddClick: (Boolean) -> Unit,
+    onFastAddClick: (DomainFastAddProduct) -> Unit
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(bottom = 10.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        FastAdd(
+            state.isShowFastAddProduct, state.fastAddList,
+            { onShowFastAddClick(it) }) { onFastAddClick(it) }
         WarehouseSection(
             titleRes = R.string.add_screen_title2,
             iconRes = R.drawable.icon_add_product,
             list = state.productList,
-            textColor = black_2,
-            borderColor = black_2,
+            textColor = green_2,
+            borderColor = green_1,
+            iconColor = green_shamrock,
+            backgroundMiniColor = green_g_1,
         ) { item ->
             ProductCard(
                 title = item.title,
                 value = item.count,
                 suffix = item.suffix
-            ) { }
+            ) { onAnalysisNavClick(item.title to item.suffix) }
         }
         WarehouseSection(
-            titleRes = R.string.add_screen_title2,
-            iconRes = R.drawable.icon_add_product,
+            titleRes = R.string.warehouse_screen_products,
+            iconRes = R.drawable.icon_expenses,
             list = state.expensesList,
-            textColor = black_2,
-            borderColor = black_2,
+            textColor = blue_8,
+            borderColor = blue_16,
+            iconColor = blue_1,
+            backgroundMiniColor = blue_3,
         ) { item ->
             ProductCard(
                 title = item.title,
@@ -265,6 +264,8 @@ private fun <T> WarehouseSection(
     @StringRes titleRes: Int,
     @DrawableRes iconRes: Int,
     list: List<T>,
+    iconColor: Color,
+    backgroundMiniColor: Color,
     textColor: Color,
     borderColor: Color,
     itemCard: @Composable (T) -> Unit
@@ -281,23 +282,23 @@ private fun <T> WarehouseSection(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(painterResource(iconRes), contentDescription = null)
+                    Icon(painterResource(iconRes), contentDescription = null, tint = iconColor)
                     Text(stringResource(titleRes), style = text_16, color = black_2)
                 }
                 TextMiniCard(
                     "${list.size} " +
                             stringResource(R.string.warehouse_screen_positions),
-                    textColor = green_9,
-                    backgroundColor = price_green_2
+                    textColor = textColor,
+                    backgroundColor = backgroundMiniColor
                 )
             }
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (list.isNotEmpty()) {
                     for (i in list.indices) {
                         itemCard(list[i])
-                        if (i == 5 && !expanded)
+                        if (i == 4 && !expanded)
                             break
                     }
                 }
@@ -306,7 +307,7 @@ private fun <T> WarehouseSection(
                     modifier = Modifier.fillMaxWidth(),
             visible = isManyCount
             ) {*/
-            if (list.size > 5)
+            if (list.size >= 4)
                 BorderShowAllButton(
                     listSize = list.size,
                     textColor = textColor,
@@ -317,8 +318,149 @@ private fun <T> WarehouseSection(
     }
 }
 
-/*
 
+@Composable
+private fun FastAdd(
+    isShowFastAddProduct: Boolean,
+    list: List<DomainFastAddProduct>,
+    onShowClick: (Boolean) -> Unit,
+    onClick: (DomainFastAddProduct) -> Unit
+) {
+    val icon =
+        if (isShowFastAddProduct) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down
+
+    Card(
+        onClick = { onShowClick(!isShowFastAddProduct) },
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = blue_3
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = blue_9
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painterResource(R.drawable.baseline_electric_bolt_24),
+                        contentDescription = null,
+                        tint = blue_1
+                    )
+                    Text(
+                        stringResource(R.string.warehouse_screen_fast_add),
+                        style = text_16,
+                        color = blue_14
+                    )
+                }
+                Icon(
+                    painterResource(icon),
+                    contentDescription = null,
+                    tint = blue_1
+                )
+            }
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = isShowFastAddProduct
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    list.forEach {
+                        FastAddCard(
+                            title = it.title,
+                            count = it.count,
+                            suffix = it.suffix,
+                            category = it.category,
+                            animal = it.animalName,
+                            onClick = { onClick(it) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FastAddCard(
+    title: String,
+    count: Double,
+    suffix: Suffix,
+    animal: String?,
+    category: String?,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = white
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                IconTransaction(
+                    icon = R.drawable.icon_add,
+                    colorIcon = blue_1,
+                    color = blue_13,
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(title, style = text_14, color = black_2)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        animal?.let {
+                            TextMiniCard(
+                                it,
+                                textColor = blue_15,
+                                backgroundColor = green_g_3
+                            )
+                        }
+                        if (animal != null && category != null) Text(
+                            "•",
+                            style = text_12,
+                            color = grey
+                        )
+                        category?.let {
+                            Text(it, style = text_12, color = marengo)
+                        }
+                    }
+                }
+            }
+            Text(
+                "${count.formatNumber()} " + stringResource(suffix.toResId()),
+                style = text_14,
+                color = black_2
+            )
+        }
+
+    }
+}
+/*
 @Composable
 private fun WarehouseBody(
     itemList: List<WarehouseData>,

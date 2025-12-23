@@ -1,4 +1,4 @@
-package com.zaroslikov.data.room.table.ferma
+package com.zaroslikov.data.room.table.project
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -36,8 +36,3 @@ data class ProjectTable(
     val mode: Int, //Инкубатор = 0, Хозяйство = 1
     val imageData: ByteArray? // Изображение
 )
-
-
-
-
-

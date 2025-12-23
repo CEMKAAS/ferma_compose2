@@ -1,6 +1,6 @@
 package com.zaroslikov.data.room.mapper.table
 
-import com.zaroslikov.data.room.table.ferma.ProjectTable
+import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.table.DomainProjectTable
 
 fun ProjectTable.toDomainProjectTable(): DomainProjectTable {

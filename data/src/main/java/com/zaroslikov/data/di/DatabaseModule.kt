@@ -17,6 +17,7 @@ import com.zaroslikov.data.room.database.AppDatabase.Companion.Instance
 import com.zaroslikov.data.room.dao.NoteDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
+import com.zaroslikov.data.room.dao.SettingsDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.database.migration.MIGRATION_1_2
@@ -137,6 +138,12 @@ object DatabaseModule {
     @Singleton
     fun provideWriteOffDao(database: AppDatabase): WriteOffDao {
         return database.writeOffDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSettingsDao(database: AppDatabase): SettingsDao {
+        return database.settingsDao()
     }
 
 }

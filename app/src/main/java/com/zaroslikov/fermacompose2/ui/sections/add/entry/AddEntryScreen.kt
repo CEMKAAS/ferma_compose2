@@ -57,7 +57,7 @@ fun AddEntryProduct(
         topBar = {
             TopAppBarBack(
                 intRes = R.string.add_screen_title,
-                navigateUp = navigateBack,
+                onNavigateBackClick = navigateBack,
                 scrollBehavior = scrollBehavior
             )
         }

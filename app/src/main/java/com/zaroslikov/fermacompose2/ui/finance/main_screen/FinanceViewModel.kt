@@ -3,9 +3,12 @@ package com.zaroslikov.fermacompose2.ui.finance
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
+import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.FinanceRepository
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
@@ -23,7 +26,8 @@ class FinanceViewModel @Inject constructor(
     private val financeRepository: FinanceRepository,
     private val saleRepository: SaleRepository,
     private val expensesRepository: ExpensesRepository,
-    private val writeOffRepository: WriteOffRepository
+    private val writeOffRepository: WriteOffRepository,
+    private val settingsRepository: SettingsRepository
 ) : ListViewModel<FinanceState, FinanceIntent>(FinanceState()) {
 
     private val itemId: Long = checkNotNull(savedStateHandle[FinanceDestination.itemIdArg])
@@ -47,7 +51,8 @@ class FinanceViewModel @Inject constructor(
                 writeOffRepository.getScrap(itemId),
                 saleRepository.getIncomeMount(itemId, start, end),
                 expensesRepository.getExpensesMount(itemId, start, end),
-                financeRepository.getIncomeExpensesCurrentMonth(itemId, start, end)
+                financeRepository.getIncomeExpensesCurrentMonth(itemId, start, end),
+                settingsRepository.getSettings(itemId)
             ) { values: Array<Any?> ->
                 val currentBalance = (values[0] as? Double) ?: 0.0
                 val income = (values[1] as? Double) ?: 0.0
@@ -58,6 +63,7 @@ class FinanceViewModel @Inject constructor(
                 val expensesMount = (values[6] as? Double) ?: 0.0
                 val domainList =
                     (values[7] as? List<DomainIncomeExpenses>) ?: emptyList<DomainIncomeExpenses>()
+                val settings = (values[8] as? DomainSettings) ?: DomainSettings()
 
                 FinanceCombined(
                     currentBalance,
@@ -68,7 +74,8 @@ class FinanceViewModel @Inject constructor(
                     income + ownNeed - expenses - scrap,
                     incomeMount,
                     expensesMount,
-                    domainList
+                    domainList,
+                    settings
                 )
             }.collect { combined ->
                 updateState {
@@ -83,7 +90,8 @@ class FinanceViewModel @Inject constructor(
                         profit = combined.profit,
                         incomeMount = combined.incomeMount,
                         expensesMount = combined.expensesMount,
-                        domainIncomeExpenseList = combined.list
+                        domainIncomeExpenseList = combined.list,
+                        currencySuffix = combined.settings.currencySuffix
                     )
                 }
             }
@@ -100,6 +108,8 @@ data class FinanceCombined(
     val profit: Double,
     val incomeMount: Double,
     val expensesMount: Double,
-    val list: List<DomainIncomeExpenses>
+    val list: List<DomainIncomeExpenses>,
+    val settings: DomainSettings
 )
+
 sealed class FinanceIntent() : BaseIntent

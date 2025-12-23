@@ -542,6 +542,7 @@ fun BorderCard(
     shape: Shape = RoundedCornerShape(14.dp),
     borderWidth: Dp = 1.dp,
     borderColor: Color = grey_2,
+    onClick: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
@@ -553,7 +554,38 @@ fun BorderCard(
         border = BorderStroke(
             width = borderWidth,
             color = borderColor
-        )
+        ), onClick = onClick
+    ) {
+        Column(
+            Modifier
+                .padding(padding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun BorderCard(
+    modifier: Modifier = Modifier,
+    containerColor: Color = white,
+    padding: PaddingValues = PaddingValues(20.dp),
+    shape: Shape = RoundedCornerShape(14.dp),
+    borderWidth: Dp = 1.dp,
+    borderColor: Color = grey_2,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = modifier,
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor
+        ),
+        border = BorderStroke(
+            width = borderWidth,
+            color = borderColor
+        ),
     ) {
         Column(
             Modifier
@@ -1123,9 +1155,10 @@ fun BigColorCard(
                         .clickable { onDetailClick() }
                 else Modifier
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.CenterStart
     ) {
         Column(
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = verticalArrangement,
             modifier = Modifier.padding(padding)
         ) {

@@ -75,10 +75,10 @@ import com.zaroslikov.fermacompose2.violet_1
 fun SearchBar(
     value: String,
     onValueChange: (String) -> Unit,
-    isGroup: Boolean,
-    onClick: (Boolean) -> Unit,
+    isGroup: Boolean? = null,
+    onClick: (Boolean) -> Unit = {},
     @StringRes intRes: Int = R.string.search_section,
-    iconRes: Int
+    iconRes: Int = if (isGroup == true) R.drawable.icon_group else R.drawable.icon_list
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -116,17 +116,19 @@ fun SearchBar(
                 )
             }
         }
-        BorderCard(
-            modifier = Modifier
-                .size(62.dp)
-                .wrapContentWidth()
-                .clickable { onClick(!isGroup) },
-        ) {
-            Icon(
-                painterResource(iconRes),
-                contentDescription = null,
-                modifier = Modifier.size(48.dp)
-            )
+        isGroup?.let {
+            BorderCard(
+                modifier = Modifier
+                    .size(62.dp)
+                    .wrapContentWidth()
+                    .clickable { onClick(!isGroup) },
+            ) {
+                Icon(
+                    painterResource(iconRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
         }
     }
 }
@@ -140,6 +142,7 @@ fun OutlinedTextNoteNew(
     @DrawableRes leadingIconRes: Int? = R.drawable.baseline_sticky_note_2_24,
     @StringRes labelIntRes: Int? = R.string.outlined_text_note,
     @StringRes supportingText: Int = R.string.support_text_note,
+    minLines: Int = 3
 ) {
     val textField: @Composable () -> Unit = {
         BaseOutlinedTextNew(
@@ -151,7 +154,32 @@ fun OutlinedTextNoteNew(
             singleLine = false,
             keyboardOptions = keyboardOptionsNext(),
             keyboardActions = KeyboardActionFocus.CLEAN,
-            minLines = 3
+            minLines = minLines
+        )
+    }
+    if (isBorderCard) BorderCard {
+        textField()
+    } else textField()
+}
+
+@Composable
+fun OutlinedTextNew(
+    value: String,
+    onValueChange: (String) -> Unit,
+    isError: Boolean = false,
+    isBorderCard: Boolean = true,
+    @StringRes labelIntRes: Int? = R.string.outlined_text_note,
+    @StringRes supportingText: Int = R.string.support_text_note,
+) {
+    val textField: @Composable () -> Unit = {
+        BaseOutlinedTextNew(
+            value = value,
+            onValueChange = { onValueChange(it) },
+            labelIntRes = labelIntRes,
+            intResSup = supportingText,
+            isError = isError,
+            singleLine = false,
+            keyboardOptions = keyboardOptionsNext(),
         )
     }
     if (isBorderCard) BorderCard {
@@ -362,8 +390,7 @@ fun OutlinedTextDateNew(
         }
     }
     BorderCard(
-        modifier = Modifier
-            .clickable(onClick = { openDialog = !openDialog })
+        onClick = { openDialog = !openDialog }
     ) {
         BaseOutlinedTextNew(
             value = date,

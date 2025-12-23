@@ -181,7 +181,7 @@ private fun WriteOffContainer(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailsClick = onDetailsClick,
-        detailCard = { item ->
+        detailCard = { index,item ->
             DetailProductCardNew(
                 title = item.title,
                 count = item.count,

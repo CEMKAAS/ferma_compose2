@@ -154,7 +154,6 @@ fun SectionWorkspaceScreen(
                 Page.ADD -> AddScreen(
                     navigationToAnalysis = { navigationToAnalysis(it) }
                 )
-
                 Page.SALE -> SaleScreen()
                 Page.EXPENSES -> ExpensesScreen()
                 Page.WRITE_OFF -> WriteOffScreen()

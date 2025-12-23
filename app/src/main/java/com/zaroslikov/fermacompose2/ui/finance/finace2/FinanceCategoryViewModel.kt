@@ -8,6 +8,7 @@ import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
@@ -29,7 +30,8 @@ class FinanceCategoryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val saleRepository: SaleRepository,
     private val expensesRepository: ExpensesRepository,
-    private val writeOffRepository: WriteOffRepository
+    private val writeOffRepository: WriteOffRepository,
+    private val settingsRepository: SettingsRepository
 ) : ListViewModel<FinanceCategoryState, FinanceCategoryIntent>(FinanceCategoryState()) {
 
     private val itemId: Long =
@@ -79,7 +81,7 @@ class FinanceCategoryViewModel @Inject constructor(
                         saleRepository.getIncomeMount(itemId, start, end),
                         writeOffRepository.getOwnNeedMonth(itemId, start, end),
                         expensesRepository.getExpensesMount(itemId, start, end),
-                        writeOffRepository.getScrapMonth(itemId, start, end)
+                        writeOffRepository.getScrapMonth(itemId, start, end),
                     ) { income, ownNeed, expenses, scrap ->
                         BalanceStructure(
                             currentBalance = income - expenses/*ownNeed - expenses - scrap*/,
@@ -153,22 +155,24 @@ class FinanceCategoryViewModel @Inject constructor(
                 currentBalanceFlow,
                 financeCategoryFlow,
                 financeProductFlow,
-            ) { currentBalance, categoryList, productList ->
+                settingsRepository.getSettings(itemId)
+            ) { currentBalance, categoryList, productList, set ->
                 val financeCategoryUiList = reduceCategories(categoryList)
                 val financeProductUiList = reduceProduct(productList)
                 Triple(
                     currentBalance,
                     financeCategoryUiList,
                     financeProductUiList
-                )
-            }.collect { (currentBalance, categoryUi, productUi) ->
+                ) to set
+            }.collect { (finance, set) ->
                 updateState { state ->
                     state.copy(
                         financeCategory = financeCategory,
                         isLoading = false,
-                        currentBalance = currentBalance,
-                        financeCategoryList = categoryUi,
-                        financeProductList = productUi
+                        currentBalance = finance.first,
+                        financeCategoryList = finance.second,
+                        financeProductList = finance.third,
+                        suffixPrice = set.currencySuffix
                     )
                 }
             }

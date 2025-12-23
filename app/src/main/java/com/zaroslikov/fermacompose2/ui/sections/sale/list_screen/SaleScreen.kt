@@ -184,7 +184,7 @@ private fun SaleContainer(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailsClick = onDetailsClick,
-        detailCard = { item ->
+        detailCard = {index, item ->
             DetailProductCardNew(
                 title = item.title,
                 count = item.count,

@@ -34,7 +34,7 @@ fun MainProjectScreen(
     itemPT: Long
 ) {
     val projectNavController = rememberNavController()
-    val startDestination = Destination.MAGAZINE
+    val startDestination = Destination.WAREHOUSE
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
     Scaffold(

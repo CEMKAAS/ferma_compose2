@@ -1,42 +1,57 @@
 package com.zaroslikov.fermacompose2.ui.sections.note.list_screen
 
-
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.DrawerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainNoteTable
+import com.zaroslikov.fermacompose2.TopAppBarNewFilter
+import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.blue_1
+import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.orang_11
+import com.zaroslikov.fermacompose2.orang_12
+import com.zaroslikov.fermacompose2.orang_13
+import com.zaroslikov.fermacompose2.orang_14
+import com.zaroslikov.fermacompose2.ui.animal.indicators.DetailBottomSheet
+import com.zaroslikov.fermacompose2.ui.animal.indicators.EntryBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.FloatButton
-import com.zaroslikov.fermacompose2.ui.elements.IconAndText
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
-import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigation
+import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
+import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.elements.textBold_20
-import com.zaroslikov.fermacompose2.ui.start.DrawerNavigation
-import com.zaroslikov.fermacompose2.ui.start.DrawerSheet
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
+import com.zaroslikov.fermacompose2.ui.start.dateBuilder
+import com.zaroslikov.fermacompose2.ui.start.monthToResString
 
 
 object NoteDestination : NavigationDestination {
@@ -49,60 +64,114 @@ object NoteDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteScreen(
-    navigateToStart: () -> Unit,
-    navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    navigateBack: () -> Unit,
     viewModel: NoteViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val coroutineScope = rememberCoroutineScope()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val idProject = state.idPT
+
+    val colors = listOf(orang_11, orang_12)
+
+    val query = state.textSearch.trim().lowercase()
+    val searchList = if (query.isBlank()) state.list
+    else
+        state.list.filter { item ->
+            val date = item.date.split(".")
+            val monthText = stringResource(id = monthToResString(date[1].toInt()))
+            item.title.lowercase().contains(query) ||
+                    item.note.lowercase().contains(query) ||
+                    dateBuilder(date[0].toInt(), monthText, date[2].toInt()).lowercase()
+                        .contains(query)
+        }
+
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-           /* TopAppBarNavigation(
-                title = R.string.note_screen_title,
-                scope = coroutineScope,
-                drawerState = drawerState,
-                scrollBehavior = scrollBehavior
-            )*/
+            TopAppBarNewFilter(
+                title = stringResource(R.string.note_screen_title),
+                navigateBack = navigateBack,
+                scrollBehavior = scrollBehavior,
+                content = {
+                    SearchBar(
+                        value = state.textSearch,
+                        onValueChange = { viewModel.onIntent(NoteListIntent.SearchChanged(it)) },
+                        intRes = R.string.note_screen_search_note
+                    )
+                }
+            )
         },
-        floatingActionButton = { FloatButton { navigateToItemAdd(idProject) } },
+        floatingActionButton = {
+            NeonGlowFab(colors = colors) {
+                viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true))
+            }
+        },
     ) { innerPadding ->
         if (state.isLoading)
             CircularProgress(
                 modifier = modifier.padding(innerPadding),
             )
         else
-            NoteBody(
+            NoteContainer(
                 modifier = modifier
                     .modifierScreenLazy(innerPadding),
                 itemList = state.list,
-                onItemClick = navigateToItemUpdate,
-                navigateToItemAdd = { navigateToItemAdd(idProject) }
+                color = colors.first(),
+                searchList = searchList,
+                onInsertClick = { viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true)) },
+                onEditClick = { viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true, it)) },
+                onDeleteClick = { viewModel.onIntent(NoteListIntent.Delete(it)) },
+                onDetailClick = {
+                    viewModel.onIntent(NoteListIntent.OpenBottomSheetDetail(true, it))
+                }
+            )
+        if (state.openBottomSheetEntry)
+            NoteEntryBottomSheet(
+                colors = colors,
+                state = state.currentProduct,
+                onIntent = viewModel::onIntent
+            )
+        if (state.openBottomSheetDetail)
+            NoteDetailBottomSheet(
+                state = state.detailDomainNoteTable,
+                onIntent = viewModel::onIntent
             )
     }
 }
 
 @Composable
-private fun NoteBody(
-    itemList: List<DomainNoteTable>,
-    onItemClick: (Pair<Long, Long>) -> Unit,
+private fun NoteContainer(
     modifier: Modifier = Modifier,
-    navigateToItemAdd: () -> Unit
+    color: Color = blue_1,
+    itemList: List<DomainNoteTable>,
+    searchList: List<DomainNoteTable>,
+    onInsertClick: () -> Unit,
+    onEditClick: (DomainNoteTable) -> Unit,
+    onDeleteClick: (Long) -> Unit,
+    onDetailClick: (Int) -> Unit,
 ) {
-    if (itemList.isNotEmpty())
-        InventoryList(
-            itemList = itemList,
-            onItemClick = { onItemClick(it.idPT to it.id) },
-            modifier = modifier
-        )
-    else MessageNoData(
+    InventoryBody(
         modifier = modifier,
-        onClick = navigateToItemAdd,
+        details = true,
+        itemList = itemList,
+        searchList = searchList,
+        brieflyList = emptyList<Int>(),
+        onInsertClick = onInsertClick,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        onDetailsClick = {},
+        detailCard = { index, item ->
+            NoteCard(
+                title = item.title,
+                note = item.note,
+                date = item.date,
+                color = color,
+                onEditClick = { onEditClick(item) },
+                onDeleteClick = { onDeleteClick(item.id) },
+                onDetailClick = { onDetailClick(index) }
+            )
+        },
+        brieflyCard = {},
         titleRes = R.string.message_no_date_title_note,
         messageRes = R.string.message_no_date_message_note,
         supportRes = R.string.message_no_date_support_text_note,
@@ -110,53 +179,136 @@ private fun NoteBody(
     )
 }
 
-
-@Composable
-private fun InventoryList(
-    modifier: Modifier = Modifier,
-    itemList: List<DomainNoteTable>,
-    onItemClick: (DomainNoteTable) -> Unit,
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = modifier,
-        verticalArrangement = Arrangement.Top,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        items(items = itemList, key = { it.id }) { item ->
-            NoteCard(
-                noteTable = item,
-                modifier = Modifier
-                    .clickable { onItemClick(item) })
-        }
-    }
-}
-
 @Composable
 fun NoteCard(
-    noteTable: DomainNoteTable,
-    modifier: Modifier = Modifier
+    title: String,
+    note: String,
+    date: String,
+    color: Color,
+    onDetailClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
-    CardField(modifier = modifier) {
+    val date = date.split(".")
+    val monthText = stringResource(id = monthToResString(date[1].toInt()))
+    val date2 = dateBuilder(date[0].toInt(), monthText, date[2].toInt())
+    CardFieldNew(
+        onClick = onDetailClick
+    ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.Start
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    IconTransaction(
+                        icon = R.drawable.baseline_sticky_note_2_24,
+                        colorIcon = color,
+                        color = orang_13
+                    )
+                    Text(
+                        text = title,
+                        style = text_16,
+                        color = black_2,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                DropdownMenuEdit(
+                    onEditClick = onEditClick,
+                    onDeleteClick = onDeleteClick
+                )
+            }
             Text(
-                modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                text = noteTable.title,
-                style = textBold_20,
-                maxLines = 1,
+                text = note, style = text_16, color = marengo, maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-            IconAndText(
-                iconRes = R.drawable.baseline_sticky_note_2_24,
-                valueString = noteTable.note
-            )
-            IconAndText(
+            IconAndTextNew(
                 iconRes = R.drawable.baseline_calendar_month_24,
-                valueString = noteTable.date
+                valueString = date2,
+                color = color
             )
         }
     }
 }
+
+@Composable
+private fun NoteEntryBottomSheet(
+    colors: List<Color>,
+    state: NoteEntryState2,
+    onIntent: (NoteListIntent) -> Unit
+) {
+    EntryBottomSheet(
+        modifier = Modifier,
+        isEntry = state.isEntry,
+        enabledButton = state.enabledButton(),
+        colors = colors,
+        onDismissRequest = {
+            onIntent(
+                NoteListIntent.OpenBottomSheetEntry(false)
+            )
+        },
+        onInsertClick = { onIntent(NoteListIntent.Insert) },
+        onUpdateClick = { onIntent(NoteListIntent.Update) }
+    ) {
+        OutlinedTextNew(
+            value = state.title,
+            onValueChange = { onIntent(NoteListIntent.TitleChanged(it)) },
+            isError = state.error.isErrorTitle,
+            labelIntRes = R.string.note_screen_note_title,
+            supportingText = R.string.note_screen_note_support_title
+        )
+        OutlinedTextNoteNew(
+            value = state.note,
+            onValueChange = { onIntent(NoteListIntent.NoteChanged(it)) },
+            labelIntRes = R.string.note_screen_note_text,
+            supportingText = R.string.note_screen_note_support_text,
+            minLines = 6
+        )
+    }
+}
+
+@Composable
+private fun NoteDetailBottomSheet(
+    state: DomainNoteTable,
+    onIntent: (NoteListIntent) -> Unit
+) {
+    val date = state.date.split(".")
+    val monthText = stringResource(id = monthToResString(date[1].toInt()))
+
+    DetailBottomSheet(
+        modifier = Modifier,
+        onDismissRequest = {
+            onIntent(NoteListIntent.OpenBottomSheetDetail(false))
+        },
+        title = state.title,
+        date = dateBuilder(date[0].toInt(), monthText, date[2].toInt()),
+        onDeleteClick = {
+            onIntent(NoteListIntent.Delete(state.id))
+            onIntent(NoteListIntent.OpenBottomSheetDetail(false))
+        },
+        onUpdateClick = { onIntent(NoteListIntent.OpenBottomSheetEntry(true, state)) },
+    ) {
+        BorderCard(
+            modifier = Modifier.fillMaxWidth(),
+            padding = PaddingValues(26.dp),
+            shape = RoundedCornerShape(16.dp),
+            borderWidth = 2.dp,
+            borderColor = orang_14,
+            containerColor = orang_13.copy(alpha = 0.5f)
+        ) {
+            Text(text = state.note, style = text_16, color = dark, textAlign = TextAlign.Justify)
+        }
+    }
+}
+
+
+
 

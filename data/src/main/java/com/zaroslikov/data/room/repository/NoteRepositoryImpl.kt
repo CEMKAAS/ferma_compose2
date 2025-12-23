@@ -30,4 +30,8 @@ class NoteRepositoryImpl @Inject constructor(private val noteDao: NoteDao) : Not
         return noteDao.deleteNote(item.toNoteMap())
     }
 
+    override suspend fun deleteNoteById(id: Long) {
+        return noteDao.deleteNoteById(id)
+    }
+
 }

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.zaroslikov.data.room.table.ferma.ProjectTable
+import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.enums.Suffix
 
 

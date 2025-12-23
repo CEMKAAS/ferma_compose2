@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2
 
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -318,30 +319,31 @@ fun TopAppBarStart(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarStart2(
-    title: String,
+    @StringRes title: Int,
     infoBottomSheet: () -> Unit,
     archiveButton: () -> Unit,
     boolean: Boolean,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     TopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = { Text(text = title) },
+        title = { Text(text = stringResource(title)) },
         scrollBehavior = scrollBehavior,
+        navigationIcon = {
+            IconButton(onClick = infoBottomSheet) {
+                Icon(
+                    painterResource(R.drawable.icon_menu),
+                    contentDescription = "Информация"
+                )
+            }
+        },
+        windowInsets = WindowInsets(0),
         actions = {
             IconButton(onClick = archiveButton) {
                 Icon(
                     painter = painterResource(id = if (boolean) R.drawable.baseline_unarchive_24 else R.drawable.baseline_archive_24),
                     contentDescription = "Localized description",
                 )
-            }
-            IconButton(onClick = infoBottomSheet) {
-                Icon(
-                    painterResource(R.drawable.icon_info),
-                    contentDescription = "Информация"
-                )
+
             }
         }
     )

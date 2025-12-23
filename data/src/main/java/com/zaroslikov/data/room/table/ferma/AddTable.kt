@@ -7,6 +7,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import com.zaroslikov.data.room.table.animal.AnimalTable
+import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.enums.Suffix
 
 

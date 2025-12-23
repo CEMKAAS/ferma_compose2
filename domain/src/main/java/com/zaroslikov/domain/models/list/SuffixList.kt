@@ -31,3 +31,15 @@ val suffixHeightList = listOf(
     Suffix.CENTIMETERS,
     Suffix.METERS,
 )
+val suffixVolumeList = listOf(
+    Suffix.MILLILITRES,
+    Suffix.LITERS,
+    Suffix.CUBIC_METERS,
+)
+
+val suffixCurrencyList = listOf(
+    Suffix.RUBLE,
+    Suffix.TENGE,
+    Suffix.DOLLAR,
+    Suffix.EURO
+)

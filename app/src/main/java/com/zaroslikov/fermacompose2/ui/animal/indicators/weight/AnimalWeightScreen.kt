@@ -61,7 +61,7 @@ fun AnimalWeightScreen(
             TopAppBarBack(
                 intRes = title,
                 scrollBehavior = scrollBehavior,
-                navigateUp = navigateBack
+                onNavigateBackClick = navigateBack
             )
         },
         floatingActionButton = {

@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -16,14 +17,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.green_2
 import com.zaroslikov.fermacompose2.green_4
 import com.zaroslikov.fermacompose2.white
@@ -83,11 +89,12 @@ fun IconFinance(
 
 @Composable
 fun IconTransaction(
-    @DrawableRes icon: Int, colorIcon: Color, color: Color,
-    sizeCard: Dp = 36.dp, sizeIcon: Dp = 20.dp
+    modifier: Modifier = Modifier,
+    sizeCard: Dp = 40.dp,
+    @DrawableRes icon: Int, colorIcon: Color, color: Color
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(sizeCard)
             .background(color = color, shape = RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
@@ -97,7 +104,65 @@ fun IconTransaction(
             contentDescription = null,
             tint = colorIcon,
             modifier = Modifier
-                .size(sizeIcon)
+                .size(sizeCard / 2)
+        )
+    }
+}
+
+@Composable
+fun IconTransaction(
+    modifier: Modifier = Modifier,
+    sizeCard: Dp = 40.dp,
+    image: Painter,
+    color: Color,
+    isPainter: Boolean
+) {
+    val shape = RoundedCornerShape(10.dp)
+    Box(
+        modifier = modifier
+            .size(sizeCard)
+            .clip(shape)
+            .background(color = color, shape = shape),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = image,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .background(color = color, shape = shape)
+                .then(
+                    if (!isPainter) Modifier.size(sizeCard / 2) else Modifier
+                )
+        )
+    }
+}
+
+@Composable
+fun IconTransaction2(
+    modifier: Modifier = Modifier,
+    sizeCard: Dp = 40.dp,
+    image: ImageBitmap,
+    color: Color,
+    isPainter: Boolean
+) {
+    val shape = RoundedCornerShape(10.dp)
+    Box(
+        modifier = modifier
+            .size(sizeCard)
+            .clip(shape)
+            .background(color = color, shape = shape),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            image,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .background(color = color, shape = shape)
+                .then(
+                    if (!isPainter) Modifier.size(sizeCard / 2) else Modifier
+                )
         )
     }
 }

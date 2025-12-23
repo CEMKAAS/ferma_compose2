@@ -1,71 +1,40 @@
-package com.zaroslikov.fermacompose2.ui.start
+package com.zaroslikov.fermacompose2.ui.start.StartScreen
 
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.zaroslikov.fermacompose2.AlterDialigStart
+import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarStart2
-import com.zaroslikov.data.room.dto.ProjectTableStartScreen
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
-import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
-import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
+import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_9
+import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.price_green_2
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
+import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-//import com.zaroslikov.fermacompose2.ui.add.ChoiseProjectDestination
-//import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
-//import com.zaroslikov.fermacompose2.ui.warehouse.newYearBoolean
-import io.appmetrica.analytics.AppMetrica
+import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 
 
 object StartDestination : NavigationDestination {
@@ -77,7 +46,7 @@ object StartDestination : NavigationDestination {
 @Composable
 fun StartScreen(
     navController: NavController,
-    navigateToItemProject: (Int) -> Unit,
+    navigateToItemProject: (Long) -> Unit,
     navigateToItemIncubator: (Int) -> Unit,
     navigateToItemProjectArh: (Int) -> Unit,
     navigateToItemIncubatorArh: (Int) -> Unit,
@@ -87,81 +56,80 @@ fun StartScreen(
     isFirstEnd: () -> Unit,
     viewModel: StartScreenViewModel = hiltViewModel()
 ) {
-    val projectList by viewModel.getAllProject.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val colors = listOf(price_green, green_9)
+    /*val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerClose = {
+        scope.launch {
+            drawerState.apply {
+                if (isClosed) open() else close()
+            }
+        }
+    }*/
+    /* var infoBottomSheet by remember { mutableStateOf(false) }
+     var showDialogTime by remember { mutableStateOf(false) }
+     var arhivBoolean by remember { mutableStateOf(false) }*/
 
-    var infoBottomSheet by remember { mutableStateOf(false) }
-    var showDialogTime by remember { mutableStateOf(false) }
-    var arhivBoolean by remember { mutableStateOf(false) }
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    if (showDialogTime) {
+    /*if (showDialogTime) {
         TimePicker(time = if (viewModel.time == "") "20:00" else viewModel.time, showDialog = {
             viewModel.onUpdate(time1 = it)
             showDialogTime = false
         })
-    }
+    }*/
 
-    AlterDialigStart(
+    /*AlterDialigStart(
         isFirstStart = isFirstStart,
         dialogTitle = "Главный экран",
         dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.\nДля получения дополнительной информации по использованию приложения обращайтесь в нашу группу ВКонтакте.\n" +
                 "\nУдачи.",
         textAppMetrica = "Окончание обучения",
         isFirstEndConfig = isFirstEnd
-    )
+    )*/
 
+    /*   ModalNavigationDrawer(
+           drawerState = drawerState,
+           drawerContent = {
+               DrawerSheetNew(
+                   onProfileClick = { },
+                   onSettingsClick = { TODO() },
+                   onAboutAppClick = { TODO() },
+                   onCloseClick = { drawerClose() }
+               )
+           }
+       ) {*/
     Scaffold(
         topBar = {
-            TopAppBarStart2(
-                title = "Мое Хозяйство",
-                infoBottomSheet = {
-                    infoBottomSheet = true
-                    AppMetrica.reportEvent("Информация")
-                },
-                archiveButton = {
-                    arhivBoolean = !arhivBoolean
-                },
-                boolean = arhivBoolean
-            )
+            /*TopAppBarStart2(
+                title = R.string.start_screen_title,
+                infoBottomSheet = { drawerClose() },
+                archiveButton = {},
+                boolean = true
+            )*/
         }, floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
-                    navController.navigate(
-//                    ChoiseProjectDestination.route
-                        ProjectAddDestination.route
-                    )
-                },
-                icon = { Icon(painterResource(R.drawable.icon_add), "Localized description") },
-                text = { Text(text = "Добавить") },
-            )
+            NeonGlowFab(colors = colors) {
+                navController.navigate("${WarehouseEditDestination.route}/${-1}")
+            }
         }
     ) { innerPadding ->
-        if (isLoading) {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            StartScreenContainer(
-                modifier = Modifier.padding(innerPadding),
-                projectList = projectList,
-                navigateToItemProject = navigateToItemProject,
-                navigateToItemIncubator = navigateToItemIncubator,
-                navigateToItemProjectArh = navigateToItemProjectArh,
-                navigateToItemIncubatorArh = navigateToItemIncubatorArh,
-                navigationToNewYear = { navigationToNewYear(Pair(false, 0)) },
-                navController = navController,
-                arhivBoolean = arhivBoolean
-            )
-        }
 
-        if (infoBottomSheet) {
+        if (state.isLoading)
+            CircularProgress(
+                modifier = modifier.padding(innerPadding),
+            )
+        else
+            StartScreenContainer2(
+                modifier = Modifier.modifierScreenLazy(innerPadding),
+                itemList = state.list,
+                brieflyList = state.list,
+                onEditClick = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
+                onArchiveClick = { viewModel.onIntent(StartScreenIntent.ArchiveClicked(it)) },
+                onDeleteClick = { viewModel.onIntent(StartScreenIntent.DeleteClicked(it)) },
+                onNavigationProject = { navigateToItemProject(it) },
+            )
+
+        /*if (infoBottomSheet) {
             InfoBottomSheet(
                 infoBottomSheet = { infoBottomSheet = false },
                 saveBottomSheet = {
@@ -177,10 +145,174 @@ fun StartScreen(
                     AppMetrica.reportEvent("УведОбщ - нет")
                 },
             )
+        }*/
+    }
+}
+/*
+}
+*/
+
+@Composable
+private fun StartScreenContainer2(
+    modifier: Modifier = Modifier,
+    itemList: List<DomainProjectTable>,
+    brieflyList: List<DomainProjectTable>,
+    onEditClick: (Long) -> Unit,
+    onDeleteClick: (DomainProjectTable) -> Unit,
+    onArchiveClick: (DomainProjectTable) -> Unit,
+    onNavigationProject: (Long) -> Unit
+) {
+    InventoryBody(
+        modifier = modifier,
+        details = true,
+        itemList = itemList,
+        searchList = itemList,
+        brieflyList = brieflyList,
+        onInsertClick = {},
+        onEditClick = { },
+        onDeleteClick = {},
+        onDetailsClick = {},
+        detailCard = { index, item ->
+            ProjectCard(
+                projectTable = item,
+                onEditClick = { onEditClick(item.id) },
+                onDeleteClick = { onDeleteClick(item) },
+                onArchiveClick = { onArchiveClick(item) },
+                onNavigationProject = { onNavigationProject(item.id) }
+            )
+        },
+        brieflyCard = {},
+        titleRes = R.string.start_screen_positions_message_no_date_title,
+        messageRes = R.string.start_screen_positions_message_no_date_message,
+        supportRes = R.string.start_screen_positions_message_no_date_support_text,
+        buttonRes = R.string.start_screen_positions_button_note_message_no_data
+    )
+}
+
+@Composable
+private fun ProjectCard(
+    projectTable: DomainProjectTable,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onArchiveClick: () -> Unit,
+    onNavigationProject: () -> Unit
+) {
+    CardFieldNew(
+        onClick = onNavigationProject
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                IconTransaction(
+                    image = painterResource(R.drawable.livestock),
+                    color = price_green_2,
+                    sizeCard = 64.dp,
+                    isPainter = true
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = projectTable.titleProject,
+                        style = text_16,
+                        color = black_2
+                    )
+                    IconAndTextNew(
+                        iconRes = R.drawable.baseline_calendar_month_24,
+                        valueString = projectTable.data,
+                        color = gray_7
+                    )
+                }
+            }
+            DropdownMenuEdit(
+                onEditClick = onEditClick,
+                onArchiveClick = onArchiveClick,
+                onDeleteClick = onDeleteClick
+            )
         }
     }
 }
+/*@Composable
+private fun ProjectCard(
+    projectTable: DomainProjectTable
+) {
+    CardFieldNew() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 3.dp,
+                        color = if (projectTable.arhive == "0") MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = 0.5f
+                        ),
+                        shape = CircleShape
+                    )
+            ) {
+                if (projectTable.imageData != null) {
+                    *//*    Image(
+                            bitmap = projectTable.imageData,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.align(Alignment.Center),
+                            colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
+                                Color.Gray
+                            )
+                        )*//*
+                } else {
+                    Image(
+                        painter = painterResource(setImage(projectTable)),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(194.dp),
+                        colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
+                            Color.Gray
+                        )
+                    )
+                }
+            }
 
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Text(
+                    text = projectTable.titleProject,
+                    modifier = Modifier
+                        .padding(horizontal = 3.dp, vertical = 6.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 26.sp
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painterResource(R.drawable.icon_date_range), contentDescription = "Дата")
+                    Text(
+                        text = if (projectTable.arhive == "0") projectTable.data else "Завершен",
+                        modifier = Modifier
+                            .padding(horizontal = 6.dp)
+                    )
+                }
+            }
+        }
+    }
+}*/
+
+
+/*
 @Composable
 fun StartScreenContainer(
     modifier: Modifier,
@@ -197,7 +329,8 @@ fun StartScreenContainer(
     if (projectList.isNotEmpty()) {
         Column(modifier = modifier) {
 
-            /*  if (newYearBoolean()) {
+            */
+/*  if (newYearBoolean()) {
                   Button(
                       onClick = {
                           navigationToNewYear()
@@ -209,7 +342,8 @@ fun StartScreenContainer(
                   ) {
                       Text(text = "Итоги года!")
                   }
-              }*/
+              }*//*
+
 
             LazyColumn(contentPadding = PaddingValues(8.dp)) {
                 items(items = projectList, key = { it.id }) {
@@ -279,83 +413,8 @@ fun StartScreenContainer(
         }
     }
 }
-
-@Composable
-fun CardFerma(
-    projectTable: ProjectTableStartScreen, modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .border(
-                        width = 3.dp,
-                        color = if (projectTable.arhive == "0") MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = 0.5f
-                        ),
-                        shape = CircleShape
-                    )
-            ) {
-                if (projectTable.imageData != null) {
-                    /*    Image(
-                            bitmap = projectTable.imageData,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.align(Alignment.Center),
-                            colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
-                                Color.Gray
-                            )
-                        )*/
-                } else {
-                    Image(
-                        painter = painterResource(setImage(projectTable)),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(194.dp),
-                        colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
-                            Color.Gray
-                        )
-                    )
-                }
-            }
-
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Text(
-                    text = projectTable.titleProject,
-                    modifier = Modifier
-                        .padding(horizontal = 3.dp, vertical = 6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 26.sp
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painterResource(R.drawable.icon_date_range), contentDescription = "Дата")
-                    Text(
-                        text = if (projectTable.arhive == "0") projectTable.data else "Завершен",
-                        modifier = Modifier
-                            .padding(horizontal = 6.dp)
-                    )
-                }
-            }
-        }
-    }
-}
+*/
+/*
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -500,21 +559,4 @@ fun setImage(projectTable: ProjectTableStartScreen): Int {
     } else {
         return R.drawable.livestock
     }
-}
-
-@Preview
-@Composable
-fun prewieCard() {
-    CardFerma(
-        ProjectTableStartScreen(
-            id = 0,
-            titleProject = "Мое Хозяйство",
-            type = "Курицы",
-            data = "11.01.2025",
-            arhive = "0",
-            dateEnd = "11.12.2025",
-            mode = 0,
-            imageData = null
-        )
-    )
-}
+}*/

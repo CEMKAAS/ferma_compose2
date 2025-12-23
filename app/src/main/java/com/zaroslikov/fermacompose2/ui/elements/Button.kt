@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 
-import android.graphics.drawable.Icon
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -11,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +21,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -153,6 +152,7 @@ fun ButtonCustom(
 fun GradientMaterialButton(
     text: String,
     onClick: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     val gradient = Brush.linearGradient(
@@ -166,6 +166,7 @@ fun GradientMaterialButton(
             containerColor = Color.Transparent
         ),
         shape = RoundedCornerShape(14.dp),
+        enabled = enabled,
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
             .background(brush = gradient)
@@ -184,7 +185,9 @@ fun GradientButton(
     modifier: Modifier = Modifier,
     colors: List<Color>,
     text: String,
+    @DrawableRes iconRes: Int? = null,
     enable: Boolean,
+    paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     onClick: () -> Unit,
 ) {
     val gradient = Brush.linearGradient(
@@ -203,12 +206,24 @@ fun GradientButton(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            text = text,
-            color = Color.White,
-            style = text_14
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            iconRes?.let {
+                Icon(
+                    painterResource(it),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+            Text(
+                modifier = Modifier.padding(paddingValues),
+                text = text,
+                color = Color.White,
+                style = text_14
+            )
+        }
     }
 }
 
@@ -216,6 +231,7 @@ fun GradientButton(
 fun CloseButton(
     modifier: Modifier = Modifier,
     @StringRes text: Int,
+    @DrawableRes iconRes: Int? = null,
     onClick: () -> Unit,
 ) {
     Box(
@@ -226,12 +242,24 @@ fun CloseButton(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text(
+        Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            text = stringResource(text),
-            color = black,
-            style = text_14
-        )
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            iconRes?.let {
+                Icon(
+                    painterResource(it),
+                    contentDescription = null,
+                    tint = black
+                )
+            }
+            Text(
+                text = stringResource(text),
+                color = black,
+                style = text_14
+            )
+        }
     }
 }
 
@@ -284,9 +312,9 @@ fun BorderShowAllButton(
     onClick: () -> Unit
 ) {
     val (icon, text) = if (isShowMore)
-        R.drawable.icon_keyboard_arrow_down to
-                stringResource(R.string.animal_card_screen_show_product_all).format(listSize)
-    else R.drawable.icon_keyboard_arrow_up to stringResource(R.string.button_wrap)
+        R.drawable.icon_keyboard_arrow_up to stringResource(R.string.button_wrap)
+    else R.drawable.icon_keyboard_arrow_down to
+            stringResource(R.string.animal_card_screen_show_product_all).format(listSize)
 
     Card(
         modifier = modifier,

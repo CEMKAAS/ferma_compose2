@@ -137,14 +137,12 @@ fun TopAppBarNavigationNew2(
 fun TopAppBarBack(
     @StringRes intRes: Int? = null,
     title: String = "",
-    navigateUp: () -> Unit = {},
-    calendarClick: (() -> Unit)? = null,
+    onNavigateBackClick: ((() -> Unit)?) = {},
+    onCalendarClick: (() -> Unit)? = null,
+    onSettingsClick: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
         title = {
             Text(
                 text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
@@ -152,20 +150,30 @@ fun TopAppBarBack(
             )
         },
         navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(
-                    painterResource(R.drawable.baseline_arrow_back_24),
-                    contentDescription = "Назад"
-                )
+            onNavigateBackClick?.let {
+                IconButton(onClick = onNavigateBackClick) {
+                    Icon(
+                        painterResource(R.drawable.baseline_arrow_back_24),
+                        contentDescription = "Назад"
+                    )
+                }
             }
         },
         windowInsets = WindowInsets(0),
         scrollBehavior = scrollBehavior,
         actions = {
-            if (calendarClick != null) {
-                IconButton(onClick = calendarClick) {
+            onCalendarClick?.let {
+                IconButton(onClick = it) {
                     Icon(
                         painterResource(R.drawable.icon_date_range),
+                        contentDescription = "Date Range"
+                    )
+                }
+            }
+            onSettingsClick?.let {
+                IconButton(onClick = it) {
+                    Icon(
+                        painterResource(R.drawable.icon_setting),
                         contentDescription = "Date Range"
                     )
                 }

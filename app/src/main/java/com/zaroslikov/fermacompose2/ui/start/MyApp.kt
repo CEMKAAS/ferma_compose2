@@ -36,6 +36,7 @@ import com.zaroslikov.fermacompose2.ui.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleDestination
 //import com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.sections.writeOff.list_screen.WriteOffDestination
+import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -143,6 +144,8 @@ fun DrawerSheet(
         }
     }
 }
+
+
 
 fun formatter(number: Double): String {
     val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))

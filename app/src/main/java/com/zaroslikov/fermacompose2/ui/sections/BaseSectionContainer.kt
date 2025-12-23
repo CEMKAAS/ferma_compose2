@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -64,7 +65,7 @@ fun <T, B> InventoryBody(
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (B) -> Unit,
     // карточки передаются как composable-функции
-    detailCard: @Composable (T) -> Unit,
+    detailCard: @Composable (Int,T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
     // ресурсы строк для пустого состояния
     titleRes: Int,
@@ -106,7 +107,7 @@ private fun <T, B> InventoryList(
     onEditClick: (T) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (B) -> Unit,
-    detailCard: @Composable (T) -> Unit,
+    detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
 ) {
     LazyColumn(
@@ -115,7 +116,7 @@ private fun <T, B> InventoryList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (details)
-            items(items = itemList) { item -> detailCard(item) }
+            itemsIndexed(items = itemList) { index, item -> detailCard(index, item) }
         else
             items(items = brieflyList) { item -> brieflyCard(item) }
     }

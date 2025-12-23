@@ -410,10 +410,9 @@ class AnimalViewModel @Inject constructor(
     ): Pair<DomainAnimalCount, DomainExpensesTable?> {
         val dateFactory2 = if (isDateFactory) dateBorn else dateFactory
         val dateList = dateFactory2.split(".")
-        val countAnimal = if (count == "") "1" else count
+        val countAnimal = if (count.isBlank()) "1" else count
 
         return DomainAnimalCount(
-            id = 0,
             count = countAnimal,
             suffix = countSuffix,
             date = if (!isDateFactory) dateFactory else dateBorn,
@@ -423,12 +422,11 @@ class AnimalViewModel @Inject constructor(
         ) to
                 if (price.isNotBlank())
                     DomainExpensesTable(
-                        id = 0,
                         title = title,
-                        count = count.toConvertZeroDouble(),
+                        count = countAnimal.toConvertZeroDouble(),
                         day = dateList[0].toInt(),
-                        month = dateList[0].toInt(),
-                        year = dateList[0].toInt(),
+                        month = dateList[1].toInt(),
+                        year = dateList[2].toInt(),
                         price = price.toConvertDbDouble(),
                         priceAll = if (isAutoPrice && isAnimalGroup) priceAll.toConvertDbDouble() else null,
                         countSuffix = countSuffix,

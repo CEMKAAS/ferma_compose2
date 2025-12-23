@@ -13,8 +13,10 @@ import com.zaroslikov.fermacompose2.ui.add.AddProject
 import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectScreen
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
-import com.zaroslikov.fermacompose2.ui.start.StartDestination
-import com.zaroslikov.fermacompose2.ui.start.StartScreen
+import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartDestination
+import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartScreen
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +77,24 @@ fun InventoryNavHost(
             )
         }
 
+        /* composable(route = WarehouseEditDestination.route) {
+             WarehouseEditScreen(
+                 navigateBack = { navController.popBackStack() },
+                 navigateUp = { navController.navigateUp() },
+                 navigateToStart = { navController.navigate(StartDestination.route) })
+         }*/
+
+        composable(
+            route = WarehouseEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(WarehouseEditDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            WarehouseEditScreen(
+                navigateBack = navController::popBackStack)
+
+        }
+
         /* composable(route = ChoiseProjectDestination.route) {
              ChoiseProject(
                  navigateBack = { navController.popBackStack() },
@@ -84,7 +104,6 @@ fun InventoryNavHost(
              )
          }
          */
-
 
 
         /*
@@ -199,60 +218,49 @@ fun InventoryNavHost(
          }
 
 
-         composable(
-             route = WarehouseEditDestination.routeWithArgs,
-             arguments = listOf(navArgument(WarehouseEditDestination.itemIdArg) {
-                 type = NavType.IntType
-             })
-         ) {
-             WarehouseEditScreen(
-                 navigateBack = { navController.popBackStack() },
-                 navigateUp = { navController.navigateUp() },
-                 navigateToStart = { navController.navigate(StartDestination.route) })
 
-         }
 */
         //==================== Finance ====================
-     /*   composable(
-            route = FinanceDestination.routeWithArgs,
-            arguments = listOf(navArgument(FinanceDestination.itemIdArg) {
-                type = NavType.IntType
-            })
-        ) {
-            FinanceScreen(
-                navigateToStart = { navController.navigate(StartDestination.route) },
-                navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
-                navigateToIncomeExpenses = {
-                    navController.navigate(
-                        navNull(
-                            FinanceIncomeExpensesDestination.route,
-                            FinanceIncomeExpensesDestination.itemIdArg,
-                            it.first.toString(),
-                            FinanceIncomeExpensesDestination.itemIdArgTwo,
-                            it.second.toString()
-                        )
-                    )
-                },
-                navigateToFinanceMonth = {
-                    navController.navigate(
-                        navNull(
-                            FinanceMonthDestination.route,
-                            FinanceMonthDestination.itemIdPT,
-                            it.toString()
-                        )
-                    )
-                }
-            )
-        }
-        composable(
-            route = FinanceMonthDestination.routeWithArgs,
-            arguments = listOf(navArgument(FinanceMonthDestination.itemIdPT) {
-                type = NavType.LongType
-            })
-        ) {
-            FinanceMonthScreen(
-                navigateBack = { navController.popBackStack() },
-                *//*  navigateToCategory = {
+        /*   composable(
+               route = FinanceDestination.routeWithArgs,
+               arguments = listOf(navArgument(FinanceDestination.itemIdArg) {
+                   type = NavType.IntType
+               })
+           ) {
+               FinanceScreen(
+                   navigateToStart = { navController.navigate(StartDestination.route) },
+                   navigateToModalSheet = { navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}") },
+                   navigateToIncomeExpenses = {
+                       navController.navigate(
+                           navNull(
+                               FinanceIncomeExpensesDestination.route,
+                               FinanceIncomeExpensesDestination.itemIdArg,
+                               it.first.toString(),
+                               FinanceIncomeExpensesDestination.itemIdArgTwo,
+                               it.second.toString()
+                           )
+                       )
+                   },
+                   navigateToFinanceMonth = {
+                       navController.navigate(
+                           navNull(
+                               FinanceMonthDestination.route,
+                               FinanceMonthDestination.itemIdPT,
+                               it.toString()
+                           )
+                       )
+                   }
+               )
+           }
+           composable(
+               route = FinanceMonthDestination.routeWithArgs,
+               arguments = listOf(navArgument(FinanceMonthDestination.itemIdPT) {
+                   type = NavType.LongType
+               })
+           ) {
+               FinanceMonthScreen(
+                   navigateBack = { navController.popBackStack() },
+                   *//*  navigateToCategory = {
                 navController.navigate( "${FinanceCategoryDestination.route}/${it.idPT}/${it.category}/${it.incomeBoolean}/${it.dateBegin}/${it.dateEnd}"
                }*//*
             )
@@ -328,68 +336,68 @@ fun InventoryNavHost(
                     )
                 }
             )*/
-            /* AddScreen(
-                 drawerState = drawerState,
-                 navigateToStart = {
-                     navController.navigate(StartDestination.route)
-                 },
-                 navigateToModalSheet = {
-                     navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
-                 },
-                 navigateToItemAdd = {
-                     navController.navigate(
-                         navNull(
-                             AddEntryDestination.route,
-                             AddEntryDestination.itemIdPT,
-                             it.toString()
-                         )
+        /* AddScreen(
+             drawerState = drawerState,
+             navigateToStart = {
+                 navController.navigate(StartDestination.route)
+             },
+             navigateToModalSheet = {
+                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")
+             },
+             navigateToItemAdd = {
+                 navController.navigate(
+                     navNull(
+                         AddEntryDestination.route,
+                         AddEntryDestination.itemIdPT,
+                         it.toString()
                      )
-                 },
-                 navigateToItemUpdate = {
-                     navController.navigate(
-                         navNull(
-                             AddEntryDestination.route,
-                             AddEntryDestination.itemIdPT,
-                             it.first.toString(),
-                             AddEntryDestination.itemId,
-                             it.second.toString()
-                         )
+                 )
+             },
+             navigateToItemUpdate = {
+                 navController.navigate(
+                     navNull(
+                         AddEntryDestination.route,
+                         AddEntryDestination.itemIdPT,
+                         it.first.toString(),
+                         AddEntryDestination.itemId,
+                         it.second.toString()
                      )
-                 },
-                 navigationToAnalysis = {
- //                    navController.navigate(
- //                        nav(
- //                            FinanceAnalysisDestination.route,
- //                            it.first.toString(),
- //                            it.second
- //                        )
- //                    )
- //                    "${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}")
-                 },
-             )*/
-     /*   }
-        composable(
-            route = AddEntryDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(AddEntryDestination.itemIdPT) {
-                    type = NavType.IntType
-                },
-                navArgument(AddEntryDestination.itemId) {
-                    type = NavType.IntType
-                    defaultValue = -1
-                })
-        ) {
-            AddEntryProduct(navigateBack = { navController.popBackStack() })
-        }
+                 )
+             },
+             navigationToAnalysis = {
+//                    navController.navigate(
+//                        nav(
+//                            FinanceAnalysisDestination.route,
+//                            it.first.toString(),
+//                            it.second
+//                        )
+//                    )
+//                    "${FinanceAnalysisDestination.route}/${it.idProject}/${it.name}")
+             },
+         )*/
+        /*   }
+           composable(
+               route = AddEntryDestination.routeWithArgs,
+               arguments = listOf(
+                   navArgument(AddEntryDestination.itemIdPT) {
+                       type = NavType.IntType
+                   },
+                   navArgument(AddEntryDestination.itemId) {
+                       type = NavType.IntType
+                       defaultValue = -1
+                   })
+           ) {
+               AddEntryProduct(navigateBack = { navController.popBackStack() })
+           }
 
-        //Sale
-        composable(
-            route = SaleDestination.routeWithArgs,
-            arguments = listOf(navArgument(SaleDestination.itemIdArg) {
-                type = NavType.IntType
-            })
-        ) {
-            *//*SaleScreen(drawerState = drawerState, navigateToStart = {
+           //Sale
+           composable(
+               route = SaleDestination.routeWithArgs,
+               arguments = listOf(navArgument(SaleDestination.itemIdArg) {
+                   type = NavType.IntType
+               })
+           ) {
+               *//*SaleScreen(drawerState = drawerState, navigateToStart = {
                 navController.navigate(StartDestination.route)
             }, navigateToModalSheet = {
                 navController.navigate("${it.routeDrawer}/${it.idProjectDrawer}")

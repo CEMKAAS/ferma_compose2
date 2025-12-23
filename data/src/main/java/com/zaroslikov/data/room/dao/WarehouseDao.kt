@@ -63,7 +63,7 @@ interface WarehouseDao {
                 " FROM ( " +
                 " SELECT title, count as count, count_suffix AS suffix" +
                 " FROM expenses_table" +
-                " WHERE idPT=:id and is_show_warehouse = 1 and is_show_food != 1" +
+                " WHERE idPT=:id and is_show_food != 1" +
 
                 " UNION All " +
                 " SELECT title, -count as count, count_suffix AS suffix " +

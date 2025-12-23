@@ -27,8 +27,6 @@ import com.zaroslikov.fermacompose2.ui.elements.CardFinanceRow
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-
 
 
 @Composable
@@ -50,7 +48,7 @@ fun FinanceIncomeExpensesScreen(
             TopAppBarBack(
                 scrollBehavior = scrollBehavior,
                 intRes = if (state.isIncome) R.string.income_screen_title else R.string.expenses_my_screen_title,
-                navigateUp = navigateBack
+                onNavigateBackClick = navigateBack
             )
         }
     ) { innerPadding ->

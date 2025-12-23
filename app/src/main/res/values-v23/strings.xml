@@ -18,6 +18,7 @@
     <string name="height_screen_title">Размер</string>
     <string name="count_screen_title">Количество</string>
     <string name="vaccination_screen_title">Прививки</string>
+    <string name="warehouse_screen_title">Мой Склад</string>
 
     <string name="add_screen_title2">Продукция</string>
     <string name="sale_screen_title2">Продажи</string>
@@ -96,6 +97,7 @@
     <string name="button_write_off">Списать</string>
     <string name="button_note">Записать</string>
     <string name="button_cancel">Отмена</string>
+    <string name="button_edit">Редактировать</string>
     <string name="button_save">Сохранить</string>
     <string name="button_wrap">Свернуть</string>
     <string name="button_add_message_no_data">Добавить Продукцию!</string>
@@ -164,6 +166,26 @@
     <string name="suffix_gram_day">г./день</string>
     <string name="suffix_kilogram_day">кг./день</string>
     <string name="suffix_tons_day">тн./день</string>
+
+    <string name="suffix_full_gram">Граммы</string>
+    <string name="suffix_full_kilogram">Килограммы</string>
+    <string name="suffix_full_tons">Тонны</string>
+    <string name="suffix_full_millilitres">Миллилитры</string>
+    <string name="suffix_full_liters">Литры</string>
+    <string name="suffix_full_cubic_meters">Кубические метры</string>
+    <string name="suffix_full_millimeters">Миллиметры</string>
+    <string name="suffix_full_centimetre">Сантиметры</string>
+    <string name="suffix_full_meters">Метры</string>
+
+    //Currency
+    <string name="currency_ruble">₽</string>
+    <string name="currency_full_ruble">Российский рубль</string>
+    <string name="currency_tenge">₸</string>
+    <string name="currency_full_tenge">Казахстанский тенге</string>
+    <string name="currency_dollar">$</string>
+    <string name="currency_full_dollar">Доллар США</string>
+    <string name="currency_euro">€</string>
+    <string name="currency_full_euro">Евро</string>
 
 
     //ContentDescription
@@ -245,9 +267,42 @@
     <string name="support_text_all_weight">Общий вес составит: %s %s</string>
     <string name="support_text_empty">Не указано</string>
 
+    //DrawerSheet
+    <string name="drawer_sheer_menu">Меню</string>
+    <string name="drawer_sheer_profile">Профиль</string>
+    <string name="drawer_sheer_profile_support">Личные данные и аналитика</string>
+    <string name="drawer_sheer_settings">Настройки</string>
+    <string name="drawer_sheer_settings_support">Настройки приложения</string>
+    <string name="drawer_sheer_about_app">О приложении</string>
+    <string name="drawer_sheer_about_app_support">Версия и контакты</string>
+
+    //StartScreen
+    <string name="start_screen_title">Мое Хозяйство</string>
+    <string name="start_screen_positions_message_no_date_title">Добро пожаловать!\nМое Хозяйство</string>
+    <string name="start_screen_positions_message_no_date_message">Здесь Вы сможете увидеть все Ваши проекты (инкубаторы и хозяйства). У Вас есть возможность создавать несколько проектов, каждый из которых будет иметь свою уникальную экономику и склад и д.р., что позволит эффективно управлять каждым Вашим бизнесом!</string>
+    <string name="start_screen_positions_message_no_date_support_text">Сейчас нет проектов:(\nНажмите + чтобы добавить\nили </string>
+    <string name="start_screen_positions_button_note_message_no_data">Добавить проект!</string>
+
+    //Warehouse
     <string name="warehouse_screen_positions">позиции</string>
+    <string name="warehouse_screen_products">Товары</string>
+    <string name="warehouse_screen_fast_add">Быстрое добавление</string>
 
+    //WarehouseEdit
+    <string name="warehouse_edit_screen_title_add">Создание проекта</string>
+    <string name="warehouse_edit_screen_title_edit">Настройка проекта</string>
+    <string name="warehouse_edit_screen_name_project">Название проекта</string>
+    <string name="warehouse_edit_screen_name_project_support">Ферма "Бузина"</string>
+    <string name="warehouse_edit_screen_choice_icon_project">Выберите иконку проекта</string>
+    <string name="warehouse_edit_screen_project_creation_date">Дата создания проекта</string>
 
+    <string name="warehouse_edit_screen_currency">Валюта</string>
+    <string name="warehouse_edit_screen_default_units_measurement">Единицы измерения по умолчанию</string>
+    <string name="warehouse_edit_screen_weight_units">Весовые единицы</string>
+    <string name="warehouse_edit_screen_volume_units">Объемные единицы</string>
+    <string name="warehouse_edit_screen_linear_dimensions">Линейные размеры</string>
+    <string name="warehouse_edit_screen_warning_title">О единицах измерения</string>
+    <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные по умолчанию, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
 
     //SupportTextWidget
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
@@ -346,11 +401,6 @@
     <string name="message_no_date_support_count">Сейчас количество не указано:(\nНажмите + чтобы добавить\nили</string>
 
     <string name="message_no_item_finance">Нет транкзаций</string>
-
-
-    //Currency
-    <string name="currency_ruble">₽</string>
-
 
 
     //AlertDialogInfo
@@ -510,6 +560,13 @@
     <string name="animal_list_expenses">Стоимость</string>
     <string name="animal_list_food">Расход корма</string>
     <string name="animal_list_count">Кол-во</string>
+
+    // NoteScreen
+    <string name="note_screen_note_title">Заголовок</string>
+    <string name="note_screen_note_support_title">Введите заголовок заметки</string>
+    <string name="note_screen_note_text">Содержание</string>
+    <string name="note_screen_note_support_text">Введите содержание заметки</string>
+    <string name="note_screen_search_note">Поиск заметок...</string>
 
 
     //AnimalCardScreen

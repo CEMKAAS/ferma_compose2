@@ -88,7 +88,7 @@ fun ExpensesEntryProduct(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = R.string.expenses_screen_title, navigateUp = navigateBack,
+                intRes = R.string.expenses_screen_title, onNavigateBackClick = navigateBack,
                 scrollBehavior = scrollBehavior
             )
         }

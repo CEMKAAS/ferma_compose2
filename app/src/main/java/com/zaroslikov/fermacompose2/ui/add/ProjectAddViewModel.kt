@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.data.room.table.ferma.ProjectTable
+import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.repository.ProjectRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

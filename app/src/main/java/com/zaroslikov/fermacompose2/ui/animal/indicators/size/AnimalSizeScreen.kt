@@ -4,35 +4,21 @@ package com.zaroslikov.fermacompose2.ui.animal.indicators.size
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.list.suffixHeightList
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.gray_7
-import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
@@ -40,22 +26,14 @@ import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.animal.indicators.AnimalIndicatorsCardNew
 import com.zaroslikov.fermacompose2.ui.animal.indicators.InventoryAnimalBody
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.FloatButton
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
-import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.elements.textBold_18
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sections.EntryIndicationBottomSheet
-import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.AddListIntent
-import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleListIntent
-import io.appmetrica.analytics.impl.ic
-import io.appmetrica.analytics.impl.ve
 
 
 object AnimalSizeDestination : NavigationDestination {
@@ -83,7 +61,7 @@ fun AnimalSizeScreen(
             TopAppBarBack(
                 intRes = title,
                 scrollBehavior = scrollBehavior,
-                navigateUp = navigateBack
+                onNavigateBackClick = navigateBack
             )
         },
         floatingActionButton = {

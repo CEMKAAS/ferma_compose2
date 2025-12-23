@@ -29,7 +29,6 @@ import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
-import com.zaroslikov.fermacompose2.ui.sections.add.entry.AddEntryDestination
 import io.appmetrica.analytics.AppMetrica
 
 
@@ -53,8 +52,8 @@ fun FinanceMonthScreen(
         topBar = {
             TopAppBarBack(
                 title = state.currentPeriod,
-                navigateUp = navigateBack,
-                calendarClick = {
+                onNavigateBackClick = navigateBack,
+                onCalendarClick = {
                     viewModel.onIntent(FinanceMonthIntent.OpenCalendarDialogClicked(true))
                     AppMetrica.reportEvent("Финансы Месяц Диапазон")
                 }

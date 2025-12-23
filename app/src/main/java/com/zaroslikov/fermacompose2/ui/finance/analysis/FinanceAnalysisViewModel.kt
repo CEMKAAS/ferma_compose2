@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.finance.analysis
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
@@ -8,15 +9,20 @@ import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.FinanceRepository
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import com.zaroslikov.fermacompose2.supportFun.DomainChartPoint
 import com.zaroslikov.fermacompose2.supportFun.chartFilter
 import com.zaroslikov.fermacompose2.supportFun.conversation2
+import com.zaroslikov.fermacompose2.supportFun.conversation22
+import com.zaroslikov.fermacompose2.supportFun.conversation3
+import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.dateLongToString
 import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQLPair
 import com.zaroslikov.fermacompose2.supportFun.datePeriod
@@ -36,6 +42,7 @@ class FinanceAnalysisViewModel @Inject constructor(
     private val saleRepository: SaleRepository,
     private val writeOffRepository: WriteOffRepository,
     private val financeRepository: FinanceRepository,
+    private val settingsRepository: SettingsRepository
 ) : ListViewModel<FinanceAnalysisState, FinanceAnalysisIntent>(FinanceAnalysisState()) {
 
     private val itemId: Long = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArg])
@@ -57,7 +64,7 @@ class FinanceAnalysisViewModel @Inject constructor(
         }
     }
 
-    private fun loadData(suffixPrice: Suffix = Suffix.RUBLE) {
+    private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
             val state = getState()
@@ -85,7 +92,8 @@ class FinanceAnalysisViewModel @Inject constructor(
                     start,
                     end
                 ),
-                saleRepository.getAnalysisSaleRangeList(itemId, titleProduct, start, end)
+                saleRepository.getAnalysisSaleRangeList(itemId, titleProduct, start, end),
+                settingsRepository.getSettings(itemId)
             ) { values: Array<Any?> ->
                 buildUiState(
                     transactionList = values[0] as List<DomainTransaction>,
@@ -95,9 +103,9 @@ class FinanceAnalysisViewModel @Inject constructor(
                     totalOwnNeed = values[4] as List<DomainCountSuffixPriceDate>,
                     totalScrap = values[5] as List<DomainCountSuffixPriceDate>,
                     saleProduct = values[6] as List<DomainCountSuffixPriceDate>,
+                    settings = values[7] as DomainSettings,
                     start = start,
                     end = end,
-                    suffixPrice = suffixPrice,
                 )
             }.collect { newState ->
                 updateState {
@@ -131,22 +139,44 @@ class FinanceAnalysisViewModel @Inject constructor(
         totalOwnNeed: List<DomainCountSuffixPriceDate>,
         totalScrap: List<DomainCountSuffixPriceDate>,
         saleProduct: List<DomainCountSuffixPriceDate>,
+        settings: DomainSettings,
         start: String,
         end: String,
-        suffixPrice: Suffix
     ): AnalysisUiCalculatedState {
-        val topBuyer = topBuyersList(buyersList)
-        val animalProducerList = animalProducerList(animalProducerList)
-        val char = char(productList, saleProduct, totalOwnNeed, totalScrap, start, end)
+        val topBuyer = topBuyersList(buyersList, settings)
+        val animalProducerList = animalProducerList(animalProducerList, settings)
+        val char = char(productList, saleProduct, totalOwnNeed, totalScrap, settings, start, end)
+
+        val transactionList2 =
+            transactionList.filter { it.suffix.conversation4(settings) == baseSuffix }
+
+        Log.i("analysis", "buildUiState: $baseSuffix")
 
         val totalCountProduct = productList.sumOf {
-            it.count.conversation2(it.suffix, baseSuffix, baseSuffix)
+            it.count.conversation22(it.suffix, baseSuffix, settings)
         } //TODO
 
-        val financeSale = financeAnalysis(saleProduct, suffixPrice, FinanceAnalysisEnum.SALE)
+        val financeSale =
+            financeAnalysis(
+                saleProduct,
+                settings.currencySuffix,
+                FinanceAnalysisEnum.SALE,
+                settings
+            )
         val financeOwnNeed =
-            financeAnalysis(totalOwnNeed, suffixPrice, FinanceAnalysisEnum.OWN_NEED)
-        val financeScrap = financeAnalysis(totalScrap, suffixPrice, FinanceAnalysisEnum.SCRAP)
+            financeAnalysis(
+                totalOwnNeed,
+                settings.currencySuffix,
+                FinanceAnalysisEnum.OWN_NEED,
+                settings
+            )
+        val financeScrap =
+            financeAnalysis(
+                totalScrap,
+                settings.currencySuffix,
+                FinanceAnalysisEnum.SCRAP,
+                settings
+            )
 
         val totalStock = // TODO
             totalCountProduct - financeSale.totalCount - financeOwnNeed.totalCount - financeScrap.totalCount
@@ -164,7 +194,7 @@ class FinanceAnalysisViewModel @Inject constructor(
             totalCount = totalStock,
             suffixCount = baseSuffix,
             totalPrice = totalPriceStock,
-            suffixPrice = suffixPrice,
+            suffixPrice = settings.currencySuffix,
             averagePrice = averagePurchasePrice,
             financeAnalysis = FinanceAnalysisEnum.STOCK,
             percentDouble = 0.0,
@@ -199,20 +229,23 @@ class FinanceAnalysisViewModel @Inject constructor(
             potentialBalance = totalPriceStock,
             soldLost = financeScrap.totalPrice,
             stock = totalStock,
-            transactionList = transactionList,
+            transactionList = transactionList2,
             averagePrice = resultAnimalProducer2[0].averagePrice,
         )
     }
 
-    private fun animalProducerList(animalProducerList: List<DomainAnimalCountSuffix>): List<AnimalProducer> {
+    private fun animalProducerList(
+        animalProducerList: List<DomainAnimalCountSuffix>,
+        domainSettings: DomainSettings
+    ): List<AnimalProducer> {
         val groupedAnimalProducerList = animalProducerList
             .groupBy { it.title } // название животного
             .map { (animalName, items) ->
                 val totalCount = items.sumOf {
-                    it.count.conversation2(
+                    it.count.conversation22(
                         suffix = it.suffix,
                         baseSuffix = baseSuffix,
-                        settingsSuffix = baseSuffix
+                        settings = domainSettings
                     )
                 }
                 AnimalProducer(
@@ -236,13 +269,16 @@ class FinanceAnalysisViewModel @Inject constructor(
         }
     }
 
-    private fun topBuyersList(buyersList: List<DomainBuyerPrice>): List<Buyer> {
+    private fun topBuyersList(
+        buyersList: List<DomainBuyerPrice>,
+        domainSettings: DomainSettings
+    ): List<Buyer> {
         return buyersList
             .groupBy { it.buyer }
             .map { (buyerName, items) ->
                 val totalCount = items.sumOf {
-                    it.count.conversation2(
-                        suffix = it.suffix, baseSuffix, baseSuffix
+                    it.count.conversation22(
+                        suffix = it.suffix, baseSuffix, settings = domainSettings
                     )
                 }
                 val totalPrice = items.sumOf { it.price }
@@ -262,25 +298,26 @@ class FinanceAnalysisViewModel @Inject constructor(
         saleProduct: List<DomainCountSuffixPriceDate>,
         totalOwnNeed: List<DomainCountSuffixPriceDate>,
         totalScrap: List<DomainCountSuffixPriceDate>,
+        domainSettings: DomainSettings,
         start: String,
         end: String
     ): List<Pair<List<DomainChartPoint>, FinanceAnalysisEnum>> {
 
         val chartFilterStock = chartFilter(
             productList, getState().dateFilter.filterDate, start,
-            end, baseSuffix
+            end, baseSuffix, domainSettings
         )
         val chartFilterSale = chartFilter(
             saleProduct, getState().dateFilter.filterDate, start,
-            end, baseSuffix
+            end, baseSuffix, domainSettings
         )
         val chartFilterOwnNeed = chartFilter(
             totalOwnNeed, getState().dateFilter.filterDate, start,
-            end, baseSuffix
+            end, baseSuffix, domainSettings
         )
         val chartFilterScrap = chartFilter(
             totalScrap, getState().dateFilter.filterDate, start,
-            end, baseSuffix
+            end, baseSuffix, domainSettings
         )
 
         return listOf(
@@ -294,11 +331,12 @@ class FinanceAnalysisViewModel @Inject constructor(
     private fun financeAnalysis(
         list: List<DomainCountSuffixPriceDate>,
         suffixPrice: Suffix,
-        financeAnalysisEnum: FinanceAnalysisEnum
+        financeAnalysisEnum: FinanceAnalysisEnum,
+        settings: DomainSettings
     ): FinanceAnalysis {
         val totalProduct2 =
             list.sumOf {
-                it.count.conversation2(it.suffix, baseSuffix, baseSuffix)
+                it.count.conversation22(it.suffix, baseSuffix, settings)
             }
         val totalSum = list.sumOf { it.price }
         val averagePrice = if (totalSum == 0.0) 0.0 else totalSum / totalProduct2

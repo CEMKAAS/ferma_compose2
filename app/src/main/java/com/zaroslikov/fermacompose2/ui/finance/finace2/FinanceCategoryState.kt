@@ -18,6 +18,7 @@ data class FinanceCategoryState(
     val financeCategory: FinanceCategory = FinanceCategory.SALE,
     val currentBalance: BalanceStructure = BalanceStructure(),
     val currentProduct: Pair<String, Double> = "" to 0.0,
+    val suffixPrice: Suffix = Suffix.RUBLE,
     val financeCategoryList: List<CategoryUi> = emptyList(),
     val financeProductList: List<ProductUi> = emptyList(),
     val financeGroupList: List<ProductUi2> = emptyList(),

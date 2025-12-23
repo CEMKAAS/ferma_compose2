@@ -9,4 +9,5 @@ interface NoteRepository {
     suspend fun insertNote(item: DomainNoteTable)
     suspend fun updateNote(item: DomainNoteTable)
     suspend fun deleteNote(item: DomainNoteTable)
+    suspend fun deleteNoteById(id: Long)
 }

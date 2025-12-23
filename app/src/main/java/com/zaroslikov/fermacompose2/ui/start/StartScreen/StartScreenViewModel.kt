@@ -1,63 +1,71 @@
-package com.zaroslikov.fermacompose2.ui.start
+package com.zaroslikov.fermacompose2.ui.start.StartScreen
 
-import android.graphics.BitmapFactory
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.data.room.table.ferma.ProjectTable
-import com.zaroslikov.data.room.dto.ProjectTableStartScreen
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.repository.ProjectRepository
-import com.zaroslikov.domain.repository.WarehouseRepository
-import com.zaroslikov.fermacompose2.data.water.WaterRepository
+import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class StartScreenViewModel @Inject constructor(
-    private val fermaRepository: ProjectRepository,
-//    private val waterRepository: WaterRepository
-) : ViewModel() {
-
-    private var _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
-    var time by mutableStateOf("")
+    private val projectRepository: ProjectRepository,
+) : ListViewModel<StartScreenState, StartScreenIntent>(StartScreenState()) {
 
     init {
+        loadData()
+    }
+
+    private fun loadData() {
         viewModelScope.launch {
-//            time = waterRepository.getTimeReminder()
+            updateState { it.copy(isLoading = true) }
+            projectRepository.getAllProject().collectLatest { list ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        list = list
+                    )
+                }
+            }
         }
     }
 
-    fun onUpdate(time1: String) {
-        time = time1
+    fun onIntent(intent: StartScreenIntent) {
+        return when (intent) {
+            is StartScreenIntent.DeleteClicked -> deleteProject(intent.domainProjectTable)
+            is StartScreenIntent.ArchiveClicked -> archiveProject(intent.domainProjectTable)
+        }
     }
 
-    fun saveItem() {
+    private fun archiveProject(domainProjectTable: DomainProjectTable) {
         viewModelScope.launch {
-         /*   waterRepository.cancelAllNotifications("7bc20e66-fc56-4002-ac33-4cc15dd28213")
-            waterRepository.setTimeReminder(time)
-            if (time != "") {
-                waterRepository.setupDailyReminder()
-            }*/
+            projectRepository.updateProject(domainProjectTable.copy(mode = 0))
+        }
+    }
+
+    private fun deleteProject(domainProjectTable: DomainProjectTable) {
+        viewModelScope.launch {
+            projectRepository.deleteProject(domainProjectTable)
+        }
+    }
+
+    /* var time by mutableStateOf("")
+
+                time = waterRepository.getTimeReminder()
+        fun onUpdate(time1: String) {
+            time = time1
+        }
+
+        fun saveItem() {
+            viewModelScope.launch {
+                *//*   waterRepository.cancelAllNotifications("7bc20e66-fc56-4002-ac33-4cc15dd28213")
+               waterRepository.setTimeReminder(time)
+               if (time != "") {
+                   waterRepository.setupDailyReminder()
+               }*//*
         }
     }
 
@@ -115,5 +123,10 @@ class StartScreenViewModel @Inject constructor(
                 mode,
                 imageBitmap
             )
-        }
+        }*/
+}
+
+sealed class StartScreenIntent() : BaseIntent {
+    data class DeleteClicked(val domainProjectTable: DomainProjectTable) : StartScreenIntent()
+    data class ArchiveClicked(val domainProjectTable: DomainProjectTable) : StartScreenIntent()
 }

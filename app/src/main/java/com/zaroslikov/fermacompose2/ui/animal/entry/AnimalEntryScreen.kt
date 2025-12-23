@@ -69,7 +69,7 @@ fun AnimalEntryProduct(
         topBar = {
             TopAppBarBack(
                 intRes = gerAppBarTitle(state.isAnimalGroup, state.isEntry),
-                navigateUp = navigateBack,
+                onNavigateBackClick = navigateBack,
                 scrollBehavior = scrollBehavior
             )
         }

@@ -58,7 +58,7 @@ fun SaleEntryProduct(
         topBar = {
             TopAppBarBack(
                 intRes = R.string.sale_screen_title,
-                navigateUp = navigateBack,
+                onNavigateBackClick = navigateBack,
                 scrollBehavior = scrollBehavior
             )
         }

@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixCurrencyList
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarNew
 import com.zaroslikov.fermacompose2.black_2
@@ -109,6 +110,7 @@ fun FinanceScreen(
                 incomeMount = state.incomeMount,
                 expensesMount = state.expensesMount,
                 incomeExpensesList = state.domainIncomeExpenseList,
+                suffix = state.currencySuffix,
                 navigate = { navigateToIncomeExpenses(idProject to it) },
             )
     }
@@ -126,7 +128,7 @@ private fun FinanceBody(
     incomeMount: Double,
     expensesMount: Double,
     incomeExpensesList: List<DomainIncomeExpenses>,
-    suffix: Suffix = Suffix.RUBLE,
+    suffix: Suffix,
     navigate: (FinanceCategory) -> Unit
 ) {
     Column(
@@ -150,7 +152,7 @@ private fun FinanceBody(
             ownNeed = ownNeed,
             suffix = suffix
         ) { navigate(it) }
-        TransactionList(incomeExpensesList)
+        TransactionList(incomeExpensesList, suffix)
     }
 }
 
@@ -172,7 +174,7 @@ private fun CurrentBalance(
         colors = listOf(blue_10, blue_11, blue_12),
         borderStroke = BorderStroke(1.dp, Color.Black),
         onDetailClick = onDetailClick
-    ){
+    ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -354,6 +356,7 @@ private fun WriteOffFinanceCards(
 @Composable
 private fun TransactionList(
     incomeExpensesList: List<DomainIncomeExpenses>,
+    suffixCurrency: Suffix,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -375,6 +378,7 @@ private fun TransactionList(
                         suffix = it.suffix,
                         category = it.category,
                         price = it.price,
+                        suffixCurrency = suffixCurrency,
                         date = it.date,
                         positive = it.price > 0,
 
@@ -397,6 +401,7 @@ fun TransactionFinanceCard(
     suffix: Suffix = Suffix.PIECES,
     category: FinanceCategory,
     price: Double,
+    suffixCurrency: Suffix,
     date: String? = null,
     positive: Boolean,
     onDetailClick: () -> Unit = {}
@@ -437,7 +442,7 @@ fun TransactionFinanceCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "${price.formatNumber()} ${stringResource(Suffix.RUBLE.toResId())}",
+                        "${price.formatNumber()} ${stringResource(suffixCurrency.toResId())}",
                         textAlign = TextAlign.Center,
                         style = textBold_16,
                         color = if (positive) price_green else error_base

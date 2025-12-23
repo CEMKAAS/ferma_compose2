@@ -1,6 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.finance.main_screen
 
+import android.icu.util.Currency
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.state.ListState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
@@ -15,6 +17,7 @@ data class FinanceState(
     val incomeMount: Double = 0.0,
     val expensesMount: Double = 0.0,
     val domainIncomeExpenseList: List<DomainIncomeExpenses> = emptyList(),
+    val currencySuffix: Suffix = Suffix.RUBLE,
     override val idPT: Long = 0,
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null

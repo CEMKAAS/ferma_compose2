@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.zaroslikov.data.room.table.ferma.Incubator
-import com.zaroslikov.data.room.table.ferma.ProjectTable
+import com.zaroslikov.data.room.table.project.ProjectTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao

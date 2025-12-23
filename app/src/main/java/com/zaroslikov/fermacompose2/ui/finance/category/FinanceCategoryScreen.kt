@@ -49,7 +49,7 @@ fun FinanceCategoryScreen(
         topBar = {
             TopAppBarBack(
                 title = viewModel.itemCategory,
-                navigateUp = navigateBack,
+                onNavigateBackClick = navigateBack,
                 scrollBehavior = scrollBehavior
             )
         }

@@ -335,7 +335,7 @@ private fun AnimalContainer(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailsClick = onDetailsClick,
-        detailCard = { item ->
+        detailCard = { index, item ->
             AnimalCard(
                 modifier = Modifier,
                 animal = item,

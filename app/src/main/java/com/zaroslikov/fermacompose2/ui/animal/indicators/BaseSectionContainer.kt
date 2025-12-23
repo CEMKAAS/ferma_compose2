@@ -44,6 +44,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_1
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.grey_3
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.animal.indicators.count.ProductKill
@@ -62,6 +63,7 @@ import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelDetailNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.start.formatNumber
 
@@ -180,6 +182,63 @@ fun EntryBottomSheet(
                 onClickInsert = onInsertClick,
                 onClickUpdate = onUpdateClick,
                 onClickClose = onDismissRequest
+            )
+        }
+    }
+}
+
+@Composable
+fun DetailBottomSheet(
+    modifier: Modifier = Modifier,
+    title: String,
+    date: String,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onUpdateClick: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .fillMaxHeight()
+        ) {
+            Column(
+                modifier = Modifier.modifierBottomSheet(true),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextLine(
+                            modifier = Modifier.weight(1f),
+                            valueString = title,
+                            textStyle = textBold_20
+                        )
+                        IconButton(onClick = onDismissRequest) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Close"
+                            )
+                        }
+                    }
+                    Text(text = date, style = text_14, color = grey_3)
+                }
+                content()
+            }
+            ButtonPanelDetailNew(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(),
+                onClickUpdate = onUpdateClick,
+                onClickDelete = onDeleteClick
             )
         }
     }

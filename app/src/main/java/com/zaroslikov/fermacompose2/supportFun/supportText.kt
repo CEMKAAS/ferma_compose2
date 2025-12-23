@@ -34,10 +34,37 @@ fun Suffix.toResId(): Int {
         Suffix.CENTIMETERS -> R.string.suffix_centimetre
         // Money
         Suffix.RUBLE -> R.string.currency_ruble
+        Suffix.TENGE -> R.string.currency_tenge
+        Suffix.DOLLAR -> R.string.currency_dollar
+        Suffix.EURO -> R.string.currency_euro
         Suffix.GRAM_DAY -> R.string.suffix_gram_day
         Suffix.KILOGRAM_DAY -> R.string.suffix_kilogram_day
         Suffix.TONS_DAY -> R.string.suffix_tons_day
+    }
+}
 
+fun Suffix.toFullResId(): Int {
+    return when (this) {
+        Suffix.RUBLE -> R.string.currency_full_ruble
+        Suffix.TENGE -> R.string.currency_full_tenge
+        Suffix.DOLLAR -> R.string.currency_full_dollar
+        Suffix.EURO -> R.string.currency_full_euro
+
+        // Weight
+        Suffix.GRAM -> R.string.suffix_full_gram
+        Suffix.KILOGRAM -> R.string.suffix_full_kilogram
+        Suffix.TONS -> R.string.suffix_full_tons
+
+        // Liters
+        Suffix.MILLILITRES -> R.string.suffix_full_millilitres
+        Suffix.LITERS -> R.string.suffix_full_liters
+        Suffix.CUBIC_METERS -> R.string.suffix_full_cubic_meters
+
+        // Size
+        Suffix.METERS -> R.string.suffix_full_meters
+        Suffix.MILLIMETERS -> R.string.suffix_full_millimeters
+        Suffix.CENTIMETERS -> R.string.suffix_full_centimetre
+        else -> R.string.is_empty
     }
 }
 

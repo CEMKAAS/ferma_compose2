@@ -20,6 +20,7 @@ import com.zaroslikov.data.room.dao.IncubatorDao
 import com.zaroslikov.data.room.dao.NoteDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
+import com.zaroslikov.data.room.dao.SettingsDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
@@ -32,9 +33,10 @@ import com.zaroslikov.data.room.table.ferma.ExpensesAnimalTable
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
 import com.zaroslikov.data.room.table.ferma.Incubator
 import com.zaroslikov.data.room.table.ferma.NoteTable
-import com.zaroslikov.data.room.table.ferma.ProjectTable
+import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.project.SettingsTable
 
 @Database(
     entities = [
@@ -50,7 +52,8 @@ import com.zaroslikov.data.room.table.ferma.WriteOffTable
         AnimalVaccinationTable::class,
         AnimalWeightTable::class,
         NoteTable::class,
-        ExpensesAnimalTable::class
+        ExpensesAnimalTable::class,
+        SettingsTable::class
     ],
     version = 4,
     exportSchema = false
@@ -77,6 +80,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun saleDao(): SaleDao
     abstract fun warehouseDao(): WarehouseDao
     abstract fun writeOffDao(): WriteOffDao
+    abstract fun settingsDao(): SettingsDao
 
     companion object {
         @Volatile

@@ -61,7 +61,7 @@ import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.data.room.table.ferma.ProjectTable
+import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination

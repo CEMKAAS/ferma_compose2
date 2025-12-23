@@ -91,10 +91,12 @@ fun Suffix.toColorList(): Color {
         Suffix.METERS -> Color(0xFF512DA8)       // Deep Purple 700 — насыщенный
 
         // --- Валюта ---
-        Suffix.RUBLE -> price_green
+
         Suffix.GRAM_DAY -> Color(0xFFA5D6A7)
         Suffix.KILOGRAM_DAY -> Color(0xFF66BB6A)
         Suffix.TONS_DAY -> Color(0xFF2E7D32)
+
+        Suffix.DOLLAR, Suffix.EURO, Suffix.TENGE, Suffix.RUBLE -> price_green
     }
 }
 
