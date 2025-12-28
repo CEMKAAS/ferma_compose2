@@ -12,7 +12,7 @@ import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
 import com.zaroslikov.fermacompose2.supportFun.convertSize
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest

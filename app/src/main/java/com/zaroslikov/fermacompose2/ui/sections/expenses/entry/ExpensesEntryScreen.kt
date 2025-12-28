@@ -55,7 +55,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.start.formatter
+import com.zaroslikov.fermacompose2.ui.formatter
 
 
 

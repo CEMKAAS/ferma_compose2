@@ -60,7 +60,7 @@ import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.incubator.TimeOutlinedTextField
 import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
-import com.zaroslikov.fermacompose2.ui.start.dateLong
+import com.zaroslikov.fermacompose2.ui.dateLong
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat

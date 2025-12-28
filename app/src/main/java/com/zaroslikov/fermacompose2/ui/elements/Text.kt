@@ -3,7 +3,6 @@ package com.zaroslikov.fermacompose2.ui.elements
 import android.content.Context
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,15 +37,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.black_1
-import com.zaroslikov.fermacompose2.green_1
-import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.theme.errorLight
 import com.zaroslikov.fermacompose2.ui.theme.tertiaryLight
 import kotlinx.coroutines.launch

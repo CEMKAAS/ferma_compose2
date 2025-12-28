@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.start
+package com.zaroslikov.fermacompose2.ui
 
 import android.content.Intent
 import android.net.Uri

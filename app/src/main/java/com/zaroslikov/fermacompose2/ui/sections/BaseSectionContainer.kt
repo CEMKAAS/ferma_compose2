@@ -51,7 +51,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 
 @Composable
 fun <T, B> InventoryBody(

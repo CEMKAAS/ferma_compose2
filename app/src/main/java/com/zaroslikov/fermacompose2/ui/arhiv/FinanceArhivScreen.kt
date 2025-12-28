@@ -35,7 +35,7 @@
 //import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 //import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 //import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-//import com.zaroslikov.fermacompose2.ui.start.formatter
+//import com.zaroslikov.fermacompose2.ui.formatter
 //import kotlinx.coroutines.launch
 //
 //object FinanceArhivDestination : NavigationDestination {

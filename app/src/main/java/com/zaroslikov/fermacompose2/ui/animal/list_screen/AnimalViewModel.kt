@@ -17,10 +17,7 @@ import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.animal.entry.AnimalEntryState
-import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.sections.sale.list_screen.SaleListIntent
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest

@@ -7,7 +7,6 @@ import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.models.DomainExpensesTable
-import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
@@ -23,11 +22,9 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbOnlyInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroString
-import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first

@@ -30,7 +30,17 @@
           <theme>@style/Theme.FermaCompose2</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_foreground.xml">
+        <config>
+          <theme>@style/Theme.FermaCompose2</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/icon_arrow_up.xml">
+        <config>
+          <theme>@style/Theme.FermaCompose2</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/outline_bedtime_24.xml">
         <config>
           <theme>@style/Theme.FermaCompose2</theme>
         </config>
@@ -42,117 +52,103 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="35cfaaea-37a9-4a28-bf38-7617cc438d50" name="Changes" comment="Update StartScreen.kt">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/DrawerSheet.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/StartScreen/StartScreenState.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseSettingScreen/WarehouseEditState.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_electric_bolt_24.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/SettingsDao.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/mapper/table/SettingsMapper.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/repository/SettingsRepositoryImpl.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/project/ProjectTable.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/project/SettingsTable.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/table/DomainSettings.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/repository/SettingsRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/checksums/checksums.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/checksums/md5-checksums.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/checksums/sha1-checksums.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/dependencies-accessors/gc.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/executionHistory/executionHistory.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/executionHistory/executionHistory.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/fileChanges/last-build.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/fileHashes/fileHashes.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/fileHashes/fileHashes.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/fileHashes/resourceHashesCache.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10.2/gc.properties" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/incubator/AddIncubator/AddIncubatorScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/incubator/AddIncubator/AddIncubatorState.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/incubator/AddIncubator/AddIncubatorViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/aboutApp/AboutApp.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/settings/SettingsScreen.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_chevron_right_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_email_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_favorite_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_groups_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_notifications_none_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_telegram.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/logo.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/outline_bedtime_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/outline_chat_bubble_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/outline_database_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/outline_download_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/outline_egg_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/outline_upload_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/outline_work_24.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/vk_logo_white.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/IncubatorTableDao.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/mapper/table/IncubatorTableMapper.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/repository/IncubatorTableRepositoryImpl.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/incubator/IncubatorTable.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/table/DomainIncubatorTable.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/repository/IncubatorTableRepository.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/Color.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/Color.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InventoryApp.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InventoryApp.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Chart.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Chart.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Conversion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Conversion.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/supportColor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/supportColor.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/supportNav.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/supportNav.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/supportText.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/supportText.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/ProjectAdd.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/ProjectAdd.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/ProjectAddViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/ProjectAddViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/entry/AnimalEntryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/entry/AnimalEntryScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Error.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Error.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Extensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Extensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/ChoiseProject.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/ChoiseProject.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/incubator/AddIncubator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/add/incubator/AddIncubator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/animalCard/AnimalCardScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/entry/AnimalEntryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/entry/AnimalEntryState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/entry/AnimalEntryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/entry/AnimalEntryViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/BaseSectionContainer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/BaseSectionContainer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/size/AnimalSizeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/size/AnimalSizeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/AnimalCountViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetKillAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/count/BottomSheetKillAnimal.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/size/AnimalSizeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/size/AnimalSizeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationReduce.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationReduce.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/weight/AnimalWeightScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/weight/AnimalWeightScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/list_screen/AnimalScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/list_screen/AnimalScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/vaccination/AnimalVaccinationViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/weight/AnimalWeightViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/indicators/weight/AnimalWeightViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/list_screen/AnimalViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/animal/list_screen/AnimalViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/AppBar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/AppBar.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Button.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Button.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/arhiv/FinanceArhivScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/arhiv/FinanceArhivScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Card.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Card.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Checkbox.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Checkbox.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/DrawerSheet.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/DrawerSheet.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/ErrorUI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/ErrorUI.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Icon.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Icon.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Modifier.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Modifier.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Text.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/Text.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/TextField/BaseTextField.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/TextField/BaseTextField.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/TextField/OutlinedTextFieldNew.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/TextField/OutlinedTextFieldNew.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/сompositions/ButtonPanel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/сompositions/ButtonPanel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/analysis/FinanceAnalysisViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/analysis/FinanceAnalysisViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/category/FinanceCategoryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/category/FinanceCategoryScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/сompositions/Chart.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/elements/сompositions/Chart.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/analysis/FinanceAnalysisProduct.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/analysis/FinanceAnalysisProduct.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/finace2/FinaceCategory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/finace2/FinaceCategory.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/finace2/FinanceCategoryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/finace2/FinanceCategoryState.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/finace2/FinanceCategoryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/finace2/FinanceCategoryViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/income_expenses/FinanceIncomeExpensesScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/income_expenses/FinanceIncomeExpensesScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/main_screen/FinaceState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/main_screen/FinaceState.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/main_screen/FinanceScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/main_screen/FinanceScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/main_screen/FinanceViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/main_screen/FinanceViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/month/FinanceMountScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/finance/month/FinanceMountScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/incubator/IncubatorProjectEditScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/incubator/IncubatorProjectEditScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/navigation/InventoryNavGraph.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/navigation/InventoryNavGraph.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/navigation/ProjectNavGraph.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/navigation/ProjectNavGraph.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/mainScreen/MainProjectsScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/mainScreen/MainProjectsScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/new_year/NewYear.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/new_year/NewYear.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/BaseSectionContainer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/BaseSectionContainer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/SectionWorkspace.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/SectionWorkspace.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/entry/AddEntryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/entry/AddEntryScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/entry/AddEntryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/entry/AddEntryState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/entry/AddEntryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/entry/AddEntryViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/list_screen/AddScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/list_screen/AddScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/list_screen/AddViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/add/list_screen/AddViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/entry/ExpensesEntryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/entry/ExpensesEntryScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/entry/ExpensesEntryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/entry/ExpensesEntryState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/entry/ExpensesEntryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/entry/ExpensesEntryViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/list_screen/ExpensesScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/list_screen/ExpensesScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/entry/NoteEntryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/entry/NoteEntryScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/entry/NoteEntryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/entry/NoteEntryState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/entry/NoteEntryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/entry/NoteEntryViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/list_screen/NoteListState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/list_screen/NoteListState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/list_screen/ExpensesViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/expenses/list_screen/ExpensesViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/list_screen/NoteScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/list_screen/NoteScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/list_screen/NoteViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/note/list_screen/NoteViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/entry/SaleEntryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/entry/SaleEntryScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/entry/SaleEntryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/entry/SaleEntryState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/entry/SaleEntryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/entry/SaleEntryViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/list_screen/SaleScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/list_screen/SaleScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/entry/WriteOffEntryScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/entry/WriteOffEntryScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/list_screen/SaleViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/sale/list_screen/SaleViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/entry/WriteOffEntryState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/entry/WriteOffEntryState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/entry/WriteOffEntryViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/entry/WriteOffEntryViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/list_screen/WriteOffScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/list_screen/WriteOffScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/MyApp.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/MyApp.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/StartScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/StartScreen/StartScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/StartScreenViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/StartScreen/StartScreenViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/list_screen/WriteOffViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/sections/writeOff/list_screen/WriteOffViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/MyApp.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/MyApp.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/StartScreen/StartScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/StartScreen/StartScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseScreen/WarehouseScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseScreen/WarehouseScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseScreen/WarehouseState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseScreen/WarehouseState.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseScreen/WarehouseViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseScreen/WarehouseViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseSettingScreen/WarehouseEditScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseSettingScreen/WarehouseEditScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseSettingScreen/WarehouseEditViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/warehouse/warehouseSettingScreen/WarehouseEditViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/values-v23/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values-v23/strings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/di/DatabaseModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/di/DatabaseModule.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/di/RoomRepositoryModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/di/RoomRepositoryModule.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/NoteDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/NoteDao.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/ProjectDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/ProjectDao.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/WarehouseDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/WarehouseDao.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/database/AppDatabase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/database/AppDatabase.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dto/add/FastAddProductDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dto/add/FastAddProductDto.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/mapper/table/ProjectMapper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/mapper/table/ProjectMapper.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/repository/NoteRepositoryImpl.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/repository/NoteRepositoryImpl.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/animal/AnimalTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/animal/AnimalTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/AddTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/AddTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/ExpensesAnimalTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/ExpensesAnimalTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/ExpensesTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/ExpensesTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/Incubator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/Incubator.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/NoteTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/NoteTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/ProjectTable.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/SaleTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/SaleTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/WriteOffTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/table/ferma/WriteOffTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/dto/add/DomainFastAddProduct.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/dto/add/DomainFastAddProduct.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/enums/Suffix.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/enums/Suffix.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/list/SuffixList.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/list/SuffixList.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/table/DomainNoteTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/table/DomainNoteTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/table/DomainProjectTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/models/table/DomainProjectTable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/repository/NoteRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/domain/src/main/java/com/zaroslikov/domain/repository/NoteRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dto/DataClass.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dto/DataSupport.kt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -215,9 +211,9 @@
         <option value="Kotlin Object" />
         <option value="Kotlin Enum" />
         <option value="Kotlin Interface" />
-        <option value="Kotlin Class" />
-        <option value="Kotlin Data Class" />
         <option value="Kotlin File" />
+        <option value="Kotlin Data Class" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -249,6 +245,8 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="jrt://$APPLICATION_HOME_DIR$/jbr!/java.base/jdk/internal/math/FloatingDecimal.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../Programms/Android/Sdk/caches/8.11.1/transforms/1680ed7559c1f64165c734a872dbc409/transformed/analytics-7.13.0/jars/classes.jar!/io/appmetrica/analytics/BuildConfig.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../Programms/Android/Sdk/caches/modules-2/files-2.1/com.android.tools.build/gradle-api/8.10.1/212e739e21a17d9479eb2293994788c0cf3739fc/gradle-api-8.10.1.jar!/com/android/build/api/dsl/ApplicationBaseFlavor.class" root0="SKIP_INSPECTION" />
     <setting file="jar://$PROJECT_DIR$/../../../Programms/Android/Sdk/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.10.2/4a9f78ef49483748e2c129f3d124b8fa249dafbf/kotlinx-coroutines-core-jvm-1.10.2.jar!/kotlinx/coroutines/flow/FlowKt.class" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProblemsViewState">
@@ -289,6 +287,7 @@
     &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;new__desing&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_directory_selection&quot;: &quot;D:/Work/_Project/ferma_compose2/app/build/generated/ksp/debug/java/com/zaroslikov/fermacompose2&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/zaros/OneDrive/Desktop&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.17&quot;,
@@ -337,11 +336,11 @@
       <recent name="com.zaroslikov.domain.models.dto.add" />
     </key>
     <key name="K2MoveDeclarationsDialog.RECENT_PACKAGE_KEY">
+      <recent name="com.zaroslikov.fermacompose2.ui" />
+      <recent name="com.zaroslikov.domain.models.table" />
       <recent name="com.zaroslikov.fermacompose2.ui.start.StartScreen" />
       <recent name="com.zaroslikov.data.room.table.project" />
       <recent name="com.zaroslikov.fermacompose2.ui.warehouse.warehouseSettingScreen" />
-      <recent name="com.zaroslikov.fermacompose2.ui.warehouse.warehouseScreen" />
-      <recent name="com.zaroslikov.fermacompose2.ui.finance.finance_list" />
     </key>
   </component>
   <component name="RunManager">
@@ -748,12 +747,12 @@
       <map>
         <entry key="com.zaroslikov.fermacompose2">
           <value>
-            <CheckInfo lastCheckTimestamp="1766428292119" />
+            <CheckInfo lastCheckTimestamp="1766601569592" />
           </value>
         </entry>
         <entry key="com.zaroslikov.fermacompose2.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1766428292116" />
+            <CheckInfo lastCheckTimestamp="1766601569596" />
           </value>
         </entry>
       </map>

@@ -276,12 +276,72 @@
     <string name="drawer_sheer_about_app">О приложении</string>
     <string name="drawer_sheer_about_app_support">Версия и контакты</string>
 
+    //AboutApp
+    <string name="about_app_screen_title">О приложении</string>
+    <string name="about_app_screen_developer_zaroslikov">Разработчик: Заросликов Семён Николаевич</string>
+    <string name="about_app_screen_contacts">Контакты</string>
+    <string name="about_app_screen_email">Email поддержка</string>
+    <string name="about_app_screen_telegram">Telegram</string>
+    <string name="about_app_screen_vk">Группа в VK</string>
+    <string name="about_app_screen_love_part_1">Создано с</string>
+    <string name="about_app_screen_love_part_2">для фермеров</string>
+    <string name="about_app_screen_help_us_title">Помогите нам стать лучше!</string>
+    <string name="about_app_screen_help_us_text">Мы постоянно развиваем приложение и ценим мнение каждого пользователя. У вас есть идеи по улучшению? Нашли ошибку? Хотите предложить новую функцию? Напишите нам — мы всегда рады обратной связи! Присоединяйcя к нашим соцсетям! Это отличный способ оставаться в курсе новостей, делиться впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство еще лучше!</string>
+
+    //SettingsScreen
+    <string name="settings_screen_title">Настройки приложения</string>
+    <string name="settings_screen_appearance">Внешний вид</string>
+    <string name="settings_screen_dark_theme">Темная тема</string>
+    <string name="settings_screen_on">Включена</string>
+    <string name="settings_screen_off">Выключена</string>
+    <string name="settings_screen_notification">Уведомления</string>
+    <string name="settings_screen_push_notification">Push-уведомления</string>
+    <string name="settings_screen_on_s">Включены</string>
+    <string name="settings_screen_off_s">Выключены</string>
+    <string name="settings_screen_language">Язык</string>
+    <string name="settings_screen_language_interface">Язык интерфейса</string>
+    <string name="settings_screen_language_russian">Русский</string>
+    <string name="settings_screen_data_management">Управление данными</string>
+    <string name="settings_screen_exporting_data">Экспорт данных</string>
+    <string name="settings_screen_upload_all_projects">Выгрузить все проекты</string>
+    <string name="settings_screen_importing_data">Импорт данных</string>
+    <string name="settings_screen_upload_projects_from_file">Загрузить проекты из файла</string>
+    <string name="settings_screen_clear_all_data">Очистить все данные</string>
+    <string name="settings_screen_delete_all_projects_and_settings">Удалить все проекты и настройки</string>
+    <string name="settings_screen_data_storage">Хранилище данных</string>
+    <string name="settings_screen_data_storage_text">Все данные хранятся только на вашем устройстве</string>
+
     //StartScreen
     <string name="start_screen_title">Мое Хозяйство</string>
     <string name="start_screen_positions_message_no_date_title">Добро пожаловать!\nМое Хозяйство</string>
     <string name="start_screen_positions_message_no_date_message">Здесь Вы сможете увидеть все Ваши проекты (инкубаторы и хозяйства). У Вас есть возможность создавать несколько проектов, каждый из которых будет иметь свою уникальную экономику и склад и д.р., что позволит эффективно управлять каждым Вашим бизнесом!</string>
     <string name="start_screen_positions_message_no_date_support_text">Сейчас нет проектов:(\nНажмите + чтобы добавить\nили </string>
     <string name="start_screen_positions_button_note_message_no_data">Добавить проект!</string>
+    <string name="start_screen_create_new_project">Создать новый проект</string>
+    <string name="start_screen_choice_type_project">Выберите тип проекта</string>
+    <string name="start_screen_common_project">Обычный проект</string>
+    <string name="start_screen_common_project_support">Управление хозяйством, складом и финансами</string>
+    <string name="start_screen_incubator_project">Инкубатор</string>
+    <string name="start_screen_incubator_project_support">Учет инкубации яиц и вывода молодняка</string>
+
+    //AddIncubatorScreen
+    <string name="add_incubator_screen_title">Создание инкубатора</string>
+    <string name="add_incubator_screen_download_image">Загрузите фото инкубатора (необязательно)</string>
+    <string name="add_incubator_screen_name_incubator">Название инкубатора</string>
+    <string name="add_incubator_screen_name_incubator_support">Например: Инкубатор №1</string>
+    <string name="add_incubator_screen_capacity">Вместимость</string>
+    <string name="add_incubator_screen_capacity_egg">Кол-во яиц</string>
+    <string name="add_incubator_screen_date_sale">Дата покупки</string>
+    <string name="add_incubator_screen_incubator_sell">Стоимость инкубатора</string>
+    <string name="add_incubator_screen_incubator_sell_support">Укажите стоимость инкубатора</string>
+    <string name="add_incubator_screen_note">Описание</string>
+    <string name="add_incubator_screen_note_support">Добавить описание или заметки…</string>
+    <string name="add_incubator_screen_save">Создать инкубатор</string>
+    <string name="add_incubator_screen_function_incubator">Функции иникубатора</string>
+    <string name="add_incubator_screen_automatic_egg_rotation">Автопереворот яиц</string>
+    <string name="add_incubator_screen_automatic_egg_rotation_support">Автоматический механизм переворота яиц</string>
+    <string name="add_incubator_screen_auto_ventilation">Автопроветривание</string>
+    <string name="add_incubator_screen_auto_ventilation_support">Автоматическая система вентиляции</string>
 
     //Warehouse
     <string name="warehouse_screen_positions">позиции</string>
@@ -730,7 +790,7 @@
     <string name="month_dec_">дек.</string>
 
 
-    <string name="app_name">Мое Хозяйство 2</string>
+    <string name="app_name">Мое Хозяйство</string>
     <string name="attention">Attention</string>
     <string name="back_button">Back</string>
     <string name="delete">Delete</string>

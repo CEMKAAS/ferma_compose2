@@ -83,9 +83,9 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.HeadingAnimalCard
-import com.zaroslikov.fermacompose2.ui.start.dateBuilder
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_5
@@ -145,7 +145,7 @@ fun CardField(
 fun CardFieldNew(
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(20.dp),
-    onClick: (() -> Unit)? = null,
+    onClick: () -> Unit = { },
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     contentRow: @Composable (RowScope.() -> Unit)? = null,
@@ -160,7 +160,54 @@ fun CardFieldNew(
     val shape = RoundedCornerShape(14.dp)
 
     Card(
-        onClick = { onClick?.let { it() } },
+        onClick = { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = white
+        ),
+        shape = shape,
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation( // Добавляем тень
+            defaultElevation = 5.dp
+        )
+    ) {
+        when {
+            contentRow != null -> Row(
+                modifier = modifierCard,
+                horizontalArrangement = horizontalArrangement,
+                verticalAlignment = verticalAlignment
+            ) {
+                contentRow()
+            }
+
+            contentColumn != null -> Column(
+                modifier = modifierCard,
+                horizontalAlignment = horizontalAlignment,
+                verticalArrangement = verticalArrangement
+            ) {
+                contentColumn()
+            }
+        }
+    }
+}
+
+@Composable
+fun CardFieldNew(
+    modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(20.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
+    contentRow: @Composable (RowScope.() -> Unit)? = null,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    contentColumn: @Composable (ColumnScope.() -> Unit)? = null,
+) {
+    val modifierCard = Modifier
+        .fillMaxWidth()
+        .padding(padding)
+
+    val shape = RoundedCornerShape(14.dp)
+
+    Card(
         colors = CardDefaults.cardColors(
             containerColor = white
         ),
@@ -971,7 +1018,7 @@ fun DateFactoryCardNew(
                 intResSup = intResSup,
                 drawableRes = R.drawable.baseline_event_24,
                 onValueChange = { dateFactoryChanged(it) },
-                isCardBorder = false,
+                isBorderCard = false,
                 minDate = dateBoring
             )
         }

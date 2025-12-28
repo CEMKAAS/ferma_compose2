@@ -12,6 +12,7 @@ import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.dao.ExpensesDao
 import com.zaroslikov.data.room.dao.FinanceDao
 import com.zaroslikov.data.room.dao.IncubatorDao
+import com.zaroslikov.data.room.dao.IncubatorTableDao
 import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.data.room.database.AppDatabase.Companion.Instance
 import com.zaroslikov.data.room.dao.NoteDao
@@ -144,6 +145,12 @@ object DatabaseModule {
     @Singleton
     fun provideSettingsDao(database: AppDatabase): SettingsDao {
         return database.settingsDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideIncubatorTableDao(database: AppDatabase): IncubatorTableDao {
+        return database.incubatorTableDao()
     }
 
 }

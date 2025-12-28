@@ -25,11 +25,9 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
-import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextBuyerNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
-import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleSaleNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
@@ -37,7 +35,7 @@ import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.monthToResString
 
 object SaleDestination : NavigationDestination {
     override val route = "Sale"
@@ -323,28 +321,7 @@ private fun SaleEntryBottomSheet(
             title = state.title,
             warehouseList = state.warehouseList
         )
-        OutlinedPriceInputNew(
-            price = state.price,
-            onPriceChange = {
-                onIntent(SaleListIntent.PriceChanged(it))
-            },
-            priceAll = state.priceAll,
-            isError = state.error.isErrorPrice,
-            priceSuffix = Suffix.RUBLE,
-            isAutoCalculate = state.isAutoPrice,
-            onAutoCalculate = {
-                onIntent(SaleListIntent.AutoPriceClicked(it))
-            },
-            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
-            isManyCount = true,
-            isNecessarily = true,
-            count = state.count,
-            countSuffix = state.countSuffix,
-        )
-        OutlinedTextDateNew(
-            value = state.date,
-            onValueChange = { onIntent(SaleListIntent.DateClicked(it)) }
-        )
+
         OutlinedTextCategoryNew(
             value = state.category,
             onValueChange = { onIntent(SaleListIntent.CategoryChanged(it)) },

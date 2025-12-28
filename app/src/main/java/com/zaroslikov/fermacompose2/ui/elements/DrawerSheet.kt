@@ -157,7 +157,7 @@ fun DrawerItemsNew(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        IconTransaction(
+        IconTransaction2(
             sizeCard = 36.dp,
             icon = iconRes,
             colorIcon = colorIcon,

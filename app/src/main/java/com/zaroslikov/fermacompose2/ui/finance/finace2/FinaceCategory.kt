@@ -84,7 +84,7 @@ import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconFinance
 import com.zaroslikov.fermacompose2.ui.elements.IconText
-import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
@@ -99,8 +99,8 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
 import com.zaroslikov.fermacompose2.ui.finance.TransactionFinanceCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
 
@@ -388,7 +388,7 @@ fun WarningCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.Top
         ) {
-            IconTransaction(
+            IconTransaction2(
                 icon = icon,
                 color = colorIconBackground,
                 colorIcon = colorIcon,
@@ -496,7 +496,7 @@ private fun BottomSheet(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        IconTransaction(
+                        IconTransaction2(
                             icon = category.toTransactionDrawRes(),
                             color = category.toColorIconBorderSecond(),
                             colorIcon = category.toColorIconSecond(),
@@ -754,7 +754,7 @@ private fun FinanceCategoryCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                IconTransaction(
+                IconTransaction2(
                     icon = category.toDrawRes(),
                     color = category.toBorderCard(),
                     colorIcon = category.toColorIconSecond()

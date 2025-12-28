@@ -73,7 +73,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_3
 

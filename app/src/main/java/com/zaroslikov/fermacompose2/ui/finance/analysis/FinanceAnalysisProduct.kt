@@ -70,7 +70,7 @@ import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconCircle
 import com.zaroslikov.fermacompose2.ui.elements.IconCircleText
 import com.zaroslikov.fermacompose2.ui.elements.IconFinance
-import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
 import com.zaroslikov.fermacompose2.ui.elements.WhiteTenCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
@@ -85,8 +85,8 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.start.monthToResString2
+import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.monthToResString2
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_6
 import com.zaroslikov.fermacompose2.white
@@ -750,7 +750,7 @@ private fun TransitionCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            IconTransaction(
+            IconTransaction2(
                 icon = categoryFinance.toTransactionDrawRes(),
                 color = categoryFinance.toColorIconBorderSecond(),
                 colorIcon = categoryFinance.toColorIconSecond()

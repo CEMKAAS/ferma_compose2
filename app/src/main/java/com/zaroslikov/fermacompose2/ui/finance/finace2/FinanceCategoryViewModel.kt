@@ -15,7 +15,7 @@ import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import com.zaroslikov.fermacompose2.supportFun.dateLongToString
 import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQLPair
 import com.zaroslikov.fermacompose2.supportFun.datePeriod
-import com.zaroslikov.fermacompose2.ui.start.dateBuilder
+import com.zaroslikov.fermacompose2.ui.dateBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

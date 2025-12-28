@@ -13,6 +13,14 @@ android {
     compileSdk = 36
 
     defaultConfig {
+        val buildTime = System.currentTimeMillis()
+
+        buildConfigField(
+            "long",
+            "BUILD_TIME",
+            buildTime.toString()
+        )
+
         applicationId = "com.zaroslikov.fermacompose2"
         minSdk = 26
         targetSdk = 36
@@ -42,6 +50,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.1.1"

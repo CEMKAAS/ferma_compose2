@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 

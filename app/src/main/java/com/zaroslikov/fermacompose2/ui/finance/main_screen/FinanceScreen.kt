@@ -29,7 +29,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.domain.models.list.suffixCurrencyList
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarNew
 import com.zaroslikov.fermacompose2.black_2
@@ -61,9 +60,9 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
-import com.zaroslikov.fermacompose2.ui.start.monthToResString2
-import com.zaroslikov.fermacompose2.ui.start.monthToResString3
+import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.monthToResString2
+import com.zaroslikov.fermacompose2.ui.monthToResString3
 import com.zaroslikov.fermacompose2.white
 import java.time.LocalDate
 

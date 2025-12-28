@@ -1,16 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.sections.writeOff.entry
 
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.data.room.dto.PairDataDoubleSting
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.mapper.table.toRoomMap
-import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
@@ -22,13 +15,9 @@ import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.sections.sale.entry.SaleEntryDestination
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
-import com.zaroslikov.fermacompose2.utils.SnackbarController
-import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull

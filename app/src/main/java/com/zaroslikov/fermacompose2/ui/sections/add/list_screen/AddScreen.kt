@@ -38,7 +38,7 @@ import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.monthToResString
 
 /*object HomeDestination : NavigationDestination {
     override val route = "home"

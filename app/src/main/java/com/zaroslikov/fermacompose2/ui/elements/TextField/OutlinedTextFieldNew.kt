@@ -67,8 +67,8 @@ import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.elements.AutoCalculateCheckbox
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.text_14
-import com.zaroslikov.fermacompose2.ui.start.dateBuilder
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.violet_1
 
 @Composable
@@ -180,6 +180,41 @@ fun OutlinedTextNew(
             isError = isError,
             singleLine = false,
             keyboardOptions = keyboardOptionsNext(),
+        )
+    }
+    if (isBorderCard) BorderCard {
+        textField()
+    } else textField()
+}
+
+@Composable
+fun OutlinedNumberNew(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    suffix: Suffix? = null,
+    isError: Boolean = false,
+    drawableRes: Int? = null,
+    @StringRes intRes: Int = R.string.outlined_text_field_quantity,
+    @StringRes intResSup: Int = R.string.support_text_product,
+    @StringRes intResError: Int = R.string.error_no_count_product,
+    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
+    isBorderCard: Boolean = true,
+    /*  colorTextField: Color = gray_9,*/
+) {
+    val textField: @Composable () -> Unit = {
+        BaseOutlinedTextNew(
+            modifier = modifier,
+            value = value,
+            onValueChange = onValueChange,
+            suffix = suffix,
+            isError = isError,
+            leadingIconRes = drawableRes,
+            labelIntRes = intRes,
+            intResSup = intResSup,
+            intResError = intResError,
+            keyboardOptions = keyboardOptions,
+            /*colorTextField = colorTextField*/
         )
     }
     if (isBorderCard) BorderCard {
@@ -362,8 +397,8 @@ fun OutlinedTextDateNew(
     drawableRes: Int = R.drawable.baseline_calendar_month_24,
     enable: Boolean = true,
     isLimit: Boolean = true,
-    isCardBorder: Boolean = true,
     isNecessarily: Boolean = false,
+    isBorderCard: Boolean = true,
     minDate: String? = null
 ) {
     val dateList = value.split(".")
@@ -389,10 +424,9 @@ fun OutlinedTextDateNew(
             openDialog = !openDialog
         }
     }
-    BorderCard(
-        onClick = { openDialog = !openDialog }
-    ) {
+    val textField: @Composable () -> Unit = {
         BaseOutlinedTextNew(
+            modifier = Modifier.clickable(onClick = { openDialog = !openDialog }),
             value = date,
             onValueChange = { openDialog = !openDialog },
             readOnly = true,
@@ -403,6 +437,10 @@ fun OutlinedTextDateNew(
             leadingIconClick = { openDialog = !openDialog }
         )
     }
+    if (isBorderCard) BorderCard(
+        onClick = { openDialog = !openDialog }
+    ) { textField() }
+    else textField()
 }
 
 @Composable

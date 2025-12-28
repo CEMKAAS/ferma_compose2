@@ -1,9 +1,8 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import android.util.Log
-import androidx.compose.runtime.snapshots.SnapshotStateList
 //import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.KillTitleList
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 
 
 //fun <T : Enum<T>> validateCount(

@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import kotlinx.coroutines.launch
 
 

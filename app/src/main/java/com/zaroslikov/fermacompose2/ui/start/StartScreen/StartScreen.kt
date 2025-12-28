@@ -1,40 +1,70 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.start.StartScreen
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_11
+import com.zaroslikov.fermacompose2.green_8
 import com.zaroslikov.fermacompose2.green_9
+import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.orang_3
+import com.zaroslikov.fermacompose2.orang_5
+import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.DrawerSheetNew
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
-import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.text_12
+import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
+import kotlinx.coroutines.launch
 
 
 object StartDestination : NavigationDestination {
@@ -45,20 +75,17 @@ object StartDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartScreen(
-    navController: NavController,
     navigateToItemProject: (Long) -> Unit,
-    navigateToItemIncubator: (Int) -> Unit,
-    navigateToItemProjectArh: (Int) -> Unit,
-    navigateToItemIncubatorArh: (Int) -> Unit,
-    navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
+    navigateToProject: (Long) -> Unit,
+    navigateToAboutApp: () -> Unit,
+    navigateToSettings: () -> Unit,
+    navigateToIncubator: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    isFirstStart: Boolean,
-    isFirstEnd: () -> Unit,
-    viewModel: StartScreenViewModel = hiltViewModel()
+    viewModel: StartScreenViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(price_green, green_9)
-    /*val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val drawerClose = {
         scope.launch {
@@ -66,7 +93,17 @@ fun StartScreen(
                 if (isClosed) open() else close()
             }
         }
-    }*/
+    }
+
+
+    /*  val bottomSheetClose = {
+          scope.launch {
+              bottomSheetState.apply {
+                  if (isVisible) is
+              }
+          }
+      }*/
+
     /* var infoBottomSheet by remember { mutableStateOf(false) }
      var showDialogTime by remember { mutableStateOf(false) }
      var arhivBoolean by remember { mutableStateOf(false) }*/
@@ -88,69 +125,60 @@ fun StartScreen(
         isFirstEndConfig = isFirstEnd
     )*/
 
-    /*   ModalNavigationDrawer(
-           drawerState = drawerState,
-           drawerContent = {
-               DrawerSheetNew(
-                   onProfileClick = { },
-                   onSettingsClick = { TODO() },
-                   onAboutAppClick = { TODO() },
-                   onCloseClick = { drawerClose() }
-               )
-           }
-       ) {*/
-    Scaffold(
-        topBar = {
-            /*TopAppBarStart2(
-                title = R.string.start_screen_title,
-                infoBottomSheet = { drawerClose() },
-                archiveButton = {},
-                boolean = true
-            )*/
-        }, floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                navController.navigate("${WarehouseEditDestination.route}/${-1}")
-            }
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerSheetNew(
+                onProfileClick = { },
+                onSettingsClick = { navigateToSettings() },
+                onAboutAppClick = { navigateToAboutApp() },
+                onCloseClick = { drawerClose() }
+            )
         }
-    ) { innerPadding ->
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBarStart2(
+                    title = R.string.start_screen_title,
+                    infoBottomSheet = { drawerClose() },
+                    archiveButton = {},
+                    boolean = true
+                )
+            },
+            floatingActionButton = {
+                NeonGlowFab(
+                    colors = colors,
+                    onClick = { showBottomSheet = true })
+            }
+        ) { innerPadding ->
 
-        if (state.isLoading)
-            CircularProgress(
-                modifier = modifier.padding(innerPadding),
-            )
-        else
-            StartScreenContainer2(
-                modifier = Modifier.modifierScreenLazy(innerPadding),
-                itemList = state.list,
-                brieflyList = state.list,
-                onEditClick = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
-                onArchiveClick = { viewModel.onIntent(StartScreenIntent.ArchiveClicked(it)) },
-                onDeleteClick = { viewModel.onIntent(StartScreenIntent.DeleteClicked(it)) },
-                onNavigationProject = { navigateToItemProject(it) },
-            )
+            if (state.isLoading)
+                CircularProgress(
+                    modifier = modifier.padding(innerPadding),
+                )
+            else
+                StartScreenContainer2(
+                    modifier = Modifier.modifierScreenLazy(innerPadding),
+                    itemList = state.list,
+                    brieflyList = state.list,
+                    onEditClick = { navigateToProject(it) },
+                    onArchiveClick = { viewModel.onIntent(StartScreenIntent.ArchiveClicked(it)) },
+                    onDeleteClick = { viewModel.onIntent(StartScreenIntent.DeleteClicked(it)) },
+                    onNavigationProject = { navigateToItemProject(it) },
+                )
 
-        /*if (infoBottomSheet) {
-            InfoBottomSheet(
-                infoBottomSheet = { infoBottomSheet = false },
-                saveBottomSheet = {
-                    viewModel.saveItem()
-                    AppMetrica.reportEvent("УведОбщ - ${viewModel.time}")
-                    infoBottomSheet = false
-                },
-                sheetState = sheetState,
-                time = viewModel.time,
-                showDialogTime = { showDialogTime = true },
-                clearTime = {
-                    viewModel.onUpdate("")
-                    AppMetrica.reportEvent("УведОбщ - нет")
-                },
-            )
-        }*/
+            if (showBottomSheet)
+                ChoiceProjectBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    onIncubatorProject = { navigateToIncubator(-1) },
+                    onAddProject = { navigateToProject(-1) }
+                )
+        }
     }
 }
-/*
-}
-*/
 
 @Composable
 private fun StartScreenContainer2(
@@ -209,7 +237,7 @@ private fun ProjectCard(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                IconTransaction(
+                IconTransaction2(
                     image = painterResource(R.drawable.livestock),
                     color = price_green_2,
                     sizeCard = 64.dp,
@@ -238,6 +266,114 @@ private fun ProjectCard(
         }
     }
 }
+
+@Composable
+private fun ChoiceProjectBottomSheet(
+    onDismissRequest: () -> Unit,
+    onAddProject: () -> Unit,
+    onIncubatorProject: () -> Unit
+) {
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = bottomSheetState,
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    stringResource(R.string.start_screen_create_new_project),
+                    style = text_16,
+                    color = black_2
+                )
+                Text(
+                    stringResource(R.string.start_screen_choice_type_project),
+                    style = text_14,
+                    color = gray_7
+                )
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ChoiceProjectCard(
+                    titleRes = R.string.start_screen_common_project,
+                    supportText = stringResource(R.string.start_screen_common_project_support),
+                    icon = R.drawable.outline_work_24,
+                    color = green_8,
+                    colorIcon = green_9,
+                    borderColor = green_11,
+                    containerColor = price_green_2
+                ) { onAddProject() }
+                ChoiceProjectCard(
+                    titleRes = R.string.start_screen_incubator_project,
+                    supportText = stringResource(R.string.start_screen_incubator_project_support),
+                    icon = R.drawable.outline_egg_24,
+                    color = orang_5,
+                    colorIcon = orang_6,
+                    borderColor = orang_5,
+                    containerColor = orang_3
+                ) { onIncubatorProject() }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChoiceProjectCard(
+    @StringRes titleRes: Int,
+    supportText: String,
+    @DrawableRes icon: Int,
+    color: Color,
+    colorIcon: Color,
+    borderColor: Color,
+    containerColor: Color,
+    onClick: () -> Unit
+) {
+    BorderCard(
+        borderColor = borderColor,
+        containerColor = containerColor,
+        padding = PaddingValues(16.dp),
+        shape = RoundedCornerShape(16.dp),
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                IconTransaction2(
+                    sizeCard = 48.dp,
+                    icon = icon,
+                    colorIcon = colorIcon,
+                    color = color
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(stringResource(titleRes), style = text_16, color = black_2)
+                    Text(supportText, style = text_12, color = gray_7)
+                }
+            }
+            Icon(
+                painterResource(R.drawable.baseline_chevron_right_24),
+                contentDescription = null,
+                tint = grey
+            )
+        }
+    }
+}
+
+
 /*@Composable
 private fun ProjectCard(
     projectTable: DomainProjectTable

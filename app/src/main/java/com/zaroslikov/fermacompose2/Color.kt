@@ -27,6 +27,7 @@ val green_7 = Color(0xFF05DF72)
 val green_8 = Color(0xFFDCFCE7)
 val green_9 = Color(0xFF008236)
 val green_10 = Color(0xFF00786F)
+val green_11 = Color(0xFFB9F8CF)
 
 
 // Color Suffix
@@ -65,6 +66,8 @@ val blue_14 = Color(0xFF1C398E)
 val blue_15 = Color(0xFF007595)
 val blue_16 = Color(0xFF3A70B4)
 val blue_17 = Color(0xFF51A2FF)
+val blue_18 = Color(0xFF0077FF)
+val blue_19 = Color(0xFF28A7E8)
 
 
 val orang_1 = Color(0xFFF54900)
@@ -81,6 +84,7 @@ val orang_11 = Color(0xFFD08700)
 val orang_12 = Color(0xFFE17100)
 val orang_13 = Color(0xFFFEFCE8)
 val orang_14 = Color(0xFFFEF9C2)
+val orang_15 = Color(0xFFFF6900)
 
 
 
@@ -91,6 +95,8 @@ val violet_4 = Color(0xFFAD46FF)
 val violet_5 = Color(0xFFE9D4FF)
 val violet_6 = Color(0xFF8200DB)
 val violet_7 = Color(0xFFC27AFF)
+val violet_8 = Color(0xFFF3E8FF)
+val violet_9 = Color(0xFF59168B)
 
 
 val green_g_1 = Color(0xFFECFDF5)
@@ -114,6 +120,10 @@ val red_11 = Color(0xFFFEF2F2)
 val red_12 = Color(0xFFFFE2E2)
 val red_13 = Color(0xFFFB2C36)
 val red_14 = Color(0xFFC10007)
+val red_15 = Color(0xFFFFC9C9)
+val red_16 = Color(0xFFFCCEE8)
+val red_17 = Color(0xFFA3004C)
+val red_18 = Color(0xFFF6339A)
 
 
 val animal_1 = Color(0xFF009689)

@@ -4,14 +4,11 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,16 +19,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zaroslikov.fermacompose2.black
-import com.zaroslikov.fermacompose2.green_2
-import com.zaroslikov.fermacompose2.green_4
 import com.zaroslikov.fermacompose2.white
 
 @Composable
@@ -88,7 +81,7 @@ fun IconFinance(
 
 
 @Composable
-fun IconTransaction(
+fun IconTransaction2(
     modifier: Modifier = Modifier,
     sizeCard: Dp = 40.dp,
     @DrawableRes icon: Int, colorIcon: Color, color: Color
@@ -110,7 +103,7 @@ fun IconTransaction(
 }
 
 @Composable
-fun IconTransaction(
+fun IconTransaction2(
     modifier: Modifier = Modifier,
     sizeCard: Dp = 40.dp,
     image: Painter,

@@ -41,7 +41,7 @@ import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
-import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNew
@@ -50,8 +50,8 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
-import com.zaroslikov.fermacompose2.ui.start.dateBuilder
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.ui.monthToResString
 
 
 object NoteDestination : NavigationDestination {
@@ -208,7 +208,7 @@ fun NoteCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    IconTransaction(
+                    IconTransaction2(
                         icon = R.drawable.baseline_sticky_note_2_24,
                         colorIcon = color,
                         color = orang_13

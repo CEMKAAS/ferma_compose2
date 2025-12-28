@@ -32,7 +32,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sections.EntryIndicationBottomSheet
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.violet_2
 import com.zaroslikov.fermacompose2.violet_4
 

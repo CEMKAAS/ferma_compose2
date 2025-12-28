@@ -90,7 +90,6 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
-import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNew
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
@@ -100,8 +99,8 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.finance.finace2.WarningCard
-import com.zaroslikov.fermacompose2.ui.start.dateBuilder
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.warehouse.warehouseSettingScreen.WarehouseEditState
 import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_4
@@ -263,7 +262,7 @@ private fun MainSettingsCard(
                     isPainter = isPainter
                 )
             } else
-                IconTransaction(
+                IconTransaction2(
                     modifier = Modifier.clickable(onClick = { expanded = !expanded }),
                     image = painter2,
                     color = price_green_2,
@@ -344,7 +343,7 @@ private fun DateSettingsCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            IconTransaction(
+            IconTransaction2(
                 icon = R.drawable.baseline_calendar_month_24,
                 colorIcon = green_10,
                 color = green_g_4,
@@ -368,9 +367,8 @@ private fun DateSettingsCard(
     }
 }
 
-
 @Composable
-private fun CurrencySettingsCard(
+fun CurrencySettingsCard(
     currentCurrency: Suffix,
     baseColor: Color = blue_8,
     secondColor: Color = blue_3,
@@ -392,7 +390,7 @@ private fun CurrencySettingsCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    IconTransaction(
+                    IconTransaction2(
                         icon = R.drawable.baseline_currency_ruble_24,
                         colorIcon = baseColor,
                         color = secondColor,
@@ -534,7 +532,7 @@ private fun UnitsMeasurementSettingsCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                IconTransaction(
+                IconTransaction2(
                     icon = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
                     colorIcon = violet_6,
                     color = violet_5,

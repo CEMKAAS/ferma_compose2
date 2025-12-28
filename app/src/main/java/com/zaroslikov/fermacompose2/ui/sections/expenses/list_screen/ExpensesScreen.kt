@@ -59,13 +59,12 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
-import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
-import com.zaroslikov.fermacompose2.ui.start.formatter
-import com.zaroslikov.fermacompose2.ui.start.monthToResString
+import com.zaroslikov.fermacompose2.ui.formatter
+import com.zaroslikov.fermacompose2.ui.monthToResString
 
 object ExpensesDestination : NavigationDestination {
     override val route = "expenses"

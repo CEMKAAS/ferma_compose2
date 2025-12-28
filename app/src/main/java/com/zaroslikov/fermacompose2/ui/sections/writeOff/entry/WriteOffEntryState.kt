@@ -1,8 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.sections.writeOff.entry
 
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
-import com.zaroslikov.data.room.dto.PairDataDoubleSting
-import com.zaroslikov.data.room.dto.SaleTitleData
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Suffix
@@ -11,9 +9,8 @@ import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import kotlin.text.trim
 
 data class WriteOffEntryState(

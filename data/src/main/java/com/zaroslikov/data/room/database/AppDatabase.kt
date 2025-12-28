@@ -17,6 +17,7 @@ import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.dao.ExpensesDao
 import com.zaroslikov.data.room.dao.FinanceDao
 import com.zaroslikov.data.room.dao.IncubatorDao
+import com.zaroslikov.data.room.dao.IncubatorTableDao
 import com.zaroslikov.data.room.dao.NoteDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
@@ -36,6 +37,7 @@ import com.zaroslikov.data.room.table.ferma.NoteTable
 import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.incubator.IncubatorTable
 import com.zaroslikov.data.room.table.project.SettingsTable
 
 @Database(
@@ -53,7 +55,8 @@ import com.zaroslikov.data.room.table.project.SettingsTable
         AnimalWeightTable::class,
         NoteTable::class,
         ExpensesAnimalTable::class,
-        SettingsTable::class
+        SettingsTable::class,
+        IncubatorTable::class
     ],
     version = 4,
     exportSchema = false
@@ -81,6 +84,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun warehouseDao(): WarehouseDao
     abstract fun writeOffDao(): WriteOffDao
     abstract fun settingsDao(): SettingsDao
+    abstract fun incubatorTableDao(): IncubatorTableDao
 
     companion object {
         @Volatile

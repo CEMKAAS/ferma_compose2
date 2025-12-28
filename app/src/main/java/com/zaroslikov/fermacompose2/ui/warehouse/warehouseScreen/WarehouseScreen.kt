@@ -17,13 +17,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,7 +62,7 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BorderShowAllButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.IconTransaction
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
@@ -72,7 +70,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseIntent
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
 import com.zaroslikov.fermacompose2.white
@@ -420,7 +418,7 @@ private fun FastAddCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                IconTransaction(
+                IconTransaction2(
                     icon = R.drawable.icon_add,
                     colorIcon = blue_1,
                     color = blue_13,

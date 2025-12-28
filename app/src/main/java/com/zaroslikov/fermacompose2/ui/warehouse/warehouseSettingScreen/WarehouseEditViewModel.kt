@@ -113,7 +113,6 @@ class WarehouseEditViewModel @Inject constructor(
         }
     }
 
-
     private fun WarehouseEditState.toDomainProjectTable(id: Long? = null): DomainProjectTable {
         return DomainProjectTable(
             id = id ?: 0,

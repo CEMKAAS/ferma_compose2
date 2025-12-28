@@ -29,7 +29,7 @@ import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CompletableDeferred

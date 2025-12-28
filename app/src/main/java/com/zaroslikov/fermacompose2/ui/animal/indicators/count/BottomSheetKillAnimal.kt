@@ -2,7 +2,6 @@
 
 package com.zaroslikov.fermacompose2.ui.animal.indicators.count
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -73,7 +72,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.sections.EntryIndicationBottomSheet
-import com.zaroslikov.fermacompose2.ui.start.formatNumber
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.white
 
 @Composable

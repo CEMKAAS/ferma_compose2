@@ -62,7 +62,7 @@ fun Modifier.modifierScreenLazy(
         .padding(top = innerPadding.calculateTopPadding())
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
-//            vertical = dimensionResource(R.dimen.padding_small)
+            vertical = dimensionResource(R.dimen.padding_small)
         )
         .fillMaxHeight()
 //        .pointerInput(Unit) {

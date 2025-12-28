@@ -129,6 +129,7 @@ fun BaseOutlinedTextNew(
     }
 
     Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
@@ -154,7 +155,7 @@ fun BaseOutlinedTextNew(
             }
         }
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     color = if (isError) Color(0xFFFFEAEA) else colorTextField,
