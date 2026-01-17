@@ -5,7 +5,6 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_10
 import com.zaroslikov.fermacompose2.blue_11
@@ -13,7 +12,6 @@ import com.zaroslikov.fermacompose2.blue_12
 import com.zaroslikov.fermacompose2.blue_13
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.blue_3
-import com.zaroslikov.fermacompose2.blue_5
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.green_5
@@ -34,9 +32,10 @@ import com.zaroslikov.fermacompose2.red_12
 import com.zaroslikov.fermacompose2.red_4
 import com.zaroslikov.fermacompose2.red_5
 import com.zaroslikov.fermacompose2.red_7
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination.*
-import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.Page
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
 import com.zaroslikov.fermacompose2.white
@@ -105,6 +104,14 @@ fun Destination.toColorList(): List<Color> {
         MAGAZINE -> listOf(green_5, green_shamrock)
         WAREHOUSE -> listOf(green_6, price_green)
         FINANCE -> listOf(white, blue_2)
+    }
+}
+
+fun DestinationIncubator.toColorList(): List<Color> {
+    return when (this) {
+        DestinationIncubator.REVIEW -> listOf(green_5, green_shamrock)
+        DestinationIncubator.BOOKMARK -> listOf(green_6, price_green)
+        DestinationIncubator.FINANCE -> listOf(white, blue_2)
     }
 }
 

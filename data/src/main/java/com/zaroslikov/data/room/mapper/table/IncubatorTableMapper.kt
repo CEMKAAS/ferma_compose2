@@ -12,7 +12,9 @@ fun IncubatorTable.toDomainIncubatorTable(): DomainIncubatorTable {
         capacity = this.capacity,
         note = this.note,
         currencySuffix = this.currencySuffix,
-        idPT = this.idPT
+        idPT = this.idPT,
+        brand = this.brand,
+        model = this.model
     )
 }
 
@@ -25,6 +27,8 @@ fun DomainIncubatorTable.toIncubatorTable(): IncubatorTable {
         capacity = this.capacity,
         note = this.note,
         currencySuffix = this.currencySuffix,
-        idPT = this.idPT
+        idPT = this.idPT,
+        brand = this.brand,
+        model = this.model
     )
 }

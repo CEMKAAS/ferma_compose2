@@ -222,6 +222,44 @@ fun OutlinedNumberNew(
     } else textField()
 }
 
+@Composable
+fun OutlinedTextDropdownMenuNew(
+    value: String,
+    onValueChange: (String) -> Unit,
+    titleList: List<String>,
+    enable: Boolean = true,
+    readOnly: Boolean = false,
+    isBorderCard: Boolean = true,
+    @DrawableRes leadingIconRes: Int? = null,
+    @StringRes labelIntRes: Int,
+    @StringRes intResSup: Int
+) {
+    val textField: @Composable () -> Unit = {
+        ExposedDropdownMenuCategoryBuyer(
+            title = value,
+            setTitle = { onValueChange(it) },
+            titleList = titleList
+        ) {
+            BaseOutlinedTextNew(
+                modifier = it.first,
+                value = value,
+                onValueChange = { onValueChange(it) },
+                onClear = { onValueChange("") },
+                leadingIconRes = leadingIconRes,
+                isError = false,
+                labelIntRes = labelIntRes,
+                intResSup = intResSup,
+                keyboardOptions = keyboardOptionsNext(),
+                enable = enable,
+                readOnly = readOnly, isMore = value.isBlank()
+            )
+        }
+    }
+    if (isBorderCard) BorderCard {
+        textField()
+    } else textField()
+}
+
 
 @Composable
 fun OutlinedTextAnimalNew(

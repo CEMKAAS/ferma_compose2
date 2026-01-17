@@ -23,7 +23,9 @@ data class IncubatorTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long = 0,
-    @ColumnInfo(name = "capacity")
+    val brand: String?,
+    val model: String?,
+    @ColumnInfo(name = "capacity") // Вместимость
     val capacity: Int = 0,
     @ColumnInfo(name = "price")
     val price: Double? = null,

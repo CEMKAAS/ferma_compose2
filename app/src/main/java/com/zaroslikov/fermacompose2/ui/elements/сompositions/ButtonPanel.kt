@@ -24,8 +24,7 @@ import com.zaroslikov.fermacompose2.ui.elements.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.elements.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.elements.CloseButton
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
-import com.zaroslikov.fermacompose2.ui.sections.expenses.entry.ExpensesEntryState
-import com.zaroslikov.fermacompose2.white
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.entry.ExpensesEntryState
 
 @Composable
 fun ButtonPanel(

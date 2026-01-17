@@ -18,6 +18,10 @@ val text_36: TextStyle
     @Composable get() = TextStyle(
         fontSize = 36.sp,
     )
+val text_30: TextStyle
+    @Composable get() = TextStyle(
+        fontSize = 30.sp,
+    )
 
 val text_24: TextStyle
     @Composable get() = TextStyle(

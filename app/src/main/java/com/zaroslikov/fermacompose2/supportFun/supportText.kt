@@ -6,8 +6,10 @@ import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator.*
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
-import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.Page
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
 
 fun infoTextKillAnimal(count: String, suffix: String): String {
     return "${count.toConvertZeroString().toFormatNumber()} " +
@@ -102,6 +104,14 @@ fun Destination.toResId(): Int {
         Destination.MAGAZINE -> R.string.bottom_bar_magazine
         Destination.WAREHOUSE -> R.string.bottom_bar_warehouse
         Destination.FINANCE -> R.string.bottom_bar_finance
+    }
+}
+
+fun DestinationIncubator.toResId(): Int {
+    return when (this) {
+        REVIEW -> R.string.bottom_bar_review
+        BOOKMARK -> R.string.bottom_bar_bookmark
+        FINANCE -> R.string.bottom_bar_finance
     }
 }
 

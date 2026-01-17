@@ -538,7 +538,7 @@ fun DetailProductCardNew(
             IconAndTextNew(
                 iconRes = iconRes,
                 valueString = stringResource(valueString),
-                color = if (status) violet_1 else error_base,
+                iconColor = if (status) violet_1 else error_base,
             )
         }
         category.takeUnless { it == "Без категории" /*|| it.isEmpty()*/ }
@@ -546,20 +546,20 @@ fun DetailProductCardNew(
                 IconAndTextNew(
                     iconRes = R.drawable.baseline_format_list_bulleted_24,
                     valueString = category,
-                    color = color
+                    iconColor = color
                 )
             }
         buyer?.let {
             IconAndTextNew(
                 iconRes = R.drawable.baseline_person_24,
                 valueString = it,
-                color = color
+                iconColor = color
             )
         }
         IconAndTextNew(
             iconRes = R.drawable.baseline_calendar_month_24,
             valueString = date,
-            color = color
+            iconColor = color
         )
 
 //                if (addProduct.animal != "")
@@ -788,7 +788,7 @@ fun NoteColorCard(
             iconRes = R.drawable.baseline_sticky_note_2_24,
             valueString = note,
             modifier = Modifier.padding(12.dp),
-            color = color
+            iconColor = color
         )
     }
 }

@@ -8,6 +8,8 @@ interface IncubatorTableRepository {
     fun getIncubator(id: Long): Flow<DomainIncubatorTable>
     suspend fun insertIncubator(domainIncubatorTable: DomainIncubatorTable)
     suspend fun insertIncubatorLong(domainIncubatorTable: DomainIncubatorTable): Long
-    suspend fun updateIncubator(domainIncubatorTable:DomainIncubatorTable)
+    suspend fun updateIncubator(domainIncubatorTable: DomainIncubatorTable)
     suspend fun deleteIncubator(domainIncubatorTable: DomainIncubatorTable)
+    fun getBrandIncubatorList(): Flow<List<String>>
+    fun getModelIncubatorList(): Flow<List<String>>
 }

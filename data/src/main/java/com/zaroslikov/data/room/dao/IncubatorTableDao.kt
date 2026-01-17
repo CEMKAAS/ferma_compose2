@@ -28,4 +28,11 @@ interface IncubatorTableDao {
 
     @Delete
     suspend fun deleteIncubator(incubatorTable: IncubatorTable)
+
+    @Query("SELECT brand FROM incubator_table WHERE brand IS NOT NULL")
+    fun getBrandIncubatorList(): Flow<List<String>>
+
+    @Query("SELECT model FROM incubator_table WHERE model IS NOT NULL")
+    fun getModelIncubatorList(): Flow<List<String>>
+
 }

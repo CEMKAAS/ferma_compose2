@@ -11,8 +11,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zaroslikov.fermacompose2.ui.add.AddProject
 import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
-import com.zaroslikov.fermacompose2.ui.incubator.AddIncubator.AddIncubatorDestination
-import com.zaroslikov.fermacompose2.ui.incubator.AddIncubator.AddIncubatorScreen
+import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.AddIncubatorDestination
+import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.AddIncubatorScreen
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorDestination
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorScreen
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectScreen
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
 import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartDestination
@@ -68,6 +70,20 @@ fun InventoryNavHost(
             val itemId = backStackEntry.arguments!!.getLong(MainProjectsDestination.itemIdArg)
             MainProjectScreen(itemId)
         }
+
+
+        composable(
+            route = MainIncubatorDestination.routeWithArgs,
+            arguments = listOf(navArgument(MainIncubatorDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments!!.getLong(MainIncubatorDestination.itemIdArg)
+            MainIncubatorScreen(itemId)
+        }
+
+
+
         composable(route = ProjectAddDestination.route) {
             AddProject(
                 navigateBack = { navController.popBackStack() },

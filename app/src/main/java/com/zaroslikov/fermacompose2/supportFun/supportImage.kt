@@ -4,9 +4,10 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
-import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination.*
-import com.zaroslikov.fermacompose2.ui.sections.add.list_screen.Page
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
+
 
 fun Category.toDrawRes(): Int {
     return when (this) {
@@ -39,9 +40,16 @@ fun Page.toDrawRes(): Int {
 
 fun Destination.toDrawRes(): Int {
     return when (this) {
-        MAGAZINE -> R.drawable.baseline_edit_document_24
-        WAREHOUSE -> R.drawable.baseline_warehouse_24
-        FINANCE -> R.drawable.baseline_currency_ruble_24
+        Destination.MAGAZINE -> R.drawable.baseline_edit_document_24
+        Destination.WAREHOUSE -> R.drawable.baseline_warehouse_24
+        Destination.FINANCE -> R.drawable.baseline_currency_ruble_24
+    }
+}
+fun DestinationIncubator.toDrawRes(): Int {
+    return when (this) {
+        DestinationIncubator.REVIEW -> R.drawable.baseline_edit_document_24
+        DestinationIncubator.BOOKMARK -> R.drawable.baseline_warehouse_24
+        DestinationIncubator.FINANCE -> R.drawable.baseline_currency_ruble_24
     }
 }
 

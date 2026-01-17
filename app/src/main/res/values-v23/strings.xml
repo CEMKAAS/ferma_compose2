@@ -27,10 +27,14 @@
     <string name="animal_screen_title2">Животные</string>
     <string name="is_empty"></string>
 
-    // BottomBar
+    // BottomBarProject
     <string name="bottom_bar_magazine">Журнал</string>
     <string name="bottom_bar_warehouse">Журнал</string>
     <string name="bottom_bar_finance">Финансы</string>
+
+    // BottomBarIncubator
+    <string name="bottom_bar_review">Журнал</string>
+    <string name="bottom_bar_bookmark">Журнал</string>
 
     //OutlinedTextField
     <string name="outlined_text_product">Товар</string>
@@ -329,6 +333,10 @@
     <string name="add_incubator_screen_download_image">Загрузите фото инкубатора (необязательно)</string>
     <string name="add_incubator_screen_name_incubator">Название инкубатора</string>
     <string name="add_incubator_screen_name_incubator_support">Например: Инкубатор №1</string>
+    <string name="add_incubator_screen_brand">Марка</string>
+    <string name="add_incubator_screen_brand_support">Укажите марку</string>
+    <string name="add_incubator_screen_model">Модель</string>
+    <string name="add_incubator_screen_model_support">Укажите модель</string>
     <string name="add_incubator_screen_capacity">Вместимость</string>
     <string name="add_incubator_screen_capacity_egg">Кол-во яиц</string>
     <string name="add_incubator_screen_date_sale">Дата покупки</string>
@@ -342,6 +350,15 @@
     <string name="add_incubator_screen_automatic_egg_rotation_support">Автоматический механизм переворота яиц</string>
     <string name="add_incubator_screen_auto_ventilation">Автопроветривание</string>
     <string name="add_incubator_screen_auto_ventilation_support">Автоматическая система вентиляции</string>
+
+    //BookmarkScreen
+    <string name="book_mark_screen_day_incubator">День инкубации</string>
+    <string name="book_mark_screen_progress">Прогресс</string>
+    <string name="bookmark_screen_current_parametrs_s">Текущие параметры (День %s)</string>
+    <string name="bookmark_screen_current_temp">Температура</string>
+    <string name="bookmark_screen_current_damp">Влажность</string>
+    <string name="bookmark_screen_current_over">Переворот</string>
+    <string name="bookmark_screen_current_airing">Проветривание</string>
 
     //Warehouse
     <string name="warehouse_screen_positions">позиции</string>

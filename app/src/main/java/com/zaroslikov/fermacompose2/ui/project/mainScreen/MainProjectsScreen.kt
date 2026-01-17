@@ -16,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.supportFun.toColorList
+import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toNav
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BottomBarButton
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.ProjectNavHost
@@ -47,7 +50,7 @@ fun MainProjectScreen(
                 ) {
                     Destination.entries.forEachIndexed { index, destination ->
                         BottomBarButton(
-                            destination = destination,
+                            destination = destination.ordinal,
                             index = selectedDestination,
                             onClick = {
                                 projectNavController.navigate(route = destination.toNav(itemPT)) {
@@ -58,7 +61,10 @@ fun MainProjectScreen(
                                     restoreState = true
                                 }
                                 selectedDestination = index
-                            }
+                            },
+                            colors = destination.toColorList(),
+                            drawableRes = destination.toDrawRes(),
+                            stringRes = destination.toResId()
                         )
                     }
                 }

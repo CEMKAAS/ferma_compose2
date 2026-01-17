@@ -35,4 +35,12 @@ class IncubatorTableRepositoryImpl @Inject constructor(private val incubatorTabl
     override suspend fun deleteIncubator(domainIncubatorTable: DomainIncubatorTable) {
         return incubatorTableDao.deleteIncubator(domainIncubatorTable.toIncubatorTable())
     }
+
+    override fun getBrandIncubatorList(): Flow<List<String>> {
+        return incubatorTableDao.getBrandIncubatorList()
+    }
+
+    override fun getModelIncubatorList(): Flow<List<String>> {
+        return incubatorTableDao.getModelIncubatorList()
+    }
 }

@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,11 +37,14 @@ import com.zaroslikov.fermacompose2.white
 
 @Composable
 fun BottomBarButton(
-    destination: Destination,
+    destination: Int,
     index: Int,
+    colors: List<Color>,
+    @DrawableRes drawableRes: Int,
+    @StringRes stringRes: Int,
     onClick: () -> Unit
 ) {
-    val cardSetting = if (destination.ordinal == index)
+    val cardSetting = if (destination == index)
         Triple(
             RoundedCornerShape(16.dp), CardDefaults.cardColors(
                 containerColor = white
@@ -54,7 +59,7 @@ fun BottomBarButton(
         ), null
     )
     val gradient = Brush.linearGradient(
-        colors = destination.toColorList(),
+        colors = colors,
         start = Offset(0f, 0f),
         end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
     )
@@ -73,7 +78,7 @@ fun BottomBarButton(
                 modifier = Modifier
                     .size(40.dp)
                     .then(
-                        if (destination.ordinal == index) Modifier
+                        if (destination == index) Modifier
                             .shadow(
                                 elevation = 5.dp,
                                 shape = RoundedCornerShape(14.dp)
@@ -85,18 +90,18 @@ fun BottomBarButton(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painterResource(destination.toDrawRes()),
+                    painterResource(drawableRes),
                     modifier = Modifier.size(20.dp),
                     contentDescription = null,
-                    tint = if (destination.ordinal == index) Color.White else grey_3
+                    tint = if (destination == index) Color.White else grey_3
                 )
             }
             Spacer(Modifier.padding(4.dp))
             Text(
-                text = stringResource(destination.toResId()),
+                text = stringResource(stringRes),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = if (destination.ordinal == index) black else grey_3,
+                color = if (destination == index) black else grey_3,
                 style = text_12
             )
         }

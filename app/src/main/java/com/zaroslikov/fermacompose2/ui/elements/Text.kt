@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.elements
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -102,9 +104,11 @@ fun IconAndText(
 @Composable
 fun IconAndTextNew(
     modifier: Modifier = Modifier,
-    iconRes: Int,
+    @DrawableRes iconRes: Int,
     valueString: String,
-    color: Color,
+    iconColor: Color,
+    iconSize: Dp = 16.dp,
+    textColor: Color = marengo,
     textStyle: TextStyle = text_14
 ) {
     Row(
@@ -114,16 +118,15 @@ fun IconAndTextNew(
     ) {
         Icon(
             painter = painterResource(iconRes), contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = color
+            modifier = Modifier.size(iconSize),
+            tint = iconColor
         )
         Text(
-//            modifier = Modifier.fillMaxWidth(),
             text = valueString,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = textStyle,
-            color = marengo
+            color = textColor
         )
     }
 }

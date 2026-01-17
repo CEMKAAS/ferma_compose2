@@ -34,8 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart2
@@ -63,7 +61,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.sections.InventoryBody
+import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import kotlinx.coroutines.launch
 
 
@@ -254,7 +252,7 @@ private fun ProjectCard(
                     IconAndTextNew(
                         iconRes = R.drawable.baseline_calendar_month_24,
                         valueString = projectTable.data,
-                        color = gray_7
+                        iconColor = gray_7
                     )
                 }
             }
