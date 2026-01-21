@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -285,6 +287,102 @@ fun BaseOutlinedTextNew2(
                 // Обязательно делаем innerTextField заполняющим ширину своего контейнера
                 Box(modifier = Modifier.fillMaxWidth()) {
                     innerTextField()
+                }
+            }
+        }
+    )
+}
+
+
+@Composable
+fun BaseOutlinedTextNew3(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes intResSup: Int,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    dividerColor: Color,
+    focusManager: FocusManager = LocalFocusManager.current,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
+) {
+    // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier,
+        textStyle = TextStyle(
+            color = Color.Black,
+            fontSize = 24.sp,
+            lineHeight = 26.sp
+        ),
+        cursorBrush = SolidColor(Color(0xFF007AFF)),
+        singleLine = singleLine,
+        decorationBox = { innerTextField ->
+            Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {
+                if (value.isEmpty()) {
+                    Text(
+                        text = stringResource(intResSup),
+                        color = Color(0xFF9A9A9A),
+                        style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
+                    )
+                }
+                // Обязательно делаем innerTextField заполняющим ширину своего контейнера
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Column {
+                        innerTextField()
+                        HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth(),
+                            thickness = 2.dp,
+                            color = dividerColor
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+
+@Composable
+fun BaseOutlinedTextNew4(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes intResSup: Int,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    focusManager: FocusManager = LocalFocusManager.current,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
+) {
+    // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        textStyle = TextStyle(
+            color = Color.Black,
+            fontSize = 16.sp,
+            lineHeight = 26.sp,
+            textAlign = TextAlign.Center
+        ),
+        cursorBrush = SolidColor(Color(0xFF007AFF)),
+        singleLine = singleLine,
+        maxLines = 1,
+        decorationBox = { innerTextField ->
+            Box(contentAlignment = Alignment.Center) {
+                if (value.isEmpty()) {
+                    Text(
+                        text = stringResource(intResSup),
+                        color = Color(0xFF9A9A9A),
+                        style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
+                    )
+                }
+                // Обязательно делаем innerTextField заполняющим ширину своего контейнера
+                Box(Modifier.fillMaxWidth()) {
+                    Column { innerTextField() }
                 }
             }
         }

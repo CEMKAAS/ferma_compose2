@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 
@@ -35,13 +36,14 @@ fun Modifier.toButton(): Modifier {
 
 @Composable
 fun Modifier.modifierScreen(
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    horizontalPaddingValues: Dp = dimensionResource(id = R.dimen.padding_medium)
 ): Modifier {
     val focusManager = LocalFocusManager.current
     return this
         .padding(top = innerPadding.calculateTopPadding())
         .padding(
-            horizontal = dimensionResource(id = R.dimen.padding_medium),
+            horizontal = horizontalPaddingValues,
 //            vertical = dimensionResource(R.dimen.padding_small)
         )
         .verticalScroll(rememberScrollState())

@@ -24,12 +24,9 @@ class BookmarkViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
-            val incubatorList = incubatorRepository.getIncubatorList(id)
+//            val incubatorList = incubatorRepository.getIncubatorList(id)
         }
     }
-
-
-
 
 
 }

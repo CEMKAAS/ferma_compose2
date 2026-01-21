@@ -166,11 +166,12 @@ fun IconText(
     number: String,
     colorBackground: Color,
     colorText: Color,
+    sizeCard: Dp = 24.dp,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
-            .size(24.dp)
+            .size(sizeCard)
             .background(color = colorBackground, shape = RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {

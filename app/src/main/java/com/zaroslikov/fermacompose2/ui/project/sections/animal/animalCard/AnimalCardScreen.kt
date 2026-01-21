@@ -111,14 +111,14 @@ fun AnimalCardProduct(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-        TopAppBarStart(
-            title = stringResource(R.string.animal_card_screen_animal_card),
-            true,
-            navigateUp = navigateBack,
-            settingUp = { onNavigateSetting(state.itemIdPT to state.itemId) },
-            scrollBehavior = scrollBehavior
-        )
-    }) { innerPadding ->
+            TopAppBarStart(
+                title = stringResource(R.string.animal_card_screen_animal_card),
+                true,
+                navigateUp = navigateBack,
+                settingUp = { onNavigateSetting(state.itemIdPT to state.itemId) },
+                scrollBehavior = scrollBehavior
+            )
+        }) { innerPadding ->
         if (state.isLoading)
             CircularProgress(
                 modifier = Modifier.padding(innerPadding),
@@ -164,7 +164,7 @@ fun AnimalCardContainer(
             onNavigateWeight = onNavigateWeight,
             onNavigateVaccination = onNavigateVaccination
         )
-        NoteWidget(state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
+        NoteWidget(note =state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
         PullOutCardNew(
             icon = R.drawable.baseline_analytics_24,
             intRes = R.string.animal_card_screen_animal_card_product,
@@ -397,13 +397,14 @@ private fun DataCardTwo(
 
 
 @Composable
-private fun NoteWidget(
+fun NoteWidget(
+    @StringRes intRes: Int = R.string.outlined_text_note,
     note: String,
     updateNote: (String) -> Unit
 ) {
     SecondAnimalCard(
         icon = R.drawable.baseline_sticky_note_2_24,
-        intRes = R.string.outlined_text_note,
+        intRes = intRes,
     ) {
         OutlinedTextNoteNew(
             value = note,

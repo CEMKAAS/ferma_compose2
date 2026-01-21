@@ -351,10 +351,31 @@
     <string name="add_incubator_screen_auto_ventilation">Автопроветривание</string>
     <string name="add_incubator_screen_auto_ventilation_support">Автоматическая система вентиляции</string>
 
+    //EntryBookmark
+    <string name="entry_bookmark_title">Название закладки</string>
+    <string name="entry_bookmark_type">Тип яиц</string>
+    <string name="entry_bookmark_count_egg">Количество яиц</string>
+    <string name="entry_bookmark_data">Дата закладки</string>
+    <string name="entry_bookmark_time">Время закладки</string>
+    <string name="entry_bookmark_price_egg">Цена за яйцо</string>
+    <string name="entry_bookmark_title_support">Например: Закладка №1</string>
+    <string name="entry_bookmark_price_support">100</string>
+    <string name="entry_bookmark_day_tooltip">День</string>
+    <string name="entry_bookmark_temp_tooltip">Температура (°C)</string>
+    <string name="entry_bookmark_damp_tooltip">Влажность (%)</string>
+    <string name="entry_bookmark_over_tooltip">Перевороты (раз в день)</string>
+    <string name="entry_bookmark_airing_tooltip">Проветривание (мин)</string>
+    <string name="entry_bookmark_warning_title">Внимание</string>
+    <string name="entry_bookmark_warning_text">Значения в таблице являются ориентировочными. Корректируйте её по своему усмотрению, в будущем значения могут быть изменены.</string>
+    <string name="entry_bookmark_information">Информация</string>
+    <string name="entry_bookmark_parameters_for_day">Параметры по дням</string>
+    <string name="entry_bookmark_notification">Напоминание</string>
+
     //BookmarkScreen
     <string name="book_mark_screen_day_incubator">День инкубации</string>
     <string name="book_mark_screen_progress">Прогресс</string>
     <string name="bookmark_screen_current_parametrs_s">Текущие параметры (День %s)</string>
+    <string name="bookmark_screen_current_note">Заметка на текущий день</string>
     <string name="bookmark_screen_current_temp">Температура</string>
     <string name="bookmark_screen_current_damp">Влажность</string>
     <string name="bookmark_screen_current_over">Переворот</string>

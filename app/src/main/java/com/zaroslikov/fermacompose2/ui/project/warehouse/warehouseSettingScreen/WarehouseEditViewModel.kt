@@ -128,7 +128,7 @@ class WarehouseEditViewModel @Inject constructor(
             time1 = this.currentProject.time1,
             time2 = this.currentProject.time2,
             time3 = this.currentProject.time3,
-            mode = 1,
+            mode = 0,
             imageData = this.currentProject.imageData
         )
     }

@@ -50,6 +50,7 @@ fun InventoryNavHost(
                 navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it}") },
                 navigateToProject = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToIncubator = { navController.navigate("${AddIncubatorDestination.route}/${it}") },
+                navigateToItemIncubator = { navController.navigate("${MainIncubatorDestination.route}/${it}") },
                 /*                navigateToItemIncubatorArh = {
                //                    navController.navigate("${IncubatorArhivDestination.route}/${it}")
                                },
@@ -81,8 +82,6 @@ fun InventoryNavHost(
             val itemId = backStackEntry.arguments!!.getLong(MainIncubatorDestination.itemIdArg)
             MainIncubatorScreen(itemId)
         }
-
-
 
         composable(route = ProjectAddDestination.route) {
             AddProject(

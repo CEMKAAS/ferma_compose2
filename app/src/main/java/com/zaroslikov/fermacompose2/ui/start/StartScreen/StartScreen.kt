@@ -74,10 +74,11 @@ object StartDestination : NavigationDestination {
 @Composable
 fun StartScreen(
     navigateToItemProject: (Long) -> Unit,
+    navigateToItemIncubator: (Long) -> Unit,
     navigateToProject: (Long) -> Unit,
+    navigateToIncubator: (Long) -> Unit,
     navigateToAboutApp: () -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToIncubator: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StartScreenViewModel = hiltViewModel(),
 ) {
@@ -166,6 +167,7 @@ fun StartScreen(
                     onArchiveClick = { viewModel.onIntent(StartScreenIntent.ArchiveClicked(it)) },
                     onDeleteClick = { viewModel.onIntent(StartScreenIntent.DeleteClicked(it)) },
                     onNavigationProject = { navigateToItemProject(it) },
+                    onNavigationIncubator = { navigateToItemIncubator(it) }
                 )
 
             if (showBottomSheet)
@@ -186,7 +188,8 @@ private fun StartScreenContainer2(
     onEditClick: (Long) -> Unit,
     onDeleteClick: (DomainProjectTable) -> Unit,
     onArchiveClick: (DomainProjectTable) -> Unit,
-    onNavigationProject: (Long) -> Unit
+    onNavigationProject: (Long) -> Unit,
+    onNavigationIncubator: (Long) -> Unit
 ) {
     InventoryBody(
         modifier = modifier,
@@ -204,7 +207,10 @@ private fun StartScreenContainer2(
                 onEditClick = { onEditClick(item.id) },
                 onDeleteClick = { onDeleteClick(item) },
                 onArchiveClick = { onArchiveClick(item) },
-                onNavigationProject = { onNavigationProject(item.id) }
+                onNavigationProject = {
+                    if (item.mode == 0) onNavigationProject(item.id)
+                    else onNavigationIncubator(item.id)
+                }
             )
         },
         brieflyCard = {},

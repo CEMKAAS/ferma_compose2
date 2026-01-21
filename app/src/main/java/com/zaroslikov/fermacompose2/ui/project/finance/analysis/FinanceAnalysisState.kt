@@ -112,10 +112,10 @@ enum class FinanceAnalysisEnum(
     val colorBackground: Color,
     val iconBackground: Color,
     val textColor: Color,
-    @DrawableRes val icon: Int,
-    @StringRes val title: Int,
-    @StringRes val titleButton: Int,
-    @StringRes val titleChar: Int,
+    @param:DrawableRes val icon: Int,
+    @param:StringRes val title: Int,
+    @param:StringRes val titleButton: Int,
+    @param:StringRes val titleChar: Int,
     val sign: String,
     val colorTextPercent: Color
 ) {
