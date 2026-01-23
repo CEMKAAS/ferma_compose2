@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -43,6 +46,9 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.gray_4
+import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_3
+import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.white
 
 @Composable
@@ -379,5 +385,43 @@ fun ButtonForGroupButtons(
                 }
                 .padding(vertical = 8.dp, horizontal = 10.dp)
         )
+    }
+}
+
+@Composable
+fun OutlineIconButtonNew(
+    enabled: Boolean,
+    isEntry: Boolean,
+    onClick: () -> Unit
+) {
+    OutlinedButton(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(
+            2.dp,
+            if (enabled) green_3 else grey
+        ),
+        enabled = enabled,
+        onClick = onClick
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                if (isEntry) Icons.Default.Add else Icons.Default.Edit,
+                contentDescription = null,
+                tint = if (enabled) green_2 else grey,
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                stringResource(
+                    if (isEntry) R.string.button_text_add_title
+                    else R.string.button_text_edit_title
+                ),
+                style = text_14,
+                color = if (enabled) green_2 else grey
+            )
+        }
     }
 }

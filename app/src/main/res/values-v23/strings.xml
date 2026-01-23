@@ -41,6 +41,7 @@
     <string name="outlined_text_field_quantity">Количество</string>
     <string name="outlined_text_field_category">Категория</string>
     <string name="outlined_text_date">Дата</string>
+    <string name="outlined_text_notification">Напоминание</string>
     <string name="outlined_text_animals">Животное</string>
     <string name="outlined_text_note">Примечание</string>
     <string name="outlined_text_reason">Причина</string>
@@ -242,6 +243,7 @@
     <string name="support_text_count_warehouse_s">Сейчас на складе:</string>
     <string name="support_text_category">Укажите или выберите категорию, к которой относится данный товар</string>
     <string name="support_text_date">Выберите дату</string>
+    <string name="support_text_notification">Выберите уведомление</string>
     <string name="support_text_animal">Выберите животное, которое дало вам продукцию</string>
     <string name="support_text_note">Здесь может содержаться важная информация</string>
     <string name="support_text_buyer">Укажите или выберите имя клиента.</string>
@@ -354,6 +356,7 @@
     //EntryBookmark
     <string name="entry_bookmark_title">Название закладки</string>
     <string name="entry_bookmark_type">Тип яиц</string>
+    <string name="entry_bookmark_breed">Порода</string>
     <string name="entry_bookmark_count_egg">Количество яиц</string>
     <string name="entry_bookmark_data">Дата закладки</string>
     <string name="entry_bookmark_time">Время закладки</string>

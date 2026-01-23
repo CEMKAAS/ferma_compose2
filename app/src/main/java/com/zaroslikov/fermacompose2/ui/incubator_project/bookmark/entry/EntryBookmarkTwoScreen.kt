@@ -198,3 +198,1483 @@ private fun IconToggle(
         }
     }
 }
+
+fun setIncubator(typeIncubator: String): MutableList<Incubator> {
+//    val incubator: MutableList<Incubator> = mutableListOf()
+//    when (typeIncubator) {
+//        "Курицы" -> {
+//            incubator.add(
+//                Incubator(
+//                    day = 1,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 минут",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 2,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 минут",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 3,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 минут",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 4,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 минут",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 5,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 минут",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 6,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 7,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 8,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 9,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 10,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 11,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 12,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 13,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 14,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 15,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 16,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 17,
+//                    temp = "37.3",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 18,
+//                    temp = "37.3",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 19,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "нет",
+//                    airing = "2 раза по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 20,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "нет",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 21,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "нет",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            return incubator
+//        }
+//
+//        "Гуси" -> {
+//            incubator.add(
+//                Incubator(
+//                    day = 1,
+//                    temp = "38.0",
+//                    damp = "65",
+//                    over = "3-4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 2,
+//                    temp = "37.8",
+//                    damp = "65",
+//                    over = "6",
+//                    airing = "1 раз по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 3,
+//                    temp = "37.8",
+//                    damp = "65",
+//                    over = "6",
+//                    airing = "1 раз по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 4,
+//                    temp = "37.6",
+//                    damp = "70",
+//                    over = "6",
+//                    airing = "1 раз по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 5,
+//                    temp = "37.6",
+//                    damp = "70",
+//                    over = "6",
+//                    airing = "1 раз по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 6,
+//                    temp = "37.6",
+//                    damp = "70",
+//                    over = "6",
+//                    airing = "2 раза по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 7,
+//                    temp = "37.6",
+//                    damp = "70",
+//                    over = "6",
+//                    airing = "2 раза по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 8,
+//                    temp = "37.6",
+//                    damp = "70",
+//                    over = "6",
+//                    airing = "2 раза по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 9,
+//                    temp = "37.6",
+//                    damp = "70",
+//                    over = "10",
+//                    airing = "2 раз по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 10,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 11,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 12,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 13,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 14,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 15,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 16,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 17,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 18,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 19,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 20,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 21,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 22,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 23,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 24,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 25,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 26,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 27,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "10",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 28,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "нет",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 29,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "нет",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 30,
+//                    temp = "37.3",
+//                    damp = "75",
+//                    over = "нет",
+//                    airing = "3 раза по 45 мин",
+//                    idPT = 0
+//                )
+//            )
+//            return incubator
+//        }
+//
+//
+//        "Перепела" -> {
+//            incubator.add(
+//                Incubator(
+//                    day = 1,
+//                    temp = "38.0",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 2,
+//                    temp = "38.0",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 3,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 4,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 5,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 6,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 7,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 8,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 9,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 10,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 11,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 12,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 13,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 14,
+//                    temp = "37.7",
+//                    damp = "55",
+//                    over = "3-6",
+//                    airing = "1 раз по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 15,
+//                    temp = "37.5",
+//                    damp = "37,5",
+//                    over = "3-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 16,
+//                    temp = "37.5",
+//                    damp = "37,5",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 17,
+//                    temp = "37.5",
+//                    damp = "37,5",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            return incubator
+//        }
+//
+//        "Индюки" -> {
+//            incubator.add(
+//                Incubator(
+//                    day = 1,
+//                    temp = "38.0",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 2,
+//                    temp = "38.0",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 3,
+//                    temp = "38.0",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 4,
+//                    temp = "38.0",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 5,
+//                    temp = "38.0",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 6,
+//                    temp = "38.0",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 7,
+//                    temp = "38.0",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 8,
+//                    temp = "37.7",
+//                    damp = "45",
+//                    over = "6",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 9,
+//                    temp = "37.7",
+//                    damp = "45",
+//                    over = "6",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 10,
+//                    temp = "37.7",
+//                    damp = "45",
+//                    over = "6",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 11,
+//                    temp = "37.7",
+//                    damp = "45",
+//                    over = "6",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 12,
+//                    temp = "37.7",
+//                    damp = "45",
+//                    over = "6",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 13,
+//                    temp = "37.7",
+//                    damp = "45",
+//                    over = "6",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 14,
+//                    temp = "37.7",
+//                    damp = "65",
+//                    over = "6",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 15,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 16,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 17,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 18,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 19,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 20,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 21,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 22,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 23,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 24,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 25,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "4",
+//                    airing = "4 раза по 10 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 26,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 27,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 28,
+//                    temp = "37.5",
+//                    damp = "65",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            return incubator
+//        }
+//
+//        "Утки" -> {
+//            incubator.add(
+//                Incubator(
+//                    day = 1,
+//                    temp = "38.0",
+//                    damp = "75",
+//                    over = "4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 2,
+//                    temp = "38.0",
+//                    damp = "75",
+//                    over = "4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 3,
+//                    temp = "38.0",
+//                    damp = "75",
+//                    over = "4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 4,
+//                    temp = "38.0",
+//                    damp = "75",
+//                    over = "4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 5,
+//                    temp = "38.0",
+//                    damp = "75",
+//                    over = "4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 6,
+//                    temp = "38.0",
+//                    damp = "75",
+//                    over = "4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 7,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 8,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 9,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 10,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 11,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 12,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 13,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 14,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "4-6",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 15,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 16,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 17,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 18,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 19,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 20,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 21,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 22,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 23,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 24,
+//                    temp = "37.8",
+//                    damp = "60",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 25,
+//                    temp = "37.5",
+//                    damp = "90",
+//                    over = "6",
+//                    airing = "2 раза по 15 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 26,
+//                    temp = "37.5",
+//                    damp = "90",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 27,
+//                    temp = "37.5",
+//                    damp = "90",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 28,
+//                    temp = "37.5",
+//                    damp = "90",
+//                    over = "нет",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            return incubator
+//        }
+//
+//        else -> {
+//            incubator.add(
+//                Incubator(
+//                    day = 1,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 2,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 3,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 4,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 5,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 6,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 7,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 8,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 9,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 10,
+//                    temp = "37.9",
+//                    damp = "66",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 11,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "нет",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 12,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 13,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 14,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 15,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 16,
+//                    temp = "37.5",
+//                    damp = "60",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 17,
+//                    temp = "37.3",
+//                    damp = "47",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 18,
+//                    temp = "37.3",
+//                    damp = "47",
+//                    over = "2-3",
+//                    airing = "2 раза по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 19,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "2-3",
+//                    airing = "2 раза по 20 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 20,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            incubator.add(
+//                Incubator(
+//                    day = 21,
+//                    temp = "37.0",
+//                    damp = "70",
+//                    over = "2-3",
+//                    airing = "2 раза по 5 мин",
+//                    idPT = 0
+//                )
+//            )
+//            return incubator
+//        }
+//    }
+//}

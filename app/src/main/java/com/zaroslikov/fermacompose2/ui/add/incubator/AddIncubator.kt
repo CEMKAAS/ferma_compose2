@@ -456,7 +456,7 @@ import com.zaroslikov.fermacompose2.ui.formatterTime
 //}
 //
 //
-@Composable
+/*@Composable
 fun TimeOutlinedTextField(
     time: String,
     count: Int,
@@ -504,6 +504,40 @@ fun TimeOutlinedTextField(
     }
 }
 
+@Composable
+fun TimeOutlinedTextFieldNew(
+    time: String,
+    showDialog: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = time,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Уведомление $count") },
+            supportingText = {
+                Text("Укажите время для уведомления $count")
+            },
+            trailingIcon = {
+                IconButton(onClick = showDialog) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_access_time_24),
+                        contentDescription = "Показать меню"
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth(if (countTime.intValue < count + 1) 0.9f else 1f)
+                .clickable { showDialog() }
+                .padding(bottom = 2.dp)
+        )
+    }
+}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

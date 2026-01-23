@@ -25,6 +25,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -64,6 +66,7 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.MinDateSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.add.incubator.TimePicker
 import com.zaroslikov.fermacompose2.ui.elements.AutoCalculateCheckbox
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.text_14
@@ -480,6 +483,45 @@ fun OutlinedTextDateNew(
     ) { textField() }
     else textField()
 }
+
+
+@Composable
+fun TimeOutlinedTextFieldNew(
+    time: String,
+    onValueChange: (String) -> Unit,
+    @StringRes intRes: Int = R.string.outlined_text_notification,
+    @StringRes intResSup: Int = R.string.support_text_notification,
+    drawableRes: Int = R.drawable.baseline_access_time_24,
+    enable: Boolean = true,
+    isBorderCard: Boolean = true,
+) {
+    var openDialog by remember { mutableStateOf(false) }
+
+    if (openDialog)
+        TimePicker(
+            time = time,
+            showDialog = {
+                onValueChange(it)
+                openDialog = !openDialog
+            })
+
+    val textField: @Composable () -> Unit = {
+        BaseOutlinedTextNew(
+            modifier = Modifier.clickable(onClick = { openDialog = !openDialog }),
+            value = time,
+            onValueChange = { openDialog = !openDialog },
+            readOnly = true,
+            enable = enable,
+            labelIntRes = intRes,
+            intResSup = intResSup,
+            leadingIconRes = drawableRes,
+            leadingIconClick = { openDialog = !openDialog }
+        )
+    }
+    if (isBorderCard) BorderCard(onClick = { openDialog = !openDialog }) { textField() }
+    else textField()
+}
+
 
 @Composable
 fun OutlinedTextCategoryNew(

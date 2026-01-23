@@ -18,6 +18,7 @@ data class EntryBookmarkState(
 data class EntryBookmark(
     val title: String = "",
     val type: String = "",
+    val breed: String = "",
     val countEgg: String = "",
     val date: String = dateToday(),
     val time: String = "",
