@@ -8,6 +8,7 @@ import com.zaroslikov.data.room.dao.AnimalDao
 import com.zaroslikov.data.room.dao.AnimalSizeDao
 import com.zaroslikov.data.room.dao.AnimalVaccinationDao
 import com.zaroslikov.data.room.dao.AnimalWeightDao
+import com.zaroslikov.data.room.dao.BookmarkDao
 import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.dao.ExpensesDao
 import com.zaroslikov.data.room.dao.FinanceDao
@@ -151,6 +152,12 @@ object DatabaseModule {
     @Singleton
     fun provideIncubatorTableDao(database: AppDatabase): IncubatorTableDao {
         return database.incubatorTableDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideBookmarkTableDao(database: AppDatabase): BookmarkDao {
+        return database.bookmarkTableDao()
     }
 
 }

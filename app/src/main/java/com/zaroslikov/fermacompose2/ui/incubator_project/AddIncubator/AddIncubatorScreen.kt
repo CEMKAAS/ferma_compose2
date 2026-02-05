@@ -224,7 +224,7 @@ private fun EnterValue(
 
 
 @Composable
-private fun FunctionIncubatorCard(
+fun FunctionIncubatorCard(
     isAutoRotation: Boolean,
     isAutoVentilation: Boolean,
     onAutoRotationCheckedChange: (Boolean) -> Unit,

@@ -11,7 +11,7 @@ import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
-import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseSettingScreen.WarehouseEditState
+import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -116,20 +116,20 @@ class WarehouseEditViewModel @Inject constructor(
     private fun WarehouseEditState.toDomainProjectTable(id: Long? = null): DomainProjectTable {
         return DomainProjectTable(
             id = id ?: 0,
-            titleProject = this.currentProject.titleProject,
-            type = this.currentProject.type,
-            data = this.currentProject.data,
-            eggAll = this.currentProject.eggAll,
-            eggAllEND = this.currentProject.eggAllEND,
-            airing = this.currentProject.airing,
-            over = this.currentProject.over,
-            arhive = this.currentProject.arhive,
-            dateEnd = this.currentProject.dateEnd,
-            time1 = this.currentProject.time1,
-            time2 = this.currentProject.time2,
-            time3 = this.currentProject.time3,
+            titleProject = currentProject.titleProject,
+            type = currentProject.type,
+            data = currentProject.data,
+            eggAll = currentProject.eggAll,
+            eggAllEND =currentProject.eggAllEND,
+            airing = currentProject.airing,
+            over = currentProject.over,
+            arhive = currentProject.arhive,
+            dateEnd = currentProject.dateEnd,
+            time1 = currentProject.time1,
+            time2 = currentProject.time2,
+            time3 = currentProject.time3,
             mode = 0,
-            imageData = this.currentProject.imageData
+            imageData = currentProject.imageData
         )
     }
 

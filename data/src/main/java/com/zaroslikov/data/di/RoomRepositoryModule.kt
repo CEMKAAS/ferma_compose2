@@ -6,6 +6,7 @@ import com.zaroslikov.data.room.repository.AnimalRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalSizeRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalVaccinationRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalWeightRepositoryImpl
+import com.zaroslikov.data.room.repository.BookmarkRepositoryImpl
 import com.zaroslikov.data.room.repository.ExpensesAnimalRepositoryImpl
 import com.zaroslikov.data.room.repository.ExpensesRepositoryImpl
 import com.zaroslikov.data.room.repository.FinanceRepositoryImpl
@@ -23,6 +24,7 @@ import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
+import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.FinanceRepository
@@ -111,4 +113,8 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindIncubatorTableRepository(incubatorTableRepositoryImpl: IncubatorTableRepositoryImpl): IncubatorTableRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBookmarkTableRepository(bookmarkRepositoryImpl: BookmarkRepositoryImpl): BookmarkRepository
 }

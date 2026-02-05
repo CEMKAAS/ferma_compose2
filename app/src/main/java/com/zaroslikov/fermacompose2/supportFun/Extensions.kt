@@ -7,6 +7,7 @@ import com.zaroslikov.fermacompose2.ui.formatNumber
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.Period
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -26,6 +27,10 @@ fun String.toConvertDb(): String {
 
 fun String.toConvertDbDouble(): Double {
     return this.replace(",", ".").replace(Regex("[^\\d.]"), "").trim().toDouble()
+}
+
+fun String.toConvertDbInt(): Int {
+    return this.replace(Regex("[^\\d.]"), "").trim().toInt()
 }
 
 fun String.toConvertDbOnlyInt(): Int {
@@ -91,6 +96,11 @@ fun calculatePriceAll(price: String, count: String): String {
     return (price.toConvertZeroString().toConvertDbDouble() * count.toConvertZeroString()
         .toConvertDbDouble()).formatNumber()
 }
+
+//Time
+
+fun currentTime(): String =
+    LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()))
 
 //Date
 //Выдает сегодняшнюю датуVersionToImage в формате dd.MM.yyyy"

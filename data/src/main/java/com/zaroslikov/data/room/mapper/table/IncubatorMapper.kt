@@ -1,6 +1,6 @@
 package com.zaroslikov.data.room.mapper.table
 
-import com.zaroslikov.data.room.table.ferma.Incubator
+import com.zaroslikov.data.room.table.incubator.Incubator
 import com.zaroslikov.domain.models.table.DomainIncubator
 
 fun Incubator.toDomainIncubator(): DomainIncubator {
@@ -11,6 +11,11 @@ fun Incubator.toDomainIncubator(): DomainIncubator {
         damp = this.damp,
         over = this.over,
         airing = this.airing,
+        tempFact = this.tempFact,
+        dampFact = this.dampFact,
+        overFact = this.overFact,
+        airingFact = this.airingFact,
+        note = this.note,
         idPT = this.idPT,
     )
 }
@@ -18,11 +23,16 @@ fun Incubator.toDomainIncubator(): DomainIncubator {
 fun DomainIncubator.toIncubator(): Incubator {
     return Incubator(
         id = this.id,
-        airing = this.airing,
         day = this.day,
-        damp = this.damp,
-        idPT = this.idPT,
         temp = this.temp,
+        damp = this.damp,
         over = this.over,
+        airing = this.airing,
+        tempFact = this.tempFact,
+        dampFact = this.dampFact,
+        overFact = this.overFact,
+        airingFact = this.airingFact,
+        note = this.note,
+        idPT = this.idPT
     )
 }

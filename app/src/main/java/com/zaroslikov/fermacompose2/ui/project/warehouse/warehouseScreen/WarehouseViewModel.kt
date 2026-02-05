@@ -89,7 +89,7 @@ class WarehouseViewModel @Inject constructor(
                     month = dateList[1].toInt(),
                     year = dateList[2].toInt(),
                     price = 0.0,
-                    category = domain.category ?: "TODO()",
+                    category = domain.category ?: "TODO()", //FIXME
                     animalId = domain.idAnimal,
                     note = "TODO()", //TODO
                     idPT = itemId

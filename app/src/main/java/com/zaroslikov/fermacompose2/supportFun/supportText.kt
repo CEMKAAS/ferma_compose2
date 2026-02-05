@@ -5,6 +5,7 @@ import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator.*
@@ -153,5 +154,15 @@ fun FilterDate.toResId(): Int {
         FilterDate.YEAR -> R.string.filter_date_year
         FilterDate.ALL_TIME -> R.string.filter_date_all_time
         FilterDate.PERIOD -> R.string.filter_date_period
+    }
+}
+
+fun TypeEgg.toResId(): Int {
+    return when (this) {
+        TypeEgg.CHICKENS -> R.string.type_egg_chickens
+        TypeEgg.GEESE -> R.string.type_egg_geese
+        TypeEgg.QUAILS -> R.string.type_egg_quails
+        TypeEgg.TURKEYS -> R.string.type_egg_turkeys
+        TypeEgg.DUCKS -> R.string.type_egg_ducks
     }
 }

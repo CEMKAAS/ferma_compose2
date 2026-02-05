@@ -46,9 +46,11 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.gray_4
+import com.zaroslikov.fermacompose2.gray_8
 import com.zaroslikov.fermacompose2.green_2
 import com.zaroslikov.fermacompose2.green_3
 import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.white
 
 @Composable
@@ -192,8 +194,10 @@ fun GradientButton(
     colors: List<Color>,
     text: String,
     @DrawableRes iconRes: Int? = null,
-    enable: Boolean,
+    isShadow: Boolean = false,
+    enable: Boolean = false,
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    shape: RoundedCornerShape = RoundedCornerShape(14.dp),
     onClick: () -> Unit,
 ) {
     val gradient = Brush.linearGradient(
@@ -205,7 +209,10 @@ fun GradientButton(
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
+            .then(
+                if (isShadow) Modifier.shadow(5.dp, shape = shape) else Modifier
+            )
+            .clip(shape)
             .background(brush = gradient, alpha = alpha)
             .then(
                 if (enable) Modifier else Modifier.clickable(onClick = onClick)
@@ -220,13 +227,61 @@ fun GradientButton(
                 Icon(
                     painterResource(it),
                     contentDescription = null,
-                    tint = Color.White
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
                 )
             }
             Text(
                 modifier = Modifier.padding(paddingValues),
                 text = text,
                 color = Color.White,
+                style = text_14
+            )
+        }
+    }
+}
+
+@Composable
+fun BorderButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    @DrawableRes iconRes: Int? = null,
+    enable: Boolean = false,
+    backgroundColor: Color = white,
+    borderColor: Color = gray_8,
+    textColor: Color = black,
+    iconColor: Color = white,
+    iconSize: Dp = 16.dp,
+    paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    shape: RoundedCornerShape = RoundedCornerShape(14.dp),
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .clip(shape)
+            .border(1.dp, color = borderColor, shape = shape)
+            .background(color = backgroundColor, shape = shape)
+            .then(
+                if (enable) Modifier else Modifier.clickable(onClick = onClick)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier.padding(paddingValues),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            iconRes?.let {
+                Icon(
+                    painterResource(it),
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(iconSize)
+                )
+            }
+            Text(
+                text = text,
+                color = textColor,
                 style = text_14
             )
         }
@@ -309,6 +364,61 @@ fun BigBorderButton(
 }
 
 @Composable
+fun BigButton(
+    modifier: Modifier = Modifier,
+    shape: RoundedCornerShape = RoundedCornerShape(14.dp),
+    borderStroke: BorderStroke? = null,
+    backgroundColors: List<Color> = listOf(white, white),
+    @DrawableRes icon: Int? = null,
+    @StringRes text: Int,
+    textColor: Color = black,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    val gradient = Brush.linearGradient(
+        colors = backgroundColors,
+        start = Offset(0f, 0f),
+        end = Offset(300f, 0f)
+    )
+    val alpha = if (enabled) 1f else 0.5f
+    Box(
+        modifier = modifier
+            .clip(shape)
+            .background(brush = gradient, alpha = alpha)
+            .then(
+                if (borderStroke != null)
+                    Modifier.border(borderStroke, shape)
+                else Modifier
+            )
+            .then(
+                if (enabled) Modifier.clickable(onClick = onClick) else Modifier
+            )
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier.padding(vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            icon?.let {
+                Icon(
+                    painterResource(icon),
+                    contentDescription = null,
+                    tint = textColor,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            Text(
+                text = stringResource(text),
+                color = textColor,
+                style = text_14
+            )
+        }
+    }
+}
+
+@Composable
 fun BorderShowAllButton(
     modifier: Modifier = Modifier,
     listSize: Int,
@@ -362,7 +472,7 @@ fun ButtonForGroupButtons(
     @StringRes text: Int,
     backgroundColor: Color,
     textColor: Color,
-    shadowElevation: Dp,
+    shadowElevation: Dp = 0.dp,
     onClick: () -> Unit
 ) {
     Surface(
@@ -392,6 +502,7 @@ fun ButtonForGroupButtons(
 fun OutlineIconButtonNew(
     enabled: Boolean,
     isEntry: Boolean,
+    @StringRes intRes: Int,
     onClick: () -> Unit
 ) {
     OutlinedButton(
@@ -416,11 +527,46 @@ fun OutlineIconButtonNew(
             )
             Text(
                 stringResource(
-                    if (isEntry) R.string.button_text_add_title
+                    if (isEntry) intRes
                     else R.string.button_text_edit_title
                 ),
                 style = text_14,
                 color = if (enabled) green_2 else grey
+            )
+        }
+    }
+}
+
+@Composable
+fun OutlineIconButton(
+    modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int,
+    @StringRes intRes: Int,
+    onClick: () -> Unit
+) {
+    OutlinedButton(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(
+            1.dp,
+            gray_8
+        ),
+        onClick = onClick
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(13.dp)
+        ) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                tint = marengo,
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                stringResource(intRes),
+                style = text_14,
+                color = marengo
             )
         }
     }

@@ -101,7 +101,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.dateBuilder
 import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
-import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseSettingScreen.WarehouseEditState
+import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
 import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_4
 import com.zaroslikov.fermacompose2.violet_5

@@ -14,8 +14,11 @@ interface IncubatorTableDao {
     @Query("SELECT * From incubator_table")
     fun getAllIncubator(): Flow<List<IncubatorTable>>
 
+    @Query("SELECT * FROM incubator_table WHERE idPT=:idPT")
+    fun getIncubatorByIdPT(idPT: Long): Flow<IncubatorTable>
+
     @Query("SELECT * FROM incubator_table WHERE id=:id")
-    fun getIncubator(id: Long): Flow<IncubatorTable>
+    fun getIncubatorById(id: Long): Flow<IncubatorTable>
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
     suspend fun insertIncubator(incubatorTable: IncubatorTable)

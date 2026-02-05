@@ -21,12 +21,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -52,6 +52,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_7
@@ -197,7 +198,9 @@ fun OutlinedNumberNew(
     onValueChange: (String) -> Unit,
     suffix: Suffix? = null,
     isError: Boolean = false,
-    drawableRes: Int? = null,
+    @DrawableRes drawableRes: Int? = null,
+    @DrawableRes drawableRes2: Int? = null,
+    drawableColor2: Color = Color(0xFF9A9A9A),
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
@@ -217,6 +220,8 @@ fun OutlinedNumberNew(
             intResSup = intResSup,
             intResError = intResError,
             keyboardOptions = keyboardOptions,
+            leadingIconRes2 = drawableRes2,
+            leadingIconColor2 = drawableColor2
             /*colorTextField = colorTextField*/
         )
     }
@@ -263,6 +268,53 @@ fun OutlinedTextDropdownMenuNew(
     } else textField()
 }
 
+@Composable
+fun OutlinedTextDropdownMenuTypeEgg(
+    value: TypeEgg,
+    onValueChange: (TypeEgg) -> Unit,
+    titleList: List<TypeEgg>,
+    enable: Boolean = true,
+    readOnly: Boolean = true,
+    isBorderCard: Boolean = true,
+    @DrawableRes leadingIconRes: Int? = null,
+    @StringRes labelIntRes: Int,
+    @StringRes intResSup: Int
+) {
+    val textField: @Composable () -> Unit = {
+        ExposedDropdownMenuEnum(
+            valueList = titleList,
+            dropdownMenuItem = { index, item, closeMenu ->
+                val trailingIcon: @Composable (() -> Unit)? = if (item == value) {
+                    { Icon(Icons.Default.Done, contentDescription = null) }
+                } else null
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(item.toResId())) },
+                    trailingIcon = trailingIcon,
+                    onClick = {
+                        onValueChange(item)
+                        closeMenu()
+                    }
+                )
+            }
+        ) {
+            BaseOutlinedTextNew(
+                modifier = it.first,
+                value = stringResource(value.toResId()),
+                onValueChange = { },
+                leadingIconRes = leadingIconRes,
+                isError = false,
+                labelIntRes = labelIntRes,
+                intResSup = intResSup,
+                keyboardOptions = keyboardOptionsNext(),
+                enable = enable,
+                readOnly = readOnly,
+            )
+        }
+    }
+    if (isBorderCard) BorderCard {
+        textField()
+    } else textField()
+}
 
 @Composable
 fun OutlinedTextAnimalNew(

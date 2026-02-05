@@ -49,6 +49,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.dark
 import com.zaroslikov.fermacompose2.gray_9
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
+import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 
@@ -134,28 +135,29 @@ fun BaseOutlinedTextNew(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            leadingIconRes?.let {
-                Icon(
-                    painter = painterResource(it), contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = Color(0xFF6A7282)
-                )
+        if (labelIntRes != null || leadingIconRes != null)
+            Row(
+                modifier = Modifier,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                leadingIconRes?.let {
+                    Icon(
+                        painter = painterResource(it), contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = Color(0xFF6A7282)
+                    )
+                }
+                labelIntRes?.let {
+                    Text(
+                        text = stringResource(it),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = text_16,
+                        color = dark
+                    )
+                }
             }
-            labelIntRes?.let {
-                Text(
-                    text = stringResource(it),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = text_16,
-                    color = dark
-                )
-            }
-        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -216,7 +218,8 @@ fun BaseOutlinedTextNew(
                                 innerTextField()
                             }
                         }
-                    }
+                    },
+                    keyboardOptions = keyboardOptions
                 )
                 // ИКОНКА: фиксированного размера, не будет ужиматься
                 when (isMore) {
@@ -301,10 +304,11 @@ fun BaseOutlinedTextNew3(
     onValueChange: (String) -> Unit,
     @StringRes intResSup: Int,
     singleLine: Boolean = true,
+    readOnly: Boolean = false,
     minLines: Int = 1,
     dividerColor: Color,
     focusManager: FocusManager = LocalFocusManager.current,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
 ) {
     // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
@@ -317,8 +321,9 @@ fun BaseOutlinedTextNew3(
             fontSize = 24.sp,
             lineHeight = 26.sp
         ),
-        cursorBrush = SolidColor(Color(0xFF007AFF)),
+        readOnly = readOnly,
         singleLine = singleLine,
+        keyboardOptions = keyboardOptions,
         decorationBox = { innerTextField ->
             Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {
                 if (value.isEmpty()) {
@@ -352,9 +357,10 @@ fun BaseOutlinedTextNew4(
     onValueChange: (String) -> Unit,
     @StringRes intResSup: Int,
     singleLine: Boolean = true,
+    readOnly: Boolean = false,
     minLines: Int = 1,
     focusManager: FocusManager = LocalFocusManager.current,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
 ) {
     // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
@@ -368,9 +374,9 @@ fun BaseOutlinedTextNew4(
             lineHeight = 26.sp,
             textAlign = TextAlign.Center
         ),
-        cursorBrush = SolidColor(Color(0xFF007AFF)),
+        readOnly = readOnly,
         singleLine = singleLine,
-        maxLines = 1,
+        maxLines = minLines,
         decorationBox = { innerTextField ->
             Box(contentAlignment = Alignment.Center) {
                 if (value.isEmpty()) {
@@ -385,6 +391,7 @@ fun BaseOutlinedTextNew4(
                     Column { innerTextField() }
                 }
             }
-        }
+        },
+        keyboardOptions = keyboardOptions
     )
 }

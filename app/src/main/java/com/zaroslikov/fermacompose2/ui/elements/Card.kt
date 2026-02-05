@@ -1056,7 +1056,7 @@ fun ProductKillCard(
     number: Int,
     name: String,
     value: String,
-    suffix: Suffix,
+    suffix: Suffix?,
     isEditMode: Boolean = false,
     onClick: () -> Unit,
     onDeleteClick: () -> Unit
@@ -1086,13 +1086,13 @@ fun ProductKillCard(
                 ) {
                     Text(name, style = text_14, color = black_1)
                     Text(
-                        "$value ${stringResource(suffix.toResId())}",
+                        "$value " +
+                                if (suffix != null) stringResource(suffix.toResId()) else "",
                         style = text_12,
                         color = green_shamrock
                     )
                 }
             }
-
             IconButton(
                 onClick = onDeleteClick,
             ) {
@@ -1280,5 +1280,52 @@ fun TextMiniCard(
             color = textColor,
             modifier = Modifier.padding(vertical = 2.dp, horizontal = 8.dp)
         )
+    }
+}
+
+@Composable
+fun InfoCard(
+    colorBackground: Color,
+    colorBorder: Color,
+    colorIcon: Color,
+    colorIconBackground: Color,
+    colorTitle: Color,
+    @DrawableRes icon: Int,
+    @StringRes title: Int,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colorBackground
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = colorBorder
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+//                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconTransaction2(
+                    icon = icon,
+                    color = colorIconBackground,
+                    colorIcon = colorIcon,
+                    sizeCard = 32.dp
+                )
+                Text(stringResource(title), style = text_14, color = colorTitle)
+            }
+            Column {
+                content()
+            }
+        }
     }
 }

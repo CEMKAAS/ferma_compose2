@@ -17,6 +17,7 @@ import com.zaroslikov.fermacompose2.gray_6
 
 @Composable
 fun GroupButton(
+    modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
     Card(
@@ -26,8 +27,7 @@ fun GroupButton(
         shape = RoundedCornerShape(10.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = modifier
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

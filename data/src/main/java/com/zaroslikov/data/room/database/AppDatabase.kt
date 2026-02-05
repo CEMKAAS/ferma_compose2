@@ -13,6 +13,7 @@ import com.zaroslikov.data.room.dao.AnimalDao
 import com.zaroslikov.data.room.dao.AnimalSizeDao
 import com.zaroslikov.data.room.dao.AnimalVaccinationDao
 import com.zaroslikov.data.room.dao.AnimalWeightDao
+import com.zaroslikov.data.room.dao.BookmarkDao
 import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.dao.ExpensesDao
 import com.zaroslikov.data.room.dao.FinanceDao
@@ -32,11 +33,12 @@ import com.zaroslikov.data.room.table.animal.AnimalWeightTable
 import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.data.room.table.ferma.ExpensesAnimalTable
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
-import com.zaroslikov.data.room.table.ferma.Incubator
+import com.zaroslikov.data.room.table.incubator.Incubator
 import com.zaroslikov.data.room.table.ferma.NoteTable
 import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
 import com.zaroslikov.data.room.table.project.SettingsTable
 
@@ -56,7 +58,8 @@ import com.zaroslikov.data.room.table.project.SettingsTable
         NoteTable::class,
         ExpensesAnimalTable::class,
         SettingsTable::class,
-        IncubatorTable::class
+        IncubatorTable::class,
+        BookmarkTable::class
     ],
     version = 4,
     exportSchema = false
@@ -85,6 +88,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun writeOffDao(): WriteOffDao
     abstract fun settingsDao(): SettingsDao
     abstract fun incubatorTableDao(): IncubatorTableDao
+    abstract fun bookmarkTableDao(): BookmarkDao
 
     companion object {
         @Volatile

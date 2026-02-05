@@ -16,8 +16,12 @@ class IncubatorTableRepositoryImpl @Inject constructor(private val incubatorTabl
             .map { it -> it.map { it.toDomainIncubatorTable() } }
     }
 
-    override fun getIncubator(id: Long): Flow<DomainIncubatorTable> {
-        return incubatorTableDao.getIncubator(id).map { it.toDomainIncubatorTable() }
+    override fun getIncubatorByIdPT(idPT: Long): Flow<DomainIncubatorTable> {
+        return incubatorTableDao.getIncubatorByIdPT(idPT).map { it.toDomainIncubatorTable() }
+    }
+
+    override fun getIncubatorById(id: Long): Flow<DomainIncubatorTable> {
+        return incubatorTableDao.getIncubatorById(id).map { it.toDomainIncubatorTable() }
     }
 
     override suspend fun insertIncubator(domainIncubatorTable: DomainIncubatorTable) {

@@ -33,7 +33,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Exp
 import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffDestination
-import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartDestination
+import com.zaroslikov.fermacompose2.ui.start.startScreen.StartDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

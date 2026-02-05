@@ -52,7 +52,7 @@ class AddIncubatorViewModel @Inject constructor(
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
             val project = projectRepository.getProject(itemId).first()
-            val settings = incubatorTableRepository.getIncubator(itemId).first()
+            val settings = incubatorTableRepository.getIncubatorById(itemId).first()
             val modelList = incubatorTableRepository.getModelIncubatorList().first()
             val brandList = incubatorTableRepository.getBrandIncubatorList().first()
             updateState {
@@ -270,7 +270,7 @@ class AddIncubatorViewModel @Inject constructor(
             model = model.ifBlank { null },
             brand = brand.ifBlank { null },
             capacity = capacity.toInt(),
-            price = price.toConvertDbDouble(),
+            price = if (price.isEmpty()) null else price.toConvertDbDouble(),
             note = note.trim(),
             isAutoRotation = isAutoRotation,
             isAutoVentilation = isAutoVentilation,

@@ -5,7 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface IncubatorTableRepository {
     fun getAllIncubator(): Flow<List<DomainIncubatorTable>>
-    fun getIncubator(id: Long): Flow<DomainIncubatorTable>
+    fun getIncubatorByIdPT(idPT: Long): Flow<DomainIncubatorTable>
+    fun getIncubatorById(id: Long): Flow<DomainIncubatorTable>
     suspend fun insertIncubator(domainIncubatorTable: DomainIncubatorTable)
     suspend fun insertIncubatorLong(domainIncubatorTable: DomainIncubatorTable): Long
     suspend fun updateIncubator(domainIncubatorTable: DomainIncubatorTable)

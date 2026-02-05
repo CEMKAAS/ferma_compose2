@@ -82,7 +82,7 @@ private fun ButtonPanel2(
 
 @Composable
 fun ButtonPanelNew(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     isEntry: Boolean,
     enable: Boolean,
     colors: List<Color>,

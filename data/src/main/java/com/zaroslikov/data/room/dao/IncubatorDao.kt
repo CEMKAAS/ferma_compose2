@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.zaroslikov.data.room.table.ferma.Incubator
+import com.zaroslikov.data.room.table.incubator.Incubator
 import kotlinx.coroutines.flow.Flow
 
 @Dao

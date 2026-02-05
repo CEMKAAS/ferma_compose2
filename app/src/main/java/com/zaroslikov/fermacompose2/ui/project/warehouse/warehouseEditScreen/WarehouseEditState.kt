@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseSettingScreen
+package com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen
 
 import androidx.compose.ui.graphics.ImageBitmap
 import com.zaroslikov.domain.models.table.DomainProjectTable

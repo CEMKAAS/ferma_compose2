@@ -660,11 +660,12 @@ private fun Chart(
                 .background(Color.White)
                 .padding(bottom = 20.dp)
         )
-        GroupButton {
+        GroupButton(
+            modifier = Modifier.fillMaxWidth()
+        ) {
             FinanceAnalysisEnum.entries.forEach {
                 val triple = if (it == charSelection) Triple(it.iconBackground, white, 1.dp)
                 else Triple(Color.Transparent, marengo, 0.dp)
-
                 ButtonForGroupButtons(
                     text = it.titleButton,
                     backgroundColor = triple.first,

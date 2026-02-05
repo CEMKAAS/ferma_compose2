@@ -17,8 +17,8 @@ import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubat
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorScreen
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectScreen
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
-import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartDestination
-import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartScreen
+import com.zaroslikov.fermacompose2.ui.start.startScreen.StartDestination
+import com.zaroslikov.fermacompose2.ui.start.startScreen.StartScreen
 import com.zaroslikov.fermacompose2.ui.start.aboutApp.AboutAppDestination
 import com.zaroslikov.fermacompose2.ui.start.aboutApp.AboutAppScreen
 import com.zaroslikov.fermacompose2.ui.start.settings.SettingsDestination
@@ -48,9 +48,9 @@ fun InventoryNavHost(
                 navigateToAboutApp = { navController.navigate(AboutAppDestination.route) },
                 navigateToSettings = { navController.navigate(SettingsDestination.route) },
                 navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it}") },
+                navigateToItemIncubator = { navController.navigate("${MainIncubatorDestination.route}/${it}") },
                 navigateToProject = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToIncubator = { navController.navigate("${AddIncubatorDestination.route}/${it}") },
-                navigateToItemIncubator = { navController.navigate("${MainIncubatorDestination.route}/${it}") },
                 /*                navigateToItemIncubatorArh = {
                //                    navController.navigate("${IncubatorArhivDestination.route}/${it}")
                                },

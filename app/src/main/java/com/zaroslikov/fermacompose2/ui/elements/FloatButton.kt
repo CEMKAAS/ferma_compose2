@@ -140,7 +140,7 @@ fun NeonGlowFab(
     colors: List<Color>,
     onClick: () -> Unit,
 ) {
-    val glowColor = Color(0xFF00A63E)
+    val glowColor = colors.first()
     val gradient = Brush.linearGradient(
         colors = colors,
         start = Offset(0f, 0f),

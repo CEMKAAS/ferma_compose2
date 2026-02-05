@@ -105,6 +105,7 @@
     <string name="button_edit">Редактировать</string>
     <string name="button_save">Сохранить</string>
     <string name="button_wrap">Свернуть</string>
+    <string name="button_сomplete">Завершить</string>
     <string name="button_add_message_no_data">Добавить Продукцию!</string>
     <string name="button_sale_message_no_data">Добавить Продажу!</string>
     <string name="button_expenses_message_no_data">Добавить Покупку!</string>
@@ -115,6 +116,7 @@
     <string name="button_sale_message_no_weight">Добавить Вес!</string>
     <string name="button_sale_message_no_height">Добавить Размер!</string>
     <string name="button_sale_message_no_count">Добавить Количество!</string>
+    <string name="button_by_default">По умолчанию</string>
 
     //DataPicker
     <string name="data_picker_ok">Принять</string>
@@ -140,7 +142,8 @@
     <string name="button_text_sale">Продать!</string>
     <string name="button_text_expenses">Купить!</string>
     <string name="button_text_add">Добавить!</string>
-    <string name="button_text_add_title">Добавить позию</string>
+    <string name="button_text_add_title">Добавить позицю</string>
+    <string name="button_text_add_notification">Добавить напоминание</string>
     <string name="button_text_edit_title">Сохранить изменения</string>
     <string name="button_text_cancel">Отмена</string>
     <string name="button_text_cancel_2">Отменить</string>
@@ -347,22 +350,31 @@
     <string name="add_incubator_screen_note">Описание</string>
     <string name="add_incubator_screen_note_support">Добавить описание или заметки…</string>
     <string name="add_incubator_screen_save">Создать инкубатор</string>
-    <string name="add_incubator_screen_function_incubator">Функции иникубатора</string>
+    <string name="add_incubator_screen_function_incubator">Функции инкубатора</string>
     <string name="add_incubator_screen_automatic_egg_rotation">Автопереворот яиц</string>
     <string name="add_incubator_screen_automatic_egg_rotation_support">Автоматический механизм переворота яиц</string>
     <string name="add_incubator_screen_auto_ventilation">Автопроветривание</string>
     <string name="add_incubator_screen_auto_ventilation_support">Автоматическая система вентиляции</string>
 
     //EntryBookmark
+    <string name="entry_bookmark_screen_add_title">Создание закладка</string>
+    <string name="entry_bookmark_screen_edit_title">Редактирование закладка</string>
     <string name="entry_bookmark_title">Название закладки</string>
     <string name="entry_bookmark_type">Тип яиц</string>
     <string name="entry_bookmark_breed">Порода</string>
+    <string name="entry_bookmark_support_breed">Укажите породу</string>
     <string name="entry_bookmark_count_egg">Количество яиц</string>
+    <string name="entry_bookmark_support_count_egg">Укажите кол-во яиц</string>
     <string name="entry_bookmark_data">Дата закладки</string>
     <string name="entry_bookmark_time">Время закладки</string>
+    <string name="entry_bookmark_time_notification">Время уведомления</string>
+    <string name="entry_bookmark_text_notification">Текст уведомления</string>
+    <string name="entry_bookmark_support_text_notification">Здесь можете указать текст уведомления</string>
     <string name="entry_bookmark_price_egg">Цена за яйцо</string>
     <string name="entry_bookmark_title_support">Например: Закладка №1</string>
     <string name="entry_bookmark_price_support">100</string>
+    <string name="entry_bookmark_templates_previous_bookmarks">Шаблоны из предыдущих закладок</string>
+    <string name="entry_bookmark_select_template">Выберите шаблон</string>
     <string name="entry_bookmark_day_tooltip">День</string>
     <string name="entry_bookmark_temp_tooltip">Температура (°C)</string>
     <string name="entry_bookmark_damp_tooltip">Влажность (%)</string>
@@ -373,6 +385,22 @@
     <string name="entry_bookmark_information">Информация</string>
     <string name="entry_bookmark_parameters_for_day">Параметры по дням</string>
     <string name="entry_bookmark_notification">Напоминание</string>
+    <string name="entry_bookmark_note">Заметки</string>
+    <string name="entry_bookmark_note_text">Здесь может содержаться важная информация о закладке</string>
+    <string name="entry_bookmark_not_specified">Не указано</string>
+    <string name="entry_bookmark_auto">Авто</string>
+    <string name="entry_bookmark_screen_save">Создать закладку</string>
+    <string name="entry_bookmark_completed_s">Завершена: %s</string>
+    <string name="entry_bookmark_fact">Факт</string>
+    <string name="entry_bookmark_plan">План</string>
+
+    //TypeEgg
+    <string name="type_egg_chickens">Курицы</string>
+    <string name="type_egg_geese">Гуси</string>
+    <string name="type_egg_quails">Перепела</string>
+    <string name="type_egg_turkeys">Индюки</string>
+    <string name="type_egg_ducks">Утки</string>
+
 
     //BookmarkScreen
     <string name="book_mark_screen_day_incubator">День инкубации</string>
@@ -383,6 +411,73 @@
     <string name="bookmark_screen_current_damp">Влажность</string>
     <string name="bookmark_screen_current_over">Переворот</string>
     <string name="bookmark_screen_current_airing">Проветривание</string>
+    <string name="bookmark_screen_current_standard">Норма: </string>
+    <string name="bookmark_screen_current_day_s">День %s</string>
+    <string name="bookmark_screen_current_day">Текущий день</string>
+    <string name="bookmark_screen_days_to_end">До завершения</string>
+    <string name="bookmark_screen_ovoscopy_day">Овоскопирование</string>
+    <string name="bookmark_screen_ovoscopy_day_today">Овоскопирование сегодня</string>
+    <string name="bookmark_screen_incubation_schedule_s">Расписание инкубации (%s день)</string>
+    <string name="bookmark_screen_сomplete_incubation">Завершить инкубацию</string>
+    <string name="bookmark_screen_early_completion_incubation">Досрочное завершение инкубации</string>
+    <string name="bookmark_screen_chicks_been_bred">Выведено птенцов</string>
+    <string name="bookmark_screen_support_count_chicks">Укажите кол-во птенцов</string>
+    <string name="bookmark_screen_where_add_chicks">Куда добавить птенцов?</string>
+    <string name="bookmark_screen_new_project">Новый проект</string>
+    <string name="bookmark_screen_existing_project">В существующий</string>
+    <string name="bookmark_screen_choice_project">Выберите проект</string>
+    <string name="bookmark_screen_s_eggs_laid">%s яиц заложено</string>
+    <string name="bookmark_screen_incubation_end_early">Инкубация завершается досрочно</string>
+    <string name="bookmark_screen_reason_incubation_end_early">Причина досрочного завершения</string>
+    <string name="bookmark_screen_reason_sup_incubation_end_early">Опишите причину завершения инкубации раньше срока</string>
+    <string name="bookmark_screen_plan_parameters">Плановые значения</string>
+    <string name="bookmark_screen_input_fact_parameters">Введите фактические значения</string>
+    <string name="bookmark_screen_fact_parameters_s">Фактические данные - День %s</string>
+    <string name="bookmark_screen_schedule">Расписание</string>
+    <string name="bookmark_screen_tomorrow_days_s">Завтра (День %s)</string>
+
+
+    //BookmarkScreen - Ovospopy
+    <string name="bookmark_screen_first_ovoscopy_title">Первое овоскопирование (День %s)</string>
+    <string name="bookmark_screen_second_ovoscopy_tilte">Второе овоскопирование (День %s)</string>
+    <string name="bookmark_screen_third_ovoscopy_title">Третье овоскопирование (День %s)</string>
+
+    <string name="bookmark_screen_first_ovoscopy_title_sup">Первое овоскопирование проводится для определения оплодотворенности яиц.</string>
+    <string name="bookmark_screen_second_ovoscopy_tilte_sup">Второе овоскопирование проводится для оценки развития эмбриона и выявления замерших яиц.</string>
+    <string name="bookmark_screen_third_ovoscopy_title_sup">Третье овоскопирование проводится для контроля жизнеспособности эмбриона перед выводом и выявления яиц с нарушениями развития.</string>
+
+    <string name="bookmark_screen_first_ovoscopy">Первое овоскопирование - проверка развития эмбриона</string>
+    <string name="bookmark_screen_second_ovoscopy">Второе овоскопирование - контроль роста</string>
+    <string name="bookmark_screen_third_ovoscopy">Третье овоскопирование - финальная проверка</string>
+    <string name="bookmark_screen_today_ovoscopy">Сегодня овоскопирование!</string>
+    <string name="bookmark_screen_begin_ovoscopy">Начать овоскопирование!</string>
+    <string name="bookmark_screen_warning_text">Картинка предназначена для ознакомительных целей.\nДля получения более подробной информации обратитесь к другим источникам</string>
+    <string name="bookmark_screen_lantern">Фонарик</string>
+    <string name="bookmark_screen_off">Выключить</string>
+    <string name="bookmark_screen_ovoscopy_paint_support">Яйцо должно выглядеть так. Если нет — его нужно убрать из инкубатора.</string>
+    <string name="bookmark_screen_ovoscopy_was">Было:</string>
+    <string name="bookmark_screen_ovoscopy_rejected">Отбраковано:</string>
+    <string name="bookmark_screen_rejected_egg">Отбраковано яиц</string>
+    <string name="bookmark_screen_ovoscopy_left">Осталось:</string>
+    <string name="bookmark_screen_ovoscopy_results">Результат овоскопирования</string>
+    <string name="bookmark_screen_eggs">яиц</string>
+    <string name="bookmark_screen_before_withdrawal">до вывода</string>
+    <string name="bookmark_screen_mortgaged">Заложено</string>
+    <string name="bookmark_screen_waiting_conclusion">Ожид. вывод</string>
+    <string name="bookmark_screen_hint_remember_title">Важно помнить</string>
+    <string name="bookmark_screen_hint_remember_1">Проводите овоскопирование в затемненном помещении</string>
+    <string name="bookmark_screen_hint_remember_2">Держите яйцо не более 5–10 секунд</string>
+    <string name="bookmark_screen_hint_remember_3">Не переохлаждайте яйца</string>
+    <string name="bookmark_screen_hint_remember_4">Удалите неоплодотворенные и с замершими эмбрионами</string>
+
+
+    <string name="bookmark_screen_hint_ovoscopy_title">Как проводить овоскопирование</string>
+    <string name="bookmark_screen_hint_ovoscopy_1">Подготовьте овоскоп и затемненное помещение</string>
+    <string name="bookmark_screen_hint_ovoscopy_2">Аккуратно возьмите яйцо и приложите к овоскопу</string>
+    <string name="bookmark_screen_hint_ovoscopy_3">Просветите яйцо, медленно поворачивая его</string>
+    <string name="bookmark_screen_hint_ovoscopy_4">Оцените признаки развития эмбриона</string>
+    <string name="bookmark_screen_hint_ovoscopy_5">Отберите яйца с плохими признаками</string>
+    <string name="bookmark_screen_hint_ovoscopy_6">Верните хорошие яйца обратно в инкубатор</string>
 
     //Warehouse
     <string name="warehouse_screen_positions">позиции</string>
@@ -393,6 +488,7 @@
     <string name="warehouse_edit_screen_title_add">Создание проекта</string>
     <string name="warehouse_edit_screen_title_edit">Настройка проекта</string>
     <string name="warehouse_edit_screen_name_project">Название проекта</string>
+    <string name="warehouse_edit_screen_name_new_project">Название нового проекта</string>
     <string name="warehouse_edit_screen_name_project_support">Ферма "Бузина"</string>
     <string name="warehouse_edit_screen_choice_icon_project">Выберите иконку проекта</string>
     <string name="warehouse_edit_screen_project_creation_date">Дата создания проекта</string>
@@ -403,7 +499,7 @@
     <string name="warehouse_edit_screen_volume_units">Объемные единицы</string>
     <string name="warehouse_edit_screen_linear_dimensions">Линейные размеры</string>
     <string name="warehouse_edit_screen_warning_title">О единицах измерения</string>
-    <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные по умолчанию, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
+    <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные ё, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
 
     //SupportTextWidget
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
@@ -456,6 +552,12 @@
     <string name="tooltip_auto_calculate_kill">В случае активации этой опции необходимо указать кол-во товара не за всё поголовье, а за одно животное. При этом сохранится общая сумма товара.</string>
     <string name="tooltip_weight_big_kill">Предупреждение!\nВес товаров больше, чем вес животного</string>
     <string name="tooltip_weight_big_average_kill">Предупреждение!\nВес товаров больше, чем средний вес животных</string>
+
+    //MessageNoData2
+    <string name="message_no_date_empty">Пока пусто</string>
+    <string name="message_no_date_empty_egg_1">Здесь появятся ваши закладки яиц</string>
+    <string name="message_no_date_empty_egg_2">Нажмите на кнопку</string>
+    <string name="message_no_date_empty_egg_3">внизу экрана</string>
 
 
     //MessageNoData
@@ -709,7 +811,6 @@
     <string name="animal_card_screen_kill_add_product">Получено продукции: </string>
 
     //AnimalIndicatorsScreen
-
     <string name="animal_indicators_screen_no_note">Примечание не указано</string>
     <string name="animal_indicators_screen_expenses_count">Укажите стоимость за купленное кол-во</string>
     <string name="animal_indicators_screen_sale_count">Укажите стоимость за проданное кол-во</string>
@@ -750,6 +851,7 @@
     <string name="animal_vaccination">Режим редактирования</string>
     <string name="animal_vaccination_next_date">След:</string>
     <string name="animal_vaccination_next_vaccination">Последующая вакцинация не предусмотрена.</string>
+
     // AnimalCountScreen
     <string name="animal_count_screen_product">Продукция:</string>
     <string name="animal_count_screen_total_weight">Итоговый вес:</string>

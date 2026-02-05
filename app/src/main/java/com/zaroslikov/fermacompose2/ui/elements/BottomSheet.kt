@@ -1,21 +1,43 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.zaroslikov.fermacompose2.ui.elements
 
+import android.graphics.Paint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 
 @ExperimentalMaterial3Api
 @Composable
@@ -62,6 +84,68 @@ fun CountBottomSheet2(
                 onClickDelete = onDelete
             )
 
+        }
+    }
+}
+
+@Composable
+fun BaseBottomSheet(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    isScroll: Boolean = true,
+    skipPartiallyExpanded: Boolean = true,
+    onDismissRequest: () -> Unit,
+    contentBottom: @Composable (ColumnScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+    val bottomPadding = if (contentBottom != null) 72.dp else 0.dp
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
+    ) {
+        Box(
+            modifier = Modifier
+//                .fillMaxSize()
+//                .fillMaxHeight()
+        ) {
+            Column(
+                modifier = Modifier
+                    .modifierBottomSheet(isScroll)
+                    .padding(bottom = bottomPadding),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextLine(
+                            modifier = Modifier.weight(1f),
+                            valueString = title,
+                            textStyle = textBold_20
+                        )
+                        IconButton(onClick = onDismissRequest) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Close"
+                            )
+                        }
+                    }
+//                    Text(text = "Введите информацию о новой продукции")
+                }
+                content()
+            }
+            contentBottom?.let {
+                Column(
+                    modifier = Modifier
+                        .align(alignment = Alignment.BottomCenter)
+                        .padding(horizontal = dimensionResource(id = R.dimen.padding_medium))
+                ) {
+                    it()
+                }
+            }
         }
     }
 }

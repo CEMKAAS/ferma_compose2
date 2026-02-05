@@ -1,10 +1,10 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.start.StartScreen
+package com.zaroslikov.fermacompose2.ui.start.startScreen
+
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,19 +12,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +48,6 @@ import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.DrawerSheetNew
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
@@ -62,7 +58,6 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
-import kotlinx.coroutines.launch
 
 
 object StartDestination : NavigationDestination {
@@ -70,7 +65,6 @@ object StartDestination : NavigationDestination {
     override val titleRes = R.string.app_name
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartScreen(
     navigateToItemProject: (Long) -> Unit,
@@ -80,10 +74,11 @@ fun StartScreen(
     navigateToAboutApp: () -> Unit,
     navigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: StartScreenViewModel = hiltViewModel(),
+    viewModel: StartScreenViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(price_green, green_9)
+    /*
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val drawerClose = {
@@ -92,7 +87,7 @@ fun StartScreen(
                 if (isClosed) open() else close()
             }
         }
-    }
+    }*/
 
 
     /*  val bottomSheetClose = {
@@ -127,58 +122,58 @@ fun StartScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerSheetNew(
-                onProfileClick = { },
-                onSettingsClick = { navigateToSettings() },
-                onAboutAppClick = { navigateToAboutApp() },
-                onCloseClick = { drawerClose() }
+    /* ModalNavigationDrawer(
+         drawerState = drawerState,
+         drawerContent = {
+             DrawerSheetNew(
+                 onProfileClick = { },
+                 onSettingsClick = { navigateToSettings() },
+                 onAboutAppClick = { navigateToAboutApp() },
+                 onCloseClick = { drawerClose() }
+             )
+         }
+     ) {*/
+    Scaffold(
+        topBar = {
+            TopAppBarStart2(
+                title = R.string.start_screen_title,
+                infoBottomSheet = {/* drawerClose()*/ },
+                archiveButton = {},
+                boolean = true
             )
+        },
+        floatingActionButton = {
+            NeonGlowFab(
+                colors = colors,
+                onClick = { showBottomSheet = true })
         }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBarStart2(
-                    title = R.string.start_screen_title,
-                    infoBottomSheet = { drawerClose() },
-                    archiveButton = {},
-                    boolean = true
-                )
-            },
-            floatingActionButton = {
-                NeonGlowFab(
-                    colors = colors,
-                    onClick = { showBottomSheet = true })
-            }
-        ) { innerPadding ->
+    ) { innerPadding ->
 
-            if (state.isLoading)
-                CircularProgress(
-                    modifier = modifier.padding(innerPadding),
-                )
-            else
-                StartScreenContainer2(
-                    modifier = Modifier.modifierScreenLazy(innerPadding),
-                    itemList = state.list,
-                    brieflyList = state.list,
-                    onEditClick = { navigateToProject(it) },
-                    onArchiveClick = { viewModel.onIntent(StartScreenIntent.ArchiveClicked(it)) },
-                    onDeleteClick = { viewModel.onIntent(StartScreenIntent.DeleteClicked(it)) },
-                    onNavigationProject = { navigateToItemProject(it) },
-                    onNavigationIncubator = { navigateToItemIncubator(it) }
-                )
+      /*  if (state.isLoading)
+            CircularProgress(
+                modifier = modifier.padding(innerPadding),
+            )
+        else*/
+            StartScreenContainer2(
+                modifier = Modifier.modifierScreenLazy(innerPadding),
+                itemList = /*state.list*/ emptyList(),
+                brieflyList = /*state.list*/ emptyList(),
+                onEditClick = { navigateToProject(it) },
+                onArchiveClick = {/* viewModel.onIntent(StartScreenIntent.ArchiveClicked(it))*/ },
+                onDeleteClick = { /*viewModel.onIntent(StartScreenIntent.DeleteClicked(it))*/ },
+                onNavigationProject = { navigateToItemProject(it) },
+                onNavigationIncubator = { navigateToItemIncubator(it) }
+            )
 
-            if (showBottomSheet)
-                ChoiceProjectBottomSheet(
-                    onDismissRequest = { showBottomSheet = false },
-                    onIncubatorProject = { navigateToIncubator(-1) },
-                    onAddProject = { navigateToProject(-1) }
-                )
-        }
+        if (showBottomSheet)
+            ChoiceProjectBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                onIncubatorProject = { navigateToIncubator(-1) },
+                onAddProject = { navigateToProject(-1) }
+            )
     }
 }
+
 
 @Composable
 private fun StartScreenContainer2(

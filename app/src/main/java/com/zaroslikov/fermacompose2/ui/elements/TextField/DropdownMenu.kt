@@ -99,7 +99,7 @@ fun DropdownMenuEdit(
 
 private data class MenuItemData(
     val title: String,
-    @DrawableRes val icon: Int,
+    @param:DrawableRes val icon: Int,
     val color: Color,
     val onClick: () -> Unit
 )
@@ -132,6 +132,7 @@ fun ExposedDropdownMenuCategoryBuyer(
         )
     }
 }
+
 
 @Composable
 fun ExposedDropdownMenuFilterDate(
@@ -217,6 +218,19 @@ fun ExposedDropdownMenuSuffix(
             }
         )
     }
+}
+
+@Composable
+fun <T> ExposedDropdownMenuEnum(
+    valueList: List<T>,
+    dropdownMenuItem: @Composable (Int, T, () -> Unit) -> Unit,
+    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
+) {
+    BaseExposedDropdownMenu(
+        list = valueList,
+        content = content,
+        dropdownMenuItem = dropdownMenuItem
+    )
 }
 
 @Composable

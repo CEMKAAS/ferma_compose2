@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.start.StartScreen
+package com.zaroslikov.fermacompose2.ui.start.startScreen
 
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.base.state.ListState

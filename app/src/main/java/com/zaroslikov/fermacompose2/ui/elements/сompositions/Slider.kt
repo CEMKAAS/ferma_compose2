@@ -28,7 +28,7 @@ fun Slider(
             .fillMaxWidth()
             .height(8.dp)
             .clip(RoundedCornerShape(50))
-            .background(gray_6)
+            .background(gray_6.copy(alpha = 0.5f))
     ) {
         Box(
             modifier = Modifier

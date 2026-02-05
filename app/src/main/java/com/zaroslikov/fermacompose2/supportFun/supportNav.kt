@@ -1,7 +1,7 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
-import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.BookmarkDestination
+import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.main.BookmarkDestination
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination

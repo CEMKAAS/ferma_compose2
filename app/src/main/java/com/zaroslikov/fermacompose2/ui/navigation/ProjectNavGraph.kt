@@ -43,7 +43,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.sale.entry.SaleEntryProd
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.entry.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.entry.WriteOffEntryProduct
-import com.zaroslikov.fermacompose2.ui.start.StartScreen.StartDestination
+import com.zaroslikov.fermacompose2.ui.start.startScreen.StartDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination

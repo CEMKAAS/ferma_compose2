@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.zaroslikov.data.room.table.ferma.Incubator
+import com.zaroslikov.data.room.table.incubator.Incubator
 import com.zaroslikov.data.room.table.project.ProjectTable
 import kotlinx.coroutines.flow.Flow
 
@@ -21,7 +21,7 @@ interface ProjectDao {
     @Query("SELECT * from МyINCUBATOR Where TYPE =:type and mode = 0 and ARHIVE = 1")
     fun getIncubatorListArh6(type: String): Flow<List<ProjectTable>>
 
-    @Query("SELECT * from МyINCUBATOR Where mode = 1 and ARHIVE = 0")
+    @Query("SELECT * from МyINCUBATOR Where mode = 0 and ARHIVE = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>
 
     @Query("SELECT COUNT(*) AS row_count from МyINCUBATOR Where mode = 0")
