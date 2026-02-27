@@ -63,6 +63,10 @@ fun String.toConvertZeroDouble2(): Double {
         .toDouble()
 }
 
+fun String.toConvertZeroDbInt(): Int {
+    return if (this == "") 0 else this.replace(Regex("[^\\d.]"), "").trim().toInt()
+}
+
 fun String.toConvertZeroTooOneDouble(): Double {
     return if (this == "") 1.0 else this.toDouble()
 }

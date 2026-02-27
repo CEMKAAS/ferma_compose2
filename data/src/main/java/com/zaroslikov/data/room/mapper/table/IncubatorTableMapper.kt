@@ -5,9 +5,10 @@ import com.zaroslikov.domain.models.table.DomainIncubatorTable
 
 fun IncubatorTable.toDomainIncubatorTable(): DomainIncubatorTable {
     return DomainIncubatorTable(
+        id = this.id,
+        title = this.title,
         isAutoRotation = this.isAutoRotation,
         price = this.price,
-        id = this.id,
         isAutoVentilation = this.isAutoVentilation,
         capacity = this.capacity,
         note = this.note,
@@ -20,9 +21,10 @@ fun IncubatorTable.toDomainIncubatorTable(): DomainIncubatorTable {
 
 fun DomainIncubatorTable.toIncubatorTable(): IncubatorTable {
     return IncubatorTable(
+        id = this.id,
+        title = this.title,
         isAutoRotation = this.isAutoRotation,
         price = this.price,
-        id = this.id,
         isAutoVentilation = this.isAutoVentilation,
         capacity = this.capacity,
         note = this.note,

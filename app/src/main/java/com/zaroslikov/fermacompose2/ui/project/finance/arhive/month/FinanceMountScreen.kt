@@ -53,7 +53,7 @@ fun FinanceMonthScreen(
             TopAppBarBack(
                 title = state.currentPeriod,
                 onNavigateBackClick = navigateBack,
-                onCalendarClick = {
+                onNoteClick = {
                     viewModel.onIntent(FinanceMonthIntent.OpenCalendarDialogClicked(true))
                     AppMetrica.reportEvent("Финансы Месяц Диапазон")
                 }

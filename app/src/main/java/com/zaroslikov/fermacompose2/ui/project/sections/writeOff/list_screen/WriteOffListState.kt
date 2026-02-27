@@ -53,8 +53,8 @@ data class WriteOffEntryState2(
 
     fun enabledButton(): Boolean {
         val isEnabled =
-            title.isNotBlank() && count.isNotBlank() && price.isNotBlank() && !hasAnyError
-        return !isEnabled
+            title.isNotBlank() && count.isNotBlank() && !hasAnyError
+        return isEnabled
     }
 }
 

@@ -21,6 +21,5 @@ object SnackbarController {
 
     suspend fun sendEvent(event: SnackbarEvent) {
         _events.send(event)
-        Log.i("showMessage", "showMessage: jhe222")
     }
 }

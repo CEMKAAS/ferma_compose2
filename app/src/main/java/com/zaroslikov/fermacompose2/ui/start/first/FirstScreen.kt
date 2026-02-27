@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.start.startScreen
-
+package com.zaroslikov.fermacompose2.ui.start.first
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -12,16 +11,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +44,7 @@ import com.zaroslikov.fermacompose2.green_8
 import com.zaroslikov.fermacompose2.green_9
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.orang_3
+import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.price_green
@@ -48,6 +52,7 @@ import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.DrawerSheetNew
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
@@ -58,27 +63,27 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
+import kotlinx.coroutines.launch
 
-
-object StartDestination : NavigationDestination {
-    override val route = "Start"
+object FirstDestination : NavigationDestination {
+    override val route = "First"
     override val titleRes = R.string.app_name
+    const val itemIdArg = "itemId"
+    val routeWithArgs = "$route/{$itemIdArg}"
 }
 
 @Composable
-fun StartScreen(
+fun FirstScreen(
     navigateToItemProject: (Long) -> Unit,
     navigateToItemIncubator: (Long) -> Unit,
     navigateToProject: (Long) -> Unit,
     navigateToIncubator: (Long) -> Unit,
     navigateToAboutApp: () -> Unit,
     navigateToSettings: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: StartScreenViewModel = hiltViewModel()
+    viewModel: FirstScreenViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(price_green, green_9)
-    /*
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val drawerClose = {
@@ -87,7 +92,7 @@ fun StartScreen(
                 if (isClosed) open() else close()
             }
         }
-    }*/
+    }
 
 
     /*  val bottomSheetClose = {
@@ -122,58 +127,58 @@ fun StartScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
 
-    /* ModalNavigationDrawer(
-         drawerState = drawerState,
-         drawerContent = {
-             DrawerSheetNew(
-                 onProfileClick = { },
-                 onSettingsClick = { navigateToSettings() },
-                 onAboutAppClick = { navigateToAboutApp() },
-                 onCloseClick = { drawerClose() }
-             )
-         }
-     ) {*/
-    Scaffold(
-        topBar = {
-            TopAppBarStart2(
-                title = R.string.start_screen_title,
-                infoBottomSheet = {/* drawerClose()*/ },
-                archiveButton = {},
-                boolean = true
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerSheetNew(
+                onProfileClick = { },
+                onSettingsClick = { navigateToSettings() },
+                onAboutAppClick = { navigateToAboutApp() },
+                onCloseClick = { drawerClose() }
             )
-        },
-        floatingActionButton = {
-            NeonGlowFab(
-                colors = colors,
-                onClick = { showBottomSheet = true })
         }
-    ) { innerPadding ->
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBarStart2(
+                    title = R.string.start_screen_title,
+                    infoBottomSheet = { drawerClose() },
+                    archiveButton = {},
+                    boolean = true
+                )
+            },
+            floatingActionButton = {
+                NeonGlowFab(
+                    colors = colors,
+                    onClick = { showBottomSheet = true })
+            }
+        ) { innerPadding ->
 
-      /*  if (state.isLoading)
-            CircularProgress(
-                modifier = modifier.padding(innerPadding),
-            )
-        else*/
-            StartScreenContainer2(
-                modifier = Modifier.modifierScreenLazy(innerPadding),
-                itemList = /*state.list*/ emptyList(),
-                brieflyList = /*state.list*/ emptyList(),
-                onEditClick = { navigateToProject(it) },
-                onArchiveClick = {/* viewModel.onIntent(StartScreenIntent.ArchiveClicked(it))*/ },
-                onDeleteClick = { /*viewModel.onIntent(StartScreenIntent.DeleteClicked(it))*/ },
-                onNavigationProject = { navigateToItemProject(it) },
-                onNavigationIncubator = { navigateToItemIncubator(it) }
-            )
+            if (state.isLoading)
+                CircularProgress(
+                    modifier = Modifier.padding(innerPadding),
+                )
+            else
+                StartScreenContainer2(
+                    modifier = Modifier.modifierScreenLazy(innerPadding),
+                    itemList = state.list,
+                    brieflyList = state.list,
+                    onEditClick = { navigateToProject(it) },
+                    onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveClicked(it)) },
+                    onDeleteClick = { viewModel.onIntent(FirstIntent.DeleteClicked(it)) },
+                    onNavigationProject = { navigateToItemProject(it) },
+                    onNavigationIncubator = { navigateToItemIncubator(it) }
+                )
 
-        if (showBottomSheet)
-            ChoiceProjectBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
-                onIncubatorProject = { navigateToIncubator(-1) },
-                onAddProject = { navigateToProject(-1) }
-            )
+            if (showBottomSheet)
+                ChoiceProjectBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    onIncubatorProject = { navigateToIncubator(-1) },
+                    onAddProject = { navigateToProject(-1) }
+                )
+        }
     }
 }
-
 
 @Composable
 private fun StartScreenContainer2(
@@ -203,7 +208,7 @@ private fun StartScreenContainer2(
                 onDeleteClick = { onDeleteClick(item) },
                 onArchiveClick = { onArchiveClick(item) },
                 onNavigationProject = {
-                    if (item.mode == 0) onNavigationProject(item.id)
+                    if (item.mode) onNavigationProject(item.id)
                     else onNavigationIncubator(item.id)
                 }
             )
@@ -211,8 +216,9 @@ private fun StartScreenContainer2(
         brieflyCard = {},
         titleRes = R.string.start_screen_positions_message_no_date_title,
         messageRes = R.string.start_screen_positions_message_no_date_message,
-        supportRes = R.string.start_screen_positions_message_no_date_support_text,
-        buttonRes = R.string.start_screen_positions_button_note_message_no_data
+        iconRes = R.drawable.icon_money,
+        iconColor = orang_5,
+        backgroundColor = orang_4
     )
 }
 
@@ -246,13 +252,13 @@ private fun ProjectCard(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = projectTable.titleProject,
+                        text = projectTable.title,
                         style = text_16,
                         color = black_2
                     )
                     IconAndTextNew(
                         iconRes = R.drawable.baseline_calendar_month_24,
-                        valueString = projectTable.data,
+                        valueString = projectTable.date,
                         iconColor = gray_7
                     )
                 }

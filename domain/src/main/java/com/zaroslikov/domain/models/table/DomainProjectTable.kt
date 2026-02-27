@@ -2,18 +2,9 @@ package com.zaroslikov.domain.models.table
 
 data class DomainProjectTable(
     val id: Long = 0,
-    val titleProject: String = "",
-    val type: String = "",
-    val data: String = "",
-    val eggAll: String = "",
-    val eggAllEND: String = "",
-    val airing: String = "",
-    val over: String = "",
-    var arhive: String = "0",
+    val title: String = "",
+    val date: String = "",
     val dateEnd: String = "",
-    var time1: String = "",
-    var time2: String = "",
-    var time3: String = "",
-    val mode: Int = 0,
-    val imageData: ByteArray? = null // Изображение
+    val mode: Boolean = true, //Инкубатор = 0, Хозяйство = 1
+    val archive: Boolean = false,  //не архив = 0, Архив = 1
 )

@@ -80,12 +80,14 @@ fun AddIncubatorScreen(
             }
         }
     }
+    val titleRes = if (state.isEntry) R.string.add_incubator_screen_title else
+        R.string.add_incubator_screen_title_edit
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = R.string.add_incubator_screen_title,
+                intRes = titleRes,
                 onNavigateBackClick = navigateBack,
                 scrollBehavior = scrollBehavior
             )
@@ -302,7 +304,7 @@ private fun SaveButton(
             else onUpdateClick()
         },
         colors = listOf(orang_9, orang_15),
-        enable = enabledButton,
+        enabled = enabledButton,
         paddingValues = PaddingValues(vertical = 14.dp)
     )
 }

@@ -13,7 +13,7 @@ import com.zaroslikov.domain.models.enums.Suffix
     foreignKeys = [
         ForeignKey(
             entity = ProjectTable::class,
-            parentColumns = arrayOf("_id"),
+            parentColumns = arrayOf("id"),
             childColumns = arrayOf("idPT"),
             onDelete = ForeignKey.CASCADE
         )],
@@ -23,6 +23,7 @@ data class IncubatorTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long = 0,
+    val title: String,
     val brand: String?,
     val model: String?,
     @ColumnInfo(name = "capacity") // Вместимость

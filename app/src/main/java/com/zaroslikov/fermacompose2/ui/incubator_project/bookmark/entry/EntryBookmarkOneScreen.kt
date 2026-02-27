@@ -29,6 +29,7 @@ import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.OutlineIconButtonNew
 import com.zaroslikov.fermacompose2.ui.elements.ProductKillCard
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedNumberNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDropdownMenuNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDropdownMenuTypeEgg
@@ -52,7 +53,7 @@ fun EntryBookmarkOneScreen(
             .padding(bottom = 20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        EntryValue(state, onIntent)
+        EntryValue(isEntry, state, onIntent)
         FunctionIncubatorCard(
             isAutoRotation = state.autoRotation,
             isAutoVentilation = state.autoVentilation,
@@ -80,6 +81,7 @@ fun EntryBookmarkOneScreen(
 
 @Composable
 private fun EntryValue(
+    isEntry: Boolean,
     state: EntryBookmark,
     onIntent: (EntryBookmarkIntent) -> Unit
 ) {
@@ -102,6 +104,7 @@ private fun EntryValue(
             titleList = typeEggList,
             labelIntRes = R.string.entry_bookmark_type,
             intResSup = R.string.is_empty,
+            enable = isEntry,
             isBorderCard = false
         )
         OutlinedTextDropdownMenuNew(
@@ -117,20 +120,44 @@ private fun EntryValue(
             onValueChange = { onIntent(EntryBookmarkIntent.CountChanged(it)) },
             intRes = R.string.entry_bookmark_count_egg,
             intResSup = R.string.entry_bookmark_support_count_egg,
-            isError = state.error.isErrorCount,
+            intResError = R.string.entry_bookmark_error_count,
+            isError = state.error.isErrorLargeCount,
             suffix = Suffix.PIECES,
             isBorderCard = false
         )
-        OutlinedNumberNew(
-            value = state.price,
-            onValueChange = { onIntent(EntryBookmarkIntent.PriceChanged(it)) },
-            intRes = R.string.entry_bookmark_price_egg,
-            intResSup = R.string.entry_bookmark_price_support,
-            suffix = Suffix.PIECES,
-            isBorderCard = false
+        if (!isEntry)
+            OutlinedNumberNew(
+                value = state.rejectedCount,
+                onValueChange = { onIntent(EntryBookmarkIntent.RejectedCountChanged(it)) },
+                intRes = R.string.entry_bookmark_rejected_count_egg,
+                intResSup = R.string.entry_bookmark_support_count_egg,
+                intResError = R.string.entry_bookmark_error_reject_count,
+                isError = state.error.isErrorRejectedCount,
+                suffix = Suffix.PIECES,
+                isBorderCard = false
+            )
+        OutlinedPriceInputNew(
+            price = state.price,
+            onPriceChange = {
+                onIntent(EntryBookmarkIntent.PriceChanged(it))
+            },
+            priceAll = state.priceAll,
+            isAutoCalculate = state.isAutoPrice,
+            isManyCount = true,
+            isBorderCard = false,
+            onAutoCalculate = {
+                onIntent(EntryBookmarkIntent.AutoPriceClicked(it))
+            },
+            count = state.count,
+            countSuffix = Suffix.PIECES,
+            priceSuffix = Suffix.RUBLE,
+            leadingIconRes = null,
+            supportTextRes = R.string.entry_bookmark_support_text_all_price,
+            supportTextResAutoCal = R.string.entry_bookmark_support_text_price,
+            tooltipTextResAutoCal = R.string.entry_bookmark_tooltip_auto_calculate_price,
         )
         OutlinedTextDateNew(
-            value = state.date,
+            value = state.startDate,
             onValueChange = { onIntent(EntryBookmarkIntent.DateClicked(it)) },
             intRes = R.string.entry_bookmark_data,
             isBorderCard = false
@@ -257,7 +284,7 @@ private fun SaveButton(
             else onUpdateClick()
         },
         colors = listOf(orang_9, orang_15),
-        enable = enabledButton,
+        enabled = enabledButton,
         paddingValues = PaddingValues(vertical = 14.dp)
     )
 }

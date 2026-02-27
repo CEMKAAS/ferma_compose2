@@ -13,7 +13,7 @@ import com.zaroslikov.domain.models.enums.Suffix
     tableName = "animal_table",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
-        parentColumns = arrayOf("_id"),
+        parentColumns = arrayOf("id"),
         childColumns = arrayOf("idPT"),
         onDelete = ForeignKey.CASCADE
     )],

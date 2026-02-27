@@ -6,31 +6,30 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.zaroslikov.data.room.table.incubator.Incubator
 import com.zaroslikov.data.room.table.project.ProjectTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProjectDao {
-    @Query("SELECT * from МyINCUBATOR ORDER BY ARHIVE ASC")
+    @Query("SELECT * from project_table ORDER BY archive ASC")
     fun getAllProject(): Flow<List<ProjectTable>>
 
-    @Query("SELECT * from МyINCUBATOR Where _id=:id")
+    @Query("SELECT * from project_table Where id=:id")
     fun getProject(id: Long): Flow<ProjectTable>
 
-    @Query("SELECT * from МyINCUBATOR Where TYPE =:type and mode = 0 and ARHIVE = 1")
+  /*  @Query("SELECT * from project_table Where TYPE =:type and mode = 0 and archive = 1")
     fun getIncubatorListArh6(type: String): Flow<List<ProjectTable>>
-
-    @Query("SELECT * from МyINCUBATOR Where mode = 0 and ARHIVE = 0")
+*/
+    @Query("SELECT * from project_table Where mode = 0 and archive = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>
 
-    @Query("SELECT COUNT(*) AS row_count from МyINCUBATOR Where mode = 0")
+    @Query("SELECT COUNT(*) AS row_count from project_table Where mode = 0")
     fun getCountRowIncubator(): Flow<Int>
 
-    @Query("SELECT COUNT(*) AS row_count from МyINCUBATOR Where mode = 1")
+    @Query("SELECT COUNT(*) AS row_count from project_table Where mode = 1")
     fun getCountRowProject(): Flow<Int>
 
-    @Query("SELECT _id from МyINCUBATOR ORDER BY _id DESC Limit 1")
+    @Query("SELECT id from project_table ORDER BY id DESC Limit 1")
     fun getLastProject(): Flow<Int>
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)

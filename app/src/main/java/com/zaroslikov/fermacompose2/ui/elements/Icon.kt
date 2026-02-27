@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -90,6 +92,34 @@ fun IconTransaction2(
         modifier = modifier
             .size(sizeCard)
             .background(color = color, shape = RoundedCornerShape(10.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painterResource(icon),
+            contentDescription = null,
+            tint = colorIcon,
+            modifier = Modifier
+                .size(sizeCard / 2)
+        )
+    }
+}
+
+@Composable
+fun IconGradient(
+    modifier: Modifier = Modifier,
+    sizeCard: Dp = 40.dp,
+    shape: Shape = RoundedCornerShape(10.dp),
+    @DrawableRes icon: Int, colorIcon: Color, colors: List<Color>
+) {
+    val gradient = Brush.linearGradient(
+        colors = colors,
+        start = Offset(0f, 0f),
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
+    )
+    Box(
+        modifier = modifier
+            .size(sizeCard)
+            .background(brush = gradient, shape = shape),
         contentAlignment = Alignment.Center
     ) {
         Icon(

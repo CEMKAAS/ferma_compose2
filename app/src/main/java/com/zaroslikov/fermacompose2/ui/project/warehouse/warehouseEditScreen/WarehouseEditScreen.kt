@@ -78,6 +78,7 @@ import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
+import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.toFullResId
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -162,7 +163,7 @@ private fun WarehouseEditBody(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         MainSettingsCard(
-            nameProject = state.currentProject.titleProject, onValueChange = {
+            nameProject = state.currentProject.title, onValueChange = {
                 onIntent(WarehouseEditIntent.NameProjectChanged(it))
             },
             currentIcon = state.currentIcon,
@@ -170,7 +171,13 @@ private fun WarehouseEditBody(
             onImageSelected = { onIntent(WarehouseEditIntent.IconClicked(it)) },
             onAddImageClicked = { /*onIntent(WarehouseEditIntent.IconClicked(it))*/ }
         )
-        DateSettingsCard(state.currentProject.data) { onIntent(WarehouseEditIntent.DateClicked(it)) }
+        DateSettingsCard(state.currentProject.date) {
+            onIntent(
+                WarehouseEditIntent.DateClicked(
+                    it
+                )
+            )
+        }
         CurrencySettingsCard(state.currentSettings.currencySuffix) {
             onIntent(WarehouseEditIntent.CurrencyClicked(it))
         }
@@ -269,12 +276,12 @@ private fun MainSettingsCard(
                     sizeCard = 80.dp,
                     isPainter = isPainter
                 )
-
             OutlinedTextNew(
                 value = nameProject,
                 onValueChange = onValueChange,
                 labelIntRes = R.string.warehouse_edit_screen_name_project,
-                supportingText = R.string.warehouse_edit_screen_name_project_support
+                supportingText = R.string.warehouse_edit_screen_name_project_support,
+                isBorderCard = false
             )
             AnimatedVisibility(
                 modifier = Modifier.fillMaxWidth(),
@@ -391,7 +398,7 @@ fun CurrencySettingsCard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     IconTransaction2(
-                        icon = R.drawable.baseline_currency_ruble_24,
+                        icon = R.drawable.icon_money,
                         colorIcon = baseColor,
                         color = secondColor,
                         sizeCard = 36.dp
@@ -670,7 +677,7 @@ private fun SaveButton(
             onNavigateBackClick()
         },
         colors = listOf(Color(0xFF00A63E), Color(0xFF009966)),
-        enable = enabledButton,
+        enabled = enabledButton,
         paddingValues = PaddingValues(vertical = 14.dp)
     )
 }

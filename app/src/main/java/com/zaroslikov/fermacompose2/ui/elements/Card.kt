@@ -93,6 +93,11 @@ import com.zaroslikov.fermacompose2.violet_6
 import com.zaroslikov.fermacompose2.white
 
 
+@Deprecated(
+    message = "Используй CardFieldNew()",
+    replaceWith = ReplaceWith("CardFielNew()"),
+    level = DeprecationLevel.WARNING
+)
 @Composable
 fun CardField(
     modifier: Modifier = Modifier,
@@ -645,6 +650,31 @@ fun BorderCard(
 }
 
 @Composable
+fun ColorCard(
+    modifier: Modifier = Modifier,
+    containerColor: Color = white,
+    padding: PaddingValues = PaddingValues(20.dp),
+    shape: Shape = RoundedCornerShape(14.dp),
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = modifier,
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor
+        )
+    ) {
+        Column(
+            Modifier
+                .padding(padding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
 fun BrieflyCountCardNew(
     modifier: Modifier = Modifier,
     titleProduct: String,
@@ -817,6 +847,7 @@ fun WarehouseCountCard(
 
 @Composable
 fun CardClips(
+    modifier: Modifier = Modifier,
     colorBackground: Color,
     colorBorder: Color,
     colorText: Color,
@@ -825,6 +856,7 @@ fun CardClips(
     value: String
 ) {
     Card(
+        modifier = modifier,
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = colorBackground

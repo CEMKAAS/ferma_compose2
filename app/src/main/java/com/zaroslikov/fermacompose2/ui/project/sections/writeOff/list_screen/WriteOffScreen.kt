@@ -38,6 +38,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
+import com.zaroslikov.fermacompose2.violet_3
 
 object WriteOffDestination : NavigationDestination {
     override val route = "WriteOff"
@@ -181,7 +182,7 @@ private fun WriteOffContainer(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailsClick = onDetailsClick,
-        detailCard = { index,item ->
+        detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
                 count = item.count,
@@ -216,10 +217,12 @@ private fun WriteOffContainer(
                 icon = R.drawable.icon_trash,
             )
         },
-        titleRes = R.string.message_no_date_title_write_off,
-        messageRes = R.string.message_no_date_message_write_off,
-        supportRes = /*if (writeOffBoolean) R.string.message_no_date_support_write_off else*/ R.string.message_no_date_support_no_write_off,
-        buttonRes = R.string.button_sale_message_no_data
+        titleRes = R.string.message_no_data_title_write_off,
+        messageRes = R.string.message_no_data_message_write_off,
+        supportSecondText = null,
+        iconRes = R.drawable.baseline_edit_note_24,
+        iconColor =  violet_1,
+        backgroundColor = violet_3,
     )
 }
 

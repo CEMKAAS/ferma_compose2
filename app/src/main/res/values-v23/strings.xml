@@ -29,12 +29,12 @@
 
     // BottomBarProject
     <string name="bottom_bar_magazine">Журнал</string>
-    <string name="bottom_bar_warehouse">Журнал</string>
+    <string name="bottom_bar_warehouse">Склад</string>
     <string name="bottom_bar_finance">Финансы</string>
 
     // BottomBarIncubator
-    <string name="bottom_bar_review">Журнал</string>
-    <string name="bottom_bar_bookmark">Журнал</string>
+    <string name="bottom_bar_incubator">Инкубатор</string>
+    <string name="bottom_bar_bookmark">Закладка</string>
 
     //OutlinedTextField
     <string name="outlined_text_product">Товар</string>
@@ -117,6 +117,8 @@
     <string name="button_sale_message_no_height">Добавить Размер!</string>
     <string name="button_sale_message_no_count">Добавить Количество!</string>
     <string name="button_by_default">По умолчанию</string>
+    <string name="button_reset">Сбросить</string>
+    <string name="button_confirm">Подтвердить</string>
 
     //DataPicker
     <string name="data_picker_ok">Принять</string>
@@ -184,6 +186,10 @@
     <string name="suffix_full_millimeters">Миллиметры</string>
     <string name="suffix_full_centimetre">Сантиметры</string>
     <string name="suffix_full_meters">Метры</string>
+
+    <string name="suffix_chicks">птенцов</string>
+    <string name="suffix_eggs">яиц</string>
+    <string name="suffix_egg">яйцо</string>
 
     //Currency
     <string name="currency_ruble">₽</string>
@@ -335,6 +341,7 @@
 
     //AddIncubatorScreen
     <string name="add_incubator_screen_title">Создание инкубатора</string>
+    <string name="add_incubator_screen_title_edit">Настройка инкубатора</string>
     <string name="add_incubator_screen_download_image">Загрузите фото инкубатора (необязательно)</string>
     <string name="add_incubator_screen_name_incubator">Название инкубатора</string>
     <string name="add_incubator_screen_name_incubator_support">Например: Инкубатор №1</string>
@@ -357,13 +364,14 @@
     <string name="add_incubator_screen_auto_ventilation_support">Автоматическая система вентиляции</string>
 
     //EntryBookmark
-    <string name="entry_bookmark_screen_add_title">Создание закладка</string>
-    <string name="entry_bookmark_screen_edit_title">Редактирование закладка</string>
-    <string name="entry_bookmark_title">Название закладки</string>
+    <string name="entry_bookmark_screen_add_title">Создание закладки</string>
+    <string name="entry_bookmark_screen_edit_title">Редактирование закладки</string>
+    <string name="entry_bookmark_title">Название закладки*</string>
     <string name="entry_bookmark_type">Тип яиц</string>
     <string name="entry_bookmark_breed">Порода</string>
     <string name="entry_bookmark_support_breed">Укажите породу</string>
-    <string name="entry_bookmark_count_egg">Количество яиц</string>
+    <string name="entry_bookmark_count_egg">Количество яиц*</string>
+    <string name="entry_bookmark_rejected_count_egg">Отложено яиц</string>
     <string name="entry_bookmark_support_count_egg">Укажите кол-во яиц</string>
     <string name="entry_bookmark_data">Дата закладки</string>
     <string name="entry_bookmark_time">Время закладки</string>
@@ -393,6 +401,11 @@
     <string name="entry_bookmark_completed_s">Завершена: %s</string>
     <string name="entry_bookmark_fact">Факт</string>
     <string name="entry_bookmark_plan">План</string>
+    <string name="entry_bookmark_error_count">В инкубаторе нет столько места</string>
+    <string name="entry_bookmark_error_reject_count">В инкубаторе нет столько яиц</string>
+    <string name="entry_bookmark_support_text_all_price">Укажите цену за яйца</string>
+    <string name="entry_bookmark_support_text_price">Укажите цену за яйцо</string>
+    <string name="entry_bookmark_tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за все яйца, а за одно яйцо. При этом сохранится общая сумма.</string>
 
     //TypeEgg
     <string name="type_egg_chickens">Курицы</string>
@@ -422,11 +435,13 @@
     <string name="bookmark_screen_early_completion_incubation">Досрочное завершение инкубации</string>
     <string name="bookmark_screen_chicks_been_bred">Выведено птенцов</string>
     <string name="bookmark_screen_support_count_chicks">Укажите кол-во птенцов</string>
+    <string name="bookmark_screen_price_chick">Цена одного птенца</string>
+    <string name="bookmark_screen_support_price_chick">Укажите цену за одного птенца</string>
     <string name="bookmark_screen_where_add_chicks">Куда добавить птенцов?</string>
     <string name="bookmark_screen_new_project">Новый проект</string>
     <string name="bookmark_screen_existing_project">В существующий</string>
     <string name="bookmark_screen_choice_project">Выберите проект</string>
-    <string name="bookmark_screen_s_eggs_laid">%s яиц заложено</string>
+    <string name="bookmark_screen_s_eggs_laid">%s яиц в инкубаторе</string>
     <string name="bookmark_screen_incubation_end_early">Инкубация завершается досрочно</string>
     <string name="bookmark_screen_reason_incubation_end_early">Причина досрочного завершения</string>
     <string name="bookmark_screen_reason_sup_incubation_end_early">Опишите причину завершения инкубации раньше срока</string>
@@ -435,6 +450,10 @@
     <string name="bookmark_screen_fact_parameters_s">Фактические данные - День %s</string>
     <string name="bookmark_screen_schedule">Расписание</string>
     <string name="bookmark_screen_tomorrow_days_s">Завтра (День %s)</string>
+    <string name="bookmark_screen_complete">Поздравляем!\nПериод инкубации завершён</string>
+    <string name="bookmark_screen_complete_support">Пришло время подвести итоги и зафиксировать результаты</string>
+    <string name="bookmark_screen_egg_success">Успешность вывода</string>
+    <string name="bookmark_screen_toggle_all_egg">Всего заложено яиц в инкубатор</string>
 
 
     //BookmarkScreen - Ovospopy
@@ -479,10 +498,58 @@
     <string name="bookmark_screen_hint_ovoscopy_5">Отберите яйца с плохими признаками</string>
     <string name="bookmark_screen_hint_ovoscopy_6">Верните хорошие яйца обратно в инкубатор</string>
 
+    //JournalScreen
+    <string name="journal_screen_title">Журнал</string>
+    <string name="journal_screen_overall_efficiency">Общая эффективность</string>
+    <string name="journal_screen_statistics">Статистика</string>
+    <string name="journal_screen_types_and_breeds">Типы и породы</string>
+    <string name="journal_screen_types">Типы яйц</string>
+    <string name="journal_screen_breeds">Породы</string>
+    <string name="journal_screen_completed">Завершена</string>
+    <string name="journal_screen_early_completed">Прервана</string>
+    <string name="journal_screen_history_conclusions">История выводов</string>
+    <string name="journal_screen_bookmarks">Закладок</string>
+    <string name="journal_screen_chicks">Выведено</string>
+    <string name="journal_screen_hatch">Не вылупились</string>
+    <string name="journal_screen_active_bookmark">Активировать закладку?</string>
+    <string name="journal_screen_delete_bookmark">Удалить закладку?</string>
+    <string name="journal_screen_activate_this_bookmark_now_s">Если вы активируете эту закладку (%s) сейчас:</string>
+    <string name="journal_screen_delete_this_bookmark_now_s">Вы действительно хотите удалить эту закладку (%s)?</string>
+    <string name="journal_screen_activate_bookmark_end">Активная закладка завершится</string>
+    <string name="journal_screen_activate_bookmark_end_sup">Текущая активная закладка будет автоматически переведена в статус "Завершена"</string>
+    <string name="journal_screen_new_date">Новый отсчет с текущего дня</string>
+    <string name="journal_screen_new_date_sup">Выбранная закладка станет активной, и период инкубации начнется с сегодняшнего дня</string>
+    <string name="journal_screen_delete_title">Действие необратимо</string>
+    <string name="journal_screen_delete_title_sup">Все данные закладки будут безвозвратно удалены, включая историю параметров и результаты овоскопирования</string>
+
+    //FinanceIncubatorScreen
+    <string name="finance_incubator_screen_title">Финансы</string>
+    <string name="finance_incubator_screen_incubator_plus_eggs">Инкубатор + яйца</string>
+    <string name="finance_incubator_screen_egg_expenses">Расходы на яйца</string>
+    <string name="finance_incubator_screen_posted_s_s">Вложено (%s %s)</string>
+    <string name="finance_incubator_screen_losses_s_s">Потери (%s %s)</string>
+    <string name="finance_incubator_screen_posted">Вложено</string>
+    <string name="finance_incubator_screen_losses">Потери</string>
+    <string name="finance_incubator_screen_average_price_egg">Средняя цена за яйцо</string>
+    <string name="finance_incubator_screen_average_price_chick">Средняя цена птенца</string>
+    <string name="finance_incubator_screen_cost_chick">Себестоимость птенца</string>
+    <string name="finance_incubator_screen_finance_on_bookmark">Финансы по закладкам</string>
+    <string name="finance_incubator_screen_message_no_date_empty"> Финансовая информация об инкубаторе появится здесь</string>
+    <string name="finance_incubator_screen_second_message_no_date_empty">Завершите одну инкубацию, чтобы отобразилась информация</string>
+    <string name="finance_incubator_screen_average_chicks">Средняя цена птенца</string>
+    <string name="finance_incubator_screen_chicks_price">Себестоимость птенца</string>
+
+
     //Warehouse
     <string name="warehouse_screen_positions">позиции</string>
     <string name="warehouse_screen_products">Товары</string>
     <string name="warehouse_screen_fast_add">Быстрое добавление</string>
+    <string name="warehouse_screen_welcome">Добро пожаловать!</string>
+    <string name="warehouse_screen_welcome_support_text">Начните вести учет вашей продукции</string>
+    <string name="warehouse_screen_welcome_support_second_text">Добавьте первый товар, чтобы отслеживать остатки на складе</string>
+    <string name="warehouse_screen_warehouse_empty">Склад пуст</string>
+    <string name="warehouse_screen_warehouse_empty_support_text">Все запасы распроданы или использованы</string>
+    <string name="warehouse_screen_warehouse_empty_support_second_text">Добавьте товар, чтобы продолжить отслеживать остатки на складе</string>
 
     //WarehouseEdit
     <string name="warehouse_edit_screen_title_add">Создание проекта</string>
@@ -499,7 +566,7 @@
     <string name="warehouse_edit_screen_volume_units">Объемные единицы</string>
     <string name="warehouse_edit_screen_linear_dimensions">Линейные размеры</string>
     <string name="warehouse_edit_screen_warning_title">О единицах измерения</string>
-    <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные ё, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
+    <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
 
     //SupportTextWidget
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
@@ -604,6 +671,25 @@
     <string name="message_no_date_support_count">Сейчас количество не указано:(\nНажмите + чтобы добавить\nили</string>
 
     <string name="message_no_item_finance">Нет транкзаций</string>
+
+    //MessageNoData2
+    <string name="message_no_data_title_add">Нет продукции</string>
+    <string name="message_no_data_message_add">Начните вести учет вашей продукции</string>
+
+    <string name="message_no_data_title_sale">Нет продаж</string>
+    <string name="message_no_data_message_sale">Начните вести учет ваших продаж</string>
+
+    <string name="message_no_data_title_expenses">Нет покупок</string>
+    <string name="message_no_data_message_expenses">Начните вести учет ваших покупок</string>
+
+    <string name="message_no_data_title_write_off">Нет списаний</string>
+    <string name="message_no_data_message_write_off">Начните вести учет ваших списаний</string>
+
+    <string name="message_no_data_title_animals">Нет животных</string>
+    <string name="message_no_data_message_animals">Начните вести учет ваших животных.</string>
+
+    <string name="message_no_data_title_note">Нет заметок</string>
+    <string name="message_no_data_message_note">Начните вести свои заметки</string>
 
 
     //AlertDialogInfo

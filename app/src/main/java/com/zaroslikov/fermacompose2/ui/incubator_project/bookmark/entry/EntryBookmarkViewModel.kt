@@ -6,15 +6,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainBookmark
-import com.zaroslikov.domain.models.table.DomainIncubator
+import com.zaroslikov.domain.models.table.DomainIncubatorParameters
 import com.zaroslikov.domain.repository.BookmarkRepository
-import com.zaroslikov.domain.repository.IncubatorRepository
+import com.zaroslikov.domain.repository.IncubatorParametersRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -26,10 +28,10 @@ import javax.inject.Inject
 @HiltViewModel
 class EntryBookmarkViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val incubatorRepository: IncubatorRepository,
-    private val incubatorTableRepository: IncubatorTableRepository,
+    private val resourceProvider: ResourceProvider,
     private val bookmarkRepository: BookmarkRepository,
-    private val resourceProvider: ResourceProvider
+    private val incubatorTableRepository: IncubatorTableRepository,
+    private val incubatorParametersRepository: IncubatorParametersRepository
 ) : EntryNewViewModel<EntryBookmarkState, EntryBookmarkIntent>(EntryBookmarkState()) {
 
     private val itemIdPT: Long = checkNotNull(savedStateHandle[EntryBookmarkDestination.itemIdPT])
@@ -47,7 +49,9 @@ class EntryBookmarkViewModel @Inject constructor(
             is EntryBookmarkIntent.TypeChanged -> updateType(intent.value)
             is EntryBookmarkIntent.BreedChanged -> updateBreed(intent.value)
             is EntryBookmarkIntent.CountChanged -> updateCount(intent.value)
+            is EntryBookmarkIntent.RejectedCountChanged -> updateRejectedCount(intent.value)
             is EntryBookmarkIntent.PriceChanged -> updatePrice(intent.value)
+            is EntryBookmarkIntent.AutoPriceClicked -> updateAutoPrice(intent.value)
             is EntryBookmarkIntent.DateClicked -> updateDate(intent.value)
             is EntryBookmarkIntent.TimeClicked -> updateTime(intent.value)
             is EntryBookmarkIntent.NoteChanged -> updateNote(intent.value)
@@ -71,6 +75,7 @@ class EntryBookmarkViewModel @Inject constructor(
             is EntryBookmarkIntent.IndexChoiceBookmarkClicked -> updateIndexChoiceBookmark(intent.value)
             is EntryBookmarkIntent.ByDefaultTemplatesClicked -> updateByDefaultTemplates()
             EntryBookmarkIntent.ChoiceTemplatesBookmarkClicked -> updateChoiceTemplates()
+
         }
     }
 
@@ -94,7 +99,7 @@ class EntryBookmarkViewModel @Inject constructor(
                 }
             } else {
                 val bookmark = bookmarkRepository.getBookmark(itemId).first()
-                val parameter = incubatorRepository.getIncubatorList(itemId).first()
+                val parameter = incubatorParametersRepository.getIncubatorList(itemId).first()
                 val parameterDayList =
                     parameter.map { domainIncubator -> domainIncubator.toUiBookmark() }
                 updateState { state ->
@@ -106,12 +111,14 @@ class EntryBookmarkViewModel @Inject constructor(
             }
 
             val templatesBookmarkList =
-                bookmarkRepository.getBookmarkList(getState().currentProduct.type).first()
+                bookmarkRepository.getBookmarkList(getState().currentProduct.type, itemIdPT).first()
             updateState { state ->
                 state.copy(
+                    isLoading = false,
                     currentProduct = state.currentProduct.copy(
                         breedList = breedList,
-                        templatesBookmarkList = templatesBookmarkList
+                        templatesBookmarkList = templatesBookmarkList,
+                        incubatorCount = incubatorTable.capacity,
                     )
                 )
             }
@@ -130,7 +137,7 @@ class EntryBookmarkViewModel @Inject constructor(
 
     private fun updateType(type: TypeEgg) {
         viewModelScope.launch {
-            val templatesBookmarkList = bookmarkRepository.getBookmarkList(type).first()
+            val templatesBookmarkList = bookmarkRepository.getBookmarkList(type, itemIdPT).first()
             updateState { state ->
                 state.copy(
                     currentProduct = state.currentProduct.copy(
@@ -160,7 +167,24 @@ class EntryBookmarkViewModel @Inject constructor(
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
-                    count = count
+                    count = count,
+                    error = state.currentProduct.error.copy(
+                        isErrorLargeCount = count.toConvertZeroDbInt() >= state.currentProduct.incubatorCount
+                    )
+                )
+            )
+        }
+        updatePriceAll()
+    }
+
+    private fun updateRejectedCount(rejectedCount: String) {
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    rejectedCount = rejectedCount,
+                    error = state.currentProduct.error.copy(
+                        isErrorRejectedCount = rejectedCount.toConvertZeroDbInt() > state.currentProduct.count.toConvertZeroDbInt()
+                    )
                 )
             )
         }
@@ -174,13 +198,36 @@ class EntryBookmarkViewModel @Inject constructor(
                 )
             )
         }
+        updatePriceAll()
+    }
+
+    private fun updateAutoPrice(isAutoPrice: Boolean) {
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    isAutoPrice = isAutoPrice
+                )
+            )
+        }
+        updatePriceAll()
+    }
+
+    private fun updatePriceAll() {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(
+                    priceAll = if (it.currentProduct.isAutoPrice) (it.currentProduct.price.toConvertZeroDouble() * it.currentProduct.count.toConvertZeroDouble()).formatNumber()
+                    else "0"
+                )
+            )
+        }
     }
 
     private fun updateDate(date: String) {
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
-                    date = date
+                    startDate = date
                 )
             )
         }
@@ -227,7 +274,6 @@ class EntryBookmarkViewModel @Inject constructor(
     }
 
     private fun updateTemp(index: Int, temp: String) {
-
         updateState { state ->
             val updatedList = state.currentProduct.parameterDayList
                 .mapIndexed { i, item ->
@@ -396,13 +442,28 @@ class EntryBookmarkViewModel @Inject constructor(
     private fun updateIndexChoiceBookmark(indexBookmark: Long) {
         viewModelScope.launch {
             val parameterDayList =
-                incubatorRepository.getIncubatorList(indexBookmark).first()
-
+                incubatorParametersRepository.getIncubatorList(indexBookmark).first()
+            val updatedList =
+                getState().currentProduct.parameterDayList.mapIndexed { index, itemB ->
+                    val source = parameterDayList[index]
+                    itemB.copy(
+                        temp = source.temp,
+                        damp = source.damp,
+                        over = source.over,
+                        airing = source.airing,
+                        tempFact = source.tempFact,
+                        dampFact = source.dampFact,
+                        overFact = source.overFact,
+                        airingFact = source.airingFact,
+                        note = source.note,
+                        idPT = source.idPT
+                    )
+                }
             updateState { state ->
                 state.copy(
                     currentProduct = state.currentProduct.copy(
                         indexBookmark = indexBookmark,
-                        parameterDayList = parameterDayList.map { it.toUiBookmark() }
+                        parameterDayList = updatedList
                     )
                 )
             }
@@ -449,8 +510,12 @@ class EntryBookmarkViewModel @Inject constructor(
                         itemIdPT = id
                     )
                     Log.i("bookmark", "insert: $domain")
-                    incubatorRepository.insertIncubator(domain)
+                    incubatorParametersRepository.insertIncubator(domain)
                 }
+                Log.i(
+                    "bookmark",
+                    "insert bookmark: ${bookmark.toDomainBookmark(itemIdPT = itemIdPT)}"
+                )
                 navigateTo(UiEvent.NavigateBack)
             }
         }
@@ -460,15 +525,20 @@ class EntryBookmarkViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isError()) {
                 val bookmark = getState().currentProduct
+                Log.i("bookmark", "insert: yes")
+                Log.i(
+                    "bookmark",
+                    "insert bookmark: ${bookmark.toDomainBookmark(itemIdPT = itemIdPT)}"
+                )
                 bookmarkRepository.update(bookmark.toDomainBookmark(itemIdPT = itemIdPT))
                 bookmark.parameterDayList.forEach {
-                    incubatorRepository.updateIncubator(
-                        it.toDomainParameter(
-                            itemIdPT = itemId,
-                            isTemplatesPlan = bookmark.isTemplatesPlan,
-                            isEntry = getState().isEntry
-                        )
+                    val domain = it.toDomainParameter(
+                        itemIdPT = itemId,
+                        isTemplatesPlan = bookmark.isTemplatesPlan,
+                        isEntry = getState().isEntry
                     )
+                    incubatorParametersRepository.updateIncubator(domain)
+                    Log.i("bookmark", "insert: $domain")
                 }
                 navigateTo(UiEvent.NavigateBack)
             }
@@ -497,8 +567,8 @@ class EntryBookmarkViewModel @Inject constructor(
         isTemplatesPlan: Boolean,
         itemIdPT: Long,
         isEntry: Boolean,
-    ): DomainIncubator {
-        return DomainIncubator(
+    ): DomainIncubatorParameters {
+        return DomainIncubatorParameters(
             id = itemId ?: id,
             day = day,
             temp = if (isTemplatesPlan) temp else tempFact,
@@ -514,7 +584,7 @@ class EntryBookmarkViewModel @Inject constructor(
         )
     }
 
-    private fun DomainIncubator.toUiBookmark(): ParameterDay {
+    private fun DomainIncubatorParameters.toUiBookmark(): ParameterDay {
         return ParameterDay(
             id = id,
             day = day,
@@ -540,10 +610,12 @@ class EntryBookmarkViewModel @Inject constructor(
             type = type,
             breed = breed.ifEmpty { null },
             count = count.toConvertDbInt(),
-            date = date,
+            rejectedCount = rejectedCount.toConvertZeroDbInt(),
+            startDate = startDate,
+            endDate = endDate,
             time = time,
             price = if (price.isEmpty()) null else price.toConvertDbDouble(),
-            autoPrice = false,
+            priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
             note = note,
             isAutoRotation = autoRotation,
             isAutoVentilation = autoVentilation,
@@ -561,11 +633,14 @@ class EntryBookmarkViewModel @Inject constructor(
             type = type,
             breed = breed ?: resourceProvider.getString(R.string.entry_bookmark_not_specified),
             count = count.formatNumber(false),
-            date = date,
+            rejectedCount = rejectedCount.formatNumber(false),
+            startDate = startDate,
+            endDate = endDate,
             time = time,
             price = price?.formatNumber(false) ?: "",
+            priceAll = priceAll?.formatNumber(false) ?: "",
+            isAutoPrice = priceAll != null,
             parameterDayList = parameterDayList,
-            autoPrice = autoPrice,
             note = note,
             autoRotation = isAutoRotation,
             autoVentilation = isAutoVentilation,
@@ -578,145 +653,145 @@ class EntryBookmarkViewModel @Inject constructor(
     private fun setIncubator(typeIncubator: TypeEgg): List<ParameterDay> {
         when (typeIncubator) {
             TypeEgg.CHICKENS -> return listOf(
-                ParameterDay(1, "37.5", "60", "2-3", "2 раза по 5 минут"),
-                ParameterDay(2, "37.5", "60", "2-3", "2 раза по 5 минут"),
-                ParameterDay(3, "37.0", "70", "2-3", "2 раза по 5 минут"),
-                ParameterDay(4, "37.0", "70", "2-3", "2 раза по 5 минут"),
-                ParameterDay(5, "37.0", "70", "2-3", "2 раза по 5 минут"),
-                ParameterDay(6, "37.9", "66", "2-3", "нет"),
-                ParameterDay(7, "37.9", "66", "2-3", "нет"),
-                ParameterDay(8, "37.9", "66", "2-3", "нет"),
-                ParameterDay(9, "37.9", "66", "2-3", "нет"),
-                ParameterDay(10, "37.9", "66", "2-3", "нет"),
-                ParameterDay(11, "37.5", "60", "2-3", "нет"),
-                ParameterDay(12, "37.5", "60", "2-3", "2 раза по 5 мин"),
-                ParameterDay(13, "37.5", "60", "2-3", "2 раза по 5 мин"),
-                ParameterDay(14, "37.5", "60", "2-3", "2 раза по 5 мин"),
-                ParameterDay(15, "37.5", "60", "2-3", "2 раза по 5 мин"),
-                ParameterDay(16, "37.5", "60", "2-3", "2 раза по 5 мин"),
-                ParameterDay(17, "37.3", "60", "2-3", "2 раза по 5 мин"),
-                ParameterDay(18, "37.3", "60", "2-3", "2 раза по 20 мин"),
-                ParameterDay(19, "37.0", "70", "нет", "2 раза по 20 мин"),
-                ParameterDay(20, "37.0", "70", "нет", "2 раза по 5 мин"),
-                ParameterDay(21, "37.0", "70", "нет", "2 раза по 5 мин")
+                ParameterDay(1, "37.5", "60", "2 - 3", "2 x 5"),
+                ParameterDay(2, "37.5", "60", "2 - 3", "2 x 5"),
+                ParameterDay(3, "37.0", "70", "2 - 3", "2 x 5"),
+                ParameterDay(4, "37.0", "70", "2 - 3", "2 x 5"),
+                ParameterDay(5, "37.0", "70", "2 - 3", "2 x 5"),
+                ParameterDay(6, "37.9", "66", "2 - 3", "-"),
+                ParameterDay(7, "37.9", "66", "2 - 3", "-"),
+                ParameterDay(8, "37.9", "66", "2 - 3", "-"),
+                ParameterDay(9, "37.9", "66", "2 - 3", "-"),
+                ParameterDay(10, "37.9", "66", "2 - 3", "-"),
+                ParameterDay(11, "37.5", "60", "2 - 3", "-"),
+                ParameterDay(12, "37.5", "60", "2 - 3", "2 x 5"),
+                ParameterDay(13, "37.5", "60", "2 - 3", "2 x 5"),
+                ParameterDay(14, "37.5", "60", "2 - 3", "2 x 5"),
+                ParameterDay(15, "37.5", "60", "2 - 3", "2 x 5"),
+                ParameterDay(16, "37.5", "60", "2 - 3", "2 x 5"),
+                ParameterDay(17, "37.3", "60", "2 - 3", "2 x 5"),
+                ParameterDay(18, "37.3", "60", "2 - 3", "2 x 20"),
+                ParameterDay(19, "37.0", "70", "-", "2 x 20"),
+                ParameterDay(20, "37.0", "70", "-", "2 x 5"),
+                ParameterDay(21, "37.0", "70", "-", "2 x 5")
             )
 
 
             TypeEgg.GEESE -> return listOf(
-                ParameterDay(1, "38.0", "65", "3-4", "нет"),
-                ParameterDay(2, "37.8", "65", "6", "1 раз по 20 мин"),
-                ParameterDay(3, "37.8", "65", "6", "1 раз по 20 мин"),
-                ParameterDay(4, "37.6", "70", "6", "1 раз по 20 мин"),
-                ParameterDay(5, "37.6", "70", "6", "1 раз по 20 мин"),
-                ParameterDay(6, "37.6", "70", "6", "2 раза по 20 мин"),
-                ParameterDay(7, "37.6", "70", "6", "2 раза по 20 мин"),
-                ParameterDay(8, "37.6", "70", "6", "2 раза по 20 мин"),
-                ParameterDay(9, "37.6", "70", "10", "2 раз по 20 мин"),
-                ParameterDay(10, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(11, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(12, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(13, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(14, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(15, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(16, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(17, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(18, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(19, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(20, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(21, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(22, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(23, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(24, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(25, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(26, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(27, "37.3", "75", "10", "3 раза по 45 мин"),
-                ParameterDay(28, "37.3", "75", "нет", "3 раза по 45 мин"),
-                ParameterDay(29, "37.3", "75", "нет", "3 раза по 45 мин"),
-                ParameterDay(30, "37.3", "75", "нет", "3 раза по 45 мин")
+                ParameterDay(1, "38.0", "65", "3 - 4", "-"),
+                ParameterDay(2, "37.8", "65", "6", "1 x 20"),
+                ParameterDay(3, "37.8", "65", "6", "1 x 20"),
+                ParameterDay(4, "37.6", "70", "6", "1 x 20"),
+                ParameterDay(5, "37.6", "70", "6", "1 x 20"),
+                ParameterDay(6, "37.6", "70", "6", "2 x 20"),
+                ParameterDay(7, "37.6", "70", "6", "2 x 20"),
+                ParameterDay(8, "37.6", "70", "6", "2 x 20"),
+                ParameterDay(9, "37.6", "70", "10", "2 x 20"),
+                ParameterDay(10, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(11, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(12, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(13, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(14, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(15, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(16, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(17, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(18, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(19, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(20, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(21, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(22, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(23, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(24, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(25, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(26, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(27, "37.3", "75", "10", "3 x 45"),
+                ParameterDay(28, "37.3", "75", "-", "3 x 45"),
+                ParameterDay(29, "37.3", "75", "-", "3 x 45"),
+                ParameterDay(30, "37.3", "75", "-", "3 x 45")
             )
 
             TypeEgg.QUAILS -> return listOf(
-                ParameterDay(1, "38.0", "55", "3-6", "нет"),
-                ParameterDay(2, "38.0", "55", "3-6", "нет"),
-                ParameterDay(3, "37.7", "55", "3-6", "нет"),
-                ParameterDay(4, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(5, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(6, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(7, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(8, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(9, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(10, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(11, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(12, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(13, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(14, "37.7", "55", "3-6", "1 раз по 5 мин"),
-                ParameterDay(15, "37.5", "37,5", "3-6", "нет"),
-                ParameterDay(16, "37.5", "37,5", "нет", "нет"),
-                ParameterDay(17, "37.5", "37,5", "нет", "нет")
+                ParameterDay(1, "38.0", "55", "3 - 6", "-"),
+                ParameterDay(2, "38.0", "55", "3 - 6", "-"),
+                ParameterDay(3, "37.7", "55", "3 - 6", "-"),
+                ParameterDay(4, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(5, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(6, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(7, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(8, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(9, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(10, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(11, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(12, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(13, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(14, "37.7", "55", "3 - 6", "1 x 5"),
+                ParameterDay(15, "37.5", "37.5", "3 - 6", "-"),
+                ParameterDay(16, "37.5", "37.5", "нет", "-"),
+                ParameterDay(17, "37.5", "37.5", "нет", "-")
             )
 
 
             TypeEgg.TURKEYS -> return listOf(
-                ParameterDay(1, "38.0", "60", "6", "нет"),
-                ParameterDay(2, "38.0", "60", "6", "нет"),
-                ParameterDay(3, "38.0", "60", "6", "нет"),
-                ParameterDay(4, "38.0", "60", "6", "нет"),
-                ParameterDay(5, "38.0", "60", "6", "нет"),
-                ParameterDay(6, "38.0", "60", "6", "нет"),
-                ParameterDay(7, "38.0", "60", "6", "нет"),
-                ParameterDay(8, "37.7", "45", "6", "2 раза по 5 мин"),
-                ParameterDay(9, "37.7", "45", "6", "2 раза по 5 мин"),
-                ParameterDay(10, "37.7", "45", "6", "2 раза по 5 мин"),
-                ParameterDay(11, "37.7", "45", "6", "2 раза по 5 мин"),
-                ParameterDay(12, "37.7", "45", "6", "2 раза по 5 мин"),
-                ParameterDay(13, "37.7", "45", "6", "2 раза по 5 мин"),
-                ParameterDay(14, "37.7", "65", "6", "2 раза по 5 мин"),
-                ParameterDay(15, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(16, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(17, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(18, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(19, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(20, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(21, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(22, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(23, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(24, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(25, "37.5", "65", "4", "4 раза по 10 мин"),
-                ParameterDay(26, "37.5", "65", "нет", "нет"),
-                ParameterDay(27, "37.5", "65", "нет", "нет"),
-                ParameterDay(28, "37.5", "65", "нет", "нет")
+                ParameterDay(1, "38.0", "60", "6", "-"),
+                ParameterDay(2, "38.0", "60", "6", "-"),
+                ParameterDay(3, "38.0", "60", "6", "-"),
+                ParameterDay(4, "38.0", "60", "6", "-"),
+                ParameterDay(5, "38.0", "60", "6", "-"),
+                ParameterDay(6, "38.0", "60", "6", "-"),
+                ParameterDay(7, "38.0", "60", "6", "-"),
+                ParameterDay(8, "37.7", "45", "6", "2 x 5"),
+                ParameterDay(9, "37.7", "45", "6", "2 x 5"),
+                ParameterDay(10, "37.7", "45", "6", "2 x 5"),
+                ParameterDay(11, "37.7", "45", "6", "2 x 5"),
+                ParameterDay(12, "37.7", "45", "6", "2 x 5"),
+                ParameterDay(13, "37.7", "45", "6", "2 x 5"),
+                ParameterDay(14, "37.7", "65", "6", "2 x 5"),
+                ParameterDay(15, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(16, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(17, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(18, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(19, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(20, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(21, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(22, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(23, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(24, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(25, "37.5", "65", "4", "4 x 10"),
+                ParameterDay(26, "37.5", "65", "-", "-"),
+                ParameterDay(27, "37.5", "65", "", "-"),
+                ParameterDay(28, "37.5", "65", "-", "-")
             )
 
 
             TypeEgg.DUCKS -> return listOf(
-                ParameterDay(1, "38.0", "75", "4", "нет"),
-                ParameterDay(2, "38.0", "75", "4", "нет"),
-                ParameterDay(3, "38.0", "75", "4", "нет"),
-                ParameterDay(4, "38.0", "75", "4", "нет"),
-                ParameterDay(5, "38.0", "75", "4", "нет"),
-                ParameterDay(6, "38.0", "75", "4", "нет"),
-                ParameterDay(7, "37.8", "60", "4", "нет"),
-                ParameterDay(8, "37.8", "60", "4-6", "нет"),
-                ParameterDay(9, "37.8", "60", "4-6", "нет"),
-                ParameterDay(10, "37.8", "60", "4-6", "нет"),
-                ParameterDay(11, "37.8", "60", "4-6", "нет"),
-                ParameterDay(12, "37.8", "60", "4-6", "нет"),
-                ParameterDay(13, "37.8", "60", "4-6", "нет"),
-                ParameterDay(14, "37.8", "60", "4-6", "нет"),
-                ParameterDay(15, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(16, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(17, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(18, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(19, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(20, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(21, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(22, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(23, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(24, "37.8", "60", "6", "2 раза по 15 мин"),
-                ParameterDay(25, "37.5", "90", "6", "2 раза по 15 мин"),
-                ParameterDay(26, "37.5", "90", "нет", "нет"),
-                ParameterDay(27, "37.5", "90", "нет", "нет"),
-                ParameterDay(28, "37.5", "90", "нет", "нет")
+                ParameterDay(1, "38.0", "75", "4", "-"),
+                ParameterDay(2, "38.0", "75", "4", "-"),
+                ParameterDay(3, "38.0", "75", "4", "-"),
+                ParameterDay(4, "38.0", "75", "4", "-"),
+                ParameterDay(5, "38.0", "75", "4", "-"),
+                ParameterDay(6, "38.0", "75", "4", "-"),
+                ParameterDay(7, "37.8", "60", "4", "-"),
+                ParameterDay(8, "37.8", "60", "4 - 6", "-"),
+                ParameterDay(9, "37.8", "60", "4 - 6", "-"),
+                ParameterDay(10, "37.8", "60", "4 - 6", "-"),
+                ParameterDay(11, "37.8", "60", "4 - 6", "-"),
+                ParameterDay(12, "37.8", "60", "4 - 6", "-"),
+                ParameterDay(13, "37.8", "60", "4 - 6", "-"),
+                ParameterDay(14, "37.8", "60", "4 - 6", "-"),
+                ParameterDay(15, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(16, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(17, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(18, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(19, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(20, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(21, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(22, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(23, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(24, "37.8", "60", "6", "2 x 15"),
+                ParameterDay(25, "37.5", "90", "6", "2 x 15 "),
+                ParameterDay(26, "37.5", "90", "-", "-"),
+                ParameterDay(27, "37.5", "90", "-", "-"),
+                ParameterDay(28, "37.5", "90", "-", "-")
             )
         }
     }
@@ -727,7 +802,9 @@ sealed class EntryBookmarkIntent() : BaseIntent {
     data class TypeChanged(val value: TypeEgg) : EntryBookmarkIntent()
     data class BreedChanged(val value: String) : EntryBookmarkIntent()
     data class CountChanged(val value: String) : EntryBookmarkIntent()
+    data class RejectedCountChanged(val value: String) : EntryBookmarkIntent()
     data class PriceChanged(val value: String) : EntryBookmarkIntent()
+    data class AutoPriceClicked(val value: Boolean) : EntryBookmarkIntent()
     data class DateClicked(val value: String) : EntryBookmarkIntent()
     data class TimeClicked(val value: String) : EntryBookmarkIntent()
     data class NoteChanged(val value: String) : EntryBookmarkIntent()
@@ -746,7 +823,6 @@ sealed class EntryBookmarkIntent() : BaseIntent {
     data object CancelNotificationClicked : EntryBookmarkIntent()
     data object AddNotificationClicked : EntryBookmarkIntent()
     data object EditNotificationClicked : EntryBookmarkIntent()
-
 
     data object Insert : EntryBookmarkIntent()
     data object Update : EntryBookmarkIntent()

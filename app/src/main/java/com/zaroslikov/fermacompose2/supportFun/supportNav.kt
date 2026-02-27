@@ -2,7 +2,9 @@ package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.main.BookmarkDestination
+import com.zaroslikov.fermacompose2.ui.incubator_project.finance.FinanceIncubatorDestination
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
+import com.zaroslikov.fermacompose2.ui.incubator_project.journal.JournalDestination
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
@@ -26,8 +28,8 @@ fun Destination.toRoute(itemPT: Long): String {
 
 fun DestinationIncubator.toNav(itemPT: Long): String {
     return when (this) {
-        DestinationIncubator.REVIEW -> "${HomeDestination.route}/${itemPT}"
+        DestinationIncubator.JOURNAL -> "${JournalDestination.route}/${itemPT}"
         DestinationIncubator.BOOKMARK -> "${BookmarkDestination.route}/${itemPT}"
-        DestinationIncubator.FINANCE -> "${FinanceDestination.route}/${itemPT}"
+        DestinationIncubator.FINANCE -> "${FinanceIncubatorDestination.route}/${itemPT}"
     }
 }

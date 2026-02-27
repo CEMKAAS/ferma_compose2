@@ -1,9 +1,10 @@
-package com.zaroslikov.fermacompose2.ui.start.startScreen
+package com.zaroslikov.fermacompose2.ui.start.first
 
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -11,10 +12,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StartScreenViewModel @Inject constructor(
-    private val projectRepository: ProjectRepository,
-) : ListViewModel<StartScreenState, StartScreenIntent>(StartScreenState()) {
-
+class FirstScreenViewModel @Inject constructor(
+    private val projectRepository: ProjectRepository
+) : BaseViewModel2<FirstState, FirstIntent, FirstScreenReducer>(
+    FirstState(),
+    FirstScreenReducer()
+) {
     init {
         loadData()
     }
@@ -22,7 +25,7 @@ class StartScreenViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
-            projectRepository.getAllProject().collectLatest { list ->
+            projectRepository.getAllProject().collect { list ->
                 updateState {
                     it.copy(
                         isLoading = false,
@@ -33,16 +36,17 @@ class StartScreenViewModel @Inject constructor(
         }
     }
 
-    fun onIntent(intent: StartScreenIntent) {
+    fun onIntent(intent: FirstIntent) {
         return when (intent) {
-            is StartScreenIntent.DeleteClicked -> deleteProject(intent.domainProjectTable)
-            is StartScreenIntent.ArchiveClicked -> archiveProject(intent.domainProjectTable)
+            is FirstIntent.DeleteClicked -> deleteProject(intent.domainProjectTable)
+            is FirstIntent.ArchiveClicked -> archiveProject(intent.domainProjectTable)
+            else -> sendIntent(intent)
         }
     }
 
     private fun archiveProject(domainProjectTable: DomainProjectTable) {
         viewModelScope.launch {
-            projectRepository.updateProject(domainProjectTable.copy(mode = 0))
+            projectRepository.updateProject(domainProjectTable.copy(mode = false))
         }
     }
 
@@ -126,7 +130,8 @@ class StartScreenViewModel @Inject constructor(
         }*/
 }
 
-sealed class StartScreenIntent() : BaseIntent {
-    data class DeleteClicked(val domainProjectTable: DomainProjectTable) : StartScreenIntent()
-    data class ArchiveClicked(val domainProjectTable: DomainProjectTable) : StartScreenIntent()
+sealed class FirstIntent() : BaseIntent {
+    data class DeleteClicked(val domainProjectTable: DomainProjectTable) : FirstIntent()
+    data class ArchiveClicked(val domainProjectTable: DomainProjectTable) : FirstIntent()
+    data class LoadingClicked(val value: Boolean) : FirstIntent()
 }

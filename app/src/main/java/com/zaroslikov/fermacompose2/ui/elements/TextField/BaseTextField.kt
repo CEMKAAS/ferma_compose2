@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.elements.TextField
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,10 +48,13 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_9
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.text_12
+import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 
 @Composable
@@ -82,11 +86,14 @@ fun BaseOutlinedTextNew(
     isMore: Boolean? = null,
     singleLine: Boolean = true,
     minLines: Int = 1,
+    maxLength: Int? = null,
     colorTextField: Color = gray_9,
     focusManager: FocusManager = LocalFocusManager.current,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
 ) {
+
+    val isDisabled = !enable
     val leadingIcon: @Composable (() -> Unit)? = if (leadingIconRes != null) {
         {
             IconButton(onClick = { leadingIconClick() }) {
@@ -162,10 +169,14 @@ fun BaseOutlinedTextNew(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = if (isError) Color(0xFFFFEAEA) else colorTextField,
+                    color =  when {
+                        isDisabled -> Color(0xFFF2F2F2)
+                        isError -> Color(0xFFFFEAEA)
+                        else -> colorTextField
+                    },
                     shape = RoundedCornerShape(14.dp)
                 )
-                .border(borderWidth, color = Color(0xFFD1D5DC), shape = RoundedCornerShape(14.dp))
+                .border(borderWidth, color = if (isDisabled) Color(0xFFE0E0E0) else Color(0xFFD1D5DC), shape = RoundedCornerShape(14.dp))
                 .padding(horizontal = 12.dp, vertical = 4.dp)
         ) {
             Row(
@@ -181,21 +192,28 @@ fun BaseOutlinedTextNew(
                             .size(20.dp)
                             .wrapContentWidth()/*.padding(end = 5.dp)*/,
                         contentDescription = null,
-                        tint = leadingIconColor2
+                        tint = if (isDisabled) Color(0xFFB0B0B0) else leadingIconColor2
                     )
                     Spacer(modifier = Modifier.padding(3.dp))
                 }
                 // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
                 BasicTextField(
                     value = value,
-                    onValueChange = onValueChange,
+                    onValueChange = { newValue ->
+                        val filteredValue = when {
+                            maxLength == null -> newValue
+                            newValue.length <= maxLength -> newValue
+                            else -> newValue.take(maxLength)
+                        }
+                        onValueChange(filteredValue)
+                    },
                     modifier = Modifier
                         .weight(1f)           // <-- ключ: занимает свободное место
                         .padding(end = if (isMore == true) 8.dp else 0.dp) // отступ перед иконкой
                         .defaultMinSize(minHeight = (minLines * 26).dp)
                         .align(Alignment.CenterVertically),
                     textStyle = TextStyle(
-                        color = Color.Black,
+                        color = if (isDisabled) Color(0xFF9E9E9E) else Color.Black,
                         fontSize = 16.sp,
                         lineHeight = 26.sp
                     ),
@@ -248,6 +266,12 @@ fun BaseOutlinedTextNew(
                 }
 
             }
+        }
+        AnimatedVisibility(
+            modifier = Modifier.fillMaxWidth(),
+            visible = isError
+        ) {
+            Text(stringResource(intResError), style = text_12, color = error_base)
         }
     }
 }
@@ -302,6 +326,7 @@ fun BaseOutlinedTextNew3(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
+    maxLength: Int? = 5,
     @StringRes intResSup: Int,
     singleLine: Boolean = true,
     readOnly: Boolean = false,
@@ -314,7 +339,14 @@ fun BaseOutlinedTextNew3(
     // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
     BasicTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { newValue ->
+            val filteredValue = when {
+                maxLength == null -> newValue
+                newValue.length <= maxLength -> newValue
+                else -> newValue.take(maxLength)
+            }
+            onValueChange(filteredValue)
+        },
         modifier = Modifier,
         textStyle = TextStyle(
             color = Color.Black,
@@ -355,6 +387,7 @@ fun BaseOutlinedTextNew4(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
+    maxLength: Int? = 5,
     @StringRes intResSup: Int,
     singleLine: Boolean = true,
     readOnly: Boolean = false,
@@ -366,7 +399,14 @@ fun BaseOutlinedTextNew4(
     // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
     BasicTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { newValue ->
+            val filteredValue = when {
+                maxLength == null -> newValue
+                newValue.length <= maxLength -> newValue
+                else -> newValue.take(maxLength)
+            }
+            onValueChange(filteredValue)
+        },
         modifier = modifier,
         textStyle = TextStyle(
             color = Color.Black,
@@ -378,6 +418,7 @@ fun BaseOutlinedTextNew4(
         singleLine = singleLine,
         maxLines = minLines,
         decorationBox = { innerTextField ->
+
             Box(contentAlignment = Alignment.Center) {
                 if (value.isEmpty()) {
                     Text(

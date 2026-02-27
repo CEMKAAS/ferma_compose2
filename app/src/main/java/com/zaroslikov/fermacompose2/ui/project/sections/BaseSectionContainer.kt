@@ -44,6 +44,7 @@ import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
+import com.zaroslikov.fermacompose2.ui.elements.MessageNoData2
 import com.zaroslikov.fermacompose2.ui.elements.TextLine
 import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.textBold_20
@@ -65,13 +66,15 @@ fun <T, B> InventoryBody(
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (B) -> Unit,
     // карточки передаются как composable-функции
-    detailCard: @Composable (Int,T) -> Unit,
+    detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
     // ресурсы строк для пустого состояния
-    titleRes: Int,
-    messageRes: Int,
-    supportRes: Int,
-    buttonRes: Int,
+    @StringRes titleRes: Int,
+    @StringRes messageRes: Int,
+    @StringRes supportSecondText: Int? = null,
+    @DrawableRes iconRes: Int,
+    iconColor: Color,
+    backgroundColor: Color
 ) {
     if (itemList.isNotEmpty()) {
         InventoryList(
@@ -86,13 +89,14 @@ fun <T, B> InventoryBody(
             brieflyCard = brieflyCard,
         )
     } else {
-        MessageNoData(
+        MessageNoData2(
             modifier = modifier,
-            onClick = onInsertClick,
             titleRes = titleRes,
             messageRes = messageRes,
-            supportRes = supportRes,
-            buttonRes = buttonRes
+            supportSecondText = supportSecondText,
+            iconRes = iconRes,
+            iconColor = iconColor,
+            backgroundColor = backgroundColor,
         )
     }
 }

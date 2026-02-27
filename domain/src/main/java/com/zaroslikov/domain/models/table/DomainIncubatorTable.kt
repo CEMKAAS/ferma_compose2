@@ -4,6 +4,7 @@ import com.zaroslikov.domain.models.enums.Suffix
 
 data class DomainIncubatorTable(
     val id: Long = 0,
+    val title: String = "",
     val brand: String? = null,
     val model: String? = null,
     val capacity: Int = 0,

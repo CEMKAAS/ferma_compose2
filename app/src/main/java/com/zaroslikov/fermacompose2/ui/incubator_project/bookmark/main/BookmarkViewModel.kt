@@ -9,14 +9,14 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainBookmark
-import com.zaroslikov.domain.models.table.DomainIncubator
+import com.zaroslikov.domain.models.table.DomainIncubatorParameters
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
-import com.zaroslikov.domain.repository.IncubatorRepository
+import com.zaroslikov.domain.repository.IncubatorParametersRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
@@ -25,6 +25,11 @@ import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel
 import com.zaroslikov.fermacompose2.supportFun.currentTime
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.toConvertDb
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,6 +43,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -46,9 +52,9 @@ import javax.inject.Inject
 class BookmarkViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val projectRepository: ProjectRepository,
-    private val incubatorRepository: IncubatorRepository,
     private val incubatorTableRepository: IncubatorTableRepository,
     private val bookmarkRepository: BookmarkRepository,
+    private val incubatorParametersRepository: IncubatorParametersRepository,
     private val resourceProvider: ResourceProvider,
     private val settingsRepository: SettingsRepository,
     private val animalRepository: AnimalRepository,
@@ -74,7 +80,7 @@ class BookmarkViewModel @Inject constructor(
             bookmarkRepository.getActivityBookmark(incubator.id)
                 .flatMapLatest { bookmark ->
                     if (bookmark == null) flowOf(null to emptyList())
-                    else incubatorRepository.getIncubatorList(bookmark.id)
+                    else incubatorParametersRepository.getIncubatorList(bookmark.id)
                         .map { parameters ->
                             bookmark to parameters
                         }
@@ -90,8 +96,8 @@ class BookmarkViewModel @Inject constructor(
                         return@collect
                     }
                     val numberDays = parameters.size
-                    val (currentDay, endDay) = dayNumberWithTime(
-                        startDate = bookmark.date,
+                    val (currentDay, startDay, endDay) = dayNumberWithTime(
+                        startDate = bookmark.startDate,
                         startTime = bookmark.time,
                         numberDays = numberDays
                     )
@@ -104,28 +110,33 @@ class BookmarkViewModel @Inject constructor(
                         currentDay = currentDay + 1,
                         parametersList = parameters
                     ).toUi(typeEgg = bookmark.type)
-
                     val percent = percentWithTime(
-                        startDate = bookmark.date, startTime = bookmark.time,
+                        startDate = bookmark.startDate, startTime = bookmark.time,
                         numberDays = numberDays
                     )
+                    val isBookmarkCompleted = currentDay > numberDays
                     updateState { state ->
                         state.copy(
                             domainBookmark = bookmark,
                             idBookmark = bookmark.id,
                             isActivityBookmark = bookmark.isActivityBookmark,
+                            isBookmarkCompleted = isBookmarkCompleted,
                             numberDays = numberDays,
                             currentDay = currentDay,
+                            startDay = startDay,
                             endDay = endDay,
-                            daysToEnd = numberDays - currentDay,
+                            currentEgg = bookmark.count - bookmark.rejectedCount,
+                            daysToEnd = if (isBookmarkCompleted) 0 else numberDays - currentDay,
                             percent = percent.first,
                             percentFloat = percent.second,
                             parameterDayList = parameters.map { it.toUi(bookmark.type) },
                             currentParameterDay = currentParameter,
                             tomorrowParameterDay = tomorrowParameter,
-                            isLoading = false
+                            isLoading = false,
+                            isCompleteModeEnd = currentDay > numberDays - 1
                         )
                     }
+                    if (isBookmarkCompleted) updateCompleteIncubationBottomSheet(true)
                 }
         }
     }
@@ -156,6 +167,7 @@ class BookmarkViewModel @Inject constructor(
             BookmarkIntent.CompleteIncubatorClick -> completeIncubatorClick()
             is BookmarkIntent.NameProjectChanged -> updateNewNameProject(intent.value)
             is BookmarkIntent.ChicksBredChanged -> updateChicksBred(intent.value)
+            is BookmarkIntent.ChicksPriceChanged -> updateChicksPrice(intent.value)
 
             //EarlyCompleteParameter
             BookmarkIntent.EarlyCompleteIncubatorClick -> earlyCompleteIncubator()
@@ -192,9 +204,9 @@ class BookmarkViewModel @Inject constructor(
         startDate: String,
         startTime: String,
         numberDays: Int
-    ): Pair<Int, String> {
+    ): Triple<Int, String, String> {
         val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-        val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        val dateFormatter = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())
 
         val start = LocalDateTime.parse("$startDate $startTime", dateTimeFormatter)
         val current = LocalDateTime.parse("${dateToday()} ${currentTime()}", dateTimeFormatter)
@@ -204,7 +216,8 @@ class BookmarkViewModel @Inject constructor(
         val endDate = start
             .plusDays(numberDays.toLong())
             .format(dateFormatter)
-        return currentDay to endDate
+        val startDateNew = start.format(dateFormatter)
+        return Triple(currentDay, startDateNew, endDate)
     }
 
     private fun percentWithTime(
@@ -358,9 +371,9 @@ class BookmarkViewModel @Inject constructor(
 
     private fun searchCurrentParameter(
         currentDay: Int,
-        parametersList: List<DomainIncubator>
-    ): DomainIncubator {
-        return parametersList.firstOrNull { it.day == currentDay } ?: DomainIncubator()
+        parametersList: List<DomainIncubatorParameters>
+    ): DomainIncubatorParameters {
+        return parametersList.firstOrNull { it.day == currentDay } ?: DomainIncubatorParameters()
     }
 
     private fun updateTemp(temp: String) {
@@ -438,14 +451,14 @@ class BookmarkViewModel @Inject constructor(
 
     private fun earlyCompleteIncubator() {
         viewModelScope.launch {
-            bookmarkToArchive(getState().reasonNote)
+            bookmarkToArchive(getState().reasonNote, isEarlyCompletionStatus = true)
             updateCompleteIncubationBottomSheet(false)
         }
     }
 
     private fun updateCompleteIncubationBottomSheet(isOpenCompleteIncubationBottomSheet: Boolean) {
         viewModelScope.launch {
-            if (getState().currentDay <= getState().numberDays - 1)
+            if (!getState().isCompleteModeEnd)
                 updateState { state ->
                     state.copy(
                         isOpenEarlyCompleteIncubationBottomSheet = isOpenCompleteIncubationBottomSheet,
@@ -460,7 +473,9 @@ class BookmarkViewModel @Inject constructor(
                 updateState { state ->
                     state.copy(
                         isOpenCompleteIncubationBottomSheet = isOpenCompleteIncubationBottomSheet,
-                        projectList = projectList
+                        completeState = state.completeState.copy(
+                            projectList = projectList
+                        )
                     )
                 }
             }
@@ -468,31 +483,86 @@ class BookmarkViewModel @Inject constructor(
     }
 
     private fun updateChoiceProjectMode(isChoiceProjectMode: Boolean) {
-        val state = getState().isChoiceProjectMode
+        val state = getState().completeState.isChoiceProjectMode
         val value = when (isChoiceProjectMode) {
             true -> if (state == true) null else true
             false -> if (state == false) null else false
         }
+        val isEnabledCompleteButtonTwo = if (value == null) true else {
+            if (value) getState().completeState.newNameProject.isNotBlank() else getState().completeState.indexProject != 0L
+        }
+
         updateState { state ->
-            state.copy(isChoiceProjectMode = value)
+            state.copy(
+                completeState = state.completeState.copy(
+                    isChoiceProjectMode = value,
+                    isEnabledCompleteButtonTwo = isEnabledCompleteButtonTwo
+                )
+            )
         }
     }
 
     private fun updateNewNameProject(newNameProject: String) {
         updateState { state ->
-            state.copy(newNameProject = newNameProject)
+            state.copy(
+                completeState = state.completeState.copy(
+                    newNameProject = newNameProject,
+                    isEnabledCompleteButtonTwo = newNameProject.isNotBlank()
+                )
+            )
         }
     }
 
     private fun updateChicksBred(chicksBred: String) {
+        val allEgg = getState().domainBookmark.count
+        val currentEgg = getState().currentEgg
+        val rejectedEgg = getState().domainBookmark.rejectedCount
+        val chicksBredInt = chicksBred.toConvertZeroDbInt()
+
+        val fraction = (chicksBred.toConvertZeroDouble() / allEgg.toDouble())
+            .coerceIn(0.0, 1.0)
+
+        val isErrorCompleted = chicksBredInt > currentEgg
+        val rejectedEggCompleted =
+            if (isErrorCompleted) rejectedEgg
+            else currentEgg - chicksBredInt + rejectedEgg
+
+        val isEnabledCompleteButton =
+            (!isErrorCompleted && chicksBred.isNotBlank() && chicksBredInt > 0)
+
+
         updateState { state ->
-            state.copy(chicksBred = chicksBred)
+            state.copy(
+                completeState = state.completeState.copy(
+                    chicksBred = chicksBred,
+                    precentCompleted = fraction * 100.0,
+                    precentFloatCompleted = fraction.toFloat(),
+                    isErrorCompleted = isErrorCompleted,
+                    rejectedEggCompleted = rejectedEggCompleted,
+                    isEnabledCompleteButton = isEnabledCompleteButton
+                )
+            )
+        }
+    }
+
+    private fun updateChicksPrice(chicksPrice: String) {
+        updateState { state ->
+            state.copy(
+                completeState = state.completeState.copy(
+                    chicksPrice = chicksPrice,
+                )
+            )
         }
     }
 
     private fun updateIndexChoiceProject(index: Long) {
         updateState { state ->
-            state.copy(indexProject = index)
+            state.copy(
+                completeState = state.completeState.copy(
+                    indexProject = index,
+                    isEnabledCompleteButtonTwo = index != 0L
+                )
+            )
         }
     }
 
@@ -502,8 +572,9 @@ class BookmarkViewModel @Inject constructor(
                 updateState { state ->
                     state.copy(
                         domainBookmark = state.domainBookmark.copy(
-                            count = state.domainBookmark.count - getState().rejectedEgg.toInt()
-                        )
+                            rejectedCount = state.domainBookmark.rejectedCount + state.rejectedEgg.toConvertDbInt()
+                        ),
+                        rejectedEgg = ""
                     )
                 }
                 bookmarkRepository.update(getState().domainBookmark)
@@ -533,13 +604,13 @@ class BookmarkViewModel @Inject constructor(
 
     private fun updateCurrentParameterDay() {
         viewModelScope.launch {
-            incubatorRepository.updateIncubator(getState().currentParameterDay.toDomain())
+            incubatorParametersRepository.updateIncubator(getState().currentParameterDay.toDomain())
         }
     }
 
     private fun updateEditCurrentParameterDay() {
         viewModelScope.launch {
-            incubatorRepository.updateIncubator(getState().editParameterDay.toDomain())
+            incubatorParametersRepository.updateIncubator(getState().editParameterDay.toDomain())
         }
         updateOpenEditBottomSheet(false, ParametersIncubatorUi())
     }
@@ -568,9 +639,9 @@ class BookmarkViewModel @Inject constructor(
 
     private fun completeIncubatorClick() {
         viewModelScope.launch {
-            when (getState().isChoiceProjectMode) {
+            when (getState().completeState.isChoiceProjectMode) {
                 true -> insertIntoNewProject()
-                false -> insertIntoProjectAnimal(getState().indexProject)
+                false -> insertIntoProjectAnimal(getState().completeState.indexProject)
                 null -> bookmarkToArchive()
             }
             updateCompleteIncubationBottomSheet(false)
@@ -597,11 +668,23 @@ class BookmarkViewModel @Inject constructor(
         pair.second?.let { expensesRepository.insertExpenses(it) }
     }
 
-    private suspend fun bookmarkToArchive(note: String? = null) {
+    private suspend fun bookmarkToArchive(
+        note: String? = null,
+        isEarlyCompletionStatus: Boolean = false
+    ) {
+        val chicksPrice = if (getState().completeState.chicksPrice.isBlank()) null
+        else getState().completeState.chicksPrice.toConvertDbDouble()
+
+        val rejectedCount = if (isEarlyCompletionStatus) getState().domainBookmark.count
+        else getState().completeState.rejectedEggCompleted
+
         bookmarkRepository.update(
             getState().domainBookmark.copy(
                 isActivityBookmark = false,
-                dateEnd = dateToday(),
+                isEarlyCompletionStatus = isEarlyCompletionStatus,
+                endDate = dateToday(),
+                chickPrice = chicksPrice,
+                rejectedCount = rejectedCount,
                 note = note ?: getState().domainBookmark.note
             )
         )
@@ -609,9 +692,9 @@ class BookmarkViewModel @Inject constructor(
 
     private fun insertDomainProject(): DomainProjectTable {
         return DomainProjectTable(
-            titleProject = getState().newNameProject,
-            data = dateToday(),
-            mode = 1
+            title = getState().completeState.newNameProject,
+            date = dateToday(),
+            mode = false
         )
     }
 
@@ -665,7 +748,7 @@ class BookmarkViewModel @Inject constructor(
         return DomainAnimalTable(
             name = title,
             type = resourceProvider.getString(type.toResId()),
-            date = date,
+            date = dateToday(),
             dateFactory = null,
             group = true,
             sex = false,
@@ -678,7 +761,7 @@ class BookmarkViewModel @Inject constructor(
         )
     }
 
-    private fun DomainIncubator.toUi(typeEgg: TypeEgg): ParametersIncubatorUi {
+    private fun DomainIncubatorParameters.toUi(typeEgg: TypeEgg): ParametersIncubatorUi {
         val ovoskop = setOvoskop(day = day, typeEgg = typeEgg)
         return ParametersIncubatorUi(
             id = id,
@@ -697,8 +780,8 @@ class BookmarkViewModel @Inject constructor(
         )
     }
 
-    private fun ParametersIncubatorUi.toDomain(): DomainIncubator {
-        return DomainIncubator(
+    private fun ParametersIncubatorUi.toDomain(): DomainIncubatorParameters {
+        return DomainIncubatorParameters(
             id = id,
             day = day,
             temp = temp,
@@ -747,6 +830,7 @@ sealed class BookmarkIntent() : BaseIntent {
     //CompleteIncubation
     data class OpenCompleteIncubationBottomSheetClick(val value: Boolean) : BookmarkIntent()
     data class ChicksBredChanged(val value: String) : BookmarkIntent()
+    data class ChicksPriceChanged(val value: String) : BookmarkIntent()
     data class ChoiceProjectModeClick(val value: Boolean) : BookmarkIntent()
     data class IndexChoiceProjectClick(val value: Long) : BookmarkIntent()
     data class NameProjectChanged(val value: String) : BookmarkIntent()

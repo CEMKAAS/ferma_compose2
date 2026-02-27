@@ -115,7 +115,7 @@ fun ButtonPanelNew(
             GradientButton(
                 text = stringResource(text),
                 onClick = onClick,
-                enable = enable,
+                enabled = enable,
                 modifier = Modifier.weight(1f),
                 colors = colors
             )
@@ -154,7 +154,7 @@ fun ButtonPanelDetailNew(
                 text = stringResource(R.string.button_delete),
                 iconRes = R.drawable.baseline_delete_24,
                 onClick = onClickDelete,
-                enable = false,
+                enabled = false,
                 modifier = Modifier.weight(1f),
                 colors = listOf(error_base, error_base)
             )

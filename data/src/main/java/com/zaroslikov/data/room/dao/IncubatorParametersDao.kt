@@ -5,33 +5,33 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.zaroslikov.data.room.table.incubator.Incubator
+import com.zaroslikov.data.room.table.incubator.IncubatorParameters
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface IncubatorDao {
-    @Query("SELECT * from MyIncubator Where idPT =:idPT")
-    fun getIncubatorListArh4(idPT: Long): Flow<List<Incubator>>
+interface IncubatorParametersDao {
+    @Query("SELECT * from incubator_parameters Where idPT =:idPT")
+    fun getIncubatorListArh4(idPT: Long): Flow<List<IncubatorParameters>>
 
-    @Query("SELECT * from MyIncubator Where idPT=:id")
-    fun getIncubatorList(id: Long): Flow<List<Incubator>>
+    @Query("SELECT * from incubator_parameters Where idPT=:id")
+    fun getIncubatorList(id: Long): Flow<List<IncubatorParameters>>
 
-    @Query("SELECT * from MyIncubator Where idPT=:id")
-    fun getIncubatorList2(id: Long): Flow<List<Incubator>>
+    @Query("SELECT * from incubator_parameters Where idPT=:id")
+    fun getIncubatorList2(id: Long): Flow<List<IncubatorParameters>>
 
-    @Query("SELECT * from MyIncubator Where idPT=:id")
-    fun getIncubator(id: Long): Flow<Incubator>
+    @Query("SELECT * from incubator_parameters Where idPT=:id")
+    fun getIncubator(id: Long): Flow<IncubatorParameters>
 
-    @Query("SELECT * from MyIncubator Where idPT=:id and day=:day")
-    fun getIncubatorEditDay(id: Long, day: Int): Flow<Incubator>
+    @Query("SELECT * from incubator_parameters Where idPT=:id and day=:day")
+    fun getIncubatorEditDay(id: Long, day: Int): Flow<IncubatorParameters>
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
-    suspend fun insertIncubator(incubator: Incubator)
+    suspend fun insertIncubator(incubator: IncubatorParameters)
 
     @Update
-    suspend fun updateIncubator(incubator: Incubator)
+    suspend fun updateIncubator(incubator: IncubatorParameters)
 
-    @Query("SELECT COUNT(*)" +
+    /*@Query("SELECT COUNT(*)" +
             " FROM МyINCUBATOR" +
             " WHERE mode = 0" +
             " AND DATE(printf('%04d-%02d-%02d', substr(data, 7, 4), substr(data, 4, 2), substr(data, 1, 2)))" +
@@ -70,5 +70,5 @@ interface IncubatorDao {
         dateBegin: String,
         dateEnd: String
     ): Flow<String>
-
+*/
 }

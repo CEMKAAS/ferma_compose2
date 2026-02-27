@@ -172,10 +172,11 @@ private fun NoteContainer(
             )
         },
         brieflyCard = {},
-        titleRes = R.string.message_no_date_title_note,
-        messageRes = R.string.message_no_date_message_note,
-        supportRes = R.string.message_no_date_support_text_note,
-        buttonRes = R.string.button_note_message_no_data
+        titleRes = R.string.message_no_data_title_note,
+        messageRes = R.string.message_no_data_message_note,
+        iconRes = R.drawable.icon_warning,
+        iconColor = orang_11,
+        backgroundColor = orang_12
     )
 }
 

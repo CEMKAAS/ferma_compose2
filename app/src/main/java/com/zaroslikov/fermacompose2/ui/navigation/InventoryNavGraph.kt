@@ -17,8 +17,8 @@ import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubat
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorScreen
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectScreen
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
-import com.zaroslikov.fermacompose2.ui.start.startScreen.StartDestination
-import com.zaroslikov.fermacompose2.ui.start.startScreen.StartScreen
+import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
+import com.zaroslikov.fermacompose2.ui.start.first.FirstScreen
 import com.zaroslikov.fermacompose2.ui.start.aboutApp.AboutAppDestination
 import com.zaroslikov.fermacompose2.ui.start.aboutApp.AboutAppScreen
 import com.zaroslikov.fermacompose2.ui.start.settings.SettingsDestination
@@ -39,28 +39,27 @@ fun InventoryNavHost(
         navController = navController,
         startDestination =
 //            if (isFirstStart) ChoiseProjectDestination.route else
-            StartDestination.route,
+            FirstDestination.route,
         modifier = modifier
     ) {
-        composable(route = StartDestination.route) {
-            StartScreen(
-                modifier = modifier,
+        composable(route = FirstDestination.route) {
+            FirstScreen(
                 navigateToAboutApp = { navController.navigate(AboutAppDestination.route) },
                 navigateToSettings = { navController.navigate(SettingsDestination.route) },
                 navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it}") },
                 navigateToItemIncubator = { navController.navigate("${MainIncubatorDestination.route}/${it}") },
                 navigateToProject = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToIncubator = { navController.navigate("${AddIncubatorDestination.route}/${it}") },
-                /*                navigateToItemIncubatorArh = {
-               //                    navController.navigate("${IncubatorArhivDestination.route}/${it}")
-                               },
-                               navigateToItemProjectArh = {
-               //                    navController.navigate("${FinanceArhivDestination.route}/${it}")
-                               },
-                               navigationToNewYear = {
-               //                    navController.navigate("${NewYearDestination.route}/${it.first}/${it.second}")
-                               },*/
             )
+        }
+        composable(
+            route = MainIncubatorDestination.routeWithArgs,
+            arguments = listOf(navArgument(MainIncubatorDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments!!.getLong(MainIncubatorDestination.itemIdArg)
+            MainIncubatorScreen(navController, itemId)
         }
         composable(
             route = MainProjectsDestination.routeWithArgs,
@@ -69,24 +68,16 @@ fun InventoryNavHost(
             })
         ) { backStackEntry ->
             val itemId = backStackEntry.arguments!!.getLong(MainProjectsDestination.itemIdArg)
-            MainProjectScreen(itemId)
+            MainProjectScreen(navController, itemId)
         }
 
 
-        composable(
-            route = MainIncubatorDestination.routeWithArgs,
-            arguments = listOf(navArgument(MainIncubatorDestination.itemIdArg) {
-                type = NavType.LongType
-            })
-        ) { backStackEntry ->
-            val itemId = backStackEntry.arguments!!.getLong(MainIncubatorDestination.itemIdArg)
-            MainIncubatorScreen(itemId)
-        }
+
 
         composable(route = ProjectAddDestination.route) {
             AddProject(
                 navigateBack = { navController.popBackStack() },
-                navigateToStart = { navController.navigate(StartDestination.route) },
+                navigateToStart = { navController.navigate(FirstDestination.route) },
             )
         }
 
@@ -115,7 +106,7 @@ fun InventoryNavHost(
 
         composable(
             route = AddIncubatorDestination.routeWithArgs,
-            arguments = listOf(navArgument(WarehouseEditDestination.itemIdArg) {
+            arguments = listOf(navArgument(AddIncubatorDestination.itemIdArg) {
                 type = NavType.LongType
             })
         ) {

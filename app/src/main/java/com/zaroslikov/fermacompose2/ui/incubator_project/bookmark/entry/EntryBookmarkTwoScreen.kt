@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -35,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.table.DomainBookmark
 import com.zaroslikov.fermacompose2.R
@@ -94,17 +96,7 @@ fun EntryBookmarkTwoScreen(
     ) {
         if (bookmarkList.isNotEmpty())
             TemplatesCard(indexBookmark, isTemplatesPlan, bookmarkList, onIntent)
-        WarningCard(
-            colorBackground = orang_4,
-            colorBorder = orang_5,
-            colorIcon = orang_2,
-            colorIconBackground = Color(0xFFFEF3C6),
-            colorTitle = Color(0xFF7B3306),
-            colorText = orang_6,
-            icon = R.drawable.icon_warning,
-            title = R.string.entry_bookmark_warning_title,
-            text = R.string.entry_bookmark_warning_text
-        )
+        WarningCard(indexBookmark)
         CardFieldNew(padding = PaddingValues()) {
             TitleRow()
             parametersDayList.forEachIndexed { index, parameter ->
@@ -240,7 +232,7 @@ private fun BookmarkCard(
             ) {
                 Text(bookmark.title, style = text_14, color = textColor)
                 Text(
-                    stringResource(R.string.entry_bookmark_completed_s).format(bookmark.dateEnd),
+                    stringResource(R.string.entry_bookmark_completed_s).format(bookmark.endDate),
                     style = text_12,
                     color = gray_7
                 )
@@ -367,10 +359,11 @@ private fun IncubatorRow(
 }
 
 @Composable
-private fun IconToggle(
+fun IconToggle(
     @StringRes stringRes: Int,
     @DrawableRes iconRes: Int,
-    iconColor: Color
+    iconColor: Color,
+    size: Dp = 24.dp
 ) {
     val tooltipState = rememberTooltipState(isPersistent = true)
     val scope = rememberCoroutineScope()
@@ -391,7 +384,30 @@ private fun IconToggle(
                 painter = painterResource(iconRes),
                 contentDescription = null,
                 tint = iconColor,
+                modifier = Modifier.size(size)
             )
         }
+    }
+}
+
+@Composable
+private fun WarningCard(
+    indexBookmark: Long
+) {
+    AnimatedVisibility(
+        modifier = Modifier.fillMaxWidth(),
+        visible = indexBookmark == 0L
+    ) {
+        WarningCard(
+            colorBackground = orang_4,
+            colorBorder = orang_5,
+            colorIcon = orang_2,
+            colorIconBackground = Color(0xFFFEF3C6),
+            colorTitle = Color(0xFF7B3306),
+            colorText = orang_6,
+            icon = R.drawable.icon_warning,
+            title = R.string.entry_bookmark_warning_title,
+            text = R.string.entry_bookmark_warning_text
+        )
     }
 }

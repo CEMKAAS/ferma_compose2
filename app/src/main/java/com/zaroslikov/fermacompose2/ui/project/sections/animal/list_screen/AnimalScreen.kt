@@ -52,6 +52,8 @@ import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.orang_1
+import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -353,10 +355,11 @@ private fun AnimalContainer(
                 onArchive = { TODO() },
                 onDeleteClick = { onDeleteClick(item.id) })
         },
-        titleRes = R.string.message_no_date_title_animals,
-        messageRes = R.string.message_no_date_message_animals,
-        supportRes = R.string.message_no_date_support_text_animals,
-        buttonRes = R.string.button_animals_message_no_data
+        titleRes = R.string.message_no_data_title_animals,
+        messageRes = R.string.message_no_data_message_animals,
+        iconRes = R.drawable.baseline_pets_24,
+        iconColor = orang_5,
+        backgroundColor = orang_1
     )
 }
 

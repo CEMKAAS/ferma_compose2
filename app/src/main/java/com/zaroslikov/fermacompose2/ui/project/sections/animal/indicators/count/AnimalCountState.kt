@@ -75,7 +75,7 @@ data class CountItem(
 
             AnimalCountVersion.INCUBATOR -> TODO()
         }
-        return !isEnabled
+        return isEnabled
     }
 }
 

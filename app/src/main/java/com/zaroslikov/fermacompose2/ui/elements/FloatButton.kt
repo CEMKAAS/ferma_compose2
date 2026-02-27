@@ -65,6 +65,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -141,11 +142,6 @@ fun NeonGlowFab(
     onClick: () -> Unit,
 ) {
     val glowColor = colors.first()
-    val gradient = Brush.linearGradient(
-        colors = colors,
-        start = Offset(0f, 0f),
-        end = Offset(Float.POSITIVE_INFINITY, 0f)
-    )
     Box(
         modifier = modifier
             .size(64.dp)
@@ -157,8 +153,18 @@ fun NeonGlowFab(
                 ambientShadowColor = glowColor.copy(alpha = 0.8f)
                 spotShadowColor = glowColor.copy(alpha = 0.8f)
             }
+            .drawBehind {
+                val gradient = Brush.linearGradient(
+                    colors = colors,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, size.height) // диагональ
+                )
+                drawRoundRect(
+                    brush = gradient,
+                    cornerRadius = CornerRadius(99.dp.toPx()) // скругление здесь
+                )
+            }
             .clip(CircleShape)
-            .background(brush = gradient)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {

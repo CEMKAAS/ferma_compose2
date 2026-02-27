@@ -4,7 +4,6 @@ package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.main
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,9 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,6 +52,8 @@ import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_11
+import com.zaroslikov.fermacompose2.green_12
+import com.zaroslikov.fermacompose2.green_13
 import com.zaroslikov.fermacompose2.green_5
 import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_8
@@ -67,8 +70,10 @@ import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.orang_8
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.red_11
 import com.zaroslikov.fermacompose2.red_12
+import com.zaroslikov.fermacompose2.red_13
 import com.zaroslikov.fermacompose2.red_14
 import com.zaroslikov.fermacompose2.red_15
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -78,6 +83,7 @@ import com.zaroslikov.fermacompose2.ui.elements.BorderButton
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
@@ -93,6 +99,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.incubator_project.journal.TranslucentCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.NoteWidget
 import com.zaroslikov.fermacompose2.violet_1
@@ -120,6 +127,7 @@ object BookmarkDestination : NavigationDestination {
 fun BookmarkScreen(
     onClick: (Long) -> Unit,
     onSettingsClick: (Pair<Long, Long>) -> Unit,
+    navigateToBack: () -> Unit,
     viewModel: BookmarkViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -130,7 +138,7 @@ fun BookmarkScreen(
         topBar = {
             TopAppBarBack(
                 title = state.domainBookmark.title,
-                onNavigateBackClick = { },
+                onNavigateBackClick = navigateToBack,
                 onSettingsClick = {
                     state.idBookmark?.let { onSettingsClick(state.incubatorId to it) }
                 },
@@ -158,6 +166,7 @@ fun BookmarkScreen(
             else EmptyBookmark(
                 modifier = Modifier.padding(innerPadding),
                 iconRes = R.drawable.outline_egg_24,
+                title = R.string.message_no_date_empty,
                 supportText = R.string.message_no_date_empty_egg_1,
                 iconColor = orang_2,
                 backgroundColor = orang_8,
@@ -187,22 +196,29 @@ fun BookmarkScreen(
             )
         if (state.isOpenOvoscopEndBottomSheet)
             OvoscopEndBottomSheet(
-                currentEgg = state.domainBookmark.count,
+                currentEgg = state.currentEgg,
                 rejectedEgg = state.rejectedEgg,
                 enabled = state.enabledOvoscopyButton(),
                 onIntent = viewModel::onIntent
             )
         if (state.isOpenCompleteIncubationBottomSheet)
             CompleteIncubationBottomSheet(
-                egg = state.domainBookmark.count,
+                currentEgg = state.currentEgg,
+                allEgg = state.domainBookmark.count,
                 nameBookmark = state.domainBookmark.title,
-                chicksBred = state.chicksBred,
-                enabled = state.enabledCompleteButton(),
+                projectList = state.completeState.projectList,
+                chicksBred = state.completeState.chicksBred,
+                newNameProject = state.completeState.newNameProject,
+                isChoiceProjectMode = state.completeState.isChoiceProjectMode,
+                indexProject = state.completeState.indexProject,
+                precent = state.completeState.precentCompleted,
+                percentFloat = state.completeState.precentFloatCompleted,
+                isErrorCompleted = state.completeState.isErrorCompleted,
+                rejectedEgg = state.completeState.rejectedEggCompleted,
+                enabled = state.completeState.isEnabledCompleteButton,
+                enabledTwo = state.completeState.isEnabledCompleteButtonTwo,
                 onIntent = viewModel::onIntent,
-                projectList = state.projectList,
-                newNameProject = state.newNameProject,
-                isChoiceProjectMode = state.isChoiceProjectMode,
-                indexProject = state.indexProject
+                chicksPrice = state.completeState.chicksPrice
             )
         if (state.isOpenEarlyCompleteIncubationBottomSheet)
             CompleteIncubationBottomSheet2(
@@ -233,37 +249,41 @@ private fun BookmarkContainer(
             daysToEnd = state.daysToEnd,
             percent = state.percent,
             percentFloat = state.percentFloat,
-            egg = state.domainBookmark.count,
-            dateBegin = state.domainBookmark.date,
+            egg = state.currentEgg,
+            dateBegin = state.startDay,
             dateEnd = state.endDay,
             time = state.domainBookmark.time,
             note = state.domainBookmark.note
         )
-        CurrentParameters(
-            currentDay = state.currentDay,
-            domain = state.currentParameterDay,
-            onIntent = onIntent,
-            isAutoAiring = state.domainBookmark.isAutoVentilation,
-            isAutoOver = state.domainBookmark.isAutoRotation,
-        )
-        NoteWidget(
-            intRes = R.string.bookmark_screen_current_note,
-            note = state.currentParameterDay.note
-        ) {
-            onIntent(BookmarkIntent.NoteChanged(it))
-        }
-        if (state.currentParameterDay.ovoscopyState.isOvoscopyDay)
-            OvoscopCard(state.currentParameterDay.ovoscopyState.supportText) {
-                onIntent(BookmarkIntent.OpenOvoscopBottomSheetClick(true))
+        if (!state.isBookmarkCompleted) {
+            CurrentParameters(
+                currentDay = state.currentDay,
+                domain = state.currentParameterDay,
+                onIntent = onIntent,
+                isAutoAiring = state.domainBookmark.isAutoVentilation,
+                isAutoOver = state.domainBookmark.isAutoRotation,
+            )
+            NoteWidget(
+                intRes = R.string.bookmark_screen_current_note,
+                note = state.currentParameterDay.note
+            ) {
+                onIntent(BookmarkIntent.NoteChanged(it))
             }
-        TomorrowParameters(
-            isAutoAiring = state.domainBookmark.isAutoVentilation,
-            isAutoOver = state.domainBookmark.isAutoRotation,
-            domain = state.tomorrowParameterDay
-        )
+            if (state.currentParameterDay.ovoscopyState.isOvoscopyDay)
+                OvoscopCard(state.currentParameterDay.ovoscopyState.supportText) {
+                    onIntent(BookmarkIntent.OpenOvoscopBottomSheetClick(true))
+                }
+            if (!state.isCompleteModeEnd)
+                TomorrowParameters(
+                    isAutoAiring = state.domainBookmark.isAutoVentilation,
+                    isAutoOver = state.domainBookmark.isAutoRotation,
+                    domain = state.tomorrowParameterDay
+                )
+        } else CompleteCard()
         GradientButton(
             modifier = Modifier.fillMaxWidth(),
-            colors = listOf(green_6, green_5),
+            colors = if (state.isCompleteModeEnd) listOf(green_6, green_5)
+            else listOf(orang_15, red_13),
             text = stringResource(R.string.bookmark_screen_сomplete_incubation),
             iconRes = R.drawable.icon_check,
             isShadow = true,
@@ -274,68 +294,6 @@ private fun BookmarkContainer(
     }
 }
 
-@Composable
-private fun EmptyBookmark(
-    modifier: Modifier,
-    @DrawableRes iconRes: Int,
-    @StringRes supportText: Int,
-    iconColor: Color,
-    backgroundColor: Color,
-    plusColor: Color
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .shadow(6.dp, shape = CircleShape)
-                .background(color = backgroundColor, shape = CircleShape)
-                .size(128.dp)
-        ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(64.dp),
-                tint = iconColor
-            )
-        }
-        Spacer(modifier = Modifier.padding(12.dp))
-        Text(stringResource(R.string.message_no_date_empty), style = text_24, color = black_2)
-        Spacer(modifier = Modifier.padding(6.dp))
-        Text(
-            stringResource(supportText),
-            style = text_16,
-            color = gray_7
-        )
-        Spacer(modifier = Modifier.padding(4.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                stringResource(R.string.message_no_date_empty_egg_2),
-                style = text_14,
-                color = grey
-            )
-            Text(
-                "+",
-                style = text_14,
-                color = plusColor,
-                modifier = Modifier.padding(horizontal = 5.dp)
-            )
-            Text(
-                stringResource(R.string.message_no_date_empty_egg_3),
-                style = text_14,
-                color = grey
-            )
-        }
-    }
-}
 
 @Composable
 private fun MainCard(
@@ -467,6 +425,7 @@ private fun MainCard(
                             .fillMaxHeight(),
                         iconRes = R.drawable.baseline_event_24,
                         value = dateEnd,
+                        time = time,
                         supText = stringResource(R.string.bookmark_screen_waiting_conclusion)
                     )
                 }
@@ -521,12 +480,7 @@ private fun SupportNoteCard(
     modifier: Modifier = Modifier,
     value: String,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = white.copy(0.1f)
-        ),
-        shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, white.copy(0.2f)),
+    TranslucentCard(
         modifier = modifier,
     ) {
         Row(
@@ -698,7 +652,7 @@ private fun CurrentParameter(
             )
             Text(
                 text = stringResource(R.string.bookmark_screen_current_standard)
-                        + " $standardValue$suffix",
+                        + " $standardValue $suffix",
                 color = gray_7,
                 style = text_12
             )
@@ -867,6 +821,41 @@ private fun ColumnParameter(
 }
 
 @Composable
+private fun CompleteCard() {
+    BorderCard(
+        containerColor = price_green_2,
+        borderColor = green_12
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconTransaction2(
+                sizeCard = 52.dp,
+                icon = R.drawable.outline_check_circle_24,
+                colorIcon = green_9,
+                color = green_11
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    stringResource(R.string.bookmark_screen_complete),
+                    style = text_18,
+                    color = green_13
+                )
+                Text(
+                    stringResource(R.string.bookmark_screen_complete_support),
+                    style = text_14,
+                    color = green_9
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun BottomPanel(
     enabled: Boolean,
     colors: List<Color> = listOf(green_6, green_5),
@@ -889,7 +878,7 @@ fun BottomPanel(
             colors = colors,
             text = stringResource(stringRes),
             iconRes = iconRes,
-            enable = enabled,
+            enabled = enabled,
             onClick = onSaveClick
         )
     }

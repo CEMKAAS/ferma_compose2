@@ -13,51 +13,59 @@ data class BookmarkState(
     val isOpenOvoscopEndBottomSheet: Boolean = false,
     val isOpenCompleteIncubationBottomSheet: Boolean = false,
     val isOpenEarlyCompleteIncubationBottomSheet: Boolean = false,
+    val isBookmarkCompleted: Boolean = false,
     val domainBookmark: DomainBookmark = DomainBookmark(),
-    val isChoiceProjectMode: Boolean? = null,
-    val chicksBred: String = "",
-    val newNameProject: String = "",
     val numberDays: Int = 0,
     val percent: Double = 0.0,
     val percentFloat: Float = 0f,
     val idBookmark: Long? = null,
     val daysToEnd: Int = 0,
+    val startDay: String = "",
     val endDay: String = "",
     val itemIdPT: Long = 0,
     val incubatorId: Long = 0,
     val isActivityBookmark: Boolean = false,
     val currentDay: Int = 0,
+    val currentEgg: Int = 0,
     val reasonNote: String = "",
     val parameterDayList: List<ParametersIncubatorUi> = emptyList(),
     val editParameterDay: ParametersIncubatorUi = ParametersIncubatorUi(),
     val currentParameterDay: ParametersIncubatorUi = ParametersIncubatorUi(),
     val tomorrowParameterDay: ParametersIncubatorUi = ParametersIncubatorUi(),
-    val projectList: List<DomainProjectTable> = emptyList(),
     val isLantern: Boolean = false,
     val rejectedEgg: String = "",
-    val indexProject: Long = 0,
+    val isCompleteModeEnd: Boolean = false,
+    val completeState: CompleteState = CompleteState(),
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null
 ) : BaseState {
     fun enabledOvoscopyButton(): Boolean {
-        val isEnabled = (domainBookmark.count - rejectedEgg.toConvertZero()) < 0
-        return !isEnabled
+        val isEnabled = (currentEgg - rejectedEgg.toConvertZero()) > 0
+        return isEnabled
     }
+}
 
-    fun enabledCompleteButton(): Boolean {
-        val isEnabled =
-            ((chicksBred.toConvertZero()) <= domainBookmark.count) && chicksBred.isNotBlank() &&
-                    chicksBred.toConvertZero() > 0
-        return !isEnabled
-    }
 
-    fun enabledS(): Boolean {
-        return when (isChoiceProjectMode) {
-            true -> newNameProject.isNotBlank()
-            false -> true
-            else -> true
-        }
-    }
+data class CompleteState(
+    val chicksBred: String = "",
+    val chicksPrice: String ="",
+    val precentCompleted: Double = 0.0,
+    val precentFloatCompleted: Float = 0f,
+    val rejectedEggCompleted: Int = 0,
+
+    val newNameProject: String = "",
+    val indexProject: Long = 0,
+    val projectList: List<DomainProjectTable> = emptyList(),
+    val isChoiceProjectMode: Boolean? = null,
+    val isErrorCompleted: Boolean = false,
+    val isEnabledCompleteButton: Boolean = false,
+    val isEnabledCompleteButtonTwo: Boolean = true
+)
+
+data class OvoscopyState(
+    val isLantern: Boolean = false,
+) {
+
 }
 
 data class ParametersIncubatorUi(

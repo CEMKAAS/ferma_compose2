@@ -366,6 +366,7 @@ fun OvoscopEndBottomSheet(
                 onValueChange = { onIntent(BookmarkIntent.RejectedEggChanged(it)) },
                 intRes = R.string.bookmark_screen_rejected_egg,
                 intResSup = R.string.entry_bookmark_support_count_egg,
+                intResError = R.string.entry_bookmark_error_reject_count,
                 isError = !enabled,
                 drawableRes = R.drawable.outline_cancel_24
             )

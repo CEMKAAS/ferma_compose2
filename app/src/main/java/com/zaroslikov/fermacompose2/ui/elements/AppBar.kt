@@ -18,6 +18,7 @@ import androidx.compose.material3.AppBarRow
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -137,49 +139,52 @@ fun TopAppBarNavigationNew2(
 fun TopAppBarBack(
     @StringRes intRes: Int? = null,
     title: String = "",
-    onNavigateBackClick: ((() -> Unit)?) = {},
-    onCalendarClick: (() -> Unit)? = null,
+    onNavigateBackClick: ((() -> Unit)?) = null,
+    onNoteClick: (() -> Unit)? = null,
     onSettingsClick: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        navigationIcon = {
-            onNavigateBackClick?.let {
-                IconButton(onClick = onNavigateBackClick) {
-                    Icon(
-                        painterResource(R.drawable.baseline_arrow_back_24),
-                        contentDescription = "Назад"
-                    )
+    Column {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            navigationIcon = {
+                onNavigateBackClick?.let {
+                    IconButton(onClick = onNavigateBackClick) {
+                        Icon(
+                            painterResource(R.drawable.baseline_arrow_back_24),
+                            contentDescription = "Назад"
+                        )
+                    }
+                }
+            },
+            windowInsets = WindowInsets(0),
+            scrollBehavior = scrollBehavior,
+            actions = {
+                onNoteClick?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            painterResource(R.drawable.baseline_sticky_note_2_24),
+                            contentDescription = "Date Range"
+                        )
+                    }
+                }
+                onSettingsClick?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            painterResource(R.drawable.icon_setting),
+                            contentDescription = null
+                        )
+                    }
                 }
             }
-        },
-        windowInsets = WindowInsets(0),
-        scrollBehavior = scrollBehavior,
-        actions = {
-            onCalendarClick?.let {
-                IconButton(onClick = it) {
-                    Icon(
-                        painterResource(R.drawable.icon_date_range),
-                        contentDescription = "Date Range"
-                    )
-                }
-            }
-            onSettingsClick?.let {
-                IconButton(onClick = it) {
-                    Icon(
-                        painterResource(R.drawable.icon_setting),
-                        contentDescription = "Date Range"
-                    )
-                }
-            }
-        }
-    )
+        )
+        HorizontalDivider(thickness = 1.dp, color = gray_6)
+    }
 }
 
 @Composable

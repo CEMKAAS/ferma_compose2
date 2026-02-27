@@ -5,32 +5,46 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_10
 import com.zaroslikov.fermacompose2.blue_11
 import com.zaroslikov.fermacompose2.blue_12
 import com.zaroslikov.fermacompose2.blue_13
+import com.zaroslikov.fermacompose2.blue_17
 import com.zaroslikov.fermacompose2.blue_2
+import com.zaroslikov.fermacompose2.blue_21
 import com.zaroslikov.fermacompose2.blue_3
+import com.zaroslikov.fermacompose2.blue_4
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.green_5
 import com.zaroslikov.fermacompose2.green_6
+import com.zaroslikov.fermacompose2.green_7
 import com.zaroslikov.fermacompose2.green_8
+import com.zaroslikov.fermacompose2.green_9
+import com.zaroslikov.fermacompose2.green_g_2
+import com.zaroslikov.fermacompose2.green_g_5
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
+import com.zaroslikov.fermacompose2.orang_10
+import com.zaroslikov.fermacompose2.orang_15
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_3
 import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_8
+import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.red_11
 import com.zaroslikov.fermacompose2.red_12
+import com.zaroslikov.fermacompose2.red_18
+import com.zaroslikov.fermacompose2.red_3
 import com.zaroslikov.fermacompose2.red_4
 import com.zaroslikov.fermacompose2.red_5
+import com.zaroslikov.fermacompose2.red_6
 import com.zaroslikov.fermacompose2.red_7
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
@@ -38,6 +52,9 @@ import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination.*
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
+import com.zaroslikov.fermacompose2.violet_3
+import com.zaroslikov.fermacompose2.violet_4
+import com.zaroslikov.fermacompose2.violet_7
 import com.zaroslikov.fermacompose2.white
 
 fun Category.toColorList(): Color {
@@ -102,16 +119,16 @@ fun Suffix.toColorList(): Color {
 fun Destination.toColorList(): List<Color> {
     return when (this) {
         MAGAZINE -> listOf(green_5, green_shamrock)
-        WAREHOUSE -> listOf(green_6, price_green)
-        FINANCE -> listOf(white, blue_2)
+        WAREHOUSE -> listOf(blue_21, blue_4)
+        FINANCE ->  listOf(blue_11, blue_12)
     }
 }
 
 fun DestinationIncubator.toColorList(): List<Color> {
     return when (this) {
-        DestinationIncubator.REVIEW -> listOf(green_5, green_shamrock)
-        DestinationIncubator.BOOKMARK -> listOf(green_6, price_green)
-        DestinationIncubator.FINANCE -> listOf(white, blue_2)
+        DestinationIncubator.JOURNAL -> listOf(blue_21, blue_4)
+        DestinationIncubator.BOOKMARK -> listOf(orang_9, orang_15)
+        DestinationIncubator.FINANCE -> listOf(green_6, green_shamrock)
     }
 }
 
@@ -181,5 +198,25 @@ fun FinanceCategory.toBorderCard(): Color {
         FinanceCategory.OWN_NEED -> orang_8
         FinanceCategory.SCRAP -> grey_2
         FinanceCategory.PROFIT -> blue_13
+    }
+}
+
+fun TypeEgg.toColor(): List<Color> {
+    return when (this) {
+        TypeEgg.CHICKENS -> listOf(orang_10, orang_15)
+        TypeEgg.GEESE -> listOf(red_6, red_18)
+        TypeEgg.QUAILS -> listOf(blue_17, blue_4)
+        TypeEgg.TURKEYS -> listOf(violet_7, violet_4)
+        TypeEgg.DUCKS -> listOf(green_7, green_6)
+    }
+}
+
+fun TypeEgg.toCardColor(): Pair<Color, Color> {
+    return when (this) {
+        TypeEgg.CHICKENS -> orang_4 to orang_10
+        TypeEgg.GEESE -> red_3 to red_5
+        TypeEgg.QUAILS -> blue_3 to blue_17
+        TypeEgg.TURKEYS -> violet_3 to violet_7
+        TypeEgg.DUCKS -> green_g_2 to green_g_5
     }
 }

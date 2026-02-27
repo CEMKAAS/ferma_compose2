@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.Suffix
@@ -10,6 +11,7 @@ import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +29,7 @@ class AddIncubatorViewModel @Inject constructor(
     private val itemId: Long = checkNotNull(savedStateHandle[AddIncubatorDestination.itemIdArg])
 
     init {
+
         if (itemId != -1L) loadData() else loadDate2()
     }
 
@@ -76,9 +79,9 @@ class AddIncubatorViewModel @Inject constructor(
             if (!isError()) {
                 val id = projectRepository.insertProjectLong(
                     DomainProjectTable(
-                        titleProject = getState().currentProduct.title.trim(),
-                        data = getState().currentProduct.date,
-                        mode = 1
+                        title = getState().currentProduct.title.trim(),
+                        date = getState().currentProduct.date,
+                        mode = false
                     )
                 )
                 incubatorTableRepository.insertIncubator(
@@ -96,9 +99,13 @@ class AddIncubatorViewModel @Inject constructor(
             if (!isError()) {
                 projectRepository.updateProject(
                     getState().currentProject.copy(
-                        titleProject = getState().currentProduct.title.trim(),
-                        data = getState().currentProduct.date
+                        title = getState().currentProduct.title.trim(),
+                        date = getState().currentProduct.date
                     )
+                )
+                Log.i(
+                    "edit_incubator",
+                    "update: ${getState().currentProduct.toDomainIncubatorTable()}"
                 )
                 incubatorTableRepository.updateIncubator(
                     getState().currentProduct.toDomainIncubatorTable()
@@ -249,11 +256,12 @@ class AddIncubatorViewModel @Inject constructor(
         modelList: List<String>,
     ): AddIncubator {
         return copy(
-            title = domainProjectTable.titleProject,
+            id = domain.id,
+            title = domain.title,
             model = domain.model ?: "",
             brand = domain.brand ?: "",
-            capacity = domain.capacity.toString(),
-            date = domainProjectTable.data,
+            capacity = domain.capacity.formatNumber(false),
+            date = domainProjectTable.date,
             price = domain.price?.formatNumber(false) ?: "",
             note = domain.note,
             isAutoRotation = domain.isAutoRotation,
@@ -267,9 +275,10 @@ class AddIncubatorViewModel @Inject constructor(
     private fun AddIncubator.toDomainIncubatorTable(idPT: Long? = null): DomainIncubatorTable {
         return DomainIncubatorTable(
             id = id,
+            title = title,
             model = model.ifBlank { null },
             brand = brand.ifBlank { null },
-            capacity = capacity.toInt(),
+            capacity = capacity.toConvertDbInt(),
             price = if (price.isEmpty()) null else price.toConvertDbDouble(),
             note = note.trim(),
             isAutoRotation = isAutoRotation,

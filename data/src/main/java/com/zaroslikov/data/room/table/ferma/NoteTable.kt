@@ -3,6 +3,7 @@ package com.zaroslikov.data.room.table.ferma
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.project.ProjectTable
 
@@ -11,10 +12,11 @@ import com.zaroslikov.data.room.table.project.ProjectTable
     tableName = "NoteFerma",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
-        parentColumns = arrayOf("_id"),
+        parentColumns = arrayOf("id"),
         childColumns = arrayOf("idPT"),
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [Index("idPT")] // TODO добавиь в миграцию
 )
 data class NoteTable(
     @PrimaryKey(autoGenerate = true)

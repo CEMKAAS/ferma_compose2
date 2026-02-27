@@ -39,7 +39,8 @@ import com.zaroslikov.fermacompose2.violet_1
 @Composable
 fun DropdownMenuEdit(
     color: Color = grey_3,
-    onEditClick: () -> Unit,
+    onActiveClick: (() -> Unit)? = null,
+    onEditClick: (() -> Unit)? = null,
     onArchiveClick: (() -> Unit)? = null,
     onDeleteClick: () -> Unit
 ) {
@@ -56,14 +57,12 @@ fun DropdownMenuEdit(
             onDismissRequest = { expanded = false }
         ) {
             val items = buildList {
-                add(
-                    MenuItemData(
-                        "Редактировать",
-                        R.drawable.outline_edit_square_24,
-                        color,
-                        onEditClick
-                    )
-                )
+                onActiveClick?.let {
+                    add(MenuItemData("Активировать закладку", R.drawable.outline_edit_square_24, color, it))
+                }
+                onEditClick?.let {
+                    add(MenuItemData("Редактировать", R.drawable.outline_edit_square_24, color, it))
+                }
                 onArchiveClick?.let {
                     add(MenuItemData("Архивировать", R.drawable.baseline_archive_24, color, it))
                 }
@@ -223,12 +222,14 @@ fun ExposedDropdownMenuSuffix(
 @Composable
 fun <T> ExposedDropdownMenuEnum(
     valueList: List<T>,
+    enabled: Boolean = true,
     dropdownMenuItem: @Composable (Int, T, () -> Unit) -> Unit,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     BaseExposedDropdownMenu(
         list = valueList,
         content = content,
+        enabled = enabled,
         dropdownMenuItem = dropdownMenuItem
     )
 }

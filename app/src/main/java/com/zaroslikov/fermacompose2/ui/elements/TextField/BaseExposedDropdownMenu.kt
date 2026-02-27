@@ -39,6 +39,7 @@ import com.zaroslikov.fermacompose2.white
 fun <T> BaseExposedDropdownMenu(
     type: ExposedDropdownMenuAnchorType = PrimaryNotEditable,
     list: List<T>,
+    enabled: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
     dropdownMenuItem: @Composable (Int, T, () -> Unit) -> Unit
 ) {
@@ -57,30 +58,31 @@ fun <T> BaseExposedDropdownMenu(
                     expanded
                 )
             )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                shape = RoundedCornerShape(14.dp),
-                containerColor = white
-            ) {
-                list.forEachIndexed { index, item ->
-                    dropdownMenuItem(index, item) {
-                        expanded = false
+            if (enabled)
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    shape = RoundedCornerShape(14.dp),
+                    containerColor = white
+                ) {
+                    list.forEachIndexed { index, item ->
+                        dropdownMenuItem(index, item) {
+                            expanded = false
+                        }
+                        if (index != list.lastIndex)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = gray_5
+                            )
                     }
-                    if (index != list.lastIndex)
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = gray_5
-                        )
                 }
-            }
         }
     }
 }
 
 @Composable
 fun <T> BaseExposedDropdownMenu2(
-    type: ExposedDropdownMenuAnchorType = PrimaryEditable,
+        type: ExposedDropdownMenuAnchorType = PrimaryEditable,
     title: String,
     labelSelector: (T) -> String,
     list: List<T>,

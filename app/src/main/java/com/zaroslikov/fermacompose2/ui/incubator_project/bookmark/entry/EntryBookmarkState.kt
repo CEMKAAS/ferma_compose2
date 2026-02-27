@@ -2,15 +2,15 @@ package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry
 
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainBookmark
-import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class EntryBookmarkState(
-    override val isLoading: Boolean = false,
+    override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
     override val isEntry: Boolean = false,
     override val currentProduct: EntryBookmark = EntryBookmark()
@@ -23,10 +23,13 @@ data class EntryBookmark(
     val type: TypeEgg = TypeEgg.CHICKENS,
     val breed: String = "",
     val count: String = "",
-    val date: String = dateToday(),
+    val rejectedCount: String = "",
+    val startDate: String = dateToday(),
+    val endDate: String = dateToday(),
     val time: String = "12:00",
     val price: String = "",
-    val autoPrice: Boolean = false,
+    val priceAll: String = "",
+    val isAutoPrice: Boolean = false,
     val note: String = "",
     val autoRotation: Boolean = false,
     val autoVentilation: Boolean = false,
@@ -40,14 +43,19 @@ data class EntryBookmark(
     val idPT: Long = 0,
     val templatesBookmarkList: List<DomainBookmark> = emptyList(),
     val indexBookmark: Long = 0,
-    val isTemplatesPlan: Boolean = true
+    val isTemplatesPlan: Boolean = true,
+    val incubatorCount: Int = 0,
+
 ) : BaseProduct() {
     override val hasAnyError: Boolean
         get() = error.hasAnyError
 
     fun enabledButton(): Boolean {
-        val isEnabled = title.isNotBlank() && count.isNotBlank() && !hasAnyError
-        return !isEnabled
+        val isEnabled =
+            title.isNotBlank() && count.isNotBlank() && (count.toConvertZeroDbInt() <= incubatorCount) &&
+                    (rejectedCount.toConvertZeroDbInt() < count.toConvertZeroDbInt())
+                    && !hasAnyError
+        return isEnabled
     }
 }
 
@@ -84,9 +92,11 @@ data class ParameterDay(
 data class ErrorBookmark(
     val isErrorTitle: Boolean = false,
     val isErrorCount: Boolean = false,
+    val isErrorLargeCount: Boolean = false,
+    val isErrorRejectedCount: Boolean = false
 ) : BaseError {
     val hasAnyError: Boolean
-        get() = isErrorTitle || isErrorCount
+        get() = isErrorTitle || isErrorCount || isErrorLargeCount || isErrorRejectedCount
 }
 
 

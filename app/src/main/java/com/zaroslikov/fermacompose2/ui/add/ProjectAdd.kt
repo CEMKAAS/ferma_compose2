@@ -56,20 +56,19 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
-import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.table.DomainProjectTable
-import com.zaroslikov.fermacompose2.ui.AppViewModelProvider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -261,23 +260,13 @@ fun AddProjectContainer(
 
                     navigateToStart(
                         DomainProjectTable(
-                            id = 0,
-                            titleProject = name,
-                            type = "",
-                            data = date1,
-                            eggAll = "",
-                            eggAllEND = "",
-                            airing = "",
-                            over = "",
-                            arhive = "0",
+                            title = name,
+                            date = date1,
                             dateEnd = date1,
-                            time1 = "",
-                            time2 = "",
-                            time3 = "",
-                            mode = 1,
-                            imageData = if (byteArray.contentEquals(byteArrayOf()))
+                            mode = true,
+                            /*imageData = if (byteArray.contentEquals(byteArrayOf()))
                                 getByteArrayFromDrawable(context, imageResources[0])
-                            else byteArray
+                            else byteArray*/
                         )
                     )
                     val eventParameters: MutableMap<String, Any> = HashMap()
@@ -431,8 +420,8 @@ class MinDateSelectableDates(
 
     override fun isSelectableYear(year: Int): Boolean {
         // Можно ограничить и года (чтобы не проматывали слишком далеко назад)
-        val minYear = java.time.Instant.ofEpochMilli(minDateMillis)
-            .atZone(java.time.ZoneId.systemDefault()).year
+        val minYear = Instant.ofEpochMilli(minDateMillis)
+            .atZone(ZoneId.systemDefault()).year
         return year >= minYear
     }
 }

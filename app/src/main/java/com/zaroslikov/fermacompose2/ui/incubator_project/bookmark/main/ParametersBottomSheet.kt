@@ -113,7 +113,7 @@ fun EditParametersBottomSheet(
         },
         contentBottom = {
             BottomPanel(
-                enabled = false,
+                enabled = true,
                 stringRes = R.string.button_save,
                 onCloseClick = {
                     onIntent(
@@ -192,7 +192,8 @@ private fun FactParameresCard(
                     drawableColor2 = error_base,
                     intRes = R.string.entry_bookmark_temp_tooltip,
                     intResSup = R.string.is_empty,
-                    isBorderCard = false
+                    isBorderCard = false,
+                    maxLength = 6
                 )
                 OutlinedNumberNew(
                     modifier = Modifier.weight(1f),
@@ -202,7 +203,8 @@ private fun FactParameresCard(
                     drawableColor2 = blue_1,
                     intRes = R.string.entry_bookmark_damp_tooltip,
                     intResSup = R.string.is_empty,
-                    isBorderCard = false
+                    isBorderCard = false,
+                    maxLength = 6
                 )
             }
             Row(
@@ -218,7 +220,8 @@ private fun FactParameresCard(
                         drawableColor2 = violet_1,
                         intRes = R.string.entry_bookmark_temp_tooltip,
                         intResSup = R.string.is_empty,
-                        isBorderCard = false
+                        isBorderCard = false,
+                        maxLength = 6
                     )
                 if (!isAutoAiring)
                     OutlinedNumberNew(
@@ -229,7 +232,8 @@ private fun FactParameresCard(
                         drawableColor2 = green_g_5,
                         intRes = R.string.entry_bookmark_airing_tooltip,
                         intResSup = R.string.is_empty,
-                        isBorderCard = false
+                        isBorderCard = false,
+                        maxLength = 6
                     )
             }
         }

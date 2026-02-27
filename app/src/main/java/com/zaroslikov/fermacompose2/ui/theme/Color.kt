@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import com.zaroslikov.fermacompose2.white
 
 val primaryLight = Color(0xFF4C662B)
 val onPrimaryLight = Color(0xFFFFFFFF)
@@ -217,3 +218,39 @@ val surfaceContainerLowDarkHighContrast = Color(0xFF1A1C16)
 val surfaceContainerDarkHighContrast = Color(0xFF1E201A)
 val surfaceContainerHighDarkHighContrast = Color(0xFF282B24)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF33362E)
+
+val primaryLight2 = Color(0xFF4C662B)
+val onPrimaryLight2 = Color(0xFFFFFFFF)
+val primaryContainerLight2 = Color(0xFFCDEDA3)
+val onPrimaryContainerLight2 = Color(0xFF102000)
+val secondaryLight2 = Color(0xFF586249)
+val onSecondaryLight2 = Color(0xFFFFFFFF)
+val secondaryContainerLight2 = white
+val onSecondaryContainerLight2 = Color(0xFF151E0B)
+val tertiaryLight2 = Color(0xFF3F6836)
+val onTertiaryLight2 = Color(0xFFFFFFFF)
+val tertiaryContainerLight2 = Color(0xFFBFEFB1)
+val onTertiaryContainerLight2 = Color(0xFF002201)
+val errorLight2 = Color(0xFFBA1A1A)
+val onErrorLight2 = Color(0xFFFFFFFF)
+val errorContainerLight2 = Color(0xFFFFDAD6)
+val onErrorContainerLight2 = Color(0xFF410002)
+val backgroundLight2 = white
+val onBackgroundLight2 = Color(0xFF1A1C16)
+val surfaceLight2 = white
+val onSurfaceLight2 = Color(0xFF1A1C16)
+val surfaceVariantLight2 = Color(0xFFE1E4D5)
+val onSurfaceVariantLight2 = Color(0xFF44483D)
+val outlineLight2 = Color(0xFF75796C)
+val outlineVariantLight2 = Color(0xFFC5C8BA)
+val scrimLight2 = Color(0xFF000000)
+val inverseSurfaceLight2 = Color(0xFF2F312A)
+val inverseOnSurfaceLight2 = Color(0xFFF1F2E6)
+val inversePrimaryLight2 = Color(0xFFB1D18A)
+val surfaceDimLight2 = Color(0xFFDADBD0)
+val surfaceBrightLight2 = white
+val surfaceContainerLowestLight2 = Color(0xFFFFFFFF)
+val surfaceContainerLowLight2 = white // Цвет BottomSheet
+val surfaceContainerLight2 = white  // Цвет BottomNavigation
+val surfaceContainerHighLight2 = Color(0xFFE8E9DE)
+val surfaceContainerHighestLight2 = white  // Цвет фона AlertDialog

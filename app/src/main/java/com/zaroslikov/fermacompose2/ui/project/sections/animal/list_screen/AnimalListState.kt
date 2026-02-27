@@ -56,7 +56,7 @@ data class AnimalEntryState2(
             isAnimalGroup -> title.isNotBlank() && count.isNotBlank() && type.isNotBlank() && !hasAnyError
             else -> title.isNotBlank() && type.isNotBlank() && !hasAnyError
         }
-        return !isEnabled
+        return isEnabled
     }
 }
 

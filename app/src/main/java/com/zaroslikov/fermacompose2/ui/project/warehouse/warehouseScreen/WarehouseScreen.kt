@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,6 +49,7 @@ import com.zaroslikov.fermacompose2.blue_14
 import com.zaroslikov.fermacompose2.blue_15
 import com.zaroslikov.fermacompose2.blue_16
 import com.zaroslikov.fermacompose2.blue_3
+import com.zaroslikov.fermacompose2.blue_4
 import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.ghostly_white
@@ -62,6 +64,7 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BorderShowAllButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
@@ -104,7 +107,7 @@ fun WarehouseScreen(
                 scrollBehavior = scrollBehavior,
                 onNavigateBackClick = navigateToStart,
                 onSettingsClick = { navigateToEdit(state.idPT) },
-                onCalendarClick = { navigateToNote(state.idPT) }
+                onNoteClick = { navigateToNote(state.idPT) }
             )
         }
     ) { innerPadding ->
@@ -113,15 +116,26 @@ fun WarehouseScreen(
                 modifier = Modifier.padding(innerPadding),
             )
         else
-            WarehouseBody2(
-                modifier = Modifier.modifierScreen(innerPadding),
-                state = state,
-                onFastAddClick = { viewModel.onIntent(WarehouseIntent.FastAddClicked(it)) },
-                onShowFastAddClick = { viewModel.onIntent(WarehouseIntent.ShowFastAddClicked(it)) },
-                onAnalysisNavClick = {
-                    navigationToAnalysis(Triple(state.idPT, it.first, it.second))
-                }
-            )
+            if (state.productList.isEmpty() && state.expensesList.isEmpty() && state.fastAddList.isEmpty())
+                EmptyBookmark(
+                    modifier = Modifier.padding(innerPadding),
+                    iconRes = R.drawable.baseline_warehouse_24,
+                    title = R.string.warehouse_screen_welcome,
+                    supportText = R.string.warehouse_screen_welcome_support_text,
+                    supportSecondText = R.string.warehouse_screen_welcome_support_second_text,
+                    iconColor = blue_4,
+                    backgroundColor = blue_3,
+                )
+            else
+                WarehouseContainer(
+                    modifier = Modifier.modifierScreen(innerPadding),
+                    state = state,
+                    onFastAddClick = { viewModel.onIntent(WarehouseIntent.FastAddClicked(it)) },
+                    onShowFastAddClick = { viewModel.onIntent(WarehouseIntent.ShowFastAddClicked(it)) },
+                    onAnalysisNavClick = {
+                        navigationToAnalysis(Triple(state.idPT, it.first, it.second))
+                    }
+                )
         /*WarehouseBody(
             itemList = homeUiState.itemList,
             modifier = modifier.fillMaxSize(),
@@ -177,7 +191,7 @@ fun WarehouseScreen(
 }
 
 @Composable
-private fun WarehouseBody2(
+private fun WarehouseContainer(
     modifier: Modifier = Modifier,
     state: WarehouseState,
     onAnalysisNavClick: (Pair<String, Suffix>) -> Unit,
@@ -185,41 +199,62 @@ private fun WarehouseBody2(
     onFastAddClick: (DomainFastAddProduct) -> Unit
 ) {
     Column(
-        modifier = modifier.padding(bottom = 10.dp),
+        modifier = modifier
+            .padding(bottom = 10.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         FastAdd(
             state.isShowFastAddProduct, state.fastAddList,
             { onShowFastAddClick(it) }) { onFastAddClick(it) }
-        WarehouseSection(
-            titleRes = R.string.add_screen_title2,
-            iconRes = R.drawable.icon_add_product,
-            list = state.productList,
-            textColor = green_2,
-            borderColor = green_1,
-            iconColor = green_shamrock,
-            backgroundMiniColor = green_g_1,
-        ) { item ->
-            ProductCard(
-                title = item.title,
-                value = item.count,
-                suffix = item.suffix
-            ) { onAnalysisNavClick(item.title to item.suffix) }
-        }
-        WarehouseSection(
-            titleRes = R.string.warehouse_screen_products,
-            iconRes = R.drawable.icon_expenses,
-            list = state.expensesList,
-            textColor = blue_8,
-            borderColor = blue_16,
-            iconColor = blue_1,
-            backgroundMiniColor = blue_3,
-        ) { item ->
-            ProductCard(
-                title = item.title,
-                value = item.count,
-                suffix = item.suffix
-            ) { }
+        if (state.productList.isEmpty() && state.expensesList.isEmpty())
+            Box(
+                modifier = Modifier
+                    .weight(1f)              // ← занимает всё оставшееся место
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center // ← центр
+            ) {
+                EmptyBookmark(
+                    iconRes = R.drawable.icon_open_box,
+                    title = R.string.warehouse_screen_warehouse_empty,
+                    supportText = R.string.warehouse_screen_warehouse_empty_support_text,
+                    supportSecondText = R.string.warehouse_screen_warehouse_empty_support_second_text,
+                    iconColor = blue_4,
+                    backgroundColor = blue_3,
+                )
+            }
+        else {
+            if (state.productList.isNotEmpty())
+                WarehouseSection(
+                    titleRes = R.string.add_screen_title2,
+                    iconRes = R.drawable.icon_add_product,
+                    list = state.productList,
+                    textColor = green_2,
+                    borderColor = green_1,
+                    iconColor = green_shamrock,
+                    backgroundMiniColor = green_g_1,
+                ) { item ->
+                    ProductCard(
+                        title = item.title,
+                        value = item.count,
+                        suffix = item.suffix
+                    ) { onAnalysisNavClick(item.title to item.suffix) }
+                }
+            if (state.expensesList.isNotEmpty())
+                WarehouseSection(
+                    titleRes = R.string.warehouse_screen_products,
+                    iconRes = R.drawable.icon_expenses,
+                    list = state.expensesList,
+                    textColor = blue_8,
+                    borderColor = blue_16,
+                    iconColor = blue_1,
+                    backgroundMiniColor = blue_3,
+                ) { item ->
+                    ProductCard(
+                        title = item.title,
+                        value = item.count,
+                        suffix = item.suffix
+                    ) { }
+                }
         }
     }
 }
@@ -255,7 +290,6 @@ private fun ProductCard(
         }
     }
 }
-
 
 @Composable
 private fun <T> WarehouseSection(

@@ -20,7 +20,10 @@ import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.alabaster
+import com.zaroslikov.fermacompose2.green_g_1
+import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -64,7 +67,7 @@ fun AddScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val colors = listOf(Color(0xFF009966), Color(0xFF00A63E))
+    val colors = listOf(price_green, green_shamrock)
     val idProject = state.idPT
 
     val query = state.textSearch.trim().lowercase()
@@ -215,11 +218,12 @@ fun AddContainer2(
                 onClick = { onDetailsClick(item) },
             )
         },
-        titleRes = R.string.message_no_date_title_add,
-        messageRes = R.string.message_no_date_message_add,
-        supportRes = R.string.message_no_date_support_text_add,
-        buttonRes = R.string.button_add_message_no_data,
-        details = details
+        titleRes = R.string.message_no_data_title_add,
+        messageRes = R.string.message_no_data_message_add,
+        details = details,
+        iconRes = R.drawable.icon_add_product,
+        iconColor = green_shamrock,
+        backgroundColor = green_g_1
     )
 }
 

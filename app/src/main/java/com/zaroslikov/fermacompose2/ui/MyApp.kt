@@ -33,7 +33,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Exp
 import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffDestination
-import com.zaroslikov.fermacompose2.ui.start.startScreen.StartDestination
+import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -57,7 +57,7 @@ fun DrawerSheet(
     val drawerItems = listOf(
 
         DrawerItems(
-            R.drawable.baseline_arrow_back_24, "Вернуться к проектам", StartDestination.route
+            R.drawable.baseline_arrow_back_24, "Вернуться к проектам", FirstDestination.route
         ),
         DrawerItems(
             R.drawable.baseline_warehouse_24,
@@ -109,7 +109,7 @@ fun DrawerSheet(
                 onClick = {
                     selectedItem = it
                     scope.launch {
-                        if (it.route == StartDestination.route) {
+                        if (it.route == FirstDestination.route) {
                             navigateToStart()
                         } else {
                             navigateToModalSheet(
@@ -141,7 +141,6 @@ fun DrawerSheet(
         }
     }
 }
-
 
 
 fun formatter(number: Double): String {

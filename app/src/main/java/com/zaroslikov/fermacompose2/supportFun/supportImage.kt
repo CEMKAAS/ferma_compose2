@@ -40,16 +40,16 @@ fun Page.toDrawRes(): Int {
 
 fun Destination.toDrawRes(): Int {
     return when (this) {
-        Destination.MAGAZINE -> R.drawable.baseline_edit_document_24
+        Destination.MAGAZINE -> R.drawable.outline_menu_book_24
         Destination.WAREHOUSE -> R.drawable.baseline_warehouse_24
-        Destination.FINANCE -> R.drawable.baseline_currency_ruble_24
+        Destination.FINANCE -> R.drawable.icon_money
     }
 }
 fun DestinationIncubator.toDrawRes(): Int {
     return when (this) {
-        DestinationIncubator.REVIEW -> R.drawable.baseline_edit_document_24
-        DestinationIncubator.BOOKMARK -> R.drawable.baseline_warehouse_24
-        DestinationIncubator.FINANCE -> R.drawable.baseline_currency_ruble_24
+        DestinationIncubator.JOURNAL -> R.drawable.outline_book_5_24
+        DestinationIncubator.BOOKMARK -> R.drawable.baseline_edit_document_24
+        DestinationIncubator.FINANCE -> R.drawable.icon_money
     }
 }
 

@@ -20,7 +20,7 @@ data class AnimalWeightState(
 
     fun enabledButton(): Boolean {
         val isEnabled = domainAnimalWeight.weight.isNotBlank() && !hasAnyError
-        return !isEnabled
+        return isEnabled
     }
 
     data class Error(

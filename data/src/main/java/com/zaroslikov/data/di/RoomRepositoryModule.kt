@@ -10,7 +10,7 @@ import com.zaroslikov.data.room.repository.BookmarkRepositoryImpl
 import com.zaroslikov.data.room.repository.ExpensesAnimalRepositoryImpl
 import com.zaroslikov.data.room.repository.ExpensesRepositoryImpl
 import com.zaroslikov.data.room.repository.FinanceRepositoryImpl
-import com.zaroslikov.data.room.repository.IncubatorRepositoryImpl
+import com.zaroslikov.data.room.repository.IncubatorParametersRepositoryImpl
 import com.zaroslikov.data.room.repository.IncubatorTableRepositoryImpl
 import com.zaroslikov.data.room.repository.NoteRepositoryImpl
 import com.zaroslikov.data.room.repository.ProjectRepositoryImpl
@@ -28,7 +28,7 @@ import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.FinanceRepository
-import com.zaroslikov.domain.repository.IncubatorRepository
+import com.zaroslikov.domain.repository.IncubatorParametersRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.domain.repository.NoteRepository
 import com.zaroslikov.domain.repository.ProjectRepository
@@ -84,8 +84,7 @@ abstract class RoomRepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindIncubatorRepository(incubatorRepositoryImpl: IncubatorRepositoryImpl): IncubatorRepository
-
+    abstract fun bindIncubatorParametersRepository(incubatorRepositoryImpl: IncubatorParametersRepositoryImpl): IncubatorParametersRepository
     @Binds
     @Singleton
     abstract fun bindNoteRepository(noteRepositoryImpl: NoteRepositoryImpl): NoteRepository

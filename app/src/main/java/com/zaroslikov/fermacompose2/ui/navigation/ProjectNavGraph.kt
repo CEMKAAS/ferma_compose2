@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.navigation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -43,11 +44,11 @@ import com.zaroslikov.fermacompose2.ui.project.sections.sale.entry.SaleEntryProd
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.entry.WriteOffEntryDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.entry.WriteOffEntryProduct
-import com.zaroslikov.fermacompose2.ui.start.startScreen.StartDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseScreen
+import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +56,8 @@ import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.Warehou
 fun ProjectNavHost(
     navController: NavHostController,
     itemPT: Long,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    rootNavController: NavController
 ) {
     NavHost(
         navController = navController,
@@ -88,8 +90,8 @@ fun ProjectNavHost(
             })
         ) {
             WarehouseScreen(
-                navigateToStart = { navController.navigate(StartDestination.route) },
-                navigateToEdit = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
+                navigateToStart = { rootNavController.navigate(FirstDestination.route) },
+                navigateToEdit = { rootNavController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
                 navigationToAnalysis = {
                     navController.navigate(
@@ -459,22 +461,22 @@ fun ProjectNavHost(
         ) {
             NoteScreen(navigateBack = navController::popBackStack)
         }
-      /*  composable(
-            route = NoteEntryDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(NoteEntryDestination.itemIdPT) {
-                    type = NavType.LongType
-                },
-                navArgument(NoteEntryDestination.itemId) {
-                    type = NavType.LongType
-                    defaultValue = -1
-                }
-            )
-        ) {
-            NoteEntryProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
-        }*/
+        /*  composable(
+              route = NoteEntryDestination.routeWithArgs,
+              arguments = listOf(
+                  navArgument(NoteEntryDestination.itemIdPT) {
+                      type = NavType.LongType
+                  },
+                  navArgument(NoteEntryDestination.itemId) {
+                      type = NavType.LongType
+                      defaultValue = -1
+                  }
+              )
+          ) {
+              NoteEntryProduct(
+                  navigateBack = { navController.popBackStack() },
+                  onNavigateUp = { navController.navigateUp() })
+          }*/
         // Animal
         composable(
             route = AnimalDestination.routeWithArgs,

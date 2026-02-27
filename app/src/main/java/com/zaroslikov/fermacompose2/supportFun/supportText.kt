@@ -110,7 +110,7 @@ fun Destination.toResId(): Int {
 
 fun DestinationIncubator.toResId(): Int {
     return when (this) {
-        REVIEW -> R.string.bottom_bar_review
+        JOURNAL -> R.string.bottom_bar_incubator
         BOOKMARK -> R.string.bottom_bar_bookmark
         FINANCE -> R.string.bottom_bar_finance
     }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -124,8 +125,8 @@ fun SearchBar(
             BorderCard(
                 modifier = Modifier
                     .size(62.dp)
-                    .wrapContentWidth()
-                    .clickable { onClick(!isGroup) },
+                    .wrapContentWidth(),
+                onClick = { onClick(!isGroup) }
             ) {
                 Icon(
                     painterResource(iconRes),
@@ -205,6 +206,7 @@ fun OutlinedNumberNew(
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
+    maxLength: Int? = null,
     isBorderCard: Boolean = true,
     /*  colorTextField: Color = gray_9,*/
 ) {
@@ -221,7 +223,8 @@ fun OutlinedNumberNew(
             intResError = intResError,
             keyboardOptions = keyboardOptions,
             leadingIconRes2 = drawableRes2,
-            leadingIconColor2 = drawableColor2
+            leadingIconColor2 = drawableColor2,
+            maxLength = maxLength
             /*colorTextField = colorTextField*/
         )
     }
@@ -283,6 +286,7 @@ fun OutlinedTextDropdownMenuTypeEgg(
     val textField: @Composable () -> Unit = {
         ExposedDropdownMenuEnum(
             valueList = titleList,
+            enabled = enable,
             dropdownMenuItem = { index, item, closeMenu ->
                 val trailingIcon: @Composable (() -> Unit)? = if (item == value) {
                     { Icon(Icons.Default.Done, contentDescription = null) }
@@ -981,6 +985,7 @@ fun OutlinedPriceInputNew(
     isManyCount: Boolean = false,
     isError: Boolean = false,
     isNecessarily: Boolean = false,
+    leadingIconRes: Int? = R.drawable.icon_money,
     count: String,
     countSuffix: Suffix,
     priceAll: String,
@@ -988,6 +993,7 @@ fun OutlinedPriceInputNew(
     @StringRes supportTextRes: Int = R.string.support_text_count_product_sale,
     @StringRes supportTextResAutoCal: Int = R.string.support_text_count_product_sale,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_price,
+    isBorderCard: Boolean = true
 ) {
     val target = when {
         isAutoCalculate -> 4.dp
@@ -1002,36 +1008,39 @@ fun OutlinedPriceInputNew(
         )
     )
     val supportText = if (isAutoCalculate) supportTextResAutoCal else supportTextRes
-    BorderCard {
-        BaseOutlinedTextNew(
-            value = price,
-            onValueChange = { onPriceChange(it) },
-            labelIntRes = R.string.outlined_text_price,
-            intResSup = supportText,
-            intResError = R.string.error_no_count_sale,
-            isError = isError,
-            suffix = Suffix.RUBLE,
-            modifier = Modifier
-                .padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
-            leadingIconRes = R.drawable.baseline_add_card_24,
-            keyboardOptions = keyboardOptionsNextNumber(),
-        )
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = isManyCount
-        ) {
-            AutoCalculateCheckbox(
-                isChecked = isAutoCalculate,
-                onCheckedChange = onAutoCalculate,
-                tooltipTextResAutoCal = tooltipTextResAutoCal,
-                price = price,
-                count = count,
-                countSuffix = countSuffix,
-                priceSuffix = priceSuffix,
-                priceAll = priceAll,
+    val textField: @Composable () -> Unit = {
+        Column {
+            BaseOutlinedTextNew(
+                value = price,
+                onValueChange = { onPriceChange(it) },
+                labelIntRes = R.string.outlined_text_price,
+                intResSup = supportText,
+                intResError = R.string.error_no_count_sale,
+                isError = isError,
+                suffix = Suffix.RUBLE,
+                modifier = Modifier
+                    .padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
+                leadingIconRes = leadingIconRes,
+                keyboardOptions = keyboardOptionsNextNumber(),
             )
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = isManyCount
+            ) {
+                AutoCalculateCheckbox(
+                    isChecked = isAutoCalculate,
+                    onCheckedChange = onAutoCalculate,
+                    tooltipTextResAutoCal = tooltipTextResAutoCal,
+                    price = price,
+                    count = count,
+                    countSuffix = countSuffix,
+                    priceSuffix = priceSuffix,
+                    priceAll = priceAll,
+                )
+            }
         }
     }
+    if (isBorderCard) BorderCard { textField() } else textField()
 }
 
 /*

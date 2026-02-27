@@ -19,10 +19,10 @@ class ProjectRepositoryImpl @Inject constructor(private val projectDao: ProjectD
         return projectDao.getProject(id).map { it.toDomainProjectTable() }
     }
 
-    override fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>> {
+   /* override fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>> {
         return projectDao.getIncubatorListArh6(type)
             .map { it -> it.map { it.toDomainProjectTable() } }
-    }
+    }*/
 
     override fun getProjectListAct(): Flow<List<DomainProjectTable>> {
         return projectDao.getProjectListAct().map { it -> it.map { it.toDomainProjectTable() } }

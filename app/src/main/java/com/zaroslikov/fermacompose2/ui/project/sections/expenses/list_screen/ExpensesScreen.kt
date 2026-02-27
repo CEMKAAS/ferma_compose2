@@ -37,6 +37,7 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_2
+import com.zaroslikov.fermacompose2.orang_3
 import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
@@ -252,14 +253,15 @@ fun ExpensesContainer(
                 color = color,
                 colorSecondary = Color(0xFFFFF7ED),
                 onClick = { onDetailsClick(item) },
-                icon = R.drawable.icon_expenses,
+                icon = R.drawable.icon_sale,
             )
         },
-        titleRes = R.string.message_no_date_title_sale,
-        messageRes = R.string.message_no_date_message_sale,
-        supportRes = R.string.message_no_date_support_text_sale,
-        buttonRes = R.string.button_sale_message_no_data,
-        details = details
+        titleRes = R.string.message_no_data_title_expenses,
+        messageRes = R.string.message_no_data_message_expenses,
+        details = details,
+        iconRes = R.drawable.icon_sale,
+        iconColor = orang_1,
+        backgroundColor = orang_3
     )
 }
 
@@ -372,10 +374,10 @@ fun ExpensesEntryBottomSheet(
             },
             isWeightCalculate = !state.isIndicatorsValue,
         )
-       /* WarehouseCountCard(
-            title = state.title,
-            warehouseList = state.warehouseList
-        )*/
+        /* WarehouseCountCard(
+             title = state.title,
+             warehouseList = state.warehouseList
+         )*/
 
         OutlinedPriceInputNew(
             price = state.price,
@@ -433,11 +435,11 @@ private fun AdditionalSettings2(
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
     if (!state.count.isBlank() && !state.price.isBlank() && !state.isIndicatorsValue) {
-      /*  TextButtonWarehouse(
-            boolean = details,
-            onClick = { details = !details },
-            intRes = R.string.card_extra_set
-        )*/
+        /*  TextButtonWarehouse(
+              boolean = details,
+              onClick = { details = !details },
+              intRes = R.string.card_extra_set
+          )*/
         if (details) {
             Food(
                 modifier = Modifier.padding(bottom = animatedErrorPadding(details)),

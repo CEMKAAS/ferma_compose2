@@ -12,7 +12,8 @@ import com.zaroslikov.data.room.dao.BookmarkDao
 import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.dao.ExpensesDao
 import com.zaroslikov.data.room.dao.FinanceDao
-import com.zaroslikov.data.room.dao.IncubatorDao
+import com.zaroslikov.data.room.dao.IncubatorParametersDao
+//import com.zaroslikov.data.room.dao.IncubatorDao
 import com.zaroslikov.data.room.dao.IncubatorTableDao
 import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.data.room.database.AppDatabase.Companion.Instance
@@ -108,8 +109,8 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideIncubatorDao(database: AppDatabase): IncubatorDao {
-        return database.incubatorDao()
+    fun provideIncubatorParametersDao(database: AppDatabase): IncubatorParametersDao {
+        return database.incubatorParametersDao()
     }
 
     @Provides

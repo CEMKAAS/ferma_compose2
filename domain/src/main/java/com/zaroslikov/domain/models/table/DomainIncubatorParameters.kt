@@ -1,6 +1,6 @@
 package com.zaroslikov.domain.models.table
 
-data class DomainIncubator(
+data class DomainIncubatorParameters(
     val id: Long = 0,
     val day: Int = 0,
     val temp: String = "",

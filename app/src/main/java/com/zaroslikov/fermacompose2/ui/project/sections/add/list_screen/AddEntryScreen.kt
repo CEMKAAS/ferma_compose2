@@ -52,7 +52,7 @@ data class AddEntryState2(
 
     fun enabledButton(): Boolean {
         val isEnabled = title.isNotBlank() && count.isNotBlank() && !hasAnyError
-        return !isEnabled
+        return isEnabled
     }
 }
 

@@ -16,7 +16,7 @@ interface AnimalDao {
                 "an.name, " +
                 "an.type, " +
                 "an.date, " +
-                "an.date_factory, " +
+                "an.date_factory as dateFactory, " +
                 "an.`group`, " +
                 "an.sex, " +
                 "ac.count AS count, " +

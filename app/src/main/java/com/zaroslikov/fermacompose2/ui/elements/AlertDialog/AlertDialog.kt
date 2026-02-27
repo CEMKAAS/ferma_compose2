@@ -1,26 +1,48 @@
 package com.zaroslikov.fermacompose2.ui.elements.AlertDialog
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.grey_2
+import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.ui.elements.GradientButton
+import com.zaroslikov.fermacompose2.ui.elements.IconGradient
+import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextSex
 import com.zaroslikov.fermacompose2.ui.elements.modifierDialogScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.white
 
 
 @Composable
@@ -201,4 +223,115 @@ fun AlertDialogAni(
             }
         }
     )
+}
+
+@Composable
+fun AlertDialogBase(
+    modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+    onDismissRequest: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+fun AlertDialogStandard(
+    modifier: Modifier = Modifier,
+     paddingValues: PaddingValues = PaddingValues(16.dp),
+    @StringRes titleRes: Int,
+    @DrawableRes iconRes: Int,
+    titleBackgroundColor: Color,
+    onDismissRequest: () -> Unit,
+    onClick: () -> Unit,
+    colors: List<Color>,
+    isShowCancelButton: Boolean = true,
+    @StringRes textButtonRes: Int,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    AlertDialogBase(
+        modifier = modifier,
+        paddingValues = PaddingValues(),
+        onDismissRequest = onDismissRequest
+    ) {
+        Column {
+            Column(
+                modifier = Modifier.background(color = titleBackgroundColor),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(paddingValues),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        IconGradient(
+                            sizeCard = 48.dp,
+                            icon = iconRes,
+                            colorIcon = white,
+                            colors = colors
+                        )
+                        Text(
+                            stringResource(titleRes),
+                            style = text_16,
+                            color = black_2
+                        )
+                    }
+                    IconButton(
+                        onClick = onDismissRequest
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_clear_24),
+                            contentDescription = null, tint = marengo
+                        )
+                    }
+                }
+                HorizontalDivider(thickness = 1.dp, color = grey_2)
+            }
+            Column(
+                modifier = Modifier.padding(paddingValues),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                content()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    if (isShowCancelButton)
+                        GradientButton(
+                            modifier = Modifier.weight(1f),
+                            colors = listOf(gray_6, gray_6),
+                            text = stringResource(R.string.button_text_cancel_2),
+                            textColor = dark,
+                            onClick = onDismissRequest
+                        )
+                    GradientButton(
+                        modifier = Modifier.weight(1f),
+                        colors = colors,
+                        isShadow = true,
+                        text = stringResource(textButtonRes),
+                        onClick = onClick
+                    )
+                }
+            }
+        }
+    }
 }

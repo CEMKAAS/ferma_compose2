@@ -1,10 +1,10 @@
 package com.zaroslikov.data.room.mapper.table
 
-import com.zaroslikov.data.room.table.incubator.Incubator
-import com.zaroslikov.domain.models.table.DomainIncubator
+import com.zaroslikov.data.room.table.incubator.IncubatorParameters
+import com.zaroslikov.domain.models.table.DomainIncubatorParameters
 
-fun Incubator.toDomainIncubator(): DomainIncubator {
-    return DomainIncubator(
+fun IncubatorParameters.toDomainIncubatorParameters(): DomainIncubatorParameters {
+    return DomainIncubatorParameters(
         id = this.id,
         day = this.day,
         temp = this.temp,
@@ -20,8 +20,8 @@ fun Incubator.toDomainIncubator(): DomainIncubator {
     )
 }
 
-fun DomainIncubator.toIncubator(): Incubator {
-    return Incubator(
+fun DomainIncubatorParameters.toIncubatorParameters(): IncubatorParameters {
+    return IncubatorParameters(
         id = this.id,
         day = this.day,
         temp = this.temp,

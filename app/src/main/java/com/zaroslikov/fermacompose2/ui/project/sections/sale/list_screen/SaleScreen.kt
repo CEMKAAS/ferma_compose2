@@ -18,6 +18,7 @@ import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
+import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -72,8 +73,8 @@ fun SaleScreen(
                     item.category.lowercase().contains(query) ||
                     item.count.toString().lowercase().contains(query) ||
                     stringResource(item.countSuffix.toResId()).lowercase().contains(query)
-                    "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
-                        .contains(query) ||
+            "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
+                .contains(query) ||
                     item.buyer?.lowercase()?.contains(query) == true ||
                     (item.priceAll ?: item.price).toString().lowercase().contains(query)
         }
@@ -182,7 +183,7 @@ private fun SaleContainer(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailsClick = onDetailsClick,
-        detailCard = {index, item ->
+        detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
                 count = item.count,
@@ -217,10 +218,11 @@ private fun SaleContainer(
                 icon = R.drawable.icon_sale,
             )
         },
-        titleRes = R.string.message_no_date_title_sale,
-        messageRes = R.string.message_no_date_message_sale,
-        supportRes = R.string.message_no_date_support_text_sale,
-        buttonRes = R.string.button_sale_message_no_data
+        titleRes = R.string.message_no_data_title_sale,
+        messageRes = R.string.message_no_data_message_sale,
+        iconRes = R.drawable.icon_expenses,
+        iconColor = blue_1,
+        backgroundColor = blue_3,
     )
 }
 

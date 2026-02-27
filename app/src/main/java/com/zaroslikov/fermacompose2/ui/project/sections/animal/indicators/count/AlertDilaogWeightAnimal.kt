@@ -169,7 +169,7 @@ fun AlertDialogWeightAnimal(
                 GradientButton(
                     text = stringResource(R.string.button_text_take),
                     onClick = { },
-                    enable = false,
+                    enabled = false,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 18.dp, horizontal = 24.dp),

@@ -195,17 +195,18 @@ fun GradientButton(
     text: String,
     @DrawableRes iconRes: Int? = null,
     isShadow: Boolean = false,
-    enable: Boolean = false,
+    enabled: Boolean = true,
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     shape: RoundedCornerShape = RoundedCornerShape(14.dp),
+    textColor: Color = Color.White,
     onClick: () -> Unit,
 ) {
     val gradient = Brush.linearGradient(
         colors = colors,
         start = Offset(0f, 0f),
-        end = Offset(300f, 0f)
+        end = Offset(Float.POSITIVE_INFINITY, 0f)
     )
-    val alpha = if (enable) 0.5f else 1f
+    val alpha = if (enabled) 1f else 0.5f
 
     Box(
         modifier = modifier
@@ -215,7 +216,7 @@ fun GradientButton(
             .clip(shape)
             .background(brush = gradient, alpha = alpha)
             .then(
-                if (enable) Modifier else Modifier.clickable(onClick = onClick)
+                if (enabled) Modifier.clickable(onClick = onClick) else Modifier
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -227,14 +228,14 @@ fun GradientButton(
                 Icon(
                     painterResource(it),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = textColor,
                     modifier = Modifier.size(16.dp)
                 )
             }
             Text(
                 modifier = Modifier.padding(paddingValues),
                 text = text,
-                color = Color.White,
+                color = textColor,
                 style = text_14
             )
         }

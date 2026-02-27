@@ -14,7 +14,7 @@ data class WarehouseEditState(
     val nameProject: String = "",
     val dateProject: String = dateToday(),
     val isInsertProject: Boolean = true,
-    val currentProject: DomainProjectTable = DomainProjectTable(data = dateToday()),
+    val currentProject: DomainProjectTable = DomainProjectTable(date = dateToday()),
     val currentSettings: DomainSettings = DomainSettings(),
     override val idPT: Long = 0,
     override val isLoading: Boolean = false,
@@ -22,7 +22,7 @@ data class WarehouseEditState(
 ) : ListState() {
 
     fun enabledButton(): Boolean {
-        val isEnabled = currentProject.titleProject.isNotBlank()
-        return !isEnabled
+        val isEnabled = currentProject.title.isNotBlank()
+        return isEnabled
     }
 }

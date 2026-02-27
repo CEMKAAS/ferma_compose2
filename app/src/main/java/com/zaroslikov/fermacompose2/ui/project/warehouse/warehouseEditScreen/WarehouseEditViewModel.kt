@@ -51,15 +51,14 @@ class WarehouseEditViewModel @Inject constructor(
             updateState { it.copy(isLoading = true) }
             val project = projectRepository.getProject(itemId).first()
             val settings = settingsRepository.getSettings(itemId).first()
-            val imageBitmap = project.imageData?.let {
-                BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
-            }
+            /* val imageBitmap = project.imageData?.let {
+                 BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+             }*/
             updateState {
                 it.copy(
                     isLoading = false,
-                    nameProject = project.titleProject,
-                    dateProject = project.data,
-                    imageData = imageBitmap,
+                    nameProject = project.title,
+                    dateProject = project.date,
                     currentProject = project,
                     currentSettings = settings,
                     idPT = itemId
@@ -71,7 +70,7 @@ class WarehouseEditViewModel @Inject constructor(
 
     private fun updateTitle(nameProject: String) {
         updateState {
-            it.copy(currentProject = it.currentProject.copy(titleProject = nameProject))
+            it.copy(currentProject = it.currentProject.copy(title = nameProject))
         }
     }
 
@@ -80,7 +79,7 @@ class WarehouseEditViewModel @Inject constructor(
     }
 
     private fun updateDateProject(dateProject: String) {
-        updateState { it.copy(currentProject = it.currentProject.copy(data = dateProject)) }
+        updateState { it.copy(currentProject = it.currentProject.copy(date = dateProject)) }
     }
 
     private fun updateCurrentCurrency(currency: Suffix) {
@@ -116,20 +115,11 @@ class WarehouseEditViewModel @Inject constructor(
     private fun WarehouseEditState.toDomainProjectTable(id: Long? = null): DomainProjectTable {
         return DomainProjectTable(
             id = id ?: 0,
-            titleProject = currentProject.titleProject,
-            type = currentProject.type,
-            data = currentProject.data,
-            eggAll = currentProject.eggAll,
-            eggAllEND =currentProject.eggAllEND,
-            airing = currentProject.airing,
-            over = currentProject.over,
-            arhive = currentProject.arhive,
+            title = currentProject.title,
+            archive = currentProject.archive,
+            date = currentProject.date,
             dateEnd = currentProject.dateEnd,
-            time1 = currentProject.time1,
-            time2 = currentProject.time2,
-            time3 = currentProject.time3,
-            mode = 0,
-            imageData = currentProject.imageData
+            mode = true,
         )
     }
 

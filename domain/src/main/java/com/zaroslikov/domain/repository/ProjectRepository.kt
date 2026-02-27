@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ProjectRepository {
     fun getAllProject(): Flow<List<DomainProjectTable>>
     fun getProject(id: Long): Flow<DomainProjectTable>
-    fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>>
+ /*   fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>>*/
     fun getProjectListAct(): Flow<List<DomainProjectTable>>
     fun getCountRowIncubator(): Flow<Int>
     fun getCountRowProject(): Flow<Int>

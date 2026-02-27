@@ -3,10 +3,8 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.entry
 
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -19,21 +17,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.elements.AnimalNameOutlinedText
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.elements.CardField
-import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
-import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedPriceInput
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountAnimal
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextDate
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextNote
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextSex
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextTitleAdd
+import com.zaroslikov.fermacompose2.ui.elements.DateFactoryCardNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.AnimalNameOutlinedTextNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalTypeNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextSexNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
-import com.zaroslikov.fermacompose2.ui.elements.toOutlinedText
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
@@ -89,13 +84,11 @@ fun AnimalEntryContainer(
     state: AnimalEntryState,
     onIntent: (AnimalEntryIntent) -> Unit
 ) {
-    Column(modifier = modifier) {
-        /*   if (state.isEntry)
-             AnimalGroupCard(
-                  isAnimalGroup = state.isAnimalGroup,
-                  animalGroupClicked = { onIntent(AnimalEntryIntent.AnimalGroupClicked(it)) }
-              )*/
-        AnimalNameOutlinedText(
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        AnimalNameOutlinedTextNew(
             value = state.title,
             onValueChange = {
                 onIntent(AnimalEntryIntent.TitleChanged(it))
@@ -103,55 +96,36 @@ fun AnimalEntryContainer(
             isAnimalGroup = state.isAnimalGroup,
             isErrorTitle = state.error.isErrorTitle
         )
-        OutlinedTextTitleAdd(
-            intRes = R.string.outlined_text_type,
-            intResSup = if (!state.isAnimalGroup) R.string.support_text_type_animal
-            else R.string.support_text_type_animals,
-            intResError = R.string.error_no_type_animal,
+        OutlinedTextAnimalTypeNew(
             value = state.type,
             onValueChange = {
                 onIntent(AnimalEntryIntent.TypeChanged(it))
             },
-            drawableRes = R.drawable.baseline_pets_24,
-            titleList = state.typeList,
-            isErrorTitle = state.error.isErrorType,
-            isErrorSlash = false,
+            list = state.typeList,
         )
-        if (state.isAnimalGroup && state.isEntry)
-            OutlinedTextCountAnimal(
-                value = state.count,
-                onValueChange = {
-                    onIntent(AnimalEntryIntent.CountChanged(it))
-                },
-                drawableRes = R.drawable.baseline_spoke_24,
-                isError = state.error.isErrorCount,
-                suffix = Suffix.RUBLE,
-                intRes = R.string.outlined_text_field_quantity,
-                intResSup = R.string.support_text_count_animals,
-                isWarehouseShow = false,
-                isDropMenuShow = false
-            )
         if (!state.isAnimalGroup)
-            OutlinedTextSex(
+            OutlinedTextSexNew(
                 value = state.sex,
                 onValueChange = {
                     onIntent(AnimalEntryIntent.SexClicked(it))
                 },
             )
-        if (state.isEntry)
-            OutlinedPriceInput(
-                price = state.price,
-                onPriceChange = {
-                    onIntent(AnimalEntryIntent.PriceChanged(it))
-                },
-                priceAll = state.priceAll,
-                isAutoCalculate = state.isAutoPrice,
-                onAutoCalculate = {
-                    onIntent(AnimalEntryIntent.AutoPriceClicked(it))
-                },
-                isManyCount = state.isAnimalGroup,
-            )
-        OutlinedTextDate(
+        OutlinedPriceInputNew(
+            price = state.price,
+            onPriceChange = {
+                onIntent(AnimalEntryIntent.PriceChanged(it))
+            },
+            priceAll = state.priceAll,
+            isAutoCalculate = state.isAutoPrice,
+            onAutoCalculate = {
+                onIntent(AnimalEntryIntent.AutoPriceClicked(it))
+            },
+            isManyCount = state.isAnimalGroup,
+            count = state.count,
+            countSuffix = state.countSuffix,
+            priceSuffix = Suffix.RUBLE,
+        )
+        OutlinedTextDateNew(
             value = state.dateBorn,
             intRes = R.string.outlined_text_date_born,
             intResSup = if (!state.isAnimalGroup) R.string.outlined_text_date_born
@@ -160,14 +134,18 @@ fun AnimalEntryContainer(
                 onIntent(AnimalEntryIntent.DateClicked(it))
             }
         )
-        DateFactoryCard(
+        DateFactoryCardNew(
+            dateBoring = state.dateBorn,
             dateFactory = state.dateFactory,
-            isAnimalGroup = state.isAnimalGroup,
             isDateFactory = state.isDateFactory,
             dateFactoryClicked = { onIntent(AnimalEntryIntent.DateFactoryClicked(it)) },
             dateFactoryChanged = { onIntent(AnimalEntryIntent.DateFactoryChanged(it)) },
+            intTitle = if (!state.isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
+            intTooltip = R.string.tooltip_animals_born,
+            intRes = R.string.outlined_text_date_factory,
+            intResSup = if (!state.isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
         )
-        OutlinedTextCountAnimal(
+        OutlinedTextCountNew(
             value = state.foodDay,
             onValueChange = {
                 onIntent(AnimalEntryIntent.FoodDayChanged(it))
@@ -176,21 +154,11 @@ fun AnimalEntryContainer(
             onSuffixChange = {
                 onIntent(AnimalEntryIntent.FoodDaySuffixClicked(it))
             },
+            suffixList = suffixWeightDayList,
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
             suffix = state.foodDaySuffix,
-            isWarehouseShow = false,
-            isDropMenuShow = true,
-            versionDropMenu = DropdownMenu.WEIGHT,
-            isNecessarily = false
         )
-        if (state.isEntry)
-            OutlinedTextNote(
-                value = state.note,
-                onValueChange = {
-                    onIntent(AnimalEntryIntent.NoteChanged(it))
-                },
-            )
         ButtonPanel(
             entryButton = if (state.price.isBlank()) R.string.button_add else R.string.button_expenses,
             isEntry = state.isEntry,
@@ -198,46 +166,6 @@ fun AnimalEntryContainer(
             onClickUpdate = { onIntent(AnimalEntryIntent.Update) },
             onClickDelete = { onIntent(AnimalEntryIntent.Delete) }
         )
-    }
-}
-
-
-@Composable
-private fun DateFactoryCard(
-    isDateFactory: Boolean,
-    isAnimalGroup: Boolean,
-    dateFactory: String,
-    dateFactoryClicked: (Boolean) -> Unit,
-    dateFactoryChanged: (String) -> Unit
-) {
-    CardField(
-        modifier = Modifier
-            .padding(bottom = 4.dp),
-        row = false
-    ) {
-        CheckboxTextIcon(
-            modifier = if (!isDateFactory) Modifier.toOutlinedText() else Modifier,
-            checked = isDateFactory,
-            onCheckedChange = {
-                dateFactoryClicked(it)
-            },
-            intTitle = if (!isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
-            isTooltipShow = true,
-            intTooltip = R.string.tooltip_animals_born
-        )
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = !isDateFactory,
-        ) {
-            OutlinedTextDate(
-                value = dateFactory,
-                intRes = R.string.outlined_text_date_factory,
-                intResSup = if (!isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
-                drawableRes = R.drawable.baseline_event_24,
-                onValueChange = { dateFactoryChanged(it) },
-                isCardBorder = false
-            )
-        }
     }
 }
 

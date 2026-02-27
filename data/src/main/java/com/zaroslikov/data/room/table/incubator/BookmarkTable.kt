@@ -26,10 +26,20 @@ data class BookmarkTable(
     val type: TypeEgg,
     val breed: String?,
     val count: Int,
-    val date: String,
+    @ColumnInfo(name = "rejected_count")
+    val rejectedCount: Int,
+    @ColumnInfo(name = "start_date")
+    val startDate: String,
+    @ColumnInfo(name = "end_date")
+    val endDate: String,
+    @ColumnInfo(name = "early_completion_Status")
+    val isEarlyCompletionStatus: Boolean = false, //false - завершена, true - прервана
     val time: String,
     val price: Double?,
-    val autoPrice: Boolean = false,
+    @ColumnInfo(name = "price_all")
+    val priceAll: Double?,
+    @ColumnInfo(name = "chick_price")
+    val chickPrice: Double?,
     val note: String,
     @ColumnInfo(name = "auto_rotation")
     val isAutoRotation: Boolean = false,

@@ -38,7 +38,7 @@ data class AddIncubator(
 
     fun enabledButton(): Boolean {
         val isEnabled = title.isNotBlank() && capacity.isNotBlank() && !hasAnyError
-        return !isEnabled
+        return isEnabled
     }
 }
 

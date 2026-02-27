@@ -41,6 +41,7 @@ fun Modifier.modifierScreen(
 ): Modifier {
     val focusManager = LocalFocusManager.current
     return this
+        .fillMaxHeight()
         .padding(top = innerPadding.calculateTopPadding())
         .padding(
             horizontal = horizontalPaddingValues,
@@ -52,7 +53,7 @@ fun Modifier.modifierScreen(
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
             })
         }
-        .fillMaxHeight()
+
 }
 
 @Composable
