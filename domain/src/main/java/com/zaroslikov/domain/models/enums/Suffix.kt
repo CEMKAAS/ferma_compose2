@@ -19,7 +19,9 @@ enum class Suffix(val code: Int) {
     EURO(16),
     GRAM_DAY(17),
     KILOGRAM_DAY(18),
-    TONS_DAY(19);
+    TONS_DAY(19),
+    KILOGRAM_TO_CUBIC_METERS(20),
+    KILOGRAM_TO_LITERS(21);
 
     companion object {
         fun fromCode(code: Int): Suffix = entries.first { it.code == code }

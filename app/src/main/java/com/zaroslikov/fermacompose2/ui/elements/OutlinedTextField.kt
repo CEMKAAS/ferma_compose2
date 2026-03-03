@@ -291,7 +291,7 @@ fun OutlinedTextCategory(
                 labelIntRes = R.string.outlined_text_field_category,
                 intResSup = R.string.support_text_category,
                 keyboardOptions = keyboardOptionsNext(),
-                enable = enable,
+                enabled = enable,
                 readOnly = readOnly
             )
         }
@@ -357,13 +357,15 @@ fun OutlinedTextCountAnimal(
         )
             AutoWeightCheckbox(
                 count = value,
+                countSuffix = Suffix.RUBLE,
                 weight = weightValue,
                 onWeightChange = onWeightChange,
                 suffix = weightSuffix,
                 onSuffixChance = onWeightSuffixChance,
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
-                tooltipTextResAutoCal = tooltipTextResAutoCal
+                tooltipTextResAutoCal = tooltipTextResAutoCal,
+                weightAll = weightValue
             )
     }
 }
@@ -422,13 +424,15 @@ fun OutlinedTextCount2(
         )
             AutoWeightCheckbox(
                 count = value,
+                countSuffix = Suffix.RUBLE,
                 weight = weightValue,
                 onWeightChange = onWeightChange,
                 suffix = weightSuffix,
                 onSuffixChance = onWeightSuffixChance,
                 isChecked = isAutoCalculate,
                 onCheckedChange = onAutoCalculate,
-                tooltipTextResAutoCal = tooltipTextResAutoCal
+                tooltipTextResAutoCal = tooltipTextResAutoCal,
+                weightAll = weightValue
             )
     }
     if (cardBorder) {

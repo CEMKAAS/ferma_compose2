@@ -8,6 +8,8 @@ import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixAllList
+import com.zaroslikov.domain.models.list.suffixWeightList
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
@@ -37,12 +39,21 @@ data class ExpensesEntryState2(
     val itemId: Long = 0,
     val title: String = "",
     val count: String = "",
+    val countSuffix: Suffix = Suffix.PIECES,
     val date: String = dateToday(),
+
     val price: String = "",
     val priceAll: String = "",
-    val countSuffix: Suffix = Suffix.PIECES,
+
     val category: String = "",
     val note: String = "",
+
+    val isFood: Boolean = false,
+    val isPercent: Boolean = false,
+    val isShowCheckbox: Boolean = false,
+    val suffixList: List<Suffix> = suffixAllList,
+    val weightSuffixList: List<Suffix> = suffixWeightList,
+
     val isShowFood: Boolean = false,
     val isShowFoodHand: Boolean = false,
     val isShowWarehouse: Boolean = false,
@@ -61,6 +72,7 @@ data class ExpensesEntryState2(
 
     val weight: String = "",
     val weightSuffix: Suffix = Suffix.KILOGRAM,
+    val weightAllSuffix: Suffix = Suffix.KILOGRAM,
     val isAutoWeight: Boolean = false,
     val isAutoPrice: Boolean = false,
 
@@ -120,7 +132,5 @@ data class ErrorExpenses(
             else -> isErrorTitle || isErrorSlash || isErrorCount || isErrorPrice
         }
     }
-
-
 }
 

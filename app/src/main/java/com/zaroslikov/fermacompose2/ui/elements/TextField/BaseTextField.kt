@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -54,7 +53,6 @@ import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.text_12
-import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 
 @Composable
@@ -79,7 +77,7 @@ fun BaseOutlinedTextNew(
     leadingIconRes: Int? = null,
     leadingIconClick: () -> Unit = {},
     readOnly: Boolean = false,
-    enable: Boolean = true,
+    enabled: Boolean = true,
     @StringRes labelIntRes: Int? = null,
     @StringRes intResSup: Int,
     @StringRes intResError: Int = R.string.error_no_count_product,
@@ -93,7 +91,7 @@ fun BaseOutlinedTextNew(
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
 ) {
 
-    val isDisabled = !enable
+    val isDisabled = !enabled
     val leadingIcon: @Composable (() -> Unit)? = if (leadingIconRes != null) {
         {
             IconButton(onClick = { leadingIconClick() }) {
@@ -220,7 +218,7 @@ fun BaseOutlinedTextNew(
                     cursorBrush = SolidColor(Color(0xFF007AFF)),
                     singleLine = singleLine,
                     readOnly = readOnly,
-                    enabled = enable,
+                    enabled = enabled,
                     interactionSource = interactionSource,
                     decorationBox = { innerTextField ->
                         Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {

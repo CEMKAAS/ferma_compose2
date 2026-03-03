@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -55,6 +56,7 @@ import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorGradientCard
@@ -87,13 +89,8 @@ object AnimalDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalScreen(
-    /* navigateToStart: () -> Unit,
-     navigateToModalSheet: (DrawerNavigation) -> Unit,
-     drawerState: DrawerState,*/
     navigateToItemCard: (Pair<Long, Long>) -> Unit = {},
     modifier: Modifier = Modifier,
-    /*navigateToItemAdd: (Long) -> Unit,*/
-    /*   isFirstStart: Boolean,*/
     viewModel: AnimalViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -204,10 +201,14 @@ private fun AnimalEntryBottomSheet(
         onInsertClick = { onIntent(AnimalListIntent.Insert) },
         onUpdateClick = { onIntent(AnimalListIntent.Update) }
     ) {
-        /*if (state.isEntry)*/
-        AnimalGroupCard(
-            isAnimalGroup = state.isAnimalGroup,
-            animalGroupClicked = { onIntent(AnimalListIntent.AnimalGroupClicked(it)) }
+        GroupCard(
+            titleRes = R.string.animal_entry_screen_animal,
+            iconOneRes = R.drawable.baseline_pets_24,
+            iconTwoRes = R.drawable.baseline_spoke_24,
+            textOneRes = R.string.ration_button_one,
+            textTwoRes = R.string.ration_button_many,
+            isSecondValue = state.isAnimalGroup,
+            onClick = { onIntent(AnimalListIntent.AnimalGroupClicked(it)) },
         )
         AnimalNameOutlinedTextNew(
             value = state.title,
@@ -224,7 +225,7 @@ private fun AnimalEntryBottomSheet(
             },
             list = state.typeList,
         )
-        if (state.isAnimalGroup /*&& state.isEntry*/)
+        if (state.isAnimalGroup)
             OutlinedTextCountNew(
                 value = state.count,
                 onValueChange = {
@@ -237,8 +238,6 @@ private fun AnimalEntryBottomSheet(
                 suffix = state.countSuffix,
                 intRes = R.string.outlined_text_field_quantity,
                 intResSup = R.string.support_text_count_animals,
-                /*      isWarehouseShow = false,
-                      isDropMenuShow = false*/
             )
         if (!state.isAnimalGroup)
             OutlinedTextSexNew(
@@ -247,7 +246,6 @@ private fun AnimalEntryBottomSheet(
                     onIntent(AnimalListIntent.SexClicked(it))
                 },
             )
-        /*if (state.isEntry)*/
         OutlinedPriceInputNew(
             price = state.price,
             onPriceChange = {
@@ -296,12 +294,7 @@ private fun AnimalEntryBottomSheet(
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
             suffix = state.foodDaySuffix,
-            /*isWarehouseShow = false,
-            isDropMenuShow = true,
-            versionDropMenu = DropdownMenu.WEIGHT,
-            isNecessarily = false*/
         )
-        /*if (state.isEntry)*/
         OutlinedTextNoteNew(
             value = state.note,
             onValueChange = {
@@ -342,7 +335,6 @@ private fun AnimalContainer(
                 modifier = Modifier,
                 animal = item,
                 onClick = { onClick(item.id) },
-                onEditClick = { TODO() },
                 onArchive = { TODO() },
                 onDeleteClick = { onDeleteClick(item.id) })
         },
@@ -351,7 +343,6 @@ private fun AnimalContainer(
                 modifier = Modifier,
                 animal = item,
                 onClick = { TODO() },
-                onEditClick = { TODO() },
                 onArchive = { TODO() },
                 onDeleteClick = { onDeleteClick(item.id) })
         },
@@ -369,7 +360,6 @@ fun AnimalCard(
     modifier: Modifier = Modifier,
     animal: DomainAnimalWithCount,
     onClick: () -> Unit,
-    onEditClick: () -> Unit,
     onArchive: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
@@ -402,7 +392,6 @@ fun AnimalCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         DropdownMenuEdit(
-                            onEditClick = onEditClick,
                             onArchiveClick = onArchive,
                             onDeleteClick = onDeleteClick
                         )
@@ -631,28 +620,27 @@ fun IconAnimal(
 }
 
 @Composable
-private fun AnimalGroupCard(
-    isAnimalGroup: Boolean,
-    animalGroupClicked: (Boolean) -> Unit
+fun GroupCard(
+    @StringRes titleRes: Int,
+    @DrawableRes iconOneRes: Int,
+    @DrawableRes iconTwoRes: Int,
+    @StringRes textOneRes: Int,
+    @StringRes textTwoRes: Int,
+    isSecondValue: Boolean,
+    onClick: (Boolean) -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+    BorderCard(
+        modifier = Modifier.fillMaxWidth(),
+        padding = PaddingValues(18.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = green_g_3
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = green_g_4
-        )
+        borderColor = green_g_4,
+        containerColor = green_g_3
     ) {
         Column(
-            modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = stringResource(R.string.animal_entry_screen_animal),
+                text = stringResource(titleRes),
                 style = text_16
             )
             Row(
@@ -661,17 +649,17 @@ private fun AnimalGroupCard(
             ) {
                 TypeAnimalCard(
                     modifier = Modifier.weight(1f),
-                    title = R.string.ration_button_one,
-                    icon = R.drawable.baseline_pets_24,
-                    isAnimalGroup = !isAnimalGroup,
-                    onClick = { animalGroupClicked(!isAnimalGroup) }
+                    title = textOneRes,
+                    icon = iconOneRes,
+                    isAnimalGroup = !isSecondValue,
+                    onClick = { onClick(!isSecondValue) }
                 )
                 TypeAnimalCard(
                     modifier = Modifier.weight(1f),
-                    title = R.string.ration_button_many,
-                    icon = R.drawable.baseline_spoke_24,
-                    isAnimalGroup = isAnimalGroup,
-                    onClick = { animalGroupClicked(!isAnimalGroup) }
+                    title = textTwoRes,
+                    icon = iconTwoRes,
+                    isAnimalGroup = isSecondValue,
+                    onClick = { onClick(!isSecondValue) }
                 )
             }
         }

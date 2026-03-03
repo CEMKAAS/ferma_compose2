@@ -66,6 +66,7 @@ import com.zaroslikov.fermacompose2.ui.elements.CountColorGradientCard
 import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
 import com.zaroslikov.fermacompose2.ui.elements.SecondAnimalCard
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
@@ -111,11 +112,10 @@ fun AnimalCardProduct(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBarStart(
-                title = stringResource(R.string.animal_card_screen_animal_card),
-                true,
-                navigateUp = navigateBack,
-                settingUp = { onNavigateSetting(state.itemIdPT to state.itemId) },
+            TopAppBarBack(
+                intRes = R.string.animal_card_screen_animal_card,
+                onNavigateBackClick = navigateBack,
+                onSettingsClick = { onNavigateSetting(state.itemIdPT to state.itemId) },
                 scrollBehavior = scrollBehavior
             )
         }) { innerPadding ->
@@ -164,7 +164,7 @@ fun AnimalCardContainer(
             onNavigateWeight = onNavigateWeight,
             onNavigateVaccination = onNavigateVaccination
         )
-        NoteWidget(note =state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
+        NoteWidget(note = state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
         PullOutCardNew(
             icon = R.drawable.baseline_analytics_24,
             intRes = R.string.animal_card_screen_animal_card_product,

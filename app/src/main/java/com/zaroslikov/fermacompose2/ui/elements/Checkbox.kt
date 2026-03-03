@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.ui.elements.TextField.WeightOutlinedTextFieldNew
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import kotlinx.coroutines.launch
 
@@ -176,12 +178,12 @@ fun AutoCalculateCheckbox(
             intTooltip = tooltipTextResAutoCal
         )
         if (isChecked)
-            CardAllPrice(
+            SupportTotalCard(
                 count = count,
                 countSuffix = countSuffix,
-                price = price,
-                priceSuffix = priceSuffix,
-                priceAll = priceAll,
+                value = price,
+                valueSuffix = priceSuffix,
+                totalValue = priceAll,
             )
     }
 }
@@ -190,35 +192,44 @@ fun AutoCalculateCheckbox(
 @Composable
 fun AutoWeightCheckbox(
     count: String,
+    countSuffix: Suffix,
+    weightAll: String,
     weight: String,
     onWeightChange: (String) -> Unit,
     suffix: Suffix,
     onSuffixChance: (Suffix) -> Unit,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    totalSuffix: Suffix? = null,
+    suffixEnabled: Boolean = true,
     @StringRes tooltipTextResAutoCal: Int,
 ) {
-    CheckboxTextIcon(
-        modifier = if (isChecked) Modifier.toOutlinedText() else Modifier,
-        checked = isChecked,
-        onCheckedChange = onCheckedChange,
-        intTitle = R.string.checkbox_auto_weight,
-        isTooltipShow = true,
-        intTooltip = tooltipTextResAutoCal
-    )
-    if (isChecked) {
-        WeightOutlinedText(
-            modifier = Modifier.padding(bottom = 8.dp),
-            value = weight,
-            onValueChange = onWeightChange,
-            suffix = suffix,
-            onSuffixChance = onSuffixChance
+    Column {
+        CheckboxTextIcon(
+            checked = isChecked,
+            onCheckedChange = onCheckedChange,
+            intTitle = R.string.checkbox_auto_weight,
+            isTooltipShow = true,
+            intTooltip = tooltipTextResAutoCal
         )
-        TextBuildAnnotated(
-            intRes = R.string.support_text_all_weight,
-            priceAll = weight,
-            count = count,
-            suffix = suffix
-        )
+        if (isChecked) {
+            WeightOutlinedTextFieldNew(
+                value = weight,
+                onValueChange = onWeightChange,
+                suffix = suffix,
+                onSuffixChange = onSuffixChance,
+                suffixEnabled = suffixEnabled
+            )
+            Spacer(Modifier.padding(vertical = 4.dp))
+            SupportTotalCard(
+                titleRes = R.string.support_text_all_weight,
+                count = count,
+                countSuffix = countSuffix,
+                value = weight,
+                valueSuffix = suffix,
+                totalValue = weightAll,
+                totalSuffix = totalSuffix
+            )
+        }
     }
 }

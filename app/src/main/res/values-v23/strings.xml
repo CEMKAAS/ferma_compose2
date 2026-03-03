@@ -176,6 +176,8 @@
     <string name="suffix_gram_day">г./день</string>
     <string name="suffix_kilogram_day">кг./день</string>
     <string name="suffix_tons_day">тн./день</string>
+    <string name="suffix_cubic_kilogram_to_meters">кг/м3.</string>
+    <string name="suffix_kilogram_to_liters">кг/л</string>
 
     <string name="suffix_full_gram">Граммы</string>
     <string name="suffix_full_kilogram">Килограммы</string>
@@ -279,7 +281,7 @@
     <string name="support_text_no_expenses_category">"Расходов за %s не было (Это хорошо)</string>
     <string name="support_text_data_next_vaccination">Дата следующей прививки</string>
     <string name="support_text_all_price">Общая стоимость:</string>
-    <string name="support_text_all_weight">Общий вес составит: %s %s</string>
+    <string name="support_text_all_weight">Общий вес составит:</string>
     <string name="support_text_empty">Не указано</string>
 
     //DrawerSheet
@@ -568,6 +570,18 @@
     <string name="warehouse_edit_screen_warning_title">О единицах измерения</string>
     <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
 
+    //Expenses
+    <string name="expenses_screen_button_food">Корм</string>
+    <string name="expenses_screen_button_product">Продукция</string>
+    <string name="expenses_screen_choice_animals">Выберите животных</string>
+    <string name="expenses_screen_sum">Сумма</string>
+    <string name="expenses_screen_percent">Процент</string>
+    <string name="expenses_screen_type_expenses">Тип покупки</string>
+    <string name="expenses_screen_common_expenses">Обычная покупка</string>
+    <string name="expenses_screen_percents">Проценты</string>
+    <string name="expenses_screen_by_hand">Вручную</string>
+    <string name="expenses_screen_equally">Поровну</string>
+
     //SupportTextWidget
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
     <string name="support_text_widget_animal_note_tooltip">Нажмите для ввода текста, введенный текст сохранится автоматически </string>
@@ -794,6 +808,11 @@
     <string name="animal_entry_screen_animal">Тип добавления</string>
     <string name="animal_entry_screen_sex_man">Мужской</string>
     <string name="animal_entry_screen_sex_woman">Женский</string>
+
+    //AnimalEditScreen
+    <string name="animal_edit_warning_title">Изменение стоимости и количества</string>
+    <string name="animal_edit_warning_text">Если вы хотите изменить стоимость или количество животных, перейдите в раздел "Количество" в карточке животного.</string>
+
 
     //Finance
     <string name="finance_income">Доходы</string>

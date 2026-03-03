@@ -23,8 +23,8 @@ import com.zaroslikov.fermacompose2.ui.project.sections.add.entry.AddEntryDestin
 import com.zaroslikov.fermacompose2.ui.project.sections.add.entry.AddEntryProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardProduct
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.entry.AnimalEntryDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.entry.AnimalEntryProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalEditDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalEditProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.AnimalCountDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.AnimalCountScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size.AnimalSizeDestination
@@ -511,19 +511,18 @@ fun ProjectNavHost(
         }
 
         composable(
-            route = AnimalEntryDestination.routeWithArgs,
+            route = AnimalEditDestination.routeWithArgs,
             arguments = listOf(
-                navArgument(AnimalEntryDestination.itemIdPT) {
+                navArgument(AnimalEditDestination.itemIdPT) {
                     type = NavType.LongType
                 },
-                navArgument(AnimalEntryDestination.itemId) {
+                navArgument(AnimalEditDestination.itemId) {
                     type = NavType.LongType
                     defaultValue = -1
                 })
         ) {
-            AnimalEntryProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
+            AnimalEditProduct(
+                navigateBack = { navController.popBackStack() })
         }
 
         composable(
@@ -539,7 +538,7 @@ fun ProjectNavHost(
                 onNavigateSetting = {
                     navController.navigate(
                         navNull(
-                            route = AnimalEntryDestination.route,
+                            route = AnimalEditDestination.route,
                             itemOne = it.first.toString(),
                             itemTwo = it.second.toString()
                         )

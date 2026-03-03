@@ -203,7 +203,8 @@ fun ExposedDropdownMenuSuffix(
 ) {
     BaseExposedDropdownMenu(
         list = suffixList,
-        content = content
+        content = content,
+        enabled = enableDropMenu,
     ) { index, item, closeMenu ->
         val trailingIcon: @Composable (() -> Unit)? = if (item == suffix) {
             { Icon(Icons.Default.Done, contentDescription = null) }

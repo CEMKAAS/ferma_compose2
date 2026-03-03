@@ -107,12 +107,12 @@ fun Suffix.toColorList(): Color {
         Suffix.METERS -> Color(0xFF512DA8)       // Deep Purple 700 — насыщенный
 
         // --- Валюта ---
-
         Suffix.GRAM_DAY -> Color(0xFFA5D6A7)
         Suffix.KILOGRAM_DAY -> Color(0xFF66BB6A)
         Suffix.TONS_DAY -> Color(0xFF2E7D32)
 
         Suffix.DOLLAR, Suffix.EURO, Suffix.TENGE, Suffix.RUBLE -> price_green
+        else -> gray_6
     }
 }
 
@@ -120,7 +120,7 @@ fun Destination.toColorList(): List<Color> {
     return when (this) {
         MAGAZINE -> listOf(green_5, green_shamrock)
         WAREHOUSE -> listOf(blue_21, blue_4)
-        FINANCE ->  listOf(blue_11, blue_12)
+        FINANCE -> listOf(blue_11, blue_12)
     }
 }
 

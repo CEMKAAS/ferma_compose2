@@ -7,10 +7,23 @@ val suffixAllList = listOf(
     Suffix.GRAM,
     Suffix.KILOGRAM,
     Suffix.TONS,
+    Suffix.MILLIMETERS,
     Suffix.LITERS,
     Suffix.CUBIC_METERS,
+    Suffix.MILLIMETERS,
+    Suffix.CENTIMETERS,
     Suffix.METERS
 )
+
+val suffixFoodList = listOf(
+    Suffix.PIECES,
+    Suffix.GRAM,
+    Suffix.KILOGRAM,
+    Suffix.TONS,
+    Suffix.LITERS,
+    Suffix.CUBIC_METERS
+)
+
 val suffixPiecesList = listOf(
     Suffix.PIECES,
     Suffix.HEADS,
@@ -42,4 +55,11 @@ val suffixCurrencyList = listOf(
     Suffix.TENGE,
     Suffix.DOLLAR,
     Suffix.EURO
+)
+
+val suffixKilogramCubicMetersList = listOf(
+    Suffix.KILOGRAM_TO_CUBIC_METERS
+)
+val suffixKilogramLitersList = listOf(
+    Suffix.KILOGRAM_TO_LITERS
 )

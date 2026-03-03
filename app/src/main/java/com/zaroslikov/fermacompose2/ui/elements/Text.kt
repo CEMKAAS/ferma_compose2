@@ -381,22 +381,25 @@ fun TextBuildAnnotated(
     )
 }
 
+/**
+ * Карточка помогает показать какое итоговое значение
+ * Используется как для автоцены и автовеса
+ */
 @Composable
-fun CardAllPrice(
+fun SupportTotalCard(
+    @StringRes titleRes: Int = R.string.support_text_all_price,
     count: String,
     countSuffix: Suffix,
-    price: String,
-    priceSuffix: Suffix,
-    priceAll: String,
+    value: String,
+    valueSuffix: Suffix,
+    totalValue: String,
+    totalSuffix: Suffix? = null
 ) {
-    /* val gradient = Brush.linearGradient(
-         colors = listOf(green_g_1, green_g_2),
-         start = Offset(0f, 0f),
-         end = Offset(Float.POSITIVE_INFINITY, 0f)
-     )
- */
+    val countSuffixString = stringResource(countSuffix.toResId())
+    val secondSuffixString = stringResource(valueSuffix.toResId())
+    val totalSuffixString = stringResource(totalSuffix?.toResId() ?: valueSuffix.toResId())
     val countText = count.ifBlank { "-" }
-    val priceText = price.ifBlank { "-" }
+    val priceText = value.ifBlank { "-" }
 
     GreenCard {
         Column(
@@ -411,17 +414,17 @@ fun CardAllPrice(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(R.string.support_text_all_price),
+                    text = stringResource(titleRes),
                     style = text_14.copy(color = Color(0xFF364153))
                 )
                 Text(
-                    text = "$priceAll ${stringResource(priceSuffix.toResId())}",
+                    text = "$totalValue $totalSuffixString",
                     style = text_16.copy(color = Color(0xFF007A55))
                 )
             }
             Text(
-                text = "$countText ${stringResource(countSuffix.toResId())} " +
-                        "× $priceText ${stringResource(priceSuffix.toResId())}",
+                text = "$countText $countSuffixString" +
+                        "× $priceText $secondSuffixString",
                 style = text_12.copy(color = Color(0xFF6A7282))
             )
         }

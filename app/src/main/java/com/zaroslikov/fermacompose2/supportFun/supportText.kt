@@ -43,6 +43,8 @@ fun Suffix.toResId(): Int {
         Suffix.GRAM_DAY -> R.string.suffix_gram_day
         Suffix.KILOGRAM_DAY -> R.string.suffix_kilogram_day
         Suffix.TONS_DAY -> R.string.suffix_tons_day
+        Suffix.KILOGRAM_TO_CUBIC_METERS -> R.string.suffix_cubic_kilogram_to_meters
+        Suffix.KILOGRAM_TO_LITERS -> R.string.suffix_kilogram_to_liters
     }
 }
 

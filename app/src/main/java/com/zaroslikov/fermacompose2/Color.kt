@@ -30,6 +30,7 @@ val green_10 = Color(0xFF00786F)
 val green_11 = Color(0xFFB9F8CF)
 val green_12 = Color(0xFF7BF1A8)
 val green_13 = Color(0xFF0D542B)
+val green_14 = Color(0xFF004F3B)
 
 
 // Color Suffix

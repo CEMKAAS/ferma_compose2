@@ -9,6 +9,11 @@ import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixAllList
+import com.zaroslikov.domain.models.list.suffixFoodList
+import com.zaroslikov.domain.models.list.suffixKilogramCubicMetersList
+import com.zaroslikov.domain.models.list.suffixKilogramLitersList
+import com.zaroslikov.domain.models.list.suffixWeightList
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
@@ -60,6 +65,10 @@ class ExpensesViewModel @Inject constructor(
                 domainExpensesTable = intent.item
             )
 
+            is ExpensesListIntent.FoodClicked -> updateIsFood(intent.value)
+            is ExpensesListIntent.PercentClicked -> updateIsPercent(intent.value)
+            ExpensesListIntent.EquallyClicked -> updateEqually()
+
             is ExpensesListIntent.TitleChanged -> updateTitle(intent.value)
             is ExpensesListIntent.TitleAndSuffixClicked -> updateTitleAndSuffix(
                 intent.title,
@@ -104,6 +113,7 @@ class ExpensesViewModel @Inject constructor(
             }
 
             is ExpensesListIntent.GroupClicked -> updateGroup(intent.value)
+
         }
     }
 
@@ -130,6 +140,33 @@ class ExpensesViewModel @Inject constructor(
     private suspend fun getDetailsName(name: String): List<DomainExpensesTable> {
         return expensesRepository.getBrieflyDetailsItemExpenses(itemIdPT, name).first()
     }
+
+    private fun updateIsFood(isFood: Boolean) {
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    isFood = isFood,
+                    suffixList = if (isFood) suffixFoodList else suffixAllList,
+                    countSuffix = if (isFood) Suffix.KILOGRAM else Suffix.PIECES,
+                    isShowCheckbox = false,
+                )
+            )
+        }
+    }
+
+    private fun updateIsPercent(isPercent: Boolean) {
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    isPercent = isPercent
+                )
+            )
+        }
+    }
+
+    private fun updateEqually() {
+    }
+
 
     private val suffixSet =
         setOf(
@@ -202,8 +239,12 @@ class ExpensesViewModel @Inject constructor(
             viewModelScope.launch {
                 val titleList = expensesRepository.getItemsTitleExpensesList(itemIdPT).first()
                 val categoryList = expensesRepository.getItemsCategoryExpensesList(itemIdPT).first()
-                /* val animalList =
-                     expensesRepository.getItemsAnimalExpensesList2(itemIdPT, itemId).first()*/
+                val animalList =
+                    expensesRepository.getItemsAnimalExpensesList2(
+                        itemIdPT,
+                        domainExpensesTable?.id ?: 0
+                    )
+                        .first()
 
                 updateState {
                     it.copy(
@@ -219,7 +260,7 @@ class ExpensesViewModel @Inject constructor(
                             pickList = it.currentProduct.pickList.copy(
                                 titleList = titleList,
                                 categoryList = categoryList,
-                                /*animalList2 = animalList*/
+                                animalList2 = animalList
                             )
                         )
                     )
@@ -449,16 +490,29 @@ class ExpensesViewModel @Inject constructor(
         updatePriceAll()
     }
 
-    private fun updateCountSuffix(
-        suffix: Suffix
-    ) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
+    private fun updateCountSuffix(suffix: Suffix) {
+        val weightSuffix = when (suffix) {
+            Suffix.LITERS -> Suffix.KILOGRAM_TO_LITERS
+            Suffix.CUBIC_METERS -> Suffix.KILOGRAM_TO_CUBIC_METERS
+            else -> Suffix.KILOGRAM
+        }
+
+        val weightAllSuffix = when (suffix) {
+            Suffix.LITERS, Suffix.CUBIC_METERS -> Suffix.KILOGRAM
+            else -> weightSuffix
+        }
+
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
                     countSuffix = suffix,
-                    isAutoWeight = if (suffix in suffixSet) false else getState().currentProduct.isAutoWeight,
-                    isShowFood = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFood,
-                    isShowFoodHand = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFoodHand
+                    isShowCheckbox = state.currentProduct.isFood && suffix !in suffixSet,
+                    isAutoWeight = if (state.currentProduct.isFood && suffix !in suffixSet) getState().currentProduct.isAutoWeight else false,
+                    weightSuffix = weightSuffix,
+                    weightAllSuffix = weightAllSuffix
+                    /*         isAutoWeight = if (suffix in suffixSet) false else getState().currentProduct.isAutoWeight,
+                   isShowFood = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFood,
+                        isShowFoodHand = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFoodHand*/
                 )
             )
         }
@@ -489,7 +543,10 @@ class ExpensesViewModel @Inject constructor(
     private fun updateWeightSuffix(weightSuffix: Suffix) {
         updateState {
             it.copy(
-                currentProduct = it.currentProduct.copy(weightSuffix = weightSuffix)
+                currentProduct = it.currentProduct.copy(
+                    weightSuffix = weightSuffix,
+                    weightAllSuffix = weightSuffix
+                )
             )
         }
     }
@@ -933,17 +990,24 @@ sealed class ExpensesListIntent : BaseIntent {
         val item: DomainExpensesTable? = null
     ) : ExpensesListIntent()
 
+    data class FoodClicked(val value: Boolean) : ExpensesListIntent()
+    data class PercentClicked(val value: Boolean) : ExpensesListIntent()
+    data object EquallyClicked : ExpensesListIntent()
+
     data class TitleChanged(val value: String) : ExpensesListIntent()
     data class TitleAndSuffixClicked(val title: String, val suffix: Suffix) :
         ExpensesListIntent()
 
     data class CountChanged(val value: String) : ExpensesListIntent()
     data class SuffixClicked(val value: Suffix) : ExpensesListIntent()
+
+    data class AutoWeightClicked(val value: Boolean) : ExpensesListIntent()
     data class WeightChanged(val value: String) : ExpensesListIntent()
     data class WeightSuffixChanged(val value: Suffix) : ExpensesListIntent()
-    data class AutoWeightClicked(val value: Boolean) : ExpensesListIntent()
-    data class PriceChanged(val value: String) : ExpensesListIntent()
+
     data class AutoPriceClicked(val value: Boolean) : ExpensesListIntent()
+    data class PriceChanged(val value: String) : ExpensesListIntent()
+
     data class CategoryChanged(val value: String) : ExpensesListIntent()
     data class DateClicked(val value: String) : ExpensesListIntent()
     data class NoteChanged(val value: String) : ExpensesListIntent()
