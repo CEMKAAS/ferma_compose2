@@ -20,7 +20,11 @@ import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
+import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
+import com.zaroslikov.fermacompose2.supportFun.convertWeightDay
+import com.zaroslikov.fermacompose2.supportFun.currentTime
+import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
@@ -35,7 +39,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -89,6 +96,7 @@ class ExpensesViewModel @Inject constructor(
             is ExpensesListIntent.ShowFoodClicked -> updateShowFood(intent.value)
             is ExpensesListIntent.ShowFoodHandClicked -> updateShowFoodHand(intent.value)
 
+            is ExpensesListIntent.AnimalChipClicked2 -> updateAnimalChipSelection2(intent.value)
             is ExpensesListIntent.AnimalChipClicked -> updateAnimalChipSelection(intent.value)
             is ExpensesListIntent.FeedFoodChanged -> updateFeedFoodInput(intent.value)
             is ExpensesListIntent.FeedFoodSuffixClicked -> updateFeedFoodInputSuffix(intent.value)
@@ -113,7 +121,6 @@ class ExpensesViewModel @Inject constructor(
             }
 
             is ExpensesListIntent.GroupClicked -> updateGroup(intent.value)
-
         }
     }
 
@@ -149,6 +156,7 @@ class ExpensesViewModel @Inject constructor(
                     suffixList = if (isFood) suffixFoodList else suffixAllList,
                     countSuffix = if (isFood) Suffix.KILOGRAM else Suffix.PIECES,
                     isShowCheckbox = false,
+                    feedFoodChipSuffix = feedFoodSuffix(Suffix.KILOGRAM)
                 )
             )
         }
@@ -243,8 +251,7 @@ class ExpensesViewModel @Inject constructor(
                     expensesRepository.getItemsAnimalExpensesList2(
                         itemIdPT,
                         domainExpensesTable?.id ?: 0
-                    )
-                        .first()
+                    ).first()
 
                 updateState {
                     it.copy(
@@ -276,6 +283,18 @@ class ExpensesViewModel @Inject constructor(
                 }
             }
         else updateState { it.copy(openBottomSheetEntry = false) }
+    }
+
+    private fun feedFoodSuffix(
+        suffix: Suffix
+    ): Suffix {
+        return when (suffix) {
+            Suffix.GRAM -> Suffix.GRAM_DAY
+            Suffix.KILOGRAM -> Suffix.KILOGRAM_DAY
+            Suffix.TONS -> Suffix.TONS_DAY
+            Suffix.KILOGRAM_TO_LITERS, Suffix.KILOGRAM_TO_CUBIC_METERS -> Suffix.KILOGRAM_DAY
+            else -> suffix
+        }
     }
 
     override fun insert() {
@@ -441,19 +460,11 @@ class ExpensesViewModel @Inject constructor(
     }
 
     private fun updateGroup(isGroup: Boolean) {
-        updateState {
-            it.copy(
-                isGroup = isGroup
-            )
-        }
+        updateState { it.copy(isGroup = isGroup) }
     }
 
     private fun updateSearch(search: String) {
-        updateState {
-            it.copy(
-                textSearch = search
-            )
-        }
+        updateState { it.copy(textSearch = search) }
     }
 
     private fun updateTitleAndSuffix(
@@ -487,7 +498,9 @@ class ExpensesViewModel @Inject constructor(
                 )
             )
         }
-        updatePriceAll()
+        if (getState().currentProduct.isAutoWeight) updateWeightAll()
+        if (getState().currentProduct.isFood) calculateFoodDays()
+        if (getState().currentProduct.isAutoPrice) updatePriceAll()
     }
 
     private fun updateCountSuffix(suffix: Suffix) {
@@ -509,7 +522,8 @@ class ExpensesViewModel @Inject constructor(
                     isShowCheckbox = state.currentProduct.isFood && suffix !in suffixSet,
                     isAutoWeight = if (state.currentProduct.isFood && suffix !in suffixSet) getState().currentProduct.isAutoWeight else false,
                     weightSuffix = weightSuffix,
-                    weightAllSuffix = weightAllSuffix
+                    weightAllSuffix = weightAllSuffix,
+                    feedFoodChipSuffix = feedFoodSuffix(weightAllSuffix)
                     /*         isAutoWeight = if (suffix in suffixSet) false else getState().currentProduct.isAutoWeight,
                    isShowFood = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFood,
                         isShowFoodHand = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFoodHand*/
@@ -535,7 +549,23 @@ class ExpensesViewModel @Inject constructor(
     private fun updateWeight(weight: String) {
         updateState {
             it.copy(
-                currentProduct = it.currentProduct.copy(weight = weight)
+                currentProduct = it.currentProduct.copy(
+                    weight = weight
+                )
+            )
+        }
+        updateWeightAll()
+        calculateFoodDays()
+    }
+
+    private fun updateWeightAll() {
+        updateState { state ->
+            val weight = state.currentProduct.weight.toConvertZeroDouble()
+            val count = state.currentProduct.count.toConvertZeroDouble()
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    weightAll = (weight * count).formatNumber()
+                )
             )
         }
     }
@@ -577,10 +607,12 @@ class ExpensesViewModel @Inject constructor(
     }
 
     private fun updatePriceAll() {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    priceAll = if (it.currentProduct.isAutoPrice) (it.currentProduct.price.toConvertZeroDouble() * it.currentProduct.count.toConvertZeroDouble()).formatNumber() else "0"
+        updateState { state ->
+            val price = state.currentProduct.price.toConvertZeroDouble()
+            val count = state.currentProduct.count.toConvertZeroDouble()
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    priceAll = (price * count).formatNumber()
                 )
             )
         }
@@ -736,6 +768,104 @@ class ExpensesViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun updateAnimalChipSelection2(
+        id: Long
+    ) {
+        // Обновляем список животных с пересчетом presentException
+        val updatedAnimals = getState().currentProduct.pickList.animalList2.map { animal ->
+            if (animal.id == id) {
+                Log.i("food", "foodDaySuffix: ${animal.foodDaySuffix}")
+                val convertedFood =
+                    animal.foodDay.convertWeightDay(
+                        animal.foodDaySuffix,
+                        getState().currentProduct.feedFoodChipSuffix
+                    )
+                val dailyFood = convertedFood * animal.countAnimal
+
+                animal.copy(
+                    ps = !animal.ps,
+                    presentException = if (!animal.ps) (animal.foodDay / dailyFood) * 100.0 else 0.0
+                )
+            } else animal
+        }
+
+        // Сумма по выбранным животным
+        val updatedCountAnimal = updatedAnimals
+            .filter { it.ps }
+            .sumOf { it.countAnimal }
+            .toString()
+
+
+        val updatedDailyFood = updatedAnimals
+            .filter { it.ps }
+            .sumOf {
+                it.foodDay.convertWeightDay(
+                    it.foodDaySuffix,
+                    getState().currentProduct.feedFoodChipSuffix
+                ) * it.countAnimal.toDouble()
+            }
+
+        // В настройках указать расход корма в день или как-то брать по кол-ву
+        // Нужно как-то всех выбранных животных привести к единому знаменателю
+        // И разделить на текущие кол-во тогда мы получим кол-во дней, а от нее уже и дату
+        Log.i("food", "updatedDailyFood: $updatedDailyFood ")
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    feedFoodChip = updatedDailyFood.formatNumber(),
+                    countAnimalChip = updatedCountAnimal,
+                    pickList = state.currentProduct.pickList.copy(animalList2 = updatedAnimals),
+                    error = state.currentProduct.error.copy(isErrorFood = false)
+                )
+            )
+        }
+        calculateFoodDays()
+    }
+
+    private fun calculateFoodDays() {
+        val suffix = getState().currentProduct.countSuffix
+        val weightSuffix = getState().currentProduct.weightSuffix
+        val isWeightSuffix = when (suffix) {
+            Suffix.KILOGRAM, Suffix.GRAM, Suffix.TONS -> true
+            else -> false
+        }
+
+        val weight =
+            if (isWeightSuffix) getState().currentProduct.count else getState().currentProduct.weightAll
+        val feedFood = getState().currentProduct.feedFoodChip.toConvertZeroDouble()
+        val day = (weight.toConvertZeroDouble() / feedFood).toInt()
+        Log.i("food", "countSuffix: ${suffix} ")
+        Log.i("food", "isWeight: ${isWeightSuffix} ")
+        Log.i("food", "weight: ${getState().currentProduct.weight} ")
+        Log.i("food", "weightAll: ${getState().currentProduct.weightAll} ")
+        Log.i("food", "weightTotal: $weight ")
+        Log.i("food", "feedFood: $feedFood ")
+
+//        val dateEnd = endDay(getState().currentProduct.date, day)  val day =
+//            (getState().currentProduct.weightAll.toConvertZeroDouble() / updatedDailyFood).toInt()
+////        val dateEnd = endDay(getState().currentProduct.date, day)
+
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    daysFood = day,
+                    dateEnd = "12.12.2022",
+                )
+            )
+        }
+    }
+
+    private fun endDay(
+        startDate: String,
+        numberDays: Int
+    ): String {
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())
+        val start = LocalDateTime.parse(startDate, dateTimeFormatter)
+        return start
+            .plusDays(numberDays.toLong())
+            .format(dateTimeFormatter)
     }
 
     private fun updateShowAnimal(showAnimal: Boolean) {
@@ -1015,6 +1145,7 @@ sealed class ExpensesListIntent : BaseIntent {
     data class ShowFoodClicked(val value: Boolean) : ExpensesListIntent()
     data class ShowFoodHandClicked(val value: Boolean) : ExpensesListIntent()
     data class AnimalChipClicked(val value: AnimalExpensesDomain) : ExpensesListIntent()
+    data class AnimalChipClicked2(val value: Long) : ExpensesListIntent()
     data class FeedFoodChanged(val value: String) : ExpensesListIntent()
     data class FeedFoodSuffixClicked(val value: Suffix) : ExpensesListIntent()
     data class CountAnimalChanged(val value: String) : ExpensesListIntent()

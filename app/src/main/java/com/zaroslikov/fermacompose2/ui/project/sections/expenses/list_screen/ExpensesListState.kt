@@ -54,6 +54,12 @@ data class ExpensesEntryState2(
     val suffixList: List<Suffix> = suffixAllList,
     val weightSuffixList: List<Suffix> = suffixWeightList,
 
+
+    val countAnimalFood: String = "",
+    val feedFood: String = "",
+    val dayFood: String = "",
+    val dateEnd: String = "",
+
     val isShowFood: Boolean = false,
     val isShowFoodHand: Boolean = false,
     val isShowWarehouse: Boolean = false,
@@ -72,6 +78,7 @@ data class ExpensesEntryState2(
 
     val weight: String = "",
     val weightSuffix: Suffix = Suffix.KILOGRAM,
+    val weightAll: String = "",
     val weightAllSuffix: Suffix = Suffix.KILOGRAM,
     val isAutoWeight: Boolean = false,
     val isAutoPrice: Boolean = false,

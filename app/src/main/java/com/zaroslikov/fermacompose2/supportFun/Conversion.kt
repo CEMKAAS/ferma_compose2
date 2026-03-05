@@ -161,6 +161,34 @@ fun Double.convertWeight(from: Suffix, to: Suffix): Double {
     return result
 }
 
+fun Double.convertWeightDay(from: Suffix, to: Suffix): Double {
+    val result = when (from) {
+        Suffix.GRAM_DAY -> when (to) {
+            Suffix.GRAM_DAY -> this
+            Suffix.KILOGRAM_DAY -> (this / 1000)
+            Suffix.TONS_DAY -> (this / 1000000)
+            else -> 0.0
+        }
+
+        Suffix.KILOGRAM_DAY -> when (to) {
+            Suffix.GRAM_DAY -> this * 1000
+            Suffix.KILOGRAM_DAY -> this
+            Suffix.TONS_DAY -> (this / 1000)
+            else -> 0.0
+        }
+
+        Suffix.TONS_DAY -> when (to) {
+            Suffix.GRAM_DAY -> (this * 1000000)
+            Suffix.KILOGRAM_DAY -> (this * 1000)
+            Suffix.TONS_DAY -> this
+            else -> 0.0
+        }
+
+        else -> 0.0
+    }
+    return result
+}
+
 
 fun Double.convertVolume(from: Suffix, to: Suffix): Double {
 
@@ -176,7 +204,7 @@ fun Double.convertVolume(from: Suffix, to: Suffix): Double {
             Suffix.CUBIC_METERS -> this * 0.001
             Suffix.LITERS -> this
             Suffix.MILLILITRES -> this * 1000
-            else ->0.0
+            else -> 0.0
         }
 
         Suffix.MILLILITRES -> when (to) {

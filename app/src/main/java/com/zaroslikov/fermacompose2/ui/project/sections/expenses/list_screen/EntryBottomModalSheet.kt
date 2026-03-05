@@ -1,6 +1,10 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -33,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastAny
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -75,6 +81,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNe
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
@@ -145,7 +152,7 @@ fun ExpensesEntryBottomSheet(
             onWeightSuffixChance = { onIntent(ExpensesListIntent.WeightSuffixChanged(it)) },
             isError = state.error.isErrorCount,
             isShowCheckbox = state.isFood && !state.isIndicatorsValue && state.isShowCheckbox,
-            weightAll = state.weight,
+            weightAll = state.weightAll,
             weightAllSuffix = state.weightAllSuffix,
             enabledWeightSuffix = !(state.weightSuffix == Suffix.KILOGRAM_TO_CUBIC_METERS ||
                     state.weightSuffix == Suffix.KILOGRAM_TO_LITERS)
@@ -184,10 +191,15 @@ fun ExpensesEntryBottomSheet(
                     onIntent(ExpensesListIntent.DateClicked(it))
                 },
             )
-        AdditionalFunctionFood(
-            state = state,
-            onIntent = onIntent
-        )
+        if (state.isFood)
+            AdditionalFunctionFood(
+                animalList = state.pickList.animalList2,
+                onAnimalClick = { onIntent(ExpensesListIntent.AnimalChipClicked2(it)) },
+                countAnimal = state.countAnimalChip,
+                feedFood = "${state.feedFoodChip} ${stringResource(state.feedFoodChipSuffix.toResId())}",
+                day = state.daysFood.formatNumber(),
+                dateEnd = state.dateEnd,
+            )
         AdditionalFunction(
             state = state,
             onIntent = onIntent
@@ -207,14 +219,36 @@ fun ExpensesEntryBottomSheet(
 
 @Composable
 private fun AdditionalFunctionFood(
-    state: ExpensesEntryState2,
-    onIntent: (ExpensesListIntent) -> Unit
+    animalList: List<AnimalExpensesDomain>,
+    onAnimalClick: (Long) -> Unit,
+    feedFood: String,
+    day: String,
+    dateEnd: String,
+    countAnimal: String
 ) {
-    if (state.isFood)
-        AnimalList(
-            isShowAnimalList = true,
-            animalList = listOf("sds")
+    val animatedPadding by animateDpAsState(
+        targetValue = 2.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
         )
+    )
+    AnimalList(
+        modifier = Modifier.padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
+        animalList = animalList,
+        onAnimalClick = onAnimalClick
+    )
+    AnimatedVisibility(
+        visible = animalList.fastAny { it.ps }
+    ) {
+        InfoFoodCard(
+            modifier = Modifier,
+            foodFeel = feedFood,
+            day = day,
+            dateEnd = dateEnd,
+            countAnimal = countAnimal
+        )
+    }
 }
 
 @Composable
@@ -495,16 +529,20 @@ private fun AnimalFinanceCard2(
 
 @Composable
 private fun AnimalList(
-    isShowAnimalList: Boolean,
-    animalList: List<String>
+    modifier: Modifier,
+    animalList: List<AnimalExpensesDomain>,
+    onAnimalClick: (Long) -> Unit
 ) {
+    var isShowAnimalList by rememberSaveable { mutableStateOf(false) }
     val icon =
         if (isShowAnimalList) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down
     BorderCard(
+        modifier = modifier,
         borderColor = green_1,
         containerColor = green_g_1,
         shape = RoundedCornerShape(16.dp),
-        padding = PaddingValues(18.dp)
+        padding = PaddingValues(18.dp),
+        onClick = { isShowAnimalList = !isShowAnimalList }
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -544,15 +582,18 @@ private fun AnimalList(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    animalList.forEach {
+                    animalList.forEach { animal ->
                         AnimalCard(
-                            name = it,
-                            type = it,
-                            feedFood = it,
-                            feedFoodSuffix = Suffix.KILOGRAM_DAY,
-                            countAnimal = 0,
-                            totalFeedFood = it
-                        )
+                            name = animal.name,
+                            type = animal.name,
+                            feedFood = animal.foodDay,
+                            feedFoodSuffix = animal.foodDaySuffix,
+                            countAnimal = animal.countAnimal,
+                            totalFeedFood = "22",
+                            isChoice = animal.ps
+                        ) {
+                            onAnimalClick(animal.id)
+                        }
                     }
                 }
             }
@@ -561,25 +602,120 @@ private fun AnimalList(
 }
 
 @Composable
+private fun InfoFoodCard(
+    modifier: Modifier,
+    foodFeel: String,
+    day: String,
+    dateEnd: String,
+    countAnimal: String
+) {
+    BorderCard(
+        modifier = modifier,
+        borderColor = blue_9,
+        containerColor = blue_3,
+        padding = PaddingValues(18.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    painterResource(R.drawable.baseline_analytics_24),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(stringResource(R.string.expenses_screen_sum), style = text_16, color = blue_14)
+            }
+            DoubleSupportCards(
+                titleRes = R.string.expenses_screen_count_animal,
+                value = countAnimal,
+                secondTitleRes = R.string.expenses_screen_food_feed,
+                secondValue = foodFeel
+            )
+            DoubleSupportCards(
+                titleRes = R.string.expenses_screen_have,
+                value = day,
+                secondTitleRes = R.string.expenses_screen_end_day,
+                secondValue = dateEnd
+            )
+        }
+    }
+}
+
+@Composable
+private fun DoubleSupportCards(
+    @StringRes titleRes: Int,
+    value: String,
+    @StringRes secondTitleRes: Int,
+    secondValue: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        SupportCard(
+            modifier = Modifier.weight(1f),
+            titleRes = titleRes,
+            value = value,
+        )
+        SupportCard(
+            modifier = Modifier.weight(1f),
+            titleRes = secondTitleRes,
+            value = secondValue
+        )
+    }
+}
+
+@Composable
+private fun SupportCard(
+    modifier: Modifier,
+    @StringRes titleRes: Int,
+    value: String
+) {
+    BorderCard(
+        modifier = modifier,
+        borderColor = blue_9,
+        containerColor = white, shape = RoundedCornerShape(14.dp), padding = PaddingValues(13.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(stringResource(titleRes), style = text_12, color = blue_1)
+            Text(value, style = text_14, color = blue_14)
+        }
+    }
+}
+
+
+@Composable
 private fun AnimalCard(
+    isChoice: Boolean,
     name: String,
     type: String,
-    feedFood: String,
+    feedFood: Double,
     feedFoodSuffix: Suffix,
     countAnimal: Int,
     totalFeedFood: String,
+    onClick: () -> Unit
 ) {
     val suffix = stringResource(feedFoodSuffix.toResId())
+
     BorderCard(
         modifier = Modifier.fillMaxWidth(),
         containerColor = white.copy(alpha = 0.5f),
-        padding = PaddingValues((12.dp))
+        padding = PaddingValues((12.dp)),
+        onClick = onClick
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
+            Checkbox(checked = isChoice, onCheckedChange = { onClick() })
             Icon(
                 painter = painterResource(R.drawable.baseline_pets_24),
                 contentDescription = null,
@@ -589,7 +725,7 @@ private fun AnimalCard(
                 Text(name, style = text_16, color = black_2)
                 Text(type, style = text_14, color = marengo)
                 Text(
-                    "$feedFood $suffix × $countAnimal = $totalFeedFood $suffix",
+                    "${feedFood.formatNumber()} $suffix × $countAnimal = $totalFeedFood $suffix",
                     style = text_14,
                     color = marengo
                 )

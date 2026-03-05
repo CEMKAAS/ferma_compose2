@@ -581,6 +581,10 @@
     <string name="expenses_screen_percents">Проценты</string>
     <string name="expenses_screen_by_hand">Вручную</string>
     <string name="expenses_screen_equally">Поровну</string>
+    <string name="expenses_screen_food_feed">Расход в день</string>
+    <string name="expenses_screen_count_animal">Кол-во животных</string>
+    <string name="expenses_screen_have">Хватит на</string>
+    <string name="expenses_screen_end_day">Дата окончания</string>
 
     //SupportTextWidget
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
