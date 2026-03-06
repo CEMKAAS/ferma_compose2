@@ -77,11 +77,8 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedCountInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedNumberNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
-import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
-import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
-import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
@@ -176,34 +173,53 @@ fun ExpensesEntryBottomSheet(
             countSuffix = state.countSuffix,
             priceSuffix = Suffix.RUBLE,
         )
-        if (state.isIndicatorsValue || !state.isFood)
-            OutlinedTextCategoryNew(
-                value = state.category,
-                onValueChange = {
-                    onIntent(ExpensesListIntent.CategoryChanged(it))
-                },
-                titleList = state.pickList.categoryList
-            )
-        if (!state.isIndicatorsValue)
-            OutlinedTextDateNew(
-                value = state.date,
-                onValueChange = {
-                    onIntent(ExpensesListIntent.DateClicked(it))
-                },
-            )
-        if (state.isFood)
+        /* if (state.isIndicatorsValue || !state.isFood)
+             OutlinedTextCategoryNew(
+                 value = state.category,
+                 onValueChange = {
+                     onIntent(ExpensesListIntent.CategoryChanged(it))
+                 },
+                 titleList = state.pickList.categoryList
+             )
+         if (!state.isIndicatorsValue)
+             OutlinedTextDateNew(
+                 value = state.date,
+                 onValueChange = {
+                     onIntent(ExpensesListIntent.DateClicked(it))
+                 },
+             )*/
+        if (state.isFood && (!state.isShowCheckbox || state.isAutoWeight))
             AdditionalFunctionFood(
                 animalList = state.pickList.animalList2,
-                onAnimalClick = { onIntent(ExpensesListIntent.AnimalChipClicked2(it)) },
+                onAnimalClick = { onIntent(ExpensesListIntent.AnimalChipByIdFoodClicked(it)) },
                 countAnimal = state.countAnimalChip,
                 feedFood = "${state.feedFoodChip} ${stringResource(state.feedFoodChipSuffix.toResId())}",
-                day = state.daysFood.formatNumber(),
+                day = "${state.daysFood.formatNumber()} дней",
                 dateEnd = state.dateEnd,
             )
-        AdditionalFunction(
-            state = state,
-            onIntent = onIntent
-        )
+        if (!state.isFood && state.pickList.animalList2.isNotEmpty())
+            AdditionalFunction(
+                animalList = state.pickList.animalList2,
+                isPercent = state.isPercent,
+                onAnimalChipClicked = { onIntent(ExpensesListIntent.AnimalChipByIdClicked(it)) },
+                onPercentClicked = { onIntent(ExpensesListIntent.PercentClicked(it)) },
+                onEquallyClick = { onIntent(ExpensesListIntent.EquallyClicked) },
+                onSliderChange = {
+                    onIntent(
+                        ExpensesListIntent.AnimalSliderClicked(
+                            animal = it.first,
+                            newValue = it.second
+                        )
+                    )
+                },
+                onValueChange = {
+                    onIntent(
+                        ExpensesListIntent.AnimalValueChanged(
+                            animal = it.first, newValue = it.second)
+                    )
+                },
+                price = (if (state.isAutoPrice) state.priceAll else state.price).toConvertZeroDouble()
+            )
         OutlinedTextNoteNew(
             value = state.note,
             onValueChange = {
@@ -219,7 +235,7 @@ fun ExpensesEntryBottomSheet(
 
 @Composable
 private fun AdditionalFunctionFood(
-    animalList: List<AnimalExpensesDomain>,
+    animalList: List<AnimalExpensesUi>,
     onAnimalClick: (Long) -> Unit,
     feedFood: String,
     day: String,
@@ -253,37 +269,40 @@ private fun AdditionalFunctionFood(
 
 @Composable
 private fun AdditionalFunction(
-    state: ExpensesEntryState2,
-    onIntent: (ExpensesListIntent) -> Unit
+    animalList: List<AnimalExpensesUi>,
+    isPercent: Boolean,
+    price: Double,
+    onAnimalChipClicked: (Long) -> Unit,
+    onPercentClicked: (Boolean) -> Unit,
+    onEquallyClick: () -> Unit,
+    onSliderChange: (Pair<Long, Double>) -> Unit,
+    onValueChange: (Pair<Long, String>) -> Unit
 ) {
-    if (!state.isFood && state.pickList.animalList2.isNotEmpty()) {
-        ChoiceAnimalCard(
-            state = state
-        ) { onIntent(ExpensesListIntent.AnimalChipByIdClicked(it)) }
-        if (state.pickList.animalList2.any { it.ps }) {
-            ChoiceMode(
-                isTemplatesPlan = state.isPercent,
-                onValueChange = { onIntent(ExpensesListIntent.PercentClicked(it)) },
-                onEquallyClick = { onIntent(ExpensesListIntent.EquallyClicked) })
-            AnimalFinanceList(
-                isPercent = state.isPercent,
-                animalList = state.pickList.animalList2.filter { it.ps },
-                onSliderChanged = {
-                    onIntent(
-                        ExpensesListIntent.AnimalSliderClicked(
-                            animal = it.first,
-                            newValue = it.second
-                        )
-                    )
-                })
-        }
+    ChoiceAnimalCard(
+        animalList = animalList,
+        onAnimalChipClick = onAnimalChipClicked
+    )
+    if (animalList.any { it.ps }) {
+        ChoiceMode(
+            isTemplatesPlan = isPercent,
+            onValueChange = onPercentClicked,
+            onEquallyClick = onEquallyClick
+        )
+        AnimalFinanceList(
+            isPercent = isPercent,
+            animalList = animalList.filter { it.ps },
+            onSliderChange = onSliderChange,
+            onValueChange = onValueChange,
+            price = price
+        )
     }
+
 }
 
 
 @Composable
 private fun ChoiceAnimalCard(
-    state: ExpensesEntryState2,
+    animalList: List<AnimalExpensesUi>,
     onAnimalChipClick: (Long) -> Unit,
 ) {
     BorderCard {
@@ -293,7 +312,7 @@ private fun ChoiceAnimalCard(
             color = dark
         )
         FlowRow(modifier = Modifier.fillMaxWidth()) {
-            state.pickList.animalList2.forEach { animal ->
+            animalList.forEach { animal ->
                 FilterChip(
                     selected = animal.ps,
                     onClick = {
@@ -389,8 +408,10 @@ private fun ChoiceMode(
 @Composable
 private fun AnimalFinanceList(
     isPercent: Boolean,
-    animalList: List<AnimalExpensesDomain>,
-    onSliderChanged: (Pair<Long, Double>) -> Unit
+    price: Double,
+    animalList: List<AnimalExpensesUi>,
+    onSliderChange: (Pair<Long, Double>) -> Unit,
+    onValueChange: (Pair<Long, String>) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -400,17 +421,18 @@ private fun AnimalFinanceList(
                 AnimalFinanceCard2(
                     id = animal.id,
                     name = animal.name,
-                    price = 0.0,
+                    price = animal.price,
                     suffix = Suffix.RUBLE,
                     percent = animal.presentException,
-                    onSliderChanged = onSliderChanged
+                    onSliderChanged = onSliderChange
                 )
             else
                 AnimalFinanceCard(
                     name = animal.name,
-                    price = "22",
+                    price = animal.price.formatNumber(),
                     suffix = Suffix.RUBLE,
-                    percent = 12.0
+                    percent = animal.presentException,
+                    onValueChange = { onValueChange(animal.id to it) }
                 )
         }
     }
@@ -421,7 +443,8 @@ private fun AnimalFinanceCard(
     name: String,
     price: String,
     suffix: Suffix,
-    percent: Double
+    percent: Double,
+    onValueChange: (String) -> Unit
 ) {
     BorderCard(
         padding = PaddingValues(18.dp)
@@ -432,7 +455,7 @@ private fun AnimalFinanceCard(
             Text(name, style = text_16, color = black_2)
             OutlinedNumberNew(
                 value = price,
-                onValueChange = { },
+                onValueChange = onValueChange,
                 suffix = suffix,
                 intRes = R.string.expenses_screen_sum,
                 isBorderCard = false
@@ -530,7 +553,7 @@ private fun AnimalFinanceCard2(
 @Composable
 private fun AnimalList(
     modifier: Modifier,
-    animalList: List<AnimalExpensesDomain>,
+    animalList: List<AnimalExpensesUi>,
     onAnimalClick: (Long) -> Unit
 ) {
     var isShowAnimalList by rememberSaveable { mutableStateOf(false) }
@@ -734,6 +757,7 @@ private fun AnimalCard(
     }
 }
 
+/*
 @Composable
 private fun AdditionalSettings2(
     state: ExpensesEntryState2,
@@ -741,11 +765,13 @@ private fun AdditionalSettings2(
 ) {
     var details by rememberSaveable { mutableStateOf(true) }
     if (!state.count.isBlank() && !state.price.isBlank() && !state.isIndicatorsValue) {
-        /*  TextButtonWarehouse(
+        */
+/*  TextButtonWarehouse(
               boolean = details,
               onClick = { details = !details },
               intRes = R.string.card_extra_set
-          )*/
+          )*//*
+
         if (details) {
             Food(
                 modifier = Modifier.padding(bottom = animatedErrorPadding(details)),
@@ -779,6 +805,7 @@ private fun AdditionalSettings2(
         }
     }
 }
+*/
 
 // КОРМ
 @Composable
@@ -1020,7 +1047,7 @@ private fun Checkbox(
 
 @Composable
 fun ChoiceAnimal(
-    animalListState: List<AnimalExpensesDomain>,
+    animalListState: List<AnimalExpensesUi>,
     onAnimalChipClick: (AnimalExpensesDomain) -> Unit
 ) {
     val animalList = animalListState.filter { it.foodDay != 0.0 }
@@ -1038,7 +1065,7 @@ fun ChoiceAnimal(
                 FilterChip(
                     selected = selected,
                     onClick = {
-                        onAnimalChipClick(animal)
+//                        onAnimalChipClick(animal)
                     },
                     label = { Text(animal.name) },
                     leadingIcon = if (selected) {

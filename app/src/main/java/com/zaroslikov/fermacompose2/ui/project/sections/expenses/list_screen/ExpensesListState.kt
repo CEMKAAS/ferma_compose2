@@ -104,7 +104,19 @@ data class ExpensesEntryState2(
 data class PickExpensesList(
     val titleList: List<TitleAndSuffixDomain> = emptyList(),
     val categoryList: List<String> = emptyList(),
-    val animalList2: List<AnimalExpensesDomain> = emptyList(),
+    val animalList2: List<AnimalExpensesUi> = emptyList(),
+)
+
+data class AnimalExpensesUi(
+    val id: Long,
+    val name: String,
+    val foodDay: Double,
+    val foodDaySuffix: Suffix,
+    val countAnimal: Int,
+    val idExpensesAnimal: Long,
+    val ps: Boolean = false,
+    val presentException: Double = 0.0,
+    val price: Double
 )
 
 data class ErrorExpenses(

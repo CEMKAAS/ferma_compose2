@@ -1,30 +1,23 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
 import android.util.Log
+import androidx.compose.ui.util.fastAny
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.models.DomainExpensesTable
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.list.suffixFoodList
-import com.zaroslikov.domain.models.list.suffixKilogramCubicMetersList
-import com.zaroslikov.domain.models.list.suffixKilogramLitersList
-import com.zaroslikov.domain.models.list.suffixWeightList
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
-import com.zaroslikov.fermacompose2.supportFun.calculatePriceAll
-import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.convertWeightDay
-import com.zaroslikov.fermacompose2.supportFun.currentTime
-import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
@@ -41,7 +34,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 import javax.inject.Inject
 
@@ -93,18 +85,13 @@ class ExpensesViewModel @Inject constructor(
             is ExpensesListIntent.DateClicked -> updateDate(intent.value)
             is ExpensesListIntent.NoteChanged -> updateNote(intent.value)
 
-            is ExpensesListIntent.ShowFoodClicked -> updateShowFood(intent.value)
-            is ExpensesListIntent.ShowFoodHandClicked -> updateShowFoodHand(intent.value)
-
-            is ExpensesListIntent.AnimalChipClicked2 -> updateAnimalChipSelection2(intent.value)
-            is ExpensesListIntent.AnimalChipClicked -> updateAnimalChipSelection(intent.value)
-            is ExpensesListIntent.FeedFoodChanged -> updateFeedFoodInput(intent.value)
-            is ExpensesListIntent.FeedFoodSuffixClicked -> updateFeedFoodInputSuffix(intent.value)
-            is ExpensesListIntent.CountAnimalChanged -> updateCountAnimal(intent.value)
-
-            is ExpensesListIntent.ShowWarehouseClicked -> updateShowWarehouse(intent.value)
-            is ExpensesListIntent.ShowAnimalClicked -> updateShowAnimal(intent.value)
+            is ExpensesListIntent.AnimalChipByIdFoodClicked -> updateAnimalChipByIdFood(intent.value)
             is ExpensesListIntent.AnimalChipByIdClicked -> updateAnimalSelectionById(intent.value)
+            is ExpensesListIntent.AnimalValueChanged -> updateAnimalValue(
+                intent.animal,
+                intent.newValue
+            )
+
             is ExpensesListIntent.AnimalSliderClicked -> updateAnimalSlider(
                 intent.animal,
                 intent.newValue
@@ -114,12 +101,7 @@ class ExpensesViewModel @Inject constructor(
             ExpensesListIntent.Update -> update()
             is ExpensesListIntent.Delete -> delete(intent.value)
 
-
             is ExpensesListIntent.SearchChanged -> updateSearch(intent.value)
-            is ExpensesListIntent.CountWarehouse -> {
-                /* updateWarehouse(intent.value)*/
-            }
-
             is ExpensesListIntent.GroupClicked -> updateGroup(intent.value)
         }
     }
@@ -156,10 +138,10 @@ class ExpensesViewModel @Inject constructor(
                     suffixList = if (isFood) suffixFoodList else suffixAllList,
                     countSuffix = if (isFood) Suffix.KILOGRAM else Suffix.PIECES,
                     isShowCheckbox = false,
-                    feedFoodChipSuffix = feedFoodSuffix(Suffix.KILOGRAM)
                 )
             )
         }
+        updateFeedFoodSuffix(Suffix.KILOGRAM)
     }
 
     private fun updateIsPercent(isPercent: Boolean) {
@@ -172,7 +154,37 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    private fun updateEqually() {
+    private fun updateEqually(totalShare: Double = 100.0) {
+
+        val state = getState().currentProduct
+        val animals = state.pickList.animalList2
+
+        val selectedAnimals = animals.filter { it.ps }
+        if (selectedAnimals.isEmpty()) return
+
+        val equalShare = totalShare / selectedAnimals.size
+
+        val price = (if (state.isAutoPrice) state.priceAll else state.price).toConvertZeroDouble()
+
+        val updatedList = animals.map {
+            if (it.ps) it.copy(
+                presentException = equalShare,
+                price = equalShare * price / 100
+            ) else it.copy(
+                presentException = 0.0,
+                price = 0.0
+            )
+        }
+
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(
+                    pickList = it.currentProduct.pickList.copy(
+                        animalList2 = updatedList
+                    )
+                )
+            )
+        }
     }
 
 
@@ -267,7 +279,7 @@ class ExpensesViewModel @Inject constructor(
                             pickList = it.currentProduct.pickList.copy(
                                 titleList = titleList,
                                 categoryList = categoryList,
-                                animalList2 = animalList
+                                animalList2 = animalList.map { animalList -> animalList.toUi() }
                             )
                         )
                     )
@@ -285,17 +297,22 @@ class ExpensesViewModel @Inject constructor(
         else updateState { it.copy(openBottomSheetEntry = false) }
     }
 
-    private fun feedFoodSuffix(
-        suffix: Suffix
-    ): Suffix {
-        return when (suffix) {
+    private fun updateFeedFoodSuffix(suffix: Suffix) {
+        val feedFoodChipSuffix = when (suffix) {
             Suffix.GRAM -> Suffix.GRAM_DAY
             Suffix.KILOGRAM -> Suffix.KILOGRAM_DAY
             Suffix.TONS -> Suffix.TONS_DAY
-            Suffix.KILOGRAM_TO_LITERS, Suffix.KILOGRAM_TO_CUBIC_METERS -> Suffix.KILOGRAM_DAY
-            else -> suffix
+            else -> Suffix.KILOGRAM_DAY
+        }
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    feedFoodChipSuffix = feedFoodChipSuffix
+                )
+            )
         }
     }
+
 
     override fun insert() {
         viewModelScope.launch {
@@ -362,7 +379,7 @@ class ExpensesViewModel @Inject constructor(
 
         val isErrorFood =
             if (getState().currentProduct.isShowFood && !getState().currentProduct.isShowFoodHand) getState().currentProduct.pickList.animalList2.filter { it.foodDay != 0.0 }
-                .none { it.ps == true } else false
+                .none { it.ps } else false
 
         val isErrorAnimal =
             if (getState().currentProduct.isShowAnimals) getState().currentProduct.pickList.animalList2.none { it.ps == true } else false
@@ -385,16 +402,6 @@ class ExpensesViewModel @Inject constructor(
             )
         }
     }
-
-    /* fun updateWarehouseUiState(name: String) {
-         viewModelScope.launch {
-             val domainCountSuffix = warehouseRepository.getCurrentBalanceProduct(
-                 name,
-                itemIdPT
-             ).filterNotNull().first()
-             updateState { it.copy(countInWarehouse = domainCountSuffix) }
-         }
-     }*/
 
     private suspend fun setExpensesAnimal(id: Long) {
         getState().currentProduct.pickList.animalList2.filter { it.ps }.map {
@@ -445,6 +452,14 @@ class ExpensesViewModel @Inject constructor(
             }
     }
 
+    private fun updateGroup(isGroup: Boolean) {
+        updateState { it.copy(isGroup = isGroup) }
+    }
+
+    private fun updateSearch(search: String) {
+        updateState { it.copy(textSearch = search) }
+    }
+
     private fun updateTitle(title: String) {
         updateState {
             it.copy(
@@ -457,14 +472,6 @@ class ExpensesViewModel @Inject constructor(
                 )
             )
         }
-    }
-
-    private fun updateGroup(isGroup: Boolean) {
-        updateState { it.copy(isGroup = isGroup) }
-    }
-
-    private fun updateSearch(search: String) {
-        updateState { it.copy(textSearch = search) }
     }
 
     private fun updateTitleAndSuffix(
@@ -501,6 +508,12 @@ class ExpensesViewModel @Inject constructor(
         if (getState().currentProduct.isAutoWeight) updateWeightAll()
         if (getState().currentProduct.isFood) calculateFoodDays()
         if (getState().currentProduct.isAutoPrice) updatePriceAll()
+        if (!getState().currentProduct.isFood
+            && getState().currentProduct.pickList.animalList2.fastAny { it.ps }
+        ) helperSlider()
+        if (!getState().currentProduct.isFood
+            && getState().currentProduct.pickList.animalList2.fastAny { it.ps }
+        ) helperSlider()
     }
 
     private fun updateCountSuffix(suffix: Suffix) {
@@ -522,13 +535,14 @@ class ExpensesViewModel @Inject constructor(
                     isShowCheckbox = state.currentProduct.isFood && suffix !in suffixSet,
                     isAutoWeight = if (state.currentProduct.isFood && suffix !in suffixSet) getState().currentProduct.isAutoWeight else false,
                     weightSuffix = weightSuffix,
-                    weightAllSuffix = weightAllSuffix,
-                    feedFoodChipSuffix = feedFoodSuffix(weightAllSuffix)
-                    /*         isAutoWeight = if (suffix in suffixSet) false else getState().currentProduct.isAutoWeight,
-                   isShowFood = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFood,
-                        isShowFoodHand = if (suffix !in suffixSet && !getState().currentProduct.isAutoWeight) false else getState().currentProduct.isShowFoodHand*/
+                    weightAllSuffix = weightAllSuffix
                 )
             )
+        }
+        if (getState().currentProduct.isFood) {
+            updateFeedFoodSuffix(suffix)
+            calculateFeedFood()
+            calculateFoodDays()
         }
     }
 
@@ -555,6 +569,21 @@ class ExpensesViewModel @Inject constructor(
             )
         }
         updateWeightAll()
+        calculateFeedFood()
+        calculateFoodDays()
+    }
+
+    private fun updateWeightSuffix(weightSuffix: Suffix) {
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(
+                    weightSuffix = weightSuffix,
+                    weightAllSuffix = weightSuffix
+                )
+            )
+        }
+        updateFeedFoodSuffix(weightSuffix)
+        calculateFeedFood()
         calculateFoodDays()
     }
 
@@ -565,17 +594,6 @@ class ExpensesViewModel @Inject constructor(
             state.copy(
                 currentProduct = state.currentProduct.copy(
                     weightAll = (weight * count).formatNumber()
-                )
-            )
-        }
-    }
-
-    private fun updateWeightSuffix(weightSuffix: Suffix) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    weightSuffix = weightSuffix,
-                    weightAllSuffix = weightSuffix
                 )
             )
         }
@@ -593,6 +611,9 @@ class ExpensesViewModel @Inject constructor(
             )
         }
         updatePriceAll()
+        if (!getState().currentProduct.isFood
+            && getState().currentProduct.pickList.animalList2.fastAny { it.ps }
+        ) helperSlider()
     }
 
     private fun updateAutoPrice(isAutoCalculate: Boolean) {
@@ -604,6 +625,9 @@ class ExpensesViewModel @Inject constructor(
             )
         }
         updatePriceAll()
+        if (!getState().currentProduct.isFood
+            && getState().currentProduct.pickList.animalList2.fastAny { it.ps }
+        ) helperSlider()
     }
 
     private fun updatePriceAll() {
@@ -632,6 +656,7 @@ class ExpensesViewModel @Inject constructor(
                 currentProduct = it.currentProduct.copy(date = date)
             )
         }
+        if (getState().currentProduct.isFood) calculateFoodDays()
     }
 
     private fun updateNote(note: String) {
@@ -642,138 +667,7 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    private fun updateShowFood(showFood: Boolean) {
-        updateState { state ->
-            state.copy(
-                currentProduct = state.currentProduct.copy(
-                    isShowFood = showFood,
-                    isShowWarehouse = showFood,
-                    isShowAnimals = false,
-                    pickList = state.currentProduct.pickList.copy(
-                        animalList2 = state.currentProduct.pickList.animalList2.map { it.copy(ps = false) }
-                    ),
-                    error = state.currentProduct.error.copy(
-                        isErrorFood = false,
-                        isErrorAnimal = false
-                    )
-                ))
-        }
-    }
-
-    private fun updateShowFoodHand(dailyExpensesFoodAndCount: Boolean) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    isShowFoodHand = dailyExpensesFoodAndCount,
-                    error = it.currentProduct.error.copy(
-                        isErrorFood = false
-                    )
-                )
-            )
-        }
-    }
-
-    private fun updateFeedFoodInput(feedFood: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    feedFoodInput = feedFood,
-                    error = it.currentProduct.error.copy(
-                        isErrorDailyExpensesFood = feedFood.isBlank()
-                    )
-                )
-            )
-        }
-    }
-
-    private fun updateFeedFoodInputSuffix(feedFoodSuffix: Suffix) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    feedFoodInputSuffix = feedFoodSuffix,
-                )
-            )
-        }
-    }
-
-    private fun updateCountAnimal(countAnimal: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    countAnimalInput = countAnimal,
-                    error = it.currentProduct.error.copy(
-                        isErrorCountAnimal = countAnimal.isBlank()
-                    )
-                )
-            )
-        }
-    }
-
-    private fun updateShowWarehouse(isShowWarehouse: Boolean) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    isShowWarehouse = isShowWarehouse
-                )
-            )
-        }
-    }
-
-    private fun updateAnimalChipSelection(
-        toggledAnimal: AnimalExpensesDomain
-    ) {
-        val newSelected = !toggledAnimal.ps
-
-        // Обновляем список животных с пересчетом presentException
-        val updatedAnimals = getState().currentProduct.pickList.animalList2.map {
-            if (it.id == toggledAnimal.id) {
-                val convertedFood =
-                    it.foodDay.convertWeight(
-                        it.foodDaySuffix,
-                        getState().currentProduct.feedFoodChipSuffix
-                    )
-                val dailyFood = convertedFood * it.countAnimal
-
-                it.copy(
-                    ps = newSelected,
-                    presentException = if (newSelected) (it.foodDay / dailyFood) * 100.0 else 0.0
-                )
-            } else it
-        }
-
-        // Сумма по выбранным животным
-        val updatedCountAnimal = updatedAnimals
-            .filter { it.ps }
-            .sumOf { it.countAnimal }
-            .toString()
-
-
-        val updatedDailyFood = updatedAnimals
-            .filter { it.ps }
-            .sumOf {
-                it.foodDay.convertWeight(
-                    it.foodDaySuffix,
-                    getState().currentProduct.feedFoodChipSuffix
-                ) * it.countAnimal
-            }
-            .toString()
-
-        updateState { state ->
-            state.copy(
-                currentProduct = state.currentProduct.copy(
-                    feedFoodChip = updatedDailyFood,
-                    countAnimalChip = updatedCountAnimal,
-                    pickList = state.currentProduct.pickList.copy(animalList2 = updatedAnimals),
-                    error = state.currentProduct.error.copy(isErrorFood = false)
-                )
-            )
-        }
-    }
-
-    private fun updateAnimalChipSelection2(
-        id: Long
-    ) {
-        // Обновляем список животных с пересчетом presentException
+    private fun updateAnimalChipByIdFood(id: Long) {
         val updatedAnimals = getState().currentProduct.pickList.animalList2.map { animal ->
             if (animal.id == id) {
                 Log.i("food", "foodDaySuffix: ${animal.foodDaySuffix}")
@@ -790,15 +684,26 @@ class ExpensesViewModel @Inject constructor(
                 )
             } else animal
         }
+        updateState { state ->
+            state.copy(
+                currentProduct = state.currentProduct.copy(
+                    pickList = state.currentProduct.pickList.copy(animalList2 = updatedAnimals),
+                    error = state.currentProduct.error.copy(isErrorFood = false)
+                )
+            )
+        }
+        calculateFeedFood()
+        calculateFoodDays()
+    }
 
-        // Сумма по выбранным животным
-        val updatedCountAnimal = updatedAnimals
+    private fun calculateFeedFood() {
+        val animalList = getState().currentProduct.pickList.animalList2
+        val updatedCountAnimal = animalList
             .filter { it.ps }
             .sumOf { it.countAnimal }
             .toString()
 
-
-        val updatedDailyFood = updatedAnimals
+        val updatedDailyFood = animalList
             .filter { it.ps }
             .sumOf {
                 it.foodDay.convertWeightDay(
@@ -806,27 +711,18 @@ class ExpensesViewModel @Inject constructor(
                     getState().currentProduct.feedFoodChipSuffix
                 ) * it.countAnimal.toDouble()
             }
-
-        // В настройках указать расход корма в день или как-то брать по кол-ву
-        // Нужно как-то всех выбранных животных привести к единому знаменателю
-        // И разделить на текущие кол-во тогда мы получим кол-во дней, а от нее уже и дату
-        Log.i("food", "updatedDailyFood: $updatedDailyFood ")
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
                     feedFoodChip = updatedDailyFood.formatNumber(),
                     countAnimalChip = updatedCountAnimal,
-                    pickList = state.currentProduct.pickList.copy(animalList2 = updatedAnimals),
-                    error = state.currentProduct.error.copy(isErrorFood = false)
                 )
             )
         }
-        calculateFoodDays()
     }
 
     private fun calculateFoodDays() {
         val suffix = getState().currentProduct.countSuffix
-        val weightSuffix = getState().currentProduct.weightSuffix
         val isWeightSuffix = when (suffix) {
             Suffix.KILOGRAM, Suffix.GRAM, Suffix.TONS -> true
             else -> false
@@ -836,22 +732,13 @@ class ExpensesViewModel @Inject constructor(
             if (isWeightSuffix) getState().currentProduct.count else getState().currentProduct.weightAll
         val feedFood = getState().currentProduct.feedFoodChip.toConvertZeroDouble()
         val day = (weight.toConvertZeroDouble() / feedFood).toInt()
-        Log.i("food", "countSuffix: ${suffix} ")
-        Log.i("food", "isWeight: ${isWeightSuffix} ")
-        Log.i("food", "weight: ${getState().currentProduct.weight} ")
-        Log.i("food", "weightAll: ${getState().currentProduct.weightAll} ")
-        Log.i("food", "weightTotal: $weight ")
-        Log.i("food", "feedFood: $feedFood ")
-
-//        val dateEnd = endDay(getState().currentProduct.date, day)  val day =
-//            (getState().currentProduct.weightAll.toConvertZeroDouble() / updatedDailyFood).toInt()
-////        val dateEnd = endDay(getState().currentProduct.date, day)
+        val dateEnd = endDay(getState().currentProduct.date, day)
 
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
                     daysFood = day,
-                    dateEnd = "12.12.2022",
+                    dateEnd = dateEnd
                 )
             )
         }
@@ -862,35 +749,43 @@ class ExpensesViewModel @Inject constructor(
         numberDays: Int
     ): String {
         val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())
-        val start = LocalDateTime.parse(startDate, dateTimeFormatter)
+        val start = LocalDate.parse(startDate, dateTimeFormatter)
         return start
             .plusDays(numberDays.toLong())
             .format(dateTimeFormatter)
     }
 
-    private fun updateShowAnimal(showAnimal: Boolean) {
-        updateState { state ->
-            state.copy(
-                currentProduct = state.currentProduct.copy(
-                    isShowFoodHand = false,
-                    isShowAnimals = showAnimal,
-                    pickList = state.currentProduct.pickList.copy(
-                        animalList2 = state.currentProduct.pickList.animalList2.map { it.copy(ps = false) }
-                    ),
-                    error = state.currentProduct.error.copy(
-                        isErrorAnimal = false
-                    )
-                ))
+
+    private fun updateAnimalSelectionById(
+        animalId: Long,
+        totalShare: Double = 100.0
+    ) {
+        val state = getState().currentProduct
+        val list = state.pickList.animalList2
+        val totalPrice =
+            (if (getState().currentProduct.isAutoPrice) state.priceAll else state.price)
+                .toConvertZeroDouble()
+
+        // переключаем выбранный элемент
+        val toggledList = list.map {
+            if (it.id == animalId) it.copy(ps = !it.ps) else it
         }
-    }
 
-    // Хелпер: Перераспределить presentException для всех выбранных
-    fun redistributeSelectedShare(totalShare: Double = 100.0) {
-        val selected = getState().currentProduct.pickList.animalList2.filter { it.ps }
-        val equalShare = if (selected.isNotEmpty()) totalShare / selected.size else 0.0
+        val count = toggledList.filter { it.ps }.size
 
-        val updatedList = getState().currentProduct.pickList.animalList2.map {
-            if (it.ps) it.copy(presentException = equalShare) else it.copy(presentException = 0.0)
+        val share = if (count > 0) totalShare / count else 0.0
+        val pricePerAnimal = if (count > 0) totalPrice / count else 0.0
+
+        val updatedList = toggledList.map {
+            if (it.ps)
+                it.copy(
+                    presentException = share,
+                    price = pricePerAnimal
+                )
+            else it.copy(
+                presentException = 0.0,
+                price = 0.0
+            )
         }
 
         updateState {
@@ -907,47 +802,62 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    // Хелпер: Обновить ps у одного животного
-    private fun updateAnimalSelectionById(animalId: Long) {
-        val updatedList = getState().currentProduct.pickList.animalList2.map {
-            if (it.id == animalId) it.copy(ps = !it.ps) else it
-        }
-
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    pickList = it.currentProduct.pickList.copy(
-                        animalList2 = updatedList
-                    )
-                )
-            )
-        }
-        redistributeSelectedShare()
-    }
-
-
-    // Хелпер: Обновить presentException у одного животного, перераспределить остаток
     private fun updateAnimalSlider(
         animalId: Long,
         newValue: Double,
-        totalShare: Double = 100.0
     ) {
-        val selectedAnimals = getState().currentProduct.pickList.animalList2.filter { it.ps }
-        val remainingShare = (totalShare - newValue).coerceAtLeast(0.0)
-        val othersCount = selectedAnimals.size - 1
-
         val updatedList = getState().currentProduct.pickList.animalList2.map {
-            when {
-                it.id == animalId -> it.copy(presentException = newValue)
-                it.ps -> {
-                    val redistributed =
-                        if (othersCount > 0) remainingShare / othersCount else 0.0
-                    it.copy(presentException = redistributed)
-                }
-
-                else -> it.copy(presentException = 0.0)
-            }
+            if (it.id == animalId) it.copy(
+                presentException = newValue,
+            ) else it
         }
+        updateState {
+            it.copy(
+                currentProduct = it.currentProduct.copy(
+                    pickList = it.currentProduct.pickList.copy(
+                        animalList2 = updatedList
+                    )
+                )
+            )
+        }
+        helperSlider()
+    }
+
+    private fun helperSlider(totalShare: Double = 100.0) {
+
+        val state = getState().currentProduct
+        val animals = state.pickList.animalList2
+
+        val selectedAnimals = animals.filter { it.ps }
+
+        val price = (if (state.isAutoPrice) state.priceAll else state.price).toConvertZeroDouble()
+
+        val updatedList =
+            if (selectedAnimals.size <= 1) {
+                // одно животное — пользователь управляет сам
+                animals.map {
+                    if (it.ps)
+                        it.copy(price = it.presentException * price / 100)
+                    else
+                        it.copy(presentException = 0.0, price = 0.0)
+                }
+            } else {
+                val totalCurrentShare = selectedAnimals.sumOf { it.presentException }
+                val normalizedList = animals.map {
+                    if (it.ps && totalCurrentShare > 0) {
+                        val normalized = it.presentException / totalCurrentShare * totalShare
+                        it.copy(
+                            presentException = normalized,
+                            price = normalized * price / 100
+                        )
+                    } else it.copy(
+                        presentException = 0.0,
+                        price = 0.0
+                    )
+                }
+                normalizedList
+            }
+
         updateState {
             it.copy(
                 currentProduct = it.currentProduct.copy(
@@ -959,51 +869,68 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    private fun updateSettingDay() {
-        val dailyExpensesFoodAndCount = getState().currentProduct.isShowFoodHand
 
-        val countTable = getState().currentProduct.count.toConvertZeroDouble()
-        val weight = getState().currentProduct.weight.toConvertZeroDouble()
+    private fun updateAnimalValue(
+        animalId: Long,
+        newValue: String
+    ) {
+        val newPrice = newValue.toConvertZeroDouble()
+        val state = getState()
+        val animals = state.currentProduct.pickList.animalList2
 
-        val countAnimal = if (dailyExpensesFoodAndCount)
-            getState().currentProduct.countAnimalInput.toConvertZeroDouble() else getState().currentProduct.countAnimalChip.toConvertZeroDouble()
-        val dailyExpensesFood = if (dailyExpensesFoodAndCount)
-            getState().currentProduct.feedFoodInput.toConvertZeroDouble() else getState().currentProduct.feedFoodChip.toConvertZeroDouble()
+        val totalPrice =
+            if (state.currentProduct.isAutoPrice)
+                state.currentProduct.priceAll.toConvertZeroDouble()
+            else
+                state.currentProduct.price.toConvertZeroDouble()
 
-        val countProduct =
-            if (getState().currentProduct.isAutoWeight) {
-                (countTable * weight)
-                    .convertWeight(
-                        getState().currentProduct.weightSuffix,
-                        getState().currentProduct.feedFoodChipSuffix
+        if (totalPrice == 0.0) return
+
+        // процент изменённого животного
+        val changedPercent = (newPrice / totalPrice) * 100
+
+        val selectedAnimals = animals.filter { it.ps }
+        val othersCount = selectedAnimals.size - 1
+
+        val remainingPercent = (100 - changedPercent).coerceAtLeast(0.0)
+
+        val updatedList = animals.map { animal ->
+
+            when {
+
+                animal.id == animalId -> {
+                    animal.copy(
+                        price = newPrice,
+                        presentException = changedPercent
                     )
-            } else countTable.convertWeight(
-                getState().currentProduct.countSuffix,
-                getState().currentProduct.feedFoodChipSuffix
-            )
+                }
 
-        val foodDay =
-            if (dailyExpensesFoodAndCount) dailyExpensesFood
-                .convertWeight(
-                    getState().currentProduct.feedFoodInputSuffix,
-                    getState().currentProduct.feedFoodChipSuffix
+                animal.ps -> {
+
+                    val percent =
+                        if (othersCount > 0) remainingPercent / othersCount else 0.0
+
+                    val price = totalPrice * percent / 100
+
+                    animal.copy(
+                        presentException = percent,
+                        price = price
+                    )
+                }
+
+                else -> animal.copy(
+                    presentException = 0.0,
+                    price = 0.0
                 )
-            else dailyExpensesFood
-
-        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        val dateLocal = LocalDate.parse(getState().currentProduct.date, formatter)
-
-        var days =
-            (if (dailyExpensesFoodAndCount) countProduct / (countAnimal * foodDay)
-            else countProduct / foodDay).toLong()
-
-        if (days > 1000) days = 1000
-        val newDate = dateLocal.plusDays(days)
+            }
+        }
 
         updateState {
             it.copy(
                 currentProduct = it.currentProduct.copy(
-                    daysFood = days.toInt(), dateEndFood = newDate.format(formatter)
+                    pickList = it.currentProduct.pickList.copy(
+                        animalList2 = updatedList
+                    )
                 )
             )
         }
@@ -1059,7 +986,8 @@ class ExpensesViewModel @Inject constructor(
             feedFoodChip = if (!useDaily) domain.feedFood?.formatNumber() ?: "" else "",
             feedFoodChipSuffix = if (!useDaily) domain.feedFoodSuffix
                 ?: feedFoodChipSuffix else feedFoodChipSuffix,
-            countAnimalInput = if (useDaily) domain.countAnimal?.formatNumber(false) ?: "" else "",
+            countAnimalInput = if (useDaily) domain.countAnimal?.formatNumber(false)
+                ?: "" else "",
             feedFoodInput = if (useDaily) domain.feedFood?.formatNumber(false) ?: "" else "",
             feedFoodInputSuffix = if (useDaily) domain.feedFoodSuffix
                 ?: feedFoodInputSuffix else feedFoodInputSuffix,
@@ -1107,6 +1035,20 @@ class ExpensesViewModel @Inject constructor(
             idPT = itemIdPT,
         )
     }
+
+    private fun AnimalExpensesDomain.toUi(): AnimalExpensesUi {
+        return AnimalExpensesUi(
+            id = id,
+            name = name,
+            foodDay = foodDay,
+            foodDaySuffix = foodDaySuffix,
+            countAnimal = countAnimal,
+            idExpensesAnimal = idExpensesAnimal,
+            ps = ps,
+            presentException = presentException,
+            price = 0.0
+        )
+    }
 }
 
 sealed class ExpensesListIntent : BaseIntent {
@@ -1142,20 +1084,14 @@ sealed class ExpensesListIntent : BaseIntent {
     data class DateClicked(val value: String) : ExpensesListIntent()
     data class NoteChanged(val value: String) : ExpensesListIntent()
 
-    data class ShowFoodClicked(val value: Boolean) : ExpensesListIntent()
-    data class ShowFoodHandClicked(val value: Boolean) : ExpensesListIntent()
-    data class AnimalChipClicked(val value: AnimalExpensesDomain) : ExpensesListIntent()
-    data class AnimalChipClicked2(val value: Long) : ExpensesListIntent()
-    data class FeedFoodChanged(val value: String) : ExpensesListIntent()
-    data class FeedFoodSuffixClicked(val value: Suffix) : ExpensesListIntent()
-    data class CountAnimalChanged(val value: String) : ExpensesListIntent()
-    data class ShowWarehouseClicked(val value: Boolean) : ExpensesListIntent()
-    data class ShowAnimalClicked(val value: Boolean) : ExpensesListIntent()
+    data class AnimalChipByIdFoodClicked(val value: Long) : ExpensesListIntent()
     data class AnimalChipByIdClicked(val value: Long) : ExpensesListIntent()
     data class AnimalSliderClicked(val animal: Long, val newValue: Double) :
         ExpensesListIntent()
 
-    data class CountWarehouse(val value: List<DomainCountSuffix>) : ExpensesListIntent()
+    data class AnimalValueChanged(val animal: Long, val newValue: String) :
+        ExpensesListIntent()
+
     data class GroupClicked(val value: Boolean) : ExpensesListIntent()
     data class SearchChanged(val value: String) : ExpensesListIntent()
     data object Insert : ExpensesListIntent()

@@ -62,19 +62,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="35cfaaea-37a9-4a28-bf38-7617cc438d50" name="Changes" comment="Update EntryBookmarkScreen.kt">
-      <change afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dto/incubator/TitleCountDto.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/config.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Conversion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/supportFun/Conversion.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/EntryBottomModalSheet.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/EntryBottomModalSheet.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/ExpensesListState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/ExpensesListState.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/ExpensesViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/ExpensesViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values-v23/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values-v23/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/ExpensesDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/ExpensesDao.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +79,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=/Users/semyon/.android/avd/Medium_Phone.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\zaros\.android\avd\Pixel_9a.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -148,12 +143,12 @@
     &quot;assignee&quot;: &quot;CEMKAAS&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/CEMKAAS/ferma_compose2.git",
-    "accountId": "9c097180-e1ac-48a1-b59f-dc7cbc1372ea"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/CEMKAAS/ferma_compose2.git&quot;,
+    &quot;accountId&quot;: &quot;9c097180-e1ac-48a1-b59f-dc7cbc1372ea&quot;
   }
-}]]></component>
+}</component>
   <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-8.11.1-bin/bpt9gzteqjrbo1mjrsomdt32c/gradle-8.11.1" javaHome="$APPLICATION_HOME_DIR$/jbr/Contents/Home" gradleVersion="8.11.1" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
