@@ -105,9 +105,6 @@ fun BaseOutlinedTextNew(
     } else null
 
 
-    val suffixValue: @Composable (() -> Unit)? =
-        suffix?.let { { Text(text = stringResource(it.toResId())) } }
-
     val trailingIcon: @Composable (() -> Unit)? = when {
         onSuffixChance != null -> {
             { GetDropDownMenu(versionDropMenu) { onSuffixChance(it) } }
@@ -167,14 +164,18 @@ fun BaseOutlinedTextNew(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color =  when {
+                    color = when {
                         isDisabled -> Color(0xFFF2F2F2)
                         isError -> Color(0xFFFFEAEA)
                         else -> colorTextField
                     },
                     shape = RoundedCornerShape(14.dp)
                 )
-                .border(borderWidth, color = if (isDisabled) Color(0xFFE0E0E0) else Color(0xFFD1D5DC), shape = RoundedCornerShape(14.dp))
+                .border(
+                    borderWidth,
+                    color = if (isDisabled) Color(0xFFE0E0E0) else Color(0xFFD1D5DC),
+                    shape = RoundedCornerShape(14.dp)
+                )
                 .padding(horizontal = 12.dp, vertical = 4.dp)
         ) {
             Row(
@@ -237,6 +238,13 @@ fun BaseOutlinedTextNew(
                     },
                     keyboardOptions = keyboardOptions
                 )
+                suffix?.let {
+                    Text(
+                        text = stringResource(it.toResId()),
+                        color = Color(0xFF9A9A9A),
+                        style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
+                    )
+                }
                 // ИКОНКА: фиксированного размера, не будет ужиматься
                 when (isMore) {
                     true -> Icon(

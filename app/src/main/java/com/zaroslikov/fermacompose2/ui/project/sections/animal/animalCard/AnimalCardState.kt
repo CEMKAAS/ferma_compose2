@@ -15,7 +15,7 @@ data class AnimalCardState(
     val animal: DomainAnimalTable = DomainAnimalTable(),
     val weight: DomainAnimalWeight? = DomainAnimalWeight(),
     val size: DomainAnimalSize? = DomainAnimalSize(),
-    val countAnimal: DomainAnimalCount = DomainAnimalCount(),
+    val countAnimal: DomainAnimalCount? = DomainAnimalCount(),
     val vaccination: DomainAnimalVaccination? = DomainAnimalVaccination(),
     val age: String = "",
     val price: Double? = 0.0,
@@ -26,3 +26,11 @@ data class AnimalCardState(
     override val navigate: UiEvent? = null,
     val productList: List<DomainAnimalCountSuffix> = emptyList()
 ) : BaseState
+
+data class LoadDataAnimalCard(
+    val animal: DomainAnimalTable,
+    val count: DomainAnimalCount?,
+    val size: DomainAnimalSize?,
+    val vacc: DomainAnimalVaccination?,
+    val weight: DomainAnimalWeight?
+)

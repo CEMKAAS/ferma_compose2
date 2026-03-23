@@ -24,7 +24,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomShe
 fun BottomSheetSaleAnimal(
     state: CountItem,
     onIntent: (AnimalCountIntent) -> Unit,
-    countAllAnimal: String,
+    countAllAnimal: String?,
 ) {
     val focusRequester =
         remember { FocusRequester() } // ✅ нужно помнить, иначе при recomposition фокус сбрасывается
@@ -33,12 +33,23 @@ fun BottomSheetSaleAnimal(
         focusRequester.requestFocus()
     }
     EntryIndicationBottomSheet(
-        icon = state.version.toDrawRes(),
+        iconRes = state.version.toDrawRes(),
         titleRes = state.version.toResId(),
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = state.version.toColorList(),
-        onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
+        onDismissRequest = {
+            onIntent(
+                AnimalCountIntent.DialogClicked(
+                    false,
+                    isSaveStateForBottomSheet = true,
+                    version = state.version
+                )
+            )
+        },
+        onSecondDismissRequest = {
+            onIntent(AnimalCountIntent.DialogClicked(false))
+        },
         onInsertClick = { onIntent(AnimalCountIntent.InsertSalePressed) },
         onUpdateClick = { onIntent(AnimalCountIntent.UpdateSalePressed) }
     ) {
@@ -48,7 +59,7 @@ fun BottomSheetSaleAnimal(
                 onIntent(AnimalCountIntent.CountChanged(it))
             },
             isError = state.error.isErrorCount,
-            /*           isErrorCountZero = state.error.isErrorCountZero,*/
+            isErrorCountZero = state.error.isErrorCountZero,
             intRes = R.string.outlined_text_field_quantity,
             suffix = state.suffix,
             countAnimal = countAllAnimal,

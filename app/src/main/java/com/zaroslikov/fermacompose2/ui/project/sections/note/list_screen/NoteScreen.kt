@@ -29,11 +29,13 @@ import com.zaroslikov.fermacompose2.TopAppBarNewFilter
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.grey_3
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_11
 import com.zaroslikov.fermacompose2.orang_12
 import com.zaroslikov.fermacompose2.orang_13
 import com.zaroslikov.fermacompose2.orang_14
+import com.zaroslikov.fermacompose2.orang_7
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -48,6 +50,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.DetailBottomSheet
@@ -72,18 +75,6 @@ fun NoteScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val colors = listOf(orang_11, orang_12)
-
-    val query = state.textSearch.trim().lowercase()
-    val searchList = if (query.isBlank()) state.list
-    else
-        state.list.filter { item ->
-            val date = item.date.split(".")
-            val monthText = stringResource(id = monthToResString(date[1].toInt()))
-            item.title.lowercase().contains(query) ||
-                    item.note.lowercase().contains(query) ||
-                    dateBuilder(date[0].toInt(), monthText, date[2].toInt()).lowercase()
-                        .contains(query)
-        }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -117,21 +108,20 @@ fun NoteScreen(
                     .modifierScreenLazy(innerPadding),
                 itemList = state.list,
                 color = colors.first(),
-                searchList = searchList,
-                onInsertClick = { viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true)) },
+                searchList = state.searchList,
                 onEditClick = { viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true, it)) },
                 onDeleteClick = { viewModel.onIntent(NoteListIntent.Delete(it)) },
                 onDetailClick = {
-                    viewModel.onIntent(NoteListIntent.OpenBottomSheetDetail(true, it))
+                    viewModel.onIntent(NoteListIntent.OpenBottomSheetDetail(it))
                 }
             )
-        if (state.openBottomSheetEntry)
+        if (state.isOpenBottomSheetEntry)
             NoteEntryBottomSheet(
                 colors = colors,
                 state = state.currentProduct,
                 onIntent = viewModel::onIntent
             )
-        if (state.openBottomSheetDetail)
+        if (state.isOpenBottomSheetDetail)
             NoteDetailBottomSheet(
                 state = state.detailDomainNoteTable,
                 onIntent = viewModel::onIntent
@@ -145,10 +135,9 @@ private fun NoteContainer(
     color: Color = blue_1,
     itemList: List<DomainNoteTable>,
     searchList: List<DomainNoteTable>,
-    onInsertClick: () -> Unit,
     onEditClick: (DomainNoteTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
-    onDetailClick: (Int) -> Unit,
+    onDetailClick: (Long) -> Unit,
 ) {
     InventoryBody(
         modifier = modifier,
@@ -156,10 +145,6 @@ private fun NoteContainer(
         itemList = itemList,
         searchList = searchList,
         brieflyList = emptyList<Int>(),
-        onInsertClick = onInsertClick,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        onDetailsClick = {},
         detailCard = { index, item ->
             NoteCard(
                 title = item.title,
@@ -168,15 +153,15 @@ private fun NoteContainer(
                 color = color,
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
-                onDetailClick = { onDetailClick(index) }
+                onDetailClick = { onDetailClick(item.id) }
             )
         },
         brieflyCard = {},
         titleRes = R.string.message_no_data_title_note,
         messageRes = R.string.message_no_data_message_note,
-        iconRes = R.drawable.icon_warning,
-        iconColor = orang_11,
-        backgroundColor = orang_12
+        iconRes = R.drawable.baseline_sticky_note_2_24,
+        iconColor = orang_7,
+        backgroundColor = orang_13
     )
 }
 
@@ -247,14 +232,21 @@ private fun NoteEntryBottomSheet(
     onIntent: (NoteListIntent) -> Unit
 ) {
     EntryBottomSheet(
-        modifier = Modifier,
+        titleEntryRes = R.string.note_screen_title_entry,
+        titleEditRes = R.string.note_screen_title_edit,
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
-                NoteListIntent.OpenBottomSheetEntry(false)
+                NoteListIntent.OpenBottomSheetEntry(
+                    false,
+                    isSaveStateForBottomSheet = true
+                )
             )
+        },
+        onSecondDismissRequest = {
+            onIntent(NoteListIntent.OpenBottomSheetEntry(false))
         },
         onInsertClick = { onIntent(NoteListIntent.Insert) },
         onUpdateClick = { onIntent(NoteListIntent.Update) }
@@ -285,18 +277,17 @@ private fun NoteDetailBottomSheet(
     val monthText = stringResource(id = monthToResString(date[1].toInt()))
 
     DetailBottomSheet(
-        modifier = Modifier,
-        onDismissRequest = {
-            onIntent(NoteListIntent.OpenBottomSheetDetail(false))
-        },
         title = state.title,
-        date = dateBuilder(date[0].toInt(), monthText, date[2].toInt()),
+        onUpdateClick = { onIntent(NoteListIntent.OpenBottomSheetEntry(true, state)) },
         onDeleteClick = {
             onIntent(NoteListIntent.Delete(state.id))
-            onIntent(NoteListIntent.OpenBottomSheetDetail(false))
+            onIntent(NoteListIntent.OpenBottomSheetDetail(null))
         },
-        onUpdateClick = { onIntent(NoteListIntent.OpenBottomSheetEntry(true, state)) },
+        onDismissRequest = {
+            onIntent(NoteListIntent.OpenBottomSheetDetail(null))
+        }
     ) {
+        Text(text = dateBuilder(date[0].toInt(), monthText, date[2].toInt()), style = text_14, color = grey_3)
         BorderCard(
             modifier = Modifier.fillMaxWidth(),
             padding = PaddingValues(26.dp),

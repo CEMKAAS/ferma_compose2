@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,17 +19,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,9 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastAny
-import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black
@@ -51,7 +48,9 @@ import com.zaroslikov.fermacompose2.blue_4
 import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.gray_8
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_11
 import com.zaroslikov.fermacompose2.green_13
@@ -62,55 +61,61 @@ import com.zaroslikov.fermacompose2.green_g_1
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.price_green_2
-import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
-import com.zaroslikov.fermacompose2.supportFun.animatedErrorPadding
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.ButtonForGroupButtons
-import com.zaroslikov.fermacompose2.ui.elements.CardField
-import com.zaroslikov.fermacompose2.ui.elements.CheckboxTextIcon
-import com.zaroslikov.fermacompose2.ui.elements.OutlinedTextCountNoCard
-import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenu
+import com.zaroslikov.fermacompose2.ui.elements.CustomCheckbox
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedCountInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedNumberNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
+import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
+import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
 import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.formatter
+import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.GroupCard
+import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
 
 @Composable
 fun ExpensesEntryBottomSheet(
-    modifier: Modifier,
     colors: List<Color>,
+    priceSuffix: Suffix,
     state: ExpensesEntryState2,
     onIntent: (ExpensesListIntent) -> Unit
 ) {
+    val titleEdit =
+        if (state.isIndicatorsValue) R.string.expenses_screen_title_edit_animal else R.string.expenses_screen_title_edit
     EntryBottomSheet(
-        modifier = Modifier,
+        titleEntryRes = R.string.expenses_screen_title_entry,
+        titleEditRes = titleEdit,
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
-                ExpensesListIntent.OpenBottomSheetEntry(false)
+                ExpensesListIntent.OpenEntryBottomSheetByItem(
+                    value = false,
+                    isSaveStateForBottomSheet = state.isEntry
+                )
             )
+        },
+        onSecondDismissRequest = {
+            onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(false))
         },
         onInsertClick = { onIntent(ExpensesListIntent.Insert) },
         onUpdateClick = { onIntent(ExpensesListIntent.Update) }
     ) {
-        if (state.pickList.animalList2.isNotEmpty())
+        if (state.pickList.animalList2.isNotEmpty() && !state.isIndicatorsValue)
             GroupCard(
                 titleRes = R.string.expenses_screen_type_expenses,
                 iconOneRes = R.drawable.icon_sale,
@@ -148,12 +153,17 @@ fun ExpensesEntryBottomSheet(
             weightSuffix = state.weightSuffix,
             onWeightSuffixChance = { onIntent(ExpensesListIntent.WeightSuffixChanged(it)) },
             isError = state.error.isErrorCount,
-            isShowCheckbox = state.isFood && !state.isIndicatorsValue && state.isShowCheckbox,
+            isShowCheckbox = state.isFood && !state.isIndicatorsValue && state.isShowAutoWeightCheckbox,
             weightAll = state.weightAll,
             weightAllSuffix = state.weightAllSuffix,
             enabledWeightSuffix = !(state.weightSuffix == Suffix.KILOGRAM_TO_CUBIC_METERS ||
                     state.weightSuffix == Suffix.KILOGRAM_TO_LITERS)
         )
+        if (!state.isIndicatorsValue)
+            WarehouseCountCard(
+                title = state.title,
+                warehouseList = state.pickList.warehouseList
+            )
         OutlinedPriceInputNew(
             price = state.price,
             onPriceChange = {
@@ -171,36 +181,38 @@ fun ExpensesEntryBottomSheet(
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             count = state.count,
             countSuffix = state.countSuffix,
-            priceSuffix = Suffix.RUBLE,
+            priceSuffix = priceSuffix,
         )
-        /* if (state.isIndicatorsValue || !state.isFood)
-             OutlinedTextCategoryNew(
-                 value = state.category,
-                 onValueChange = {
-                     onIntent(ExpensesListIntent.CategoryChanged(it))
-                 },
-                 titleList = state.pickList.categoryList
-             )
-         if (!state.isIndicatorsValue)
-             OutlinedTextDateNew(
-                 value = state.date,
-                 onValueChange = {
-                     onIntent(ExpensesListIntent.DateClicked(it))
-                 },
-             )*/
-        if (state.isFood && (!state.isShowCheckbox || state.isAutoWeight))
+        if (!state.isIndicatorsValue && !state.isFood)
+            OutlinedTextCategoryNew(
+                value = state.category,
+                onValueChange = {
+                    onIntent(ExpensesListIntent.CategoryChanged(it))
+                },
+                titleList = state.pickList.categoryList
+            )
+        if (!state.isIndicatorsValue)
+            OutlinedTextDateNew(
+                value = state.date,
+                onValueChange = {
+                    onIntent(ExpensesListIntent.DateClicked(it))
+                },
+            )
+        if (!state.isIndicatorsValue && state.isFood && (!state.isShowAutoWeightCheckbox || state.isAutoWeight))
             AdditionalFunctionFood(
                 animalList = state.pickList.animalList2,
                 onAnimalClick = { onIntent(ExpensesListIntent.AnimalChipByIdFoodClicked(it)) },
-                countAnimal = state.countAnimalChip,
-                feedFood = "${state.feedFoodChip} ${stringResource(state.feedFoodChipSuffix.toResId())}",
-                day = "${state.daysFood.formatNumber()} дней",
-                dateEnd = state.dateEnd,
+                countAnimal = state.countAnimalFood,
+                feedFood = "${state.feedFood} ${stringResource(state.feedFoodSuffix.toResId())}",
+                day = "${state.daysFood.formatNumber()} ${stringResource(R.string.expenses_screen_days)}",
+                dateEnd = state.dateEndFood,
+                isEntry = state.isEntry
             )
-        if (!state.isFood && state.pickList.animalList2.isNotEmpty())
+        if (!state.isIndicatorsValue && !state.isFood && state.pickList.animalList2.isNotEmpty())
             AdditionalFunction(
                 animalList = state.pickList.animalList2,
                 isPercent = state.isPercent,
+                priceSuffix = priceSuffix,
                 onAnimalChipClicked = { onIntent(ExpensesListIntent.AnimalChipByIdClicked(it)) },
                 onPercentClicked = { onIntent(ExpensesListIntent.PercentClicked(it)) },
                 onEquallyClick = { onIntent(ExpensesListIntent.EquallyClicked) },
@@ -215,10 +227,10 @@ fun ExpensesEntryBottomSheet(
                 onValueChange = {
                     onIntent(
                         ExpensesListIntent.AnimalValueChanged(
-                            animal = it.first, newValue = it.second)
+                            animal = it.first, newValue = it.second
+                        )
                     )
-                },
-                price = (if (state.isAutoPrice) state.priceAll else state.price).toConvertZeroDouble()
+                }
             )
         OutlinedTextNoteNew(
             value = state.note,
@@ -236,6 +248,7 @@ fun ExpensesEntryBottomSheet(
 @Composable
 private fun AdditionalFunctionFood(
     animalList: List<AnimalExpensesUi>,
+    isEntry: Boolean,
     onAnimalClick: (Long) -> Unit,
     feedFood: String,
     day: String,
@@ -251,6 +264,7 @@ private fun AdditionalFunctionFood(
     )
     AnimalList(
         modifier = Modifier.padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
+        isEntry = isEntry,
         animalList = animalList,
         onAnimalClick = onAnimalClick
     )
@@ -271,13 +285,23 @@ private fun AdditionalFunctionFood(
 private fun AdditionalFunction(
     animalList: List<AnimalExpensesUi>,
     isPercent: Boolean,
-    price: Double,
+    priceSuffix: Suffix,
     onAnimalChipClicked: (Long) -> Unit,
     onPercentClicked: (Boolean) -> Unit,
     onEquallyClick: () -> Unit,
     onSliderChange: (Pair<Long, Double>) -> Unit,
     onValueChange: (Pair<Long, String>) -> Unit
 ) {
+    WarningCard(
+        colorBackground = blue_3,
+        colorBorder = blue_9,
+        colorIcon = blue_1,
+        colorTitle = black_2,
+        colorText = marengo,
+        icon = R.drawable.baseline_pets_24,
+        title = R.string.expenses_screen_cost_allocation_title,
+        text = R.string.expenses_screen_cost_allocation_text
+    )
     ChoiceAnimalCard(
         animalList = animalList,
         onAnimalChipClick = onAnimalChipClicked
@@ -290,13 +314,12 @@ private fun AdditionalFunction(
         )
         AnimalFinanceList(
             isPercent = isPercent,
+            priceSuffix = priceSuffix,
             animalList = animalList.filter { it.ps },
-            onSliderChange = onSliderChange,
             onValueChange = onValueChange,
-            price = price
+            onSliderChange = onSliderChange
         )
     }
-
 }
 
 
@@ -311,35 +334,59 @@ private fun ChoiceAnimalCard(
             style = text_16,
             color = dark
         )
-        FlowRow(modifier = Modifier.fillMaxWidth()) {
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             animalList.forEach { animal ->
+                val leadingIcon: @Composable (() -> Unit)? = if (animal.ps) {
+                    {
+                        Icon(
+                            painterResource(R.drawable.icon_check),
+                            contentDescription = null,
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                } else null
+
+                val borderColor = if (animal.ps) blue_4 else gray_8
+
                 FilterChip(
                     selected = animal.ps,
                     onClick = {
                         onAnimalChipClick(animal.id)
                     },
+                    shape = RoundedCornerShape(99.dp),
                     label = {
-                        Column(
-                            Modifier.padding(vertical = 5.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(5.dp)
                         ) {
                             Text(animal.name, style = text_14, color = marengo)
-                            Text(animal.name, style = text_12)
+                            TextMiniCard(
+                                value = animal.type,
+                                textColor = white,
+                                backgroundColor = blue_1
+                            )
                         }
                     },
-                    leadingIcon = {
-                        Icon(
-                            painterResource(if (animal.ps) R.drawable.icon_check else R.drawable.icon_add),
-                            contentDescription = null,
-                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                        )
-                    }
+                    leadingIcon = leadingIcon,
+                    colors = FilterChipDefaults.filterChipColors().copy(
+                        containerColor = ghostly_white,
+                        labelColor = dark,
+                        selectedContainerColor = blue_3,
+                        selectedLabelColor = blue_8,
+                        selectedLeadingIconColor = blue_8,
+                    ),
+                    border = BorderStroke(
+                        1.dp, color = borderColor
+                    )
                 )
             }
         }
     }
 }
-
 
 @Composable
 private fun ChoiceMode(
@@ -408,7 +455,7 @@ private fun ChoiceMode(
 @Composable
 private fun AnimalFinanceList(
     isPercent: Boolean,
-    price: Double,
+    priceSuffix: Suffix,
     animalList: List<AnimalExpensesUi>,
     onSliderChange: (Pair<Long, Double>) -> Unit,
     onValueChange: (Pair<Long, String>) -> Unit
@@ -417,146 +464,186 @@ private fun AnimalFinanceList(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         animalList.forEach { animal ->
-            if (isPercent)
-                AnimalFinanceCard2(
-                    id = animal.id,
-                    name = animal.name,
-                    price = animal.price,
-                    suffix = Suffix.RUBLE,
-                    percent = animal.presentException,
-                    onSliderChanged = onSliderChange
-                )
-            else
-                AnimalFinanceCard(
-                    name = animal.name,
-                    price = animal.price.formatNumber(),
-                    suffix = Suffix.RUBLE,
-                    percent = animal.presentException,
-                    onValueChange = { onValueChange(animal.id to it) }
-                )
+            AnimalFinanceCard(
+                isPercent = isPercent,
+                name = animal.name,
+                type = animal.type,
+                price = animal.price,
+                priceSuffix = priceSuffix,
+                percent = animal.presentException,
+                isError = animal.error.isErrorPrice,
+                onValueChange = { onValueChange(animal.id to it) },
+                onSliderChange = { onSliderChange(animal.id to it) }
+            )
         }
     }
 }
 
 @Composable
 private fun AnimalFinanceCard(
+    isPercent: Boolean,
     name: String,
+    type: String,
+    price: Double,
+    priceSuffix: Suffix,
+    percent: Double,
+    isError: Boolean,
+    onValueChange: (String) -> Unit,
+    onSliderChange: (Double) -> Unit
+) {
+    BorderCard(
+        padding = PaddingValues(18.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(name, style = text_16, color = black_2)
+                TextMiniCard(
+                    value = type,
+                    textColor = white,
+                    backgroundColor = violet_1
+                )
+            }
+            if (isPercent)
+                SliderFunction(
+                    price = price,
+                    priceSuffix = priceSuffix,
+                    percent = percent,
+                    onSliderChanged = onSliderChange
+                )
+            else
+                ValueFunction(
+                    price = price.formatNumber(),
+                    suffix = Suffix.RUBLE,
+                    percent = percent,
+                    isError = isError,
+                    onValueChange = onValueChange
+                )
+        }
+    }
+}
+
+
+@Composable
+private fun ValueFunction(
     price: String,
     suffix: Suffix,
     percent: Double,
-    onValueChange: (String) -> Unit
+    isError: Boolean,
+    onValueChange: (String) -> Unit,
 ) {
-    BorderCard(
-        padding = PaddingValues(18.dp)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(name, style = text_16, color = black_2)
-            OutlinedNumberNew(
-                value = price,
-                onValueChange = onValueChange,
-                suffix = suffix,
-                intRes = R.string.expenses_screen_sum,
-                isBorderCard = false
-            )
-            BorderCard(
-                containerColor = blue_3,
-                borderColor = blue_9,
-                padding = PaddingValues(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        stringResource(R.string.expenses_screen_percent),
-                        style = text_14,
-                        color = blue_8
-                    )
-                    Text("${percent.formatNumber()}%", style = text_16, color = blue_14)
-                }
-            }
-        }
-    }
+    OutlinedNumberNew(
+        value = price,
+        onValueChange = onValueChange,
+        suffix = suffix,
+        intRes = R.string.expenses_screen_sum,
+        isError = isError,
+        isBorderCard = false
+    )
+    SupportFinanceCard(
+        titleRes = R.string.expenses_screen_percent,
+        textColor = blue_8,
+        value = "${percent.formatNumber()}%",
+        valueColor = blue_14,
+        containerColor = blue_3,
+        borderColor = blue_9
+    )
 }
 
 @Composable
-private fun AnimalFinanceCard2(
-    id: Long,
-    name: String,
+private fun SliderFunction(
     price: Double,
-    suffix: Suffix,
+    priceSuffix: Suffix,
     percent: Double,
-    onSliderChanged: (Pair<Long, Double>) -> Unit
+    onSliderChanged: (Double) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            stringResource(R.string.expenses_screen_percent),
+            style = text_14,
+            color = marengo
+        )
+        Text("${percent.formatNumber()}%", color = blue_1, style = text_18)
+    }
+    Slider(
+        value = percent.toFloat(),
+        onValueChange = { newValue ->
+            onSliderChanged(newValue.toDouble())
+        },
+        colors = SliderDefaults.colors(
+            thumbColor = blue_4,
+            activeTrackColor = blue_4,
+            activeTickColor = blue_4,
+            inactiveTrackColor = blue_9,
+            inactiveTickColor = blue_9
+        ),
+        valueRange = 0f..100f,
+        steps = 99,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    )
+    SupportFinanceCard(
+        titleRes = R.string.expenses_screen_sum,
+        textColor = green_9,
+        value = "${price.formatNumber()} ${stringResource(priceSuffix.toResId())}",
+        valueColor = green_13,
+        containerColor = price_green_2,
+        borderColor = green_11
+    )
+}
+
+@Composable
+private fun SupportFinanceCard(
+    @StringRes titleRes: Int,
+    textColor: Color,
+    value: String,
+    valueColor: Color,
+    containerColor: Color,
+    borderColor: Color
 ) {
     BorderCard(
-        padding = PaddingValues(18.dp)
+        containerColor = containerColor,
+        borderColor = borderColor,
+        padding = PaddingValues(12.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(name, style = text_16, color = black_2)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    stringResource(R.string.expenses_screen_percent),
-                    style = text_14,
-                    color = marengo
-                )
-                Text("${percent.formatNumber()}%", color = blue_1, style = text_18)
-            }
-            Slider(
-                value = percent.toFloat(),
-                onValueChange = { newValue ->
-                    onSliderChanged(
-                        id to newValue.toDouble()
-                    )
-                },
-                valueRange = 0f..100f,
-                steps = 99,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 5.dp, vertical = 2.5.dp)
+            Text(
+                stringResource(titleRes),
+                style = text_14,
+                color = textColor
             )
-            BorderCard(
-                containerColor = price_green_2,
-                borderColor = green_11,
-                padding = PaddingValues(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        stringResource(R.string.expenses_screen_sum),
-                        style = text_14,
-                        color = green_9
-                    )
-                    Text(
-                        "${price.formatNumber()} ${stringResource(suffix.toResId())}",
-                        style = text_16,
-                        color = green_13
-                    )
-                }
-            }
+            Text(
+                value,
+                style = text_16,
+                color = valueColor
+            )
         }
     }
 }
-
 
 @Composable
 private fun AnimalList(
     modifier: Modifier,
+    isEntry: Boolean,
     animalList: List<AnimalExpensesUi>,
     onAnimalClick: (Long) -> Unit
 ) {
-    var isShowAnimalList by rememberSaveable { mutableStateOf(false) }
+    var isShowAnimalList by rememberSaveable { mutableStateOf(!isEntry) }
     val icon =
         if (isShowAnimalList) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down
     BorderCard(
@@ -577,7 +664,6 @@ private fun AnimalList(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(
@@ -608,11 +694,10 @@ private fun AnimalList(
                     animalList.forEach { animal ->
                         AnimalCard(
                             name = animal.name,
-                            type = animal.name,
+                            type = animal.type,
                             feedFood = animal.foodDay,
                             feedFoodSuffix = animal.foodDaySuffix,
                             countAnimal = animal.countAnimal,
-                            totalFeedFood = "22",
                             isChoice = animal.ps
                         ) {
                             onAnimalClick(animal.id)
@@ -723,11 +808,10 @@ private fun AnimalCard(
     feedFood: Double,
     feedFoodSuffix: Suffix,
     countAnimal: Int,
-    totalFeedFood: String,
     onClick: () -> Unit
 ) {
     val suffix = stringResource(feedFoodSuffix.toResId())
-
+    val totalFeedFood = (feedFood * countAnimal).formatNumber()
     BorderCard(
         modifier = Modifier.fillMaxWidth(),
         containerColor = white.copy(alpha = 0.5f),
@@ -738,12 +822,17 @@ private fun AnimalCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Checkbox(checked = isChoice, onCheckedChange = { onClick() })
-            Icon(
-                painter = painterResource(R.drawable.baseline_pets_24),
-                contentDescription = null,
-                modifier = Modifier.size(32.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CustomCheckbox(checked = isChoice, onCheckedChange = { onClick() })
+                Icon(
+                    painter = painterResource(R.drawable.baseline_pets_24),
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(name, style = text_16, color = black_2)
                 Text(type, style = text_14, color = marengo)
@@ -806,6 +895,7 @@ private fun AdditionalSettings2(
     }
 }
 */
+/*
 
 // КОРМ
 @Composable
@@ -1141,17 +1231,17 @@ fun TextFoodExpenses(
             text = stringResource(
                 R.string.expenses_entry_screen_every_day
             ).format(
-                state.feedFoodChip.toFormatNumber(),
-                state.feedFoodChipSuffix,
+                state.feedFood.toFormatNumber(),
+                state.feedFoodSuffix,
             )
         )
         Text(
             text = stringResource(
                 R.string.expenses_entry_screen_animal_count
             ).format(
-                state.countAnimalChip.toFormatNumber(),
+                state.countAnimalFood.toFormatNumber(),
                 stringResource(R.string.suffix_pieces)
             )
         )
     }
-}
+}*/

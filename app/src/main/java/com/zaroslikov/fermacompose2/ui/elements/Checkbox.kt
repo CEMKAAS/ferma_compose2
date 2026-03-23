@@ -18,10 +18,13 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TooltipDefaults.rememberTooltipPositionProvider
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -32,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -40,6 +44,25 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.WeightOutlinedTextFiel
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import kotlinx.coroutines.launch
 
+
+@Composable
+fun CustomCheckbox(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
+    size: Dp = 24.dp
+) {
+    Checkbox(
+        modifier = Modifier.size(size),
+        checked = checked,
+        onCheckedChange = { onCheckedChange(it) },
+        enabled = enabled,
+        colors = CheckboxDefaults.colors().copy(
+            checkedBoxColor = Color(0xFF030213),
+            checkedBorderColor = Color(0xFF030213)
+        )
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,15 +92,10 @@ fun CheckboxTextIcon(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Checkbox(
-                modifier = Modifier.size(24.dp),
+            CustomCheckbox(
                 checked = checked,
-                onCheckedChange = { onCheckedChange(it) },
-                enabled = enabled,
-                colors = CheckboxDefaults.colors().copy(
-                    checkedBoxColor = Color(0xFF030213),
-                    checkedBorderColor = Color(0xFF030213)
-                )
+                onCheckedChange = onCheckedChange,
+                enabled = enabled
             )
             Text(
                 text = stringResource(id = intTitle),
@@ -95,9 +113,9 @@ fun CheckboxTextIcon(
 
         if (isTooltipShow)
             TooltipBox(
-                positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                positionProvider = rememberTooltipPositionProvider(positioning = TooltipAnchorPosition.Above),
                 tooltip = {
-                    RichTooltip {
+                    PlainTooltip {
                         Text(
                             text = stringResource(intTooltip),
                             style = text_14

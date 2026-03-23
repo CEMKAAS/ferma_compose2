@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -99,7 +98,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.CircleShape
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.finance.TransactionFinanceCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.formatNumber
@@ -345,7 +344,7 @@ private fun CategorySlider(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Slider(
+            BaseSlider(
                 modifier = Modifier.weight(1f),
                 percentFloat = percentFloat,
                 color = color
@@ -367,10 +366,9 @@ fun WarningCard(
     colorBackground: Color,
     colorBorder: Color,
     colorIcon: Color,
-    colorIconBackground: Color,
+    colorIconBackground: Color? = null,
     colorTitle: Color,
     colorText: Color,
-    isShowIconBackground: Boolean = true,
     @DrawableRes icon: Int,
     @StringRes title: Int,
     @StringRes text: Int
@@ -392,7 +390,7 @@ fun WarningCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.Top
         ) {
-            if (isShowIconBackground)
+            if (colorIconBackground != null)
                 IconTransaction2(
                     icon = icon,
                     color = colorIconBackground,
@@ -405,18 +403,18 @@ fun WarningCard(
                 tint = colorIcon,
                 modifier = Modifier.size((20).dp)
             )
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(stringResource(title), style = text_14, color = colorTitle)
-                    Text(
-                        stringResource(text),
-                        style = text_12,
-                        color = colorText,
-                        textAlign = TextAlign.Justify
-                    )
-                }
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(stringResource(title), style = text_14, color = colorTitle)
+                Text(
+                    stringResource(text),
+                    style = text_12,
+                    color = colorText,
+                    textAlign = TextAlign.Justify
+                )
+            }
         }
     }
 }

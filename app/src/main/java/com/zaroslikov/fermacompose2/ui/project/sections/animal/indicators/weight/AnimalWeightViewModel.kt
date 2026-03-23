@@ -1,20 +1,16 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.domain.repository.AnimalWeightRepository
-import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
-import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber2
 import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -25,149 +21,106 @@ import kotlin.math.absoluteValue
 class AnimalWeightViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val animalWeightRepository: AnimalWeightRepository,
-    private val resourceProvider: ResourceProvider
-) : EntryViewModel<AnimalWeightState, AnimalWeightIntent>(AnimalWeightState()) {
+) : EntryNewViewModel2<AnimalWeightState, AnimalWeightIntent, AnimalWeightReduce>(
+    AnimalWeightState(),
+    AnimalWeightReduce()
+) {
     private val itemId: Long = checkNotNull(savedStateHandle[AnimalWeightDestination.itemId])
     private val itemIdPT: Long = checkNotNull(savedStateHandle[AnimalWeightDestination.itemIdPT])
 
     init {
-        viewModelScope.launch {
-            loadData()
-        }
+        loadData()
     }
 
     override fun onIntent(intent: AnimalWeightIntent) {
+        sendIntent(intent)
         return when (intent) {
-            is AnimalWeightIntent.OpenDialogClicked -> updateOpenDialog(
+            is AnimalWeightIntent.OpenDialogClicked -> loadDataForEntryOrEdit(
                 intent.isEntry,
-                intent.domainAnimalWeight
+                intent.animalWeightUi,
+                intent.isSaveStateForBottomSheet
             )
 
-            AnimalWeightIntent.EndDialogClicked -> updateEndDialog()
-            is AnimalWeightIntent.WeightChanged -> updateWeight(intent.value)
-            is AnimalWeightIntent.DateClicked -> updateDate(intent.value)
-            is AnimalWeightIntent.NoteChanged -> updateNote(intent.value)
-            is AnimalWeightIntent.SuffixClicked -> updateSuffix(intent.value)
             AnimalWeightIntent.InsertPressed -> insert()
             AnimalWeightIntent.UpdatePressed -> update()
-            AnimalWeightIntent.DeletePressed -> delete()
+            is AnimalWeightIntent.DeletePressed -> delete(intent.value)
+            else -> Unit
         }
     }
 
-    suspend fun loadData() {
-        updateState { it.copy(isLoading = true) }
-        animalWeightRepository.getWeightAnimal(itemId).collectLatest { weightList ->
-            updateState {
-                it.copy(
-                    idPT = itemIdPT,
-                    weightList = weightList,
-                    isLoading = false
-                )
+    private fun loadData() {
+        viewModelScope.launch {
+            animalWeightRepository.getWeightAnimal(itemId).collectLatest { weightList ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        weightList = settingsList(weightList),
+                        isLoading = false
+                    )
+                }
             }
         }
     }
+
+    private fun loadDataForEntryOrEdit(
+        isOpen: Boolean,
+        domain: AnimalWeightUi?,
+        isSaveStateForBottomSheet: Boolean = false
+    ) {
+        viewModelScope.launch {
+            if (!isOpen) {
+                val state =
+                    if (isSaveStateForBottomSheet) getState().currentProduct
+                    else CurrentAnimalWeight()
+                onIntent(
+                    AnimalWeightIntent.RefreshEntryBottomSheetState(
+                        false, state, isSaveStateForBottomSheet
+                    )
+                )
+                return@launch
+            }
+            val newState = if (!getState().isSaveStateForEntry || domain != null) {
+                val baseState = CurrentAnimalWeight(
+                    idAnimal = itemId
+                )
+                domain?.toCurrentAnimalWeight() ?: baseState
+            } else getState().currentProduct
+            sendIntent(
+                AnimalWeightIntent.RefreshEntryBottomSheetState(
+                    true, newState
+                )
+            )
+        }
+    }
+
 
     override fun insert() {
         viewModelScope.launch {
-            if (!isError()) {
-                Log.i("Size", "insert: ${getState().domainAnimalWeight.copy(idAnimal = itemId)}")
-                animalWeightRepository.insertAnimalWeightTable(
-                    getState().domainAnimalWeight.copy(
-                        idAnimal = itemId
-                    )
-                )
-                updateEndDialog()
-                showMessage("Добавлен размер")
-            }
+            animalWeightRepository.insertAnimalWeightTable(
+                getState().currentProduct.toDomain()
+            )
+            loadDataForEntryOrEdit(false, null)
+            showMessage("Добавлен размер")
         }
     }
+
 
     override fun update() {
         viewModelScope.launch {
-            if (!isError()) {
-                animalWeightRepository.updateAnimalWeightTable(getState().domainAnimalWeight)
-                updateEndDialog()
-                showMessage("Редактировать размер")
-            }
+            animalWeightRepository.updateAnimalWeightTable(
+                getState().currentProduct.toDomain()
+            )
+            loadDataForEntryOrEdit(false, null)
+            showMessage("Редактировать размер")
         }
     }
 
-    override fun delete() {
+
+    override fun delete(id: Long) {
         viewModelScope.launch {
-            animalWeightRepository.deleteAnimalWeightTable(getState().domainAnimalWeight)
-            updateEndDialog()
+            animalWeightRepository.deleteAnimalWeightTableById(id)
+            loadDataForEntryOrEdit(false, null)
             showMessage("Удалить размер")
-        }
-    }
-
-    override fun validation() {
-        updateState { state ->
-            state.copy(
-                error = state.error.copy(
-                    isErrorWeight = state.domainAnimalWeight.weight.isBlank()
-                )
-            )
-        }
-    }
-
-    private fun updateOpenDialog(
-        isEntry: Boolean,
-        domainAnimalWeight: DomainAnimalWeight
-    ) {
-        updateState {
-            it.copy(
-                isOpenDialog = true,
-                isEntry = isEntry,
-                domainAnimalWeight = domainAnimalWeight
-            )
-        }
-    }
-
-    private fun updateEndDialog() {
-        updateState {
-            it.copy(
-                isOpenDialog = false
-            )
-        }
-    }
-
-    private fun updateSuffix(suffix: Suffix) {
-        updateState {
-            it.copy(
-                domainAnimalWeight = it.domainAnimalWeight.copy(
-                    suffix = suffix
-                )
-            )
-        }
-    }
-
-    private fun updateWeight(size: String) {
-        updateState {
-            it.copy(
-                domainAnimalWeight = it.domainAnimalWeight.copy(
-                    weight = size
-                )
-            )
-        }
-    }
-
-    private fun updateDate(date: String) {
-        updateState {
-            it.copy(
-                domainAnimalWeight = it.domainAnimalWeight.copy(
-                    date = date
-                )
-            )
-        }
-    }
-
-    private fun updateNote(note: String) {
-        updateState {
-            it.copy(
-                domainAnimalWeight = it.domainAnimalWeight.copy(
-                    note = note
-                )
-            )
         }
     }
 
@@ -199,20 +152,79 @@ class AnimalWeightViewModel @Inject constructor(
             return totalValue to status
         }
     }
-}
 
-sealed class AnimalWeightIntent : BaseIntent {
-    data class OpenDialogClicked(
-        val isEntry: Boolean,
-        val domainAnimalWeight: DomainAnimalWeight = DomainAnimalWeight(date = dateToday())
-    ) : AnimalWeightIntent()
+    private fun settingsList(list: List<DomainAnimalWeight>): List<AnimalWeightUi> {
+        return list.mapIndexed { index, domain ->
+            val previousDomain =
+                if (index < list.size - 1) list[index + 1] else null
 
-    data object EndDialogClicked : AnimalWeightIntent()
-    data class WeightChanged(val value: String) : AnimalWeightIntent()
-    data class SuffixClicked(val value: Suffix) : AnimalWeightIntent()
-    data class DateClicked(val value: String) : AnimalWeightIntent()
-    data class NoteChanged(val value: String) : AnimalWeightIntent()
-    data object InsertPressed : AnimalWeightIntent()
-    data object UpdatePressed : AnimalWeightIntent()
-    data object DeletePressed : AnimalWeightIntent()
+            val (totalValue, indicationStatus) = if (previousDomain == null)
+                domain.weight.toFormatNumber2() to IndicationStatus.POSITIVE
+            else {
+                val size = domain.weight.toConvertZeroDouble()
+                val previousSize = previousDomain.weight.toConvertZeroDouble()
+
+                val suffix = domain.suffix
+                val suffixPrevious = previousDomain.suffix
+
+                val sizeConverted = size.convertWeight(suffix, to = Suffix.GRAM)
+                val previousCountConverted =
+                    previousSize.convertWeight(suffixPrevious, to = Suffix.GRAM)
+
+                val totalValue = (sizeConverted - previousCountConverted).convertWeight(
+                    Suffix.GRAM,
+                    suffix
+                ).absoluteValue.formatNumber()
+                val status = when {
+                    sizeConverted > previousCountConverted -> IndicationStatus.POSITIVE
+                    sizeConverted == previousCountConverted -> IndicationStatus.NEUTRAL
+                    else -> IndicationStatus.NEGATIVE
+                }
+                totalValue to status
+            }
+            domain.toAnimalWeightUi(
+                totalValue = totalValue,
+                indicationStatus = indicationStatus
+            )
+        }
+    }
+
+    private fun AnimalWeightUi.toCurrentAnimalWeight(): CurrentAnimalWeight {
+        return CurrentAnimalWeight(
+            id = id,
+            weight = weight,
+            suffix = suffix,
+            date = date,
+            idAnimal = idAnimal,
+            note = note,
+            isEntry = false
+        )
+    }
+
+    private fun CurrentAnimalWeight.toDomain(): DomainAnimalWeight {
+        return DomainAnimalWeight(
+            id = id,
+            weight = weight,
+            suffix = suffix,
+            date = date,
+            idAnimal = idAnimal,
+            note = note
+        )
+    }
+
+    private fun DomainAnimalWeight.toAnimalWeightUi(
+        totalValue: String,
+        indicationStatus: IndicationStatus
+    ): AnimalWeightUi {
+        return AnimalWeightUi(
+            id = id,
+            weight = weight,
+            suffix = suffix,
+            date = date,
+            idAnimal = idAnimal,
+            note = note,
+            totalValue = totalValue,
+            indicationStatus = indicationStatus
+        )
+    }
 }

@@ -13,19 +13,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-abstract class EntryNewViewModel2<STATE : EntryNewState, INTENT : BaseIntent, S: BaseReducer<STATE, INTENT> >(
-    initialState: STATE
-) : BaseViewModel<STATE, INTENT>(initialState) {
+abstract class EntryNewViewModel2<STATE : EntryNewState, INTENT : BaseIntent, REDUCER: BaseReducer<STATE, INTENT> >(
+    initialState: STATE, private val reducer: REDUCER
+) : BaseViewModel<STATE, INTENT>(initialState, ) {
 
     protected abstract fun insert()
     protected abstract fun update()
     protected abstract fun delete(id: Long)
     abstract fun onIntent(intent: INTENT)
 
-
-    protected abstract fun validation()
-    protected fun isError(): Boolean {
-        validation()
-        return state.value.currentProduct.hasAnyError
+    protected fun sendIntent(intent: INTENT) {
+        _state.value = reducer.reducer(_state.value, intent)
     }
 }

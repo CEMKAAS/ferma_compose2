@@ -21,7 +21,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomShe
 @Composable
 fun BottomSheetExpensesAnimal(
     state: CountItem,
-    countAllAnimal: String,
+    countAllAnimal: String?,
     countSuffix: Suffix,
     onIntent: (AnimalCountIntent) -> Unit
 ) {
@@ -32,12 +32,23 @@ fun BottomSheetExpensesAnimal(
         focusRequester.requestFocus()
     }
     EntryIndicationBottomSheet(
-        icon = state.version.toDrawRes(),
+        iconRes = state.version.toDrawRes(),
         titleRes = state.version.toResId(),
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = state.version.toColorList(),
-        onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
+        onDismissRequest = {
+            onIntent(
+                AnimalCountIntent.DialogClicked(
+                    false,
+                    isSaveStateForBottomSheet = true,
+                    version = state.version
+                )
+            )
+        },
+        onSecondDismissRequest = {
+            onIntent(AnimalCountIntent.DialogClicked(false))
+        },
         onInsertClick = { onIntent(AnimalCountIntent.InsertExpensesPressed) },
         onUpdateClick = { onIntent(AnimalCountIntent.UpdateExpensesPressed) }
     ) {
@@ -47,7 +58,7 @@ fun BottomSheetExpensesAnimal(
                 onIntent(AnimalCountIntent.CountChanged(it))
             },
             isError = state.error.isErrorCount,
-            /*            isErrorCountZero = state.error.isErrorCountZero,*/
+            isErrorCountZero = state.error.isErrorCountZero,
             suffix = countSuffix,
             countAnimal = countAllAnimal,
         )

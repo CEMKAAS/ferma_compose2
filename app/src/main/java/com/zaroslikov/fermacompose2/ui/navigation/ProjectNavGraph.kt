@@ -19,8 +19,6 @@ import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceCategoryS
 import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceIncomeExpensesDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.SectionWorkspaceScreen
-import com.zaroslikov.fermacompose2.ui.project.sections.add.entry.AddEntryDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.add.entry.AddEntryProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalEditDestination
@@ -35,15 +33,9 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.AnimalWeightScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalScreen
-import com.zaroslikov.fermacompose2.ui.project.sections.expenses.entry.ExpensesEntryDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.expenses.entry.ExpensesEntryProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteScreen
-import com.zaroslikov.fermacompose2.ui.project.sections.sale.entry.SaleEntryDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.sale.entry.SaleEntryProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.entry.WriteOffEntryDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.entry.WriteOffEntryProduct
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
@@ -299,19 +291,6 @@ fun ProjectNavHost(
                  },
              )*/
         }
-        composable(
-            route = AddEntryDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(AddEntryDestination.itemIdPT) {
-                    type = NavType.IntType
-                },
-                navArgument(AddEntryDestination.itemId) {
-                    type = NavType.IntType
-                    defaultValue = -1
-                })
-        ) {
-            AddEntryProduct(navigateBack = { navController.popBackStack() })
-        }
 
         //Sale
         composable(
@@ -340,21 +319,6 @@ fun ProjectNavHost(
                     )
                 )
             })*/
-        }
-        composable(
-            route = SaleEntryDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(SaleEntryDestination.itemIdPT) {
-                    type = NavType.IntType
-                },
-                navArgument(SaleEntryDestination.itemId) {
-                    type = NavType.IntType
-                    defaultValue = -1
-                })
-        ) {
-            SaleEntryProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
         }
 
         //Expenses
@@ -389,21 +353,6 @@ fun ProjectNavHost(
             )
         }*/
 
-        composable(
-            route = ExpensesEntryDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(ExpensesEntryDestination.itemIdPT) {
-                    type = NavType.IntType
-                },
-                navArgument(ExpensesEntryDestination.itemId) {
-                    type = NavType.IntType
-                    defaultValue = -1
-                })
-        ) {
-            ExpensesEntryProduct(
-                navigateBack = { navController.popBackStack() })
-        }
-
 
         //WriteOff
         /*composable(
@@ -436,21 +385,6 @@ fun ProjectNavHost(
                 )
             })
         }*/
-        composable(
-            route = WriteOffEntryDestination.routeWithArgs,
-            arguments = listOf(
-                navArgument(WriteOffEntryDestination.itemIdPT) {
-                    type = NavType.IntType
-                },
-                navArgument(WriteOffEntryDestination.itemId) {
-                    type = NavType.IntType
-                    defaultValue = -1
-                })
-        ) {
-            WriteOffEntryProduct(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() })
-        }
 
         //Note
         composable(

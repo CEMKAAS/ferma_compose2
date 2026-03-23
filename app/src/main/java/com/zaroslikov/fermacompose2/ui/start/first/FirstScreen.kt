@@ -197,10 +197,6 @@ private fun StartScreenContainer2(
         itemList = itemList,
         searchList = itemList,
         brieflyList = brieflyList,
-        onInsertClick = {},
-        onEditClick = { },
-        onDeleteClick = {},
-        onDetailsClick = {},
         detailCard = { index, item ->
             ProjectCard(
                 projectTable = item,

@@ -15,11 +15,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.list.suffixWeightList
-import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
+import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_4
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
@@ -66,11 +66,7 @@ fun AnimalWeightScreen(
         },
         floatingActionButton = {
             NeonGlowFab(colors = colors) {
-                viewModel.onIntent(
-                    AnimalWeightIntent.OpenDialogClicked(
-                        isEntry = true
-                    )
-                )
+                viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(true))
             }
         }
     ) { innerPadding ->
@@ -84,18 +80,20 @@ fun AnimalWeightScreen(
                 icon = icon,
                 colors = colors,
                 itemList = state.weightList,
-                onDetailClick = { viewModel.positeive(it.first, it.second) },
-                onInsertClick = { viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(isEntry = true)) },
-                onEditClick = {
-                    viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(isEntry = false, it))
+                onInsertClick = {
+                    viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(true))
                 },
-                onDeleteClick = { viewModel.onIntent(AnimalWeightIntent.DeletePressed) },
+                onEditClick = {
+                    viewModel.onIntent(
+                        AnimalWeightIntent.OpenDialogClicked(true, it)
+                    )
+                },
+                onDeleteClick = { viewModel.onIntent(AnimalWeightIntent.DeletePressed(it)) },
                 titleRes = title
             )
-
-        if (state.isOpenDialog)
+        if (state.isOpenEntryBottomSheet)
             WeightBottomSheet(
-                state = state,
+                state = state.currentProduct,
                 onIntent = viewModel::onIntent,
                 colors = colors,
                 icon = icon,
@@ -110,39 +108,41 @@ private fun AnimalWeightContainer2(
     @DrawableRes icon: Int,
     @StringRes titleRes: Int,
     colors: List<Color>,
-    itemList: List<DomainAnimalWeight>,
-    onDetailClick: (Pair<DomainAnimalWeight, DomainAnimalWeight?>) -> Pair<String, IndicationStatus>,
+    itemList: List<AnimalWeightUi>,
     onInsertClick: () -> Unit,
-    onEditClick: (DomainAnimalWeight) -> Unit,
+    onEditClick: (AnimalWeightUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
 ) {
     InventoryAnimalBody(
         modifier = modifier,
         itemList = itemList,
-        onInsertClick = onInsertClick,
+        titleRes2 = titleRes,
         titleRes = R.string.message_no_date_title_weight,
         messageRes = R.string.message_no_date_message_weight,
-        supportRes = R.string.message_no_date_support_weight,
-        buttonRes = R.string.button_sale_message_no_weight,
-        titleRes2 = titleRes
-    ) { item, previous ->
-        AnimalIndicatorsCardNew(
-            icon = icon,
-            colors = colors,
-            value = item.weight.toFormatNumber(),
-            suffix = item.suffix,
-            date = item.date,
-            note = item.note,
-            onEditClick = { onEditClick(item) },
-            onDeleteClick = { onDeleteClick(item.id) },
-            onDetailClick = { onDetailClick((item to previous)) },
-        )
-    }
+        iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
+        iconColor =  blue_1,
+        backgroundColor = blue_3,
+        detailCard = { item ->
+            AnimalIndicatorsCardNew(
+                icon = icon,
+                colors = colors,
+                value = item.weight.toFormatNumber(),
+                suffix = item.suffix,
+                date = item.date,
+                note = item.note,
+                totalValues = item.totalValue,
+                indicationStatus = item.indicationStatus,
+                onEditClick = { onEditClick(item) },
+                onDeleteClick = { onDeleteClick(item.id) },
+            )
+        },
+
+    )
 }
 
 @Composable
 private fun WeightBottomSheet(
-    state: AnimalWeightState,
+    state: CurrentAnimalWeight,
     colors: List<Color>,
     @DrawableRes icon: Int,
     @StringRes titleRes: Int,
@@ -150,22 +150,30 @@ private fun WeightBottomSheet(
 ) {
     EntryIndicationBottomSheet(
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = colors,
         onDismissRequest = {
-            onIntent(AnimalWeightIntent.EndDialogClicked)
+            onIntent(
+                AnimalWeightIntent.OpenDialogClicked(
+                    false,
+                    isSaveStateForBottomSheet = state.isEntry
+                )
+            )
+        },
+        onSecondDismissRequest = {
+            onIntent(AnimalWeightIntent.OpenDialogClicked(false))
         },
         onInsertClick = { onIntent(AnimalWeightIntent.InsertPressed) },
         onUpdateClick = { onIntent(AnimalWeightIntent.UpdatePressed) },
-        icon = icon,
+        iconRes = icon,
         titleRes = titleRes
     ) {
         OutlinedTextCountNew(
-            value = state.domainAnimalWeight.weight,
+            value = state.weight,
             onValueChange = {
                 onIntent(AnimalWeightIntent.WeightChanged(it))
             },
-            suffix = state.domainAnimalWeight.suffix,
+            suffix = state.suffix,
             onSuffixChange = {
                 onIntent(AnimalWeightIntent.SuffixClicked(it))
             },
@@ -178,11 +186,11 @@ private fun WeightBottomSheet(
             suffixList = suffixWeightList
         )
         OutlinedTextDateNew(
-            value = state.domainAnimalWeight.date,
+            value = state.date,
             onValueChange = { onIntent(AnimalWeightIntent.DateClicked(it)) },
         )
         OutlinedTextNoteNew(
-            value = state.domainAnimalWeight.note,
+            value = state.note,
             onValueChange = { onIntent(AnimalWeightIntent.NoteChanged(it)) },
         )
     }

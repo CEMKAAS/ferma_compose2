@@ -1,112 +1,142 @@
-/*
-package com.zaroslikov.fermacompose2.ui.animal.indicators.vaccination
+package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vaccination
 
-import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
+import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
+
 
 class AnimalVaccinationReduce : BaseReducer<AnimalVaccinationState, AnimalVaccinationIntent>() {
-    override fun reduce(
+    override fun reducer(
         state: AnimalVaccinationState,
         intent: AnimalVaccinationIntent
     ): AnimalVaccinationState {
-        fun updatePriceAll() : AnimalVaccinationState {
-           return state.copy(
-                currentProduct = state.currentProduct.copy(
-                    priceAll = if (state.currentProduct.isAutoCalculate)
-                        (state.currentProduct.price.toConvertZeroDouble() * state.currentProduct.countVaccination.toConvertZeroDouble()).formatNumber()
-                    else "0"
-                )
-            )
-        }
-
-        fun updateOpenDialog(
-            isEntry: Boolean,
-            domainAnimal: AnimalVaccinationExpensesDomain?
-        ) {
-            viewModelScope.launch {
-                    state.copy(
-                        isOpenDialog = true,
-                        currentProduct = Vaccination(idAnimal = itemId, isEntry = isEntry)
-                    )
-                domainAnimal?.let {
-                    val expensesVaccination =
-                        expensesRepository.getItemExpensesForVaccination(domainAnimal.id).firstOrNull()
-
-
-                        state.copy(
-                            currentProduct = state.currentProduct.toUiMap22(
-                                domainAnimal,
-                                expensesVaccination?.id
-                            )
-                        )
-                    }
-                }
-            }
-
-
         return when (intent) {
-            is AnimalVaccinationIntent.OpenDialogClicked -> updateOpenDialog(
-                intent.isEntry,
-                intent.domainAnimalVaccination
-            )
+            is AnimalVaccinationIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
+                intent.isOpen, intent.state, intent.isSaveStateForBottomSheet
+            ).updateValid()
 
-            AnimalVaccinationIntent.EndDialogClicked -> state.copy(
-                isOpenDialog = false, currentProduct = Vaccination()
-            )
+            is AnimalVaccinationIntent.VaccinationChanged ->
+                state.updateVaccination(intent.value).updateValid()
 
-            is AnimalVaccinationIntent.CountChanged -> {
-                state.copy(
-                    currentProduct = state.currentProduct.copy(countVaccination = intent.value)
-                )
-                updatePriceAll()
-            }
+            is AnimalVaccinationIntent.CountChanged ->
+                state.updateCount(intent.value).updatePriceAll().updateValid()
 
-            is AnimalVaccinationIntent.PriceChanged -> {
-                state.copy(
-                    currentProduct = state.currentProduct.copy(
-                        price = intent.value
-                    )
-                )
-                updatePriceAll()
-            }
+            is AnimalVaccinationIntent.PriceChanged ->
+                state.updatePrice(intent.value).updatePriceAll()
 
-            is AnimalVaccinationIntent.AutoPriceClicked -> {
-                state.copy(
-                    currentProduct = state.currentProduct.copy(
-                        isAutoCalculate = intent.value
-                    )
-                )
-                updatePriceAll()
-            }
+            is AnimalVaccinationIntent.AutoPriceClicked ->
+                state.updateAutoPrice(intent.value).updatePriceAll()
 
-            is AnimalVaccinationIntent.VaccinationChanged -> state.copy(
-                currentProduct = state.currentProduct.copy(vaccination = intent.value)
-            )
-
-            is AnimalVaccinationIntent.DateClicked -> state.copy(
-                currentProduct = state.currentProduct.copy(date = intent.value)
-            )
-
-            is AnimalVaccinationIntent.DateNextClicked -> state.copy(
-                currentProduct = state.currentProduct.copy(nextDate = intent.value)
-            )
-
-            is AnimalVaccinationIntent.NoteChanged -> state.copy(
-                currentProduct = state.currentProduct.copy(note = intent.value)
-            )
-
-            AnimalVaccinationIntent.InsertPressed -> insert()
-            AnimalVaccinationIntent.UpdatePressed -> update()
-            is AnimalVaccinationIntent.DeletePressed -> delete(intent.value)
-            is AnimalVaccinationIntent.DateFactoryClicked -> state.copy(
-                currentProduct = state.currentProduct.copy(isDateFactory = intent.value)
-            )
-
-        } as AnimalVaccinationState
+            is AnimalVaccinationIntent.DateClicked -> state.updateDate(intent.value)
+            is AnimalVaccinationIntent.DateNextClicked -> state.updateDateNext(intent.value)
+            is AnimalVaccinationIntent.NoteChanged -> state.updateNote(intent.value)
+            is AnimalVaccinationIntent.DateFactoryClicked -> state.updateIsDateFactory(intent.value)
+            else -> state
+        }
     }
-}*/
+
+    private fun AnimalVaccinationState.updateValid(): AnimalVaccinationState {
+        val baseValid =
+            currentProduct.vaccination.isNotBlank() && currentProduct.countVaccination.isNotBlank()
+        return copy(
+            currentProduct = currentProduct.copy(
+                hasAnyError = baseValid
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updateEntryBottomSheet(
+        isOpenEntryBottomSheet: Boolean,
+        vaccination: Vaccination,
+        isSaveStateForBottomSheet: Boolean
+    ): AnimalVaccinationState {
+        return copy(
+            isOpenDialog = isOpenEntryBottomSheet,
+            currentProduct = vaccination,
+            isSaveStateForBottomSheet = isSaveStateForBottomSheet
+        )
+    }
+
+    private fun AnimalVaccinationState.updateVaccination(vaccination: String): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                vaccination = vaccination,
+                error = currentProduct.error.copy(
+                    isErrorVaccination = vaccination.isBlank()
+                )
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updateDate(date: String): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                date = date
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updateDateNext(dateNext: String): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                nextDate = dateNext
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updateNote(note: String): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                note = note
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updateCount(count: String): AnimalVaccinationState {
+        val isAnimalGroup = currentProduct.isAnimalGroup
+        return copy(
+            currentProduct = currentProduct.copy(
+                countVaccination = count,
+                error = currentProduct.error.copy(
+                    isErrorCount = if (isAnimalGroup) currentProduct.countVaccination.isBlank() else false,
+                    isErrorCountZero = if (isAnimalGroup) isAnimalCountZero(currentProduct.countVaccination) else false,
+                )
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updatePrice(price: String): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                price = price
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updateAutoPrice(isAutoPrice: Boolean): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                isAutoCalculate = isAutoPrice
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updatePriceAll(): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                priceAll = if (currentProduct.isAutoCalculate)
+                    (currentProduct.price.toConvertZeroDouble() * currentProduct.countVaccination.toConvertZeroDouble()).formatNumber()
+                else "0"
+            )
+        )
+    }
+
+    private fun AnimalVaccinationState.updateIsDateFactory(isDateFactory: Boolean): AnimalVaccinationState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                isDateFactory = isDateFactory,
+            )
+        )
+    }
+}

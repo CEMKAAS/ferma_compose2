@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
@@ -19,24 +18,26 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.blue_3
-import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextBuyerNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleSaleNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
+import com.zaroslikov.fermacompose2.white
 
 object SaleDestination : NavigationDestination {
     override val route = "Sale"
@@ -48,45 +49,11 @@ object SaleDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaleScreen(
-    /*modifier: Modifier = Modifier,
-    navigateToStart: () -> Unit,
-    navigateToModalSheet: (DrawerNavigation) -> Unit,
-    navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: (Long) -> Unit,
-    drawerState: DrawerState,*/
-    /* state: AddListState,
-     onIntent: (AddListIntent) -> Unit,*/
     viewModel: SaleViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(blue_1, blue_2)
-    val idProject = state.idPT
-
-    val query = state.textSearch.trim().lowercase()
-
-    val searchList = if (query.isBlank() && !state.isGroup) state.list
-    else
-        state.list.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.note.lowercase().contains(query) ||
-                    item.category.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) ||
-                    stringResource(item.countSuffix.toResId()).lowercase().contains(query)
-            "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
-                .contains(query) ||
-                    item.buyer?.lowercase()?.contains(query) == true ||
-                    (item.priceAll ?: item.price).toString().lowercase().contains(query)
-        }
-
-    val searchList2 = if (query.isBlank() && state.isGroup) state.briefly
-    else
-        state.briefly.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) ||
-                    (item.price).toString().lowercase().contains(query)
-        }
-
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -113,15 +80,9 @@ fun SaleScreen(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
                 details = state.isGroup,
-                searchText = state.textSearch,
                 itemList = state.list,
-                searchList = searchList,
-                brieflyList = searchList2,
-                onInsertClick = {
-                    viewModel.onIntent(
-                        SaleListIntent.OpenBottomSheetEntry(true)
-                    )
-                },
+                searchList = state.searchList,
+                brieflyList = state.searchBrieflyList,
                 onEditClick = {
                     viewModel.onIntent(
                         SaleListIntent.OpenBottomSheetEntry(true, it)
@@ -134,14 +95,14 @@ fun SaleScreen(
                     )
                 }
             )
-        if (state.openBottomSheetEntry)
+        if (state.isOpenBottomSheetEntry)
             SaleEntryBottomSheet(
-                modifier = Modifier,
-                state = state.currentProduct,
                 colors = colors,
+                priceSuffix = state.priceSuffix,
+                state = state.currentProduct,
                 onIntent = viewModel::onIntent
             )
-        if (state.openBottomSheetGroup)
+        if (state.isOpenBottomSheetGroup)
             BrieflyBottomSheetSale(
                 list = state.listBriefly,
                 titleProduct = state.currentBriefly.title,
@@ -164,11 +125,9 @@ private fun SaleContainer(
     modifier: Modifier = Modifier,
     details: Boolean,
     color: Color = blue_1,
-    searchText: String,
     itemList: List<DomainSaleTable>,
     searchList: List<DomainSaleTable>,
     brieflyList: List<BrieflySaleDomain>,
-    onInsertClick: () -> Unit,
     onEditClick: (DomainSaleTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (BrieflySaleDomain) -> Unit
@@ -179,10 +138,6 @@ private fun SaleContainer(
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList,
-        onInsertClick = onInsertClick,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        onDetailsClick = onDetailsClick,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -198,6 +153,7 @@ private fun SaleContainer(
                 month = item.month,
                 year = item.year,
                 buyer = item.buyer,
+                colors = item.animalCountId?.let { listOf(white, green_g_4) },
                 onClick = { },
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
@@ -226,7 +182,6 @@ private fun SaleContainer(
     )
 }
 
-
 @Composable
 private fun BrieflyBottomSheetSale(
     list: List<DomainSaleTable>,
@@ -249,6 +204,7 @@ private fun BrieflyBottomSheetSale(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         itemCard = { product ->
+
             DetailProductCardNew(
                 modifier = Modifier,
                 isCardField = false,
@@ -262,6 +218,7 @@ private fun BrieflyBottomSheetSale(
                 day = product.day,
                 month = product.month,
                 year = product.year,
+                colors = product.animalCountId?.let { listOf(white, green_g_4) },
                 onClick = {},
                 onDeleteClick = { onDeleteClick(product.id) },
                 onEditClick = { onEditClick(product) },
@@ -270,24 +227,28 @@ private fun BrieflyBottomSheetSale(
     )
 }
 
-
 @Composable
 private fun SaleEntryBottomSheet(
-    modifier: Modifier,
     colors: List<Color>,
+    priceSuffix: Suffix,
     state: SaleEntryState2,
     onIntent: (SaleListIntent) -> Unit
 ) {
     EntryBottomSheet(
-        modifier = Modifier,
+        titleEntryRes = R.string.sale_screen_title_entry,
+        titleEditRes = R.string.sale_screen_title_edit,
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
-                SaleListIntent.OpenBottomSheetEntry(false)
+                SaleListIntent.OpenBottomSheetEntry(
+                    isOpen = false,
+                    isSaveStateForBottomSheet = state.isEntry
+                )
             )
         },
+        onSecondDismissRequest = { onIntent(SaleListIntent.OpenBottomSheetEntry(false)) },
         onInsertClick = { onIntent(SaleListIntent.Insert) },
         onUpdateClick = { onIntent(SaleListIntent.Update) }
     ) {
@@ -295,12 +256,11 @@ private fun SaleEntryBottomSheet(
             value = state.title,
             onValueChange = {
                 onIntent(SaleListIntent.TitleChanged(it))
-                //TODO Обновление кол-во на складе
             },
             onValueChoice = {
-                onIntent(SaleListIntent.TitleAndSuffixClicked(it.title, it.suffix))
-                /* updateCountWarehouse(it.title, it.category)*/
+                onIntent(SaleListIntent.TitleAndSuffixClicked(it.title, it.suffix, it.category))
             },
+            category = state.saleCategory,
             titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
@@ -316,19 +276,39 @@ private fun SaleEntryBottomSheet(
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product,
-//                    isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
-//                    warehouseList = state.warehouseList
         )
-        WarehouseCountCard(
-            title = state.title,
-            warehouseList = state.warehouseList
+        if (!state.isIndicatorsValue)
+            WarehouseCountCard(
+                title = state.title,
+                warehouseList = state.pickList.warehouseList
+            )
+        OutlinedPriceInputNew(
+            price = state.price,
+            onPriceChange = {
+                onIntent(SaleListIntent.PriceChanged(it))
+            },
+            priceAll = state.priceAll,
+            isError = state.error.isErrorPrice,
+            isAutoCalculate = state.isAutoPrice,
+            onAutoCalculate = {
+                onIntent(SaleListIntent.AutoPriceClicked(it))
+            },
+            isManyCount = true,
+            count = state.count,
+            countSuffix = state.countSuffix,
+            priceSuffix = priceSuffix,
         )
-
-        OutlinedTextCategoryNew(
-            value = state.category,
-            onValueChange = { onIntent(SaleListIntent.CategoryChanged(it)) },
-            titleList = state.pickList.categoryList,
-        )
+        if (!state.isIndicatorsValue)
+            OutlinedTextCategoryNew(
+                value = state.category,
+                onValueChange = { onIntent(SaleListIntent.CategoryChanged(it)) },
+                titleList = state.pickList.categoryList,
+            )
+        if (!state.isIndicatorsValue)
+            OutlinedTextDateNew(
+                value = state.date,
+                onValueChange = { onIntent(SaleListIntent.DateClicked(it)) }
+            )
         OutlinedTextBuyerNew(
             value = state.buyer,
             onValueChange = {

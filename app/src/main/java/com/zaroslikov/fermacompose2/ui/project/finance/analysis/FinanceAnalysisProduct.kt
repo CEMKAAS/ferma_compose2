@@ -82,7 +82,7 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.CircleShape
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.CustomLineChart
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString2
@@ -466,7 +466,7 @@ private fun FinanceCategorySlider(
                 )
             }
         }
-        Slider(
+        BaseSlider(
             percentFloat = percentFloat,
             color = financeAnalysisEnum.iconBackground
         )

@@ -12,18 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
-import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_3
-import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.orang_8
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
@@ -31,9 +29,9 @@ import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
+import com.zaroslikov.fermacompose2.white
 
 object ExpensesDestination : NavigationDestination {
     override val route = "expenses"
@@ -59,29 +57,6 @@ fun ExpensesScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(orang_1, orang_2)
     val primeColor = orang_1
-    val idProject = state.idPT
-
-    val query = state.textSearch.trim().lowercase()
-    val searchList = if (query.isBlank() && !state.isGroup) state.list
-    else
-        state.list.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.note.lowercase().contains(query) ||
-                    item.category.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) ||
-                    stringResource(item.countSuffix.toResId()).lowercase().contains(query)
-            "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
-                .contains(query) ||
-                    (item.priceAll ?: item.price).toString().lowercase().contains(query)
-        }
-
-    val searchList2 = if (query.isBlank() && state.isGroup) state.briefly
-    else
-        state.briefly.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) ||
-                    (item.price).toString().lowercase().contains(query)
-        }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -98,7 +73,7 @@ fun ExpensesScreen(
         },
         floatingActionButton = {
             NeonGlowFab(colors = colors) {
-                viewModel.onIntent(ExpensesListIntent.OpenBottomSheetEntry(true))
+                viewModel.onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(true))
             }
         }
     ) { innerPadding ->
@@ -111,18 +86,12 @@ fun ExpensesScreen(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
                 color = primeColor,
-                searchText = state.textSearch,
                 itemList = state.list,
-                searchList = searchList,
-                brieflyList = searchList2,
-                onInsertClick = {
-                    viewModel.onIntent(
-                        ExpensesListIntent.OpenBottomSheetEntry(true)
-                    )
-                },
+                searchList = state.searchList,
+                brieflyList = state.searchBrieflyList,
                 onEditClick = {
                     viewModel.onIntent(
-                        ExpensesListIntent.OpenBottomSheetEntry(true, it)
+                        ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
                     )
                 },
                 onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete(it)) },
@@ -132,32 +101,32 @@ fun ExpensesScreen(
                     )
                 },
                 details = state.isGroup,
+                priceSuffix = state.priceSuffix
             )
-            if (state.openBottomSheetEntry)
+            if (state.isOpenEntryBottomSheet)
                 ExpensesEntryBottomSheet(
-                    modifier = Modifier,
                     state = state.currentProduct,
+                    priceSuffix = state.priceSuffix,
                     colors = colors,
                     onIntent = viewModel::onIntent
                 )
-            if (state.openBottomSheetGroup)
+            if (state.isOpenGroupBottomSheet)
                 BrieflyBottomSheetExpenses(
                     color = primeColor,
-                    list = state.listBriefly,
+                    list = state.brieflyList,
                     titleProduct = state.currentBriefly.title,
                     count = state.currentBriefly.count,
                     suffix = state.currentBriefly.suffix,
                     countEntry = state.currentBriefly.rowCount,
+                    priceSuffix = state.priceSuffix,
                     onDismissRequest = {
                         viewModel.onIntent(
-                            ExpensesListIntent.OpenBottomSheetGroup(
-                                false
-                            )
+                            ExpensesListIntent.OpenBottomSheetGroup(false)
                         )
                     },
                     onEditClick = {
                         viewModel.onIntent(
-                            ExpensesListIntent.OpenBottomSheetEntry(true, it)
+                            ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
                         )
                     },
                     onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete(it)) },
@@ -172,31 +141,27 @@ fun ExpensesContainer(
     modifier: Modifier = Modifier,
     details: Boolean,
     color: Color = blue_1,
-    searchText: String,
-    itemList: List<DomainExpensesTable>,
-    searchList: List<DomainExpensesTable>,
+    priceSuffix: Suffix,
+    itemList: List<ExpensesTableUi>,
+    searchList: List<ExpensesTableUi>,
     brieflyList: List<BrieflyExpensesDomain>,
-    onInsertClick: () -> Unit,
-    onEditClick: (DomainExpensesTable) -> Unit,
+    onEditClick: (ExpensesTableUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (BrieflyExpensesDomain) -> Unit
 ) {
+
     InventoryBody(
         modifier = modifier,
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList,
-        onInsertClick = onInsertClick,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        onDetailsClick = onDetailsClick,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
                 count = item.count,
                 suffix = item.countSuffix,
                 price = item.priceAll ?: item.price,
-                priceSuffix = Suffix.RUBLE,
+                priceSuffix = priceSuffix,
                 category = item.category,
                 note = item.note,
                 animal = "Murka",
@@ -204,6 +169,8 @@ fun ExpensesContainer(
                 day = item.day,
                 month = item.month,
                 year = item.year,
+                food = item.food,
+                colors = item.colors,
                 onClick = { },
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
@@ -216,7 +183,7 @@ fun ExpensesContainer(
                 count = item.count,
                 suffix = item.suffix,
                 price = item.price,
-                priceSuffix = Suffix.RUBLE,
+                priceSuffix = priceSuffix,
                 countEntry = item.rowCount,
                 color = color,
                 colorSecondary = Color(0xFFFFF7ED),
@@ -236,13 +203,14 @@ fun ExpensesContainer(
 
 @Composable
 fun BrieflyBottomSheetExpenses(
-    list: List<DomainExpensesTable>,
+    list: List<ExpensesTableUi>,
     color: Color = blue_1,
     titleProduct: String,
     count: Double,
     suffix: Suffix,
     countEntry: Long,
-    onEditClick: (DomainExpensesTable) -> Unit,
+    priceSuffix: Suffix,
+    onEditClick: (ExpensesTableUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -262,6 +230,7 @@ fun BrieflyBottomSheetExpenses(
                 count = product.count,
                 suffix = product.countSuffix,
                 price = product.price,
+                priceSuffix = priceSuffix,
                 category = product.category,
                 note = product.note,
                 animal = "Mas",
@@ -269,6 +238,8 @@ fun BrieflyBottomSheetExpenses(
                 day = product.day,
                 month = product.month,
                 year = product.year,
+                food = product.food,
+                colors = product.colors,
                 onClick = {},
                 onDeleteClick = { onDeleteClick(product.id) },
                 onEditClick = { onEditClick(product) }
@@ -276,235 +247,3 @@ fun BrieflyBottomSheetExpenses(
         }
     )
 }
-
-
-/*
-
-@Composable
-private fun ExpensesBody(
-    modifier: Modifier = Modifier,
-    viewModel: ExpensesViewModel,
-    itemList: List<DomainExpensesTable>,
-    brieflyList: List<BrieflyExpensesDomain>,
-    onItemClick: (Pair<Long, Long>) -> Unit,
-    navigateToItemAdd: () -> Unit
-) {
-    if (itemList.isNotEmpty())
-        InventoryList(
-            itemList = itemList,
-            brieflyList = brieflyList,
-            viewModel = viewModel,
-            onItemClick = { onItemClick(Pair(it.idPT, it.id)) },
-            modifier = modifier
-        )
-    else MessageNoData(
-        modifier = modifier,
-        onClick = navigateToItemAdd,
-        titleRes = R.string.message_no_date_title_sale,
-        messageRes = R.string.message_no_date_message_sale,
-        supportRes = R.string.message_no_date_support_text_sale,
-        buttonRes = R.string.button_sale_message_no_data
-    )
-}
-
-@Composable
-private fun InventoryList(
-    viewModel: ExpensesViewModel,
-    itemList: List<DomainExpensesTable>,
-    brieflyList: List<BrieflyExpensesDomain>,
-    onItemClick: (DomainExpensesTable) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var details by rememberSaveable { mutableStateOf(true) }
-
-    val extraPadding by animateDpAsState(
-        if (details) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-    val extraPaddingResd by animateDpAsState(
-        if (!details) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-
-    LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Top
-    ) {
-        item {
-            TextButtonWarehouse(
-                boolean = details,
-                onClick = { details = !details },
-                intRes = if (details) R.string.widget_briefly else R.string.widget_detail
-            )
-        }
-        if (details) {
-            items(items = itemList, key = { it.id }) { item ->
-                ExpensesCard(
-                    expensesTable = item,
-                    modifier = Modifier
-                        .clickable { onItemClick(item) }
-                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
-                )
-            }
-        } else {
-            items(items = brieflyList) { item ->
-                BrieflyPriceCard(
-                    viewModel = viewModel,
-                    product = item,
-                    onItemClick = onItemClick,
-                    modifier = Modifier
-                        .padding(bottom = extraPaddingResd.coerceAtLeast(0.dp))
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun BrieflyPriceCard(
-    viewModel: ExpensesViewModel,
-    product: BrieflyExpensesDomain,
-    onItemClick: (DomainExpensesTable) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    val extraPadding by animateDpAsState(
-        if (expanded) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ), label = ""
-    )
-
-    CardField(modifier = modifier.clickable {
-        expanded = !expanded
-    }) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f)
-            ) {
-                TextLine(
-                    modifier = Modifier.padding(start = 3.dp, bottom = 5.dp),
-                    valueString = product.title,
-                    textStyle = textBold_20
-                )
-                IconAndText(
-                    iconRes = R.drawable.baseline_shopping_basket_24,
-                    valueString = stringResource(
-                        R.string.card_count_briefly_s,
-                        "${product.count.formatNumber()} ${product.suffix}",
-                        product.price.formatNumber(),
-                        stringResource(R.string.currency_ruble),
-                    ),
-                )
-            }
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    painterResource(if (expanded) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down),
-                    contentDescription = "Показать меню"
-                )
-            }
-        }
-    }
-    if (expanded) {
-        val products = viewModel.getDetailsName(product.title).collectAsState(initial = emptyList())
-        products.value.forEach {
-            ExpensesCard(
-                expensesTable = it,
-                modifier = Modifier
-                    .graphicsLayer {
-                        scaleX = 0.95f
-                    }
-                    .clickable { onItemClick(it) }
-                    .padding(bottom = extraPadding.coerceAtLeast(0.dp)))
-        }
-    }
-}
-
-
-@Composable
-fun ExpensesCard(
-    expensesTable: DomainExpensesTable,
-    modifier: Modifier = Modifier
-) {
-    val price = expensesTable.priceAll ?: expensesTable.price
-    CardField(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.7f)
-            ) {
-                Row(
-                    modifier = Modifier.padding(start = 3.dp, bottom = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(
-                        text = expensesTable.title,
-                        style = textBold_20,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    if (expensesTable.animalId != null)
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_pets_24),
-                            contentDescription = stringResource(R.string.is_empty)
-                        )
-                }
-                IconAndText(
-                    iconRes = R.drawable.baseline_calendar_month_24,
-                    valueString = dateBuilder(
-                        expensesTable.day,
-                        expensesTable.month,
-                        expensesTable.year
-                    )
-                )
-                expensesTable.category.takeUnless { it == "Без категории" || it.isEmpty() }
-                    ?.let { category ->
-                        IconAndText(
-                            iconRes = R.drawable.baseline_format_list_bulleted_24,
-                            valueString = category
-                        )
-                    }
-                if (expensesTable.note != "")
-                    IconAndText(
-                        iconRes = R.drawable.baseline_sticky_note_2_24,
-                        valueString = expensesTable.note
-                    )
-            }
-            Text(
-                text = stringResource(
-                    R.string.card_count_s,
-                    "${expensesTable.count.formatNumber()} ${expensesTable.countSuffix}",
-                    price.formatNumber(),
-                    stringResource(R.string.currency_ruble),
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.3f),
-                style = textBold_20
-            )
-        }
-    }
-}*/

@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import android.util.Log
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
@@ -23,6 +22,9 @@ data class AddListState(
     val list: List<DomainAddTable> = emptyList(),
     val briefly: List<BrieflyAddDomain> = emptyList(),
     val listBriefly: List<DomainAddTable> = emptyList(),
+    val searchList: List<DomainAddTable> = emptyList(),
+    val searchBrieflyList: List<BrieflyAddDomain> = emptyList(),
+    val isSaveStateForBottomSheet: Boolean = false,
     override val isEntry: Boolean = false,
     override val currentProduct: AddEntryState2 = AddEntryState2(),
     override val isLoading: Boolean = true,
@@ -43,30 +45,20 @@ data class AddEntryState2(
     val note: String = "",
     val itemIdPT: Long = 0,
     val isEntry: Boolean = true,
-    val warehouseList: List<DomainCountSuffix> = emptyList(),
     val pickList: PickList = PickList(),
     val error: ErrorAdd = ErrorAdd(),
-) : BaseProduct() {
-    override val hasAnyError: Boolean
-        get() = error.hasAnyError
-
-    fun enabledButton(): Boolean {
-        val isEnabled = title.isNotBlank() && count.isNotBlank() && !hasAnyError
-        return isEnabled
-    }
-}
+    override val hasAnyError: Boolean = false
+) : BaseProduct()
 
 data class PickList(
     val titleList: List<TitleAndSuffixDomain> = emptyList(),
     val categoryList: List<String> = emptyList(),
     val animalList: List<AnimalForAddDomain> = emptyList(),
+    val warehouseList: List<DomainCountSuffix> = emptyList(),
 )
 
 data class ErrorAdd(
     val isErrorTitle: Boolean = false,
     val isErrorSlash: Boolean = false,
     val isErrorCount: Boolean = false,
-) : BaseError {
-    val hasAnyError: Boolean
-        get() = isErrorTitle || isErrorSlash || isErrorCount
-}
+) : BaseError

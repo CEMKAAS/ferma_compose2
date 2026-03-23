@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -42,8 +43,8 @@ import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData2
 import com.zaroslikov.fermacompose2.ui.elements.TextLine
 import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
@@ -61,10 +62,6 @@ fun <T, B> InventoryBody(
     itemList: List<T>,
     searchList: List<T>,
     brieflyList: List<B>,
-    onInsertClick: () -> Unit,
-    onEditClick: (T) -> Unit,
-    onDeleteClick: (Long) -> Unit,
-    onDetailsClick: (B) -> Unit,
     // карточки передаются как composable-функции
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
@@ -77,18 +74,25 @@ fun <T, B> InventoryBody(
     backgroundColor: Color
 ) {
     if (itemList.isNotEmpty()) {
-        InventoryList(
+        if (searchList.isNotEmpty())
+            InventoryList(
+                modifier = modifier,
+                details = details,
+                itemList = searchList,
+                brieflyList = brieflyList,
+                detailCard = detailCard,
+                brieflyCard = brieflyCard,
+            )
+        else MessageNoData2(
             modifier = modifier,
-            details = details,
-            itemList = searchList,
-            brieflyList = brieflyList,
-            onEditClick = onEditClick,
-            onDeleteClick = onDeleteClick,
-            onDetailsClick = onDetailsClick,
-            detailCard = detailCard,
-            brieflyCard = brieflyCard,
+            titleRes = R.string.search_section_search_nothing,
+            messageRes = R.string.search_section_search_nothing_sup,
+            supportSecondText = R.string.search_section_search_nothing_sup_2,
+            iconRes = R.drawable.icon_search_off,
+            iconColor = iconColor,
+            backgroundColor = backgroundColor,
         )
-    } else {
+    } else
         MessageNoData2(
             modifier = modifier,
             titleRes = titleRes,
@@ -98,7 +102,6 @@ fun <T, B> InventoryBody(
             iconColor = iconColor,
             backgroundColor = backgroundColor,
         )
-    }
 }
 
 
@@ -108,9 +111,6 @@ private fun <T, B> InventoryList(
     details: Boolean,
     itemList: List<T>,
     brieflyList: List<B>,
-    onEditClick: (T) -> Unit,
-    onDeleteClick: (Long) -> Unit,
-    onDetailsClick: (B) -> Unit,
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
 ) {
@@ -184,88 +184,27 @@ fun <T> BrieflyBottomSheetUniversal(
 
 @Composable
 fun EntryIndicationBottomSheet(
-    modifier: Modifier = Modifier,
-    @DrawableRes icon: Int,
+    @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
     isEntry: Boolean,
     enabledButton: Boolean,
     colors: List<Color>,
     onDismissRequest: () -> Unit,
+    onSecondDismissRequest: () -> Unit = {},
     onInsertClick: () -> Unit,
     onUpdateClick: () -> Unit,
     scrollableContent: @Composable ColumnScope.() -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    ModalBottomSheet(
+    BaseBottomSheet(
+        title = stringResource(titleRes),
+        supText = if (isEntry) null else stringResource(R.string.animal_indicators_mode_edit),
+        iconRes = iconRes,
+        colors = colors,
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .fillMaxHeight()
-        ) {
-            Column(
-                modifier = Modifier.modifierBottomSheet(false),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        IconIndicatorsAnimal(
-                            icon = icon,
-                            colors = colors
-                        )
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            Text(
-                                stringResource(titleRes),
-                                style = if (isEntry) text_20 else text_16,
-                                color = black_1
-                            )
-                            if (!isEntry)
-                                Text(
-                                    stringResource(R.string.animal_indicators_mode_edit),
-                                    style = text_12,
-                                    color = gray_7
-                                )
-                        }
-                    }
-                    IconButton(
-                        onClick = onDismissRequest,
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = null,
-                            tint = marengo
-                        )
-                    }
-                }
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = gray_6
-                )
-                Column(
-                    modifier = Modifier
-                        .weight(1f, fill = false)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    scrollableContent()
-                }
-            }
+        onSecondDismissRequest = onSecondDismissRequest,
+        contentBottom = {
             ButtonPanelNew(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .fillMaxWidth(),
                 isEntry = isEntry,
                 enable = enabledButton,
@@ -274,6 +213,12 @@ fun EntryIndicationBottomSheet(
                 onClickUpdate = onUpdateClick,
                 onClickClose = onDismissRequest
             )
+        }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            scrollableContent()
         }
     }
 }

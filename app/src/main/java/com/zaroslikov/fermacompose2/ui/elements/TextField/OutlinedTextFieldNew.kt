@@ -204,7 +204,7 @@ fun OutlinedNumberNew(
     @DrawableRes drawableRes: Int? = null,
     @DrawableRes drawableRes2: Int? = null,
     drawableColor2: Color = Color(0xFF9A9A9A),
-    @StringRes intRes: Int = R.string.outlined_text_field_quantity,
+    @StringRes intRes: Int? = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
@@ -680,7 +680,8 @@ fun OutlinedTextCountAnimalNew(
     onValueChange: (String) -> Unit,
     onSuffixChange: ((Suffix) -> Unit)? = null,
     isError: Boolean,
-    countAnimal: String,
+    isErrorCountZero: Boolean,
+    countAnimal: String?,
     suffix: Suffix,
     isAnimal: Boolean = false,
     isWarehouseShow: Boolean = true,
@@ -690,6 +691,7 @@ fun OutlinedTextCountAnimalNew(
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
+    @StringRes countZeroTextErrorRes: Int = R.string.error_count_zero_animals,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_weight,
     countWarehouse: String = "",
     countWarehouseSuffix: String = "",
@@ -705,8 +707,13 @@ fun OutlinedTextCountAnimalNew(
     isBorderCard: Boolean = true,
 ) {
 
-    val textField: @Composable () -> Unit = {
+    val (isError, textError) = when {
+        isError -> true to intResError
+        isErrorCountZero -> true to countZeroTextErrorRes
+        else -> false to intResError
+    }
 
+    val textField: @Composable () -> Unit = {
         BaseOutlinedTextNew(
             modifier = modifier,
             value = value,
@@ -719,14 +726,16 @@ fun OutlinedTextCountAnimalNew(
             leadingIconRes = drawableRes,
             labelIntRes = intRes,
             intResSup = intResSup,
-            intResError = intResError,
+            intResError = textError,
             keyboardOptions = keyboardOptions,
         )
         Text(
-            stringResource(R.string.support_text_count_sale_animals).format(
-                countAnimal,
-                stringResource(suffix.toResId())
-            ),
+            countAnimal?.let {
+                stringResource(R.string.support_text_count_sale_animals).format(
+                    countAnimal,
+                    stringResource(suffix.toResId())
+                )
+            } ?: stringResource(R.string.support_text_count_sale_no_animals),
             style = text_14,
             color = gray_7
         )
@@ -791,7 +800,6 @@ fun OutlinedTextCountNew(
             modifier = modifier,
             value = value,
             onValueChange = onValueChange,
-            suffix = suffix,
             onSuffixChance = onSuffixChange,
 //                versionDropMenu = versionDropMenu,
             isError = isError,
@@ -832,7 +840,7 @@ fun OutlinedTextCountNew(
             )
         }
     }
-
+    //TODO при ошибки у них разная высота надо исправить
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -1019,7 +1027,7 @@ fun OutlinedPriceInputNew(
                 intResSup = supportText,
                 intResError = R.string.error_no_count_sale,
                 isError = isError,
-                suffix = Suffix.RUBLE,
+                suffix = priceSuffix,
                 modifier = Modifier
                     .padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
                 leadingIconRes = leadingIconRes,
@@ -1104,7 +1112,7 @@ fun OutlinedCountInputNew(
                     onCheckedChange = onAutoCalculate,
                     suffixEnabled = enabledWeightSuffix,
                     totalSuffix = weightAllSuffix,
-                    tooltipTextResAutoCal = R.string.tooltip_auto_calculate_price,
+                    tooltipTextResAutoCal = R.string.tooltip_auto_calculate_weight,
                 )
             }
         }
@@ -1160,7 +1168,6 @@ fun WeightOutlinedTextFieldNew(
             modifier = modifier,
             value = value,
             onValueChange = onValueChange,
-            suffix = suffix,
             onSuffixChance = onSuffixChange,
             isError = isError,
             leadingIconRes = drawableRes,
@@ -1301,6 +1308,7 @@ fun OutlinedTextTitleSaleNew(
     value: String,
     onValueChange: (String) -> Unit = {},
     onValueChoice: (DomainTitleSuffixCategory) -> Unit = {},
+    category: Category?,
     readOnly: Boolean = false,
     enable: Boolean = true,
     titleList: List<DomainTitleSuffixCategory>,
@@ -1309,7 +1317,7 @@ fun OutlinedTextTitleSaleNew(
     isErrorSlash: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
-    var category by rememberSaveable { mutableStateOf<Category?>(null) }
+    var category by rememberSaveable { mutableStateOf(category) }
 
     BorderCard {
         ExposedDropdownMenuPair(
@@ -1384,7 +1392,8 @@ fun OutlinedWriteOffStatus(
 @Composable
 fun OutlinedTextSexNew(
     value: Boolean,
-    onValueChange: (Boolean) -> Unit = {}
+    onValueChange: (Boolean) -> Unit = {},
+    isBorderCard: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current
     var selectedItemIndex by remember { mutableIntStateOf(if (value) 0 else 1) }
@@ -1392,7 +1401,7 @@ fun OutlinedTextSexNew(
         Triple(R.drawable.baseline_male_24, R.string.animal_entry_screen_sex_man, true),
         Triple(R.drawable.baseline_female_24, R.string.animal_entry_screen_sex_woman, false)
     )
-    BorderCard {
+    val textField: @Composable () -> Unit = {
         ExposedDropdownMenuStatusWriteOff(
             status = value,
             setStatus = {
@@ -1416,6 +1425,7 @@ fun OutlinedTextSexNew(
             )
         }
     }
+    if (isBorderCard) BorderCard { textField() } else textField()
 }
 
 @Composable
@@ -1468,7 +1478,7 @@ fun OutlinedTextAnimalTypeNew(
         ) {
             BaseOutlinedTextNew(
                 value = value,
-                onValueChange = { onValueChange(it) },
+                onValueChange = onValueChange,
                 onClear = { onValueChange("") },
                 labelIntRes = R.string.outlined_text_type,
                 intResSup = R.string.support_text_buyer,

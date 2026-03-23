@@ -27,7 +27,6 @@ import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CardNewWithTitle
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.OutlineIconButtonNew
-import com.zaroslikov.fermacompose2.ui.elements.ProductKillCard
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedNumberNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
@@ -39,6 +38,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.TimeOutlinedTextFieldN
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.FunctionIncubatorCard
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.ProductKillCard
 
 @Composable
 fun EntryBookmarkOneScreen(

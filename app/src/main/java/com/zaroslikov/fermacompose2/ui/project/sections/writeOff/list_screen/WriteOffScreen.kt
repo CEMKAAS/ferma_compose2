@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
@@ -17,7 +16,6 @@ import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
-import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
@@ -32,7 +30,6 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
@@ -54,32 +51,8 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(violet_1, violet_2)
     val primeColor = violet_1
-    val idProject = state.idPT
 
     val writeOffBoolean = state.writeOffBoolean
-
-    val query = state.textSearch.trim().lowercase()
-
-    val searchList = if (query.isBlank() && !state.isGroup) state.list
-    else
-        state.list.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.note.lowercase().contains(query) ||
-                    /*  item.category.lowercase().contains(query) ||*/
-                    item.count.toString().lowercase().contains(query) ||
-                    stringResource(item.countSuffix.toResId()).lowercase().contains(query)
-            "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
-                .contains(query) ||
-                    (item.priceAll ?: item.price).toString().lowercase().contains(query)
-        }
-
-    val searchList2 = if (query.isBlank() && state.isGroup) state.briefly
-    else
-        state.briefly.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) /*||
-                    (item.price).toString().lowercase().contains(query)*/
-        }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -106,13 +79,8 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             modifier = Modifier
                 .modifierScreenLazy(innerPadding),
             itemList = state.list,
-            searchList = searchList,
-            brieflyList = searchList2,
-            onInsertClick = {
-                viewModel.onIntent(
-                    WriteOffListIntent.OpenBottomSheetEntry(true)
-                )
-            },
+            searchList = state.searchList,
+            brieflyList = state.searchBrieflyList,
             onEditClick = {
                 viewModel.onIntent(
                     WriteOffListIntent.OpenBottomSheetEntry(true, it)
@@ -127,14 +95,14 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             color = primeColor,
             details = state.isGroup
         )
-        if (state.openBottomSheetEntry)
+        if (state.isOpenEntryBottomSheet)
             WriteOffEntryBottomSheet(
-                modifier = Modifier,
-                state = state.currentProduct,
                 colors = colors,
-                onIntent = viewModel::onIntent
+                priceSuffix = state.priceSuffix,
+                state = state.currentProduct,
+                onIntent = viewModel::onIntent,
             )
-        if (state.openBottomSheetGroup)
+        if (state.isOpenGroupBottomSheet)
             BrieflyBottomSheetWriteOff(
                 color = primeColor,
                 list = state.listBriefly,
@@ -167,7 +135,6 @@ private fun WriteOffContainer(
     itemList: List<DomainWriteOffTable>,
     searchList: List<DomainWriteOffTable>,
     brieflyList: List<BrieflyWriteOffDomain>,
-    onInsertClick: () -> Unit,
     onEditClick: (DomainWriteOffTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (BrieflyWriteOffDomain) -> Unit
@@ -178,10 +145,6 @@ private fun WriteOffContainer(
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList,
-        onInsertClick = onInsertClick,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        onDetailsClick = onDetailsClick,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -189,7 +152,6 @@ private fun WriteOffContainer(
                 suffix = item.countSuffix,
                 price = item.priceAll ?: item.price,
                 priceSuffix = Suffix.RUBLE,
-                /*category = item.category,*/
                 statusWriteOff = item.status,
                 note = item.note,
                 animal = "Murka",
@@ -221,7 +183,7 @@ private fun WriteOffContainer(
         messageRes = R.string.message_no_data_message_write_off,
         supportSecondText = null,
         iconRes = R.drawable.baseline_edit_note_24,
-        iconColor =  violet_1,
+        iconColor = violet_1,
         backgroundColor = violet_3,
     )
 }
@@ -274,24 +236,28 @@ private fun BrieflyBottomSheetWriteOff(
 
 @Composable
 private fun WriteOffEntryBottomSheet(
-    modifier: Modifier,
     colors: List<Color>,
     state: WriteOffEntryState2,
-    onIntent: (WriteOffListIntent) -> Unit
+    onIntent: (WriteOffListIntent) -> Unit,
+    priceSuffix: Suffix
 ) {
     EntryBottomSheet(
-        modifier = Modifier,
+        titleEntryRes = R.string.write_off_screen_title_entry,
+        titleEditRes = R.string.write_off_screen_title_edit,
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
-                WriteOffListIntent.OpenBottomSheetEntry(false)
+                WriteOffListIntent.OpenBottomSheetEntry(
+                    isOpen = false,
+                    isSaveStateForBottomSheet = state.isEntry
+                )
             )
         },
+        onSecondDismissRequest = { onIntent(WriteOffListIntent.OpenBottomSheetEntry(false)) },
         onInsertClick = { onIntent(WriteOffListIntent.Insert) },
-        onUpdateClick = { onIntent(WriteOffListIntent.Update) }
-    ) {
+        onUpdateClick = { onIntent(WriteOffListIntent.Update) }) {
         OutlinedWriteOffStatus(
             value = state.status,
             onValueChange = { onIntent(WriteOffListIntent.StatusClicked(it)) }
@@ -299,15 +265,15 @@ private fun WriteOffEntryBottomSheet(
         OutlinedTextTitleSaleNew(
             value = state.title,
             onValueChoice = {
-                onIntent(WriteOffListIntent.TitleAndSuffix(it.title, it.suffix))
-                /* updateCountWarehouse(it.title, it.category)*/
+                onIntent(WriteOffListIntent.TitleAndSuffix(it.title, it.suffix, it.category))
             },
-            titleList = state.titleList,
+            titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
             readOnly = state.isIndicatorsValue,
             enable = !state.isIndicatorsValue,
-            isMore = true
+            isMore = true,
+            category = state.writeOffCategory
         )
         OutlinedTextCountNew(
             value = state.count,
@@ -318,12 +284,10 @@ private fun WriteOffEntryBottomSheet(
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_write_off,
             suffixList = suffixWeightDayList
-            /*isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
-            warehouseList = state.warehouseList,*/
         )
         WarehouseCountCard(
             title = state.title,
-            warehouseList = state.warehouseList
+            warehouseList = state.pickList.warehouseList
         )
         OutlinedPriceInputNew(
             price = state.price,
@@ -341,7 +305,7 @@ private fun WriteOffEntryBottomSheet(
             isManyCount = true,
             count = state.count,
             countSuffix = state.countSuffix,
-            priceSuffix = Suffix.RUBLE,
+            priceSuffix = priceSuffix,
         )
         OutlinedTextDateNew(
             value = state.date,

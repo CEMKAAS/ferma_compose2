@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators
 
+import android.text.style.BackgroundColorSpan
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -41,15 +42,35 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.black_1
+import com.zaroslikov.fermacompose2.blue_3
+import com.zaroslikov.fermacompose2.blue_4
+import com.zaroslikov.fermacompose2.blue_5
+import com.zaroslikov.fermacompose2.blue_6
+import com.zaroslikov.fermacompose2.blue_7
+import com.zaroslikov.fermacompose2.blue_8
+import com.zaroslikov.fermacompose2.blue_9
+import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_1
+import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_g_2
+import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.grey_3
 import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.orang_4
+import com.zaroslikov.fermacompose2.orang_5
+import com.zaroslikov.fermacompose2.orang_6
+import com.zaroslikov.fermacompose2.red_1
+import com.zaroslikov.fermacompose2.red_2
+import com.zaroslikov.fermacompose2.red_3
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.CardIndicationChangeChoice
-import com.zaroslikov.fermacompose2.ui.elements.CardVaccinationDate
+import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
 import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
 import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
 import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
@@ -61,39 +82,44 @@ import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
-import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelDetailNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.ProductKill
+import com.zaroslikov.fermacompose2.violet_1
+import com.zaroslikov.fermacompose2.violet_3
+import com.zaroslikov.fermacompose2.violet_5
+import com.zaroslikov.fermacompose2.violet_6
 
 @Composable
 fun <T> InventoryAnimalBody(
     modifier: Modifier = Modifier,
+    isVaccination: Boolean = false,
     itemList: List<T>,
-    onInsertClick: () -> Unit,
     @StringRes titleRes2: Int,
     @StringRes titleRes: Int,
     @StringRes messageRes: Int,
-    @StringRes supportRes: Int,
-    @StringRes buttonRes: Int,
-    detailCard: @Composable (item: T, previous: T?) -> Unit
+    @DrawableRes iconRes: Int,
+    iconColor: Color,
+    backgroundColor: Color,
+    detailCard: @Composable (item: T) -> Unit
 ) {
     if (itemList.isNotEmpty())
         InventoryList(
             modifier = modifier,
+            titleRes2 = titleRes2,
             itemList = itemList,
+            isVaccination = isVaccination,
             detailCard = detailCard,
-            titleRes2 = titleRes2
         )
     else
-        MessageNoData(
-            modifier = modifier,
-            onClick = onInsertClick,
-            titleRes = titleRes,
-            messageRes = messageRes,
-            supportRes = supportRes,
-            buttonRes = buttonRes
+        EmptyBookmark(
+            iconRes = iconRes,
+            title = titleRes,
+            supportText = messageRes,
+            iconColor = iconColor,
+            backgroundColor = backgroundColor,
+            plusColor = iconColor
         )
 }
 
@@ -102,14 +128,15 @@ fun <T> InventoryAnimalBody(
 private fun <T> InventoryList(
     modifier: Modifier = Modifier,
     @StringRes titleRes2: Int,
+    isVaccination: Boolean = false,
     itemList: List<T>,
-    detailCard: @Composable (item: T, previous: T?) -> Unit
+    detailCard: @Composable (item: T) -> Unit
 ) {
     Column(
         modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        HeadingIndicators(titleRes2)
+        HeadingIndicators(titleRes2, isVaccination = isVaccination)
         LazyColumn(
             contentPadding = PaddingValues(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -117,9 +144,7 @@ private fun <T> InventoryList(
             itemsIndexed(
                 items = itemList,
                 key = { index, _ -> index }) { index, item ->
-                val previousItem =
-                    if (index < itemList.size - 1) itemList[index + 1] else null
-                detailCard(item, previousItem)
+                detailCard(item)
             }
         }
     }
@@ -127,149 +152,92 @@ private fun <T> InventoryList(
 
 @Composable
 fun EntryBottomSheet(
-    modifier: Modifier = Modifier,
+    @StringRes titleEntryRes: Int,
+    @StringRes titleEditRes: Int,
     isEntry: Boolean,
     enabledButton: Boolean,
     colors: List<Color>,
-    onDismissRequest: () -> Unit,
     onInsertClick: () -> Unit,
-    onUpdateClick: () -> Unit,
+    onUpdateClick: () -> Unit = {},
+    onDismissRequest: () -> Unit,
+    onSecondDismissRequest: () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    ModalBottomSheet(
+    val titleRes = if (isEntry) titleEntryRes else titleEditRes
+    BaseBottomSheet(
+        title = stringResource(titleRes),
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .fillMaxHeight()
-        ) {
-            Column(
-                modifier = Modifier.modifierBottomSheet(true),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TextLine(
-                            modifier = Modifier.weight(1f),
-                            valueString = "Добавить продуцию",
-                            textStyle = textBold_20
-                        )
-                        IconButton(onClick = onDismissRequest) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close"
-                            )
-                        }
-                    }
-                    Text(text = "Введите информацию о новой продукции")
-                }
-                content()
-            }
+        onSecondDismissRequest = onSecondDismissRequest,
+        contentBottom = {
             ButtonPanelNew(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 isEntry = isEntry,
                 enable = enabledButton,
                 colors = colors,
                 onClickInsert = onInsertClick,
                 onClickUpdate = onUpdateClick,
-                onClickClose = onDismissRequest
+                onClickClose = onSecondDismissRequest
             )
+        }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            content()
         }
     }
 }
 
 @Composable
 fun DetailBottomSheet(
-    modifier: Modifier = Modifier,
     title: String,
-    date: String,
     onDismissRequest: () -> Unit,
     onDeleteClick: () -> Unit,
     onUpdateClick: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    ModalBottomSheet(
+    BaseBottomSheet(
+        title = title,
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .fillMaxHeight()
-        ) {
-            Column(
-                modifier = Modifier.modifierBottomSheet(true),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TextLine(
-                            modifier = Modifier.weight(1f),
-                            valueString = title,
-                            textStyle = textBold_20
-                        )
-                        IconButton(onClick = onDismissRequest) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close"
-                            )
-                        }
-                    }
-                    Text(text = date, style = text_14, color = grey_3)
-                }
-                content()
-            }
+        contentBottom = {
             ButtonPanelDetailNew(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 onClickUpdate = onUpdateClick,
                 onClickDelete = onDeleteClick
             )
+        }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            content()
         }
     }
 }
 
 
 @Composable
-fun AnimalIndicatorsCardNew(
+fun AnimalIndicatorsCardBase(
     modifier: Modifier = Modifier,
     @DrawableRes icon: Int,
     colors: List<Color>,
     value: String,
-    suffix: Suffix,
     date: String,
-    note: String,
+    vaccinationDate: String? = null,
+    nextVaccinationDate: String? = null,
+    noteContainer: @Composable (ColumnScope.() -> Unit)? = null,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onDetailClick: () -> Pair<String, IndicationStatus>
+    onDetailClick: () -> Unit
 ) {
-    var details by rememberSaveable { mutableStateOf(false) }
-    var sd by rememberSaveable { mutableStateOf<Pair<String, IndicationStatus>>("" to IndicationStatus.NEGATIVE) }
     CardFieldNew(
         modifier = modifier,
         padding = PaddingValues(),
-        onClick = {
-            sd = onDetailClick()
-            details = !details
-        }
+        onClick = onDetailClick
     ) {
         Column(
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -286,7 +254,7 @@ fun AnimalIndicatorsCardNew(
                         colors = colors
                     )
                     Text(
-                        text = "$value ${stringResource(suffix.toResId())}",
+                        text = value,
                         style = textBold_16,
                         textAlign = TextAlign.Center
                     )
@@ -306,24 +274,65 @@ fun AnimalIndicatorsCardNew(
                     )
                 }
             }
+            vaccinationDate?.let {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    CardVaccinationDate(true, it)
+                    nextVaccinationDate?.let { nextVaccinationDate ->
+                        CardVaccinationDate(false, nextVaccinationDate)
+                    }
+                }
+            }
         }
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = details
-        ) {
-            BaseDetailsAnimalIndication(
-                value = sd.first,
-                suffix = suffix,
-                status = sd.second,
-                note = note
-            )
-        }
+        noteContainer?.invoke(this)
     }
+}
+
+
+@Composable
+fun AnimalIndicatorsCardNew(
+    @DrawableRes icon: Int,
+    colors: List<Color>,
+    value: String,
+    suffix: Suffix,
+    date: String,
+    note: String,
+    totalValues: String,
+    indicationStatus: IndicationStatus,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    var details by rememberSaveable() { mutableStateOf(false) }
+    AnimalIndicatorsCardBase(
+        modifier = Modifier,
+        icon = icon,
+        colors = colors,
+        value = "$value ${stringResource(suffix.toResId())}",
+        date = date,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        onDetailClick = { details = !details },
+        noteContainer = {
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = details
+            ) {
+                BaseDetailsAnimalIndication(
+                    value = totalValues,
+                    suffix = suffix,
+                    status = indicationStatus,
+                    note = note
+                )
+            }
+        }
+    )
 }
 
 @Composable
 fun AnimalCountCardNew(
-    modifier: Modifier = Modifier,
     @DrawableRes icon: Int,
     colors: List<Color>,
     value: String,
@@ -334,77 +343,37 @@ fun AnimalCountCardNew(
     productKill: List<ProductKill>,
     indicationStatus: IndicationStatus,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    /* onDetailClick: () -> List<ProductKill>,*/
+    onDeleteClick: () -> Unit
 ) {
     var details by rememberSaveable { mutableStateOf(false) }
-    /*var productKill by rememberSaveable { mutableStateOf<List<ProductKill>>(emptyList()) }*/
-    CardFieldNew(
-        modifier = modifier,
-        padding = PaddingValues(),
-        onClick = {
-            /*productKill = onDetailClick()*/
-            details = !details
-        }
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+    AnimalIndicatorsCardBase(
+        icon = icon,
+        colors = colors,
+        value = "$value ${stringResource(suffix.toResId())}",
+        date = date,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        onDetailClick = { details = !details },
+        noteContainer = {
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = details
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    IconIndicatorsAnimal(
-                        icon = icon,
-                        colors = colors
-                    )
-                    Text(
-                        text = "$value ${stringResource(suffix.toResId())}",
-                        style = textBold_16,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = date,
-                        style = textBold_16,
-                        textAlign = TextAlign.Center
-                    )
-                    DropdownMenuEdit(
-                        onEditClick = onEditClick,
-                        onDeleteClick = onDeleteClick
-                    )
-                }
+                BaseDetailsAnimalIndication(
+                    value = value,
+                    suffix = suffix,
+                    price = price?.formatNumber(),
+                    status = indicationStatus,
+                    note = note,
+                    productKill = productKill
+                )
             }
         }
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = details
-        ) {
-            BaseDetailsAnimalIndication(
-                value = value,
-                suffix = suffix,
-                price = price?.formatNumber(),
-                status = indicationStatus,
-                note = note,
-                productKill = productKill
-            )
-        }
-    }
+    )
 }
 
 @Composable
 fun AnimalVaccinationCardNew(
-    modifier: Modifier = Modifier,
     @DrawableRes icon: Int,
     colors: List<Color>,
     value: String,
@@ -416,78 +385,33 @@ fun AnimalVaccinationCardNew(
     note: String,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    /* onDetailClick: () -> Pair<String, IndicationStatus>*/
 ) {
     var details by rememberSaveable { mutableStateOf(false) }
-    CardFieldNew(
-        modifier = modifier,
-        padding = PaddingValues(),
-        onClick = {
-            details = !details
-        }
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+
+    AnimalIndicatorsCardBase(
+        icon = icon,
+        colors = colors,
+        value = value,
+        date = "$count ${stringResource(suffix.toResId())}",
+        vaccinationDate = date,
+        nextVaccinationDate = nextDate,
+        onEditClick = onEditClick,
+        onDeleteClick = onDeleteClick,
+        onDetailClick = { details = !details },
+        noteContainer = {
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = details
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    IconIndicatorsAnimal(
-                        icon = icon,
-                        colors = colors
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            value,
-                            style = text_16,
-                            color = black_1
-                        )
-                        Text(
-                            "$count ${stringResource(Suffix.PIECES.toResId())}",
-                            style = text_12,
-                            color = gray_7
-                        )
-                    }
-                }
-                DropdownMenuEdit(
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick
+                BaseDetailsAnimalIndication(
+                    value = price?.formatNumber(),
+                    suffix = suffix,
+                    status = IndicationStatus.PRICE,
+                    note = note,
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                CardVaccinationDate(true, date)
-                nextDate?.let {
-                    CardVaccinationDate(false, it)
-                }
-            }
         }
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = details
-        ) {
-            BaseDetailsAnimalIndication(
-                value = price?.formatNumber(),
-                suffix = suffix,
-                status = IndicationStatus.PRICE,
-                note = note,
-            )
-        }
-    }
+    )
 }
 
 @Composable
@@ -506,7 +430,7 @@ fun BaseDetailsAnimalIndication(
     )
     Column(
         modifier = Modifier
-            .background(color = Color(0xFFF9FAFB))
+            .background(color = ghostly_white)
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -544,9 +468,8 @@ fun BaseDetailsAnimalIndication(
 
                 else -> CardIndicationChangeChoice(value = value, suffix = suffix, status = status)
             }
-
         }
-        if (value != null && note.isNotEmpty())
+        if (note.isNotEmpty() && value != null)
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 thickness = 1.dp,
@@ -563,11 +486,11 @@ fun BaseDetailsAnimalIndication(
                 )
                 Text(
                     text = note,
-                    color = Color(0xFF364153),
+                    color = dark,
                     style = text_14,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp)
+                        .padding(horizontal = 10.dp)
                 )
             }
     }
@@ -591,18 +514,115 @@ fun HeadingIndicators(
             color = marengo
         )
         Text(
-            text = stringResource(R.string.outlined_text_date),
+            text = stringResource(if (isVaccination) R.string.count_screen_title else R.string.outlined_text_date),
             style = textBold_18,
             textAlign = TextAlign.Center,
             color = marengo
         )
-        /*if (isVaccination)
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(R.string.support_text_data_next_vaccination),
-                style = textBold_18,
-                textAlign = TextAlign.Center
-            )
-        Spacer(modifier = Modifier.weight(0.25f))*/
+    }
+}
+
+@Composable
+fun CardIndicationChangeChoice(
+    value: String,
+    suffix: Suffix,
+    status: IndicationStatus
+) {
+    val colors = when (status) {
+        IndicationStatus.POSITIVE, IndicationStatus.PRICE, IndicationStatus.ADD, IndicationStatus.ALL_WEIGHT ->
+            Triple(green_g_2, green_1, green_2)
+
+        IndicationStatus.NEUTRAL -> Triple(grey_2, grey, grey_3)
+        IndicationStatus.NEGATIVE, IndicationStatus.KILL -> Triple(red_3, red_2, red_1)
+
+        IndicationStatus.WRITE_OFF -> Triple(violet_3, violet_5, violet_1)
+        IndicationStatus.SALE -> Triple(blue_3, blue_9, blue_8)
+        IndicationStatus.EXPENSES -> Triple(orang_4, orang_5, orang_6)
+    }
+
+    val string =
+        when (status) {
+            IndicationStatus.POSITIVE -> stringResource(R.string.animal_indicators_change_increased)
+                .format(value, stringResource(suffix.toResId()))
+
+            IndicationStatus.NEGATIVE -> stringResource(R.string.animal_indicators_change_decreased)
+                .format(value, stringResource(suffix.toResId()))
+
+            IndicationStatus.NEUTRAL -> stringResource(R.string.animal_indicators_size_not_changed_s)
+                .format(value, stringResource(suffix.toResId()))
+
+            else -> "$value ${stringResource(suffix.toResId())}"
+        }
+    val titleRes = stringResource(
+        when (status) {
+            IndicationStatus.PRICE -> R.string.support_text_all_price
+            IndicationStatus.ADD -> R.string.animal_count_screen_add_animal
+            IndicationStatus.WRITE_OFF -> R.string.animal_count_screen_write_off_animal
+            IndicationStatus.SALE -> R.string.animal_count_screen_sale_animal
+            IndicationStatus.KILL -> R.string.animal_count_screen_kill_animal
+            IndicationStatus.ALL_WEIGHT -> R.string.animal_card_screen_animal_card_info_weight_all
+            IndicationStatus.EXPENSES -> R.string.animal_count_screen_expenses_animal
+            else -> R.string.animal_indicators_changed
+        }
+    )
+    CardIndicationChange(titleRes, string, colors)
+}
+
+@Composable
+fun CardIndicationChange(
+    titleRes: String,
+    string: String,
+    colors: Triple<Color, Color, Color>
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = titleRes,
+            style = text_14,
+            color = marengo
+        )
+        CardClips(
+            colorBackground = colors.first,
+            colorBorder = colors.second,
+            colorText = colors.third,
+            value = string,
+        )
+    }
+}
+
+@Composable
+fun CardVaccinationDate(
+    currentDate: Boolean,
+    date: String
+) {
+    val colors = when (currentDate) {
+        true -> Triple(violet_3, violet_5, violet_6)
+        false -> Triple(blue_5, blue_6, blue_7)
+    }
+
+    val string = stringResource(
+        when (currentDate) {
+            true -> R.string.card_date
+            false -> R.string.animal_vaccination_next_date
+        }
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            string,
+            style = text_12,
+            color = gray_7
+        )
+        CardClips(
+            colorBackground = colors.first,
+            colorBorder = colors.second,
+            colorText = colors.third,
+            value = date,
+        )
     }
 }

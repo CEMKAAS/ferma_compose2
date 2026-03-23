@@ -20,6 +20,9 @@ interface AnimalSizeDao {
     @Delete
     suspend fun deleteAnimalSizeTable(animalSizeTable: AnimalSizeTable)
 
+    @Query("DELETE FROM animal_size_table WHERE id = :id")
+    suspend fun deleteAnimalSizeTableById(id: Long)
+
     @Query(
         "SELECT * FROM animal_size_table" +
                 " WHERE animal_id=:id" +

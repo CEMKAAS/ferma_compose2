@@ -8,6 +8,6 @@ interface AnimalCountRepository {
     suspend fun insertAnimalCountTable(animalCountTable: DomainAnimalCount): Long
     suspend fun updateAnimalCountTable(animalCountTable: DomainAnimalCount)
     suspend fun deleteAnimalCountTable(id: Long)
-    fun getCountAnimalLimit(id: Long): Flow<DomainAnimalCount>
+    fun getCountAnimalLimit(id: Long): Flow<DomainAnimalCount?>
     fun getCountAnimal(id: Long): Flow<List<DomainAnimalCountPrice>>
 }

@@ -33,15 +33,15 @@ interface AnimalCountDao {
         SELECT
             CASE
                 WHEN (SELECT version FROM FirstRow) IS NULL THEN
-                    (SELECT count FROM FirstRow)
+                    COALESCE( (SELECT count FROM FirstRow), 0)
                 ELSE
-                    (SELECT SUM(
+                   COALESCE((SELECT SUM(
                         CASE
                             WHEN version IN (1, 4) THEN count
                             WHEN version IN (0, 2, 3) THEN -count
                             ELSE 0
                         END
-                    ) FROM animal_count_table WHERE animal_id = :id)
+                    ) FROM animal_count_table WHERE animal_id = :id), 0)
         END AS calculatedCount
     )
     SELECT 
@@ -55,7 +55,7 @@ interface AnimalCountDao {
     FROM FirstRow
 """
     )
-    fun getCountAnimalLimit(id: Long): Flow<AnimalCountTable>
+    fun getCountAnimalLimit(id: Long): Flow<AnimalCountTable?>
 
     @Query(
         "SELECT id, count, suffix, date, animal_id, note, version," +

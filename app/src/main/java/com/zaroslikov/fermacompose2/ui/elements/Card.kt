@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -51,6 +52,8 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.black_1
 import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.black_3
+import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_5
 import com.zaroslikov.fermacompose2.blue_6
@@ -62,7 +65,9 @@ import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_3
 import com.zaroslikov.fermacompose2.green_4
+import com.zaroslikov.fermacompose2.green_g_1
 import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
@@ -84,8 +89,11 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.HeadingAnimalCard
 import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_5
@@ -149,19 +157,11 @@ fun CardField(
 @Composable
 fun CardFieldNew(
     modifier: Modifier = Modifier,
+    colors: List<Color>? = null,
     padding: PaddingValues = PaddingValues(20.dp),
     onClick: () -> Unit = { },
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    contentRow: @Composable (RowScope.() -> Unit)? = null,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    contentColumn: @Composable (ColumnScope.() -> Unit)? = null,
+    contentColumn: @Composable (ColumnScope.() -> Unit),
 ) {
-    val modifierCard = Modifier
-        .fillMaxWidth()
-        .padding(padding)
-
     val shape = RoundedCornerShape(14.dp)
 
     Card(
@@ -175,19 +175,18 @@ fun CardFieldNew(
             defaultElevation = 5.dp
         )
     ) {
-        when {
-            contentRow != null -> Row(
-                modifier = modifierCard,
-                horizontalArrangement = horizontalArrangement,
-                verticalAlignment = verticalAlignment
-            ) {
-                contentRow()
-            }
-
-            contentColumn != null -> Column(
-                modifier = modifierCard,
-                horizontalAlignment = horizontalAlignment,
-                verticalArrangement = verticalArrangement
+        Box(
+            Modifier.then(
+                colors?.let { colors ->
+                    val gradient = Brush.linearGradient(colors)
+                    Modifier.background(gradient, shape = shape)
+                } ?: Modifier
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(padding)
             ) {
                 contentColumn()
             }
@@ -198,20 +197,20 @@ fun CardFieldNew(
 @Composable
 fun CardFieldNew(
     modifier: Modifier = Modifier,
+    colors: List<Color>? = null,
     padding: PaddingValues = PaddingValues(20.dp),
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     contentRow: @Composable (RowScope.() -> Unit)? = null,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    contentColumn: @Composable (ColumnScope.() -> Unit)? = null,
+    contentColumn: @Composable (ColumnScope.() -> Unit)? = null
 ) {
     val modifierCard = Modifier
         .fillMaxWidth()
         .padding(padding)
 
     val shape = RoundedCornerShape(14.dp)
-
     Card(
         colors = CardDefaults.cardColors(
             containerColor = white
@@ -222,21 +221,36 @@ fun CardFieldNew(
             defaultElevation = 5.dp
         )
     ) {
-        when {
-            contentRow != null -> Row(
-                modifier = modifierCard,
-                horizontalArrangement = horizontalArrangement,
-                verticalAlignment = verticalAlignment
-            ) {
-                contentRow()
-            }
+        Box(
+            Modifier.then(
+                colors?.let { colors ->
+                    val gradient = Brush.linearGradient(
+                        colorStops = arrayOf(
+                            0.0f to colors[0],
+                            0.7f to colors[0],
+                            1.0f to colors[1]
+                        )
+                    )
+                    Modifier.background(gradient, shape = shape)
+                } ?: Modifier
+            )
+        ) {
+            when {
+                contentRow != null -> Row(
+                    modifier = modifierCard,
+                    horizontalArrangement = horizontalArrangement,
+                    verticalAlignment = verticalAlignment
+                ) {
+                    contentRow()
+                }
 
-            contentColumn != null -> Column(
-                modifier = modifierCard,
-                horizontalAlignment = horizontalAlignment,
-                verticalArrangement = verticalArrangement
-            ) {
-                contentColumn()
+                contentColumn != null -> Column(
+                    modifier = modifierCard,
+                    horizontalAlignment = horizontalAlignment,
+                    verticalArrangement = verticalArrangement
+                ) {
+                    contentColumn()
+                }
             }
         }
     }
@@ -499,6 +513,8 @@ fun DetailProductCardNew(
     month: Int,
     year: Int,
     buyer: String? = null,
+    food: Food? = null,
+    colors: List<Color>? = null,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -566,12 +582,22 @@ fun DetailProductCardNew(
             valueString = date,
             iconColor = color
         )
-
 //                if (addProduct.animal != "")
 //                    IconAndText(
 //                        iconRes = R.drawable.baseline_pets_24,
 //                        valueString = addProduct.animal
 //                    )
+        food?.let { food ->
+            SliderFood(
+                feedFood = food.feedFood,
+                feedFoodSuffix = food.feedFoodSuffix,
+                daysEnd = food.daysEnd,
+                weightAll = food.weightAll,
+                weightSuffix = food.weightSuffix,
+                percentFloat = food.percentFloat,
+                animalList = food.animalList
+            )
+        }
         if (note != "") NoteColorCard(note, color)
     }
 
@@ -581,8 +607,69 @@ fun DetailProductCardNew(
             .clickable {
                 onClick()
             },
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        colors = colors
     ) { cardField() } else BorderCard { cardField() }
+}
+
+@Composable
+private fun SliderFood(
+    feedFood: Double,
+    feedFoodSuffix: Suffix,
+    daysEnd: Int,
+    weightAll: Double,
+    weightSuffix: Suffix,
+    percentFloat: Float,
+    animalList: List<String>
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            animalList.forEach {
+                AnimalFoodClips(it)
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconAndTextNew(
+                iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
+                valueString = "${weightAll.formatNumber()} ${stringResource(weightSuffix.toResId())}",
+                iconColor = blue_1,
+                iconSize = 14.dp,
+                textColor = black_2,
+                textStyle = text_12
+            )
+            IconAndTextNew(
+                iconRes = R.drawable.baseline_shopping_basket_24,
+                valueString = "${feedFood.formatNumber()} ${stringResource(feedFoodSuffix.toResId())}",
+                iconColor = green_shamrock,
+                iconSize = 14.dp,
+                textColor = black_2,
+                textStyle = text_12
+            )
+            IconAndTextNew(
+                iconRes = R.drawable.baseline_access_time_24,
+                valueString = "${daysEnd.formatNumber()} ${stringResource(R.string.expenses_screen_days)}",
+                iconColor = violet_1,
+                iconSize = 14.dp,
+                textColor = black_2,
+                textStyle = text_12
+            )
+        }
+        BaseSlider(
+            modifier = Modifier,
+            percentFloat = percentFloat,
+            color = black_3,
+        )
+    }
 }
 
 
@@ -732,6 +819,31 @@ fun BrieflyCountCardNew(
             }
         }
     )
+}
+
+@Composable
+private fun AnimalFoodClips(
+    nameAnimal: String
+) {
+    BorderCard(
+        borderColor = green_3,
+        containerColor = green_g_1,
+        shape = RoundedCornerShape(99.dp),
+        padding = PaddingValues(vertical = 4.dp, horizontal = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_shopping_basket_24),
+                contentDescription = null,
+                tint = green_shamrock,
+                modifier = Modifier.size(12.dp)
+            )
+            Text(nameAnimal, style = text_12, color = green_2)
+        }
+    }
 }
 
 @Composable
@@ -891,83 +1003,6 @@ fun CardClips(
 }
 
 
-@Composable
-fun CardIndicationChangeChoice(
-    value: String,
-    suffix: Suffix,
-    status: IndicationStatus
-) {
-    val colors = when (status) {
-        IndicationStatus.POSITIVE -> Triple(green_g_2, green_1, green_2)
-        IndicationStatus.NEGATIVE -> Triple(red_3, red_2, red_1)
-        IndicationStatus.NEUTRAL -> Triple(grey_2, grey, grey_3)
-        IndicationStatus.PRICE -> Triple(green_g_2, green_1, green_2)
-        IndicationStatus.ADD -> Triple(green_g_2, green_1, green_2)
-        IndicationStatus.WRITE_OFF -> Triple(violet_3, violet_5, violet_1)
-        IndicationStatus.SALE -> Triple(blue_3, blue_9, blue_8)
-        IndicationStatus.EXPENSES -> Triple(orang_4, orang_5, orang_6)
-        IndicationStatus.KILL -> Triple(red_3, red_2, red_1)
-        IndicationStatus.ALL_WEIGHT -> Triple(green_g_2, green_1, green_2)
-    }
-
-    val string =
-        when (status) {
-            IndicationStatus.POSITIVE -> stringResource(R.string.animal_indicators_change_increased).format(
-                value,
-                stringResource(suffix.toResId())
-            )
-
-            IndicationStatus.NEGATIVE -> stringResource(R.string.animal_indicators_change_decreased).format(
-                value,
-                stringResource(suffix.toResId())
-            )
-
-            IndicationStatus.NEUTRAL -> stringResource(R.string.animal_indicators_size_not_changed_s).format(
-                value,
-                stringResource(suffix.toResId())
-            )
-
-            else -> "$value ${stringResource(suffix.toResId())}"
-        }
-    val titleRes = stringResource(
-        when (status) {
-            IndicationStatus.PRICE -> R.string.support_text_all_price
-            IndicationStatus.ADD -> R.string.animal_count_screen_add_animal
-            IndicationStatus.WRITE_OFF -> R.string.animal_count_screen_write_off_animal
-            IndicationStatus.SALE -> R.string.animal_count_screen_sale_animal
-            IndicationStatus.KILL -> R.string.animal_count_screen_kill_animal
-            IndicationStatus.ALL_WEIGHT -> R.string.animal_card_screen_animal_card_info_weight_all
-            IndicationStatus.EXPENSES -> R.string.animal_count_screen_expenses_animal
-            else -> R.string.animal_indicators_changed
-        }
-    )
-    CardIndicationChange(titleRes, string, colors)
-}
-
-@Composable
-fun CardIndicationChange(
-    titleRes: String,
-    string: String,
-    colors: Triple<Color, Color, Color>
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = titleRes,
-            style = text_14,
-            color = marengo
-        )
-        CardClips(
-            colorBackground = colors.first,
-            colorBorder = colors.second,
-            colorText = colors.third,
-            value = string,
-        )
-    }
-}
 
 
 @Composable
@@ -983,39 +1018,7 @@ fun CardIndicationChange(
     )
 }
 
-@Composable
-fun CardVaccinationDate(
-    currentDate: Boolean,
-    date: String
-) {
-    val colors = when (currentDate) {
-        true -> Triple(violet_3, violet_5, violet_6)
-        false -> Triple(blue_5, blue_6, blue_7)
-    }
 
-    val string = stringResource(
-        when (currentDate) {
-            true -> R.string.card_date
-            false -> R.string.animal_vaccination_next_date
-        }
-    )
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Text(
-            string,
-            style = text_12,
-            color = gray_7
-        )
-        CardClips(
-            colorBackground = colors.first,
-            colorBorder = colors.second,
-            colorText = colors.third,
-            value = date,
-        )
-    }
-}
 
 @Composable
 fun DateFactoryCardNew(
@@ -1080,62 +1083,6 @@ fun GreenCard(
         )
     ) {
         content()
-    }
-}
-
-@Composable
-fun ProductKillCard(
-    number: Int,
-    name: String,
-    value: String,
-    suffix: Suffix?,
-    isEditMode: Boolean = false,
-    onClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-
-    val (containerColor, borderColor) = if (isEditMode) orang_4 to orang_7 else green_g_2 to green_1
-
-    GreenCard(
-        containerColor = containerColor,
-        borderColor = borderColor,
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("$number.", style = text_14, color = marengo)
-                Column(
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(name, style = text_14, color = black_1)
-                    Text(
-                        "$value " +
-                                if (suffix != null) stringResource(suffix.toResId()) else "",
-                        style = text_12,
-                        color = green_shamrock
-                    )
-                }
-            }
-            IconButton(
-                onClick = onDeleteClick,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_delete_24),
-                    tint = red_4,
-                    contentDescription = null
-                )
-
-            }
-        }
     }
 }
 
@@ -1277,22 +1224,40 @@ fun WhiteTenCard(
 
 @Composable
 fun CardNewWithTitle(
+    @DrawableRes iconRes: Int? = null,
     @StringRes titleRes: Int,
+    textColor: Color = black_2,
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(16.dp),
     content: @Composable ColumnScope.() -> Unit
 ) {
     CardFieldNew {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = verticalArrangement
         ) {
-            Text(
-                stringResource(titleRes),
-                style = text_16,
-                color = black_2
-            )
+            Row(
+                modifier = Modifier,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                iconRes?.let {
+                    Icon(
+                        painter = painterResource(it),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = gray_7
+                    )
+                }
+                Text(
+                    stringResource(titleRes),
+                    style = text_16,
+                    color = textColor
+                )
+            }
             content()
         }
     }
 }
+
 
 @Composable
 fun TextMiniCard(

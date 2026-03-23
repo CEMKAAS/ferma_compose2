@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.TopAppBarStart
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
@@ -50,8 +49,10 @@ import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.gray_4
+import com.zaroslikov.fermacompose2.green_15
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
+import com.zaroslikov.fermacompose2.orang_13
 import com.zaroslikov.fermacompose2.orang_3
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
@@ -273,7 +274,7 @@ private fun DataCardOne(
                         parameter = "${animal.foodDay.formatNumber()} ${stringResource(animal.foodDaySuffix.toResId())}",
                         icon = R.drawable.baseline_shopping_basket_24,
                         iconColor = Color(0xFFD08700),
-                        iconColorSecond = Color(0xFFFEFCE8)
+                        iconColorSecond = orang_13
                     )
                     AnimalParameter(
                         titleParameter = R.string.search_section,
@@ -339,7 +340,7 @@ private fun DataCardTwo(
     size: DomainAnimalSize?,
     weight: DomainAnimalWeight?,
     vaccination: DomainAnimalVaccination?,
-    count: DomainAnimalCount,
+    count: DomainAnimalCount?,
     onNavigateSize: () -> Unit,
     onNavigateCount: () -> Unit,
     onNavigateWeight: () -> Unit,
@@ -355,10 +356,11 @@ private fun DataCardTwo(
         ) {
             AnimalParameter(
                 titleParameter = R.string.count_screen_title,
-                parameter = "${count.count} ${stringResource(count.suffix.toResId())}",
+                parameter = count?.let { "${it.count} ${stringResource(it.suffix.toResId())}" }
+                    ?: stringResource(R.string.animal_card_screen_animal_card_no_count),
                 icon = R.drawable.baseline_spoke_24,
-                iconColor = Color(0xFF009689),
-                iconColorSecond = Color(0xFFF0FDFA),
+                iconColor = animal_1,
+                iconColorSecond = green_15,
                 isMore = true
             ) { onNavigateCount() }
             HorizontalDivider(thickness = 1.dp, color = gray_4)

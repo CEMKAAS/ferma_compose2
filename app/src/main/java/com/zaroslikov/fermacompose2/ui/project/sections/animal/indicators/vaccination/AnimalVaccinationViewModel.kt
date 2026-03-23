@@ -1,24 +1,24 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vaccination
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.dateTodayNextYear
-import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -33,262 +33,138 @@ class AnimalVaccinationViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
     private val animalVaccinationRepository: AnimalVaccinationRepository,
     private val expensesRepository: ExpensesRepository,
-    private val resourceProvider: ResourceProvider
-) : EntryNewViewModel<AnimalVaccinationState, AnimalVaccinationIntent>(
-    AnimalVaccinationState()
+    private val resourceProvider: ResourceProvider,
+    private val settingsRepository: SettingsRepository,
+) : EntryNewViewModel2<AnimalVaccinationState, AnimalVaccinationIntent, AnimalVaccinationReduce>(
+    AnimalVaccinationState(),
+    AnimalVaccinationReduce()
 ) {
     private val itemId: Long = checkNotNull(savedStateHandle[AnimalVaccinationDestination.itemId])
     private val itemIdPT: Long =
         checkNotNull(savedStateHandle[AnimalVaccinationDestination.itemIdPT])
 
     init {
-        viewModelScope.launch {
-            loadData()
-        }
+        loadData()
     }
 
     override fun onIntent(intent: AnimalVaccinationIntent) {
+        sendIntent(intent)
         return when (intent) {
-            is AnimalVaccinationIntent.OpenDialogClicked -> updateOpenDialog(
-                intent.isEntry,
-                intent.domainAnimalVaccination
+            is AnimalVaccinationIntent.OpenEntryBottomSheetByItem -> loadDataForEntryOrEdit(
+                intent.isOpen,
+                intent.domainAnimalVaccination,
+                intent.isSaveStateForBottomSheet
             )
 
-            AnimalVaccinationIntent.EndDialogClicked -> updateEndDialog()
-            is AnimalVaccinationIntent.CountChanged -> updateCount(intent.value)
-            is AnimalVaccinationIntent.PriceChanged -> updatePrice(intent.value)
-            is AnimalVaccinationIntent.AutoPriceClicked -> updateAutoPrice(intent.value)
-            is AnimalVaccinationIntent.VaccinationChanged -> updateVaccination(intent.value)
-            is AnimalVaccinationIntent.DateClicked -> updateDate(intent.value)
-            is AnimalVaccinationIntent.DateNextClicked -> updateDateNext(intent.value)
-            is AnimalVaccinationIntent.NoteChanged -> updateNote(intent.value)
             AnimalVaccinationIntent.InsertPressed -> insert()
             AnimalVaccinationIntent.UpdatePressed -> update()
             is AnimalVaccinationIntent.DeletePressed -> delete(intent.value)
-            is AnimalVaccinationIntent.DateFactoryClicked -> updateIsDateFactory(intent.value)
+            else -> Unit
         }
     }
 
-    suspend fun loadData() {
-        updateState { it.copy(isLoading = true) }
-        val animalGroup = animalRepository.getAnimal(itemId).first().group
-        val animalCount = animalCountAnimalRepository.getCountAnimalLimit(itemId).first()
-        updateState {
-            it.copy(
-                isAnimalGroup = animalGroup,
-                countAnimalAll = animalCount.count,
-                suffixAnimal = animalCount.suffix
-            )
-        }
-        combine(
-            animalVaccinationRepository.getTitleVaccinationAnimalList(itemId),
-            animalVaccinationRepository.getVaccinationExpensesAnimal(itemId)
-        ) { titleVaccinationList, vaccination ->
-            titleVaccinationList to vaccination
-        }.collectLatest { data ->
-            updateState {
-                it.copy(
-                    vaccinationList = data.second,
-                    titleVaccinationList = data.first,
-                    idPT = itemIdPT,
-                    isLoading = false
-                )
+    fun loadData() {
+        viewModelScope.launch {
+            combine(
+                animalVaccinationRepository.getTitleVaccinationAnimalList(itemId),
+                animalVaccinationRepository.getVaccinationExpensesAnimal(itemId)
+            ) { titleVaccinationList, vaccination ->
+                titleVaccinationList to vaccination
+            }.collectLatest { data ->
+                updateState {
+                    it.copy(
+                        vaccinationList = data.second,
+                        titleVaccinationList = data.first,
+                        idPT = itemIdPT,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
     override fun insert() {
         viewModelScope.launch {
-            if (!isError()) {
-                val vaccination = getState().currentProduct
-                val vaccinationId =
-                    animalVaccinationRepository.insertAnimalVaccinationTable(vaccination.toDomainMap())
-                if (vaccination.price.isNotBlank())
-                    expensesRepository.insertExpenses(vaccination.toUiMap222(vaccinationId))
-                updateEndDialog()
-                showMessage("Добавлен размер")
-            }
+            val vaccination = getState().currentProduct
+            val vaccinationId =
+                animalVaccinationRepository.insertAnimalVaccinationTable(vaccination.toDomainMap())
+            if (vaccination.price.isNotBlank())
+                expensesRepository.insertExpenses(vaccination.toDomainExpensesTable(vaccinationId))
+            loadDataForEntryOrEdit(false, null)
+            showMessage("Добавлен размер")
         }
     }
 
     override fun update() {
         viewModelScope.launch {
-            if (!isError()) {
-                val vaccination = getState().currentProduct
-                Log.i("vaccination2", "update: ${vaccination.toDomainMap()}")
-                animalVaccinationRepository.updateAnimalVaccinationTable(vaccination.toDomainMap())
-                when {
-                    vaccination.idExpenses == null && vaccination.price.isNotBlank() ->
-                        expensesRepository.insertExpenses(vaccination.toUiMap222())
+            val vaccination = getState().currentProduct
+            animalVaccinationRepository.updateAnimalVaccinationTable(vaccination.toDomainMap())
+            when {
+                vaccination.idExpenses == null && vaccination.price.isNotBlank() ->
+                    expensesRepository.insertExpenses(vaccination.toDomainExpensesTable())
 
-                    vaccination.idExpenses != null && vaccination.price.isNotBlank() -> {
-                        Log.i("vaccination2", "update: ${vaccination.idExpenses} ")
-                        expensesRepository.updateExpenses(vaccination.toUiMap222())
-                    }
+                vaccination.idExpenses != null && vaccination.price.isNotBlank() ->
+                    expensesRepository.updateExpenses(vaccination.toDomainExpensesTable())
 
-                    vaccination.idExpenses != null && vaccination.price.isBlank() ->
-                        expensesRepository.deleteExpensesById(vaccination.idExpenses)
-                }
-                updateEndDialog()
-                showMessage("Редактировать размер")
+                vaccination.idExpenses != null && vaccination.price.isBlank() ->
+                    expensesRepository.deleteExpensesById(vaccination.idExpenses)
             }
+            loadDataForEntryOrEdit(false, null)
+            showMessage("Редактировать размер")
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
             animalVaccinationRepository.deleteAnimalVaccinationTableById(id)
-            updateEndDialog()
             showMessage("Удалить размер")
         }
     }
 
-    override fun validation() {
-        updateState { state ->
-            state.copy(
-                currentProduct = state.currentProduct.copy(
-                    error = state.currentProduct.error.copy(
-                        isErrorVaccination = state.currentProduct.vaccination.isBlank(),
-                        isErrorCount = if (state.isAnimalGroup) state.currentProduct.countVaccination.isBlank() else false,
-                        isErrorCountZero = if (state.isAnimalGroup) isAnimalCountZero(state.currentProduct.countVaccination) else false,
-                    )
-                )
-            )
-        }
-    }
-
-    private fun updateOpenDialog(
-        isEntry: Boolean,
-        domainAnimal: AnimalVaccinationExpensesDomain?
+    private fun loadDataForEntryOrEdit(
+        isOpen: Boolean,
+        domain: AnimalVaccinationExpensesDomain?,
+        isSaveStateForBottomSheet: Boolean = false
     ) {
         viewModelScope.launch {
-            updateState {
-                it.copy(
-                    isOpenDialog = true,
-                    currentProduct = Vaccination(idAnimal = itemId, isEntry = isEntry)
-                )
-            }
-            domainAnimal?.let {
-                val expensesVaccination =
-                    expensesRepository.getItemExpensesForVaccination(domainAnimal.id).firstOrNull()
-
-                updateState {
-                    it.copy(
-                        currentProduct = it.currentProduct.toUiMap22(
-                            domainAnimal,
-                            expensesVaccination?.id
-                        )
+            if (!isOpen) {
+                val state =
+                    if (isSaveStateForBottomSheet) getState().currentProduct
+                    else Vaccination()
+                onIntent(
+                    AnimalVaccinationIntent.RefreshEntryBottomSheetState(
+                        false, state, isSaveStateForBottomSheet
                     )
-                }
+                )
+                return@launch
             }
-        }
-    }
 
-    private fun updateEndDialog() {
-        updateState {
-            it.copy(
-                isOpenDialog = false,
-                currentProduct = Vaccination()
-            )
-        }
-    }
+            val newState = if (!getState().isSaveStateForBottomSheet || domain != null) {
+                val animalDeferred = async { animalRepository.getAnimal(itemId).first().group }
+                val animalCountDeferred =
+                    async { animalCountAnimalRepository.getCountAnimalLimit(itemId).first() }
+                val settingsDeferred = async { settingsRepository.getSettings(itemIdPT).first() }
 
-    private fun updateVaccination(vaccination: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    vaccination = vaccination
+                val baseState = Vaccination(
+                    isAnimalGroup = animalDeferred.await(),
+                    countAnimalAll = animalCountDeferred.await()?.count,
+                    animalSuffix = animalCountDeferred.await()?.suffix ?: Suffix.PIECES,
+                    priceSuffix = settingsDeferred.await().currencySuffix,
+                    idAnimal = itemId
                 )
+                domain?.let {
+                    val expensesVaccination =
+                        expensesRepository.getItemExpensesForVaccination(domain.id).firstOrNull()
+                    baseState.toUi(domain, expensesVaccination?.id)
+                } ?: baseState
+            } else getState().currentProduct
+            sendIntent(
+                AnimalVaccinationIntent.RefreshEntryBottomSheetState(true, newState)
             )
         }
     }
 
-    private fun updateDate(date: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    date = date
-                )
-            )
-        }
-    }
-
-    private fun updateDateNext(dateNext: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    nextDate = dateNext
-                )
-            )
-        }
-    }
-
-    private fun updateNote(note: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    note = note
-                )
-            )
-        }
-    }
-
-    private fun updateCount(count: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    countVaccination = count
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updatePrice(price: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    price = price
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updateAutoPrice(isAutoPrice: Boolean) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    isAutoCalculate = isAutoPrice
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updatePriceAll() {
-        updateState { state ->
-            state.copy(
-                currentProduct = state.currentProduct.copy(
-                    priceAll = if (state.currentProduct.isAutoCalculate)
-                        (state.currentProduct.price.toConvertZeroDouble() * state.currentProduct.countVaccination.toConvertZeroDouble()).formatNumber()
-                    else "0"
-                )
-            )
-        }
-    }
-
-    private fun updateIsDateFactory(isDateFactory: Boolean) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    isDateFactory = isDateFactory,
-                )
-            )
-        }
-    }
-
-    private fun Vaccination.toUiMap222(
+    private fun Vaccination.toDomainExpensesTable(
         animalVaccinationId: Long? = null
     ): DomainExpensesTable {
         val dateList = date.split(".")
@@ -302,7 +178,7 @@ class AnimalVaccinationViewModel @Inject constructor(
             year = dateList[2].toInt(),
             price = price.toConvertZeroDouble(),
             priceAll = if (isAutoCalculate) priceAll.toConvertZeroDouble() else null,
-            countSuffix = getState().suffixAnimal,
+            countSuffix = animalSuffix,
             category = category,
             note = note,
             isShowFood = false,
@@ -314,7 +190,7 @@ class AnimalVaccinationViewModel @Inject constructor(
         )
     }
 
-    private fun Vaccination.toUiMap22(
+    private fun Vaccination.toUi(
         domain: AnimalVaccinationExpensesDomain,
         idExpenses: Long?
     ): Vaccination {
@@ -330,6 +206,7 @@ class AnimalVaccinationViewModel @Inject constructor(
             priceAll = domain.priceAll?.formatNumber() ?: "",
             isAutoCalculate = domain.priceAll != null,
             isDateFactory = domain.nextDate == null,
+            isEntry = false,
             idExpenses = idExpenses
         )
     }
@@ -345,24 +222,4 @@ class AnimalVaccinationViewModel @Inject constructor(
             note = note,
         )
     }
-}
-
-sealed class AnimalVaccinationIntent : BaseIntent {
-    data class OpenDialogClicked(
-        val isEntry: Boolean,
-        val domainAnimalVaccination: AnimalVaccinationExpensesDomain? = null
-    ) : AnimalVaccinationIntent()
-
-    data object EndDialogClicked : AnimalVaccinationIntent()
-    data class VaccinationChanged(val value: String) : AnimalVaccinationIntent()
-    data class CountChanged(val value: String) : AnimalVaccinationIntent()
-    data class PriceChanged(val value: String) : AnimalVaccinationIntent()
-    data class AutoPriceClicked(val value: Boolean) : AnimalVaccinationIntent()
-    data class DateClicked(val value: String) : AnimalVaccinationIntent()
-    data class DateFactoryClicked(val value: Boolean) : AnimalVaccinationIntent()
-    data class DateNextClicked(val value: String) : AnimalVaccinationIntent()
-    data class NoteChanged(val value: String) : AnimalVaccinationIntent()
-    data object InsertPressed : AnimalVaccinationIntent()
-    data object UpdatePressed : AnimalVaccinationIntent()
-    data class DeletePressed(val value: Long) : AnimalVaccinationIntent()
 }

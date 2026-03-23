@@ -218,7 +218,7 @@ fun isAnimalWeightIncrease(
 fun isAnimalCountZero(
     count: String
 ): Boolean {
-    return count.toConvertZeroString().toConvertDbOnlyInt() == 0
+    return count.toConvertZeroDbInt() == 0
 }
 
 fun isAnimalCountDifference(

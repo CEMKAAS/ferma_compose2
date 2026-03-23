@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
@@ -21,10 +20,8 @@ import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.alabaster
 import com.zaroslikov.fermacompose2.green_g_1
-import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.price_green
-import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
@@ -38,10 +35,10 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNe
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
-import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesListIntent
 
 /*object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -53,15 +50,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryB
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
-    /*    modifier: Modifier = Modifier,
-        navigateToStart: () -> Unit,
-        navigateToModalSheet: (DrawerNavigation) -> Unit,
-        navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-        navigateToItemAdd: (Long) -> Unit,
-        navigationToAnalysis: (Pair<Long, String>) -> Unit,
-        drawerState: DrawerState,*/
-    /*state: AddListState,
-    onIntent: (AddListIntent) -> Unit,*/
+    /* navigationToAnalysis: (Pair<Long, String>) -> Unit */
     viewModel: AddViewModel = hiltViewModel(),
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
 ) {
@@ -69,28 +58,6 @@ fun AddScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(price_green, green_shamrock)
     val idProject = state.idPT
-
-    val query = state.textSearch.trim().lowercase()
-
-    val searchList = if (query.isBlank() && !state.isGroup) state.list
-    else
-        state.list.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.note.lowercase().contains(query) ||
-                    item.category.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) ||
-                    stringResource(item.countSuffix.toResId()).lowercase().contains(query) ||
-                    "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
-                        .contains(query)
-        }
-
-
-    val searchList2 = if (query.isBlank() && state.isGroup) state.briefly
-    else
-        state.briefly.filter { item ->
-            item.title.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query)
-        }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -117,15 +84,9 @@ fun AddScreen(
             AddContainer2(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
-                searchText = state.textSearch,
                 itemList = state.list,
-                searchList = searchList,
-                brieflyList = searchList2,
-                onInsertClick = {
-                    viewModel.onIntent(
-                        AddListIntent.OpenBottomSheetEntry(true)
-                    )
-                },
+                searchList = state.searchList,
+                brieflyList = state.searchBrieflyList,
                 onEditClick = {
                     viewModel.onIntent(
                         AddListIntent.OpenBottomSheetEntry(true, it)
@@ -141,7 +102,6 @@ fun AddScreen(
             )
         if (state.openBottomSheetEntry)
             AddEntryBottomSheet(
-                modifier = Modifier,
                 state = state.currentProduct,
                 colors = colors,
                 onIntent = viewModel::onIntent
@@ -170,11 +130,9 @@ fun AddScreen(
 fun AddContainer2(
     modifier: Modifier = Modifier,
     details: Boolean,
-    searchText: String,
     itemList: List<DomainAddTable>,
     searchList: List<DomainAddTable>,
     brieflyList: List<BrieflyAddDomain>,
-    onInsertClick: () -> Unit,
     onEditClick: (DomainAddTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (BrieflyAddDomain) -> Unit
@@ -184,10 +142,6 @@ fun AddContainer2(
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList,
-        onInsertClick = onInsertClick,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        onDetailsClick = onDetailsClick,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -272,20 +226,26 @@ fun BrieflyBottomSheetAdd(
 
 @Composable
 fun AddEntryBottomSheet(
-    modifier: Modifier,
     state: AddEntryState2,
     colors: List<Color>,
     onIntent: (AddListIntent) -> Unit
 ) {
     EntryBottomSheet(
-        modifier = Modifier,
+        titleEntryRes = R.string.add_screen_title_entry,
+        titleEditRes = R.string.add_screen_title_edit,
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
-                AddListIntent.OpenBottomSheetEntry(false)
+                AddListIntent.OpenBottomSheetEntry(
+                    isOpen = false,
+                    isSaveStateForBottomSheet = state.isEntry
+                )
             )
+        },
+        onSecondDismissRequest = {
+            onIntent(AddListIntent.OpenBottomSheetEntry(false))
         },
         onInsertClick = { onIntent(AddListIntent.Insert) },
         onUpdateClick = { onIntent(AddListIntent.Update) },
@@ -308,12 +268,10 @@ fun AddEntryBottomSheet(
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product,
-//                    isWarehouseShow = state.title.isNotBlank() && state.warehouseList.isNotEmpty(),
-//                    warehouseList = state.warehouseList
         )
         WarehouseCountCard(
             title = state.title,
-            warehouseList = state.warehouseList
+            warehouseList = state.pickList.warehouseList
         )
         OutlinedTextCategoryNew(
             value = state.category,

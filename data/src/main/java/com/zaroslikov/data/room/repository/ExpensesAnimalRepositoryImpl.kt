@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.repository
 
 
+import android.util.Log
 import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.mapper.toExpensesAnimalTable
 import com.zaroslikov.domain.models.DomainExpensesAnimal
@@ -24,5 +25,9 @@ class ExpensesAnimalRepositoryImpl @Inject constructor(private val expensesAnima
 
     override suspend fun deleteExpensesAnimal(item: DomainExpensesAnimal) {
         return expensesAnimalDao.deleteExpensesAnimal(item.toExpensesAnimalTable())
+    }
+
+    override suspend fun deleteExpensesAnimalById(id: Long) {
+        return expensesAnimalDao.deleteExpensesAnimalById(id)
     }
 }

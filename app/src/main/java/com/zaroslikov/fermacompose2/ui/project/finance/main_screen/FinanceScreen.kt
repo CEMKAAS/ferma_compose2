@@ -408,65 +408,67 @@ fun TransactionFinanceCard(
     CardFieldNew(
         padding = PaddingValues(16.dp),
         onClick = onDetailClick,
-        contentRow = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+       contentColumn = {
+           Row {
+               Row(
+                   modifier = Modifier.fillMaxWidth(),
+                   horizontalArrangement = Arrangement.SpaceBetween,
+                   verticalAlignment = Alignment.CenterVertically
+               ) {
+                   Row(
+                       verticalAlignment = Alignment.CenterVertically,
+                       horizontalArrangement = Arrangement.spacedBy(12.dp)
+                   ) {
 
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = title,
-                            style = text_16,
-                            color = black_2
-                        )
-                        count?.let {
-                            CountColorCard(
-                                count = it,
-                                suffix = suffix,
-                                colorCard = suffix.toColorList()
-                            )
-                        }
-                    }
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        "${price.formatNumber()} ${stringResource(suffixCurrency.toResId())}",
-                        textAlign = TextAlign.Center,
-                        style = textBold_16,
-                        color = if (positive) price_green else error_base
-                    )
-                    date?.let {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                painterResource(R.drawable.baseline_calendar_month_24),
-                                modifier = Modifier.size(12.dp),
-                                contentDescription = null,
-                                tint = gray_7
-                            )
-                            val dateList = it.split(".")
-                            Text(
-                                text = "${dateList[0]} ${stringResource(monthToResString2(dateList[1].toInt()))}",
-                                style = text_14,
-                                color = gray_7
-                            )
-                        }
-                    }
-                }
-            }
+                       Column(
+                           verticalArrangement = Arrangement.spacedBy(4.dp)
+                       ) {
+                           Text(
+                               text = title,
+                               style = text_16,
+                               color = black_2
+                           )
+                           count?.let {
+                               CountColorCard(
+                                   count = it,
+                                   suffix = suffix,
+                                   colorCard = suffix.toColorList()
+                               )
+                           }
+                       }
+                   }
+                   Column(
+                       verticalArrangement = Arrangement.spacedBy(4.dp),
+                       horizontalAlignment = Alignment.CenterHorizontally
+                   ) {
+                       Text(
+                           "${price.formatNumber()} ${stringResource(suffixCurrency.toResId())}",
+                           textAlign = TextAlign.Center,
+                           style = textBold_16,
+                           color = if (positive) price_green else error_base
+                       )
+                       date?.let {
+                           Row(
+                               verticalAlignment = Alignment.CenterVertically,
+                               horizontalArrangement = Arrangement.spacedBy(4.dp)
+                           ) {
+                               Icon(
+                                   painterResource(R.drawable.baseline_calendar_month_24),
+                                   modifier = Modifier.size(12.dp),
+                                   contentDescription = null,
+                                   tint = gray_7
+                               )
+                               val dateList = it.split(".")
+                               Text(
+                                   text = "${dateList[0]} ${stringResource(monthToResString2(dateList[1].toInt()))}",
+                                   style = text_14,
+                                   color = gray_7
+                               )
+                           }
+                       }
+                   }
+               }
+           }
         }
     )
 }

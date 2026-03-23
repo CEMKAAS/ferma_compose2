@@ -211,7 +211,7 @@ fun GradientButton(
     Box(
         modifier = modifier
             .then(
-                if (isShadow) Modifier.shadow(5.dp, shape = shape) else Modifier
+                if (isShadow && enabled) Modifier.shadow(5.dp, shape = shape) else Modifier
             )
             .clip(shape)
             .background(brush = gradient, alpha = alpha)

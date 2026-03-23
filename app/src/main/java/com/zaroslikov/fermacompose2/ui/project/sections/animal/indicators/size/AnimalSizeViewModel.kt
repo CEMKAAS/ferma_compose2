@@ -1,19 +1,15 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.repository.AnimalSizeRepository
-import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.base.viewModel.EntryViewModel
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.convertSize
-import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -24,190 +20,175 @@ import kotlin.math.absoluteValue
 class AnimalSizeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val animalSizeRepository: AnimalSizeRepository,
-    private val resourceProvider: ResourceProvider
-) : EntryViewModel<AnimalSizeState, AnimalSizeIntent>(AnimalSizeState()) {
+) : EntryNewViewModel2<AnimalSizeState, AnimalSizeIntent, AnimalSizeReduce>(
+    AnimalSizeState(),
+    AnimalSizeReduce()
+) {
     val itemId: Long = checkNotNull(savedStateHandle[AnimalSizeDestination.itemId])
     val itemIdPT: Long = checkNotNull(savedStateHandle[AnimalSizeDestination.itemIdPT])
 
     init {
-        viewModelScope.launch {
-            loadData()
-        }
+        loadData()
     }
 
     override fun onIntent(intent: AnimalSizeIntent) {
+        sendIntent(intent)
         return when (intent) {
-            is AnimalSizeIntent.OpenDialogClicked -> updateOpenDialog(
+            is AnimalSizeIntent.OpenDialogClicked -> loadDataForEntryOrEdit(
                 intent.isEntry,
-                intent.domainAnimalSize
+                intent.domainAnimalSize,
+                intent.isSaveStateForBottomSheet
             )
 
-            AnimalSizeIntent.EndDialogClicked -> updateEndDialog()
-            is AnimalSizeIntent.SizeChanged -> updateSize(intent.value)
-            is AnimalSizeIntent.DateClicked -> updateDate(intent.value)
-            is AnimalSizeIntent.NoteChanged -> updateNote(intent.value)
-            is AnimalSizeIntent.SuffixClicked -> updateSuffix(intent.value)
             AnimalSizeIntent.InsertPressed -> insert()
             AnimalSizeIntent.UpdatePressed -> update()
-            AnimalSizeIntent.DeletePressed -> delete()
+            is AnimalSizeIntent.DeletePressed -> delete(intent.value)
+            else -> Unit
         }
     }
 
-    suspend fun loadData() {
-        updateState { it.copy(isLoading = true) }
-        animalSizeRepository.getSizeAnimal(itemId).collectLatest { sizeList ->
-            updateState {
-                it.copy(
-                    idPT = itemIdPT,
-                    sizeList = sizeList,
-                    isLoading = false
-                )
+    private fun loadData() {
+        viewModelScope.launch {
+            animalSizeRepository.getSizeAnimal(itemId).collectLatest { sizeList ->
+                updateState {
+                    it.copy(
+                        idPT = itemIdPT,
+                        sizeList = settingsList(sizeList),
+                        isLoading = false
+                    )
+                }
             }
+        }
+    }
+
+    private fun loadDataForEntryOrEdit(
+        isOpen: Boolean,
+        domain: AnimalSizeUi?,
+        isSaveStateForBottomSheet: Boolean = false
+    ) {
+        viewModelScope.launch {
+            if (!isOpen) {
+                val state =
+                    if (isSaveStateForBottomSheet) getState().currentProduct
+                    else CurrentAnimalSize()
+                onIntent(
+                    AnimalSizeIntent.RefreshEntryBottomSheetState(
+                        false, state, isSaveStateForBottomSheet
+                    )
+                )
+                return@launch
+            }
+            val newState = if (!getState().isSaveStateForEntry || domain != null) {
+                val baseState = CurrentAnimalSize(
+                    idAnimal = itemId
+                )
+                domain?.toCurrentAnimalSize() ?: baseState
+            } else getState().currentProduct
+            sendIntent(
+                AnimalSizeIntent.RefreshEntryBottomSheetState(
+                    true, newState
+                )
+            )
         }
     }
 
     override fun insert() {
         viewModelScope.launch {
-            if (!isError()) {
-                Log.i("Size", "insert: ${getState().domainAnimalSize.copy(idAnimal = itemId)}")
-                animalSizeRepository.insertAnimalSizeTable(getState().domainAnimalSize.copy(idAnimal = itemId))
-                updateEndDialog()
-                showMessage("Добавлен размер")
-            }
+            animalSizeRepository.insertAnimalSizeTable(getState().currentProduct.toDomain())
+            loadDataForEntryOrEdit(false, null)
+            showMessage("Добавлен размер")
         }
     }
 
     override fun update() {
         viewModelScope.launch {
-            if (!isError()) {
-                animalSizeRepository.updateAnimalSizeTable(getState().domainAnimalSize)
-                updateEndDialog()
-                showMessage("Редактировать размер")
-            }
+            animalSizeRepository.updateAnimalSizeTable(getState().currentProduct.toDomain())
+            loadDataForEntryOrEdit(false, null)
+            showMessage("Редактировать размер")
         }
     }
 
-    override fun delete() {
+    override fun delete(id: Long) {
         viewModelScope.launch {
-            animalSizeRepository.deleteAnimalSizeTable(getState().domainAnimalSize)
-            updateEndDialog()
+            animalSizeRepository.deleteAnimalSizeTableById(id)
+            loadDataForEntryOrEdit(false, null)
             showMessage("Удалить размер")
         }
     }
 
-    override fun validation() {
-        updateState { state ->
-            state.copy(
-                error = state.error.copy(
-                    isErrorSize = state.domainAnimalSize.size.isBlank()
-                )
-            )
-        }
-    }
 
-    private fun updateOpenDialog(
-        isEntry: Boolean,
-        domainAnimalSize: DomainAnimalSize
-    ) {
-        updateState {
-            it.copy(
-                isOpenDialog = true,
-                isEntry = isEntry,
-                domainAnimalSize = domainAnimalSize
-            )
-        }
-    }
+    private fun settingsList(list: List<DomainAnimalSize>): List<AnimalSizeUi> {
+        return list.mapIndexed { index, domain ->
+            val previousDomain =
+                if (index < list.size - 1) list[index + 1] else null
 
-    private fun updateEndDialog() {
-        updateState {
-            it.copy(
-                isOpenDialog = false
-            )
-        }
-    }
+            val (totalValue, indicationStatus) = if (previousDomain == null)
+                domain.size to IndicationStatus.POSITIVE
+            else {
+                val size = domain.size.toConvertZeroDouble()
+                val previousSize = previousDomain.size.toConvertZeroDouble()
 
-    private fun updateSuffix(suffix: Suffix) {
-        updateState {
-            it.copy(
-                domainAnimalSize = it.domainAnimalSize.copy(
-                    suffix = suffix
-                )
-            )
-        }
-    }
+                val suffix = domain.suffix
+                val suffixPrevious = previousDomain.suffix
 
-    private fun updateSize(size: String) {
-        updateState {
-            it.copy(
-                domainAnimalSize = it.domainAnimalSize.copy(
-                    size = size
-                )
-            )
-        }
-    }
+                val sizeConverted = size.convertSize(suffix, to = Suffix.MILLIMETERS)
+                val previousCountConverted =
+                    previousSize.convertSize(suffixPrevious, to = Suffix.MILLIMETERS)
 
-    private fun updateDate(date: String) {
-        updateState {
-            it.copy(
-                domainAnimalSize = it.domainAnimalSize.copy(
-                    date = date
-                )
-            )
-        }
-    }
-
-    private fun updateNote(note: String) {
-        updateState {
-            it.copy(
-                domainAnimalSize = it.domainAnimalSize.copy(
-                    note = note
-                )
-            )
-        }
-    }
-
-    fun positeive(
-        domainAnimalSize: DomainAnimalSize,
-        previousDomainAnimalSize: DomainAnimalSize?
-    ): Pair<String, IndicationStatus> {
-        if (previousDomainAnimalSize == null) return domainAnimalSize.size to IndicationStatus.POSITIVE
-        else {
-            val size = domainAnimalSize.size.toConvertZeroDouble()
-            val previousSize = previousDomainAnimalSize.size.toConvertZeroDouble()
-
-            val suffix = domainAnimalSize.suffix
-            val suffixPrevious = previousDomainAnimalSize.suffix
-
-            val sizeConverted = size.convertSize(suffix, to = Suffix.MILLIMETERS)
-            val previousCountConverted =
-                previousSize.convertSize(suffixPrevious, to = Suffix.MILLIMETERS)
-
-            val totalValue = (sizeConverted - previousCountConverted).convertSize(
-                Suffix.MILLIMETERS,
-                suffix
-            ).absoluteValue.formatNumber()
-            val status = when {
-                sizeConverted > previousCountConverted -> IndicationStatus.POSITIVE
-                sizeConverted == previousCountConverted -> IndicationStatus.NEUTRAL
-                else -> IndicationStatus.NEGATIVE
+                val totalValue = (sizeConverted - previousCountConverted).convertSize(
+                    Suffix.MILLIMETERS,
+                    suffix
+                ).absoluteValue.formatNumber()
+                val status = when {
+                    sizeConverted > previousCountConverted -> IndicationStatus.POSITIVE
+                    sizeConverted == previousCountConverted -> IndicationStatus.NEUTRAL
+                    else -> IndicationStatus.NEGATIVE
+                }
+                totalValue to status
             }
-            return totalValue to status
+            domain.toAnimalSizeUi(
+                totalValue = totalValue,
+                indicationStatus = indicationStatus
+            )
         }
     }
-}
 
-sealed class AnimalSizeIntent : BaseIntent {
-    data class OpenDialogClicked(
-        val isEntry: Boolean,
-        val domainAnimalSize: DomainAnimalSize = DomainAnimalSize(date = dateToday())
-    ) : AnimalSizeIntent()
+    private fun AnimalSizeUi.toCurrentAnimalSize(): CurrentAnimalSize {
+        return CurrentAnimalSize(
+            id = id,
+            size = size,
+            suffix = suffix,
+            date = date,
+            idAnimal = idAnimal,
+            note = note,
+            isEntry = false
+        )
+    }
 
-    data object EndDialogClicked : AnimalSizeIntent()
-    data class SizeChanged(val value: String) : AnimalSizeIntent()
-    data class SuffixClicked(val value: Suffix) : AnimalSizeIntent()
-    data class DateClicked(val value: String) : AnimalSizeIntent()
-    data class NoteChanged(val value: String) : AnimalSizeIntent()
-    data object InsertPressed : AnimalSizeIntent()
-    data object UpdatePressed : AnimalSizeIntent()
-    data object DeletePressed : AnimalSizeIntent()
+    private fun CurrentAnimalSize.toDomain(): DomainAnimalSize {
+        return DomainAnimalSize(
+            id = id,
+            size = size,
+            suffix = suffix,
+            date = date,
+            idAnimal = idAnimal,
+            note = note
+        )
+    }
+
+    private fun DomainAnimalSize.toAnimalSizeUi(
+        totalValue: String,
+        indicationStatus: IndicationStatus
+    ): AnimalSizeUi {
+        return AnimalSizeUi(
+            id = id,
+            size = size,
+            suffix = suffix,
+            date = date,
+            idAnimal = idAnimal,
+            note = note,
+            totalValue = totalValue,
+            indicationStatus = indicationStatus
+        )
+    }
 }

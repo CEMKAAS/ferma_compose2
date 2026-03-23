@@ -291,25 +291,6 @@ fun TextLine(
         textAlign = TextAlign.Start
     )
 }
-
-@Composable
-fun TextLineProductKill(
-    number: Int,
-    title: String,
-    value: String,
-    suffix: Suffix
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Text("$number. $title", style = text_14, color = marengo)
-        Text("$value ${stringResource(suffix.toResId())}", style = text_14, color = black_1)
-    }
-}
-
 @Composable
 fun TextColumn(
     @StringRes titleRes: Int,

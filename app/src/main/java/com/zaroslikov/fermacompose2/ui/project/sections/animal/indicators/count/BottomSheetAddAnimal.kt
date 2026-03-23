@@ -23,7 +23,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomShe
 @Composable
 fun BottomSheetAddAnimal(
     state: CountItem,
-    countAllAnimal: String,
+    countAllAnimal: String?,
     onIntent: (AnimalCountIntent) -> Unit
 ) {
     val focusRequester =
@@ -33,23 +33,34 @@ fun BottomSheetAddAnimal(
         focusRequester.requestFocus()
     }
     EntryIndicationBottomSheet(
-        icon = state.version.toDrawRes(),
+        iconRes = state.version.toDrawRes(),
         titleRes = state.version.toResId(),
         isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = state.version.toColorList(),
-        onDismissRequest = { onIntent(AnimalCountIntent.EndDialogClicked) },
+        onDismissRequest = {
+            onIntent(
+                AnimalCountIntent.DialogClicked(
+                    false,
+                    isSaveStateForBottomSheet = true,
+                    version = state.version
+                )
+            )
+        },
+        onSecondDismissRequest = {
+            onIntent(AnimalCountIntent.DialogClicked(false))
+        },
         onInsertClick = { onIntent(AnimalCountIntent.InsertAddPressed) },
         onUpdateClick = { onIntent(AnimalCountIntent.UpdateAddPressed) }
     ) {
         OutlinedTextCountAnimalNew(
             value = state.count,
             onValueChange = {
-                onIntent(AnimalCountIntent.CountAddChanged(it))
+                onIntent(AnimalCountIntent.CountChanged(it))
             },
             suffix = state.suffix,
             isError = state.error.isErrorCount,
-            /*isErrorCountZero = errorState.isErrorCountZero,*/
+            isErrorCountZero = state.error.isErrorCountZero,
             modifier = Modifier.focusRequester(focusRequester),
             countAnimal = countAllAnimal
         )

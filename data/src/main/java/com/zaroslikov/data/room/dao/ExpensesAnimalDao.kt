@@ -9,7 +9,7 @@ import androidx.room.Update
 import com.zaroslikov.data.room.table.ferma.ExpensesAnimalTable
 
 @Dao
-interface ExpensesAnimalDao{
+interface ExpensesAnimalDao {
     @Query("SELECT idAnimal FROM ExpensesAnimalTable WHERE idExpenses=:id")
     suspend fun getItemExpensesAnimal(id: Long): List<Long>
 
@@ -21,4 +21,7 @@ interface ExpensesAnimalDao{
 
     @Delete
     suspend fun deleteExpensesAnimal(item: ExpensesAnimalTable)
+
+    @Query("DELETE FROM ExpensesAnimalTable WHERE idExpenses=:id")
+    suspend fun deleteExpensesAnimalById(id: Long)
 }

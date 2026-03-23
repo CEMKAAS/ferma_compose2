@@ -3,6 +3,7 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.graphics.Paint
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -34,10 +36,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanel
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
+import com.zaroslikov.fermacompose2.white
 
 @ExperimentalMaterial3Api
 @Composable
@@ -92,14 +97,18 @@ fun CountBottomSheet2(
 fun BaseBottomSheet(
     modifier: Modifier = Modifier,
     title: String = "",
+    supText: String? = null,
+    @DrawableRes iconRes: Int? = null,
+    colors: List<Color> = listOf(white, white),
     isScroll: Boolean = true,
     skipPartiallyExpanded: Boolean = true,
     onDismissRequest: () -> Unit,
+    onSecondDismissRequest: (() -> Unit)? = null,
     contentBottom: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
-    val bottomPadding = if (contentBottom != null) 72.dp else 0.dp
+    val bottomPadding = if (contentBottom != null) 80.dp else 0.dp
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState
@@ -121,21 +130,52 @@ fun BaseBottomSheet(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        TextLine(
+                        Row(
                             modifier = Modifier.weight(1f),
-                            valueString = title,
-                            textStyle = textBold_20
-                        )
-                        IconButton(onClick = onDismissRequest) {
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            iconRes?.let {
+                                IconIndicatorsAnimal(
+                                    icon = it,
+                                    colors = colors
+                                )
+                            }
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                TextLine(
+
+                                    valueString = title,
+                                    textStyle = textBold_20
+                                )
+                                supText?.let {
+                                    Text(it, style = text_12, color = gray_7)
+                                }
+                            }
+                        }
+                        IconButton(onClick = onSecondDismissRequest ?: onDismissRequest) {
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = "Close"
                             )
                         }
                     }
-//                    Text(text = "Введите информацию о новой продукции")
                 }
-                content()
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = gray_6
+                )
+                Column(
+                    modifier = Modifier.then(
+                        if (isScroll)
+                            Modifier.verticalScroll(rememberScrollState())
+                        else Modifier
+                    )
+                ) {
+                    content()
+                }
             }
             contentBottom?.let {
                 Column(

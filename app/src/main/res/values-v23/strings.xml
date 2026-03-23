@@ -88,6 +88,9 @@
 
     // Search
     <string name="search_section">Поиск продукции...</string>
+    <string name="search_section_search_nothing">Ничего нет</string>
+    <string name="search_section_search_nothing_sup">Поиск не дал результатов</string>
+    <string name="search_section_search_nothing_sup_2">Попробуйте написать по‑другому</string>
 
 
     //Button
@@ -245,6 +248,7 @@
     <string name="support_text_height_animal">Укажите размер животного</string>
 
     <string name="support_text_count_sale_animals">Всего животных: %s %s</string>
+    <string name="support_text_count_sale_no_animals">Нет животных</string>
     <string name="support_text_add_animal_reason">Укажите причину добавления</string>
     <string name="support_text_write_off_animal_reason">Укажите причину списания</string>
 
@@ -570,7 +574,18 @@
     <string name="warehouse_edit_screen_warning_title">О единицах измерения</string>
     <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
 
+    //Add
+    <string name="add_screen_title_entry">Добавить продукцию</string>
+    <string name="add_screen_title_edit">Редактировать продукцию</string>
+
+    //Sale
+    <string name="sale_screen_title_entry">Добавить продажу</string>
+    <string name="sale_screen_title_edit">Редактировать продажу</string>
+
     //Expenses
+    <string name="expenses_screen_title_entry">Добавить покупку</string>
+    <string name="expenses_screen_title_edit">Редактировать покупку</string>
+    <string name="expenses_screen_title_edit_animal">Редактировать Животного</string>
     <string name="expenses_screen_button_food">Корм</string>
     <string name="expenses_screen_button_product">Продукция</string>
     <string name="expenses_screen_choice_animals">Выберите животных</string>
@@ -585,6 +600,17 @@
     <string name="expenses_screen_count_animal">Кол-во животных</string>
     <string name="expenses_screen_have">Хватит на</string>
     <string name="expenses_screen_end_day">Дата окончания</string>
+    <string name="expenses_screen_days">дней</string>
+    <string name="expenses_screen_cost_allocation_title">Распределение затрат</string>
+    <string name="expenses_screen_cost_allocation_text">Выберите животных и распределите стоимость покупки между ними</string>
+
+    //WriteOff
+    <string name="write_off_screen_title_entry">Добавить списание</string>
+    <string name="write_off_screen_title_edit">Редактировать списание</string>
+
+    //Note
+    <string name="note_screen_title_entry">Добавить заметку</string>
+    <string name="note_screen_title_edit">Редактировать заметку</string>
 
     //SupportTextWidget
     <string name="support_text_widget_animal_note">Нажмите для ввода текста</string>
@@ -600,6 +626,7 @@
     <string name="filter_date_year">Год</string>
     <string name="filter_date_all_time">Все время</string>
     <string name="filter_date_period">Свой период</string>
+
     //Error
     <string name="error_no_count_product">Количество не указано!</string>
     <string name="error_no_count_sale">Стоимость не указана!</string>
@@ -672,21 +699,17 @@
     <string name="message_no_date_support_text_note">Сейчас нет заметок:(\nНажмите + чтобы добавить\nили</string>
 
 
-    <string name="message_no_date_title_vaccination">Добро пожаловать в раздел "Прививки"</string>
-    <string name="message_no_date_message_vaccination">Здесь Вы можете ввести информацию о прививках вашего животного или группе животных</string>
-    <string name="message_no_date_support_vaccination">Сейчас нет прививок:(\nНажмите + чтобы добавить\nили</string>
+    <string name="message_no_date_title_vaccination">Нет вакцинаций</string>
+    <string name="message_no_date_message_vaccination">Начните вести учет вакцинаций</string>
 
-    <string name="message_no_date_title_weight">Добро пожаловать в раздел "Вес"</string>
-    <string name="message_no_date_message_weight">Здесь Вы можете ввести информацию о весе вашего животного и наблюдать за его изменениями в будущем</string>
-    <string name="message_no_date_support_weight">Сейчас вес не указан:(\nНажмите + чтобы добавить\nили</string>
+    <string name="message_no_date_title_weight">Вес не указан</string>
+    <string name="message_no_date_message_weight">Начните вести учет веса</string>
 
-    <string name="message_no_date_title_height">Добро пожаловать в раздел "Размер"</string>
-    <string name="message_no_date_message_height">Здесь Вы можете ввести информацию о размере вашего животного и наблюдать за его изменениями в будущем</string>
-    <string name="message_no_date_support_height">Сейчас размер не указан:(\nНажмите + чтобы добавить\nили</string>
+    <string name="message_no_date_title_height">Размер не указан</string>
+    <string name="message_no_date_message_height">Начните вести учет размера</string>
 
-    <string name="message_no_date_title_count">Добро пожаловать в раздел "Количество"</string>
-    <string name="message_no_date_message_count">Здесь Вы можете ввести информацию о количестве ваших животных и наблюдать за изменениями в будущем</string>
-    <string name="message_no_date_support_count">Сейчас количество не указано:(\nНажмите + чтобы добавить\nили</string>
+    <string name="message_no_date_title_count">Количество не указано</string>
+    <string name="message_no_date_message_count">Начните вести учет количество животных</string>
 
     <string name="message_no_item_finance">Нет транкзаций</string>
 
@@ -807,6 +830,8 @@
 
 
     //AnimalEntryScreen
+    <string name="animal_entry_screen_title_entry">Добавить животного</string>
+    <string name="animal_entry_screen_title_edit">Добавить животных</string>
     <string name="animal_entry_screen_">Вносим данные по группе или одному животному?</string>
     <string name="animal_entry_screen_info_animal">Вносим данные по группе или одному животному?</string>
     <string name="animal_entry_screen_animal">Тип добавления</string>
@@ -890,6 +915,7 @@
     <string name="animal_card_screen_animal_card_product_expenses">Затрачено</string>
     <string name="animal_card_screen_animal_card_no_weight">Вес не указан</string>
     <string name="animal_card_screen_animal_card_no_weight_">-</string>
+    <string name="animal_card_screen_animal_card_no_count">Колличество не указано</string>
     <string name="animal_card_screen_animal_card_no_height">Размер не указан</string>
     <string name="animal_card_screen_animal_card_no_food_day">Расход корма не указан</string>
     <string name="animal_card_screen_animal_card_no_vaccination">Прививка не указана</string>
@@ -967,18 +993,26 @@
     <string name="animal_count_screen_edit_mode">Редактирование</string>
     <string name="animal_count_screen_weight_enter">Способ ввода:</string>
     <string name="animal_count_screen_weight_individual">Индивидуально</string>
-    <string name="animal_count_screen_warning_title">Внимание</string>
+    <string name="animal_count_screen_weight_every_animal">Вес каждого животного:</string>
+    <string name="animal_count_screen_warning_title">Внимание!</string>
+    <string name="animal_count_screen_warning_text_weight">При изменении количества животных произойдет корректировка веса</string>
+
     <string name="animal_count_screen_warning_text">Если вы продолжите данную операцию, количество животных уйдет в минус, вы согласны на применить данные изменения?</string>
     <string name="animal_count_screen_warning_minus_and_delete_text">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удалится, вся  внесенная раняя продукция, вы действительно хотите удалить?</string>
     <string name="animal_count_screen_warning_product_delete_all_text">Если вы удалите данную запись, вся  внесенная раняя продукция тоже удалится, вы действительно хотите удалить?</string>
 
-    <string name="animal_count_screen_warning_product_update_text">Если вы удалите или измените продукцию она также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
-    <string name="animal_count_screen_warning_product_update_minus_text">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удаленная или измененная продукцию, также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
+    <string name="animal_count_screen_warning_product_update_kill">Если вы измените продукцию она также удалиться или измениться в разделе моя продукция, вы действительно хотите обновить?</string>
+    <string name="animal_count_screen_warning_product_update_minus_kill">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удаленная или измененная продукцию, также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
+
+    <string name="animal_count_screen_warning_delete">Вы действительно хотите удалить данную запись?</string>
+    <string name="animal_count_screen_warning_delete_minus">Если вы продолжите данную операцию, количество животных уйдет в минус\n Вы действительно хотите обновить?</string>
+
     <string name="animal_count_screen_kill_animal">Забито животных:</string>
     <string name="animal_count_screen_expenses_animal">Куплено животных:</string>
     <string name="animal_count_screen_sale_animal">Продано животных:</string>
     <string name="animal_count_screen_write_off_animal">Списано животных:</string>
     <string name="animal_count_screen_add_animal">Добавлено животных:</string>
+    <string name="animal_count_screen_weight_animals">Вес животных</string>
 
     //ExpensesEntryScreen
     <string name="expenses_entry_screen_chooise_animal_auto_food">Выберите животных для рассчета корма:</string>

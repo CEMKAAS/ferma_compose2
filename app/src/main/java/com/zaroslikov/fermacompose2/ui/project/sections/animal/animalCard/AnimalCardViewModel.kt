@@ -2,11 +2,6 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.models.table.DomainAnimalCount
-import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
-import com.zaroslikov.domain.models.table.DomainAnimalSize
-import com.zaroslikov.domain.models.table.DomainAnimalVaccination
-import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
@@ -14,8 +9,9 @@ import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
-import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel
+import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -36,7 +32,9 @@ class AnimalCardViewModel @Inject constructor(
     private val warehouseRepository: WarehouseRepository,
     private val resourceProvider: ResourceProvider,
     private val addRepository: AddRepository,
-) : BaseViewModel<AnimalCardState, AnimalCardIntent>(AnimalCardState()) {
+) : BaseViewModel2<AnimalCardState, AnimalCardIntent, AnimalCardReduce>(
+    AnimalCardState(), AnimalCardReduce()
+) {
 
     private val itemIdPT: Long = checkNotNull(savedStateHandle[AnimalCardDestination.itemIdPT])
     private val itemId: Long = checkNotNull(savedStateHandle[AnimalCardDestination.itemId])
@@ -49,9 +47,9 @@ class AnimalCardViewModel @Inject constructor(
 
     fun onIntent(intent: AnimalCardIntent) {
         when (intent) {
-            is AnimalCardIntent.NoteChanged -> updateNote(intent.value)
-            is AnimalCardIntent.OpenArchiveDialogClicked -> updateOpenArchiveDialog(intent.value)
             AnimalCardIntent.ArchiveAnimalPressed -> updateArchive()
+            is AnimalCardIntent.NoteChanged -> updateNote(intent.value)
+            else -> Unit
         }
     }
 
@@ -64,7 +62,7 @@ class AnimalCardViewModel @Inject constructor(
             animalVaccinationRepository.getVaccinationAnimalLimit(itemId),
             animalWeightRepository.getWeightAnimalLimit(itemId)
         ) { animal, count, size, vacc, weight ->
-            AnimalData(animal, count, size, vacc, weight)
+            LoadDataAnimalCard(animal, count, size, vacc, weight)
         }.collectLatest { data ->
             updateState { animal ->
                 animal.copy(
@@ -84,51 +82,15 @@ class AnimalCardViewModel @Inject constructor(
 
     private fun updateNote(note: String) {
         viewModelScope.launch {
-            updateState { state ->
-                state.copy(
-                    animal = state.animal.copy(
-                        note = note
-                    )
-                )
-            }
+            sendIntent(AnimalCardIntent.NoteChanged(note))
             animalRepository.updateAnimalTable(getState().animal)
-        }
-    }
-
-    private fun updateOpenArchiveDialog(isOpenArchiveDialog: Boolean) {
-        updateState { state ->
-            state.copy(
-                isOpenArchiveDialog = isOpenArchiveDialog
-            )
         }
     }
 
     private fun updateArchive() {
         viewModelScope.launch {
-            updateState { state ->
-                state.copy(
-                    animal = state.animal.copy(
-                        archive = true
-                    )
-                )
-            }
+            sendIntent(AnimalCardIntent.ArchiveAnimalPressed)
             animalRepository.updateAnimalTable(getState().animal)
         }
     }
 }
-
-
-sealed class AnimalCardIntent : BaseIntent {
-    // Animal Note Animal
-    data class NoteChanged(val value: String) : AnimalCardIntent()
-    data class OpenArchiveDialogClicked(val value: Boolean) : AnimalCardIntent()
-    data object ArchiveAnimalPressed : AnimalCardIntent()
-}
-
-data class AnimalData(
-    val animal: DomainAnimalTable,
-    val count: DomainAnimalCount,
-    val size: DomainAnimalSize?,
-    val vacc: DomainAnimalVaccination?,
-    val weight: DomainAnimalWeight?
-)

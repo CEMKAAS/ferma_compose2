@@ -5,6 +5,7 @@ import com.zaroslikov.domain.models.enums.Suffix
 data class AnimalExpensesDto(
     val id: Long,
     val name: String,
+    val type: String,
     val foodDay: Double,
     val foodDaySuffix: Suffix,
     val countAnimal: Int,

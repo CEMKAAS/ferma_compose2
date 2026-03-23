@@ -33,7 +33,9 @@ import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalVaccinationCardNew
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.InventoryAnimalBody
+import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
+import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_4
 
 
@@ -67,7 +69,9 @@ fun AnimalVaccinationScreen(
         },
         floatingActionButton = {
             NeonGlowFab(colors = colors) {
-                viewModel.onIntent(AnimalVaccinationIntent.OpenDialogClicked(isEntry = true))
+                viewModel.onIntent(
+                    AnimalVaccinationIntent.OpenEntryBottomSheetByItem(true)
+                )
             }
         }
     ) { innerPadding ->
@@ -82,23 +86,19 @@ fun AnimalVaccinationScreen(
                 titleRes = title,
                 colors = colors,
                 itemList = state.vaccinationList,
-                onInsertClick = {
-                    viewModel.onIntent(AnimalVaccinationIntent.OpenDialogClicked(isEntry = true))
-                },
                 onEditClick = {
                     viewModel.onIntent(
-                        AnimalVaccinationIntent.OpenDialogClicked(
-                            isEntry = false,
+                        AnimalVaccinationIntent.OpenEntryBottomSheetByItem(
+                            true,
                             it
                         )
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(AnimalVaccinationIntent.DeletePressed(it))}
+                onDeleteClick = { viewModel.onIntent(AnimalVaccinationIntent.DeletePressed(it)) }
             )
         if (state.isOpenDialog)
             VaccinationBottomSheet(
                 state = state.currentProduct,
-                countAnimalAll = state.countAnimalAll,
                 onIntent = viewModel::onIntent,
                 colors = colors,
                 icon = icon,
@@ -115,57 +115,65 @@ private fun AnimalVaccinationContainer2(
     @StringRes titleRes: Int,
     colors: List<Color>,
     itemList: List<AnimalVaccinationExpensesDomain>,
-    onInsertClick: () -> Unit,
     onEditClick: (AnimalVaccinationExpensesDomain) -> Unit,
     onDeleteClick: (Long) -> Unit,
 ) {
     InventoryAnimalBody(
         modifier = modifier,
         itemList = itemList,
-        onInsertClick = onInsertClick,
         titleRes2 = titleRes,
+        isVaccination = true,
         titleRes = R.string.message_no_date_title_vaccination,
         messageRes = R.string.message_no_date_message_vaccination,
-        supportRes = R.string.message_no_date_support_vaccination,
-        buttonRes = R.string.button_sale_message_no_vaccination
-    ) { item, previous ->
-        AnimalVaccinationCardNew(
-            icon = icon,
-            colors = colors,
-            value = item.vaccination,
-            count = item.countVaccination.formatNumber(),
-            suffix = Suffix.RUBLE,
-            date = item.date,
-            note = item.note,
-            onEditClick = { onEditClick(item) },
-            onDeleteClick = { onDeleteClick(item.id) },
-            nextDate = item.nextDate,
-            price = item.priceAll ?: item.price,
-        )
-    }
+        detailCard = { item ->
+            AnimalVaccinationCardNew(
+                icon = icon,
+                colors = colors,
+                value = item.vaccination,
+                count = item.countVaccination.formatNumber(),
+                suffix = Suffix.RUBLE,
+                date = item.date,
+                note = item.note,
+                onEditClick = { onEditClick(item) },
+                onDeleteClick = { onDeleteClick(item.id) },
+                nextDate = item.nextDate,
+                price = item.priceAll ?: item.price,
+            )
+        },
+        iconRes =  R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
+        iconColor = violet_1,
+        backgroundColor = violet_3,
+    )
 }
 
 @Composable
 private fun VaccinationBottomSheet(
     state: Vaccination,
     colors: List<Color>,
-    countAnimalAll: String,
     @DrawableRes icon: Int,
     @StringRes titleRes: Int,
     titleList: List<String>,
     onIntent: (AnimalVaccinationIntent) -> Unit
 ) {
     EntryIndicationBottomSheet(
-        isEntry = state.isEntry,
-        enabledButton = state.enabledButton(),
+        titleRes = titleRes,
+        iconRes = icon,
         colors = colors,
+        isEntry = state.isEntry,
+        enabledButton = state.hasAnyError,
         onDismissRequest = {
-            onIntent(AnimalVaccinationIntent.EndDialogClicked)
+            onIntent(
+                AnimalVaccinationIntent.OpenEntryBottomSheetByItem(
+                    false,
+                    isSaveStateForBottomSheet = state.isEntry
+                )
+            )
+        },
+        onSecondDismissRequest = {
+            onIntent(AnimalVaccinationIntent.OpenEntryBottomSheetByItem(false))
         },
         onInsertClick = { onIntent(AnimalVaccinationIntent.InsertPressed) },
-        onUpdateClick = { onIntent(AnimalVaccinationIntent.UpdatePressed) },
-        icon = icon,
-        titleRes = titleRes
+        onUpdateClick = { onIntent(AnimalVaccinationIntent.UpdatePressed) }
     ) {
         OutlinedTextVaccinationNew(
             value = state.vaccination,
@@ -182,8 +190,8 @@ private fun VaccinationBottomSheet(
             isError = state.error.isErrorCount,
             intRes = R.string.animal_vaccination_count_vaccination,
             intResSup = R.string.animal_vaccination_support_count_vaccination,
-            countAnimal = countAnimalAll,
-            /*isErrorCountZero = state.error.isErrorCountZero*/
+            countAnimal = state.countAnimalAll,
+            isErrorCountZero = state.error.isErrorCount,
         )
         OutlinedPriceInputNew(
             price = state.price,

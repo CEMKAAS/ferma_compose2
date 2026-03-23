@@ -97,39 +97,6 @@ fun AnimalScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(animal_1, animal_2)
     val primeColor = animal_2
-    val idProject = state.idPT
-
-    val query = state.textSearch.trim().lowercase()
-
-    val searchList = if (query.isBlank() && !state.isArchive) state.list
-    else
-        state.list.filter { item ->
-
-            item.name.lowercase().contains(query) ||
-                    item.type.lowercase().contains(query) ||
-                    item.date.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) /*||*/
-            /*stringResource(item.countSuffix.toResId()).lowercase().contains(query)*/
-            /* "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
-                 .contains(query) ||
-                     (item.priceAll ?: item.price).toString().lowercase().contains(query)*/
-        }
-
-    val searchList2 = if (query.isBlank() && state.isArchive) state.list
-    else
-        state.list.filter { item ->
-
-            item.name.lowercase().contains(query) ||
-                    item.type.lowercase().contains(query) ||
-                    item.date.lowercase().contains(query) ||
-                    item.count.toString().lowercase().contains(query) /*||*/
-            /*stringResource(item.countSuffix.toResId()).lowercase().contains(query)*/
-            /* "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
-                 .contains(query) ||
-                     (item.priceAll ?: item.price).toString().lowercase().contains(query)*/
-        }
-
-
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -144,11 +111,7 @@ fun AnimalScreen(
         },
         floatingActionButton = {
             NeonGlowFab(colors = colors) {
-                viewModel.onIntent(
-                    AnimalListIntent.OpenBottomSheetEntry(
-                        true
-                    )
-                )
+                viewModel.onIntent(AnimalListIntent.OpenBottomSheetEntry(true))
             }
         }
     ) { innerPadding ->
@@ -163,17 +126,13 @@ fun AnimalScreen(
                 itemList = state.list,
                 color = primeColor,
                 details = state.isArchive,
-                searchList = searchList,
-                brieflyList = searchList2,
-                onInsertClick = { viewModel.onIntent(AnimalListIntent.OpenBottomSheetEntry(true)) },
-                onEditClick = { },
-                onDeleteClick = { viewModel.onIntent(AnimalListIntent.Delete(it)) },
-                onDetailsClick = { TODO() },
+                searchList = state.searchList,
+                brieflyList = state.searchArchiveList,
                 onClick = { navigateToItemCard(state.idPT to it) },
+                onDeleteClick = { viewModel.onIntent(AnimalListIntent.Delete(it)) }
             )
         if (state.openBottomSheetEntry)
             AnimalEntryBottomSheet(
-                modifier = Modifier,
                 state = state.currentProduct,
                 colors = colors,
                 onIntent = viewModel::onIntent
@@ -183,23 +142,28 @@ fun AnimalScreen(
 
 @Composable
 private fun AnimalEntryBottomSheet(
-    modifier: Modifier,
     colors: List<Color>,
     state: AnimalEntryState2,
     onIntent: (AnimalListIntent) -> Unit
 ) {
     EntryBottomSheet(
-        modifier = Modifier,
         isEntry = true,
-        enabledButton = state.enabledButton(),
+        enabledButton = state.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
-                AnimalListIntent.OpenBottomSheetEntry(false)
+                AnimalListIntent.OpenBottomSheetEntry(
+                    false,
+                    isSaveStateForBottomSheet = true
+                )
             )
         },
+        onSecondDismissRequest = {
+            onIntent(AnimalListIntent.OpenBottomSheetEntry(false))
+        },
         onInsertClick = { onIntent(AnimalListIntent.Insert) },
-        onUpdateClick = { onIntent(AnimalListIntent.Update) }
+        titleEntryRes = R.string.animal_entry_screen_title_entry,
+        titleEditRes = R.string.animal_entry_screen_title_edit
     ) {
         GroupCard(
             titleRes = R.string.animal_entry_screen_animal,
@@ -313,23 +277,15 @@ private fun AnimalContainer(
     itemList: List<DomainAnimalWithCount>,
     searchList: List<DomainAnimalWithCount>,
     brieflyList: List<DomainAnimalWithCount>,
-    onInsertClick: () -> Unit,
     onClick: (Long) -> Unit,
-    onEditClick: (DomainAnimalWithCount) -> Unit,
     onDeleteClick: (Long) -> Unit,
-    onDetailsClick: (DomainAnimalWithCount) -> Unit
 ) {
-
     InventoryBody(
         modifier = modifier,
         details = details,
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList,
-        onInsertClick = onInsertClick,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        onDetailsClick = onDetailsClick,
         detailCard = { index, item ->
             AnimalCard(
                 modifier = Modifier,
@@ -366,112 +322,85 @@ fun AnimalCard(
     val context = LocalContext.current
     CardFieldNew(
         onClick = { onClick() },
-        modifier = modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.Top,
-        contentRow = {
-            IconAnimal(sex = animal.sex)
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentColumn = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.Top,
             ) {
+                IconAnimal(sex = animal.sex)
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalAlignment = Alignment.Start
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        Text(
-                            text = animal.name,
-                            style = text_16,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = animal.name,
+                                style = text_16,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            DropdownMenuEdit(
+                                onArchiveClick = onArchive,
+                                onDeleteClick = onDeleteClick
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = animal.type,
+                                style = text_14,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = marengo
+                            )
+                            if (!animal.group)
+                                CountColorGradientCard(sex = animal.sex)
+                        }
+                    }
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        TableAnimalParameter(
+                            oneTitleParameter = R.string.animal_list_age,
+                            oneParameter = getAgeFromDate(
+                                context,
+                                animal.dateFactory ?: animal.date
+                            ),
+                            oneIcon = R.drawable.baseline_calendar_month_24,
+                            oneIconColor = Color(0xFF009689),
+                            oneIconColorSecond = Color(0xFFF0FDFA),
+                            twoTitleParameter = R.string.animal_list_expenses,
+                            twoParameter = "333",
+                            twoIcon = R.drawable.icon_expenses,
+                            twoIconColor = Color(0xFF0092B8),
+                            twoIconColorSecond = Color(0xFFECFEFF)
                         )
-                        DropdownMenuEdit(
-                            onArchiveClick = onArchive,
-                            onDeleteClick = onDeleteClick
+                        TableAnimalParameter(
+                            oneTitleParameter = R.string.animal_list_food,
+                            oneParameter = "Корма",
+                            oneIcon = R.drawable.baseline_shopping_basket_24,
+                            oneIconColor = Color(0xFFD08700),
+                            oneIconColorSecond = Color(0xFFFEFCE8),
+                            twoTitleParameter = R.string.animal_list_count,
+                            twoParameter = animal.count.toString(),
+                            twoIcon = R.drawable.baseline_spoke_24,
+                            twoIconColor = Color(0xFF00786F),
+                            twoIconColorSecond = Color(0xFFCBFBF1)
                         )
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = animal.type,
-                            style = text_14,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = marengo
-                        )
-                        if (!animal.group)
-                            CountColorGradientCard(sex = animal.sex)
-                    }
                 }
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    TableAnimalParameter(
-                        oneTitleParameter = R.string.animal_list_age,
-                        oneParameter = getAgeFromDate(
-                            context,
-                            animal.dateFactory ?: animal.date
-                        ),
-                        oneIcon = R.drawable.baseline_calendar_month_24,
-                        oneIconColor = Color(0xFF009689),
-                        oneIconColorSecond = Color(0xFFF0FDFA),
-                        twoTitleParameter = R.string.animal_list_expenses,
-                        twoParameter = "333",
-                        twoIcon = R.drawable.icon_expenses,
-                        twoIconColor = Color(0xFF0092B8),
-                        twoIconColorSecond = Color(0xFFECFEFF)
-                    )
-                    TableAnimalParameter(
-                        oneTitleParameter = R.string.animal_list_food,
-                        oneParameter = "Корма",
-                        oneIcon = R.drawable.baseline_shopping_basket_24,
-                        oneIconColor = Color(0xFFD08700),
-                        oneIconColorSecond = Color(0xFFFEFCE8),
-                        twoTitleParameter = R.string.animal_list_count,
-                        twoParameter = animal.count.toString(),
-                        twoIcon = R.drawable.baseline_spoke_24,
-                        twoIconColor = Color(0xFF00786F),
-                        twoIconColorSecond = Color(0xFFCBFBF1)
-                    )
-                }
-
-
-                /*Text(
-                text = animal.name,
-                style = textBold_16
-            )
-            IconAndText(
-                iconRes = R.drawable.baseline_pets_24,
-                valueString = animal.type
-            )
-            if (!animal.group)
-                IconAndText(
-                    iconRes = if (animal.sex) R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
-                    valueString = stringResource(
-                        if (animal.sex) R.string.animal_entry_screen_sex_man else R.string.animal_entry_screen_sex_woman
-                    )
-                )
-            else
-                IconAndText(
-                    iconRes = R.drawable.baseline_spoke_24,
-                    valueString = "${animal.count} ${animal.suffix}"
-                )
-
-            IconAndText(
-                iconRes = if (animal.dateFactory == null) R.drawable.baseline_calendar_month_24 else R.drawable.baseline_event_24,
-                valueString = animal.dateFactory ?: animal.date
-            )
-        }*/
             }
         }
     )
@@ -513,7 +442,6 @@ fun TableAnimalParameter(
         )
     }
 }
-
 
 @Composable
 fun AnimalParameter(
@@ -677,11 +605,13 @@ fun TypeAnimalCard(
     val colors = if (isAnimalGroup) Triple(animal_1, Color.White, animal_1)
     else Triple(Color.White, dark, grey_2)
 
+    val shape = RoundedCornerShape(14.dp)
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clip(shape)
             .clickable { onClick() },
-        shape = RoundedCornerShape(14.dp),
+        shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = colors.first
         ),

@@ -38,6 +38,7 @@ data class SaleTable(
     val id: Long = 0,
     @ColumnInfo(name = "title")
     val title: String, // название
+    //TODO Добавить колонку категории проданного товара
     @ColumnInfo(name = "count")
     val count: Double, // Кол-во
     @ColumnInfo(name = "count_suffix")

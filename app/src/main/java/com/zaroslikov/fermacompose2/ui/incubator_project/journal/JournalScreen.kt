@@ -90,10 +90,9 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.IconTitle
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.Slider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.IconToggle
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.white
@@ -293,7 +292,7 @@ private fun SliderOverallEfficiency(
                 color = white
             )
         }
-        Slider(
+        BaseSlider(
             percentFloat = percentFloat,
             color = white
         )
@@ -809,10 +808,8 @@ private fun ActivateBookmarkAlertDialog(
                 colorBackground = red_11,
                 colorBorder = red_12,
                 colorIcon = error_base,
-                colorIconBackground = red_11,
                 colorTitle = orang_17,
                 colorText = red_14,
-                isShowIconBackground = false,
                 icon = R.drawable.outline_info_24,
                 title = R.string.journal_screen_activate_bookmark_end,
                 text = R.string.journal_screen_activate_bookmark_end_sup,
@@ -821,10 +818,8 @@ private fun ActivateBookmarkAlertDialog(
                 colorBackground = orang_4,
                 colorBorder = orang_8,
                 colorIcon = orang_12,
-                colorIconBackground = orang_4,
                 colorTitle = orang_18,
                 colorText = orang_6,
-                isShowIconBackground = false,
                 icon = R.drawable.baseline_calendar_month_24,
                 title = R.string.journal_screen_new_date,
                 text = R.string.journal_screen_new_date_sup
@@ -861,10 +856,8 @@ private fun DeleteBookmarkAlertDialog(
                 colorBackground = red_11,
                 colorBorder = red_12,
                 colorIcon = error_base,
-                colorIconBackground = red_11,
                 colorTitle = orang_17,
                 colorText = red_14,
-                isShowIconBackground = false,
                 icon = R.drawable.outline_info_24,
                 title = R.string.journal_screen_delete_title,
                 text = R.string.journal_screen_delete_title_sup,

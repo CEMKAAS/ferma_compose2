@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -28,6 +29,9 @@ import com.zaroslikov.fermacompose2.blue_14
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.DateFactoryCardNew
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
@@ -70,87 +74,92 @@ fun AnimalEditProduct(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                intRes = if (state.animalUi.isAnimalGroup) R.string.animals_add_screen_edit_s
-                else R.string.animals_add_screen_edit,
+                intRes = if (state.currentProduct.isAnimalGroup)
+                    R.string.animals_add_screen_edit_s else R.string.animals_add_screen_edit,
                 onNavigateBackClick = navigateBack,
                 scrollBehavior = scrollBehavior
             )
         }
     ) { innerPadding ->
-        AnimalEntryContainer(
-            modifier = Modifier
-                .modifierScreen(innerPadding),
-            state = state,
-            onIntent = viewModel::onIntent
-        )
+        if (state.isLoading)
+            CircularProgress(
+                modifier = Modifier.padding(innerPadding),
+            )
+        else
+            AnimalEntryContainer(
+                modifier = Modifier
+                    .modifierScreen(innerPadding),
+                state = state.currentProduct,
+                onIntent = viewModel::onIntent
+            )
     }
 }
 
 @Composable
 fun AnimalEntryContainer(
     modifier: Modifier,
-    state: AnimalEditState,
-    onIntent: (AnimalEntryIntent) -> Unit
+    state: AnimalUi,
+    onIntent: (AnimalEditIntent) -> Unit
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         AnimalNameOutlinedTextNew(
-            value = state.animalUi.name,
+            value = state.name,
             onValueChange = {
-                onIntent(AnimalEntryIntent.TitleChanged(it))
+                onIntent(AnimalEditIntent.TitleChanged(it))
             },
-            isAnimalGroup = state.animalUi.isAnimalGroup,
+            isAnimalGroup = state.isAnimalGroup,
             isErrorTitle = state.error.isErrorTitle
         )
         OutlinedTextAnimalTypeNew(
-            value = state.animalUi.type,
+            value = state.type,
             onValueChange = {
-                onIntent(AnimalEntryIntent.TypeChanged(it))
+                onIntent(AnimalEditIntent.TypeChanged(it))
             },
-            list = state.typeList,
+            list = state.pickList.typeList,
         )
-        if (!state.animalUi.isAnimalGroup)
+        if (!state.isAnimalGroup)
             OutlinedTextSexNew(
-                value = state.animalUi.sex,
+                value = state.sex,
                 onValueChange = {
-                    onIntent(AnimalEntryIntent.SexClicked(it))
-                },
+                    onIntent(AnimalEditIntent.SexClicked(it))
+                }
             )
         OutlinedTextDateNew(
-            value = state.animalUi.dateBorn,
+            value = state.dateBorn,
             intRes = R.string.outlined_text_date_born,
-            intResSup = if (!state.animalUi.isAnimalGroup) R.string.outlined_text_date_born
+            intResSup = if (!state.isAnimalGroup) R.string.outlined_text_date_born
             else R.string.support_text_date_born_s,
             onValueChange = {
-                onIntent(AnimalEntryIntent.DateClicked(it))
+                onIntent(AnimalEditIntent.DateClicked(it))
             }
         )
         DateFactoryCardNew(
-            dateBoring = state.animalUi.dateBorn,
-            dateFactory = state.animalUi.dateFactory,
-            isDateFactory = state.animalUi.isDateFactory,
-            dateFactoryClicked = { onIntent(AnimalEntryIntent.DateFactoryClicked(it)) },
-            dateFactoryChanged = { onIntent(AnimalEntryIntent.DateFactoryChanged(it)) },
-            intTitle = if (!state.animalUi.isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
+            dateBoring = state.dateBorn,
+            dateFactory = state.dateFactory,
+            isDateFactory = state.isDateFactory,
+            dateFactoryClicked = { onIntent(AnimalEditIntent.DateFactoryClicked(it)) },
+            dateFactoryChanged = { onIntent(AnimalEditIntent.DateFactoryChanged(it)) },
+            intTitle = if (!state.isAnimalGroup) R.string.checkbox_born else R.string.checkbox_born_s,
             intTooltip = R.string.tooltip_animals_born,
             intRes = R.string.outlined_text_date_factory,
-            intResSup = if (!state.animalUi.isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
+            intResSup = if (!state.isAnimalGroup) R.string.support_text_date_factory else R.string.support_text_date_factory_s,
         )
         OutlinedTextCountNew(
-            value = state.animalUi.foodDay,
+            value = state.foodDay,
             onValueChange = {
-                onIntent(AnimalEntryIntent.FoodDayChanged(it))
+                onIntent(AnimalEditIntent.FoodDayChanged(it))
             },
             isError = false,
             onSuffixChange = {
-                onIntent(AnimalEntryIntent.FoodDaySuffixClicked(it))
+                onIntent(AnimalEditIntent.FoodDaySuffixClicked(it))
             },
             suffixList = suffixWeightDayList,
             intRes = R.string.outlined_food_day_animals,
-            intResSup = if (!state.animalUi.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
-            suffix = state.animalUi.foodDaySuffix,
+            intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
+            suffix = state.foodDaySuffix,
         )
         WarningCard(
             colorBackground = blue_3,
@@ -164,8 +173,8 @@ fun AnimalEntryContainer(
             text = R.string.animal_edit_warning_text
         )
         SaveButton(
-            enabledButton = true
-        ) { onIntent(AnimalEntryIntent.Update) }
+            enabledButton = state.hasAnyError
+        ) { onIntent(AnimalEditIntent.Update) }
     }
 }
 
@@ -178,7 +187,7 @@ private fun SaveButton(
         modifier = Modifier.fillMaxWidth(),
         text = stringResource(R.string.button_text_edit_title),
         onClick = onClick,
-        colors = listOf(Color(0xFF00A63E), Color(0xFF009966)),
+        colors = listOf(price_green, green_shamrock),
         enabled = enabledButton,
         paddingValues = PaddingValues(vertical = 14.dp)
     )

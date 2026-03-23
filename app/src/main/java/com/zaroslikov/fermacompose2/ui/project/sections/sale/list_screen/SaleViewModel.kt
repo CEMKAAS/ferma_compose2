@@ -4,22 +4,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
-import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
-import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -33,8 +29,12 @@ class SaleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val saleRepository: SaleRepository,
     private val warehouseRepository: WarehouseRepository,
+    private val settingsRepository: SettingsRepository,
     private val resourceProvider: ResourceProvider
-) : EntryNewViewModel<SaleListState, SaleListIntent>(SaleListState()) {
+) : EntryNewViewModel2<SaleListState, SaleListIntent, SaleListReduce>(
+    SaleListState(),
+    SaleListReduce(resourceProvider)
+) {
 
     private val itemIdPT: Long = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
 
@@ -43,10 +43,12 @@ class SaleViewModel @Inject constructor(
     }
 
     override fun onIntent(intent: SaleListIntent) {
+        sendIntent(intent)
         when (intent) {
-            is SaleListIntent.OpenBottomSheetEntry -> openBottomSheetEntry(
-                openBottomSheetEntry = intent.value,
-                domainSaleTable = intent.item
+            is SaleListIntent.OpenBottomSheetEntry -> loadDataForEntryOrEdit(
+                intent.isOpen,
+                intent.item,
+                intent.isSaveStateForBottomSheet
             )
 
             is SaleListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(
@@ -54,29 +56,13 @@ class SaleViewModel @Inject constructor(
                 currentBriefly = intent.currentBriefly
             )
 
-            is SaleListIntent.TitleChanged -> updateTitle(intent.value)
-            is SaleListIntent.TitleAndSuffixClicked -> updateTitleAndSuffix(
-                intent.title,
-                intent.suffix
-            )
-
-            is SaleListIntent.CountChanged -> updateCount(intent.value)
-            is SaleListIntent.SuffixClicked -> updateSuffix(intent.value)
-            is SaleListIntent.PriceChanged -> updatePrice(intent.value)
-            is SaleListIntent.AutoPriceClicked -> updateIsAutoPrice(intent.value)
-            is SaleListIntent.CategoryChanged -> updateCategory(intent.value)
-            is SaleListIntent.BuyerChanged -> updateBuyer(intent.value)
-            SaleListIntent.BuyerClearClicked -> updateBuyerClean()
-            is SaleListIntent.DateClicked -> updateDate(intent.value)
-            is SaleListIntent.NoteChanged -> updateNote(intent.value)
+            is SaleListIntent.TitleAndSuffixClicked ->
+                updateWarehouseUiState(intent.title, intent.category)
 
             SaleListIntent.Insert -> insert()
             SaleListIntent.Update -> update()
             is SaleListIntent.Delete -> delete(intent.value)
-
-            is SaleListIntent.SearchChanged -> updateSearch(intent.value)
-            is SaleListIntent.CountWarehouse -> updateWarehouse(intent.value)
-            is SaleListIntent.GroupClicked -> updateGroup(intent.value)
+            else -> Unit
         }
     }
 
@@ -84,15 +70,19 @@ class SaleViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 saleRepository.getAllSaleItems(itemIdPT),
-                saleRepository.getBrieflyItemSale(itemIdPT)
-            ) { addList, briefly ->
-                addList to briefly
-            }.collectLatest { (addList, briefly) ->
+                saleRepository.getBrieflyItemSale(itemIdPT),
+                settingsRepository.getSettings(itemIdPT)
+            ) { addList, briefly, settings ->
+                Triple(addList, briefly, settings)
+            }.collectLatest { (addList, briefly, settings) ->
                 updateState {
                     it.copy(
                         idPT = itemIdPT,
                         list = addList,
+                        searchList = addList,
                         briefly = briefly,
+                        searchBrieflyList = briefly,
+                        priceSuffix = settings.currencySuffix,
                         isLoading = false
                     )
                 }
@@ -100,166 +90,6 @@ class SaleViewModel @Inject constructor(
         }
     }
 
-    private fun updateTitleAndSuffix(title: String, suffix: Suffix) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    title = title,
-                    countSuffix = suffix,
-                    error = it.currentProduct.error.copy(
-                        isErrorTitle = title.isBlank(),
-                        isErrorSlash = title.contains("/")
-                    )
-                )
-            )
-        }
-//        updateWarehouseUiState(title)
-    }
-
-    private fun updateTitle(title: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    title = title,
-                    error = it.currentProduct.error.copy(
-                        isErrorTitle = title.isBlank(),
-                        isErrorSlash = title.contains("/")
-                    )
-                )
-            )
-        }
-//        updateWarehouseUiState(title)
-    }
-
-    private fun updateCount(count: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    count = count,
-                    error = it.currentProduct.error.copy(isErrorCount = count.isBlank())
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updatePrice(price: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    price = price,
-                    error = it.currentProduct.error.copy(
-                        isErrorPrice = price.isBlank()
-                    )
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updateIsAutoPrice(isAutoPrice: Boolean) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    isAutoPrice = isAutoPrice
-                )
-            )
-        }
-        updatePriceAll()
-    }
-
-    private fun updatePriceAll() {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    priceAll = if (it.currentProduct.isAutoPrice) (it.currentProduct.price.toConvertZeroDouble() * it.currentProduct.count.toConvertZeroDouble()).formatNumber()
-                    else "0"
-                )
-            )
-        }
-    }
-
-    private fun updateCountWarehouse(domainCountSuffix: List<DomainCountSuffix>) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(
-                    warehouseList = domainCountSuffix
-                )
-            )
-        }
-    }
-
-    private fun updateSuffix(suffix: Suffix) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(countSuffix = suffix)
-            )
-        }
-    }
-
-    private fun updateCategory(category: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(category = category)
-            )
-        }
-    }
-
-    private fun updateDate(date: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(date = date)
-            )
-        }
-    }
-
-    private fun updateBuyer(buyer: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(buyer = buyer)
-            )
-        }
-    }
-
-    private fun updateBuyerClean() {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(buyer = "")
-            )
-        }
-    }
-
-    private fun updateNote(note: String) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(note = note)
-            )
-        }
-    }
-
-    private fun updateWarehouse(warehouseList: List<DomainCountSuffix>) {
-        updateState {
-            it.copy(
-                currentProduct = it.currentProduct.copy(warehouseList = warehouseList)
-            )
-        }
-    }
-
-    private fun updateGroup(isGroup: Boolean) {
-        updateState {
-            it.copy(
-                isGroup = isGroup
-            )
-        }
-    }
-
-    private fun updateSearch(search: String) {
-        updateState {
-            it.copy(
-                textSearch = search
-            )
-        }
-    }
 
     private fun openBottomSheetGroup(
         openBottomSheetGroup: Boolean,
@@ -269,7 +99,7 @@ class SaleViewModel @Inject constructor(
             val listBriefly = getDetailsName(name = currentBriefly.title)
             updateState {
                 it.copy(
-                    openBottomSheetGroup = openBottomSheetGroup,
+                    isOpenBottomSheetGroup = openBottomSheetGroup,
                     currentBriefly = currentBriefly,
                     listBriefly = listBriefly
                 )
@@ -281,51 +111,56 @@ class SaleViewModel @Inject constructor(
         return saleRepository.getBrieflyDetailsItemSale(itemIdPT, name).first()
     }
 
-    private fun openBottomSheetEntry(
-        openBottomSheetEntry: Boolean,
-        domainSaleTable: DomainSaleTable?
+    private fun loadDataForEntryOrEdit(
+        isOpen: Boolean,
+        domain: DomainSaleTable?,
+        isSaveStateForBottomSheet: Boolean = false
     ) {
-        if (openBottomSheetEntry)
-            viewModelScope.launch {
-                val titleList = saleRepository.getItemsTitleSaleList(itemIdPT).first()
-                val categoryList = saleRepository.getItemsCategorySaleList(itemIdPT).first()
-                val buyerList = saleRepository.getItemsBuyerSaleList(itemIdPT).first()
-
-                updateState {
-                    it.copy(
-                        openBottomSheetEntry = true,
-                        currentProduct = SaleEntryState2(
-                            itemIdPT = itemIdPT,
-                            category = resourceProvider.getString(R.string.support_text_no_category),
-                            buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
-                            error = ErrorSale(),
-                            pickList = it.currentProduct.pickList.copy(
-                                titleList = titleList,
-                                categoryList = categoryList,
-                                buyerList = buyerList
-                            )
-                        )
+        viewModelScope.launch {
+            if (!isOpen) {
+                val state =
+                    if (isSaveStateForBottomSheet) getState().currentProduct
+                    else SaleEntryState2()
+                onIntent(
+                    SaleListIntent.RefreshEntryBottomSheetState(
+                        false, state, isSaveStateForBottomSheet
                     )
+                )
+                return@launch
+            }
+            val newState = if (!getState().isSaveStateForBottomSheet || domain != null) {
+                val titleDeferred =
+                    async { saleRepository.getItemsTitleSaleList(itemIdPT).first() }
+                val categoryDeferred =
+                    async { saleRepository.getItemsCategorySaleList(itemIdPT).first() }
+                val buyerDeferred = async {
+                    saleRepository.getItemsBuyerSaleList(itemIdPT).first()
                 }
-                domainSaleTable?.let {
-                    updateState {
-                        it.copy(
-                            currentProduct = it.currentProduct.toUiMap22(
-                                domainSaleTable
-                            )
-                        )
-                    }
-                    val suffix = getState().currentProduct.pickList.titleList
-                        .firstOrNull { it.title == getState().currentProduct.title }
+
+                val baseState = SaleEntryState2(
+                    itemIdPT = itemIdPT,
+                    category = resourceProvider.getString(R.string.support_text_no_category),
+                    buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
+                    pickList = PickSaleList(
+                        titleList = titleDeferred.await(),
+                        categoryList = categoryDeferred.await(),
+                        buyerList = buyerDeferred.await()
+                    )
+                )
+                if (domain == null) baseState
+                else {
+                    val saleCategory = baseState.pickList.titleList
+                        .firstOrNull { it.title == domain.title }
                         ?.category
 
-                    suffix?.let {
-                        updateWarehouseUiStateSync(getState().currentProduct.title, it)
-                    }
+                    baseState.toUiMap22(domain).copy(saleCategory = saleCategory)
                 }
-            }
-        else updateState { it.copy(openBottomSheetEntry = false) }
+            } else getState().currentProduct
+            onIntent(SaleListIntent.RefreshEntryBottomSheetState(true, newState))
+            newState.saleCategory?.let { updateWarehouseUiStateSync(newState.title, it) }
+        }
     }
+
 
     private fun updateWarehouseUiState(name: String, category: Category) {
         viewModelScope.launch {
@@ -343,52 +178,44 @@ class SaleViewModel @Inject constructor(
                 .getCurrentBalanceProductList(name, itemIdPT)
                 .filterNotNull()
                 .firstOrNull()
-
         if (pair != null)
-            updateCountWarehouse(pair)
+            onIntent(SaleListIntent.RefreshWarehouseCount(pair))
     }
 
     override fun insert() {
         viewModelScope.launch {
-            if (!isError()) {
-                saleRepository.insertSale(
-                    getState().currentProduct.toDomainMap()
-                )
+            saleRepository.insertSale(getState().currentProduct.toDomainMap())
 //                metricaSale(saleUiState.copy(priceAll = autoCalculate()))
-                navigateTo(UiEvent.NavigateBack)
-                showMessage(
-                    resourceProvider.getString(R.string.toast_sale_s)
-                        .format(
-                            getState().currentProduct.title,
-                            getState().currentProduct.count,
-                            getState().currentProduct.countSuffix
-                        ) //Todo Обновить название
-                )
-            }
+            loadDataForEntryOrEdit(false, null)
+            showMessage(
+                resourceProvider.getString(R.string.toast_sale_s)
+                    .format(
+                        getState().currentProduct.title,
+                        getState().currentProduct.count,
+                        getState().currentProduct.countSuffix
+                    ) //Todo Обновить название
+            )
         }
     }
 
     override fun update() {
         viewModelScope.launch {
-            if (!isError()) {
-                saleRepository.updateSale(getState().currentProduct.toDomainMap())
-                navigateTo(UiEvent.NavigateBack)
-                showMessage(
-                    resourceProvider.getString(R.string.toast_refresh_s_s)
-                        .format(
-                            getState().currentProduct.title,
-                            getState().currentProduct.count,
-                            getState().currentProduct.countSuffix
-                        ) //Todo Обновить название
-                )
-            }
+            saleRepository.updateSale(getState().currentProduct.toDomainMap())
+            loadDataForEntryOrEdit(false, null)
+            showMessage(
+                resourceProvider.getString(R.string.toast_refresh_s_s)
+                    .format(
+                        getState().currentProduct.title,
+                        getState().currentProduct.count,
+                        getState().currentProduct.countSuffix
+                    ) //Todo Обновить название
+            )
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
             saleRepository.deleteSaleById(id)
-            navigateTo(UiEvent.NavigateBack)
             showMessage(
                 resourceProvider.getString(R.string.toast_delete_s)
                     .format(
@@ -400,26 +227,10 @@ class SaleViewModel @Inject constructor(
         }
     }
 
-    override fun validation() {
-        updateState { state ->
-            state.copy(
-                currentProduct = state.currentProduct.copy(
-                    error = state.currentProduct.error.copy(
-                        isErrorTitle = state.currentProduct.title.isBlank(),
-                        isErrorSlash = state.currentProduct.title.isSlash(),
-                        isErrorCount = state.currentProduct.count.isBlank(),
-                        isErrorPrice = state.currentProduct.price.isBlank()
-                    )
-                )
-            )
-        }
-    }
-
     private fun SaleEntryState2.toUiMap22(domain: DomainSaleTable): SaleEntryState2 {
-
         val isIndicatorsValue = setOf(domain.animalId, domain.animalCountId).any { it != null }
-
         return copy(
+            itemId = domain.id,
             title = domain.title,
             count = domain.count.formatNumber(false),
             countSuffix = domain.countSuffix,
@@ -436,7 +247,9 @@ class SaleViewModel @Inject constructor(
             note = domain.note,
             animalId = domain.animalId,
             animalCountId = domain.animalCountId,
-            isIndicatorsValue = isIndicatorsValue, error = ErrorSale()
+            isEntry = false,
+            isIndicatorsValue = isIndicatorsValue, error = ErrorSale(),
+            itemIdPT = domain.idPT
         )
     }
 
@@ -460,35 +273,4 @@ class SaleViewModel @Inject constructor(
             animalCountId = animalCountId
         )
     }
-}
-
-sealed class SaleListIntent : BaseIntent {
-    data class OpenBottomSheetGroup(
-        val value: Boolean,
-        val currentBriefly: BrieflySaleDomain = BrieflySaleDomain()
-    ) : SaleListIntent()
-
-    data class OpenBottomSheetEntry(
-        val value: Boolean,
-        val item: DomainSaleTable? = null
-    ) : SaleListIntent()
-
-    data class TitleChanged(val value: String) : SaleListIntent()
-    data class TitleAndSuffixClicked(val title: String, val suffix: Suffix) : SaleListIntent()
-    data class CountChanged(val value: String) : SaleListIntent()
-    data class SuffixClicked(val value: Suffix) : SaleListIntent()
-    data class PriceChanged(val value: String) : SaleListIntent()
-    data class AutoPriceClicked(val value: Boolean) : SaleListIntent()
-    data class CategoryChanged(val value: String) : SaleListIntent()
-    data class DateClicked(val value: String) : SaleListIntent()
-    data class BuyerChanged(val value: String) : SaleListIntent()
-    data object BuyerClearClicked : SaleListIntent()
-    data class NoteChanged(val value: String) : SaleListIntent()
-
-    data class CountWarehouse(val value: List<DomainCountSuffix>) : SaleListIntent()
-    data class GroupClicked(val value: Boolean) : SaleListIntent()
-    data class SearchChanged(val value: String) : SaleListIntent()
-    data object Insert : SaleListIntent()
-    data object Update : SaleListIntent()
-    data class Delete(val value: Long) : SaleListIntent()
 }

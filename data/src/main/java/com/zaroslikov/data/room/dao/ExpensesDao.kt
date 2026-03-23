@@ -61,6 +61,7 @@ interface ExpensesDao {
         "SELECT " +
                 " a.id," +
                 " a.name AS name," +
+                " a.type as type," +
                 " a.foodDay AS foodDay," +
                 " a.food_day_suffix AS foodDaySuffix," +
                 " t.count AS countAnimal," +

@@ -287,7 +287,7 @@ fun getVersionToMessageNoMessage(version: Int): Int {
     }
 }
 
-fun getVersionToSupportNoMessage(version: Int): Int {
+/*fun getVersionToSupportNoMessage(version: Int): Int {
     return when (version) {
         0 -> R.string.message_no_date_support_weight
         1 -> R.string.message_no_date_support_height
@@ -295,7 +295,7 @@ fun getVersionToSupportNoMessage(version: Int): Int {
         3 -> R.string.message_no_date_support_vaccination
         else -> R.string.is_empty
     }
-}
+}*/
 
 fun getVersionToButtonMessage(version: Int): Int {
     return when (version) {

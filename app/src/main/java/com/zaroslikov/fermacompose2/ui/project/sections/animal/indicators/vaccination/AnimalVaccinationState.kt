@@ -14,12 +14,10 @@ data class AnimalVaccinationState(
     val titleVaccinationList: List<String> = emptyList(),
     val idPT: Long = 0,
     val isOpenDialog: Boolean = false,
-    val isAnimalGroup: Boolean = false,
-    val countAnimalAll: String = "",
-    val suffixAnimal: Suffix = Suffix.PIECES,
+    val isSaveStateForBottomSheet: Boolean = false,
     override val isEntry: Boolean = false,
     override val currentProduct: Vaccination = Vaccination(),
-    override val isLoading: Boolean = false,
+    override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null
 ) : EntryNewState()
 
@@ -31,6 +29,7 @@ data class Vaccination(
     val nextDate: String = dateTodayNextYear(),
     val note: String = "",
     val idAnimal: Long = 0,
+
     //Expenses
     val price: String = "",
     val priceAll: String = "",
@@ -38,23 +37,19 @@ data class Vaccination(
     val isDateFactory: Boolean = true,
     val isEntry: Boolean = true,
     val idExpenses: Long? = null,
-    val error: ErrorVaccination = ErrorVaccination()
-) : BaseProduct() {
-    override val hasAnyError: Boolean
-        get() = error.hasAnyError
 
-    fun enabledButton(): Boolean {
-        val isEnabled =
-            vaccination.isNotBlank() && countVaccination.isNotBlank() && !hasAnyError
-        return !isEnabled
-    }
-}
+    //Animal
+    val isAnimalGroup: Boolean = false,
+    val countAnimalAll: String? = "",
+    val animalSuffix: Suffix = Suffix.PIECES,
+    val priceSuffix: Suffix = Suffix.RUBLE,
+
+    val error: ErrorVaccination = ErrorVaccination(),
+    override val hasAnyError: Boolean = false
+) : BaseProduct()
 
 data class ErrorVaccination(
     val isErrorVaccination: Boolean = false,
     val isErrorCount: Boolean = false,
     val isErrorCountZero: Boolean = false
-) : BaseError {
-    val hasAnyError: Boolean
-        get() = isErrorVaccination || isErrorCount || isErrorCountZero
-}
+) : BaseError

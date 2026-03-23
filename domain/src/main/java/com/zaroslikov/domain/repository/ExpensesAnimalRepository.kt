@@ -8,4 +8,5 @@ interface ExpensesAnimalRepository {
     suspend fun insertExpensesAnimal(item: DomainExpensesAnimal)
     suspend fun updateExpensesAnimal(item: DomainExpensesAnimal)
     suspend fun deleteExpensesAnimal(item: DomainExpensesAnimal)
+    suspend fun deleteExpensesAnimalById(id: Long)
 }

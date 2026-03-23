@@ -24,7 +24,7 @@ import com.zaroslikov.fermacompose2.ui.elements.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.elements.ButtonStandart
 import com.zaroslikov.fermacompose2.ui.elements.CloseButton
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
-import com.zaroslikov.fermacompose2.ui.project.sections.expenses.entry.ExpensesEntryState
+
 
 @Composable
 fun ButtonPanel(
@@ -50,32 +50,6 @@ fun ButtonPanel(
             onClickUpdate()
         }
         if (!isIndicatorsValue)
-            ButtonDelete { onClickDelete() }
-    }
-}
-
-@Composable
-private fun ButtonPanel2(
-    state: ExpensesEntryState,
-    onClickInsert: () -> Unit,
-    onClickUpdate: () -> Unit,
-    onClickDelete: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-    if (state.isEntry)
-        ButtonStandart(
-            intRes = R.string.button_expenses,
-            onClick = {
-                focusManager.clearFocus()
-                onClickInsert()
-            }
-        )
-    else {
-        ButtonRefresh {
-            focusManager.clearFocus()
-            onClickUpdate()
-        }
-        if (!state.isIndicatorsValue)
             ButtonDelete { onClickDelete() }
     }
 }
@@ -141,7 +115,7 @@ fun ButtonPanelDetailNew(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(18.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             CloseButton(
@@ -154,7 +128,7 @@ fun ButtonPanelDetailNew(
                 text = stringResource(R.string.button_delete),
                 iconRes = R.drawable.baseline_delete_24,
                 onClick = onClickDelete,
-                enabled = false,
+                enabled = true,
                 modifier = Modifier.weight(1f),
                 colors = listOf(error_base, error_base)
             )

@@ -1,10 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count
 
-import android.app.Dialog
-import android.util.Log
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
-import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
@@ -16,24 +13,38 @@ import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
+enum class Transaction {
+    INSERT, UPDATE, DELETE
+}
+
+enum class WarningAnimalCount {
+    DELETE, DELETE_MINUS, DELETE_KILL, DELETE_MINUS_KILL, UPDATE_MINUS, UPDATE_KILL, UPDATE_MINUS_KILL
+}
+
 data class AnimalCountState(
+
     val openWarningDialog: Boolean = false,
     val openWarningDeleteDialog: Boolean = false,
-    val openWarningDeleteAllDialog: WarningAnimalCount = WarningAnimalCount.MINUS,
+    val statusWarningDialog: WarningAnimalCount = WarningAnimalCount.UPDATE_KILL,
+    val textWarning: String = "",
+
     val openArchiveDialog: Boolean = false,
     val openSoloDialog: Boolean = false,
-    val isOpenDialog: Boolean = false,
+    val isOpenEntryBottomSheet: Boolean = false,
 
     val ignoreWarning: Boolean = false,
     val weight: DomainAnimalWeight? = null,
     val animal: DomainAnimalTable = DomainAnimalTable(),
     val oldCount: String = "",
-    val currentAnimal: DomainAnimalCount = DomainAnimalCount(),
+
+    val countAnimal: String? = "",
+    val countAnimalSuffix: Suffix = Suffix.PIECES,
 
     val countList: List<DomainAnimalCountPriceUi> = emptyList(),
-
+    val isSaveStateForEntry: Boolean = false,
+    val saveAnimalCountVersion: AnimalCountVersion? = null,
     val idPT: Long = 0,
-    override val isLoading: Boolean = false,
+    override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
     override val isEntry: Boolean = false,
     override val currentProduct: CountItem = CountItem(),
@@ -52,8 +63,8 @@ data class CountItem(
     val isAutoCalculate: Boolean = false,
     val buyer: String = "",
     val tableId: Long = 0,
-    val idPT: Long = 0,
-    val isEntry: Boolean = false,
+    val itemIdPT: Long = 0,
+    val isEntry: Boolean = true,
     val error: ErrorCount = ErrorCount(),
     val indexProductKill: Int = 0,
     val isOpenWeightDialog: Boolean = false,
@@ -61,24 +72,12 @@ data class CountItem(
     val productKillList: List<ProductKill> = emptyList(),
     val buyerList: List<String> = emptyList(),
     val titleList: List<TitleAndSuffixDomain> = emptyList(),
-) : BaseProduct() {
-    override val hasAnyError: Boolean
-        get() = !error.hasAnyError(version)
-
-    fun enabledButton(): Boolean {
-        val isEnabled = when (version) {
-            AnimalCountVersion.SALE, AnimalCountVersion.EXPENSES ->
-                count.isNotBlank() && price.isNotBlank() &&/* isErrorCountZero*/ hasAnyError
-
-            AnimalCountVersion.KILL, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.ADD ->
-                count.isNotBlank() && hasAnyError
-
-            AnimalCountVersion.INCUBATOR -> TODO()
-        }
-        return isEnabled
-    }
-}
-
+    val oldCount: String = "",
+    val totalWeight: Double? = null,
+    val finalWeight: Double = 0.0,
+    val weightSuffix: Suffix = Suffix.KILOGRAM,
+    override val hasAnyError: Boolean = false
+) : BaseProduct()
 
 data class ProductKill(
     val idProduct: Long = 0,
@@ -90,48 +89,21 @@ data class ProductKill(
     val warehouseList: List<DomainCountSuffix> = emptyList(),
     val error: ErrorKill = ErrorKill(),
     val isEntry: Boolean = true,
-    val isVisibility: Boolean = true
-) {
-    val hasAnyError: Boolean
-        get() = !error.hasAnyError
-
-    fun enabledButton(): Boolean {
-        val isEnabled =
-            title.isNotBlank() && countProduct.isNotBlank() && hasAnyError /* isErrorCountZero*/
-        return isEnabled
-    }
-}
+    val isVisibility: Boolean = true,
+    val hasAnyError: Boolean = false
+)
 
 data class ErrorKill(
     val isError: Boolean = false,
     val isErrorSlash: Boolean = false,
     val isErrorCount: Boolean = false,
-) {
-    val hasAnyError: Boolean
-        get() = isError || isErrorSlash || isErrorCount
-}
+)
 
 data class ErrorCount(
     val isErrorPrice: Boolean = false,
     val isErrorCount: Boolean = false,
     val isErrorCountZero: Boolean = false,
-) : BaseError {
-    fun hasAnyError(animalCountVersion: AnimalCountVersion): Boolean {
-        Log.i(
-            "count23",
-            "hasAnyError: isErrorPrice: ${isErrorPrice}, isErrorCount: $isErrorCount, isErrorCountZero: $isErrorCountZero"
-        )
-        return when (animalCountVersion) {
-            AnimalCountVersion.SALE, AnimalCountVersion.EXPENSES ->
-                isErrorPrice || isErrorCount || isErrorCountZero
-
-            AnimalCountVersion.KILL, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.ADD ->
-                isErrorCount || isErrorCountZero
-
-            else -> TODO()
-        }
-    }
-}
+) : BaseError
 
 data class DomainAnimalCountPriceUi(
     val id: Long = 0,
@@ -140,7 +112,7 @@ data class DomainAnimalCountPriceUi(
     val date: String = "",
     val animalId: Long = 0,
     val note: String = "",
-    val version: AnimalCountVersion? = AnimalCountVersion.ADD,
+    val version: AnimalCountVersion? = AnimalCountVersion.ADD, //TODO
     val price: Double? = null,
     val priceAll: Double? = null,
     val buyer: String? = null,

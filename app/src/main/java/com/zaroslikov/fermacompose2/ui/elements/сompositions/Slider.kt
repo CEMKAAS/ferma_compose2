@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.gray_6
 
 @Composable
-fun Slider(
+fun BaseSlider(
     modifier: Modifier = Modifier,
     percentFloat: Float,
     color: Color

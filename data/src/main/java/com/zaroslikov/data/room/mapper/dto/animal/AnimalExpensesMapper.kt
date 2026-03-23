@@ -7,6 +7,7 @@ fun AnimalExpensesDto.toAnimalExpensesDomain(): AnimalExpensesDomain {
     return AnimalExpensesDomain(
         id = this.id,
         name = this.name,
+        type = this.type,
         foodDay = this.foodDay,
         foodDaySuffix = this.foodDaySuffix,
         countAnimal = this.countAnimal,

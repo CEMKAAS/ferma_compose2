@@ -11,10 +11,12 @@ data class NoteListState(
     val textSearch: String = "",
     val idPT: Long = 0,
     val list: List<DomainNoteTable> = emptyList(),
-    val openBottomSheetEntry: Boolean = false,
-    val openBottomSheetDetail: Boolean = false,
+    val searchList: List<DomainNoteTable> = emptyList(),
+    val isOpenBottomSheetEntry: Boolean = false,
+    val isOpenBottomSheetDetail: Boolean = false,
     val detailDomainNoteTable: DomainNoteTable = DomainNoteTable(),
     val index: Long = 0,
+    val isSaveStateForBottomSheet: Boolean = false,
     override val isEntry: Boolean = false,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
@@ -29,20 +31,9 @@ data class NoteEntryState2(
     val itemIdPT: Long = 0,
     val error: ErrorNote = ErrorNote(),
     val isEntry: Boolean = true,
-) : BaseProduct() {
-    override val hasAnyError: Boolean
-        get() = error.hasAnyError
-
-    fun enabledButton(): Boolean {
-        val isEnabled =
-            title.isNotBlank()
-        return !isEnabled
-    }
-}
+    override val hasAnyError: Boolean = false
+) : BaseProduct()
 
 data class ErrorNote(
     val isErrorTitle: Boolean = false,
-) : BaseError {
-    val hasAnyError: Boolean
-        get() = isErrorTitle
-}
+) : BaseError
