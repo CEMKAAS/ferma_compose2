@@ -32,11 +32,11 @@ data class IncubatorTable(
     val price: Double? = null,
     @ColumnInfo(name = "note")
     val note: String = "",
-    @ColumnInfo(name = "auto_rotation")
+    @ColumnInfo(name = "is_auto_rotation")
     val isAutoRotation: Boolean = false,
-    @ColumnInfo(name = "auto_ventilation")
+    @ColumnInfo(name = "is_auto_ventilation")
     val isAutoVentilation: Boolean = false,
-    @ColumnInfo(name = "currency")
+    @ColumnInfo(name = "currency_suffix")
     val currencySuffix: Suffix = Suffix.RUBLE,
     val idPT: Long = 0
 )

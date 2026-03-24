@@ -25,15 +25,16 @@ data class AnimalTable(
     val name: String,
     val type: String,
     val date: String,
-    @ColumnInfo(name= "date_factory")
+    @ColumnInfo(name = "date_factory")
     val dateFactory: String?,
-    val group: Boolean,//groop = true, one = false
+    @ColumnInfo(name = "is_group")
+    val isGroup: Boolean,//groop = true, one = false
     val sex: Boolean,
     val note : String,
     val image:String?,
     val archive: Boolean,
     val foodDay:Double,
-    @ColumnInfo(name= "food_day_suffix")
+    @ColumnInfo(name = "food_day_suffix")
     val foodDaySuffix : Suffix,
     @ColumnInfo(name = "idPT")
     val idPT: Long,

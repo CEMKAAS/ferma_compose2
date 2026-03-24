@@ -32,7 +32,7 @@ data class BookmarkTable(
     val startDate: String,
     @ColumnInfo(name = "end_date")
     val endDate: String,
-    @ColumnInfo(name = "early_completion_Status")
+    @ColumnInfo(name = "is_early_completion_status")
     val isEarlyCompletionStatus: Boolean = false, //false - завершена, true - прервана
     val time: String,
     val price: Double?,
@@ -41,9 +41,9 @@ data class BookmarkTable(
     @ColumnInfo(name = "chick_price")
     val chickPrice: Double?,
     val note: String,
-    @ColumnInfo(name = "auto_rotation")
+    @ColumnInfo(name = "is_auto_rotation")
     val isAutoRotation: Boolean = false,
-    @ColumnInfo(name = "auto_ventilation")
+    @ColumnInfo(name = "is_auto_ventilation")
     val isAutoVentilation: Boolean = false,
     @ColumnInfo(name = "is_activity_bookmark")
     val isActivityBookmark: Boolean,
