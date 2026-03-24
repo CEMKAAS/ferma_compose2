@@ -1,10 +1,162 @@
 package com.zaroslikov.data.room.database.migration
 
+import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
+        //==================== Миграция ProjectTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS project_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                title TEXT NOT NULL,
+                date TEXT NOT NULL,
+                date_end TEXT NOT NULL,
+                mode INTEGER NOT NULL,
+                archive INTEGER NOT NULL
+            )
+        """.trimIndent()
+        )
+        db.execSQL(
+            """
+            INSERT INTO project_table(
+                id, title, date, date_end, mode, archive
+            )
+            SELECT
+            _id, NAME, DATA, DATEEND, mode, ARHIVE FROM MyINCUBATOR WHERE mode = 1
+        """.trimIndent()
+        )
+
+        //==================== Миграция IncubatorTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS incubator_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                title TEXT NOT NULL,
+                brand TEXT,
+                model TEXT,
+                capacity INTEGER NOT NULL,
+                price REAL,
+                note TEXT NOT NULL,
+                is_auto_rotation INTEGER NOT NULL,
+                is_auto_ventilation INTEGER NOT NULL,
+                currency_suffix INTEGER NOT NULL,
+                idPT INTEGER NOT NULL
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO incubator_table(
+                title, brand, model, capacity, price, note, is_auto_rotation, is_auto_ventilation,
+                currency_suffix, idPT  
+            ) 
+            SELECT
+              'Инкубатор', NULL, NULL,  0, NULL, '', 0, 0,
+               1, 1
+               WHERE EXISTS (SELECT 1 FROM MyINCUBATOR WHERE mode = 0)
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_incubator_table_idPT ON incubator_table(idPT)")
+
+        //==================== Миграция BookmarkTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS bookmark_incubator
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                title TEXT NOT NULL,
+                type INTEGER NOT NULL,
+                breed TEXT,
+                count INTEGER NOT NULL,
+                rejected_count INTEGER NOT NULL,
+                start_date TEXT NOT NULL,
+                end_date TEXT NOT NULL,
+                is_early_completion_status INTEGER NOT NULL,
+                time TEXT NOT NULL,
+                price REAL NOT NULL,
+                price_all REAL,
+                chick_price REAL,
+                note TEXT,
+                is_auto_rotation INTEGER NOT NULL,
+                is_auto_ventilation INTEGER NOT NULL,
+                is_activity_bookmark INTEGER NOT NULL,
+                idPT INTEGER NOT NULL
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO bookmark_incubator(
+                 id, title, type, breed, count, rejected_count, start_date, end_date,
+                 is_early_completion_status, time, price, price_all, chick_price, note,
+                 is_auto_rotation, is_auto_ventilation,  is_activity_bookmark, idPT
+            )
+              SELECT
+                _id, NAME,
+                 CASE
+                 WHEN type = 'Курицы' THEN 0
+                 WHEN type = 'Гуси' THEN 1
+                 WHEN type = 'Перепела' THEN 2
+                 WHEN type = 'Утки' THEN 3
+                 WHEN type = 'Индюки' THEN 4
+                 ELSE 0 END,
+                 NULL,
+                EGGALL, 0, DATA, DATEEND,
+                0, '12:00', 0.0, NULL, NULL, note,
+                 CASE
+                 WHEN type = 'false' THEN 0
+                 WHEN type = 'true' THEN 1
+                 ELSE 0 END,
+                 CASE
+                 WHEN type = 'false' THEN 0
+                 WHEN type = 'true' THEN 1
+                 ELSE 0 END,
+                0, 1
+                FROM MyINCUBATOR WHERE mode = 0
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_bookmark_incubator_idPT ON bookmark_incubator(idPT)")
+
+        //==================== Миграция IncubatorParameters ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS incubator_parameters
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                day INTEGER NOT NULL,
+                temp TEXT NOT NULL,
+                damp TEXT NOT NULL,
+                over TEXT NOT NULL,
+                airing TEXT NOT NULL,
+                temp_fact TEXT NOT NULL,
+                damp_fact TEXT NOT NULL,
+                over_fact TEXT NOT NULL,
+                airing_fact TEXT NOT NULL,
+                note TEXT NOT NULL,
+                idPT INTEGER NOT NULL
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO incubator_parameters(
+                 id, day, temp, damp, over, airing, 
+                 temp_fact, damp_fact, over_fact, airing_fact, note, idPT
+            )
+            SELECT
+               id, day, temp, damp, over, airing, 
+               temp, damp, over, airing, '', idPT
+               FROM MyIncubator 
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_incubator_parameters_idPT ON incubator_parameters(idPT)")
+
+        //==================== Миграция AnimalCountTable ====================
+
         db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'ед.'")
 
         db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
@@ -459,156 +611,6 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
         db.execSQL("CREATE INDEX index_settings_table_idPT ON settings_table(idPT)")
 
-        //==================== Миграция ProjectTable ====================
-        db.execSQL(
-            """
-            CREATE TABLE IF NOT EXISTS project_table(
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                title TEXT NOT NULL,
-                date TEXT NOT NULL,
-                date_end TEXT NOT NULL,
-                mode INTEGER NOT NULL,
-                archive INTEGER NOT NULL
-            )
-        """.trimIndent()
-        )
-
-        db.execSQL(
-            """
-            INSERT INTO project_table(
-                id, title, date, date_end, mode, archive
-            )
-            SELECT
-            id, NAME, DATA, DATEEND, mode, ARHIVE
-            FROM MyINCUBATOR WHERE mode = 1
-        """.trimIndent()
-        )
-
-        //==================== Миграция IncubatorTable ====================
-        db.execSQL(
-            """
-            CREATE TABLE IF NOT EXISTS incubator_table(
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                title TEXT NOT NULL,
-                brand TEXT,
-                model TEXT,
-                capacity INTEGER NOT NULL,
-                price REAL,
-                note TEXT NOT NULL,
-                is_auto_rotation INTEGER NOT NULL,
-                is_auto_ventilation INTEGER NOT NULL,
-                currency_suffix INTEGER NOT NULL,
-                idPT INTEGER NOT NULL
-            )
-        """.trimIndent()
-        )
-
-        db.execSQL(
-            """
-            INSERT INTO incubator_table(
-                title, brand, model, capacity, price, note, is_auto_rotation, is_auto_ventilation,
-                currency_suffix, idPT  
-            ) 
-            SELECT
-              'Инкубатор', NULL, NULL,  0, NULL, '', 0, 0,
-               1, 1
-               WHERE EXISTS (SELECT 1 FROM MyINCUBATOR WHERE mode = 0)
-        """.trimIndent()
-        )
-        db.execSQL("CREATE INDEX index_incubator_table_idPT ON incubator_table(idPT)")
-
-        //==================== Миграция BookmarkTable ====================
-        db.execSQL(
-            """
-            CREATE TABLE IF NOT EXISTS bookmark_incubator
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                title TEXT NOT NULL,
-                type INTEGER NOT NULL,
-                breed TEXT,
-                count INTEGER NOT NULL,
-                rejected_count INTEGER NOT NULL,
-                start_date TEXT NOT NULL,
-                end_date TEXT NOT NULL,
-                is_early_completion_status INTEGER NOT NULL,
-                time TEXT NOT NULL,
-                price REAL NOT NULL,
-                price_all REAL,
-                chick_price REAL,
-                note TEXT,
-                is_auto_rotation INTEGER NOT NULL,
-                is_auto_ventilation INTEGER NOT NULL,
-                is_activity_bookmark INTEGER NOT NULL,
-                idPT INTEGER NOT NULL
-            )
-        """.trimIndent()
-        )
-
-        db.execSQL(
-            """
-            INSERT INTO bookmark_incubator(
-                 id, title, type, breed, count, rejected_count, start_date, end_date,
-                 is_early_completion_status, time, price, price_all, chick_price, note,
-                 is_auto_rotation, is_auto_ventilation,  is_activity_bookmark, idPT
-            )
-              SELECT
-                _id, NAME,
-                 CASE
-                 WHEN type = 'Курицы' THEN 0
-                 WHEN type = 'Гуси' THEN 1
-                 WHEN type = 'Перепела' THEN 2
-                 WHEN type = 'Утки' THEN 3
-                 WHEN type = 'Индюки' THEN 4
-                 ELSE 0 END,
-                 NULL,
-                EGGALL, 0, DATA, DATEEND,
-                0, '12:00', 0.0, NULL, NULL, note,
-                 CASE
-                 WHEN type = 'false' THEN 0
-                 WHEN type = 'true' THEN 1
-                 ELSE 0 END,
-                 CASE
-                 WHEN type = 'false' THEN 0
-                 WHEN type = 'true' THEN 1
-                 ELSE 0 END,
-                0, 1
-                FROM MyINCUBATOR WHERE mode = 0
-        """.trimIndent()
-        )
-        db.execSQL("CREATE INDEX index_bookmark_incubator_idPT ON bookmark_incubator(idPT)")
-
-        //==================== Миграция IncubatorParameters ====================
-        db.execSQL(
-            """
-            CREATE TABLE IF NOT EXISTS incubator_parameters
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                day INTEGER NOT NULL,
-                temp TEXT NOT NULL,
-                damp TEXT NOT NULL,
-                over TEXT NOT NULL,
-                airing TEXT NOT NULL,
-                temp_fact TEXT NOT NULL,
-                damp_fact TEXT NOT NULL,
-                over_fact TEXT NOT NULL,
-                airing_fact TEXT NOT NULL,
-                note TEXT NOT NULL,
-                idPT INTEGER NOT NULL
-            )
-        """.trimIndent()
-        )
-
-        db.execSQL(
-            """
-            INSERT INTO incubator_parameters(
-                 id, day, temp, damp, over, airing, 
-                 temp_fact, damp_fact, over_fact, airing_fact, note, idPT
-            )
-            SELECT
-               id, day, temp, damp, over, airing, 
-               temp, damp, over, airing, '', idPT
-               FROM MyIncubator 
-        """.trimIndent()
-        )
-        db.execSQL("CREATE INDEX index_incubator_parameters_idPT ON incubator_parameters(idPT)")
 
         /*db.execSQL("DROP TABLE MyINCUBATOR")
         db.execSQL("DROP TABLE MyIncubator")*/
