@@ -619,9 +619,6 @@ class AnimalCountViewModel @Inject constructor(
             category = resourceProvider.getString(R.string.animal_card_screen_add_category_expenses),
             note = resourceProvider.getString(R.string.animal_card_screen_note_expenses),
             isShowFood = false,
-            isShowWarehouse = false,
-            isShowAnimals = false,
-            isShowFoodHand = false,
             idPT = itemIdPT,
             animalId = itemId,
             animalCountId = countId ?: state.id

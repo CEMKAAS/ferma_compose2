@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDao {
     @Query(
-        "SELECT * from NoteFerma" +
+        "SELECT * from note_table" +
                 " Where idPT=:id" +
                 " ORDER BY strftime('%Y-%m-%d', substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2)) DESC"
     )
     fun getAllNote(id: Long): Flow<List<NoteTable>>
 
     @Query(
-        "SELECT * from NoteFerma  Where _id=:id"
+        "SELECT * from note_table Where _id=:id"
     )
     fun getNote(id: Long): Flow<NoteTable>
 
@@ -32,6 +32,6 @@ interface NoteDao {
     @Delete
     suspend fun deleteNote(item: NoteTable)
 
-    @Query("DELETE FROM noteferma WHERE _id = :id")
+    @Query("DELETE FROM note_table WHERE _id = :id")
     suspend fun deleteNoteById(id: Long)
 }

@@ -45,12 +45,12 @@ interface SaleDao {
     @Query(
         "SELECT title, count_suffix AS suffix, 0 AS category FROM add_table WHERE idPT=:id" +
                 " UNION " +
-                " SELECT title, count_suffix AS suffix, 1 AS catefory FROM expenses_table WHERE idPT=:id AND is_show_warehouse = 1 AND is_show_food != 1 GROUP BY title" +
+                " SELECT title, count_suffix AS suffix, 1 AS catefory FROM expenses_table WHERE idPT=:id AND is_show_food != 1 GROUP BY title" +
                 " UNION " +
                 " SELECT title, count_suffix AS suffix, 2 AS catefory FROM sale_table WHERE idPT=:id" +
                 " AND title NOT IN (SELECT title from add_table Where idPT=:id" +
                 " UNION " +
-                " SELECT title FROM expenses_table WHERE idPT=:id AND is_show_warehouse = 1 AND is_show_food != 1 GROUP BY title)"
+                " SELECT title FROM expenses_table WHERE idPT=:id AND is_show_food != 1 GROUP BY title)"
     )
     fun getItemsTitleSaleList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 

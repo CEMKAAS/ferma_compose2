@@ -64,12 +64,6 @@ data class ExpensesTable(
     val note: String,
     @ColumnInfo(name = "is_show_food")
     val isShowFood: Boolean,
-    @ColumnInfo(name = "is_show_food_hand")
-    val isShowFoodHand: Boolean,
-    @ColumnInfo(name = "is_show_warehouse")
-    val isShowWarehouse: Boolean,
-    @ColumnInfo(name = "is_show_animals")
-    val isShowAnimals: Boolean,
     @ColumnInfo(name = "feed_food")
     val feedFood: Double?,
     @ColumnInfo(name = "feed_food_suffix")

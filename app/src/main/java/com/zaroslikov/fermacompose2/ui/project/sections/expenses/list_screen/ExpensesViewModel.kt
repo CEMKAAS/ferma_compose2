@@ -341,9 +341,6 @@ class ExpensesViewModel @Inject constructor(
             category = category.trim(),
             note = note.trim(),
             isShowFood = isFood,
-            isShowFoodHand = true, // TODO
-            isShowWarehouse = true, //TODO
-            isShowAnimals = true, // TODO
             countAnimal = if (isFood) countAnimalFood.toConvertDbOnlyInt() else null,
             feedFood = if (isFood) feedFood.toConvertDbDouble() else null,
             feedFoodSuffix = if (isFood) feedFoodSuffix else null,
@@ -390,9 +387,6 @@ class ExpensesViewModel @Inject constructor(
             category = category,
             note = note,
             isShowFood = isShowFood,
-            isShowWarehouse = isShowWarehouse,
-            isShowAnimals = isShowAnimals,
-            isShowFoodHand = isShowFoodHand,
             feedFood = feedFood,
             countAnimal = countAnimal,
             foodDesignedDay = foodDesignedDay,

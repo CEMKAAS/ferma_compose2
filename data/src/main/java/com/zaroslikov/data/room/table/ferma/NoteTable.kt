@@ -9,7 +9,7 @@ import com.zaroslikov.data.room.table.project.ProjectTable
 
 
 @Entity(
-    tableName = "NoteFerma",
+    tableName = "note_table",
     foreignKeys = [ForeignKey(
         entity = ProjectTable::class,
         parentColumns = arrayOf("id"),

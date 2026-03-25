@@ -30,7 +30,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
 
         //==================== Миграция IncubatorTable ====================
-        /*db.execSQL(
+        db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS incubator_table(
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -43,7 +43,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 is_auto_rotation INTEGER NOT NULL,
                 is_auto_ventilation INTEGER NOT NULL,
                 currency_suffix INTEGER NOT NULL,
-                idPT INTEGER NOT NULL
+                idPT INTEGER NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
@@ -56,11 +57,10 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             ) 
             SELECT
               'Инкубатор', NULL, NULL,  0, NULL, '', 0, 0,
-               1, 1
-               WHERE EXISTS (SELECT 1 FROM MyINCUBATOR WHERE mode = 0)
+               13, 1
+               WHERE EXISTS (SELECT 1 FROM МyINCUBATOR WHERE mode = 0)
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_incubator_table_idPT ON incubator_table(idPT)")*/
 
         //==================== Миграция BookmarkTable ====================
         db.execSQL(
@@ -83,13 +83,14 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 is_auto_rotation INTEGER NOT NULL,
                 is_auto_ventilation INTEGER NOT NULL,
                 is_activity_bookmark INTEGER NOT NULL,
-                idPT INTEGER NOT NULL
+                idPT INTEGER NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES incubator_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
 
-        /*  db.execSQL(
-              """
+        db.execSQL(
+            """
               INSERT INTO bookmark_incubator(
                    id, title, type, breed, count, rejected_count, start_date, end_date,
                    is_early_completion_status, time, price, price_all, chick_price, note,
@@ -105,8 +106,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN type = 'Индюки' THEN 4
                    ELSE 0 END,
                    NULL,
-                  EGGALL, 0, DATA, DATEEND,
-                  0, '12:00', 0.0, NULL, NULL, note,
+                  EGGALL, 0, DATA, DATAEND,
+                  0, '12:00', 0.0, NULL, NULL, '',
                    CASE
                    WHEN type = 'false' THEN 0
                    WHEN type = 'true' THEN 1
@@ -116,10 +117,9 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN type = 'true' THEN 1
                    ELSE 0 END,
                   0, 1
-                  FROM MyINCUBATOR WHERE mode = 0
+                  FROM МyINCUBATOR WHERE mode = 0
           """.trimIndent()
-          )
-          db.execSQL("CREATE INDEX index_bookmark_incubator_idPT ON bookmark_incubator(idPT)")*/
+        )
 
         //==================== Миграция IncubatorParameters ====================
         db.execSQL(
@@ -136,7 +136,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 over_fact TEXT NOT NULL,
                 airing_fact TEXT NOT NULL,
                 note TEXT NOT NULL,
-                idPT INTEGER NOT NULL
+                idPT INTEGER NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES bookmark_incubator(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
@@ -153,14 +154,52 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                FROM MyIncubator 
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_incubator_parameters_idPT ON incubator_parameters(idPT)")
+
+        //==================== Миграция AnimalTable ====================
+        db.execSQL("DROP TABLE IF EXISTS animal_table")
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS animal_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL,
+                type TEXT NOT NULL,
+                date TEXT NOT NULL,
+                date_factory TEXT,
+                is_group INTEGER NOT NULL,
+                sex INTEGER NOT NULL,
+                note TEXT NOT NULL,
+                image TEXT,
+                archive INTEGER NOT NULL,
+                food_day REAL NOT NULL,
+                food_day_suffix INTEGER NOT NULL,
+                idPT INTEGER NOT NULL,
+                price REAL NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO animal_table (
+                id, name, type, date, date_factory, is_group, sex,
+                note, image, archive, food_day, food_day_suffix, price, idPT
+            )
+            SELECT
+                id, name, type, data, NULL, groop, (CASE WHEN sex IS 'Мужской' THEN 0 ELSE 1 END) AS sex, 
+                note, NULL, arhiv, foodDay, 18, price, idPT
+            FROM AnimalTable
+        """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX index_animal_table_idPT ON animal_table(idPT)")
+        db.execSQL("DROP TABLE AnimalTable")
 
         //==================== Миграция AnimalCountTable ====================
 
-        db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'ед.'")
-
-        db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
-        db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN version INTEGER")
+//        db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN suffix TEXT NOT NULL DEFAULT 'ед.'")
+//
+//        db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN note TEXT NOT NULL DEFAULT ''")
+//        db.execSQL("ALTER TABLE AnimalCountTable ADD COLUMN version INTEGER")
 
         //==================== Миграция AnimalCountTable ====================
         db.execSQL(
@@ -184,11 +223,10 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 id, count, suffix, date, note, version, animal_id
             )
             SELECT
-                id, count, 'ед.', date, '', NULL, idAnimal
+                id, count, 3, date, '', NULL, idAnimal
             FROM AnimalCountTable
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_animal_count_table_animal_id ON animal_count_table(animal_id)")
         db.execSQL("DROP TABLE AnimalCountTable")
 
         //==================== Миграция AnimalVaccinationTable ====================
@@ -217,7 +255,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             FROM AnimalVaccinationTable
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_animal_vaccination_table_animal_id ON animal_vaccination_table(animal_id)")
+//        db.execSQL("CREATE INDEX index_animal_vaccination_table_animal_id ON animal_vaccination_table(animal_id)")
         db.execSQL("DROP TABLE AnimalVaccinationTable")
 
         //==================== Миграция AnimalWeightTable ====================
@@ -241,11 +279,11 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 id, weight, suffix, date, animal_id, note
             )
             SELECT
-                id, weight, 'кг.', date, idAnimal, ''
+                id, weight, 5, date, idAnimal, ''
             FROM AnimalWeightTable
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_animal_weight_table_animal_id ON animal_weight_table(animal_id)")
+//        db.execSQL("CREATE INDEX index_animal_weight_table_animal_id ON animal_weight_table(animal_id)")
         db.execSQL("DROP TABLE AnimalWeightTable")
 
         //==================== Миграция AnimalSizeTable ====================
@@ -269,50 +307,13 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 id, size, suffix, date, animal_id, note
             )
             SELECT
-                id, size, 'м.', date, idAnimal, ''
+                id, size, 12, date, idAnimal, ''
             FROM AnimalSizeTable
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_animal_size_table_animal_id ON animal_size_table(animal_id)")
+//        db.execSQL("CREATE INDEX index_animal_size_table_animal_id ON animal_size_table(animal_id)")
         db.execSQL("DROP TABLE AnimalSizeTable")
 
-        //==================== Миграция AnimalTable ====================
-        db.execSQL(
-            """
-            CREATE TABLE IF NOT EXISTS animal_table(
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                name TEXT NOT NULL,
-                type TEXT NOT NULL,
-                date TEXT NOT NULL,
-                date_factory TEXT,
-                is_group INTEGER NOT NULL,
-                sex INTEGER NOT NULL,
-                note TEXT NOT NULL,
-                image TEXT,
-                archive INTEGER NOT NULL,
-                food_day REAL,
-                food_day_suffix REAL,
-                idPT INTEGER NOT NULL,
-                price REAL NOT NULL,
-                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE
-            )
-        """.trimIndent()
-        )
-
-        db.execSQL(
-            """
-            INSERT INTO animal_table (
-                id, name, type, date, date_factory, is_group, sex,
-                note, image, archive, food_day, food_day_suffix, price, idPT
-            )
-            SELECT
-                id, name, type, data, NULL, groop, (CASE WHEN sex IS 'Мужской' THEN 0 ELSE 1 END) AS sex, 
-                note, NULL, arhiv, foodDay, NULL, price, idPT
-            FROM AnimalTable
-        """.trimIndent()
-        )
-        db.execSQL("CREATE INDEX index_animal_table_idPT ON animal_table(idPT)")
-        db.execSQL("DROP TABLE AnimalTable")
 
         //==================== Миграция AddTable ====================
         db.execSQL(
@@ -331,8 +332,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 note TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
                 animal_count_id INTEGER,
-                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
-                FOREIGN KEY(animal_id) REFERENCES animal_table(_id) ON DELETE SET NULL,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE SET NULL,
                 FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
@@ -346,7 +347,13 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             )
             SELECT
                 _id, title, disc, DAY, MOUNT, YEAR, PRICE,
-                suffix, category, idAnimal, note, idPT
+                CASE
+                   WHEN type = 'Шт.' THEN 1
+                   WHEN type = 'Кг.' THEN 5
+                   WHEN type = 'Л.' THEN 8
+                   ELSE 1
+                END,
+                   category, idAnimal, note, idPT
             FROM MyFerma
         """.trimIndent()
         )
@@ -373,7 +380,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 note TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
                 animal_count_id INTEGER,
-                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE,
                 FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
@@ -386,8 +393,15 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 _id, title, count, count_suffix, price, price_all, category, day, month, year,
                 status, note, idPT, animal_count_id
             )
-            SELECT _id, titleWRITEOFF, discWRITEOFF, suffix, priceAll, NULL, 'Прочее', DAY, MOUNT, YEAR,
-                statusWRITEOFF, note, idPT, NUll
+            SELECT _id, titleWRITEOFF, discWRITEOFF, 
+               CASE
+                   WHEN type = 'Шт.' THEN 1
+                   WHEN type = 'Кг.' THEN 5
+                   WHEN type = 'Л.' THEN 8
+                   ELSE 1
+               END,
+            priceAll, NULL, 'Прочее', DAY, MOUNT, YEAR,
+            statusWRITEOFF, note, idPT, NUll
             FROM MyFermaWRITEOFF
         """.trimIndent()
         )
@@ -418,7 +432,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 idPT INTEGER NOT NULL,
                 animal_id INTEGER,
                 animal_count_id INTEGER,
-                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE,
                 FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE CASCADE
                 FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE
             )
@@ -432,14 +446,25 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 category, buyer, note, idPT, animal_id, animal_count_id
             )
             SELECT
-                _id, titleSale, discSale, suffix, PRICE, NULL, DAY, MOUNT, YEAR, 
-                 category, buyer, note, idPT, NULL, NULL
+                _id, titleSale, discSale,
+                  CASE
+                   WHEN type = 'Шт.' THEN 1
+                   WHEN type = 'Кг.' THEN 5
+                   WHEN type = 'Л.' THEN 8
+                   WHEN type = 'м3' THEN 9
+                   WHEN type = 'Тн' THEN 6
+                   WHEN type = 'М.' THEN 12
+                   ELSE 1
+                  END,
+                PRICE, NULL, DAY, MOUNT, YEAR, 
+                category, buyer, note, idPT, NULL, NULL
             FROM MyFermaSale
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_sale_table_idPT ON sale_table(idPT)")
-        db.execSQL("CREATE INDEX index_sale_table_animalId ON sale_table(animal_id)")
-        db.execSQL("CREATE INDEX index_sale_table_animal_count_id ON sale_table(animal_count_id)")
+
+//        db.execSQL("CREATE INDEX index_sale_table_idPT ON sale_table(idPT)")
+//        db.execSQL("CREATE INDEX index_sale_table_animalId ON sale_table(animal_id)")
+//        db.execSQL("CREATE INDEX index_sale_table_animal_count_id ON sale_table(animal_count_id)")
         db.execSQL("DROP TABLE MyFermaSale")
 
         //==================== Миграция ExpensesTable ====================
@@ -458,23 +483,20 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 category TEXT NOT NULL,
                 note TEXT NOT NULL,
                 is_show_food INTEGER NOT NULL,
-                is_show_food_hand INTEGER NOT NULL,
-                is_show_warehouse INTEGER NOT NULL,
-                is_show_animals INTEGER NOT NULL,
                 feed_food REAL,
-                feed_food_suffix TEXT,
+                feed_food_suffix INTEGER,
                 count_animal INTEGER,
                 food_designed_day INTEGER,
                 last_day_food TEXT,
                 weight REAL,
-                weight_suffix,
+                weight_suffix INTEGER,
                 idPT INTEGER NOT NULL,
                 animalId INTEGER,
                 animal_vaccination_id INTEGER,
                 animal_count_id INTEGER,
-                FOREIGN KEY(idPT) REFERENCES ProjectTable(_id) ON DELETE CASCADE,
-                FOREIGN KEY(animalId) REFERENCES AnimalTable(id) ON DELETE CASCADE,
-                FOREIGN KEY(animal_vaccination_id) REFERENCES AnimalVaccinationTable(id) ON DELETE CASCADE,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE,
+                FOREIGN KEY(animalId) REFERENCES animal_table(id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_vaccination_id) REFERENCES animal_vaccination_table(id) ON DELETE CASCADE, 
                 FOREIGN KEY(animal_count_id) REFERENCES animal_count_table(id) ON DELETE CASCADE
             )""".trimIndent()
         )
@@ -483,25 +505,73 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             INSERT INTO MyFermaEXPENSES_new (
                 _id, title, count, day, month, year, price, price_all,
                 count_suffix, category, note,
-                is_show_food, is_show_food_hand, is_show_warehouse, is_show_animals,
+                is_show_food, 
                 feed_food, feed_food_suffix, count_animal,
                 food_designed_day, last_day_food, weight,  weight_suffix,idPT, animalId, animal_vaccination_id, animal_count_id
             )
             SELECT
                 _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES, NULL,
-                suffix, category, note,
-                showFood, dailyExpensesFoodAndCount, showWarehouse, showAnimals,
-                dailyExpensesFood, 'кг.', countAnimal,
-                foodDesignedDay, lastDayFood, NULL, NULL, idPT, NULL, NULL, NULL
+                CASE
+                   WHEN type = 'Шт.' THEN 1
+                   WHEN type = 'Кг.' THEN 5
+                   WHEN type = 'Л.' THEN 8
+                   WHEN type = 'м3' THEN 9
+                   WHEN type = 'Тн' THEN 6
+                   WHEN type = 'М.' THEN 12
+                   ELSE 1
+                END, category, note,
+                showFood,
+                CASE WHEN showFood = 1 THEN dailyExpensesFood ELSE NULL END,
+                CASE WHEN showFood = 1 THEN 5 ELSE NULL END,
+                CASE WHEN showFood = 1 THEN countAnimal ELSE NULL END,
+                CASE WHEN showFood = 1 THEN foodDesignedDay ELSE NULL END,
+                CASE WHEN showFood = 1 THEN lastDayFood ELSE NULL END,
+                CASE WHEN showFood = 1 THEN lastDayFood ELSE NULL END,
+                CASE WHEN showFood = 1 THEN lastDayFood ELSE NULL END,
+                NULL, NULL, idPT, NULL, NULL, NULL
             FROM MyFermaEXPENSES
         """.trimIndent()
         )
+
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_idPT ON MyFermaEXPENSES_new(idPT)")
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animalId ON MyFermaEXPENSES_new(animalId)")
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animal_vaccination_id ON MyFermaEXPENSES_new(animal_vaccination_id)")
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animal_count_id ON MyFermaEXPENSES_new(animal_count_id)")
         db.execSQL("DROP TABLE MyFermaEXPENSES")
-        db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO expenses_table")
+//        db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO expenses_table")
+
+        db.execSQL("DROP TABLE МyINCUBATOR")
+        db.execSQL("DROP TABLE MyIncubator")
+
+        // Создаем временную таблицу
+        db.execSQL(
+            """
+            CREATE TABLE ExpensesAnimalTable_new (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                idExpenses INTEGER NOT NULL,
+                idAnimal INTEGER NOT NULL,
+                percentExpenses REAL NOT NULL,
+                idPT INTEGER NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE
+            )
+        """.trimIndent()
+        )
+
+        // Копируем данные
+        db.execSQL(
+            """
+            INSERT INTO ExpensesAnimalTable_new (_id, idExpenses, idAnimal, percentExpenses, idPT)
+            SELECT _id, idExpenses, idAnimal, percentExpenses, idPT FROM ExpensesAnimalTable
+        """.trimIndent()
+        )
+
+
+        // Удаляем старую и переименовываем новую
+        db.execSQL("DROP TABLE ExpensesAnimalTable")
+        db.execSQL("ALTER TABLE ExpensesAnimalTable_new RENAME TO ExpensesAnimalTable")
+
+        // Восстанавливаем индекс
+        db.execSQL("CREATE INDEX index_ExpensesAnimalTable_idPT ON ExpensesAnimalTable(idPT)")
 
         //==================== Перенос данных из AnimalTable в ExpensesTable ====================
         db.execSQL(
@@ -518,9 +588,6 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 category,
                 note,
                 is_show_food,
-                is_show_warehouse,
-                is_show_animals,
-                is_show_food_hand,
                 feed_food,
                 feed_food_suffix,
                 count_animal,
@@ -545,13 +612,10 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 CAST(substr(date, 7, 4) AS INTEGER) AS year,
                 price,
                 NULL,
-                'шт.' AS count_suffix,
+                1 AS count_suffix,
                 'Покупка животных' AS category,
                 note,
                 0 AS is_show_food,
-                0 AS is_show_warehouse,
-                0 AS is_show_animals,
-                0 AS is_show_food_hand,
                 NULL AS feed_food,
                 NULL AS feed_food_suffix,
                 NULL AS count_animal,
@@ -577,7 +641,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 note TEXT NOT NULL,
                 date TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
-                FOREIGN KEY(idPT) REFERENCES ProjectTable(id) ON DELETE CASCADE
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
@@ -605,14 +669,21 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 volume_suffix INTEGER NOT NULL,
                 linear_suffix INTEGER NOT NULL,
                 idPT INTEGER NOT NULL,
-                FOREIGN KEY(idPT) REFERENCES ProjectTable(id) ON DELETE CASCADE
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE
             )
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_settings_table_idPT ON settings_table(idPT)")
+
+        db.execSQL(
+            """
+            INSERT INTO settings_table(currency_suffix, weight_suffix, volume_suffix, linear_suffix, idPT) 
+            Select 13, 5, 8, 12, id FROM project_table WHERE mode = 1
+        """.trimIndent()
+        )
+
+//        db.execSQL("CREATE INDEX index_settings_table_idPT ON settings_table(idPT)")
+//        db.execSQL("CREATE INDEX index_ExpensesAnimalTable_idPT ON ExpensesAnimalTable(idPT)")
 
 
-        /*db.execSQL("DROP TABLE MyINCUBATOR")
-        db.execSQL("DROP TABLE MyIncubator")*/
     }
 }

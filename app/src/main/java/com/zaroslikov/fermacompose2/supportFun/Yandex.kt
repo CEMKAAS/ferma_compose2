@@ -36,8 +36,6 @@ fun metricalExpenses(
     eventParameters["Категория"] = domainExpensesTable.category
     eventParameters["Примечание"] = domainExpensesTable.note
     eventParameters["Корм"] = domainExpensesTable.isShowFood
-    eventParameters["Склад"] = domainExpensesTable.isShowWarehouse
-    eventParameters["Распределение"] = domainExpensesTable.isShowAnimals
     AppMetrica.reportEvent("Expenses Products", eventParameters)
 }
 

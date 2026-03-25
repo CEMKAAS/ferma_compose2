@@ -33,6 +33,7 @@ data class AnimalTable(
     val note : String,
     val image:String?,
     val archive: Boolean,
+    @ColumnInfo(name = "food_day")
     val foodDay:Double,
     @ColumnInfo(name = "food_day_suffix")
     val foodDaySuffix : Suffix,

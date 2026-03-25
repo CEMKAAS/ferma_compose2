@@ -15,15 +15,14 @@ data class DomainExpensesTable(
     val countSuffix: Suffix,
     val category: String,
     val note: String,
+
     val isShowFood: Boolean, // Показывать на складе еду
-    val isShowFoodHand: Boolean, // указать вручную
-    val isShowWarehouse: Boolean, // Показывать на складе (Перекупство)
-    val isShowAnimals: Boolean, // Связывает животных
     val feedFood: Double? = null, // Ежедневный расход еды
     val feedFoodSuffix: Suffix? = null, // Суффикс ежедневного расхода
     val countAnimal: Int? = null, // Кол-во животных
     val foodDesignedDay: Int? = null, // Кол-во дней
     val lastDayFood: String? = null, //Последний день еды
+
     val weight: Double? = null,
     val weightSuffix: Suffix? = null,
     val idPT: Long,

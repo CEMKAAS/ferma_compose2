@@ -62,7 +62,7 @@ interface ExpensesDao {
                 " a.id," +
                 " a.name AS name," +
                 " a.type as type," +
-                " a.foodDay AS foodDay," +
+                " a.food_day AS foodDay," +
                 " a.food_day_suffix AS foodDaySuffix," +
                 " t.count AS countAnimal," +
                 " case when e._id NOT NULL Then e._id  else 0 end as idExpensesAnimal," +

@@ -95,9 +95,6 @@ data class ExpensesTableUi(
     val category: String,
     val note: String,
     val isShowFood: Boolean, // Показывать на складе еду
-    val isShowFoodHand: Boolean, // указать вручную
-    val isShowWarehouse: Boolean, // Показывать на складе (Перекупство)
-    val isShowAnimals: Boolean, // Связывает животных
     val feedFood: Double? = null, // Ежедневный расход еды
     val feedFoodSuffix: Suffix? = null, // Суффикс ежедневного расхода
     val countAnimal: Int? = null, // Кол-во животных

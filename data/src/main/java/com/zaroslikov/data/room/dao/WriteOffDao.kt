@@ -56,7 +56,7 @@ interface WriteOffDao {
     @Query(
         "SELECT title, count_suffix AS suffix, 0 AS category from add_table Where idPT=:id group by title, count_suffix" +
                 " UNION ALL" +
-                " SELECT title,  count_suffix AS suffix, 1 AS category from expenses_table Where idPT=:id and is_show_warehouse = 1 group by title, count_suffix"
+                " SELECT title,  count_suffix AS suffix, 1 AS category from expenses_table Where idPT=:id group by title, count_suffix"
     )
     fun getItemsWriteOffList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 

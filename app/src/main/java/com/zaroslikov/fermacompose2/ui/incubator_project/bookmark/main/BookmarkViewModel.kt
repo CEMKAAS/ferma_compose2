@@ -733,9 +733,6 @@ class BookmarkViewModel @Inject constructor(
                         category = "", // //TODO Затраты на инкубатор
                         note = "", // //TODO Затраты на инкубатор
                         isShowFood = false,
-                        isShowFoodHand = false,
-                        isShowWarehouse = false,
-                        isShowAnimals = false,
                         idPT = itemIdPT,
                         animalId = idAnimal,
                     ) else null
