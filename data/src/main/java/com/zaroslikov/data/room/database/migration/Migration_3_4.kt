@@ -348,9 +348,9 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             SELECT
                 _id, title, disc, DAY, MOUNT, YEAR, PRICE,
                 CASE
-                   WHEN type = 'Шт.' THEN 1
-                   WHEN type = 'Кг.' THEN 5
-                   WHEN type = 'Л.' THEN 8
+                   WHEN suffix = 'Шт.' THEN 1
+                   WHEN suffix = 'Кг.' THEN 5
+                   WHEN suffix = 'Л.' THEN 8
                    ELSE 1
                 END,
                    category, idAnimal, note, idPT
@@ -395,9 +395,9 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             )
             SELECT _id, titleWRITEOFF, discWRITEOFF, 
                CASE
-                   WHEN type = 'Шт.' THEN 1
-                   WHEN type = 'Кг.' THEN 5
-                   WHEN type = 'Л.' THEN 8
+                   WHEN suffix = 'Шт.' THEN 1
+                   WHEN suffix = 'Кг.' THEN 5
+                   WHEN suffix = 'Л.' THEN 8
                    ELSE 1
                END,
             priceAll, NULL, 'Прочее', DAY, MOUNT, YEAR,
@@ -448,12 +448,12 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             SELECT
                 _id, titleSale, discSale,
                   CASE
-                   WHEN type = 'Шт.' THEN 1
-                   WHEN type = 'Кг.' THEN 5
-                   WHEN type = 'Л.' THEN 8
-                   WHEN type = 'м3' THEN 9
-                   WHEN type = 'Тн' THEN 6
-                   WHEN type = 'М.' THEN 12
+                   WHEN suffix = 'Шт.' THEN 1
+                   WHEN suffix = 'Кг.' THEN 5
+                   WHEN suffix = 'Л.' THEN 8
+                   WHEN suffix = 'м3' THEN 9
+                   WHEN suffix = 'Тн' THEN 6
+                   WHEN suffix = 'М.' THEN 12
                    ELSE 1
                   END,
                 PRICE, NULL, DAY, MOUNT, YEAR, 
@@ -468,6 +468,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("DROP TABLE MyFermaSale")
 
         //==================== Миграция ExpensesTable ====================
+        db.execSQL("DROP TABLE IF EXISTS MyFermaEXPENSES_new")
+        db.execSQL("DROP TABLE IF EXISTS expenses_table")
         db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS MyFermaEXPENSES_new (
@@ -505,19 +507,18 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             INSERT INTO MyFermaEXPENSES_new (
                 _id, title, count, day, month, year, price, price_all,
                 count_suffix, category, note,
-                is_show_food, 
-                feed_food, feed_food_suffix, count_animal,
+                is_show_food, feed_food, feed_food_suffix, count_animal,
                 food_designed_day, last_day_food, weight,  weight_suffix,idPT, animalId, animal_vaccination_id, animal_count_id
             )
             SELECT
                 _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES, NULL,
                 CASE
-                   WHEN type = 'Шт.' THEN 1
-                   WHEN type = 'Кг.' THEN 5
-                   WHEN type = 'Л.' THEN 8
-                   WHEN type = 'м3' THEN 9
-                   WHEN type = 'Тн' THEN 6
-                   WHEN type = 'М.' THEN 12
+                   WHEN suffix = 'Шт.' THEN 1
+                   WHEN suffix = 'Кг.' THEN 5
+                   WHEN suffix = 'Л.' THEN 8
+                   WHEN suffix = 'м3' THEN 9
+                   WHEN suffix = 'Тн' THEN 6
+                   WHEN suffix = 'М.' THEN 12
                    ELSE 1
                 END, category, note,
                 showFood,
@@ -525,8 +526,6 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 CASE WHEN showFood = 1 THEN 5 ELSE NULL END,
                 CASE WHEN showFood = 1 THEN countAnimal ELSE NULL END,
                 CASE WHEN showFood = 1 THEN foodDesignedDay ELSE NULL END,
-                CASE WHEN showFood = 1 THEN lastDayFood ELSE NULL END,
-                CASE WHEN showFood = 1 THEN lastDayFood ELSE NULL END,
                 CASE WHEN showFood = 1 THEN lastDayFood ELSE NULL END,
                 NULL, NULL, idPT, NULL, NULL, NULL
             FROM MyFermaEXPENSES
@@ -538,7 +537,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animal_vaccination_id ON MyFermaEXPENSES_new(animal_vaccination_id)")
         db.execSQL("CREATE INDEX index_MyFermaEXPENSES_new_animal_count_id ON MyFermaEXPENSES_new(animal_count_id)")
         db.execSQL("DROP TABLE MyFermaEXPENSES")
-//        db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO expenses_table")
+        db.execSQL("ALTER TABLE MyFermaEXPENSES_new RENAME TO expenses_table")
 
         db.execSQL("DROP TABLE МyINCUBATOR")
         db.execSQL("DROP TABLE MyIncubator")
@@ -656,7 +655,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             FROM NoteFerma
         """.trimIndent()
         )
-        db.execSQL("CREATE INDEX index_note_table_idPT ON note_table(idPT)")
+//        db.execSQL("CREATE INDEX index_note_table_idPT ON note_table(idPT)")
         db.execSQL("DROP TABLE NoteFerma")
 
         //==================== Миграция SettingsTable ====================
