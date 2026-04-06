@@ -6,6 +6,7 @@ import com.zaroslikov.data.room.repository.AnimalRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalSizeRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalVaccinationRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalWeightRepositoryImpl
+import com.zaroslikov.data.room.repository.AppSettingsRepositoryImpl
 import com.zaroslikov.data.room.repository.BookmarkRepositoryImpl
 import com.zaroslikov.data.room.repository.ExpensesAnimalRepositoryImpl
 import com.zaroslikov.data.room.repository.ExpensesRepositoryImpl
@@ -13,6 +14,7 @@ import com.zaroslikov.data.room.repository.FinanceRepositoryImpl
 import com.zaroslikov.data.room.repository.IncubatorParametersRepositoryImpl
 import com.zaroslikov.data.room.repository.IncubatorTableRepositoryImpl
 import com.zaroslikov.data.room.repository.NoteRepositoryImpl
+import com.zaroslikov.data.room.repository.ProfileTableRepositoryImpl
 import com.zaroslikov.data.room.repository.ProjectRepositoryImpl
 import com.zaroslikov.data.room.repository.SaleRepositoryImpl
 import com.zaroslikov.data.room.repository.SettingsRepositoryImpl
@@ -24,6 +26,7 @@ import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
+import com.zaroslikov.domain.repository.AppSettingsRepository
 import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
@@ -31,6 +34,7 @@ import com.zaroslikov.domain.repository.FinanceRepository
 import com.zaroslikov.domain.repository.IncubatorParametersRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.domain.repository.NoteRepository
+import com.zaroslikov.domain.repository.ProfileRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
@@ -85,6 +89,7 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindIncubatorParametersRepository(incubatorRepositoryImpl: IncubatorParametersRepositoryImpl): IncubatorParametersRepository
+
     @Binds
     @Singleton
     abstract fun bindNoteRepository(noteRepositoryImpl: NoteRepositoryImpl): NoteRepository
@@ -116,4 +121,12 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBookmarkTableRepository(bookmarkRepositoryImpl: BookmarkRepositoryImpl): BookmarkRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAppSettingsTableRepository(appSettingsRepositoryImpl: AppSettingsRepositoryImpl): AppSettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProfileTableRepository(profileTable: ProfileTableRepositoryImpl): ProfileRepository
 }

@@ -1,20 +1,17 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 
 sealed class AddListIntent : BaseIntent {
-    data class OpenBottomSheetGroup(
-        val value: Boolean,
-        val currentBriefly: BrieflyAddDomain = BrieflyAddDomain()
-    ) : AddListIntent()
+    data class OpenBottomSheetGroup(val title: String? = null) : AddListIntent()
 
     data class OpenBottomSheetEntry(
         val isOpen: Boolean,
-        val state: DomainAddTable? = null,
+        val state: DomainAddItemDto? = null,
         val isSaveStateForBottomSheet: Boolean = false
     ) : AddListIntent()
 
@@ -24,7 +21,12 @@ sealed class AddListIntent : BaseIntent {
         val isSaveStateForBottomSheet: Boolean = false
     ) : AddListIntent()
 
-    data class RefreshWarehouseCount(val value: List<DomainCountSuffix>): AddListIntent()
+    data class RefreshWarehouseCount(val value: List<DomainCountSuffix>) : AddListIntent()
+
+    data class OpenBottomSheetDetail(
+        val value: Long? = null
+    ) : AddListIntent()
+
 
     data class GroupClicked(val value: Boolean) : AddListIntent()
     data class TitleChanged(val value: String) : AddListIntent()

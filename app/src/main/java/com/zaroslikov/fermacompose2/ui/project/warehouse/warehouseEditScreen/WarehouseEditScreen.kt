@@ -78,7 +78,6 @@ import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
-import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.toFullResId
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -352,8 +351,8 @@ private fun DateSettingsCard(
         ) {
             IconTransaction2(
                 icon = R.drawable.baseline_calendar_month_24,
-                colorIcon = green_10,
-                color = green_g_4,
+                iconColor = green_10,
+                boxColor = green_g_4,
                 sizeCard = 36.dp
             )
             Column(
@@ -399,8 +398,8 @@ fun CurrencySettingsCard(
                 ) {
                     IconTransaction2(
                         icon = R.drawable.icon_money,
-                        colorIcon = baseColor,
-                        color = secondColor,
+                        iconColor = baseColor,
+                        boxColor = secondColor,
                         sizeCard = 36.dp
                     )
                     Column(
@@ -541,8 +540,8 @@ private fun UnitsMeasurementSettingsCard(
             ) {
                 IconTransaction2(
                     icon = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
-                    colorIcon = violet_6,
-                    color = violet_5,
+                    iconColor = violet_6,
+                    boxColor = violet_5,
                     sizeCard = 36.dp
                 )
                 Text(

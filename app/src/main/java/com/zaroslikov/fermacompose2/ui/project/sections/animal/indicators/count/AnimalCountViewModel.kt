@@ -70,7 +70,7 @@ class AnimalCountViewModel @Inject constructor(
 
             // Open Bottom Sheet Animal
             is AnimalCountIntent.DialogClicked -> loadDataForEntryOrEdit(
-                isOpen = intent.isEntry,
+                isOpen = intent.isOpen,
                 domain = intent.item,
                 version = intent.version,
                 isSaveStateForBottomSheet = intent.isSaveStateForBottomSheet
@@ -156,6 +156,20 @@ class AnimalCountViewModel @Inject constructor(
                 )
                 return@launch
             }
+            Log.i(
+                "count_animal",
+                " !getState().isSaveStateForEntry = ${!getState().isSaveStateForEntry}"
+            )
+            Log.i("count_animal", " domain != null = ${domain != null}")
+            Log.i(
+                "count_animal",
+                " version != getState().saveAnimalCountVersion = ${version != getState().saveAnimalCountVersion}"
+            )
+            Log.i(
+                "count_animal",
+                " total = ${!getState().isSaveStateForEntry || domain != null || version != getState().saveAnimalCountVersion}"
+            )
+
             val newState =
                 if (!getState().isSaveStateForEntry || domain != null || version != getState().saveAnimalCountVersion) {
                     val titleDeferred =
@@ -621,7 +635,8 @@ class AnimalCountViewModel @Inject constructor(
             isShowFood = false,
             idPT = itemIdPT,
             animalId = itemId,
-            animalCountId = countId ?: state.id
+            animalCountId = countId ?: state.id,
+            isFood = false
         )
     }
 

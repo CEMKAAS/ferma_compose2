@@ -8,12 +8,14 @@ import com.zaroslikov.data.room.mapper.dto.expenses.toBrieflyExpensesDomain
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
 import com.zaroslikov.data.room.mapper.dto.toTitleAndSuffixDomain
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.toDomainMap
 import com.zaroslikov.data.room.mapper.toExpensesRoomMap
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.repository.ExpensesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,6 +23,13 @@ import javax.inject.Inject
 
 class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: ExpensesDao) :
     ExpensesRepository {
+    override fun getAllExpensesTableForExport(): Flow<List<DomainExpensesTable>> {
+        return expensesDao.getAllExpensesTableForExport().map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override suspend fun clearAndInsertExpensesTableForImport(domainExpensesTable: List<DomainExpensesTable>) {
+        return expensesDao.clearAndInsertExpensesTableForImport(domainExpensesTable.map { it.toExpensesRoomMap() })
+    }
 
     override fun getAllExpensesItems(id: Long): Flow<List<DomainExpensesTable>> {
         return expensesDao.getAllExpensesItems(id).map { it -> it.map { it.toDomainMap() } }
@@ -88,6 +97,10 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: Expens
         return expensesDao.getExpenses(id)
     }
 
+    override fun getExpensesAllProject(currencySuffix: Suffix): Flow<Double> {
+        return expensesDao.getExpensesAllProject(currencySuffix)
+    }
+
     override fun getExpensesMountFin(
         id: Long,
         mount: Int,
@@ -137,6 +150,10 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: Expens
 
     override fun getCurrentFoodWarehouse(id: Long): Flow<List<DomainExpensesTable>> {
         return expensesDao.getCurrentFoodWarehouse(id).map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override suspend fun updateFoodOnWriteOffWarehouse(id: Long) {
+        return expensesDao.updateFoodOnWriteOffWarehouse(id)
     }
 
     override fun getAnalysisExpensesNewYearProject(

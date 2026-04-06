@@ -4,6 +4,7 @@ import com.zaroslikov.data.room.dao.AnimalDao
 import com.zaroslikov.data.room.mapper.AnimaMapper.dto.toDomain
 import com.zaroslikov.data.room.mapper.dto.animal.toAnimalForAddDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
+import com.zaroslikov.data.room.mapper.table.toDomainProfileTable
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
@@ -15,6 +16,15 @@ import javax.inject.Inject
 
 class AnimalRepositoryImpl @Inject constructor(private val animalDao: AnimalDao) :
     AnimalRepository {
+    override fun getAllAnimalTableForExport(): Flow<List<DomainAnimalTable>> {
+        return animalDao.getAllAnimalTableForExport()
+            .map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override suspend fun clearAndInsertAnimalTableForImport(domainAnimal: List<DomainAnimalTable>) {
+        return animalDao.clearAndInsertAnimalTableForImport(domainAnimal.map { it.toRoomMap() })
+    }
+
     override fun getAllAnimal(id: Long): Flow<List<DomainAnimalWithCount>> {
         return animalDao.getAllAnimal(id).map { list -> list.map { it.toDomain() } }
     }

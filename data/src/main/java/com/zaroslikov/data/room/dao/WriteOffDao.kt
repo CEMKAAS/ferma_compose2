@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
@@ -12,10 +14,27 @@ import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
 import com.zaroslikov.data.room.dto.write_off.BrieflyWriteOffDto
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
+import com.zaroslikov.domain.models.enums.Suffix
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WriteOffDao {
+
+    @Query("SELECT * from write_off_table")
+    fun getAllWriteOffTableForExport(): Flow<List<WriteOffTable>>
+
+    @Upsert
+    suspend fun insertAllWriteOffTable(data: List<WriteOffTable>)
+
+    @Query("DELETE FROM write_off_table")
+    suspend fun deleteAllWriteOffTable()
+
+    @Transaction
+    suspend fun clearAndInsertWriteOffTableForImport(writeOffTables: List<WriteOffTable>) {
+        deleteAllWriteOffTable()
+        insertAllWriteOffTable(writeOffTables)
+    }
+
     @Query("SELECT * from write_off_table Where idPT=:id ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC")
     fun getAllWriteOffItems(id: Long): Flow<List<WriteOffTable>>
 
@@ -78,11 +97,30 @@ interface WriteOffDao {
     fun getOwnNeed(id: Long): Flow<Double> //Write off Maybe
 
     @Query(
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
+                " FROM write_off_table s" +
+                " INNER JOIN project_table p ON p.id = s.idPT" +
+                " INNER JOIN settings_table st ON st.idPT = p.id" +
+                " WHERE st.currency_suffix = :currencySuffix"
+    )
+    fun getOwnNeedAllProject(currencySuffix: Suffix): Flow<Double> //Write off Maybe
+
+    @Query(
         "SELECT COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
                 " FROM write_off_table" +
                 " WHERE idPT =:id and status = 1 AND price IS NOT NULL"
     )
     fun getScrap(id: Long): Flow<Double> // WriteOff Maybe
+
+    @Query(
+        "SELECT COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
+                " FROM write_off_table s" +
+                " INNER JOIN project_table p ON p.id = s.idPT" +
+                " INNER JOIN settings_table st ON st.idPT = p.id" +
+                " WHERE st.currency_suffix = :currencySuffix"
+    )
+    fun getScrapAllProject(currencySuffix: Suffix): Flow<Double> // WriteOff Maybe
 
     @Query(
         "SELECT title," +

@@ -135,47 +135,6 @@ fun CheckboxTextIcon(
 }
 
 @Composable
-fun autoCalculate(
-    isAutoCalculate: MutableState<Boolean>,
-    price: String,
-    count: String
-): String {
-
-    val isAutoCalculatePadding by animateDpAsState(
-        if (isAutoCalculate.value) 2.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
-    )
-    val amount = (price.toConvertZeroDouble() * count.toConvertZeroDouble()).formatNumber()
-    CardField(
-        modifier = Modifier
-            .padding(bottom = 4.dp)
-            .padding(bottom = isAutoCalculatePadding.coerceAtLeast(0.dp)),
-        row = false
-    ) {
-        CheckboxTextIcon(
-            modifier = if (isAutoCalculate.value) Modifier.toOutlinedText() else Modifier,
-            checked = isAutoCalculate.value,
-            onCheckedChange = {
-                isAutoCalculate.value = it
-            },
-            intTitle = R.string.checkbox_auto_calculate,
-            isTooltipShow = true,
-            intTooltip = R.string.tooltip_auto_calculate_price
-        )
-        if (isAutoCalculate.value)
-            TextBuildAnnotated(
-                intRes = R.string.support_text_all_price,
-                priceAll = price,
-                count = count
-            )
-    }
-    return amount
-}
-
-@Composable
 fun AutoCalculateCheckbox(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
@@ -205,7 +164,6 @@ fun AutoCalculateCheckbox(
             )
     }
 }
-
 
 @Composable
 fun AutoWeightCheckbox(

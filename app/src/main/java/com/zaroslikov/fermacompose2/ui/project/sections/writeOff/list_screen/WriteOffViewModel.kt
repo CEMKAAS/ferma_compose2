@@ -2,8 +2,10 @@ package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.SettingsRepository
@@ -14,6 +16,8 @@ import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -23,6 +27,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @HiltViewModel
 class WriteOffViewModel @Inject constructor(
@@ -50,7 +56,7 @@ class WriteOffViewModel @Inject constructor(
                 loadDataForEntryOrEdit(intent.isOpen, intent.item, intent.isSaveStateForBottomSheet)
 
             is WriteOffListIntent.OpenBottomSheetGroup ->
-                openBottomSheetGroup(intent.value, intent.currentBriefly)
+                openBottomSheetGroup(intent.value)
 
             is WriteOffListIntent.TitleAndSuffix ->
                 updateWarehouseUiState(intent.title, intent.writeOffCategory)
@@ -66,11 +72,11 @@ class WriteOffViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 writeOffRepository.getAllWriteOffItems(itemIdPT),
-                writeOffRepository.getBrieflyItemWriteOff(itemIdPT),
                 addRepository.getItemsTitleAddList(itemIdPT),
                 settingsRepository.getSettings(itemIdPT)
-            ) { addList, briefly, titleList, settings->
-                LoadDataWriteOffList(addList, briefly, titleList, settings)
+            ) { addList, titleList, settings ->
+                val brieflyList = brieflyList(addList, settings)
+                LoadDataWriteOffList(addList, brieflyList, titleList, settings)
             }.collectLatest { (addList, briefly, titleList, setting) ->
                 updateState {
                     it.copy(
@@ -80,13 +86,25 @@ class WriteOffViewModel @Inject constructor(
                         searchList = addList,
                         searchBrieflyList = briefly,
                         writeOffBoolean = titleList.isNotEmpty(),
-                        priceSuffix = setting.currencySuffix,
+                        settings = setting,
                         isLoading = false
                     )
                 }
             }
         }
     }
+
+    private fun brieflyList(
+        list: List<DomainWriteOffTable>,
+        settings: DomainSettings
+    ): List<BrieflyItem> {
+        return list
+            .groupBy { it.title }
+            .map { (title, items) ->
+                mapperToBrieflyItem(title, items, settings = settings)
+            }
+    }
+
 
     private suspend fun getDetailsName(name: String): List<DomainWriteOffTable> {
         return writeOffRepository.getBrieflyDetailsItemWriteOff(itemIdPT, name).first()
@@ -111,7 +129,10 @@ class WriteOffViewModel @Inject constructor(
     override fun update() {
         viewModelScope.launch {
             writeOffRepository.updateWriteOff(getState().currentProduct.updateForSave())
+            if (getState().currentDetail != null)
+                updateState { it.copy(currentDetail = getState().currentProduct.updateForSave()) }
             loadDataForEntryOrEdit(false, null)
+
             showMessage(
                 resourceProvider.getString(R.string.toast_refresh_s_s)
                     .format(
@@ -138,15 +159,21 @@ class WriteOffViewModel @Inject constructor(
         }
     }
 
-    private fun openBottomSheetGroup(
-        openBottomSheetGroup: Boolean,
-        currentBriefly: BrieflyWriteOffDomain
-    ) {
+    private fun openBottomSheetGroup(title: String?) {
         viewModelScope.launch {
-            val listBriefly = getDetailsName(name = currentBriefly.title)
+            if (title == null) {
+                updateState { state ->
+                    state.copy(isOpenGroupBottomSheet = false)
+                }
+                return@launch
+            }
+            val listBriefly = getDetailsName(name = title)
+            val currentBriefly =
+                mapperToBrieflyItem(title, listBriefly, settings = getState().settings)
+
             updateState {
                 it.copy(
-                    isOpenGroupBottomSheet = openBottomSheetGroup,
+                    isOpenGroupBottomSheet = true,
                     currentBriefly = currentBriefly,
                     listBriefly = listBriefly
                 )

@@ -3,9 +3,11 @@ package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAddTable
-import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
@@ -13,7 +15,9 @@ import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -31,7 +35,8 @@ class AddViewModel @Inject constructor(
     private val addRepository: AddRepository,
     private val animalRepository: AnimalRepository,
     private val warehouseRepository: WarehouseRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val settingsRepository: SettingsRepository,
 ) : EntryNewViewModel2<AddListState, AddListIntent, AddListReduce>(
     AddListState(),
     AddListReduce(resourceProvider)
@@ -45,10 +50,7 @@ class AddViewModel @Inject constructor(
     override fun onIntent(intent: AddListIntent) {
         sendIntent(intent)
         when (intent) {
-            is AddListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(
-                openBottomSheetGroup = intent.value,
-                currentBriefly = intent.currentBriefly
-            )
+            is AddListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(title = intent.title)
 
             is AddListIntent.OpenBottomSheetEntry -> loadDataForEntryOrEdit(
                 intent.isOpen,
@@ -69,17 +71,23 @@ class AddViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 addRepository.getAllItems(itemIdPT),
-                addRepository.getBrieflyItemAdd(itemIdPT)
-            ) { addList, briefly ->
-                addList to briefly
-            }.collectLatest { (addList, briefly) ->
-                updateState {
-                    it.copy(
+                settingsRepository.getSettings(itemIdPT)
+            ) { addList, settings ->
+                val brieflyList = brieflyList(addList, settings)
+                Triple(addList, brieflyList, settings)
+            }.collectLatest { (addList, briefly, settings) ->
+                val currentDetail = getState().currentDetail
+                updateState { state ->
+                    state.copy(
                         idPT = itemIdPT,
                         list = addList,
                         searchList = addList,
                         briefly = briefly,
+                        settings = settings,
                         searchBrieflyList = briefly,
+                        currentDetail = currentDetail?.let { detail ->
+                            addList.find { it.id == detail.id }
+                        },
                         isLoading = false
                     )
                 }
@@ -87,15 +95,31 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    private fun openBottomSheetGroup(
-        openBottomSheetGroup: Boolean,
-        currentBriefly: BrieflyAddDomain
-    ) {
+    private fun brieflyList(
+        list: List<DomainAddItemDto>,
+        settings: DomainSettings
+    ): List<BrieflyItem> {
+        return list
+            .groupBy { it.title }
+            .map { (title, items) ->
+                mapperToBrieflyItem(title, items, settings = settings)
+            }
+    }
+
+    private fun openBottomSheetGroup(title: String?) {
         viewModelScope.launch {
-            val listBriefly = getDetailsName(name = currentBriefly.title)
+            if (title == null) {
+                updateState { state ->
+                    state.copy(openBottomSheetGroup = false)
+                }
+                return@launch
+            }
+            val listBriefly = getDetailsName(name = title)
+            val currentBriefly =
+                mapperToBrieflyItem(title, listBriefly, settings = getState().settings)
             updateState {
                 it.copy(
-                    openBottomSheetGroup = openBottomSheetGroup,
+                    openBottomSheetGroup = true,
                     currentBriefly = currentBriefly,
                     listBriefly = listBriefly
                 )
@@ -103,13 +127,13 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getDetailsName(name: String): List<DomainAddTable> {
+    private suspend fun getDetailsName(name: String): List<DomainAddItemDto> {
         return addRepository.getBrieflyDetailsItemAdd(itemIdPT, name).first()
     }
 
     private fun loadDataForEntryOrEdit(
         isOpen: Boolean,
-        domain: DomainAddTable?,
+        domain: DomainAddItemDto?,
         isSaveStateForBottomSheet: Boolean = false
     ) {
         viewModelScope.launch {
@@ -216,7 +240,8 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    private fun AddEntryState2.toUiMap22(domain: DomainAddTable): AddEntryState2 {
+    private fun AddEntryState2.toUiMap22(domain: DomainAddItemDto): AddEntryState2 {
+        val isIndicatorsValue = domain.animalCountId != null
         return copy(
             itemId = domain.id,
             title = domain.title,
@@ -233,6 +258,8 @@ class AddViewModel @Inject constructor(
             note = domain.note,
             itemIdPT = domain.idPT,
             isEntry = false,
+            animalCountId = domain.animalCountId,
+            isIndicatorsValue = isIndicatorsValue,
             error = ErrorAdd()
         )
     }
@@ -251,7 +278,8 @@ class AddViewModel @Inject constructor(
             animalId = animalId,
             note = note.trim(),
             price = 0.0,
-            idPT = itemIdPT
+            idPT = itemIdPT,
+            animalCountId = animalCountId
         )
     }
 }

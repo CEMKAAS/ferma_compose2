@@ -735,6 +735,7 @@ class BookmarkViewModel @Inject constructor(
                         isShowFood = false,
                         idPT = itemIdPT,
                         animalId = idAnimal,
+                        isFood = false,
                     ) else null
     }
 

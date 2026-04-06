@@ -3,8 +3,8 @@ package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
-import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
@@ -13,6 +13,8 @@ import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -23,6 +25,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @HiltViewModel
 class SaleViewModel @Inject constructor(
@@ -51,10 +55,7 @@ class SaleViewModel @Inject constructor(
                 intent.isSaveStateForBottomSheet
             )
 
-            is SaleListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(
-                openBottomSheetGroup = intent.value,
-                currentBriefly = intent.currentBriefly
-            )
+            is SaleListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(intent.value)
 
             is SaleListIntent.TitleAndSuffixClicked ->
                 updateWarehouseUiState(intent.title, intent.category)
@@ -70,10 +71,10 @@ class SaleViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 saleRepository.getAllSaleItems(itemIdPT),
-                saleRepository.getBrieflyItemSale(itemIdPT),
                 settingsRepository.getSettings(itemIdPT)
-            ) { addList, briefly, settings ->
-                Triple(addList, briefly, settings)
+            ) { addList, settings ->
+                val brieflyList = brieflyList(addList, settings)
+                Triple(addList, brieflyList, settings)
             }.collectLatest { (addList, briefly, settings) ->
                 updateState {
                     it.copy(
@@ -82,7 +83,7 @@ class SaleViewModel @Inject constructor(
                         searchList = addList,
                         briefly = briefly,
                         searchBrieflyList = briefly,
-                        priceSuffix = settings.currencySuffix,
+                        settings = settings,
                         isLoading = false
                     )
                 }
@@ -90,16 +91,31 @@ class SaleViewModel @Inject constructor(
         }
     }
 
+    private fun brieflyList(
+        list: List<DomainSaleTable>,
+        settings: DomainSettings
+    ): List<BrieflyItem> {
+        return list
+            .groupBy { it.title }
+            .map { (title, items) ->
+                mapperToBrieflyItem(title, items, settings = settings)
+            }
+    }
 
-    private fun openBottomSheetGroup(
-        openBottomSheetGroup: Boolean,
-        currentBriefly: BrieflySaleDomain
-    ) {
+    private fun openBottomSheetGroup(title: String?) {
         viewModelScope.launch {
-            val listBriefly = getDetailsName(name = currentBriefly.title)
+            if (title == null) {
+                updateState { state ->
+                    state.copy(isOpenBottomSheetGroup = false)
+                }
+                return@launch
+            }
+            val listBriefly = getDetailsName(name = title)
+            val currentBriefly =
+                mapperToBrieflyItem(title, listBriefly, settings = getState().settings)
             updateState {
                 it.copy(
-                    isOpenBottomSheetGroup = openBottomSheetGroup,
+                    isOpenBottomSheetGroup = true,
                     currentBriefly = currentBriefly,
                     listBriefly = listBriefly
                 )
@@ -201,6 +217,8 @@ class SaleViewModel @Inject constructor(
     override fun update() {
         viewModelScope.launch {
             saleRepository.updateSale(getState().currentProduct.toDomainMap())
+            if (getState().currentDetail != null)
+                updateState { it.copy(currentDetail = getState().currentProduct.toDomainMap()) }
             loadDataForEntryOrEdit(false, null)
             showMessage(
                 resourceProvider.getString(R.string.toast_refresh_s_s)

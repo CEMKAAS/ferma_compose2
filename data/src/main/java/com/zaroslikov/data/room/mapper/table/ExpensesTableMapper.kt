@@ -5,29 +5,31 @@ import com.zaroslikov.domain.models.DomainExpensesTable
 
 
 fun DomainExpensesTable.toExpensesRoomMap(): ExpensesTable = ExpensesTable(
+
     id = id,
     title = title,
     count = count,
+    countSuffix = countSuffix,
     day = day,
     mount = month,
     year = year,
     price = price,
-    countSuffix = countSuffix,
+    priceAll = priceAll,
     category = category,
     note = note,
+    isFood = isFood,
     isShowFood = isShowFood,
     feedFood = feedFood,
     feedFoodSuffix = feedFoodSuffix,
     countAnimal = countAnimal,
     foodDesignedDay = foodDesignedDay,
     lastDayFood = lastDayFood,
+    weight = weight,
+    weightSuffix = weightSuffix,
     idPT = idPT,
     animalId = animalId,
     animalVaccinationId = animalVaccinationId,
     animalCountId = animalCountId,
-    priceAll = priceAll,
-    weight = weight,
-    weightSuffix = weightSuffix
 )
 
 fun ExpensesTable.toDomainMap(): DomainExpensesTable = DomainExpensesTable(
@@ -41,6 +43,7 @@ fun ExpensesTable.toDomainMap(): DomainExpensesTable = DomainExpensesTable(
     countSuffix = countSuffix,
     category = category,
     note = note,
+    isFood = isFood,
     isShowFood = isShowFood,
     feedFood = feedFood,
     countAnimal = countAnimal,

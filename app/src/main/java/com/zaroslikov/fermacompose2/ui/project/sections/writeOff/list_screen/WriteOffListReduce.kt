@@ -8,7 +8,6 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString
-
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 
 class WriteOffListReduce(
@@ -19,7 +18,6 @@ class WriteOffListReduce(
         intent: WriteOffListIntent
     ): WriteOffListState {
         return when (intent) {
-
             is WriteOffListIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
                 intent.isOpen,
                 intent.state,
@@ -47,10 +45,26 @@ class WriteOffListReduce(
 
             is WriteOffListIntent.SearchChanged -> state.updateSearch(intent.value)
             is WriteOffListIntent.GroupClicked -> state.updateGroup(intent.value)
+            is WriteOffListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
+
             else -> state
         }
     }
 
+    private fun WriteOffListState.updateOpenBottomSheetDetail(id: Long?): WriteOffListState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDetail = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDetail = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
+        }
+    }
 
     private fun WriteOffListState.updateValid(): WriteOffListState {
         val baseValid =
@@ -177,7 +191,7 @@ class WriteOffListReduce(
         else
             briefly.filter { item ->
                 item.title.lowercase().contains(query) ||
-                        item.count.toString().lowercase().contains(query) ||
+                        item.volume.toString().lowercase().contains(query) ||
                         (item.price).toString().lowercase().contains(query)
             }
         return copy(

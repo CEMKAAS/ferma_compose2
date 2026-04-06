@@ -4,6 +4,8 @@ import com.zaroslikov.domain.models.table.DomainAnimalSize
 import kotlinx.coroutines.flow.Flow
 
 interface AnimalSizeRepository {
+    fun getAllAnimalSizeTableForExport(): Flow<List<DomainAnimalSize>>
+    suspend fun clearAndInsertAnimalSizeTableForImport(domainAnimalSize: List<DomainAnimalSize>)
 
     suspend fun insertAnimalSizeTable(animalSizeTable: DomainAnimalSize)
     suspend fun updateAnimalSizeTable(animalSizeTable: DomainAnimalSize)

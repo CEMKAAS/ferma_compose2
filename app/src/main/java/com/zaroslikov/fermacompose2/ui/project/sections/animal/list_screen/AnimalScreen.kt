@@ -32,7 +32,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +39,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.domain.models.list.suffixWeightDayList
@@ -48,14 +46,17 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.green_15
 import com.zaroslikov.fermacompose2.green_g_3
 import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
+import com.zaroslikov.fermacompose2.orang_11
+import com.zaroslikov.fermacompose2.orang_13
 import com.zaroslikov.fermacompose2.orang_5
-import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -72,8 +73,10 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextSexNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
@@ -274,9 +277,9 @@ private fun AnimalContainer(
     modifier: Modifier = Modifier,
     color: Color,
     details: Boolean,
-    itemList: List<DomainAnimalWithCount>,
-    searchList: List<DomainAnimalWithCount>,
-    brieflyList: List<DomainAnimalWithCount>,
+    itemList: List<AnimalListUi>,
+    searchList: List<AnimalListUi>,
+    brieflyList: List<AnimalListUi>,
     onClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
 ) {
@@ -288,7 +291,6 @@ private fun AnimalContainer(
         brieflyList = brieflyList,
         detailCard = { index, item ->
             AnimalCard(
-                modifier = Modifier,
                 animal = item,
                 onClick = { onClick(item.id) },
                 onArchive = { TODO() },
@@ -296,7 +298,6 @@ private fun AnimalContainer(
         },
         brieflyCard = { item ->
             AnimalCard(
-                modifier = Modifier,
                 animal = item,
                 onClick = { TODO() },
                 onArchive = { TODO() },
@@ -313,15 +314,13 @@ private fun AnimalContainer(
 
 @Composable
 fun AnimalCard(
-    modifier: Modifier = Modifier,
-    animal: DomainAnimalWithCount,
+    animal: AnimalListUi,
     onClick: () -> Unit,
     onArchive: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     CardFieldNew(
-        onClick = { onClick() },
+        onClick = onClick,
         contentColumn = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -331,15 +330,13 @@ fun AnimalCard(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.Start
+                        verticalAlignment = Alignment.Top,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
                                 text = animal.name,
@@ -347,58 +344,60 @@ fun AnimalCard(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            DropdownMenuEdit(
-                                onArchiveClick = onArchive,
-                                onDeleteClick = onDeleteClick
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = animal.type,
+                                    style = text_14,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = marengo
+                                )
+                                if (animal.sex != null)
+                                    CountColorGradientCard(sex = animal.sex)
+                                else animal.count?.let {
+                                    Text(
+                                        "- $it ${stringResource(animal.suffix.toResId())}",
+                                        style = text_14,
+                                        color = marengo
+                                    )
+                                }
+                            }
                         }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = animal.type,
-                                style = text_14,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = marengo
-                            )
-                            if (!animal.group)
-                                CountColorGradientCard(sex = animal.sex)
-                        }
+                        DropdownMenuEdit(
+                            onArchiveClick = onArchive,
+                            onDeleteClick = onDeleteClick
+                        )
                     }
-
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         TableAnimalParameter(
                             oneTitleParameter = R.string.animal_list_age,
-                            oneParameter = getAgeFromDate(
-                                context,
-                                animal.dateFactory ?: animal.date
-                            ),
+                            oneParameter = animal.date,
                             oneIcon = R.drawable.baseline_calendar_month_24,
-                            oneIconColor = Color(0xFF009689),
-                            oneIconColorSecond = Color(0xFFF0FDFA),
+                            oneIconColor = animal_1,
+                            oneIconColorSecond = green_15,
+                            twoTitleParameter = R.string.animal_list_food,
+                            twoParameter = "${animal.foodDay.formatNumber()} ${stringResource(animal.foodDaySuffix.toResId())}",
+                            twoIcon = R.drawable.baseline_shopping_basket_24,
+                            twoIconColor = orang_11,
+                            twoIconColorSecond = orang_13
+                        )
+                        /*TableAnimalParameter(
+                            oneTitleParameter = R.string.animal_list_count,
+                            oneParameter = ,
+                            oneIcon = R.drawable.baseline_spoke_24,
+                            oneIconColor = green_10,
+                            oneIconColorSecond = Color(0xFFCBFBF1),
                             twoTitleParameter = R.string.animal_list_expenses,
                             twoParameter = "333",
                             twoIcon = R.drawable.icon_expenses,
-                            twoIconColor = Color(0xFF0092B8),
-                            twoIconColorSecond = Color(0xFFECFEFF)
-                        )
-                        TableAnimalParameter(
-                            oneTitleParameter = R.string.animal_list_food,
-                            oneParameter = "Корма",
-                            oneIcon = R.drawable.baseline_shopping_basket_24,
-                            oneIconColor = Color(0xFFD08700),
-                            oneIconColorSecond = Color(0xFFFEFCE8),
-                            twoTitleParameter = R.string.animal_list_count,
-                            twoParameter = animal.count.toString(),
-                            twoIcon = R.drawable.baseline_spoke_24,
-                            twoIconColor = Color(0xFF00786F),
-                            twoIconColorSecond = Color(0xFFCBFBF1)
-                        )
+                            twoIconColor = animal_2,
+                            twoIconColorSecond = green_g_3,
+                        )*/
                     }
                 }
             }
@@ -406,16 +405,15 @@ fun AnimalCard(
     )
 }
 
-
 @Composable
 fun TableAnimalParameter(
     @StringRes oneTitleParameter: Int,
-    oneParameter: String,
+    oneParameter: String?,
     oneIcon: Int,
     oneIconColor: Color,
     oneIconColorSecond: Color,
     @StringRes twoTitleParameter: Int,
-    twoParameter: String,
+    twoParameter: String?,
     twoIcon: Int,
     twoIconColor: Color,
     twoIconColorSecond: Color
@@ -424,22 +422,26 @@ fun TableAnimalParameter(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        AnimalParameter(
-            modifier = Modifier.weight(1f),
-            titleParameter = oneTitleParameter,
-            parameter = oneParameter,
-            icon = oneIcon,
-            iconColor = oneIconColor,
-            iconColorSecond = oneIconColorSecond
-        )
-        AnimalParameter(
-            modifier = Modifier.weight(1f),
-            titleParameter = twoTitleParameter,
-            parameter = twoParameter,
-            icon = twoIcon,
-            iconColor = twoIconColor,
-            iconColorSecond = twoIconColorSecond
-        )
+        oneParameter?.let {
+            AnimalParameter(
+                modifier = Modifier.weight(1f),
+                titleParameter = oneTitleParameter,
+                parameter = oneParameter,
+                icon = oneIcon,
+                iconColor = oneIconColor,
+                iconColorSecond = oneIconColorSecond
+            )
+        }
+        twoParameter?.let {
+            AnimalParameter(
+                modifier = Modifier.weight(1f),
+                titleParameter = twoTitleParameter,
+                parameter = twoParameter,
+                icon = twoIcon,
+                iconColor = twoIconColor,
+                iconColorSecond = twoIconColorSecond
+            )
+        }
     }
 }
 
@@ -452,14 +454,14 @@ fun AnimalParameter(
     iconColor: Color,
     iconColorSecond: Color,
     isMore: Boolean = false,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable {
-                onClick()
-            },
+            .then(
+                if (onClick != null) Modifier.clickable { onClick() } else Modifier
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -475,19 +477,22 @@ fun AnimalParameter(
             ) {
                 Icon(
                     painterResource(icon),
+                    contentDescription = null,
+                    tint = iconColor,
                     modifier = Modifier
-                        /*   .size(14.dp)*/
-                        .padding(8.dp),
-                    contentDescription = null, tint = iconColor
+                        .padding(8.dp)
+                        .size(14.dp)
                 )
             }
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(
-                    stringResource(titleParameter), color = grey, maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    stringResource(titleParameter), color = grey, style = text_12,
+                    overflow = TextOverflow.Ellipsis, maxLines = 1,
                 )
                 Text(
-                    text = parameter, color = dark, maxLines = 1,
+                    text = parameter, color = dark, maxLines = 1, style = text_12,
                     overflow = TextOverflow.Ellipsis
                 )
             }
@@ -505,13 +510,15 @@ fun AnimalParameter(
 fun IconAnimal(
     modifier: Modifier = Modifier,
     size: Dp = 64.dp,
-    sex: Boolean,
+    sex: Boolean?,
 ) {
     val glowColor = Color(0xFF00A63E)
 
-    val colors = if (sex)
-        listOf(Color(0xFF51A2FF), Color(0xFF615FFF))
-    else listOf(Color(0xFFFB64B6), Color(0xFFFF2056))
+    val colors = when (sex) {
+        true -> listOf(Color(0xFF51A2FF), Color(0xFF615FFF))
+        false -> listOf(Color(0xFFFB64B6), Color(0xFFFF2056))
+        null -> listOf(Color(0xFFFB64B6), Color(0xFFFF2056))// TODO
+    }
 
     val gradient = Brush.linearGradient(
         colors = colors,

@@ -3,9 +3,13 @@ package com.zaroslikov.domain.repository
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
+import com.zaroslikov.domain.models.table.DomainAnimalSize
+import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import kotlinx.coroutines.flow.Flow
 
 interface AnimalRepository {
+    fun getAllAnimalTableForExport(): Flow<List<DomainAnimalTable>>
+    suspend fun clearAndInsertAnimalTableForImport(domainAnimal: List<DomainAnimalTable>)
     fun getAllAnimal(id: Long): Flow<List<DomainAnimalWithCount>>
     fun getAnimal(id: Long): Flow<DomainAnimalTable>
     fun getTypeAnimal(id: Long): Flow<List<String>>

@@ -13,7 +13,7 @@ sealed class AnimalCountIntent : BaseIntent {
 
     // Open Bottom Sheet Animal
     data class DialogClicked(
-        val isEntry: Boolean,
+        val isOpen: Boolean,
         val version: AnimalCountVersion = AnimalCountVersion.ADD,
         val item: DomainAnimalCountPriceUi? = null,
         val isSaveStateForBottomSheet: Boolean = false

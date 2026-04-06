@@ -5,12 +5,29 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface IncubatorTableDao {
+    @Query("SELECT * from incubator_table")
+    fun getAllIncubatorTableForExport(): Flow<List<IncubatorTable>>
+
+    @Upsert
+    suspend fun insertAllIncubatorTable(data: List<IncubatorTable>)
+
+    @Query("DELETE FROM incubator_table")
+    suspend fun deleteAllIncubatorTable()
+
+    @Transaction
+    suspend fun clearAndInsertIncubatorTableForImport(incubatorTable: List<IncubatorTable>) {
+        deleteAllIncubatorTable()
+        insertAllIncubatorTable(incubatorTable)
+    }
+
     @Query("SELECT * From incubator_table")
     fun getAllIncubator(): Flow<List<IncubatorTable>>
 

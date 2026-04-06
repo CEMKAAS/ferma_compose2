@@ -630,8 +630,8 @@ private fun CurrentParameter(
                 IconTransaction2(
                     sizeCard = 32.dp,
                     icon = iconRes,
-                    colorIcon = iconColor,
-                    color = iconBackgroundColor
+                    iconColor = iconColor,
+                    boxColor = iconBackgroundColor
                 )
                 Text(stringResource(titleRes), style = text_14, color = marengo)
             }
@@ -672,8 +672,8 @@ private fun OvoscopCard(
                 IconTransaction2(
                     sizeCard = 48.dp,
                     icon = R.drawable.ic_ovos2,
-                    colorIcon = white,
-                    color = white.copy(alpha = 0.2f)
+                    iconColor = white,
+                    boxColor = white.copy(alpha = 0.2f)
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -802,8 +802,8 @@ private fun ColumnParameter(
         IconTransaction2(
             sizeCard = 36.dp,
             icon = iconRes,
-            colorIcon = iconColor,
-            color = iconBackgroundColor
+            iconColor = iconColor,
+            boxColor = iconBackgroundColor
         )
         Text(text = value, style = text_20, color = black_2)
         suffix?.let {
@@ -826,8 +826,8 @@ private fun CompleteCard() {
             IconTransaction2(
                 sizeCard = 52.dp,
                 icon = R.drawable.outline_check_circle_24,
-                colorIcon = green_9,
-                color = green_11
+                iconColor = green_9,
+                boxColor = green_11
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)

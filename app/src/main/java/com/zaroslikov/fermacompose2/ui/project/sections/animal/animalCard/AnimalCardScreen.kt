@@ -153,9 +153,8 @@ fun AnimalCardContainer(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        DataCardOne(Modifier, state.animal, state.price)
+        DataCardOne(state.animal, state.price)
         DataCardTwo(
-            isGroup = state.animal.group,
             size = state.size,
             weight = state.weight,
             vaccination = state.vaccination,
@@ -177,8 +176,10 @@ fun AnimalCardContainer(
             ProductKillInfoCard(
                 number = index + 1,
                 name = item.title,
-                value = item.count.toString(),
-                suffix = item.suffix
+                weight = item.weight,
+                linear = item.linear,
+                volume = item.volume,
+                pieces = item.pieces
             )
         }
         /*PullOutCard(
@@ -212,17 +213,15 @@ fun AnimalCardContainer(
 
 @Composable
 private fun DataCardOne(
-    modifier: Modifier = Modifier,
     animal: DomainAnimalTable,
     price: Double?
 ) {
     val context = LocalContext.current
-    CardFieldNew(
-        modifier = modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.Top,
-        contentRow = {
+    CardFieldNew() {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
             IconAnimal(sex = animal.sex)
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -253,90 +252,45 @@ private fun DataCardOne(
                         if (!animal.group)
                             CountColorGradientCard(sex = animal.sex)
                     }
+                }
+                AnimalParameter(
+                    titleParameter = R.string.animal_list_age,
+                    parameter = getAgeFromDate(context, animal.date) + " (${animal.date})",
+                    icon = R.drawable.baseline_calendar_month_24,
+                    iconColor = Color(0xFF009689),
+                    iconColorSecond = Color(0xFFF0FDFA)
+                )
+                animal.dateFactory?.let {
                     AnimalParameter(
-                        titleParameter = R.string.animal_list_age,
-                        parameter = animal.date + " (${getAgeFromDate(context, animal.date)})",
-                        icon = R.drawable.baseline_calendar_month_24,
+                        titleParameter = R.string.animal_list_date_factory,
+                        parameter = getAgeFromDate(context, it) + " (${it})",
+                        icon = R.drawable.baseline_event_24,
                         iconColor = Color(0xFF009689),
                         iconColorSecond = Color(0xFFF0FDFA)
                     )
-                    animal.dateFactory?.let {
-                        AnimalParameter(
-                            titleParameter = R.string.animal_list_date_factory,
-                            parameter = it + " (${getAgeFromDate(context, it)})",
-                            icon = R.drawable.baseline_event_24,
-                            iconColor = Color(0xFF009689),
-                            iconColorSecond = Color(0xFFF0FDFA)
-                        )
-                    }
-                    AnimalParameter(
-                        titleParameter = R.string.animal_list_food,
-                        parameter = "${animal.foodDay.formatNumber()} ${stringResource(animal.foodDaySuffix.toResId())}",
-                        icon = R.drawable.baseline_shopping_basket_24,
-                        iconColor = Color(0xFFD08700),
-                        iconColorSecond = orang_13
-                    )
-                    AnimalParameter(
-                        titleParameter = R.string.search_section,
-                        parameter = "$price",
-                        icon = R.drawable.baseline_add_card_24,
-                        iconColor = price_green,
-                        iconColorSecond = price_green_2
-                    )
                 }
-
+                AnimalParameter(
+                    titleParameter = R.string.animal_list_food,
+                    parameter = "${animal.foodDay.formatNumber()} ${stringResource(animal.foodDaySuffix.toResId())}",
+                    icon = R.drawable.baseline_shopping_basket_24,
+                    iconColor = Color(0xFFD08700),
+                    iconColorSecond = orang_13
+                )
+                /* AnimalParameter(
+                     titleParameter = R.string.search_section,
+                     parameter = "$price",
+                     icon = R.drawable.baseline_add_card_24,
+                     iconColor = price_green,
+                     iconColorSecond = price_green_2
+                 )*/
             }
-
-            /*CardFieldNew(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(
-                    text = state.name,
-                    style = textBold_18
-                )
-                IconAndText(
-                    iconRes = R.drawable.baseline_pets_24,
-                    valueString = state.type
-                )
-                if (!state.group) {
-                    IconAndText(
-                        iconRes = if (state.sex) R.drawable.baseline_male_24 else R.drawable.baseline_female_24,
-                        valueString = stringResource(if (state.sex) R.string.animal_entry_screen_sex_man else R.string.animal_entry_screen_sex_woman)
-                    )
-                }
-                IconAndText(
-                    iconRes = R.drawable.baseline_calendar_month_24,
-                    valueString = state.date + getAgeFromDate(context, state.date)
-                )
-                state.dateFactory?.let {
-                    IconAndText(
-                        iconRes = R.drawable.baseline_event_24,
-                        valueString = it
-                    )
-                }
-                if (price != null)
-                    IconAndText(
-                        iconRes = R.drawable.baseline_add_card_24,
-                        valueString = stringResource(
-                            R.string.card_ruble_s,
-                            price.formatNumber()
-                        )
-                    )
-                IconAndText(
-                    iconRes = R.drawable.baseline_calendar_month_24,//TODO нужен мешок
-                    valueString =
-                        if (state.foodDay == 0.0) stringResource(R.string.animal_card_screen_animal_card_no_food_day)
-                        else "${state.foodDay.formatNumber()} ${state.foodDaySuffix}"
-                )
-            }*/
         }
-    )
+    }
 }
 
 
 @Composable
 private fun DataCardTwo(
-    isGroup: Boolean,
     size: DomainAnimalSize?,
     weight: DomainAnimalWeight?,
     vaccination: DomainAnimalVaccination?,
@@ -462,27 +416,30 @@ fun <T> PullOutCardNew(
                         break
                 }
             } else Text(text = stringResource(R.string.analysis_screen_no))
-        }
-        if (list.size > 3)
-            TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+            if (list.size > 3)
+                TextButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        if (expanded) stringResource(R.string.button_wrap) else
-                            stringResource(R.string.animal_card_screen_show_product_all).format(
-                                list.size
-                            ),
-                        style = text_14,
-                        color = primalColor
-                    )
-                    Icon(
-                        if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Показать меню",
-                        tint = primalColor
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Text(
+                            if (expanded) stringResource(R.string.button_wrap) else
+                                stringResource(R.string.animal_card_screen_show_product_all).format(
+                                    list.size
+                                ),
+                            style = text_14,
+                            color = primalColor
+                        )
+                        Icon(
+                            if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Показать меню",
+                            tint = primalColor
+                        )
+                    }
                 }
-            }
+        }
     }
 }

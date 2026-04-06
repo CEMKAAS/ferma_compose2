@@ -145,6 +145,8 @@ val red_18 = Color(0xFFF6339A)
 
 
 val animal_1 = Color(0xFF009689)
+val animal_3 = Color(0xFFCBFBF1)
+val animal_4 = Color(0xFF005F5A)
 val animal_2 = Color(0xFF0092B8)
 
 // Error

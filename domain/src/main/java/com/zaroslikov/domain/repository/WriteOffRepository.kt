@@ -6,10 +6,16 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import kotlinx.coroutines.flow.Flow
 
 interface WriteOffRepository {
+
+    fun getAllWriteOffTableForExport(): Flow<List<DomainWriteOffTable>>
+
+    suspend fun clearAndInsertWriteOffTableForImport(domainWriteOffTable: List<DomainWriteOffTable>)
+
     fun getAllWriteOffItems(id: Long): Flow<List<DomainWriteOffTable>>
     fun getItemWriteOff(id: Long): Flow<DomainWriteOffTable>
     fun getItemWriteOffIdAnimalCount(id: Long): Flow<DomainWriteOffTable>
@@ -56,7 +62,10 @@ interface WriteOffRepository {
     ): Flow<List<DomainCategoryPrice>>
 
     fun getOwnNeed(id: Long): Flow<Double>
+
+    fun getOwnNeedAllProject(currencySuffix: Suffix): Flow<Double>
     fun getScrap(id: Long): Flow<Double>
+    fun getScrapAllProject(currencySuffix: Suffix): Flow<Double>
     fun getOwnNeedMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double>
     fun getScrapMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double>
     fun getAnalysisWriteOffAllTime(id: Long, name: String): Flow<DomainCountSuffix>

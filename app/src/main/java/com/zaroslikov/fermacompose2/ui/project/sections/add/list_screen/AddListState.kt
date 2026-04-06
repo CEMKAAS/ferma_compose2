@@ -1,16 +1,18 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 
 data class AddListState(
     val textSearch: String = "",
@@ -18,13 +20,19 @@ data class AddListState(
     val idPT: Long = 0,
     val openBottomSheetGroup: Boolean = false,
     val openBottomSheetEntry: Boolean = false,
-    val currentBriefly: BrieflyAddDomain = BrieflyAddDomain(),
-    val list: List<DomainAddTable> = emptyList(),
-    val briefly: List<BrieflyAddDomain> = emptyList(),
-    val listBriefly: List<DomainAddTable> = emptyList(),
-    val searchList: List<DomainAddTable> = emptyList(),
-    val searchBrieflyList: List<BrieflyAddDomain> = emptyList(),
+    val isOpenBottomSheetDetail: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
+
+    val currentDetail: DomainAddItemDto? = null,
+    val currentBriefly: BrieflyItem? = null,
+
+    val list: List<DomainAddItemDto> = emptyList(),
+    val briefly: List<BrieflyItem> = emptyList(),
+    val listBriefly: List<DomainAddItemDto> = emptyList(),
+    val searchList: List<DomainAddItemDto> = emptyList(),
+    val searchBrieflyList: List<BrieflyItem> = emptyList(),
+
+    val settings: DomainSettings = DomainSettings(),
     override val isEntry: Boolean = false,
     override val currentProduct: AddEntryState2 = AddEntryState2(),
     override val isLoading: Boolean = true,
@@ -47,6 +55,8 @@ data class AddEntryState2(
     val isEntry: Boolean = true,
     val pickList: PickList = PickList(),
     val error: ErrorAdd = ErrorAdd(),
+    val isIndicatorsValue: Boolean = false,
+    val animalCountId: Long? = null,
     override val hasAnyError: Boolean = false
 ) : BaseProduct()
 

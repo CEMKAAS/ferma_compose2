@@ -4,13 +4,30 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.table.animal.AnimalSizeTable
 import kotlinx.coroutines.flow.Flow
 
 
 @Dao
 interface AnimalSizeDao {
+    @Query("SELECT * from animal_size_table")
+    fun getAllAnimalSizeTableForExport(): Flow<List<AnimalSizeTable>>
+
+    @Upsert
+    suspend fun insertAllAnimalSizeTable(animalSizeTable: List<AnimalSizeTable>)
+
+    @Query("DELETE FROM animal_size_table")
+    suspend fun deleteAllAnimalSizeTable()
+
+    @Transaction
+    suspend fun clearAndInsertAnimalSizeTableForImport(animalSizeTable: List<AnimalSizeTable>) {
+        deleteAllAnimalSizeTable()
+        insertAllAnimalSizeTable(animalSizeTable)
+    }
+
     @Insert
     suspend fun insertAnimalSizeTable(animalSizeTable: AnimalSizeTable)
 

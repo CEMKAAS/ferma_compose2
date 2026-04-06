@@ -6,6 +6,7 @@ import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteListState
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.text.lowercase
 
@@ -35,7 +36,27 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.Animal -> state.updateAnimal(intent.animal)
             is AddListIntent.AnimalClear -> state.updateAnimalClear(intent.value)
             is AddListIntent.AnimalNameById -> state.updateAnimal(intent.value)
+
+
+            is AddListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
             else -> state
+        }
+    }
+
+    private fun AddListState.updateOpenBottomSheetDetail(
+        id: Long?
+    ): AddListState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDetail = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDetail = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
         }
     }
 
@@ -105,7 +126,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         else
             briefly.filter { item ->
                 item.title.lowercase().contains(query) ||
-                        item.count.toString().lowercase().contains(query)
+                        item.weight.toString().lowercase().contains(query)
             }
 
 
@@ -185,7 +206,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateAnimalClear(animal: String): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                animalId = 0,
+                animalId = null,
                 animal = animal
             )
         )

@@ -43,7 +43,7 @@ fun IconIndicatorsAnimal(
     val gradient = Brush.linearGradient(
         colors = colors,
         start = Offset(0f, 0f),
-        end = Offset(Float.POSITIVE_INFINITY, 0f)
+        end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
     )
     Box(
         modifier = modifier
@@ -56,7 +56,7 @@ fun IconIndicatorsAnimal(
             painterResource(icon),
             contentDescription = null,
             tint = Color.White,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(20.dp)
         )
     }
 }
@@ -86,18 +86,18 @@ fun IconFinance(
 fun IconTransaction2(
     modifier: Modifier = Modifier,
     sizeCard: Dp = 40.dp,
-    @DrawableRes icon: Int, colorIcon: Color, color: Color
+    @DrawableRes icon: Int, iconColor: Color, boxColor: Color
 ) {
     Box(
         modifier = modifier
             .size(sizeCard)
-            .background(color = color, shape = RoundedCornerShape(10.dp)),
+            .background(color = boxColor, shape = RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             painterResource(icon),
             contentDescription = null,
-            tint = colorIcon,
+            tint = iconColor,
             modifier = Modifier
                 .size(sizeCard / 2)
         )

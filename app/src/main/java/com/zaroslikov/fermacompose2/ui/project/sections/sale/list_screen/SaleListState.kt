@@ -1,16 +1,19 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
+import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 
 data class SaleListState(
     val textSearch: String = "",
@@ -18,18 +21,23 @@ data class SaleListState(
     val idPT: Long = 0,
     val isOpenBottomSheetGroup: Boolean = false,
     val isOpenBottomSheetEntry: Boolean = false,
+    val isOpenBottomSheetDetail: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
-    val currentBriefly: BrieflySaleDomain = BrieflySaleDomain(),
+
+    val currentDetail: DomainSaleTable? = null,
+    val currentBriefly: BrieflyItem? = null,
+
     val list: List<DomainSaleTable> = emptyList(),
-    val briefly: List<BrieflySaleDomain> = emptyList(),
+    val briefly: List<BrieflyItem> = emptyList(),
     val listBriefly: List<DomainSaleTable> = emptyList(),
     val searchList: List<DomainSaleTable> = emptyList(),
-    val searchBrieflyList: List<BrieflySaleDomain> = emptyList(),
+    val searchBrieflyList: List<BrieflyItem> = emptyList(),
+
+    val settings: DomainSettings = DomainSettings(),
     override val isEntry: Boolean = false,
     override val currentProduct: SaleEntryState2 = SaleEntryState2(),
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
-    val priceSuffix: Suffix = Suffix.RUBLE,
 ) : EntryNewState()
 
 data class SaleEntryState2(

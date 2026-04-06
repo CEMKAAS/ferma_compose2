@@ -3,6 +3,7 @@ package com.zaroslikov.data.room.repository
 import com.zaroslikov.data.room.dao.AnimalSizeDao
 import com.zaroslikov.data.room.mapper.table.toAnimalSizeTable
 import com.zaroslikov.data.room.mapper.table.toDomainAnimalSize
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +12,15 @@ import javax.inject.Inject
 
 class AnimalSizeRepositoryImpl @Inject constructor(private val animalSizeDao: AnimalSizeDao) :
     AnimalSizeRepository {
+    override fun getAllAnimalSizeTableForExport(): Flow<List<DomainAnimalSize>> {
+        return animalSizeDao.getAllAnimalSizeTableForExport()
+            .map { it -> it.map { it.toDomainAnimalSize() } }
+    }
+
+    override suspend fun clearAndInsertAnimalSizeTableForImport(domainAnimalSize: List<DomainAnimalSize>) {
+        return animalSizeDao.clearAndInsertAnimalSizeTableForImport(domainAnimalSize.map { it.toAnimalSizeTable() })
+    }
+
     override suspend fun insertAnimalSizeTable(animalSizeTable: DomainAnimalSize) {
         return animalSizeDao.insertAnimalSizeTable(animalSizeTable.toAnimalSizeTable())
     }

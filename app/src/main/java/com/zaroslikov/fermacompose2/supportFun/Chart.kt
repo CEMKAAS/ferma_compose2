@@ -63,7 +63,7 @@ fun chartFilter(
 
     // 1️⃣ группируем входные данные
     val grouped: Map<LocalDate, Float> =
-        list.groupBy {
+        list.filter { it.suffix.conversation4(domainSettings) == baseSuffix }.groupBy {
             parseDate(it.date).toGroupKey(granularity)
         }.mapValues { (_, items) ->
             items.sumOf {

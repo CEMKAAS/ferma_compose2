@@ -183,7 +183,8 @@ class AnimalVaccinationViewModel @Inject constructor(
             note = note,
             isShowFood = false,
             idPT = itemIdPT,
-            animalVaccinationId = animalVaccinationId ?: id
+            animalVaccinationId = animalVaccinationId ?: id,
+            isFood = false
         )
     }
 

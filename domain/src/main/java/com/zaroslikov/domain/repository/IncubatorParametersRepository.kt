@@ -1,9 +1,14 @@
 package com.zaroslikov.domain.repository
 
 import com.zaroslikov.domain.models.table.DomainIncubatorParameters
+import com.zaroslikov.domain.models.table.DomainIncubatorTable
+import com.zaroslikov.domain.models.table.DomainProjectTable
 import kotlinx.coroutines.flow.Flow
 
 interface IncubatorParametersRepository {
+    fun getAllIncubatorParameterTableForExport(): Flow<List<DomainIncubatorParameters>>
+
+    suspend fun clearAndInsertIncubatorParametersTableForImport(domainIncubatorParameter: List<DomainIncubatorParameters>)
     fun getIncubatorListArh4(idPT: Long): Flow<List<DomainIncubatorParameters>>
     fun getIncubatorList(id: Long): Flow<List<DomainIncubatorParameters>>
     fun getIncubatorList2(id: Long): Flow<List<DomainIncubatorParameters>>

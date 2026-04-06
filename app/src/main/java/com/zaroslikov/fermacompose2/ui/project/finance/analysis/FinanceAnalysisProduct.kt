@@ -159,6 +159,7 @@ fun FinanceAnalysisProduct(
 fun FinanceAnalysisContainer(
     modifier: Modifier,
     state: FinanceAnalysisState,
+    priceSuffix: Suffix = state.settings.currencySuffix,
     onCharSelectionClick: (FinanceAnalysisEnum) -> Unit
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -167,12 +168,12 @@ fun FinanceAnalysisContainer(
             stock = state.stock,
             suffix = state.baseSuffix,
             averagePrice = state.averagePrice,
-            priceSuffix = Suffix.RUBLE
+            priceSuffix = priceSuffix
         )
         FinanceAnalysisCard(
             financeCategory2 = state.financeAnalysis,
             totalPrice = state.totalPrice,
-            suffixPrice = Suffix.RUBLE,
+            suffixPrice = priceSuffix,
             realizedPrice = state.realizedPrice,
             potentialBalance = state.potentialBalance,
             soldLost = state.soldLost
@@ -186,7 +187,11 @@ fun FinanceAnalysisContainer(
             onClick = onCharSelectionClick,
             suffix = state.baseSuffix
         )
-        TransactionSection(R.string.analysis_screen_history_transaction, state.transactionList)
+        TransactionSection(
+            R.string.analysis_screen_history_transaction,
+            priceSuffix,
+            state.transactionList,
+        )
     }
 }
 
@@ -357,7 +362,7 @@ private fun FinanceAnalysisRowCard(
                     Text(
                         totalCount.formatNumber() +
                                 " ${stringResource(suffixCount.toResId())}" + " • " +
-                                "${percent.formatNumber()}%",
+                                "${percent.formatNumber()} %",
                         style = text_12,
                         color = gray_7
                     )
@@ -477,26 +482,27 @@ private fun FinanceCategorySlider(
 private fun AnimalProducers(
     animalProducer: List<AnimalProducer>
 ) {
-    CardNewWithTitle(
-        titleRes = R.string.analysis_screen_animal_producers
-    ) {
-        animalProducer.forEach {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                AnimalProducerSlider(
-                    name = it.name,
-                    type = it.type,
-                    count = it.count,
-                    suffix = it.suffix,
-                    percentDouble = it.percentDouble,
-                    percentFloat = it.percentFloat
-                )
-            }
+    if (animalProducer.isNotEmpty())
+        CardNewWithTitle(
+            titleRes = R.string.analysis_screen_animal_producers
+        ) {
+            animalProducer.forEach {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    AnimalProducerSlider(
+                        name = it.name,
+                        type = it.type,
+                        count = it.count,
+                        suffix = it.suffix,
+                        percentDouble = it.percentDouble,
+                        percentFloat = it.percentFloat
+                    )
+                }
 
+            }
         }
-    }
 }
 
 @Composable
@@ -550,26 +556,27 @@ private fun AnimalProducerSlider(
 private fun TopBuyers(
     buyersList: List<Buyer>
 ) {
-    CardNewWithTitle(
-        titleRes = R.string.analysis_screen_byers
-    ) {
-        buyersList.forEachIndexed { index, buyer ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                BuyerCard(
-                    number = index + 1,
-                    buyer = buyer.buyer,
-                    count = buyer.count,
-                    suffix = buyer.suffix,
-                    price = buyer.price,
-                    priceSuffix = buyer.priceSuffix,
-                    countTransaction = buyer.countTransaction
-                )
+    if (buyersList.isNotEmpty())
+        CardNewWithTitle(
+            titleRes = R.string.analysis_screen_byers
+        ) {
+            buyersList.forEachIndexed { index, buyer ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    BuyerCard(
+                        number = index + 1,
+                        buyer = buyer.buyer,
+                        count = buyer.count,
+                        suffix = buyer.suffix,
+                        price = buyer.price,
+                        priceSuffix = buyer.priceSuffix,
+                        countTransaction = buyer.countTransaction
+                    )
+                }
             }
         }
-    }
 }
 
 @Composable
@@ -680,6 +687,7 @@ private fun Chart(
 @Composable
 private fun TransactionSection(
     @StringRes title: Int,
+    priceSuffix: Suffix,
     transactionList: List<DomainTransaction>
 ) {
     Column(
@@ -714,7 +722,7 @@ private fun TransactionSection(
                     price = it.price,
                     date = it.data,
                     priceAll = it.priceAll,
-                    priceSuffix = Suffix.RUBLE,
+                    priceSuffix = priceSuffix,
                     buyer = it.buyer,
                     animal = it.animal,
                     categoryFinance = it.categoryFinance
@@ -754,8 +762,8 @@ private fun TransitionCard(
         ) {
             IconTransaction2(
                 icon = categoryFinance.toTransactionDrawRes(),
-                color = categoryFinance.toColorIconBorderSecond(),
-                colorIcon = categoryFinance.toColorIconSecond()
+                boxColor = categoryFinance.toColorIconBorderSecond(),
+                iconColor = categoryFinance.toColorIconSecond()
             )
             Column(
                 horizontalAlignment = Alignment.Start,

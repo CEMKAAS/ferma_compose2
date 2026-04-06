@@ -10,6 +10,14 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(private val noteDao: NoteDao) : NoteRepository {
+    override fun getAllNoteTableForExport(): Flow<List<DomainNoteTable>> {
+        return noteDao.getAllNoteForExport().map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override suspend fun clearAndInsertNoteTableForImport(domainNoteTable: List<DomainNoteTable>) {
+        return noteDao.clearAndInsertAllNoteTableForImport(domainNoteTable.map { it.toNoteMap() })
+    }
+
     override fun getAllNote(id: Long): Flow<List<DomainNoteTable>> {
         return noteDao.getAllNote(id).map { it -> it.map { it.toDomainMap() } }
     }

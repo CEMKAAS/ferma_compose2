@@ -9,6 +9,7 @@ import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.state.ListState
 import com.zaroslikov.fermacompose2.blue_1
@@ -35,6 +36,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 data class FinanceAnalysisState(
     val baseSuffix: Suffix = Suffix.LITERS,
     val settingSuffix: Suffix = Suffix.LITERS,
+    val settings: DomainSettings = DomainSettings(),
     val titleProduct: String = "",
     val totalPrice: Double = 0.0,
     val countProduct: Double = 0.0,

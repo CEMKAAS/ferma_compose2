@@ -1,17 +1,13 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
 import com.zaroslikov.domain.models.DomainSaleTable
-import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 
 sealed class SaleListIntent : BaseIntent {
-    data class OpenBottomSheetGroup(
-        val value: Boolean,
-        val currentBriefly: BrieflySaleDomain = BrieflySaleDomain()
-    ) : SaleListIntent()
+    data class OpenBottomSheetGroup(val value: String?) : SaleListIntent()
 
     data class OpenBottomSheetEntry(
         val isOpen: Boolean,
@@ -23,6 +19,10 @@ sealed class SaleListIntent : BaseIntent {
         val isOpen: Boolean,
         val state: SaleEntryState2,
         val isSaveStateForBottomSheet: Boolean = false
+    ) : SaleListIntent()
+
+    data class OpenBottomSheetDetail(
+        val value: Long? = null
     ) : SaleListIntent()
 
     data class TitleChanged(val value: String) : SaleListIntent()

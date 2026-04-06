@@ -51,7 +51,6 @@ import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.red_11
 import com.zaroslikov.fermacompose2.red_14
-import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BigColorCard
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
@@ -184,8 +183,8 @@ private fun MainCard(
                 IconTransaction2(
                     sizeCard = 56.dp,
                     icon = R.drawable.icon_money,
-                    colorIcon = white,
-                    color = white.copy(alpha = 0.2f)
+                    iconColor = white,
+                    boxColor = white.copy(alpha = 0.2f)
                 )
                 Column(
                     horizontalAlignment = Alignment.Start

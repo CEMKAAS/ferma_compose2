@@ -222,8 +222,8 @@ private fun MainCard(
                 IconTransaction2(
                     sizeCard = 56.dp,
                     icon = R.drawable.outline_egg_24,
-                    colorIcon = white,
-                    color = white.copy(alpha = 0.2f)
+                    iconColor = white,
+                    boxColor = white.copy(alpha = 0.2f)
                 )
                 Column(
                     horizontalAlignment = Alignment.Start

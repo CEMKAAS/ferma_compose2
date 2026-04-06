@@ -13,7 +13,9 @@ fun DomainAnimalWithCount.toRoom(): AnimalWithCountDto = AnimalWithCountDto(
     isGroup = group,
     sex = sex,
     count = count,
-    suffix = suffix
+    suffix = suffix,
+    foodDay = foodDay,
+    foodDaySuffix = foodDaySuffix,
 )
 
 fun AnimalWithCountDto.toDomain(): DomainAnimalWithCount = DomainAnimalWithCount(
@@ -25,5 +27,7 @@ fun AnimalWithCountDto.toDomain(): DomainAnimalWithCount = DomainAnimalWithCount
     group = isGroup,
     sex = sex,
     count = count,
-    suffix = suffix
+    suffix = suffix,
+    foodDay = foodDay,
+    foodDaySuffix = foodDaySuffix,
 )

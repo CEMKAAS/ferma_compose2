@@ -1,16 +1,18 @@
 package com.zaroslikov.domain.models.table
 
+import com.zaroslikov.domain.models.dto.BaseProductSection
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class DomainWriteOffTable(
     val id: Long = 0,
-    val title: String,
-    val count: Double,
-    val countSuffix: Suffix,
-    val price: Double? = null,
-    val priceAll: Double? = null,
+    override val title: String,
+    override val count: Double,
+    override val countSuffix: Suffix,
+    override val price: Double? = null,
+    override val priceAll: Double? = null,
     val category: String = "",
     val day: Int,
     val month: Int,
@@ -19,4 +21,4 @@ data class DomainWriteOffTable(
     val note: String,
     val idPT: Long,
     val animalCountId: Long? = null
-)
+) : BaseProductSection

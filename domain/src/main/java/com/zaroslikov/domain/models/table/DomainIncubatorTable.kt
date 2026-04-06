@@ -1,7 +1,9 @@
 package com.zaroslikov.domain.models.table
 
 import com.zaroslikov.domain.models.enums.Suffix
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DomainIncubatorTable(
     val id: Long = 0,
     val title: String = "",

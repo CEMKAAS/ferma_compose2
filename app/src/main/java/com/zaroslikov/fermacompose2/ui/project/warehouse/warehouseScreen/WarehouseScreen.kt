@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,19 +55,32 @@ import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_4
 import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
+import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_2
+import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_g_1
 import com.zaroslikov.fermacompose2.green_g_3
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.orang_2
+import com.zaroslikov.fermacompose2.orang_4
+import com.zaroslikov.fermacompose2.orang_5
+import com.zaroslikov.fermacompose2.orang_6
+import com.zaroslikov.fermacompose2.orang_9
+import com.zaroslikov.fermacompose2.red_3
+import com.zaroslikov.fermacompose2.red_4
+import com.zaroslikov.fermacompose2.red_5
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogStandard
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.BorderShowAllButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
+import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
@@ -72,10 +88,11 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseIntent
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
+import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
 
 object WarehouseDestination : NavigationDestination {
@@ -134,59 +151,26 @@ fun WarehouseScreen(
                     onShowFastAddClick = { viewModel.onIntent(WarehouseIntent.ShowFastAddClicked(it)) },
                     onAnalysisNavClick = {
                         navigationToAnalysis(Triple(state.idPT, it.first, it.second))
+                    },
+                    onWriteOffClick = {
+                        viewModel.onIntent(
+                            WarehouseIntent.OpenWarningWriteOffAlterDialogClicked(it)
+                        )
                     }
                 )
-        /*WarehouseBody(
-            itemList = homeUiState.itemList,
-            modifier = modifier.fillMaxSize(),
-            contentPadding = innerPadding,
-            navigationToAnalysis = {
-                navigationToAnalysis(AnalysisNav(idProject = idProject, name = it))
-                AppMetrica.reportEvent("Анализ через склад")
-            },
-            itemExpensesList = homeExpensesUiState.itemList,
-            itemFoodList = homeFoodUiState.itemList,
-            writeOffButton = {
-                coroutineScope.launch {
-                    viewModel.saveItem(
-                        WriteOffTable(
-                            id = it.first.id,
-                            title = it.first.title,
-                            count = it.first.count,
-                            day = it.first.day,
-                            mount = it.first.mount,
-                            year = it.first.year,
-                            priceAll = it.first.priceAll,
-                            countSuffix = it.first.countSuffix,
-                            status = it.first.status,
-                            idPT = idProject.toLong(),
-                            note = it.first.note,
-                            price = null
-                        ), it.second
+
+        if (state.isOpenWarningWriteOffAlterDialog)
+            WarningWriteOffAlterDialog(
+                currentFoodOnWriteOff = state.currentFoodOnWriteOff,
+                onDismissRequest = {
+                    viewModel.onIntent(
+                        WarehouseIntent.OpenWarningWriteOffAlterDialogClicked(null)
                     )
+                },
+                onClick = {
+                    viewModel.onIntent(WarehouseIntent.FoodOnWriteOffChange)
                 }
-                Toast.makeText(
-                    context,
-                    "Списано: ${it.first.title}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            },
-            navigationToNewYaer = { navigationToNewYear(Pair(true, idProject)) },
-            itemFastAddList = fastAddUiState.itemList,
-            idProject = idProject,
-            fastAddButton = {
-                coroutineScope.launch {
-                    viewModel.saveFastAddItem(
-                        it
-                    )
-                }
-                Toast.makeText(
-                    context,
-                    "Добавлено: ${it.title} ${it.disc} ${it.suffix}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        )*/
+            )
     }
 }
 
@@ -196,7 +180,8 @@ private fun WarehouseContainer(
     state: WarehouseState,
     onAnalysisNavClick: (Pair<String, Suffix>) -> Unit,
     onShowFastAddClick: (Boolean) -> Unit,
-    onFastAddClick: (DomainFastAddProduct) -> Unit
+    onFastAddClick: (DomainFastAddProduct) -> Unit,
+    onWriteOffClick: (Long) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -238,6 +223,25 @@ private fun WarehouseContainer(
                         value = item.count,
                         suffix = item.suffix
                     ) { onAnalysisNavClick(item.title to item.suffix) }
+                }
+            if (state.foodList.isNotEmpty())
+                WarehouseSection(
+                    titleRes = R.string.warehouse_screen_warehouse_foods,
+                    iconRes = R.drawable.icon_add_product,
+                    list = state.foodList,
+                    textColor = orang_6,
+                    borderColor = orang_5,
+                    iconColor = orang_2,
+                    backgroundMiniColor = orang_4,
+                ) { item ->
+                    SliderFood(
+                        title = item.title,
+                        daysEnd = item.daysEnd,
+                        weightAll = item.weightAll,
+                        weightSuffix = item.weightSuffix,
+                        percentFloat = item.percentFloat,
+                        onWriteOffClick = { onWriteOffClick(item.id) }
+                    )
                 }
             if (state.expensesList.isNotEmpty())
                 WarehouseSection(
@@ -290,6 +294,87 @@ private fun ProductCard(
         }
     }
 }
+
+
+@Composable
+private fun SliderFood(
+    title: String,
+    daysEnd: Int,
+    weightAll: Double,
+    weightSuffix: Suffix,
+    percentFloat: Float,
+    onWriteOffClick: (() -> Unit)? = null
+) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = ghostly_white)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
+                .padding(start = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = title,
+                        style = text_14,
+                        color = black_2,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                    Row {
+                        IconAndTextNew(
+                            iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
+                            valueString = "${weightAll.formatNumber()} " +
+                                    stringResource(weightSuffix.toResId()),
+                            iconColor = blue_1,
+                            iconSize = 14.dp,
+                            textColor = black_2,
+                            textStyle = text_12
+                        )
+                        Text(" / ", style = text_12)
+                        IconAndTextNew(
+                            iconRes = R.drawable.baseline_access_time_24,
+                            valueString = "${daysEnd.formatNumber()} ${stringResource(R.string.expenses_screen_days)}",
+                            iconColor = violet_1,
+                            iconSize = 14.dp,
+                            textColor = black_2,
+                            textStyle = text_12
+                        )
+                    }
+                }
+                BaseSlider(
+                    percentFloat = percentFloat,
+                    color = when {
+                        percentFloat > 0.45f -> green_6
+                        percentFloat < 0.45f && percentFloat > 0.25f -> orang_9
+                        else -> error_base
+                    }
+                )
+            }
+            onWriteOffClick?.let {
+                IconButton(onClick = onWriteOffClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_trash),
+                        contentDescription = null,
+                        tint = error_base
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun <T> WarehouseSection(
@@ -454,8 +539,8 @@ private fun FastAddCard(
             ) {
                 IconTransaction2(
                     icon = R.drawable.icon_add,
-                    colorIcon = blue_1,
-                    color = blue_13,
+                    iconColor = blue_1,
+                    boxColor = blue_13,
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -489,389 +574,90 @@ private fun FastAddCard(
                 color = black_2
             )
         }
-
     }
 }
-/*
+
 @Composable
-private fun WarehouseBody(
-    itemList: List<WarehouseData>,
-    itemFoodList: List<ExpensesTable>,
-    itemExpensesList: List<WarehouseData>,
-    itemFastAddList: List<FastAdd>,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    navigationToAnalysis: (String) -> Unit,
-    idProject: Int,
-    writeOffButton: (Pair<WriteOffTable, ExpensesTable>) -> Unit,
-    navigationToNewYaer: () -> Unit,
-    fastAddButton: (FastAdd) -> Unit
+private fun WarningWriteOffAlterDialog(
+    currentFoodOnWriteOff: FoodListUi?,
+    onDismissRequest: () -> Unit, onClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
+    AlertDialogStandard(
+        titleRes = R.string.warehouse_screen_warehouse_write_off_food,
+        iconRes = R.drawable.baseline_edit_note_24,
+        titleBackgroundColor = red_3,
+        onDismissRequest = onDismissRequest,
+        onClick = onClick,
+        colors = listOf(red_4, red_5),
+        textButtonRes = R.string.button_write_off
     ) {
-        if (itemList.isEmpty() && itemFoodList.isEmpty() && itemExpensesList.isEmpty()) {
-            Column(
-                modifier = modifier
-                    .padding(contentPadding)
-                    .padding(15.dp)
-            ) {
-                Text(
-                    text = "Добро пожаловать на Склад!",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "В этом разделе указано сколько Вашего товара сейчас на складе (учитываются данные при добавлении, продажи и списании), если колличество Вашего Товара ушло в минус, оно отображаться в этом Разделе не будет!",
-                    textAlign = TextAlign.Justify,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    fontSize = 20.sp,
-                )
-                Text(
-                    text = "Сейчас склад пустой:(\nДобавьте товар на склад в разделе \"Моя Продукция\" или \"Мои Покупки\"",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontSize = 20.sp,
-                )
-            }
-        } else {
-            WarehouseInventoryList(
-                itemList = itemList,
-                itemExpensesList = itemExpensesList,
-                itemFoodList = itemFoodList,
-                contentPadding = contentPadding,
-                modifier = Modifier.padding(
-                    horizontal = dimensionResource(id = R.dimen.padding_small)
+        Column(
+            modifier = Modifier.padding(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = stringResource(
+                    R.string.warehouse_screen_warehouse_write_off_food_text
                 ),
-                navigationToAnalysis = navigationToAnalysis,
-                writeOffButton = writeOffButton,
-                navigationToNewYear = navigationToNewYaer,
-                itemFastAddList = itemFastAddList,
-                fastAddButton = fastAddButton,
-                idProject = idProject
+                style = text_14,
+                color = marengo
             )
-        }
-
-    }
-}
-
-@Composable
-private fun WarehouseInventoryList(
-    itemList: List<WarehouseData>,
-    itemFoodList: List<ExpensesTable>,
-    itemExpensesList: List<WarehouseData>,
-    itemFastAddList: List<FastAdd>,
-    contentPadding: PaddingValues,
-    modifier: Modifier = Modifier,
-    idProject: Int,
-    navigationToAnalysis: (String) -> Unit,
-    navigationToNewYear: () -> Unit,
-    writeOffButton: (Pair<WriteOffTable, ExpensesTable>) -> Unit,
-    fastAddButton: (FastAdd) -> Unit
-) {
-    var fastAddBoolean by rememberSaveable { mutableStateOf(true) }
-    var productBoolean by rememberSaveable { mutableStateOf(true) }
-    var foodBoolean by rememberSaveable { mutableStateOf(true) }
-    var expensesTable by rememberSaveable { mutableStateOf(true) }
-
-    Column(
-        modifier = Modifier.padding(contentPadding)
-    ) {
-        if (itemFastAddList.isNotEmpty()) {
-            TextButtonWarehouse(
-                boolean = fastAddBoolean,
-                onClick = { fastAddBoolean = !fastAddBoolean },
-                title = "Быстрое добавление",
-            )
-            LazyRow(verticalAlignment = Alignment.CenterVertically) {
-                if (fastAddBoolean) {
-                    items(items = itemFastAddList) { item ->
-                        FastAddCard(
-                            fastAdd = item,
-                            onClick = { fastAddButton(item) },
-                        )
-                    }
-                }
-            }
-        }
-
-        LazyColumn(
-            modifier = modifier
-        ) {
-            if (newYearBoolean()) {
-                item {
-                    Button(
-                        onClick = {
-                            navigationToNewYear()
-                            AppMetrica.reportEvent("Итоги года по проекту")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 5.dp, horizontal = 8.dp)
-                    ) {
-                        Text(text = "Итоги года по проекту!")
-                    }
-                }
-            }
-
-
-            if (itemList.isNotEmpty()) {
-                item {
-                    TextButtonWarehouse(
-                        boolean = productBoolean,
-                        onClick = { productBoolean = !productBoolean },
-                        title = "Продукция"
-                    )
-                }
-                if (productBoolean) {
-                    items(items = itemList) { item ->
-                        WarehouseProductCard(
-                            warehouseProduct = item,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clickable {
-                                    navigationToAnalysis(item.Title.replace("/", "-"))
-                                }
-                        )
-                    }
-                }
-            }
-
-            if (itemFoodList.isNotEmpty()) {
-                item {
-                    TextButtonWarehouse(
-                        boolean = foodBoolean,
-                        onClick = { foodBoolean = !foodBoolean },
-                        title = "Корм"
-                    )
-                }
-                if (foodBoolean) {
-                    items(items = itemFoodList) { item ->
-                        WarehouseFoodCard(
-                            warehouseProduct = item,
-                            idProject = idProject,
-                            modifier = Modifier
-                                .padding(8.dp),
-                            writeOffButton = writeOffButton
-                        )
-                    }
-                }
-            }
-            if (itemExpensesList.isNotEmpty()) {
-                item {
-                    TextButtonWarehouse(
-                        boolean = expensesTable,
-                        onClick = { expensesTable = !expensesTable },
-                        title = "Купленный товар"
-                    )
-                }
-                if (expensesTable) {
-                    items(items = itemExpensesList) { item ->
-                        WarehouseExpensesCard(
-                            warehouseProduct = item,
-                            modifier = Modifier
-                                .padding(8.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun WarehouseProductCard(
-    warehouseProduct: WarehouseData,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Column(
-                modifier = Modifier.fillMaxWidth(0.7f)
-            ) {
-                Text(
-                    text = warehouseProduct.Title,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
+            currentFoodOnWriteOff?.let {
+                WarningFoodOnWriteOffCard(
+                    title = it.title,
+                    weightAll = it.weightAll,
+                    weightSuffix = it.weightSuffix,
+                    percentFloat = it.percentFloat
                 )
             }
-            Text(
-                text = "${formatter(warehouseProduct.ResultCount)} ${warehouseProduct.suffix}",
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(1f),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
         }
     }
 }
 
 @Composable
-fun WarehouseFoodCard(
-    warehouseProduct: ExpensesTable,
-    idProject: Int,
-    modifier: Modifier = Modifier,
-    writeOffButton: (Pair<WriteOffTable, ExpensesTable>) -> Unit
+fun WarningFoodOnWriteOffCard(
+    title: String,
+    weightAll: Double,
+    weightSuffix: Suffix,
+    percentFloat: Float
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors()
+    BorderCard(
+        containerColor = orang_4,
+        borderColor = orang_5,
+        padding = PaddingValues(17.dp)
     ) {
-
-
-        val startDate =
-            LocalDate.of(warehouseProduct.year, warehouseProduct.mount, warehouseProduct.day)
-        val daysToAdd = warehouseProduct.foodDesignedDay
-        val endDate = startDate.plusDays(daysToAdd!!.toLong())
-        val currentDate = LocalDate.now()
-
-
-        if (currentDate >= endDate) println("Конечная дата уже наступила.")
-
-        val totalDays = ChronoUnit.DAYS.between(startDate, endDate)
-        val remainingDays = ChronoUnit.DAYS.between(currentDate, endDate)
-        val percentageRemaining = (remainingDays.toDouble() / totalDays * 100).coerceIn(0.0, 100.0)
-
-        val endFood = currentDate >= endDate
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
-            Text(
-                text = "${warehouseProduct.title} - ${if (endFood) "закончился" else "хватит на $remainingDays суток"}",
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-
-            if (endFood) {
-                val calendar = Calendar.getInstance()
-                Button(onClick = {
-                    writeOffButton(
-                        Pair(
-                            WriteOffTable(
-                                id = 0,
-                                title = warehouseProduct.title,
-                                count = warehouseProduct.count,
-                                day = calendar.get(Calendar.DAY_OF_MONTH),
-                                mount = calendar.get(Calendar.MONTH),
-                                year = calendar.get(Calendar.YEAR),
-                                status = false,
-                                priceAll = 0.0,
-                                note = "",
-                                idPT = idProject.toLong(),
-                                countSuffix = warehouseProduct.countSuffix,
-                                price = TODO()
-                            ), warehouseProduct
-                        )
-                    )
-                }) {
-                    Text(text = "Cписать")
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = title,
+                    style = text_14,
+                    color = black_2
+                )
+                TextMiniCard(
+                    value = "${weightAll.formatNumber()} " +
+                            stringResource(weightSuffix.toResId()),
+                    textColor = white,
+                    backgroundColor = orang_2
+                )
             }
-        }
-
-        if (!endFood) {
-            LinearProgressIndicator(
-                progress = {
-                    (percentageRemaining / 100.0).toFloat()
-                },
-                color = if (percentageRemaining <= 20) MaterialTheme.colorScheme.error else ProgressIndicatorDefaults.linearColor,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(10.dp)
+            BaseSlider(
+                percentFloat = percentFloat,
+                color = when {
+                    percentFloat > 0.45f -> green_6
+                    percentFloat < 0.45f && percentFloat > 0.25f -> orang_9
+                    else -> error_base
+                }
             )
         }
     }
 }
 
-
-@Composable
-fun WarehouseExpensesCard(
-    warehouseProduct: WarehouseData,
-    modifier: Modifier = Modifier
-) {
-*/
-
-
-////    OutlinedCard(
-////        colors = CardDefaults.cardColors(
-////            containerColor = MaterialTheme.colorScheme.surface,
-////        ),
-////        border = BorderStroke(4.dp, CardDefaults.cardColors().containerColor),
-////        modifier = modifier
-////    )
-//
-//    Card(
-//        modifier = modifier,
-//        elevation = CardDefaults.cardElevation(2.dp),
-//        colors = CardDefaults.cardColors()
-//    )
-//    {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .wrapContentHeight(),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//
-//            Column(
-//                modifier = Modifier.fillMaxWidth(0.7f)
-//            ) {
-//                Text(
-//                    text = warehouseProduct.Title,
-//                    modifier = Modifier
-//                        .wrapContentSize()
-//                        .padding(6.dp),
-//                    fontWeight = FontWeight.SemiBold,
-//                    fontSize = 16.sp
-//                )
-//            }
-//            Text(
-//                text = "${formatter(warehouseProduct.ResultCount)} ${warehouseProduct.suffix}",
-//                textAlign = TextAlign.End,
-//                modifier = Modifier
-//                    .padding(6.dp)
-//                    .fillMaxWidth(1f),
-//                fontWeight = FontWeight.SemiBold,
-//                fontSize = 18.sp
-//            )
-//        }
-//    }
-//}
-//
 @Composable
 fun TextButtonWarehouse(
     onClick: () -> Unit,
@@ -910,93 +696,3 @@ fun TextButtonWarehouse(
         }
     }
 }
-
-
-//@Composable
-//fun FastAddCard(
-//    fastAdd: FastAdd,
-//    onClick: () -> Unit = {}
-//) {
-//    var selected by rememberSaveable { mutableStateOf(false) }
-//    if (selected) {
-//        LaunchedEffect(Unit) {
-//            delay(2000) // Задержка в 2000 миллисекунд (2 секунды)
-//            selected = false
-//        }
-//    }
-//    Spacer(modifier = Modifier.width(8.dp))
-//    FilterChip(
-//        selected = selected,
-//        label = {
-//            Column(
-//
-//        }
-//}   modifier = Modifier.padding(3.dp)
-//            ) {
-//                Text(
-//                    text = fastAdd.title,
-//                    fontWeight = FontWeight.SemiBold,
-//                    fontSize = 14.sp
-//                )
-//                Text(
-//                    text = "${formatter(fastAdd.disc)} ${fastAdd.suffix}",
-//                    fontWeight = FontWeight.SemiBold,
-//                    fontSize = 12.sp
-//                )
-//                if (fastAdd.category == "" || fastAdd.category == "Без категории")
-//                else Text(
-//                    text = fastAdd.category,
-//                    modifier = Modifier
-//                        .padding(top = 2.dp),
-//                    fontSize = 10.sp
-//                )
-//
-//                if (fastAdd.animal != "") {
-//                    Text(
-//                        text = fastAdd.animal,
-//                        fontSize = 10.sp
-//                    )
-//                }
-//            }
-//        },
-//        leadingIcon = {
-//            Icon(
-//                imageVector = if (selected) Icons.Filled.Done else Icons.Filled.Add,
-//                contentDescription = "Done icon",
-//                modifier = Modifier.size(FilterChipDefaults.IconSize)
-//            )
-//        },
-//        onClick = {
-//            onClick()
-//            selected = true
-//        }
-//    )
-//}
-//
-//
-//fun newYearBoolean(): Boolean {
-//    val format = SimpleDateFormat("dd.MM.yyyy")
-//    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-//    val formattedDate: String = format.format(calendar.timeInMillis)
-//    val year = calendar.get(Calendar.YEAR)
-//    return formattedDate == "30.12.$year" || formattedDate == "31.12.$year"
-//}
-//
-//data class WarehouseData(
-//    val Title: String,
-//    val ResultCount: Double,
-//    val suffix: String
-//)
-//
-//data class AnalysisNav(
-//    val idProject: Int,
-//    val name: String
-//)
-//
-//
-////@Preview
-////@Composable
-////fun FastPrewie() {
-//////    FastAddCard(fastAdd = FastAdd("Молоко", 10.0, "Шт.", "Без категории", 0, "Несушка", 5))
-////    TextButtonWarehouse(onClick = {},true, "Быстрое добавление")
-////}

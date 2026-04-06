@@ -1,5 +1,8 @@
 package com.zaroslikov.domain.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DomainExpensesAnimal(
     val id: Long,
     val idExpenses: Long,

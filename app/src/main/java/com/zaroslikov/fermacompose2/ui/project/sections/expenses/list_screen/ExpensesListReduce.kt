@@ -128,9 +128,27 @@ class ExpensesListReduce(private val resourceProvider: ResourceProvider) :
                 intent.newValue
             )
 
+            is ExpensesListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
             else -> state
         }
         return newState.updateValid()
+    }
+
+    private fun ExpensesListState.updateOpenBottomSheetDetail(
+        id: Long?
+    ): ExpensesListState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDetail = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDetail = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
+        }
     }
 
     private fun ExpensesListState.updateSearch(search: String): ExpensesListState {
@@ -153,7 +171,7 @@ class ExpensesListReduce(private val resourceProvider: ResourceProvider) :
         else
             briefly.filter { item ->
                 item.title.lowercase().contains(query) ||
-                        item.count.toString().lowercase().contains(query) ||
+                        item.weight?.value.toString().lowercase().contains(query) ||
                         (item.price).toString().lowercase().contains(query)
             }
         return copy(

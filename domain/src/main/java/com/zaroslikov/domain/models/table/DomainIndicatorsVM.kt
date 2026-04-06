@@ -1,5 +1,8 @@
 package com.zaroslikov.domain.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DomainIndicatorsVM(
     val id: Int = 0,
     val weight: String = "",

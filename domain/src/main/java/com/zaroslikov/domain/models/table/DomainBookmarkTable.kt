@@ -1,7 +1,9 @@
 package com.zaroslikov.domain.models.table
 
 import com.zaroslikov.domain.models.enums.TypeEgg
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DomainBookmark(
     val id: Long = 0,
     val title: String = "",

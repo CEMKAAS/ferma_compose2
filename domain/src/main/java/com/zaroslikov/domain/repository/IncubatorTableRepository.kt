@@ -1,9 +1,14 @@
 package com.zaroslikov.domain.repository
 
+import com.zaroslikov.domain.models.DomainNoteTable
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainIncubatorTable
+import com.zaroslikov.domain.models.table.DomainProjectTable
 import kotlinx.coroutines.flow.Flow
 
 interface IncubatorTableRepository {
+    fun getAllIncubatorTableForExport(): Flow<List<DomainIncubatorTable>>
+    suspend fun clearAndInsertIncubatorTableForImport(domainIncubatorTable: List<DomainIncubatorTable>)
     fun getAllIncubator(): Flow<List<DomainIncubatorTable>>
     fun getIncubatorByIdPT(idPT: Long): Flow<DomainIncubatorTable>
     fun getIncubatorById(id: Long): Flow<DomainIncubatorTable>

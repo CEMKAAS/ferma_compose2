@@ -123,8 +123,8 @@ fun OvoscopBottomSheet(
                         IconTransaction2(
                             sizeCard = 52.dp,
                             icon = R.drawable.ic_ovos2,
-                            colorIcon = white,
-                            color = white.copy(alpha = 0.2f)
+                            iconColor = white,
+                            boxColor = white.copy(alpha = 0.2f)
                         )
                         Text(
                             ovoscopyState.titleText,

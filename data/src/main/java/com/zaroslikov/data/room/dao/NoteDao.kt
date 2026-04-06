@@ -5,12 +5,30 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.table.ferma.NoteTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
+    @Query("SELECT * from note_table")
+    fun getAllNoteForExport(): Flow<List<NoteTable>>
+
+    @Upsert
+    suspend fun insertAllNoteTable(data: List<NoteTable>)
+
+    @Query("DELETE FROM note_table")
+    suspend fun deleteAllNoteTable()
+
+    @Transaction
+    suspend fun clearAndInsertAllNoteTableForImport(noteTable: List<NoteTable>) {
+        deleteAllNoteTable()
+        insertAllNoteTable(noteTable)
+    }
+
+
     @Query(
         "SELECT * from note_table" +
                 " Where idPT=:id" +

@@ -42,7 +42,7 @@ fun BottomSheetSaleAnimal(
             onIntent(
                 AnimalCountIntent.DialogClicked(
                     false,
-                    isSaveStateForBottomSheet = true,
+                    isSaveStateForBottomSheet =  state.isEntry,
                     version = state.version
                 )
             )

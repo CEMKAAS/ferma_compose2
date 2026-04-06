@@ -21,6 +21,8 @@ import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
 import com.zaroslikov.fermacompose2.ui.start.first.FirstScreen
 import com.zaroslikov.fermacompose2.ui.start.aboutApp.AboutAppDestination
 import com.zaroslikov.fermacompose2.ui.start.aboutApp.AboutAppScreen
+import com.zaroslikov.fermacompose2.ui.start.profile.ProfileDestination
+import com.zaroslikov.fermacompose2.ui.start.profile.ProfileScreen
 import com.zaroslikov.fermacompose2.ui.start.settings.SettingsDestination
 import com.zaroslikov.fermacompose2.ui.start.settings.SettingsScreen
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
@@ -44,6 +46,7 @@ fun InventoryNavHost(
     ) {
         composable(route = FirstDestination.route) {
             FirstScreen(
+                navigateToProfile = { navController.navigate(ProfileDestination.route) },
                 navigateToAboutApp = { navController.navigate(AboutAppDestination.route) },
                 navigateToSettings = { navController.navigate(SettingsDestination.route) },
                 navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it}") },
@@ -72,8 +75,6 @@ fun InventoryNavHost(
         }
 
 
-
-
         composable(route = ProjectAddDestination.route) {
             AddProject(
                 navigateBack = { navController.popBackStack() },
@@ -90,6 +91,10 @@ fun InventoryNavHost(
             WarehouseEditScreen(
                 navigateBack = navController::popBackStack
             )
+        }
+
+        composable(route = ProfileDestination.route) {
+            ProfileScreen(onNavigateBack = navController::popBackStack)
         }
 
         composable(route = AboutAppDestination.route) {

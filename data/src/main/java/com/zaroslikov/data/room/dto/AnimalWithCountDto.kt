@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.dto
 
 import androidx.room.ColumnInfo
+import com.zaroslikov.domain.models.enums.Suffix
 
 
 data class AnimalWithCountDto(
@@ -13,5 +14,9 @@ data class AnimalWithCountDto(
     val isGroup: Boolean,
     val sex: Boolean,
     val count: String?,
-    val suffix: String?
+    val suffix: String?,
+    @ColumnInfo(name = "food_day")
+    val foodDay: Double,
+    @ColumnInfo(name = "food_day_suffix")
+    val foodDaySuffix: Suffix
 )

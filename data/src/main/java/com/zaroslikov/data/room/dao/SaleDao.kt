@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.sale.BrieflySaleDto
 import com.zaroslikov.data.room.dto.sale.BuyerPriceDto
 import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
@@ -12,10 +14,28 @@ import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixCategoryDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
 import com.zaroslikov.data.room.table.ferma.SaleTable
+import com.zaroslikov.domain.models.enums.Suffix
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SaleDao {
+
+    @Query("SELECT * from sale_table")
+    fun getAllSaleTableForExport(): Flow<List<SaleTable>>
+
+    @Upsert
+    suspend fun insertAllSaleTable(data: List<SaleTable>)
+
+    @Query("DELETE FROM sale_table")
+    suspend fun deleteAllSaleTable()
+
+    @Transaction
+    suspend fun clearAndInsertAllSaleTableForImport(saleTable: List<SaleTable>) {
+        deleteAllSaleTable()
+        insertAllSaleTable(saleTable)
+    }
+
+
     @Query(
         "SELECT * from sale_table Where idPT=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC"
@@ -76,6 +96,17 @@ interface SaleDao {
                 " FROM sale_table WHERE idPT =:id"
     )
     fun getIncome(id: Long): Flow<Double>
+
+
+    @Query(
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0)" +
+                " FROM sale_table s" +
+                " INNER JOIN project_table p ON p.id = s.idPT" +
+                " INNER JOIN settings_table st ON st.idPT = p.id" +
+                " WHERE st.currency_suffix = :currencySuffix"
+    )
+    fun getIncomeAllProject(currencySuffix: Suffix): Flow<Double>
 
     @Query(
         "SELECT COALESCE(SUM(price), 0.0) AS ResultCount FROM sale_table" +

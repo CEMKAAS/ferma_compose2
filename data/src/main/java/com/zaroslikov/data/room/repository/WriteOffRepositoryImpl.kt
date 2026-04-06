@@ -15,14 +15,23 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.WriteOffRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import kotlin.collections.map
 
 class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteOffDao) :
     WriteOffRepository {
+    override fun getAllWriteOffTableForExport(): Flow<List<DomainWriteOffTable>> {
+        return writeOffDao.getAllWriteOffTableForExport().map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override suspend fun clearAndInsertWriteOffTableForImport(domainWriteOffTable: List<DomainWriteOffTable>) {
+        return writeOffDao.clearAndInsertWriteOffTableForImport(domainWriteOffTable.map { it.toRoomMap() })
+    }
 
     override fun getAllWriteOffItems(id: Long): Flow<List<DomainWriteOffTable>> {
         return writeOffDao.getAllWriteOffItems(id).map { it -> it.map { it.toDomainMap() } }
@@ -142,8 +151,16 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
         return writeOffDao.getOwnNeed(id)
     }
 
+    override fun getOwnNeedAllProject(currencySuffix: Suffix): Flow<Double> {
+        return writeOffDao.getOwnNeedAllProject(currencySuffix)
+    }
+
     override fun getScrap(id: Long): Flow<Double> {
         return writeOffDao.getScrap(id)
+    }
+
+    override fun getScrapAllProject(currencySuffix: Suffix): Flow<Double> {
+        return writeOffDao.getOwnNeedAllProject(currencySuffix)
     }
 
     override fun getOwnNeedMonth(

@@ -223,11 +223,11 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 id, count, suffix, date, note, version, animal_id
             )
             SELECT
-                id, count, 3, date, '', NULL, idAnimal
+                id, count, 3, date, '', 4, idAnimal
             FROM AnimalCountTable
         """.trimIndent()
         )
-        db.execSQL("DROP TABLE AnimalCountTable")
+        db.execSQL("DROP TABLE AnimalCountTable") //TODO весия всегда добавление
 
         //==================== Миграция AnimalVaccinationTable ====================
         db.execSQL(
@@ -355,7 +355,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 END,
                    category, idAnimal, note, idPT
             FROM MyFerma
-        """.trimIndent()
+        """.trimIndent() //TODO idAnimal всегда 0 или заменить на null
         )
         db.execSQL("CREATE INDEX IF NOT EXISTS index_add_table_idPT ON add_table(idPT)")
         db.execSQL("CREATE INDEX IF NOT EXISTS index_add_table_animal_id ON add_table(animal_id)")
@@ -484,6 +484,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 count_suffix INTEGER NOT NULL,
                 category TEXT NOT NULL,
                 note TEXT NOT NULL,
+                is_food INTEGER NOT NULL,
                 is_show_food INTEGER NOT NULL,
                 feed_food REAL,
                 feed_food_suffix INTEGER,
@@ -506,7 +507,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             """
             INSERT INTO MyFermaEXPENSES_new (
                 _id, title, count, day, month, year, price, price_all,
-                count_suffix, category, note,
+                count_suffix, category, note, is_food,
                 is_show_food, feed_food, feed_food_suffix, count_animal,
                 food_designed_day, last_day_food, weight,  weight_suffix,idPT, animalId, animal_vaccination_id, animal_count_id
             )
@@ -521,7 +522,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN suffix = 'М.' THEN 12
                    ELSE 1
                 END, category, note,
-                showFood,
+                showFood, showFood,
                 CASE WHEN showFood = 1 THEN dailyExpensesFood ELSE NULL END,
                 CASE WHEN showFood = 1 THEN 5 ELSE NULL END,
                 CASE WHEN showFood = 1 THEN countAnimal ELSE NULL END,
@@ -677,6 +678,44 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             """
             INSERT INTO settings_table(currency_suffix, weight_suffix, volume_suffix, linear_suffix, idPT) 
             Select 13, 5, 8, 12, id FROM project_table WHERE mode = 1
+        """.trimIndent()
+        )
+
+        //==================== Создание ProfileTable ====================
+
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS profile_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL
+            )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO profile_table(name) 
+            VALUES ('Фермер')
+        """.trimIndent()
+        )
+
+        //==================== Миграция AppSettingsTable ====================
+
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS app_settings_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                last_version_app TEXT,
+                current_version_app TEXT NOT NULL,
+                is_first_launch INTEGER NOT NULL
+                )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO app_settings_table(last_version_app, current_version_app, is_first_launch) 
+            VALUES (NULL, '1', 1)
         """.trimIndent()
         )
 

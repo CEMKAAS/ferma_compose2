@@ -86,88 +86,91 @@ private fun EntryValue(
     onIntent: (EntryBookmarkIntent) -> Unit
 ) {
     CardFieldNew(
-        padding = PaddingValues(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        padding = PaddingValues(24.dp)
     ) {
-        OutlinedTextNew(
-            value = state.title,
-            onValueChange = { onIntent(EntryBookmarkIntent.TitleChanged(it)) },
-            isError = state.error.isErrorTitle,
-            labelIntRes = R.string.entry_bookmark_title,
-            supportingText = R.string.entry_bookmark_title_support,
-            isBorderCard = false
-        )
-        OutlinedTextDropdownMenuTypeEgg(
-            value = state.type,
-            onValueChange = { onIntent(EntryBookmarkIntent.TypeChanged(it)) },
-            titleList = typeEggList,
-            labelIntRes = R.string.entry_bookmark_type,
-            intResSup = R.string.is_empty,
-            enable = isEntry,
-            isBorderCard = false
-        )
-        OutlinedTextDropdownMenuNew(
-            value = state.breed,
-            onValueChange = { onIntent(EntryBookmarkIntent.BreedChanged(it)) },
-            titleList = state.breedList,
-            labelIntRes = R.string.entry_bookmark_breed,
-            intResSup = R.string.entry_bookmark_support_breed,
-            isBorderCard = false
-        )
-        OutlinedNumberNew(
-            value = state.count,
-            onValueChange = { onIntent(EntryBookmarkIntent.CountChanged(it)) },
-            intRes = R.string.entry_bookmark_count_egg,
-            intResSup = R.string.entry_bookmark_support_count_egg,
-            intResError = R.string.entry_bookmark_error_count,
-            isError = state.error.isErrorLargeCount,
-            suffix = Suffix.PIECES,
-            isBorderCard = false
-        )
-        if (!isEntry)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            OutlinedTextNew(
+                value = state.title,
+                onValueChange = { onIntent(EntryBookmarkIntent.TitleChanged(it)) },
+                isError = state.error.isErrorTitle,
+                labelIntRes = R.string.entry_bookmark_title,
+                supportingText = R.string.entry_bookmark_title_support,
+                isBorderCard = false
+            )
+            OutlinedTextDropdownMenuTypeEgg(
+                value = state.type,
+                onValueChange = { onIntent(EntryBookmarkIntent.TypeChanged(it)) },
+                titleList = typeEggList,
+                labelIntRes = R.string.entry_bookmark_type,
+                intResSup = R.string.is_empty,
+                enable = isEntry,
+                isBorderCard = false
+            )
+            OutlinedTextDropdownMenuNew(
+                value = state.breed,
+                onValueChange = { onIntent(EntryBookmarkIntent.BreedChanged(it)) },
+                titleList = state.breedList,
+                labelIntRes = R.string.entry_bookmark_breed,
+                intResSup = R.string.entry_bookmark_support_breed,
+                isBorderCard = false
+            )
             OutlinedNumberNew(
-                value = state.rejectedCount,
-                onValueChange = { onIntent(EntryBookmarkIntent.RejectedCountChanged(it)) },
-                intRes = R.string.entry_bookmark_rejected_count_egg,
+                value = state.count,
+                onValueChange = { onIntent(EntryBookmarkIntent.CountChanged(it)) },
+                intRes = R.string.entry_bookmark_count_egg,
                 intResSup = R.string.entry_bookmark_support_count_egg,
-                intResError = R.string.entry_bookmark_error_reject_count,
-                isError = state.error.isErrorRejectedCount,
+                intResError = R.string.entry_bookmark_error_count,
+                isError = state.error.isErrorLargeCount,
                 suffix = Suffix.PIECES,
                 isBorderCard = false
             )
-        OutlinedPriceInputNew(
-            price = state.price,
-            onPriceChange = {
-                onIntent(EntryBookmarkIntent.PriceChanged(it))
-            },
-            priceAll = state.priceAll,
-            isAutoCalculate = state.isAutoPrice,
-            isManyCount = true,
-            isBorderCard = false,
-            onAutoCalculate = {
-                onIntent(EntryBookmarkIntent.AutoPriceClicked(it))
-            },
-            count = state.count,
-            countSuffix = Suffix.PIECES,
-            priceSuffix = Suffix.RUBLE,
-            leadingIconRes = null,
-            supportTextRes = R.string.entry_bookmark_support_text_all_price,
-            supportTextResAutoCal = R.string.entry_bookmark_support_text_price,
-            tooltipTextResAutoCal = R.string.entry_bookmark_tooltip_auto_calculate_price,
-        )
-        OutlinedTextDateNew(
-            value = state.startDate,
-            onValueChange = { onIntent(EntryBookmarkIntent.DateClicked(it)) },
-            intRes = R.string.entry_bookmark_data,
-            isBorderCard = false
-        )
-        TimeOutlinedTextFieldNew(
-            time = state.time,
-            onValueChange = { onIntent(EntryBookmarkIntent.TimeClicked(it)) },
-            intRes = R.string.entry_bookmark_time,
-            isBorderCard = false
-        )
+            if (!isEntry)
+                OutlinedNumberNew(
+                    value = state.rejectedCount,
+                    onValueChange = { onIntent(EntryBookmarkIntent.RejectedCountChanged(it)) },
+                    intRes = R.string.entry_bookmark_rejected_count_egg,
+                    intResSup = R.string.entry_bookmark_support_count_egg,
+                    intResError = R.string.entry_bookmark_error_reject_count,
+                    isError = state.error.isErrorRejectedCount,
+                    suffix = Suffix.PIECES,
+                    isBorderCard = false
+                )
+            OutlinedPriceInputNew(
+                price = state.price,
+                onPriceChange = {
+                    onIntent(EntryBookmarkIntent.PriceChanged(it))
+                },
+                priceAll = state.priceAll,
+                isAutoCalculate = state.isAutoPrice,
+                isManyCount = true,
+                isBorderCard = false,
+                onAutoCalculate = {
+                    onIntent(EntryBookmarkIntent.AutoPriceClicked(it))
+                },
+                count = state.count,
+                countSuffix = Suffix.PIECES,
+                priceSuffix = Suffix.RUBLE,
+                leadingIconRes = null,
+                supportTextRes = R.string.entry_bookmark_support_text_all_price,
+                supportTextResAutoCal = R.string.entry_bookmark_support_text_price,
+                tooltipTextResAutoCal = R.string.entry_bookmark_tooltip_auto_calculate_price,
+            )
+            OutlinedTextDateNew(
+                value = state.startDate,
+                onValueChange = { onIntent(EntryBookmarkIntent.DateClicked(it)) },
+                intRes = R.string.entry_bookmark_data,
+                isBorderCard = false
+            )
+            TimeOutlinedTextFieldNew(
+                time = state.time,
+                onValueChange = { onIntent(EntryBookmarkIntent.TimeClicked(it)) },
+                intRes = R.string.entry_bookmark_time,
+                isBorderCard = false
+            )
+        }
     }
 }
 

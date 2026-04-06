@@ -772,6 +772,7 @@ fun OutlinedTextCountNew(
     onSuffixChange: ((Suffix) -> Unit)? = null,
     suffixList: List<Suffix> = suffixAllList,
     isError: Boolean,
+    enabled: Boolean = true,
 //    isAnimal: Boolean = false,
 //    isWarehouseShow: Boolean = true,
 //    isDropMenuShow: Boolean = true,
@@ -810,7 +811,8 @@ fun OutlinedTextCountNew(
             intResSup = R.string.outlined_text_count,
             intResError = intResError,
             keyboardOptions = keyboardOptions,
-            colorTextField = colorTextField
+            colorTextField = colorTextField,
+            enabled = enabled
         )
     }
 
@@ -823,7 +825,8 @@ fun OutlinedTextCountNew(
                     focusManager.moveFocus(FocusDirection.Down)
                 }
             },
-            suffixList = suffixList
+            suffixList = suffixList,
+            enableDropMenu = enabled
         ) {
             BaseOutlinedTextNew(
                 modifier = it.first,
@@ -834,6 +837,7 @@ fun OutlinedTextCountNew(
                 labelIntRes = R.string.outlined_text_suffix,
                 intResSup = R.string.outlined_text_suffix,
                 keyboardOptions = keyboardOptions,
+                enabled = enabled,
                 isMore = true,
                 readOnly = true,
                 colorTextField = colorTextField
@@ -1060,6 +1064,7 @@ fun OutlinedCountInputNew(
     countSuffixList: List<Suffix> = suffixAllList,
     countSuffix: Suffix,
     onSuffixChange: ((Suffix) -> Unit)? = null,
+    enabled: Boolean = true,
     isAutoCalculate: Boolean,
     onAutoCalculate: (Boolean) -> Unit,
     weight: String,
@@ -1094,7 +1099,8 @@ fun OutlinedCountInputNew(
                 onSuffixChange = onSuffixChange,
                 isError = isError,
                 suffixList = countSuffixList,
-                isBorderCard = false
+                isBorderCard = false,
+                enabled = enabled
             )
             AnimatedVisibility(
                 modifier = Modifier.fillMaxWidth(),

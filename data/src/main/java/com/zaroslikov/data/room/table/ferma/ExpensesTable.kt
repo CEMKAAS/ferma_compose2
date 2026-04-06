@@ -62,6 +62,8 @@ data class ExpensesTable(
     val countSuffix: Suffix,
     val category: String,
     val note: String,
+    @ColumnInfo(name = "is_food")
+    val isFood: Boolean,
     @ColumnInfo(name = "is_show_food")
     val isShowFood: Boolean,
     @ColumnInfo(name = "feed_food")

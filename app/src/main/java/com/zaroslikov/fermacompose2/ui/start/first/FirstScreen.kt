@@ -78,6 +78,8 @@ fun FirstScreen(
     navigateToItemIncubator: (Long) -> Unit,
     navigateToProject: (Long) -> Unit,
     navigateToIncubator: (Long) -> Unit,
+
+    navigateToProfile: () -> Unit,
     navigateToAboutApp: () -> Unit,
     navigateToSettings: () -> Unit,
     viewModel: FirstScreenViewModel = hiltViewModel()
@@ -131,7 +133,7 @@ fun FirstScreen(
         drawerState = drawerState,
         drawerContent = {
             DrawerSheetNew(
-                onProfileClick = { },
+                onProfileClick = {navigateToProfile()},
                 onSettingsClick = { navigateToSettings() },
                 onAboutAppClick = { navigateToAboutApp() },
                 onCloseClick = { drawerClose() }
@@ -355,8 +357,8 @@ private fun ChoiceProjectCard(
                 IconTransaction2(
                     sizeCard = 48.dp,
                     icon = icon,
-                    colorIcon = colorIcon,
-                    color = color
+                    iconColor = colorIcon,
+                    boxColor = color
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)

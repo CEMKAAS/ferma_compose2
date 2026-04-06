@@ -140,20 +140,23 @@ private fun AddIncubatorContainer(
 private fun ImageCard() {
     CardFieldNew(
         padding = PaddingValues(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        IconTransaction2(
-            icon = R.drawable.outline_egg_24,
-            sizeCard = 128.dp,
-            color = orang_8,
-            colorIcon = orang_12
-        )
-        Text(
-            stringResource(R.string.add_incubator_screen_download_image),
-            style = text_14,
-            color = gray_7
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconTransaction2(
+                icon = R.drawable.outline_egg_24,
+                sizeCard = 128.dp,
+                boxColor = orang_8,
+                iconColor = orang_12
+            )
+            Text(
+                stringResource(R.string.add_incubator_screen_download_image),
+                style = text_14,
+                color = gray_7
+            )
+        }
     }
 }
 
@@ -163,64 +166,67 @@ private fun EnterValue(
     onIntent: (AddIncubatorIntent) -> Unit
 ) {
     CardFieldNew(
-        padding = PaddingValues(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        padding = PaddingValues(24.dp)
     ) {
-        OutlinedTextNew(
-            value = state.title,
-            onValueChange = { onIntent(AddIncubatorIntent.TitleChanged(it)) },
-            isError = state.error.isErrorTitle,
-            labelIntRes = R.string.add_incubator_screen_name_incubator,
-            supportingText = R.string.add_incubator_screen_name_incubator_support,
-            isBorderCard = false
-        )
-        OutlinedTextDropdownMenuNew(
-            value = state.brand,
-            onValueChange = {onIntent(AddIncubatorIntent.BrandChanged(it))},
-            titleList = state.brandList,
-            labelIntRes = R.string.add_incubator_screen_brand,
-            intResSup = R.string.add_incubator_screen_brand_support,
-            isBorderCard = false
-        )
-        OutlinedTextDropdownMenuNew(
-            value = state.model,
-            onValueChange = {onIntent(AddIncubatorIntent.ModelChanged(it))},
-            titleList = state.modelList,
-            labelIntRes = R.string.add_incubator_screen_model,
-            intResSup = R.string.add_incubator_screen_model_support,
-            isBorderCard = false
-        )
-        OutlinedNumberNew(
-            value = state.capacity,
-            onValueChange = { onIntent(AddIncubatorIntent.CapacityChanged(it)) },
-            intRes = R.string.add_incubator_screen_capacity,
-            intResSup = R.string.add_incubator_screen_capacity_egg,
-            isError = state.error.isErrorCapacity,
-            suffix = Suffix.PIECES,
-            isBorderCard = false
-        )
-        OutlinedNumberNew(
-            value = state.price,
-            onValueChange = { onIntent(AddIncubatorIntent.PriceChanged(it)) },
-            intRes = R.string.add_incubator_screen_incubator_sell,
-            intResSup = R.string.add_incubator_screen_incubator_sell_support,
-            suffix = Suffix.PIECES,
-            isBorderCard = false
-        )
-        OutlinedTextDateNew(
-            value = state.date,
-            onValueChange = { onIntent(AddIncubatorIntent.DateClicked(it)) },
-            intRes = R.string.add_incubator_screen_date_sale,
-            isBorderCard = false
-        )
-        OutlinedTextNoteNew(
-            value = state.note,
-            onValueChange = { onIntent(AddIncubatorIntent.NoteClicked(it)) },
-            labelIntRes = R.string.add_incubator_screen_note,
-            supportingText = R.string.add_incubator_screen_note_support,
-            isBorderCard = false
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            OutlinedTextNew(
+                value = state.title,
+                onValueChange = { onIntent(AddIncubatorIntent.TitleChanged(it)) },
+                isError = state.error.isErrorTitle,
+                labelIntRes = R.string.add_incubator_screen_name_incubator,
+                supportingText = R.string.add_incubator_screen_name_incubator_support,
+                isBorderCard = false
+            )
+            OutlinedTextDropdownMenuNew(
+                value = state.brand,
+                onValueChange = { onIntent(AddIncubatorIntent.BrandChanged(it)) },
+                titleList = state.brandList,
+                labelIntRes = R.string.add_incubator_screen_brand,
+                intResSup = R.string.add_incubator_screen_brand_support,
+                isBorderCard = false
+            )
+            OutlinedTextDropdownMenuNew(
+                value = state.model,
+                onValueChange = { onIntent(AddIncubatorIntent.ModelChanged(it)) },
+                titleList = state.modelList,
+                labelIntRes = R.string.add_incubator_screen_model,
+                intResSup = R.string.add_incubator_screen_model_support,
+                isBorderCard = false
+            )
+            OutlinedNumberNew(
+                value = state.capacity,
+                onValueChange = { onIntent(AddIncubatorIntent.CapacityChanged(it)) },
+                intRes = R.string.add_incubator_screen_capacity,
+                intResSup = R.string.add_incubator_screen_capacity_egg,
+                isError = state.error.isErrorCapacity,
+                suffix = Suffix.PIECES,
+                isBorderCard = false
+            )
+            OutlinedNumberNew(
+                value = state.price,
+                onValueChange = { onIntent(AddIncubatorIntent.PriceChanged(it)) },
+                intRes = R.string.add_incubator_screen_incubator_sell,
+                intResSup = R.string.add_incubator_screen_incubator_sell_support,
+                suffix = Suffix.PIECES,
+                isBorderCard = false
+            )
+            OutlinedTextDateNew(
+                value = state.date,
+                onValueChange = { onIntent(AddIncubatorIntent.DateClicked(it)) },
+                intRes = R.string.add_incubator_screen_date_sale,
+                isBorderCard = false
+            )
+            OutlinedTextNoteNew(
+                value = state.note,
+                onValueChange = { onIntent(AddIncubatorIntent.NoteClicked(it)) },
+                labelIntRes = R.string.add_incubator_screen_note,
+                supportingText = R.string.add_incubator_screen_note_support,
+                isBorderCard = false
+            )
+        }
     }
 }
 

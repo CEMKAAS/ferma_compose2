@@ -4,29 +4,61 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
+import com.zaroslikov.data.room.dto.add.AddItemDto
 import com.zaroslikov.data.room.dto.add.AnimalCountSuffixDto
 import com.zaroslikov.data.room.dto.add.BrieflyAddDto
 import com.zaroslikov.data.room.dto.add.FastAddProductDto
 import com.zaroslikov.data.room.dto.add.TitleAndSuffixDto
 import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
-import com.zaroslikov.data.room.dto.shared.CountSuffixDateDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
 import com.zaroslikov.data.room.table.ferma.AddTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AddDao {
+    @Query("SELECT * from add_table")
+    fun getAllAddTableForExport(): Flow<List<AddTable>>
+
+    @Upsert
+    suspend fun insertAllAddTable(addTable: List<AddTable>)
+
+    @Query("DELETE FROM add_table")
+    suspend fun deleteAllAddTable()
+
+    @Transaction
+    suspend fun clearAndInsertAddTableForImport(addTable: List<AddTable>) {
+        deleteAllAddTable()
+        insertAllAddTable(addTable)
+    }
+
     @Query("SELECT * FROM add_table WHERE _id = :id")
     fun getItem(id: Long): Flow<AddTable>
 
     @Query(
-        "SELECT * FROM add_table" +
-                " WHERE idPT=:id" +
-                " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " DESC, _id DESC"
+        "SELECT " +
+                " a._id," +
+                " a.title," +
+                " a.count," +
+                " a.count_suffix," +
+                " a.day," +
+                " a.month," +
+                " a.year," +
+                " a.price," +
+                " a.category," +
+                " a.animal_id," +
+                " at.name AS animal_name," +
+                " a.note," +
+                " a.idPT," +
+                " a.animal_count_id" +
+                " FROM add_table a" +
+                " LEFT JOIN animal_table at ON at.id = a.animal_id" +
+                " WHERE a.idPT = :id" +
+                " ORDER BY DATE(printf('%04d-%02d-%02d', a.year, a.month, a.day)) DESC, a._id DESC "
     )
-    fun getAllItems(id: Long): Flow<List<AddTable>>
+    fun getAllItems(id: Long): Flow<List<AddItemDto>>
 
     @Query("SELECT * FROM add_table WHERE _id=:id")
     fun getItemAdd(id: Long): Flow<AddTable>
@@ -44,11 +76,27 @@ interface AddDao {
     fun getBrieflyItemAdd(id: Long): Flow<List<BrieflyAddDto>>
 
     @Query(
-        "SELECT * FROM add_table" +
-                " WHERE idPT=:id AND title =:name" +
+        "SELECT " +
+                " a._id," +
+                " a.title," +
+                " a.count," +
+                " a.count_suffix," +
+                " a.day," +
+                " a.month," +
+                " a.year," +
+                " a.price," +
+                " a.category," +
+                " a.animal_id," +
+                " at.name AS animal_name," +
+                " a.note," +
+                " a.idPT," +
+                " a.animal_count_id" +
+                " FROM add_table a" +
+                " LEFT JOIN animal_table at ON at.id = a.animal_id" +
+                " WHERE a.idPT=:id AND a.title =:name" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC"
     )
-    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddTable>>
+    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddItemDto>>
 
     @Query(
         "SELECT title," +
@@ -188,11 +236,10 @@ interface AddDao {
         "SELECT" +
                 " title," +
                 " '' AS type," +
-                " COALESCE(SUM(count), 0.0) AS count," +
+                " count AS count," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
                 " WHERE animal_id=:idAnimal" +
-                " GROUP BY title" +
                 " ORDER BY count DESC"
     )
     fun getProductAnimal(idAnimal: Long): Flow<List<AnimalCountSuffixDto>>

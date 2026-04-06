@@ -13,6 +13,15 @@ import javax.inject.Inject
 
 class AnimalCountRepositoryImpl @Inject constructor(private val animalCountDao: AnimalCountDao) :
     AnimalCountRepository {
+    override fun getAllAnimalCountTableForExport(): Flow<List<DomainAnimalCount>> {
+        return animalCountDao.getAllAnimalCountTableForExport()
+            .map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override suspend fun clearAndInsertAnimalCountTableForImport(domainAnimalCount: List<DomainAnimalCount>) {
+        return animalCountDao.clearAndInsertAnimalCountTableForImport(domainAnimalCount.map { it.toRoomMap() })
+    }
+
     override suspend fun insertAnimalCountTable(animalCountTable: DomainAnimalCount): Long {
         return animalCountDao.insertAnimalCountTable(animalCountTable.toRoomMap())
     }

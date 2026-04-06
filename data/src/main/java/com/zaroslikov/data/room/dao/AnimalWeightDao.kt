@@ -4,12 +4,31 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.table.animal.AnimalWeightTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnimalWeightDao {
+
+    @Query("SELECT * from animal_weight_table")
+    fun getAllAnimalWeightTableForExport(): Flow<List<AnimalWeightTable>>
+
+
+    @Upsert
+    suspend fun insertAllAnimalWeightTable(data: List<AnimalWeightTable>)
+
+    @Query("DELETE FROM animal_weight_table")
+    suspend fun deleteAllAnimalWeightTable()
+
+    @Transaction
+    suspend fun clearAndInsertAnimalWeightTableForImport(animalWeightTable: List<AnimalWeightTable>) {
+        deleteAllAnimalWeightTable()
+        insertAllAnimalWeightTable(animalWeightTable)
+    }
+
     @Insert
     suspend fun insertAnimalWeightTable(animalWeightTable: AnimalWeightTable)
 

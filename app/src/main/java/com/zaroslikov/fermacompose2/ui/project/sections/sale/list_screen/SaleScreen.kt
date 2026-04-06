@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -9,16 +10,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainSaleTable
-import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.green_g_4
+import com.zaroslikov.fermacompose2.ui.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -34,7 +36,10 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleSaleN
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.white
@@ -54,6 +59,8 @@ fun SaleScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(blue_1, blue_2)
+    val iconRes = R.drawable.icon_expenses
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -79,10 +86,12 @@ fun SaleScreen(
             SaleContainer(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
+                iconRes = iconRes,
                 details = state.isGroup,
                 itemList = state.list,
                 searchList = state.searchList,
                 brieflyList = state.searchBrieflyList,
+                onDetailsCardClick = { viewModel.onIntent(SaleListIntent.OpenBottomSheetDetail(it)) },
                 onEditClick = {
                     viewModel.onIntent(
                         SaleListIntent.OpenBottomSheetEntry(true, it)
@@ -90,47 +99,82 @@ fun SaleScreen(
                 },
                 onDeleteClick = { viewModel.onIntent(SaleListIntent.Delete(it)) },
                 onDetailsClick = {
-                    viewModel.onIntent(
-                        SaleListIntent.OpenBottomSheetGroup(true, it)
-                    )
+                    viewModel.onIntent(SaleListIntent.OpenBottomSheetGroup(it))
                 }
             )
         if (state.isOpenBottomSheetEntry)
             SaleEntryBottomSheet(
                 colors = colors,
-                priceSuffix = state.priceSuffix,
+                priceSuffix = state.settings.currencySuffix,
                 state = state.currentProduct,
                 onIntent = viewModel::onIntent
             )
         if (state.isOpenBottomSheetGroup)
             BrieflyBottomSheetSale(
                 list = state.listBriefly,
-                titleProduct = state.currentBriefly.title,
-                count = state.currentBriefly.count,
-                suffix = state.currentBriefly.suffix,
-                countEntry = state.currentBriefly.rowCount,
-                onDismissRequest = { viewModel.onIntent(SaleListIntent.OpenBottomSheetGroup(false)) },
+                onDismissRequest = { viewModel.onIntent(SaleListIntent.OpenBottomSheetGroup(null)) },
                 onEditClick = {
                     viewModel.onIntent(
                         SaleListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
                 onDeleteClick = { viewModel.onIntent(SaleListIntent.Delete(it)) },
+                iconRes = iconRes,
+                color = colors.first(),
+                state = state.currentBriefly,
             )
+        if (state.isOpenBottomSheetDetail)
+            SaleDetailBottomSheet(
+                state = state.currentDetail,
+                colors = colors,
+                onIntent = viewModel::onIntent
+            )
+    }
+}
+
+@Composable
+private fun SaleDetailBottomSheet(
+    state: DomainSaleTable?,
+    colors: List<Color>,
+    onIntent: (SaleListIntent) -> Unit
+) {
+    state?.let {
+        val monthText = stringResource(id = monthToResString(state.month))
+        val date = dateBuilder(state.day, monthText, state.year)
+        DetailSectionBottomSheet(
+            title = state.title,
+            count = state.count,
+            countSuffix = state.countSuffix,
+            price = state.price,
+            priceAll = state.priceAll,
+            category = state.category,
+            buyer = state.buyer,
+            date = date,
+            note = state.note,
+            iconColor = blue_1,
+            animalCountId = state.animalCountId,
+            boxColor = Color(0xFFEFF6FF),
+            colors = colors,
+            onUpdateClick = { onIntent(SaleListIntent.OpenBottomSheetEntry(true, state)) },
+            onDeleteClick = { onIntent(SaleListIntent.Delete(state.id)) },
+            onDismissRequest = { onIntent(SaleListIntent.OpenBottomSheetDetail(null)) },
+        )
     }
 }
 
 @Composable
 private fun SaleContainer(
     modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int,
     details: Boolean,
     color: Color = blue_1,
     itemList: List<DomainSaleTable>,
     searchList: List<DomainSaleTable>,
-    brieflyList: List<BrieflySaleDomain>,
+    brieflyList: List<BrieflyItem>,
+    onDetailsCardClick: (Long) -> Unit,
     onEditClick: (DomainSaleTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
-    onDetailsClick: (BrieflySaleDomain) -> Unit
+    onDetailsClick: (String) -> Unit
 ) {
     InventoryBody(
         modifier = modifier,
@@ -145,16 +189,15 @@ private fun SaleContainer(
                 suffix = item.countSuffix,
                 price = item.priceAll ?: item.price,
                 priceSuffix = Suffix.RUBLE,
-                category = item.category,
                 note = item.note,
-                animal = "Murka",
                 color = color,
                 day = item.day,
                 month = item.month,
                 year = item.year,
                 buyer = item.buyer,
+                animalCountId = item.animalCountId,
                 colors = item.animalCountId?.let { listOf(white, green_g_4) },
-                onClick = { },
+                onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
@@ -162,21 +205,22 @@ private fun SaleContainer(
         brieflyCard = { item ->
             BrieflyCountCardNew(
                 modifier = Modifier,
-                titleProduct = item.title,
-                count = item.count,
-                suffix = item.suffix,
-                price = item.price,
-                priceSuffix = Suffix.RUBLE,
-                countEntry = item.rowCount,
+                title = item.title,
+                weight = item.weight,
+                linear = item.linear,
+                volume = item.volume,
+                icon = iconRes,
                 color = color,
                 colorSecondary = Color(0xFFEFF6FF),
-                onClick = { onDetailsClick(item) },
-                icon = R.drawable.icon_sale,
+                onClick = { onDetailsClick(item.title) },
+                price = item.price,
+                pieces = item.pieces,
+                rowCount = item.rowCount,
             )
         },
         titleRes = R.string.message_no_data_title_sale,
         messageRes = R.string.message_no_data_message_sale,
-        iconRes = R.drawable.icon_expenses,
+        iconRes = iconRes,
         iconColor = blue_1,
         backgroundColor = blue_3,
     )
@@ -184,47 +228,47 @@ private fun SaleContainer(
 
 @Composable
 private fun BrieflyBottomSheetSale(
+    @DrawableRes iconRes: Int,
     list: List<DomainSaleTable>,
     color: Color = blue_1,
-    titleProduct: String,
-    count: Double,
-    suffix: Suffix,
-    countEntry: Long,
+    state: BrieflyItem?,
     onEditClick: (DomainSaleTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    BrieflyBottomSheetUniversal(
-        list = list,
-        titleProduct = titleProduct,
-        count = count,
-        suffix = suffix,
-        countEntry = countEntry,
-        onDismissRequest = onDismissRequest,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        itemCard = { product ->
-
-            DetailProductCardNew(
-                modifier = Modifier,
-                isCardField = false,
-                count = product.count,
-                suffix = product.countSuffix,
-                price = product.price,
-                category = product.category,
-                note = product.note,
-                buyer = product.buyer,
-                color = color,
-                day = product.day,
-                month = product.month,
-                year = product.year,
-                colors = product.animalCountId?.let { listOf(white, green_g_4) },
-                onClick = {},
-                onDeleteClick = { onDeleteClick(product.id) },
-                onEditClick = { onEditClick(product) },
-            )
-        }
-    )
+    state?.let { currentBriefly ->
+        BrieflyBottomSheetUniversal(
+            list = list,
+            title = currentBriefly.title,
+            price = currentBriefly.price,
+            weight = currentBriefly.weight,
+            linear = currentBriefly.linear,
+            volume = currentBriefly.volume,
+            pieces = currentBriefly.pieces,
+            iconRes = iconRes,
+            onDismissRequest = onDismissRequest,
+            itemCard = { product ->
+                DetailProductCardNew(
+                    modifier = Modifier,
+                    isCardField = false,
+                    count = product.count,
+                    suffix = product.countSuffix,
+                    price = product.priceAll ?: product.price,
+                    note = product.note,
+                    buyer = product.buyer,
+                    color = color,
+                    day = product.day,
+                    month = product.month,
+                    year = product.year,
+                    animalCountId = product.animalCountId,
+                    colors = product.animalCountId?.let { listOf(white, green_g_4) },
+                    onClick = {},
+                    onDeleteClick = { onDeleteClick(product.id) },
+                    onEditClick = { onEditClick(product) },
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -276,6 +320,7 @@ private fun SaleEntryBottomSheet(
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product,
+            enabled = !state.isIndicatorsValue,
         )
         if (!state.isIndicatorsValue)
             WarehouseCountCard(

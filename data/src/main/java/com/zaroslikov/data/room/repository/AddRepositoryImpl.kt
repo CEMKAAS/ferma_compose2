@@ -1,16 +1,19 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.AddDao
+import com.zaroslikov.data.room.mapper.dto.add.toDomainAddItemDto
 import com.zaroslikov.data.room.mapper.dto.add.toDomainFastAddProduct
 import com.zaroslikov.data.room.mapper.dto.sale.toDomainCountSuffixPriceDate
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainAnimalCountSuffix
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainCountSuffix
 import com.zaroslikov.data.room.mapper.dto.toBrieflyAddDomain
 import com.zaroslikov.data.room.mapper.dto.toTitleAndSuffixDomain
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.toAddDomainMap
 import com.zaroslikov.data.room.mapper.toAddRoomMap
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
@@ -22,12 +25,20 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRepository {
+    override fun getAllAddTableForExport(): Flow<List<DomainAddTable>> {
+        return addDao.getAllAddTableForExport().map { it -> it.map { it.toAddDomainMap() } }
+    }
+
+    override suspend fun clearAndInsertAddTableForImport(domainAddTable: List<DomainAddTable>) {
+        return addDao.clearAndInsertAddTableForImport(domainAddTable.map { it.toAddRoomMap() })
+    }
+
     override fun getItem(id: Long): Flow<DomainAddTable> {
         return addDao.getItem(id).map { it.toAddDomainMap() }
     }
 
-    override fun getAllItems(id: Long): Flow<List<DomainAddTable>> {
-        return addDao.getAllItems(id).map { it -> it.map { it.toAddDomainMap() } }
+    override fun getAllItems(id: Long): Flow<List<DomainAddItemDto>> {
+        return addDao.getAllItems(id).map { it -> it.map { it.toDomainAddItemDto() } }
     }
 
     override fun getItemAdd(id: Long): Flow<DomainAddTable> {
@@ -41,9 +52,9 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
     override fun getBrieflyDetailsItemAdd(
         id: Long,
         name: String
-    ): Flow<List<DomainAddTable>> {
+    ): Flow<List<DomainAddItemDto>> {
         return addDao.getBrieflyDetailsItemAdd(id, name)
-            .map { it -> it.map { it.toAddDomainMap() } }
+            .map { it -> it.map { it.toDomainAddItemDto() } }
     }
 
     override fun getItemsTitleAddList(id: Long): Flow<List<TitleAndSuffixDomain>> {

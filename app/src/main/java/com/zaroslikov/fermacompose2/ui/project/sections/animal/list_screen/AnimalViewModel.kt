@@ -1,16 +1,21 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 
+import android.content.Context
+import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -18,6 +23,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,12 +62,13 @@ class AnimalViewModel @Inject constructor(
     private fun loadDate() {
         viewModelScope.launch {
             animalRepository.getAllAnimal(itemIdPT).collectLatest { list ->
+                val animalList = list.map { animal -> animal.toUi() }
                 updateState {
                     it.copy(
                         idPT = itemIdPT,
-                        list = list,
-                        searchList = list,
-                        archiveList = list,
+                        list = animalList,
+                        searchList = animalList,
+                        archiveList = animalList,
                         isLoading = false
                     )
                 }
@@ -188,7 +198,49 @@ class AnimalViewModel @Inject constructor(
                         animalId = idAnimal,
                         animalVaccinationId = null,
                         animalCountId = null,
+                        isFood = false,
                     ) else null
+    }
+
+    private suspend fun DomainAnimalWithCount.toUi(): AnimalListUi {
+        val animalCount = animalCountRepository.getCountAnimalLimit(id).first()
+        return AnimalListUi(
+            id = id,
+            name = name,
+            type = type,
+            date = getAgeFromDate(dateFactory ?: date),
+            isGroup = group,
+            sex = if (group) null else sex,
+            count = animalCount?.count?.let { if (it.toInt() > 1) it else null },
+            suffix = animalCount?.suffix ?: Suffix.KILOGRAM_DAY,
+            foodDay = foodDay,
+            foodDaySuffix = foodDaySuffix
+        )
+    }
+
+    fun getAgeFromDate(dateString: String): String {
+        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        val birthDate = LocalDate.parse(dateString, formatter)
+        val currentDate = LocalDate.now()
+
+        if (birthDate.isAfter(currentDate)) {
+            return "Дата в будущем"
+        }
+
+        val period = Period.between(birthDate, currentDate)
+        val years = period.years
+        val months = period.months
+
+        val yeatsString = resourceProvider.getString(R.string.date_years)
+        val monthsString = resourceProvider.getString(R.string.date_months)
+
+        return when {
+            years >= 1 -> "$years $yeatsString $months $monthsString"
+            else -> {
+                val totalMonths = ChronoUnit.MONTHS.between(birthDate, currentDate)
+                "$totalMonths $monthsString"
+            }
+        }
     }
 
     override fun update() {}

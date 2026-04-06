@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+
+    <!-- доступ к внутренним файлам -->
+    <files-path
+        name="files"
+        path="." />
+
+    <!-- доступ к cache -->
+    <cache-path
+        name="cache"
+        path="." />
+
+    <!-- доступ к внешнему storage (если нужен) -->
+    <external-files-path
+        name="external"
+        path="." />
+
+</paths>

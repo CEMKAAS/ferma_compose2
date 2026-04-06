@@ -160,8 +160,8 @@ fun DrawerItemsNew(
         IconTransaction2(
             sizeCard = 36.dp,
             icon = iconRes,
-            colorIcon = colorIcon,
-            color = color
+            iconColor = colorIcon,
+            boxColor = color
         )
         Column {
             Text(stringResource(titleRes), style = text_16, color = black_2)

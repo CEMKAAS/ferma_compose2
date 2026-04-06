@@ -4,13 +4,30 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.animal.AnimalVaccinationExpensesDto
 import com.zaroslikov.data.room.table.animal.AnimalVaccinationTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnimalVaccinationDao {
+    @Query("SELECT * from animal_vaccination_table")
+    fun getAllAnimalVaccinationTableForExport(): Flow<List<AnimalVaccinationTable>>
+
+    @Upsert
+    suspend fun insertAllAnimalVaccinationTable(data: List<AnimalVaccinationTable>)
+
+    @Query("DELETE FROM animal_vaccination_table")
+    suspend fun deleteAllAnimalVaccinationTable()
+
+    @Transaction
+    suspend fun clearAndInsertAnimalVaccinationForImport(animalVaccinationTable: List<AnimalVaccinationTable>) {
+        deleteAllAnimalVaccinationTable()
+        insertAllAnimalVaccinationTable(animalVaccinationTable)
+    }
+
     @Insert
     suspend fun insertAnimalVaccinationTable(animalVaccinationTable: AnimalVaccinationTable): Long
 

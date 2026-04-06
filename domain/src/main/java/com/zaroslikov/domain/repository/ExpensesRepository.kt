@@ -6,9 +6,14 @@ import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
+import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainIncubatorParameters
 import kotlinx.coroutines.flow.Flow
+import java.util.Currency
 
 interface ExpensesRepository {
+    fun getAllExpensesTableForExport(): Flow<List<DomainExpensesTable>>
+    suspend fun clearAndInsertExpensesTableForImport(domainExpensesTable: List<DomainExpensesTable>)
     fun getAllExpensesItems(id: Long): Flow<List<DomainExpensesTable>>
     fun getItemExpenses(id: Long): Flow<DomainExpensesTable>
     fun getItemExpensesIdAnimalCount(id: Long): Flow<DomainExpensesTable>
@@ -28,6 +33,7 @@ interface ExpensesRepository {
     suspend fun deleteExpensesById(id: Long)
 
     fun getExpenses(id: Long): Flow<Double> //Finance
+    fun getExpensesAllProject(currencySuffix: Suffix) : Flow<Double>
     fun getExpensesMountFin(
         id: Long,
         mount: Int,
@@ -48,6 +54,7 @@ interface ExpensesRepository {
     ): Flow<List<DomainTitleSuffixPrice>> //maybe
 
     fun getCurrentFoodWarehouse(id: Long): Flow<List<DomainExpensesTable>>
+    suspend fun updateFoodOnWriteOffWarehouse(id: Long)
     fun getAnalysisExpensesNewYearProject(
         id: Long,
         dateBegin: String,

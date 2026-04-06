@@ -15,7 +15,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +51,8 @@ import com.zaroslikov.fermacompose2.red_11
 import com.zaroslikov.fermacompose2.red_13
 import com.zaroslikov.fermacompose2.red_14
 import com.zaroslikov.fermacompose2.red_15
-import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
 import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
-import com.zaroslikov.fermacompose2.ui.elements.CardField
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedNumberNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNew
@@ -125,8 +122,8 @@ fun CompleteIncubationBottomSheet(
                     IconTransaction2(
                         sizeCard = 48.dp,
                         icon = R.drawable.outline_egg_24,
-                        colorIcon = orang_6,
-                        color = orang_5
+                        iconColor = orang_6,
+                        boxColor = orang_5
                     )
                     Column(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -353,8 +350,8 @@ fun CompleteIncubationBottomSheet2(
                         IconTransaction2(
                             sizeCard = 48.dp,
                             icon = R.drawable.icon_warning,
-                            colorIcon = red_14,
-                            color = red_15
+                            iconColor = red_14,
+                            boxColor = red_15
                         )
                         Column(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -458,8 +455,8 @@ private fun ProjectCard(
                 IconTransaction2(
                     sizeCard = 32.dp,
                     icon = R.drawable.outline_work_24,
-                    colorIcon = iconColor,
-                    color = iconBackgroundColor
+                    iconColor = iconColor,
+                    boxColor = iconBackgroundColor
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)

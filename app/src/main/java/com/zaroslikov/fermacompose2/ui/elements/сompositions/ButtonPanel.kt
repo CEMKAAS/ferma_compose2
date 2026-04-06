@@ -19,6 +19,9 @@ import androidx.compose.ui.zIndex
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.ui.elements.BorderButton
 import com.zaroslikov.fermacompose2.ui.elements.ButtonDelete
 import com.zaroslikov.fermacompose2.ui.elements.ButtonRefresh
 import com.zaroslikov.fermacompose2.ui.elements.ButtonStandart
@@ -100,6 +103,8 @@ fun ButtonPanelNew(
 @Composable
 fun ButtonPanelDetailNew(
     modifier: Modifier,
+    colors: List<Color> = listOf(price_green,  green_shamrock),
+    enabled: Boolean = true,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
 ) {
@@ -118,19 +123,23 @@ fun ButtonPanelDetailNew(
                 .padding(18.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            CloseButton(
-                iconRes = R.drawable.icon_edit,
-                text = R.string.button_edit,
-                onClick = onClickUpdate,
-                modifier = Modifier.weight(1f)
-            )
+
             GradientButton(
-                text = stringResource(R.string.button_delete),
-                iconRes = R.drawable.baseline_delete_24,
-                onClick = onClickDelete,
+                text = stringResource(R.string.button_edit),
+                iconRes = R.drawable.icon_edit,
+                onClick = onClickUpdate,
                 enabled = true,
                 modifier = Modifier.weight(1f),
-                colors = listOf(error_base, error_base)
+                colors = colors
+            )
+            BorderButton(
+                iconRes = R.drawable.baseline_delete_24,
+                iconColor = error_base,
+                text = stringResource(R.string.button_delete),
+                textColor = error_base,
+                enabled = enabled,
+                onClick = onClickDelete,
+                modifier = Modifier.weight(1f)
             )
         }
     }

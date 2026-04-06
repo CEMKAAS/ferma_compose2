@@ -2,6 +2,7 @@ package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.IncubatorParametersDao
 import com.zaroslikov.data.room.mapper.table.toDomainIncubatorParameters
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toIncubatorParameters
 import com.zaroslikov.domain.models.table.DomainIncubatorParameters
 import com.zaroslikov.domain.repository.IncubatorParametersRepository
@@ -12,17 +13,29 @@ import javax.inject.Inject
 
 class IncubatorParametersRepositoryImpl @Inject constructor(private val incubatorParametersDao: IncubatorParametersDao) :
     IncubatorParametersRepository {
+    override fun getAllIncubatorParameterTableForExport(): Flow<List<DomainIncubatorParameters>> {
+        return incubatorParametersDao.getAllIncubatorParametersTableForExport()
+            .map { it -> it.map { it.toDomainIncubatorParameters() } }
+    }
+
+    override suspend fun clearAndInsertIncubatorParametersTableForImport(domainIncubatorParameter: List<DomainIncubatorParameters>) {
+        return incubatorParametersDao.clearAndInsertIncubatorParametersForImport(
+            domainIncubatorParameter.map { it.toIncubatorParameters() })
+    }
+
     override fun getIncubatorListArh4(idPT: Long): Flow<List<DomainIncubatorParameters>> {
         return incubatorParametersDao.getIncubatorListArh4(idPT)
             .map { it -> it.map { it.toDomainIncubatorParameters() } }
     }
 
     override fun getIncubatorList(id: Long): Flow<List<DomainIncubatorParameters>> {
-        return incubatorParametersDao.getIncubatorList(id).map { it -> it.map { it.toDomainIncubatorParameters() } }
+        return incubatorParametersDao.getIncubatorList(id)
+            .map { it -> it.map { it.toDomainIncubatorParameters() } }
     }
 
     override fun getIncubatorList2(id: Long): Flow<List<DomainIncubatorParameters>> {
-        return incubatorParametersDao.getIncubatorList2(id).map { it -> it.map { it.toDomainIncubatorParameters() } }
+        return incubatorParametersDao.getIncubatorList2(id)
+            .map { it -> it.map { it.toDomainIncubatorParameters() } }
     }
 
     override fun getIncubator(id: Long): Flow<DomainIncubatorParameters> {
@@ -33,7 +46,8 @@ class IncubatorParametersRepositoryImpl @Inject constructor(private val incubato
         id: Long,
         day: Int
     ): Flow<DomainIncubatorParameters> {
-        return incubatorParametersDao.getIncubatorEditDay(id, day).map { it.toDomainIncubatorParameters() }
+        return incubatorParametersDao.getIncubatorEditDay(id, day)
+            .map { it.toDomainIncubatorParameters() }
     }
 
     override suspend fun insertIncubator(domainIncubatorParameters: DomainIncubatorParameters) {

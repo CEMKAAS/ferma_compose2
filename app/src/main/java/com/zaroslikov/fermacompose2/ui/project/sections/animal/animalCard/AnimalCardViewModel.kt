@@ -2,23 +2,29 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
+import com.zaroslikov.domain.models.table.DomainAnimalCount
+import com.zaroslikov.domain.models.table.DomainAnimalSize
+import com.zaroslikov.domain.models.table.DomainAnimalVaccination
+import com.zaroslikov.domain.models.table.DomainAnimalWeight
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
-import com.zaroslikov.domain.repository.WarehouseRepository
-import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
-import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
-import com.zaroslikov.fermacompose2.utils.ResourceProvider
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.component1
 
 
 @HiltViewModel
@@ -29,9 +35,8 @@ class AnimalCardViewModel @Inject constructor(
     private val animalCountRepository: AnimalCountRepository,
     private val animalWeightRepository: AnimalWeightRepository,
     private val animalVaccinationRepository: AnimalVaccinationRepository,
-    private val warehouseRepository: WarehouseRepository,
-    private val resourceProvider: ResourceProvider,
     private val addRepository: AddRepository,
+    private val settingsRepository: SettingsRepository
 ) : BaseViewModel2<AnimalCardState, AnimalCardIntent, AnimalCardReduce>(
     AnimalCardState(), AnimalCardReduce()
 ) {
@@ -54,15 +59,27 @@ class AnimalCardViewModel @Inject constructor(
     }
 
     private suspend fun loadData() {
-        val productList = addRepository.getProductAnimal(itemId).first()
         combine(
             animalRepository.getAnimal(itemId),
             animalCountRepository.getCountAnimalLimit(itemId),
             animalSizeRepository.getSizeAnimalLimit(itemId),
             animalVaccinationRepository.getVaccinationAnimalLimit(itemId),
-            animalWeightRepository.getWeightAnimalLimit(itemId)
-        ) { animal, count, size, vacc, weight ->
-            LoadDataAnimalCard(animal, count, size, vacc, weight)
+            animalWeightRepository.getWeightAnimalLimit(itemId),
+            addRepository.getProductAnimal(itemId),
+            settingsRepository.getSettings(itemIdPT)
+        ) { list ->
+            val productList = productsGetFromAnimalList(
+                list[5] as List<DomainAnimalCountSuffix>,
+                list[6] as DomainSettings
+            )
+
+            LoadDataAnimalCard(
+                list[0] as DomainAnimalTable,
+                list[1] as DomainAnimalCount?, list[2] as DomainAnimalSize?,
+                list[3] as DomainAnimalVaccination?, list[4] as DomainAnimalWeight?,
+                productList,
+                list[6] as DomainSettings
+            )
         }.collectLatest { data ->
             updateState { animal ->
                 animal.copy(
@@ -74,7 +91,8 @@ class AnimalCardViewModel @Inject constructor(
                     weight = data.weight,
                     itemId = itemId,
                     itemIdPT = itemIdPT,
-                    productList = productList
+                    productList = data.productList,
+                    settings = data.settings
                 )
             }
         }
@@ -92,5 +110,16 @@ class AnimalCardViewModel @Inject constructor(
             sendIntent(AnimalCardIntent.ArchiveAnimalPressed)
             animalRepository.updateAnimalTable(getState().animal)
         }
+    }
+
+    private fun productsGetFromAnimalList(
+        productList: List<DomainAnimalCountSuffix>,
+        domainSettings: DomainSettings
+    ): List<BrieflyItem> {
+        return productList
+            .groupBy { it.title }
+            .map { (title, items) ->
+                mapperToBrieflyItem(title, items, settings = domainSettings)
+            }
     }
 }

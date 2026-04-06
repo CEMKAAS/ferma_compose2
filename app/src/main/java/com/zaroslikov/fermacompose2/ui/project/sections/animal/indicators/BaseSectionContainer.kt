@@ -191,6 +191,8 @@ fun EntryBottomSheet(
 @Composable
 fun DetailBottomSheet(
     title: String,
+    colors: List<Color>,
+    enabledButton: Boolean = true,
     onDismissRequest: () -> Unit,
     onDeleteClick: () -> Unit,
     onUpdateClick: () -> Unit,
@@ -202,6 +204,8 @@ fun DetailBottomSheet(
         contentBottom = {
             ButtonPanelDetailNew(
                 modifier = Modifier.fillMaxWidth(),
+                colors = colors,
+                enabled = enabledButton,
                 onClickUpdate = onUpdateClick,
                 onClickDelete = onDeleteClick
             )

@@ -221,6 +221,7 @@ fun GradientButton(
         contentAlignment = Alignment.Center
     ) {
         Row(
+            modifier = Modifier.padding(paddingValues),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -233,7 +234,6 @@ fun GradientButton(
                 )
             }
             Text(
-                modifier = Modifier.padding(paddingValues),
                 text = text,
                 color = textColor,
                 style = text_14
@@ -247,7 +247,7 @@ fun BorderButton(
     modifier: Modifier = Modifier,
     text: String,
     @DrawableRes iconRes: Int? = null,
-    enable: Boolean = false,
+    enabled: Boolean = false,
     backgroundColor: Color = white,
     borderColor: Color = gray_8,
     textColor: Color = black,
@@ -263,7 +263,7 @@ fun BorderButton(
             .border(1.dp, color = borderColor, shape = shape)
             .background(color = backgroundColor, shape = shape)
             .then(
-                if (enable) Modifier else Modifier.clickable(onClick = onClick)
+                if (enabled) Modifier.clickable(onClick = onClick) else Modifier
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -276,13 +276,13 @@ fun BorderButton(
                 Icon(
                     painterResource(it),
                     contentDescription = null,
-                    tint = iconColor,
+                    tint = if (enabled) iconColor else iconColor.copy(alpha = 0.4f),
                     modifier = Modifier.size(iconSize)
                 )
             }
             Text(
                 text = text,
-                color = textColor,
+                color = if (enabled) textColor else textColor.copy(alpha = 0.4f),
                 style = text_14
             )
         }

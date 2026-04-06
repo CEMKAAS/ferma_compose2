@@ -3,6 +3,7 @@ package com.zaroslikov.data.room.repository
 import com.zaroslikov.data.room.dao.AnimalWeightDao
 import com.zaroslikov.data.room.mapper.table.toAnimalWeightTable
 import com.zaroslikov.data.room.mapper.table.toDomainAnimalWeight
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.domain.repository.AnimalWeightRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +12,14 @@ import javax.inject.Inject
 
 class AnimalWeightRepositoryImpl @Inject constructor(private val animalWeightDao: AnimalWeightDao) :
     AnimalWeightRepository {
+    override fun getAllAnimalWeightTableForExport(): Flow<List<DomainAnimalWeight>> {
+        return animalWeightDao.getAllAnimalWeightTableForExport()
+            .map { it -> it.map { it.toDomainAnimalWeight() } }
+    }
+
+    override suspend fun clearAndInsertAnimalWeightTableForImport(domainAnimalWeight: List<DomainAnimalWeight>) {
+        return animalWeightDao.clearAndInsertAnimalWeightTableForImport(domainAnimalWeight.map { it.toAnimalWeightTable() })
+    }
 
     override suspend fun insertAnimalWeightTable(animalWeightTable: DomainAnimalWeight) {
         return animalWeightDao.insertAnimalWeightTable(animalWeightTable.toAnimalWeightTable())

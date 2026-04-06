@@ -1,7 +1,9 @@
 package com.zaroslikov.domain.models.DomainAnimalTable
 
 import com.zaroslikov.domain.models.enums.Suffix
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DomainAnimalTable(
     val id: Long = 0,
     val name: String = "",

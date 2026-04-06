@@ -146,6 +146,7 @@ fun ExpensesEntryBottomSheet(
             onCountChange = { onIntent(ExpensesListIntent.CountChanged(it)) },
             countSuffix = state.countSuffix,
             onSuffixChange = { onIntent(ExpensesListIntent.SuffixClicked(it)) },
+            enabled = !state.isIndicatorsValue,
             isAutoCalculate = state.isAutoWeight,
             onAutoCalculate = { onIntent(ExpensesListIntent.AutoWeightClicked(it)) },
             weight = state.weight,

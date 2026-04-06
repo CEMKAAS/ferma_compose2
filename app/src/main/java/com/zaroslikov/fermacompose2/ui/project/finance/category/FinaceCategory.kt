@@ -393,8 +393,8 @@ fun WarningCard(
             if (colorIconBackground != null)
                 IconTransaction2(
                     icon = icon,
-                    color = colorIconBackground,
-                    colorIcon = colorIcon,
+                    boxColor = colorIconBackground,
+                    iconColor = colorIcon,
                     sizeCard = 32.dp
                 )
             else Icon(
@@ -507,8 +507,8 @@ private fun BottomSheet(
                     ) {
                         IconTransaction2(
                             icon = category.toTransactionDrawRes(),
-                            color = category.toColorIconBorderSecond(),
-                            colorIcon = category.toColorIconSecond(),
+                            boxColor = category.toColorIconBorderSecond(),
+                            iconColor = category.toColorIconSecond(),
                         )
                         Column(
                             verticalArrangement = Arrangement.Center,
@@ -765,8 +765,8 @@ private fun FinanceCategoryCard(
             ) {
                 IconTransaction2(
                     icon = category.toDrawRes(),
-                    color = category.toBorderCard(),
-                    colorIcon = category.toColorIconSecond()
+                    boxColor = category.toBorderCard(),
+                    iconColor = category.toColorIconSecond()
                 )
                 Text(stringResource(category.toTitleSecondResId()), style = text_16, color = dark)
             }

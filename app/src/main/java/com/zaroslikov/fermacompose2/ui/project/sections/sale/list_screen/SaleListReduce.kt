@@ -24,8 +24,10 @@ class SaleListReduce(
                 isSaveStateForEntry = intent.isSaveStateForBottomSheet,
                 entryState2 = intent.state
             ).updateValid()
+
             is SaleListIntent.SearchChanged -> state.updateSearch(intent.value)
             is SaleListIntent.GroupClicked -> state.updateGroup(intent.value)
+            is SaleListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
             is SaleListIntent.TitleChanged -> state.updateTitle(intent.value).updateValid()
             is SaleListIntent.TitleAndSuffixClicked ->
                 state.updateTitleAndSuffix(intent.title, intent.suffix).updateValid()
@@ -47,6 +49,23 @@ class SaleListReduce(
             is SaleListIntent.DateClicked -> state.updateDate(intent.value)
             is SaleListIntent.NoteChanged -> state.updateNote(intent.value)
             else -> state
+        }
+    }
+
+    private fun SaleListState.updateOpenBottomSheetDetail(
+        id: Long?
+    ): SaleListState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDetail = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDetail = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
         }
     }
 
@@ -199,7 +218,7 @@ class SaleListReduce(
         else
             briefly.filter { item ->
                 item.title.lowercase().contains(query) ||
-                        item.count.toString().lowercase().contains(query) ||
+                        item.weight?.value.toString().lowercase().contains(query) ||
                         (item.price).toString().lowercase().contains(query)
             }
         return copy(

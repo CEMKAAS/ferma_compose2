@@ -13,6 +13,7 @@ import com.zaroslikov.data.room.dao.AnimalDao
 import com.zaroslikov.data.room.dao.AnimalSizeDao
 import com.zaroslikov.data.room.dao.AnimalVaccinationDao
 import com.zaroslikov.data.room.dao.AnimalWeightDao
+import com.zaroslikov.data.room.dao.AppSettingsDao
 import com.zaroslikov.data.room.dao.BookmarkDao
 import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.dao.ExpensesDao
@@ -20,6 +21,7 @@ import com.zaroslikov.data.room.dao.FinanceDao
 import com.zaroslikov.data.room.dao.IncubatorParametersDao
 import com.zaroslikov.data.room.dao.IncubatorTableDao
 import com.zaroslikov.data.room.dao.NoteDao
+import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
@@ -30,6 +32,7 @@ import com.zaroslikov.data.room.table.animal.AnimalSizeTable
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.animal.AnimalVaccinationTable
 import com.zaroslikov.data.room.table.animal.AnimalWeightTable
+import com.zaroslikov.data.room.table.app.AppSettingsTable
 import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.data.room.table.ferma.ExpensesAnimalTable
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
@@ -40,6 +43,7 @@ import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
+import com.zaroslikov.data.room.table.profile.ProfileTable
 import com.zaroslikov.data.room.table.project.SettingsTable
 
 @Database(
@@ -60,6 +64,8 @@ import com.zaroslikov.data.room.table.project.SettingsTable
         IncubatorTable::class,
         BookmarkTable::class,
         IncubatorParameters::class,
+        AppSettingsTable::class,
+        ProfileTable::class,
     ],
     version = 4,
     exportSchema = false
@@ -89,6 +95,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun settingsDao(): SettingsDao
     abstract fun incubatorTableDao(): IncubatorTableDao
     abstract fun bookmarkTableDao(): BookmarkDao
+
+    abstract fun appSettingsDao(): AppSettingsDao
+    abstract fun profileTableDao(): ProfileDao
+
 
     companion object {
         @Volatile

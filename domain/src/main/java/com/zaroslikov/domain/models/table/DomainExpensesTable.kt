@@ -1,21 +1,23 @@
 package com.zaroslikov.domain.models
 
+import com.zaroslikov.domain.models.dto.BaseProductSection
 import com.zaroslikov.domain.models.enums.Suffix
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class DomainExpensesTable(
     val id: Long = 0,
-    val title: String, // название
-    val count: Double, // Кол-во
+    override val title: String, // название
+    override val count: Double, // Кол-во
+    override val countSuffix: Suffix,
     val day: Int,  // день
     val month: Int, // месяц
     val year: Int, // время
-    val price: Double,
-    val priceAll: Double? = null,
-    val countSuffix: Suffix,
+    override val price: Double,
+    override val priceAll: Double? = null,
     val category: String,
     val note: String,
-
+    val isFood: Boolean,
     val isShowFood: Boolean, // Показывать на складе еду
     val feedFood: Double? = null, // Ежедневный расход еды
     val feedFoodSuffix: Suffix? = null, // Суффикс ежедневного расхода
@@ -29,5 +31,5 @@ data class DomainExpensesTable(
     val animalId: Long? = null,
     val animalVaccinationId: Long? = null,
     val animalCountId: Long? = null,
-)
+) : BaseProductSection
 

@@ -2,7 +2,9 @@ package com.zaroslikov.domain.models.table
 
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DomainAnimalCount(
     val id: Long = 0,
     val count: String = "",

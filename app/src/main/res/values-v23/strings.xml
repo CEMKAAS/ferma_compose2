@@ -297,6 +297,17 @@
     <string name="drawer_sheer_about_app">О приложении</string>
     <string name="drawer_sheer_about_app_support">Версия и контакты</string>
 
+    //Profile
+    <string name="profile_screen_title">Профиль</string>
+    <string name="profile_screen_owner_of_farms">Владелец хозяйств</string>
+    <string name="profile_screen_current_balance">Текущий баланс</string>
+    <string name="profile_screen_analysis_project">Аналитика по проектам</string>
+    <string name="profile_screen_analysis_incubator">Аналитика по инкубаторам</string>
+    <string name="profile_screen_warning_title">Обратите внимание</string>
+    <string name="profile_screen_warning_text">В профиле отображается сводная информация по всем вашим проектам. Детальная аналитика доступна внутри каждого проекта.</string>
+    <string name="profile_screen_name">Имя</string>
+    <string name="profile_screen_name_support">К примеру: Фермер</string>
+
     //AboutApp
     <string name="about_app_screen_title">О приложении</string>
     <string name="about_app_screen_developer_zaroslikov">Разработчик: Заросликов Семён Николаевич</string>
@@ -331,6 +342,27 @@
     <string name="settings_screen_delete_all_projects_and_settings">Удалить все проекты и настройки</string>
     <string name="settings_screen_data_storage">Хранилище данных</string>
     <string name="settings_screen_data_storage_text">Все данные хранятся только на вашем устройстве</string>
+
+    <string name="settings_screen_export_data">Экспорт данных</string>
+    <string name="settings_screen_choice_save_data">Выберите способ сохранения</string>
+    <string name="settings_screen_save_in_device">Сохранить на устройство</string>
+    <string name="settings_screen_save_in_device_data">Скачать файл с данными</string>
+    <string name="settings_screen_send_file">Отправить файл</string>
+    <string name="settings_screen_send_file_data">Поделиться через приложения</string>
+
+
+    <string name="settings_screen_warning">Внимание!</string>
+    <string name="settings_screen_confirm_action">Подтвердите действие</string>
+    <string name="settings_screen_import_data_title">Импорт данных заменит все текущие проекты и настройки.</string>
+    <string name="settings_screen_import_data_text">Рекомендуем сначала создать резервную копию через "Экспорт данных". Это действие нельзя отменить.</string>
+    <string name="settings_screen_confirm_and_select_file">Подтвердить и выбрать файл</string>
+
+    <string name="settings_screen_warning_delete">Опасное действие!</string>
+    <string name="settings_screen_confirm_delete">Подтвердите удаление</string>
+    <string name="settings_screen_delete_data_title">Все данные будут безвозвратно удалены!</string>
+    <string name="settings_screen_delete_data_text">Будут удалены все проекты, животные, записи, склады, финансы и настройки. Восстановить данные будет невозможно.\nПеред удалением рекомендуем создать резервную копию через "Экспорт данных".</string>
+    <string name="settings_screen_delete_all_data">Да, удалить все данные</string>
+
 
     //StartScreen
     <string name="start_screen_title">Мое Хозяйство</string>
@@ -556,6 +588,10 @@
     <string name="warehouse_screen_warehouse_empty">Склад пуст</string>
     <string name="warehouse_screen_warehouse_empty_support_text">Все запасы распроданы или использованы</string>
     <string name="warehouse_screen_warehouse_empty_support_second_text">Добавьте товар, чтобы продолжить отслеживать остатки на складе</string>
+    <string name="warehouse_screen_warehouse_foods">Корма</string>
+    <string name="warehouse_screen_warehouse_write_off_food">Списать корм?</string>
+    <string name="warehouse_screen_warehouse_write_off_food_text">Вы собираетесь списать весь оставшийся корм:</string>
+    <string name="warehouse_screen_warehouse_food_write_off">Списание корма</string>
 
     //WarehouseEdit
     <string name="warehouse_edit_screen_title_add">Создание проекта</string>
@@ -573,6 +609,39 @@
     <string name="warehouse_edit_screen_linear_dimensions">Линейные размеры</string>
     <string name="warehouse_edit_screen_warning_title">О единицах измерения</string>
     <string name="warehouse_edit_screen_warning_text">Единицы измерения, выбранные, будут автоматически использоваться для конвертации продукции в указанные величины. Информация на складе, а также в разделах финансов и аналитики будет отображаться именно в этих единицах измерения.</string>
+
+
+    //BrieflyCard
+    <string name="briefly_card_row">Записи</string>
+
+    <string name="briefly_detail_card_analysis">Посмотреть полный анализ подукта</string>
+    <string name="briefly_detail_card_total_price">Общая стоимость:</string>
+
+
+    //DetailCard
+    <string name="detail_card_count">Количество</string>
+    <string name="detail_card_status_write_off">Причина списания</string>
+    <string name="detail_card_price">Стоимость</string>
+    <string name="detail_card_buyer">Покупатель</string>
+    <string name="detail_card_category">Категория</string>
+    <string name="detail_card_date">Дата</string>
+    <string name="detail_card_animal">Животное</string>
+    <string name="detail_card_note">Примечание</string>
+    <string name="detail_card_food">Корм</string>
+    <string name="detail_card_rest_food">Остаток корма</string>
+    <string name="detail_card_rest_weight">Осталось</string>
+    <string name="detail_card_weight">Всего корма</string>
+    <string name="detail_card_rest_day">Хватит на</string>
+    <string name="detail_card_day_end">Закончится</string>
+    <string name="detail_card_food_feel">Расход/день</string>
+    <string name="detail_card_food_animals">Привязанные животные:</string>
+    <string name="detail_card_food_indicators">Показатели:</string>
+    <string name="detail_card_animal_vaccination">Вакцинация</string>
+    <string name="detail_card_animal_vaccination_text">Этот товар ванкцинация, здесь вы можете изменить только его стоимость оснвую информацию нужно корректировать у самого животного </string>
+    <string name="detail_card_animal_warning">Животные</string>
+    <string name="detail_card_animal_warning_text">Этота позиция животное, здесь вы можете изменить только цену, основую информацию можно изменить в самом животном</string>
+    <string name="detail_card_animal_kill_warning">Продукция от забоя</string>
+    <string name="detail_card_animal_kill_warning_text">Этота позиция от забоя животного, осноную информацию можно изменить вы можете изменить здесь, кроме даты забоя</string>
 
     //Add
     <string name="add_screen_title_entry">Добавить продукцию</string>

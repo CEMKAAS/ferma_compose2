@@ -86,7 +86,7 @@ interface WarehouseDao {
                 " FROM (" +
                 "    SELECT title, count_suffix as suffix, SUM(count) AS ExpensesCount, 0 AS WriteOffCount, 0 AS SaleCount" +
                 "    FROM expenses_table" +
-                "    WHERE idPT = :id and is_show_food != 1" +
+                "    WHERE idPT = :id and is_food = 0" +
                 "    GROUP BY title" +
                 "    UNION ALL" +
                 "    SELECT title, count_suffix as suffix, 0 AS ExpensesCoun, SUM(count) AS WriteOffCount, 0 AS SaleCount" +

@@ -1,34 +1,41 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
 import androidx.compose.ui.graphics.Color
+import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
-import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.list.suffixWeightList
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 
 
 data class ExpensesListState(
+    val textSearch: String = "",
     val isGroup: Boolean = true,
     val idPT: Long = 0,
     val isOpenGroupBottomSheet: Boolean = false,
     val isOpenEntryBottomSheet: Boolean = false,
-    val currentBriefly: BrieflyExpensesDomain = BrieflyExpensesDomain(),
-    val list: List<ExpensesTableUi> = emptyList(),
-    val briefly: List<BrieflyExpensesDomain> = emptyList(),
-    val brieflyList: List<ExpensesTableUi> = emptyList(),
-    val textSearch: String = "",
-    val searchList: List<ExpensesTableUi> = emptyList(),
-    val searchBrieflyList: List<BrieflyExpensesDomain> = emptyList(),
+    val isOpenBottomSheetDetail: Boolean = false,
     val isSaveStateForEntry: Boolean = false,
-    val priceSuffix: Suffix = Suffix.RUBLE,
+
+    val currentDetail: ExpensesTableUi? = null,
+    val currentBriefly: BrieflyItem? = null,
+
+    val list: List<ExpensesTableUi> = emptyList(),
+    val briefly: List<BrieflyItem> = emptyList(),
+    val brieflyList: List<ExpensesTableUi> = emptyList(),
+    val searchList: List<ExpensesTableUi> = emptyList(),
+    val searchBrieflyList: List<BrieflyItem> = emptyList(),
+
+    val settings: DomainSettings = DomainSettings(),
     override val isEntry: Boolean = false,
     override val currentProduct: ExpensesEntryState2 = ExpensesEntryState2(),
     override val isLoading: Boolean = true,
@@ -61,6 +68,7 @@ data class ExpensesEntryState2(
     val date: String = dateToday(),
     val note: String = "",
 
+    val isShowFood: Boolean = false,
     val feedFood: String = "",
     val feedFoodSuffix: Suffix = Suffix.GRAM,
     val countAnimalFood: String = "",
@@ -78,6 +86,10 @@ data class ExpensesEntryState2(
     val suffixSet: Set<Suffix> = setOf(Suffix.GRAM, Suffix.KILOGRAM, Suffix.TONS),
     val pickList: PickExpensesList = PickExpensesList(),
     val error: ErrorExpenses = ErrorExpenses(),
+
+    val animalId: Long? = null,
+    val animalVaccinationId: Long? = null,
+    val animalCountId: Long? = null,
     override val hasAnyError: Boolean = false
 ) : BaseProduct()
 
@@ -94,6 +106,7 @@ data class ExpensesTableUi(
     val countSuffix: Suffix,
     val category: String,
     val note: String,
+    val isFood: Boolean,
     val isShowFood: Boolean, // Показывать на складе еду
     val feedFood: Double? = null, // Ежедневный расход еды
     val feedFoodSuffix: Suffix? = null, // Суффикс ежедневного расхода
@@ -117,7 +130,8 @@ data class Food(
     val weightAll: Double,
     val weightSuffix: Suffix,
     val percentFloat: Float,
-    val animalList: List<String>
+    val animalList: List<AnimalExpensesDomain>,
+    val remainingFood: Double
 )
 
 data class PickExpensesList(

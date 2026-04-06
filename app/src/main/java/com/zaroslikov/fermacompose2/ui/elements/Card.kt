@@ -13,13 +13,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -45,8 +48,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black
@@ -54,12 +57,6 @@ import com.zaroslikov.fermacompose2.black_1
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.black_3
 import com.zaroslikov.fermacompose2.blue_1
-import com.zaroslikov.fermacompose2.blue_3
-import com.zaroslikov.fermacompose2.blue_5
-import com.zaroslikov.fermacompose2.blue_6
-import com.zaroslikov.fermacompose2.blue_7
-import com.zaroslikov.fermacompose2.blue_8
-import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_7
@@ -72,17 +69,7 @@ import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
-import com.zaroslikov.fermacompose2.grey_3
-import com.zaroslikov.fermacompose2.marengo
-import com.zaroslikov.fermacompose2.orang_4
-import com.zaroslikov.fermacompose2.orang_5
-import com.zaroslikov.fermacompose2.orang_6
-import com.zaroslikov.fermacompose2.orang_7
 import com.zaroslikov.fermacompose2.price_green
-import com.zaroslikov.fermacompose2.red_1
-import com.zaroslikov.fermacompose2.red_2
-import com.zaroslikov.fermacompose2.red_3
-import com.zaroslikov.fermacompose2.red_4
 import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
@@ -90,14 +77,11 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.HeadingAnimalCard
 import com.zaroslikov.fermacompose2.ui.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
-import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.ValueItem
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
 import com.zaroslikov.fermacompose2.violet_1
-import com.zaroslikov.fermacompose2.violet_3
-import com.zaroslikov.fermacompose2.violet_5
-import com.zaroslikov.fermacompose2.violet_6
 import com.zaroslikov.fermacompose2.white
 
 
@@ -111,12 +95,10 @@ fun CardField(
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     isNecessarily: Boolean = false,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    row: Boolean = true,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    content: @Composable () -> Unit,
+    padding: PaddingValues = PaddingValues(20.dp),
+    elevation: Dp = 2.dp,
+    shape: Shape = RoundedCornerShape(14.dp),
+    contentColumn: @Composable (ColumnScope.() -> Unit)
 ) {
     val border = when {
         isError -> BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.error)
@@ -125,30 +107,17 @@ fun CardField(
     }
     Card(
         modifier = modifier.padding(vertical = 6.dp),
-        elevation = CardDefaults.cardElevation(2.dp),
+        shape = shape,
+        elevation = CardDefaults.cardElevation(elevation),
         colors = CardDefaults.cardColors(),
         border = border
     ) {
-        if (row) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = horizontalArrangement,
-                verticalAlignment = verticalAlignment
-            ) {
-                content()
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalAlignment = horizontalAlignment,
-                verticalArrangement = verticalArrangement
-            ) {
-                content()
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValues = padding),
+        ) {
+            contentColumn()
         }
     }
 }
@@ -159,11 +128,11 @@ fun CardFieldNew(
     modifier: Modifier = Modifier,
     colors: List<Color>? = null,
     padding: PaddingValues = PaddingValues(20.dp),
-    onClick: () -> Unit = { },
-    contentColumn: @Composable (ColumnScope.() -> Unit),
+    elevation: Dp = 5.dp,
+    shape: Shape = RoundedCornerShape(14.dp),
+    onClick: () -> Unit,
+    contentColumn: @Composable ColumnScope.() -> Unit
 ) {
-    val shape = RoundedCornerShape(14.dp)
-
     Card(
         onClick = { onClick() },
         colors = CardDefaults.cardColors(
@@ -171,18 +140,29 @@ fun CardFieldNew(
         ),
         shape = shape,
         modifier = modifier,
-        elevation = CardDefaults.cardElevation( // Добавляем тень
-            defaultElevation = 5.dp
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = elevation
         )
     ) {
-        Box(
-            Modifier.then(
-                colors?.let { colors ->
-                    val gradient = Brush.linearGradient(colors)
-                    Modifier.background(gradient, shape = shape)
-                } ?: Modifier
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
         ) {
+            if (colors != null) {
+                Box(
+                    modifier = Modifier
+                        .width(6.dp)
+                        .fillMaxHeight()
+                        .background(
+                            brush = Brush.verticalGradient(colors),
+                            shape = RoundedCornerShape(
+                                topStart = 14.dp,
+                                bottomStart = 14.dp
+                            )
+                        )
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -197,28 +177,21 @@ fun CardFieldNew(
 @Composable
 fun CardFieldNew(
     modifier: Modifier = Modifier,
+    containerColor: Color = white,
     colors: List<Color>? = null,
     padding: PaddingValues = PaddingValues(20.dp),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    contentRow: @Composable (RowScope.() -> Unit)? = null,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    contentColumn: @Composable (ColumnScope.() -> Unit)? = null
+    elevation: Dp = 2.dp,
+    shape: Shape = RoundedCornerShape(14.dp),
+    contentColumn: @Composable ColumnScope.() -> Unit
 ) {
-    val modifierCard = Modifier
-        .fillMaxWidth()
-        .padding(padding)
-
-    val shape = RoundedCornerShape(14.dp)
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = white
+            containerColor = containerColor
         ),
         shape = shape,
         modifier = modifier,
         elevation = CardDefaults.cardElevation( // Добавляем тень
-            defaultElevation = 5.dp
+            defaultElevation = elevation
         )
     ) {
         Box(
@@ -235,22 +208,12 @@ fun CardFieldNew(
                 } ?: Modifier
             )
         ) {
-            when {
-                contentRow != null -> Row(
-                    modifier = modifierCard,
-                    horizontalArrangement = horizontalArrangement,
-                    verticalAlignment = verticalAlignment
-                ) {
-                    contentRow()
-                }
-
-                contentColumn != null -> Column(
-                    modifier = modifierCard,
-                    horizontalAlignment = horizontalAlignment,
-                    verticalArrangement = verticalArrangement
-                ) {
-                    contentColumn()
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(padding)
+            ) {
+                contentColumn()
             }
         }
     }
@@ -515,101 +478,107 @@ fun DetailProductCardNew(
     buyer: String? = null,
     food: Food? = null,
     colors: List<Color>? = null,
+    animalVaccinationId: Long? = null,
+    animalCountId: Long? = null,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
+    onDeleteClick: (() -> Unit)?,
     isCardField: Boolean = true
 ) {
     val monthText = stringResource(id = monthToResString(month))
     val date = dateBuilder(day, monthText, year)
 
+    val onDeleteProductClick =
+        if (animalVaccinationId != null || animalCountId != null) null else onDeleteClick
+
     val cardField: @Composable () -> Unit = {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                title?.let {
-                    Text(
-                        text = it,
-                        style = textBold_16,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    title?.let {
+                        Text(
+                            text = it,
+                            style = textBold_16,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    CountColorCard(count, suffix, color)
+                    price?.let {
+                        CountColorCard(it, priceSuffix, price_green)
+                    }
+                }
+                DropdownMenuEdit(
+                    onEditClick = onEditClick,
+                    onDeleteClick = onDeleteProductClick
+                )
+            }
+            statusWriteOff?.let { status ->
+                val (iconRes, valueString) = if (status)
+                    R.drawable.baseline_cottage_24 to R.string.ration_button_own_needs
+                else
+                    R.drawable.baseline_delete_24 to R.string.ration_button_disposal
+                IconAndTextNew(
+                    iconRes = iconRes,
+                    valueString = stringResource(valueString),
+                    iconColor = if (status) violet_1 else error_base,
+                )
+            }
+            category.takeUnless { it == "Без категории" /*|| it.isEmpty()*/ }
+                ?.let { category ->
+                    IconAndTextNew(
+                        iconRes = R.drawable.baseline_format_list_bulleted_24,
+                        valueString = category,
+                        iconColor = color
                     )
                 }
-                CountColorCard(count, suffix, color)
-                price?.let {
-                    CountColorCard(it, priceSuffix, price_green)
-                }
-            }
-            DropdownMenuEdit(
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick
-            )
-        }
-        statusWriteOff?.let { status ->
-            val (iconRes, valueString) = if (status)
-                R.drawable.baseline_cottage_24 to R.string.ration_button_own_needs
-            else
-                R.drawable.baseline_delete_24 to R.string.ration_button_disposal
-            IconAndTextNew(
-                iconRes = iconRes,
-                valueString = stringResource(valueString),
-                iconColor = if (status) violet_1 else error_base,
-            )
-        }
-        category.takeUnless { it == "Без категории" /*|| it.isEmpty()*/ }
-            ?.let { category ->
+            buyer?.let {
                 IconAndTextNew(
-                    iconRes = R.drawable.baseline_format_list_bulleted_24,
-                    valueString = category,
+                    iconRes = R.drawable.baseline_person_24,
+                    valueString = it,
                     iconColor = color
                 )
             }
-        buyer?.let {
             IconAndTextNew(
-                iconRes = R.drawable.baseline_person_24,
-                valueString = it,
+                iconRes = R.drawable.baseline_calendar_month_24,
+                valueString = date,
                 iconColor = color
             )
+            if (animal != null)
+                IconAndTextNew(
+                    iconRes = R.drawable.baseline_pets_24,
+                    valueString = animal,
+                    iconColor = color
+                )
+            food?.let { food ->
+                SliderFood(
+                    feedFood = food.feedFood,
+                    feedFoodSuffix = food.feedFoodSuffix,
+                    daysEnd = food.daysEnd,
+                    weightAll = food.weightAll,
+                    weightSuffix = food.weightSuffix,
+                    percentFloat = food.percentFloat,
+                    animalList = food.animalList
+                )
+            }
+            if (note != "") NoteColorCard(note, color)
         }
-        IconAndTextNew(
-            iconRes = R.drawable.baseline_calendar_month_24,
-            valueString = date,
-            iconColor = color
-        )
-//                if (addProduct.animal != "")
-//                    IconAndText(
-//                        iconRes = R.drawable.baseline_pets_24,
-//                        valueString = addProduct.animal
-//                    )
-        food?.let { food ->
-            SliderFood(
-                feedFood = food.feedFood,
-                feedFoodSuffix = food.feedFoodSuffix,
-                daysEnd = food.daysEnd,
-                weightAll = food.weightAll,
-                weightSuffix = food.weightSuffix,
-                percentFloat = food.percentFloat,
-                animalList = food.animalList
-            )
-        }
-        if (note != "") NoteColorCard(note, color)
     }
 
-    if (isCardField) CardFieldNew(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            },
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        colors = colors
-    ) { cardField() } else BorderCard { cardField() }
+    if (isCardField)
+        CardFieldNew(
+            modifier = modifier,
+            colors = colors,
+            onClick = onClick
+        ) { cardField() }
+    else BorderCard { cardField() }
 }
 
 @Composable
@@ -620,7 +589,7 @@ private fun SliderFood(
     weightAll: Double,
     weightSuffix: Suffix,
     percentFloat: Float,
-    animalList: List<String>
+    animalList: List<AnimalExpensesDomain>
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -631,7 +600,7 @@ private fun SliderFood(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             animalList.forEach {
-                AnimalFoodClips(it)
+                AnimalFoodClips(it.name)
             }
         }
         Row(
@@ -764,52 +733,79 @@ fun ColorCard(
 @Composable
 fun BrieflyCountCardNew(
     modifier: Modifier = Modifier,
-    titleProduct: String,
-    count: Double,
-    suffix: Suffix,
-    countEntry: Long,
-    price: Double? = null,
-    priceSuffix: Suffix = Suffix.PIECES,
+    title: String,
+    price: Pair<Double, Suffix>?,
+    weight: ValueItem?,
+    linear: ValueItem?,
+    volume: ValueItem?,
+    pieces: ValueItem?,
+    rowCount: Int,
     color: Color,
     colorSecondary: Color,
-    icon: Int,
+    @DrawableRes icon: Int,
     onClick: () -> Unit
 ) {
     CardFieldNew(
-        modifier = modifier
-            .clickable { onClick() }
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentRow = {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = colorSecondary
-                ),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Icon(
-                    painterResource(icon),
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.padding(8.dp),
-                )
-            }
-            TextLine(
-                modifier = Modifier.weight(1f),
-                valueString = titleProduct,
-                textStyle = textBold_20
-            )
+        modifier = modifier,
+        onClick = onClick,
+        contentColumn = {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    CountColorCard(count, suffix, color)
-                    price?.let {
-                        CountColorCard(it, priceSuffix, price_green)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorSecondary
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(
+                            painterResource(icon),
+                            contentDescription = null,
+                            tint = color,
+                            modifier = Modifier.padding(8.dp),
+                        )
                     }
-                    Text(text = "$countEntry Записи", style = text_12)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        TextLine(
+                            valueString = title,
+                            textStyle = textBold_20
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            listOfNotNull(weight, volume, linear, pieces).forEach {
+                                CountColorCard(
+                                    it.value.first,
+                                    it.value.second,
+                                    it.value.second.toColorList()
+                                )
+                            }
+                        }
+                    }
                 }
-                IconButton(onClick = onClick) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                        price?.let {
+                            CountColorCard(it.first, it.second, price_green)
+                        }
+                        Text(
+                            text = "$rowCount ${stringResource(R.string.briefly_card_row)}",
+                            style = text_12,
+                            color = gray_7
+                        )
+                    }
                     Icon(
                         painterResource(R.drawable.outline_keyboard_arrow_right_24),
                         contentDescription = null,
@@ -822,7 +818,7 @@ fun BrieflyCountCardNew(
 }
 
 @Composable
-private fun AnimalFoodClips(
+fun AnimalFoodClips(
     nameAnimal: String
 ) {
     BorderCard(
@@ -1003,8 +999,6 @@ fun CardClips(
 }
 
 
-
-
 @Composable
 fun CardIndicationChange(
     value: String,
@@ -1017,7 +1011,6 @@ fun CardIndicationChange(
         value = "$value ${stringResource(suffix.toResId())}",
     )
 }
-
 
 
 @Composable
@@ -1107,14 +1100,66 @@ fun ProductKillInfoCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                IconText(number = number.toString(), colorBackground = green_4, colorText = green_2)
+                IconText(
+                    number = number.toString(),
+                    colorBackground = green_4,
+                    colorText = green_2
+                )
                 Text(name, style = text_14, color = black_1)
             }
+
             CountColorCard(
                 count = value.toDouble(),
                 suffix = suffix,
                 colorCard = suffix.toColorList()
             )
+        }
+    }
+}
+
+@Composable
+fun ProductKillInfoCard(
+    number: Int,
+    name: String,
+    weight: ValueItem?,
+    linear: ValueItem?,
+    volume: ValueItem?,
+    pieces: ValueItem?,
+) {
+    BorderCard(
+        padding = PaddingValues(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                IconText(
+                    number = number.toString(),
+                    colorBackground = green_4,
+                    colorText = green_2
+                )
+                Text(name, style = text_14, color = black_1)
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                listOfNotNull(weight, volume, linear, pieces).forEach {
+                    CountColorCard(
+                        it.value.first,
+                        it.value.second,
+                        it.value.second.toColorList()
+                    )
+                }
+
+            }
         }
     }
 }
@@ -1126,9 +1171,7 @@ fun SecondAnimalCard(
     @StringRes intRes: Int,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    CardFieldNew(
-        modifier = modifier
-    ) {
+    CardFieldNew {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -1314,8 +1357,8 @@ fun InfoCard(
             ) {
                 IconTransaction2(
                     icon = icon,
-                    color = colorIconBackground,
-                    colorIcon = colorIcon,
+                    boxColor = colorIconBackground,
+                    iconColor = colorIcon,
                     sizeCard = 32.dp
                 )
                 Text(stringResource(title), style = text_14, color = colorTitle)

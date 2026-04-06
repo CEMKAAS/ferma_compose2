@@ -5,18 +5,37 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.incubator.CountRejectedCountDto
+import com.zaroslikov.data.room.dto.incubator.FinanceAllIncubator
 import com.zaroslikov.data.room.dto.incubator.FinanceIncubatorHistoryDto
 import com.zaroslikov.data.room.dto.incubator.FinanceIncubatorMainDto
 import com.zaroslikov.data.room.dto.incubator.TitleCountDto
 import com.zaroslikov.data.room.dto.incubator.TypeEggCountDto
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BookmarkDao {
+    @Query("SELECT * from bookmark_incubator")
+    fun getAllBookmarkIncubatorTableForExport(): Flow<List<BookmarkTable>>
+
+    @Upsert
+    suspend fun insertAllBookmarkTable(data: List<BookmarkTable>)
+
+    @Query("DELETE FROM bookmark_incubator")
+    suspend fun deleteAllBookmarkTable()
+
+    @Transaction
+    suspend fun clearAndInsertBookmarkTableForImport(bookmarkTable: List<BookmarkTable>) {
+        deleteAllBookmarkTable()
+        insertAllBookmarkTable(bookmarkTable)
+    }
+
     @Query("SELECT * FROM bookmark_incubator WHERE id = :id")
     fun getBookmark(id: Long): Flow<BookmarkTable>
 
@@ -52,8 +71,10 @@ interface BookmarkDao {
     @Query("SELECT * FROM bookmark_incubator WHERE type =:type and is_activity_bookmark = 0 and idPT =:idPT")
     fun getBookmarkList(type: TypeEgg, idPT: Long): Flow<List<BookmarkTable>>
 
-    @Query("SELECT * FROM bookmark_incubator WHERE is_activity_bookmark = 0 and idPT =:idPT " +
-            " ORDER BY strftime('%Y-%m-%d', substr(end_date, 7, 4) || '-' || substr(end_date, 4, 2) || '-' || substr(end_date, 1, 2)) DESC, id DESC")
+    @Query(
+        "SELECT * FROM bookmark_incubator WHERE is_activity_bookmark = 0 and idPT =:idPT " +
+                " ORDER BY strftime('%Y-%m-%d', substr(end_date, 7, 4) || '-' || substr(end_date, 4, 2) || '-' || substr(end_date, 1, 2)) DESC, id DESC"
+    )
     fun getBookmarkListByIdPT(idPT: Long): Flow<List<BookmarkTable>>
 
     @Query(
@@ -103,6 +124,19 @@ interface BookmarkDao {
                 " ORDER BY strftime('%Y-%m-%d', substr(end_date, 7, 4) || '-' || substr(end_date, 4, 2) || '-' || substr(end_date, 1, 2)) DESC, id DESC"
     )
     fun getFinanceIncubatorList(idPT: Long): Flow<List<FinanceIncubatorHistoryDto>>
+
+
+    @Query(
+        "SELECT " +
+                " SUM(COALESCE(chick_price, 0.0) * (count - rejected_count)) AS income, " +
+                " SUM(count * COALESCE(price_all, b.price, 0.0)) + COALESCE(i.price, 0.0) AS expenses, " +
+                " SUM(count - rejected_count) AS posted_egg, " +
+                " SUM(rejected_count) AS losses_egg " +
+                " FROM bookmark_incubator b " +
+                " JOIN incubator_table i ON i.id = b.idPT " +
+                " WHERE b.is_activity_bookmark = 0 AND i.currency_suffix = :currencySuffix"
+    )
+    fun getFinanceIncubatorAllProject(currencySuffix: Suffix): Flow<FinanceAllIncubator>
 
     @Query("SELECT * FROM bookmark_incubator WHERE is_activity_bookmark = 1 and idPT =:idPT")
     fun getActivityBookmark(idPT: Long): Flow<BookmarkTable?>

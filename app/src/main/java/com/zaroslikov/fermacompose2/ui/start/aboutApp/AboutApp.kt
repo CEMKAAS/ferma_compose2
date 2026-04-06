@@ -230,8 +230,8 @@ private fun Contact(
                 IconTransaction2(
                     sizeCard = 36.dp,
                     icon = icon,
-                    colorIcon = colorIcon,
-                    color = color
+                    iconColor = colorIcon,
+                    boxColor = color
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(2.dp)

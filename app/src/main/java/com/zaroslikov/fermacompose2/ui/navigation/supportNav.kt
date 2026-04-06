@@ -31,3 +31,8 @@ fun nav(route: String, itemOne: String, itemTwo: String, itemThree: String) =
 sealed class UiEvent {
     data object NavigateBack : UiEvent()
 }
+
+
+sealed class EventFile {
+    data class File(val value: String) : EventFile()
+}

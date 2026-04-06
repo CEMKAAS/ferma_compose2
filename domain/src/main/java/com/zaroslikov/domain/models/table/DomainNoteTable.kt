@@ -1,5 +1,8 @@
 package com.zaroslikov.domain.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DomainNoteTable(
     val id: Long = 0,
     val title: String ="",

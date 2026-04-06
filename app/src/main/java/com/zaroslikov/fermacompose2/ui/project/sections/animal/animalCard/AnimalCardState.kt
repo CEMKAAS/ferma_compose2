@@ -7,8 +7,10 @@ import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 
 data class AnimalCardState(
     val isOpenArchiveDialog: Boolean = false,
@@ -17,14 +19,15 @@ data class AnimalCardState(
     val size: DomainAnimalSize? = DomainAnimalSize(),
     val countAnimal: DomainAnimalCount? = DomainAnimalCount(),
     val vaccination: DomainAnimalVaccination? = DomainAnimalVaccination(),
+    val productList: List<BrieflyItem> = emptyList(),
     val age: String = "",
     val price: Double? = 0.0,
     val buyerList: List<String> = emptyList(),
     val itemIdPT: Long = 0,
     val itemId: Long = 0,
+    val settings: DomainSettings = DomainSettings(),
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
-    val productList: List<DomainAnimalCountSuffix> = emptyList()
 ) : BaseState
 
 data class LoadDataAnimalCard(
@@ -32,5 +35,7 @@ data class LoadDataAnimalCard(
     val count: DomainAnimalCount?,
     val size: DomainAnimalSize?,
     val vacc: DomainAnimalVaccination?,
-    val weight: DomainAnimalWeight?
+    val weight: DomainAnimalWeight?,
+    val productList: List<BrieflyItem>,
+    val settings: DomainSettings
 )

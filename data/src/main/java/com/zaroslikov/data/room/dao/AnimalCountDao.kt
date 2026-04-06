@@ -1,16 +1,32 @@
 package com.zaroslikov.data.room.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.animal.AnimalCountPriceDto
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnimalCountDao {
+    @Query("SELECT * from animal_count_table")
+    fun getAllAnimalCountTableForExport(): Flow<List<AnimalCountTable>>
+
+    @Upsert
+    suspend fun insertAllAnimalCountTable(data: List<AnimalCountTable>)
+
+    @Query("DELETE FROM animal_count_table")
+    suspend fun deleteAllAnimalCountTable()
+
+    @Transaction
+    suspend fun clearAndInsertAnimalCountTableForImport(animalCountTable: List<AnimalCountTable>) {
+        deleteAllAnimalCountTable()
+        insertAllAnimalCountTable(animalCountTable)
+    }
+
     @Insert
     suspend fun insertAnimalCountTable(animalCountTable: AnimalCountTable): Long
 

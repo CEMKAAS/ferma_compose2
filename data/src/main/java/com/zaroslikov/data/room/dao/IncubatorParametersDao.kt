@@ -4,12 +4,30 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.table.incubator.IncubatorParameters
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface IncubatorParametersDao {
+
+    @Query("SELECT * from incubator_parameters")
+    fun getAllIncubatorParametersTableForExport(): Flow<List<IncubatorParameters>>
+
+    @Upsert
+    suspend fun insertAllIncubatorParameters(data: List<IncubatorParameters>)
+
+    @Query("DELETE FROM incubator_parameters")
+    suspend fun deleteAllIncubatorParameters()
+
+    @Transaction
+    suspend fun clearAndInsertIncubatorParametersForImport(incubatorParameters: List<IncubatorParameters>) {
+        deleteAllIncubatorParameters()
+        insertAllIncubatorParameters(incubatorParameters)
+    }
+
     @Query("SELECT * from incubator_parameters Where idPT =:idPT")
     fun getIncubatorListArh4(idPT: Long): Flow<List<IncubatorParameters>>
 

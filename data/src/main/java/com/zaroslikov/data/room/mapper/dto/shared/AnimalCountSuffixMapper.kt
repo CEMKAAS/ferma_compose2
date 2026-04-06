@@ -8,6 +8,8 @@ fun AnimalCountSuffixDto.toDomainAnimalCountSuffix(): DomainAnimalCountSuffix {
         title = this.title,
         type = this.type,
         count = this.count,
-        suffix = this.suffix,
+        countSuffix = this.suffix,
+        price = null,
+        priceAll = null,
     )
 }

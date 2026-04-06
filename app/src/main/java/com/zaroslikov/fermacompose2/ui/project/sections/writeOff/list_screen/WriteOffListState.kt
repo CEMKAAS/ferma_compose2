@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen
 
+import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
@@ -13,6 +14,7 @@ import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 
 data class WriteOffListState(
     val textSearch: String = "",
@@ -20,19 +22,24 @@ data class WriteOffListState(
     val idPT: Long = 0,
     val isOpenGroupBottomSheet: Boolean = false,
     val isOpenEntryBottomSheet: Boolean = false,
-    val currentBriefly: BrieflyWriteOffDomain = BrieflyWriteOffDomain(),
-    val list: List<DomainWriteOffTable> = emptyList(),
-    val briefly: List<BrieflyWriteOffDomain> = emptyList(),
-    val searchList: List<DomainWriteOffTable> = emptyList(),
-    val searchBrieflyList: List<BrieflyWriteOffDomain> = emptyList(),
-    val listBriefly: List<DomainWriteOffTable> = emptyList(),
+    val isOpenBottomSheetDetail: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
+
+    val currentDetail: DomainWriteOffTable? = null,
+    val currentBriefly: BrieflyItem? = null,
+
+    val list: List<DomainWriteOffTable> = emptyList(),
+    val briefly: List<BrieflyItem> = emptyList(),
+    val listBriefly: List<DomainWriteOffTable> = emptyList(),
+    val searchList: List<DomainWriteOffTable> = emptyList(),
+    val searchBrieflyList: List<BrieflyItem> = emptyList(),
+
+    val settings: DomainSettings = DomainSettings(),
+    val writeOffBoolean: Boolean = false,
     override val isEntry: Boolean = false,
     override val currentProduct: WriteOffEntryState2 = WriteOffEntryState2(),
     override val isLoading: Boolean = false,
-    override val navigate: UiEvent? = null,
-    val writeOffBoolean: Boolean = false,
-    val priceSuffix: Suffix = Suffix.RUBLE
+    override val navigate: UiEvent? = null
 ) : EntryNewState()
 
 data class WriteOffEntryState2(
@@ -69,7 +76,7 @@ data class ErrorWriteOff(
 
 data class LoadDataWriteOffList(
     val addList: List<DomainWriteOffTable>,
-    val briefly: List<BrieflyWriteOffDomain>,
+    val briefly: List<BrieflyItem>,
     val titleList: List<TitleAndSuffixDomain>,
     val settings: DomainSettings
 )

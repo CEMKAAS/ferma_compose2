@@ -5,12 +5,10 @@ import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 sealed class ExpensesListIntent : BaseIntent {
-    data class OpenBottomSheetGroup(
-        val value: Boolean,
-        val currentBriefly: BrieflyExpensesDomain = BrieflyExpensesDomain()
-    ) : ExpensesListIntent()
+    data class OpenBottomSheetGroup(val title: String? = null) : ExpensesListIntent()
 
     data class OpenEntryBottomSheetByItem(
         val value: Boolean,
@@ -25,6 +23,12 @@ sealed class ExpensesListIntent : BaseIntent {
     ) :
         ExpensesListIntent()
     data class RefreshWarehouseCount(val value: List<DomainCountSuffix>): ExpensesListIntent()
+
+    data class OpenBottomSheetDetail(
+        val value: Long? = null
+    ) :  ExpensesListIntent()
+
+
     data class FoodClicked(val value: Boolean) : ExpensesListIntent()
     data class PercentClicked(val value: Boolean) : ExpensesListIntent()
     data object EquallyClicked : ExpensesListIntent()

@@ -3,6 +3,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -12,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
@@ -21,17 +23,19 @@ import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_3
-import com.zaroslikov.fermacompose2.orang_8
+import com.zaroslikov.fermacompose2.ui.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
-import com.zaroslikov.fermacompose2.white
 
 object ExpensesDestination : NavigationDestination {
     override val route = "expenses"
@@ -43,20 +47,13 @@ object ExpensesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreen(
-    /* modifier: Modifier = Modifier,
-     navigateToStart: () -> Unit,
-     navigateToModalSheet: (DrawerNavigation) -> Unit,
-     navigateToItemUpdate: (Pair<Long, Long>) -> Unit,
-     navigateToItemAdd: (Long) -> Unit,
-     drawerState: DrawerState,*/
     viewModel: ExpensesViewModel = hiltViewModel()
-    /* state: AddListState,
-     onIntent: (AddListIntent) -> Unit*/
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(orang_1, orang_2)
     val primeColor = orang_1
+    val iconRes = R.drawable.icon_sale
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -77,18 +74,28 @@ fun ExpensesScreen(
             }
         }
     ) { innerPadding ->
-        if (state.isLoading) {
+        if (state.isLoading)
             CircularProgress(
                 modifier = Modifier.padding(innerPadding),
             )
-        } else {
+        else
             ExpensesContainer(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
                 color = primeColor,
+                iconRes = iconRes,
                 itemList = state.list,
                 searchList = state.searchList,
                 brieflyList = state.searchBrieflyList,
+                priceSuffix = state.settings.currencySuffix,
+                details = state.isGroup,
+                onDetailsCardClick = {
+                    viewModel.onIntent(
+                        ExpensesListIntent.OpenBottomSheetDetail(
+                            it
+                        )
+                    )
+                },
                 onEditClick = {
                     viewModel.onIntent(
                         ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
@@ -97,57 +104,102 @@ fun ExpensesScreen(
                 onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete(it)) },
                 onDetailsClick = {
                     viewModel.onIntent(
-                        ExpensesListIntent.OpenBottomSheetGroup(true, it)
+                        ExpensesListIntent.OpenBottomSheetGroup(it)
+                    )
+                }
+            )
+
+        if (state.isOpenEntryBottomSheet)
+            ExpensesEntryBottomSheet(
+                colors = colors,
+                state = state.currentProduct,
+                priceSuffix = state.settings.currencySuffix,
+                onIntent = viewModel::onIntent
+            )
+        if (state.isOpenGroupBottomSheet)
+            BrieflyBottomSheetExpenses(
+                color = primeColor,
+                iconRes = iconRes,
+                list = state.brieflyList,
+                state = state.currentBriefly,
+                priceSuffix = state.settings.currencySuffix,
+                onDismissRequest = {
+                    viewModel.onIntent(
+                        ExpensesListIntent.OpenBottomSheetGroup(null)
                     )
                 },
-                details = state.isGroup,
-                priceSuffix = state.priceSuffix
+                onEditClick = {
+                    viewModel.onIntent(
+                        ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
+                    )
+                },
+                onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete(it)) },
             )
-            if (state.isOpenEntryBottomSheet)
-                ExpensesEntryBottomSheet(
-                    state = state.currentProduct,
-                    priceSuffix = state.priceSuffix,
-                    colors = colors,
-                    onIntent = viewModel::onIntent
-                )
-            if (state.isOpenGroupBottomSheet)
-                BrieflyBottomSheetExpenses(
-                    color = primeColor,
-                    list = state.brieflyList,
-                    titleProduct = state.currentBriefly.title,
-                    count = state.currentBriefly.count,
-                    suffix = state.currentBriefly.suffix,
-                    countEntry = state.currentBriefly.rowCount,
-                    priceSuffix = state.priceSuffix,
-                    onDismissRequest = {
-                        viewModel.onIntent(
-                            ExpensesListIntent.OpenBottomSheetGroup(false)
-                        )
-                    },
-                    onEditClick = {
-                        viewModel.onIntent(
-                            ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
-                        )
-                    },
-                    onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete(it)) },
-                )
-        }
     }
+    if (state.isOpenBottomSheetDetail)
+        ExpensesDetailBottomSheet(
+            state = state.currentDetail,
+            priceSuffix = state.settings.currencySuffix,
+            colors = colors,
+            onIntent = viewModel::onIntent
+        )
 }
 
 
 @Composable
+private fun ExpensesDetailBottomSheet(
+    state: ExpensesTableUi?,
+    priceSuffix: Suffix,
+    colors: List<Color>,
+    onIntent: (ExpensesListIntent) -> Unit
+) {
+    state?.let {
+        val monthText = stringResource(id = monthToResString(state.month))
+        val date = dateBuilder(state.day, monthText, state.year)
+        DetailSectionBottomSheet(
+            title = state.title,
+            count = state.count,
+            countSuffix = state.countSuffix,
+            price = state.price,
+            priceAll = state.priceAll,
+            priceSuffix = priceSuffix,
+            category = state.category,
+            date = date,
+            note = state.note,
+            food = state.food,
+            animalVaccinationId = state.animalVaccinationId,
+            animalCountId = state.animalCountId,
+            iconColor = orang_1,
+            boxColor = Color(0xFFFFF7ED),
+            colors = colors,
+            onUpdateClick = {
+                onIntent(
+                    ExpensesListIntent.OpenEntryBottomSheetByItem(
+                        true,
+                        state
+                    )
+                )
+            },
+            onDeleteClick = { onIntent(ExpensesListIntent.Delete(state.id)) },
+            onDismissRequest = { onIntent(ExpensesListIntent.OpenBottomSheetDetail(null)) },
+        )
+    }
+}
+
+@Composable
 fun ExpensesContainer(
     modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int,
     details: Boolean,
     color: Color = blue_1,
     priceSuffix: Suffix,
     itemList: List<ExpensesTableUi>,
     searchList: List<ExpensesTableUi>,
-    brieflyList: List<BrieflyExpensesDomain>,
+    brieflyList: List<BrieflyItem>,
+    onDetailsCardClick: (Long) -> Unit,
     onEditClick: (ExpensesTableUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
-    onDetailsClick: (BrieflyExpensesDomain) -> Unit
+    onDetailsClick: (String) -> Unit
 ) {
 
     InventoryBody(
@@ -164,14 +216,15 @@ fun ExpensesContainer(
                 priceSuffix = priceSuffix,
                 category = item.category,
                 note = item.note,
-                animal = "Murka",
                 color = color,
                 day = item.day,
                 month = item.month,
                 year = item.year,
                 food = item.food,
                 colors = item.colors,
-                onClick = { },
+                animalCountId = item.animalCountId,
+                animalVaccinationId = item.animalVaccinationId,
+                onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
@@ -179,16 +232,17 @@ fun ExpensesContainer(
         brieflyCard = { item ->
             BrieflyCountCardNew(
                 modifier = Modifier,
-                titleProduct = item.title,
-                count = item.count,
-                suffix = item.suffix,
-                price = item.price,
-                priceSuffix = priceSuffix,
-                countEntry = item.rowCount,
                 color = color,
                 colorSecondary = Color(0xFFFFF7ED),
-                onClick = { onDetailsClick(item) },
-                icon = R.drawable.icon_sale,
+                icon = iconRes,
+                title = item.title,
+                price = item.price,
+                weight = item.weight,
+                linear = item.linear,
+                volume = item.volume,
+                pieces = item.pieces,
+                rowCount = item.rowCount,
+                onClick = { onDetailsClick(item.title) },
             )
         },
         titleRes = R.string.message_no_data_title_expenses,
@@ -203,47 +257,49 @@ fun ExpensesContainer(
 
 @Composable
 fun BrieflyBottomSheetExpenses(
+    @DrawableRes iconRes: Int,
     list: List<ExpensesTableUi>,
+    state: BrieflyItem?,
     color: Color = blue_1,
-    titleProduct: String,
-    count: Double,
-    suffix: Suffix,
-    countEntry: Long,
     priceSuffix: Suffix,
     onEditClick: (ExpensesTableUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    BrieflyBottomSheetUniversal(
-        list = list,
-        titleProduct = titleProduct,
-        count = count,
-        suffix = suffix,
-        countEntry = countEntry,
-        onDismissRequest = onDismissRequest,
-        onEditClick = onEditClick,
-        onDeleteClick = onDeleteClick,
-        itemCard = { product ->
-            DetailProductCardNew(
-                modifier = Modifier,
-                isCardField = false,
-                count = product.count,
-                suffix = product.countSuffix,
-                price = product.price,
-                priceSuffix = priceSuffix,
-                category = product.category,
-                note = product.note,
-                animal = "Mas",
-                color = color,
-                day = product.day,
-                month = product.month,
-                year = product.year,
-                food = product.food,
-                colors = product.colors,
-                onClick = {},
-                onDeleteClick = { onDeleteClick(product.id) },
-                onEditClick = { onEditClick(product) }
-            )
-        }
-    )
+    state?.let { currentBriefly ->
+        BrieflyBottomSheetUniversal(
+            list = list,
+            iconRes = iconRes,
+            title = currentBriefly.title,
+            price = currentBriefly.price,
+            weight = currentBriefly.weight,
+            linear = currentBriefly.linear,
+            volume = currentBriefly.volume,
+            pieces = currentBriefly.pieces,
+            onDismissRequest = onDismissRequest,
+            itemCard = { product ->
+                DetailProductCardNew(
+                    modifier = Modifier,
+                    isCardField = false,
+                    count = product.count,
+                    suffix = product.countSuffix,
+                    price = product.priceAll ?: product.price,
+                    priceSuffix = priceSuffix,
+                    category = product.category,
+                    note = product.note,
+                    color = color,
+                    day = product.day,
+                    month = product.month,
+                    year = product.year,
+                    food = product.food,
+                    colors = product.colors,
+                    animalCountId = product.animalCountId,
+                    animalVaccinationId = product.animalVaccinationId,
+                    onClick = {},
+                    onDeleteClick = { onDeleteClick(product.id) },
+                    onEditClick = { onEditClick(product) }
+                )
+            }
+        )
+    }
 }

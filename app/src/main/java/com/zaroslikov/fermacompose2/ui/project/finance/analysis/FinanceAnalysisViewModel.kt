@@ -123,7 +123,8 @@ class FinanceAnalysisViewModel @Inject constructor(
                         potentialBalance = newState.potentialBalance,
                         soldLost = newState.soldLost,
                         transactionList = newState.transactionList,
-                        charFilter = newState.charFilter
+                        charFilter = newState.charFilter,
+                        baseSuffix = baseSuffix
                     )
                 }
             }
@@ -152,9 +153,10 @@ class FinanceAnalysisViewModel @Inject constructor(
 
         Log.i("analysis", "buildUiState: $baseSuffix")
 
-        val totalCountProduct = productList.sumOf {
-            it.count.conversation22(it.suffix, baseSuffix, settings)
-        } //TODO
+        val totalCountProduct =
+            productList.filter { it.suffix.conversation4(settings) == baseSuffix }.sumOf {
+                it.count.conversation22(it.suffix, baseSuffix, settings)
+            } //TODO
 
         val financeSale =
             financeAnalysis(
@@ -239,11 +241,12 @@ class FinanceAnalysisViewModel @Inject constructor(
         domainSettings: DomainSettings
     ): List<AnimalProducer> {
         val groupedAnimalProducerList = animalProducerList
+            .filter { it.countSuffix.conversation4(domainSettings) == baseSuffix }
             .groupBy { it.title } // название животного
             .map { (animalName, items) ->
                 val totalCount = items.sumOf {
                     it.count.conversation22(
-                        suffix = it.suffix,
+                        suffix = it.countSuffix,
                         baseSuffix = baseSuffix,
                         settings = domainSettings
                     )
@@ -274,6 +277,7 @@ class FinanceAnalysisViewModel @Inject constructor(
         domainSettings: DomainSettings
     ): List<Buyer> {
         return buyersList
+            .filter { it.suffix.conversation4(domainSettings) == baseSuffix }
             .groupBy { it.buyer }
             .map { (buyerName, items) ->
                 val totalCount = items.sumOf {
@@ -335,10 +339,11 @@ class FinanceAnalysisViewModel @Inject constructor(
         settings: DomainSettings
     ): FinanceAnalysis {
         val totalProduct2 =
-            list.sumOf {
+            list.filter { it.suffix.conversation4(settings) == baseSuffix }.sumOf {
                 it.count.conversation22(it.suffix, baseSuffix, settings)
             }
-        val totalSum = list.sumOf { it.price }
+        val totalSum =
+            list.filter { it.suffix.conversation4(settings) == baseSuffix }.sumOf { it.price }
         val averagePrice = if (totalSum == 0.0) 0.0 else totalSum / totalProduct2
 
         return FinanceAnalysis(

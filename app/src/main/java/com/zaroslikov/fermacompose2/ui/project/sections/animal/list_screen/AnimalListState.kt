@@ -13,10 +13,10 @@ data class AnimalListState(
     val isArchive: Boolean = true,
     val idPT: Long = 0,
     val openBottomSheetEntry: Boolean = false,
-    val list: List<DomainAnimalWithCount> = emptyList(),
-    val archiveList: List<DomainAnimalWithCount> = emptyList(),
-    val searchList: List<DomainAnimalWithCount> = emptyList(),
-    val searchArchiveList: List<DomainAnimalWithCount> = emptyList(),
+    val list: List<AnimalListUi> = emptyList(),
+    val archiveList: List<AnimalListUi> = emptyList(),
+    val searchList: List<AnimalListUi> = emptyList(),
+    val searchArchiveList: List<AnimalListUi> = emptyList(),
     val isSaveStateForEntry: Boolean = false,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
@@ -52,6 +52,20 @@ data class AnimalEntryState2(
     val error: ErrorEntryAnimal = ErrorEntryAnimal(),
     override val hasAnyError: Boolean = false
 ) : BaseProduct()
+
+
+data class AnimalListUi(
+    val id: Long,
+    val name: String,
+    val type: String,
+    val date: String,
+    val isGroup: Boolean,
+    val sex: Boolean?,
+    val count: String?,
+    val suffix: Suffix,
+    val foodDay: Double,
+    val foodDaySuffix: Suffix
+)
 
 
 data class ErrorEntryAnimal(

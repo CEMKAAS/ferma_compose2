@@ -124,6 +124,7 @@ fun NoteScreen(
         if (state.isOpenBottomSheetDetail)
             NoteDetailBottomSheet(
                 state = state.detailDomainNoteTable,
+                colors = colors,
                 onIntent = viewModel::onIntent
             )
     }
@@ -196,8 +197,8 @@ fun NoteCard(
                 ) {
                     IconTransaction2(
                         icon = R.drawable.baseline_sticky_note_2_24,
-                        colorIcon = color,
-                        color = orang_13
+                        iconColor = color,
+                        boxColor = orang_13
                     )
                     Text(
                         text = title,
@@ -271,6 +272,7 @@ private fun NoteEntryBottomSheet(
 @Composable
 private fun NoteDetailBottomSheet(
     state: DomainNoteTable,
+    colors: List<Color>,
     onIntent: (NoteListIntent) -> Unit
 ) {
     val date = state.date.split(".")
@@ -278,6 +280,7 @@ private fun NoteDetailBottomSheet(
 
     DetailBottomSheet(
         title = state.title,
+        colors = colors,
         onUpdateClick = { onIntent(NoteListIntent.OpenBottomSheetEntry(true, state)) },
         onDeleteClick = {
             onIntent(NoteListIntent.Delete(state.id))

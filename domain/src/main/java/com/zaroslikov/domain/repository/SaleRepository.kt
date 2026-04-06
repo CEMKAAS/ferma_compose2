@@ -7,9 +7,14 @@ import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
+import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
+import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import kotlinx.coroutines.flow.Flow
 
 interface SaleRepository {
+    fun getAllSaleTableForExport(): Flow<List<DomainSaleTable>>
+    suspend fun clearAndInsertSaleTableForImport(domainSaleTable: List<DomainSaleTable>)
     fun getAllSaleItems(id: Long): Flow<List<DomainSaleTable>>
     fun getItemSale(id: Long): Flow<DomainSaleTable>
     fun getItemSaleIdCountAnimal(id: Long): Flow<DomainSaleTable>
@@ -23,6 +28,9 @@ interface SaleRepository {
     suspend fun deleteSaleById(id: Long)
 
     fun getIncome(id: Long): Flow<Double>
+
+    fun getIncomeAllProject(currencySuffix: Suffix): Flow<Double>
+
     fun getIncomeMountFin(id: Long, month: Int, year: Int): Flow<Double>
     fun getIncomeMount(id: Long, dateBegin: String, dateEnd: String): Flow<Double>
     fun getCategoryIncomeCurrentMonth(

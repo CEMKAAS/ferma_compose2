@@ -188,55 +188,6 @@ fun TopAppBarBack(
 }
 
 @Composable
-fun TopAppBarBackAndFilter(
-    @StringRes intRes: Int? = null,
-    title: String = "",
-    navigateUp: () -> Unit = {},
-    calendarClick: (() -> Unit)? = null,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                OutlinedTextNote(
-                    value = "TODO()",
-                    onValueChange = { TODO() }
-                )
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(
-                    painterResource(R.drawable.baseline_arrow_back_24),
-                    contentDescription = "Назад"
-                )
-            }
-        },
-        windowInsets = WindowInsets(0),
-        scrollBehavior = scrollBehavior,
-        actions = {
-            if (calendarClick != null) {
-                IconButton(onClick = calendarClick) {
-                    Icon(
-                        painterResource(R.drawable.icon_date_range),
-                        contentDescription = "Date Range"
-                    )
-                }
-            }
-        }
-    )
-}
-
-@Composable
 fun TopAppBarBack2(
     @StringRes intRes: Int? = null,
     title: String = "",

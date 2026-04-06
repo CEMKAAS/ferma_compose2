@@ -1,5 +1,8 @@
 package com.zaroslikov.domain.models.table
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DomainIncubatorParameters(
     val id: Long = 0,
     val day: Int = 0,

@@ -5,17 +5,36 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.add.TitleAndSuffixDto
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDto
 import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
+import com.zaroslikov.domain.models.enums.Suffix
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExpensesDao {
+
+    @Query("SELECT * from expenses_table")
+    fun getAllExpensesTableForExport(): Flow<List<ExpensesTable>>
+
+    @Upsert
+    suspend fun insertAllExpensesTable(data: List<ExpensesTable>)
+
+    @Query("DELETE FROM expenses_table")
+    suspend fun deleteAllExpensesTable()
+
+    @Transaction
+    suspend fun clearAndInsertExpensesTableForImport(expensesTable: List<ExpensesTable>) {
+        deleteAllExpensesTable()
+        insertAllExpensesTable(expensesTable)
+    }
+
     @Query(
         "SELECT * FROM expenses_table " +
                 "WHERE idPT=:id ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day) ) DESC, _id DESC"
@@ -102,6 +121,16 @@ interface ExpensesDao {
     fun getExpenses(id: Long): Flow<Double>
 
     @Query(
+        "SELECT" +
+                " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0)" +
+                " FROM expenses_table s" +
+                " INNER JOIN project_table p ON p.id = s.idPT" +
+                " INNER JOIN settings_table st ON st.idPT = p.id" +
+                " WHERE st.currency_suffix = :currencySuffix"
+    )
+    fun getExpensesAllProject(currencySuffix: Suffix): Flow<Double>
+
+    @Query(
         "SELECT title," +
                 " count_suffix as suffix," +
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
@@ -170,8 +199,11 @@ interface ExpensesDao {
     ): Flow<List<TitleSuffixPriceDto>> //maybe
 
 
-    @Query("SELECT * FROM expenses_table WHERE idPT =:id AND is_show_food = 1")
+    @Query("SELECT * FROM expenses_table WHERE idPT =:id AND is_show_food = 1 AND is_food = 1")
     fun getCurrentFoodWarehouse(id: Long): Flow<List<ExpensesTable>>
+
+    @Query("UPDATE expenses_table SET is_show_food = 0 WHERE _id = :id")
+    suspend fun updateFoodOnWriteOffWarehouse(id: Long)
 
     @Query(
         "SELECT COALESCE(SUM(price),0) AS price" +

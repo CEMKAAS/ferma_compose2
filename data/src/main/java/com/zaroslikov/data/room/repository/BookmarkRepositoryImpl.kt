@@ -3,17 +3,21 @@ package com.zaroslikov.data.room.repository
 import android.R
 import com.zaroslikov.data.room.dao.BookmarkDao
 import com.zaroslikov.data.room.mapper.dto.incubator.toDomainCountRejectedCount
+import com.zaroslikov.data.room.mapper.dto.incubator.toDomainFinanceAllIncubator
 import com.zaroslikov.data.room.mapper.dto.incubator.toDomainFinanceIncubatorHistory
 import com.zaroslikov.data.room.mapper.dto.incubator.toDomainFinanceIncubatorMain
 import com.zaroslikov.data.room.mapper.dto.incubator.toDomainTypeEggCount
 import com.zaroslikov.data.room.mapper.dto.incubator.toTitleCountDto
 import com.zaroslikov.data.room.mapper.table.toBookmarkTable
 import com.zaroslikov.data.room.mapper.table.toDomainBookmark
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.domain.models.dto.incubator.DomainCountRejectedCount
+import com.zaroslikov.domain.models.dto.incubator.DomainFinanceAllIncubator
 import com.zaroslikov.domain.models.dto.incubator.DomainFinanceIncubatorHistory
 import com.zaroslikov.domain.models.dto.incubator.DomainFinanceIncubatorMain
 import com.zaroslikov.domain.models.dto.incubator.DomainTitleCount
 import com.zaroslikov.domain.models.dto.incubator.DomainTypeEggCount
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainBookmark
 import com.zaroslikov.domain.repository.BookmarkRepository
@@ -24,6 +28,15 @@ import kotlin.collections.map
 
 class BookmarkRepositoryImpl @Inject constructor(private val bookmarkDao: BookmarkDao) :
     BookmarkRepository {
+    override fun getAllBookmarkTableForExport(): Flow<List<DomainBookmark>> {
+        return bookmarkDao.getAllBookmarkIncubatorTableForExport()
+            .map { it -> it.map { it.toDomainBookmark() } }
+    }
+
+    override suspend fun clearAndInsertBookmarkTableForImport(domainBookmark: List<DomainBookmark>) {
+        return bookmarkDao.clearAndInsertBookmarkTableForImport(domainBookmark.map { it.toBookmarkTable() })
+    }
+
     override fun getBookmark(id: Long): Flow<DomainBookmark> {
         return bookmarkDao.getBookmark(id).map { it.toDomainBookmark() }
     }
@@ -83,6 +96,11 @@ class BookmarkRepositoryImpl @Inject constructor(private val bookmarkDao: Bookma
 
     override fun getFinanceIncubator(idPT: Long): Flow<DomainFinanceIncubatorMain?> {
         return bookmarkDao.getFinanceIncubator(idPT).map { it?.toDomainFinanceIncubatorMain() }
+    }
+
+    override fun getFinanceIncubatorAllProject(currencySuffix: Suffix): Flow<DomainFinanceAllIncubator> {
+        return bookmarkDao.getFinanceIncubatorAllProject(currencySuffix = currencySuffix)
+            .map { it.toDomainFinanceAllIncubator() }
     }
 
     override fun getFinanceIncubatorList(idPT: Long): Flow<List<DomainFinanceIncubatorHistory>> {

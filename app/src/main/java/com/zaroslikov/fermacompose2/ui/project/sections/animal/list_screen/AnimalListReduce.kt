@@ -88,7 +88,7 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
                 /* "${item.day} ${stringResource(monthToResString(item.month))} ${item.year}".lowercase()
                      .contains(query) ||
                          (item.priceAll ?: item.price).toString().lowercase().contains(query)*/
-            }
+            } //TODO
 
         val searchArchiveList = if (query.isBlank() && isArchive) list
         else

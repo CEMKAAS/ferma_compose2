@@ -8,6 +8,7 @@ import com.zaroslikov.data.room.dao.AnimalDao
 import com.zaroslikov.data.room.dao.AnimalSizeDao
 import com.zaroslikov.data.room.dao.AnimalVaccinationDao
 import com.zaroslikov.data.room.dao.AnimalWeightDao
+import com.zaroslikov.data.room.dao.AppSettingsDao
 import com.zaroslikov.data.room.dao.BookmarkDao
 import com.zaroslikov.data.room.dao.ExpensesAnimalDao
 import com.zaroslikov.data.room.dao.ExpensesDao
@@ -18,6 +19,7 @@ import com.zaroslikov.data.room.dao.IncubatorTableDao
 import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.data.room.database.AppDatabase.Companion.Instance
 import com.zaroslikov.data.room.dao.NoteDao
+import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
@@ -161,4 +163,15 @@ object DatabaseModule {
         return database.bookmarkTableDao()
     }
 
+    @Provides
+    @Singleton
+    fun provideAppSettingsTableDao(database: AppDatabase): AppSettingsDao {
+        return database.appSettingsDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileTableDao(database: AppDatabase): ProfileDao {
+        return database.profileTableDao()
+    }
 }

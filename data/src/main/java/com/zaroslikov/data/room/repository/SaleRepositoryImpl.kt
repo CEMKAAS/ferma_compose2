@@ -16,6 +16,7 @@ import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.repository.SaleRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -24,6 +25,13 @@ import kotlin.collections.map
 
 
 class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : SaleRepository {
+    override fun getAllSaleTableForExport(): Flow<List<DomainSaleTable>> {
+        return saleDao.getAllSaleTableForExport().map { it -> it.map { it.toDomainMap() } }
+    }
+
+    override suspend fun clearAndInsertSaleTableForImport(domainSaleTable: List<DomainSaleTable>) {
+        return saleDao.clearAndInsertAllSaleTableForImport(domainSaleTable.map { it.toRoomMap() })
+    }
 
     override fun getAllSaleItems(id: Long): Flow<List<DomainSaleTable>> {
         return saleDao.getAllSaleItems(id).map { it -> it.map { it.toDomainMap() } }
@@ -75,6 +83,10 @@ class SaleRepositoryImpl @Inject constructor(private val saleDao: SaleDao) : Sal
 
     override fun getIncome(id: Long): Flow<Double> {
         return saleDao.getIncome(id)
+    }
+
+    override fun getIncomeAllProject(currencySuffix: Suffix): Flow<Double> {
+        return saleDao.getIncomeAllProject(currencySuffix)
     }
 
     override fun getIncomeMountFin(

@@ -38,8 +38,8 @@ fun IconTitle(
         IconTransaction2(
             sizeCard = sizeIcon,
             icon = iconRes,
-            colorIcon = colorIcon,
-            color = colorBackgroundIcon
+            iconColor = colorIcon,
+            boxColor = colorBackgroundIcon
         )
         Column(
             horizontalAlignment = Alignment.Start

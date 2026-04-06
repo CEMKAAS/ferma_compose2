@@ -6,12 +6,10 @@ import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 sealed class WriteOffListIntent : BaseIntent {
-    data class OpenBottomSheetGroup(
-        val value: Boolean,
-        val currentBriefly: BrieflyWriteOffDomain = BrieflyWriteOffDomain()
-    ) : WriteOffListIntent()
+    data class OpenBottomSheetGroup(val value: String?) : WriteOffListIntent()
 
     data class OpenBottomSheetEntry(
         val isOpen: Boolean,
@@ -26,6 +24,11 @@ sealed class WriteOffListIntent : BaseIntent {
     ) : WriteOffListIntent()
 
     data class RefreshWarehouseCount(val value: List<DomainCountSuffix>) : WriteOffListIntent()
+
+    data class OpenBottomSheetDetail(
+        val value: Long? = null
+    ) : WriteOffListIntent()
+
     data class TitleAndSuffix(
         val title: String, val suffix: Suffix,
         val writeOffCategory: Category

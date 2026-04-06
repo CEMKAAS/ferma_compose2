@@ -3,13 +3,25 @@ package com.zaroslikov.data.room.repository
 
 import android.util.Log
 import com.zaroslikov.data.room.dao.ExpensesAnimalDao
+import com.zaroslikov.data.room.mapper.table.toDomainMap
+import com.zaroslikov.data.room.mapper.toDomainExpensesAnimal
 import com.zaroslikov.data.room.mapper.toExpensesAnimalTable
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ExpensesAnimalRepositoryImpl @Inject constructor(private val expensesAnimalDao: ExpensesAnimalDao) :
     ExpensesAnimalRepository {
+    override fun getAllExpensesAnimalTableForExport(): Flow<List<DomainExpensesAnimal>> {
+        return expensesAnimalDao.getAllExpensesAnimalTableForExport()
+            .map { it -> it.map { it.toDomainExpensesAnimal() } }
+    }
+
+    override suspend fun clearAndInsertExpensesAnimalTableForImport(domainExpensesAnimal: List<DomainExpensesAnimal>) {
+        return expensesAnimalDao.clearAndInsertExpensesAnimalTableForImport(domainExpensesAnimal.map { it.toExpensesAnimalTable() })
+    }
 
     override suspend fun getItemExpensesAnimal(id: Long): List<Long> {
         return expensesAnimalDao.getItemExpensesAnimal(id)

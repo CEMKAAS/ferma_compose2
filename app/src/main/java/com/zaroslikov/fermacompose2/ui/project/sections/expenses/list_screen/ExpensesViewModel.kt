@@ -1,13 +1,12 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
-import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.SettingsRepository
@@ -20,6 +19,8 @@ import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbOnlyInt
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.white
@@ -34,6 +35,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @HiltViewModel
 class ExpensesViewModel @Inject constructor(
@@ -57,10 +60,8 @@ class ExpensesViewModel @Inject constructor(
     override fun onIntent(intent: ExpensesListIntent) {
         sendIntent(intent)
         when (intent) {
-            is ExpensesListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(
-                openBottomSheetGroup = intent.value,
-                currentBriefly = intent.currentBriefly
-            )
+            is ExpensesListIntent.OpenBottomSheetGroup ->
+                openBottomSheetGroup(intent.title)
 
             is ExpensesListIntent.OpenEntryBottomSheetByItem -> loadDataForEntryOrEdit(
                 intent.value,
@@ -81,20 +82,24 @@ class ExpensesViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 expensesRepository.getAllExpensesItems(itemIdPT),
-                expensesRepository.getBrieflyItemExpenses(itemIdPT),
                 settingsRepository.getSettings(itemIdPT)
-            ) { addList, briefly, settings ->
-                Triple(addList, briefly, settings)
+            ) { addList, settings ->
+                val brieflyList = brieflyList(addList, settings)
+                Triple(addList, brieflyList, settings)
             }.collectLatest { (addList, briefly, settings) ->
                 val expensesList = addList.map { it.toUi() }
-                updateState {
-                    it.copy(
+                val currentDetail = getState().currentDetail
+                updateState { state ->
+                    state.copy(
                         idPT = itemIdPT,
                         list = expensesList,
                         searchList = expensesList,
                         briefly = briefly,
                         searchBrieflyList = briefly,
-                        priceSuffix = settings.currencySuffix,
+                        settings = settings,
+                        currentDetail = currentDetail?.let { detail ->
+                            expensesList.find { it.id == detail.id }
+                        },
                         isLoading = false
                     )
                 }
@@ -106,17 +111,34 @@ class ExpensesViewModel @Inject constructor(
         return expensesRepository.getBrieflyDetailsItemExpenses(itemIdPT, name).first()
     }
 
-    private fun openBottomSheetGroup(
-        openBottomSheetGroup: Boolean,
-        currentBriefly: BrieflyExpensesDomain
-    ) {
+    private fun brieflyList(
+        list: List<DomainExpensesTable>,
+        settings: DomainSettings
+    ): List<BrieflyItem> {
+        return list
+            .groupBy { it.title }
+            .map { (title, items) ->
+                mapperToBrieflyItem(title, items, settings = settings)
+            }
+    }
+
+    private fun openBottomSheetGroup(title: String?) {
         viewModelScope.launch {
-            val listBriefly = getDetailsName(name = currentBriefly.title).map { it.toUi() }
+            if (title == null) {
+                updateState { state ->
+                    state.copy(isOpenGroupBottomSheet  = false)
+                }
+                return@launch
+            }
+            val listBriefly = getDetailsName(name = title)
+            val listBrieflyMap = listBriefly.map { it.toUi() }
+            val currentBriefly =
+                mapperToBrieflyItem(title, listBriefly, settings = getState().settings)
             updateState {
                 it.copy(
-                    isOpenGroupBottomSheet = openBottomSheetGroup,
+                    isOpenGroupBottomSheet = true,
                     currentBriefly = currentBriefly,
-                    brieflyList = listBriefly
+                    brieflyList = listBrieflyMap
                 )
             }
         }
@@ -182,10 +204,11 @@ class ExpensesViewModel @Inject constructor(
 
     override fun insert() {
         viewModelScope.launch {
-            val id = expensesRepository.insertExpenses(getState().currentProduct.toDomainMap())
+            val id = expensesRepository.insertExpenses(getState().currentProduct.toDomainMap(true))
             setExpensesAnimal(id)
 //                metricalExpenses() TODO Нужно придумать, как грамотно сохранять
             loadDataForEntryOrEdit(false, null)
+
             showMessage(
                 resourceProvider.getString(R.string.toast_expenses_s_s)
                     .format(
@@ -199,9 +222,10 @@ class ExpensesViewModel @Inject constructor(
 
     override fun update() {
         viewModelScope.launch {
-            expensesRepository.updateExpenses(getState().currentProduct.toDomainMap())
+            expensesRepository.updateExpenses(getState().currentProduct.toDomainMap(false))
             saveExpensesAnimal()
             loadDataForEntryOrEdit(false, null)
+
             showMessage(
                 resourceProvider.getString(R.string.toast_refresh_s_s)
                     .format(
@@ -274,8 +298,8 @@ class ExpensesViewModel @Inject constructor(
                 .any { it != null }
         val isAutoWeight = domain.weight != null
         val weightAll = when {
-            domain.isShowFood && isAutoWeight -> (domain.weight * domain.count).formatNumber()
-            domain.isShowFood && !isAutoWeight -> domain.count.formatNumber()
+            domain.isFood && isAutoWeight -> (domain.weight * domain.count).formatNumber()
+            domain.isFood && !isAutoWeight -> domain.count.formatNumber()
             else -> ""
         }
 
@@ -305,7 +329,8 @@ class ExpensesViewModel @Inject constructor(
             ),
             category = domain.category,
             note = domain.note,
-            isFood = domain.isShowFood,
+            isFood = domain.isFood,
+            isShowFood = domain.isShowFood,
             feedFood = domain.feedFood?.formatNumber() ?: "",
             feedFoodSuffix = domain.feedFoodSuffix ?: Suffix.GRAM,
             countAnimalFood = domain.countAnimal?.formatNumber() ?: "",
@@ -319,11 +344,14 @@ class ExpensesViewModel @Inject constructor(
             weightAllSuffix = weightAllSuffix ?: Suffix.KILOGRAM,
             isIndicatorsValue = isIndicatorsValue,
             isEntry = false,
-            itemIdPT = domain.idPT
+            itemIdPT = domain.idPT,
+            animalId = domain.animalId,
+            animalVaccinationId = domain.animalVaccinationId,
+            animalCountId = domain.animalCountId,
         )
     }
 
-    private fun ExpensesEntryState2.toDomainMap(): DomainExpensesTable {
+    private fun ExpensesEntryState2.toDomainMap(isEntry: Boolean): DomainExpensesTable {
         val dateList = date.split(".")
         val (weight, weightSuffix) = if (isFood) {
             if (isAutoWeight) weight.toConvertDbDouble() to weightSuffix else null to null
@@ -340,7 +368,8 @@ class ExpensesViewModel @Inject constructor(
             priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
             category = category.trim(),
             note = note.trim(),
-            isShowFood = isFood,
+            isShowFood = if (isFood && isEntry) true else isShowFood,
+            isFood = isFood,
             countAnimal = if (isFood) countAnimalFood.toConvertDbOnlyInt() else null,
             feedFood = if (isFood) feedFood.toConvertDbDouble() else null,
             feedFoodSuffix = if (isFood) feedFoodSuffix else null,
@@ -349,6 +378,9 @@ class ExpensesViewModel @Inject constructor(
             weight = weight,
             weightSuffix = weightSuffix,
             idPT = itemIdPT,
+            animalId = animalId,
+            animalVaccinationId = animalVaccinationId,
+            animalCountId = animalCountId,
         )
     }
 
@@ -369,7 +401,7 @@ class ExpensesViewModel @Inject constructor(
 
     private suspend fun DomainExpensesTable.toUi(): ExpensesTableUi {
         val colors = when {
-            isShowFood -> listOf(white, orang_8)
+            isFood -> listOf(white, orang_8)
             animalVaccinationId != null -> listOf(white, violet_5)
             animalId != null -> listOf(white, green_g_4)
             else -> null
@@ -386,6 +418,7 @@ class ExpensesViewModel @Inject constructor(
             countSuffix = countSuffix,
             category = category,
             note = note,
+            isFood = isFood,
             isShowFood = isShowFood,
             feedFood = feedFood,
             countAnimal = countAnimal,
@@ -400,21 +433,21 @@ class ExpensesViewModel @Inject constructor(
             weight = weight,
             weightSuffix = weightSuffix,
             food = this.food(),
-            colors = colors
+            colors = colors,
         )
     }
 
     private suspend fun DomainExpensesTable.food(): Food? {
-        if (!isShowFood) return null
+        if (!isFood) return null
 
-        val animals = updateAnimalList(id).filter { it.ps }.map { it.name }
+        val animals = updateAnimalList(id).filter { it.ps }
 
         val startDate = formatDateToString(day, month, year)
 
         val weightAll = weight?.let { it * count } ?: count
         val feedPerDay = feedFood ?: 0.0
 
-        val (percent, daysLeft) = percent(
+        val (percent, daysLeft, remainingFood) = percent(
             startDate = startDate,
             weight = weightAll,
             feedPerDay = feedPerDay
@@ -425,6 +458,7 @@ class ExpensesViewModel @Inject constructor(
             feedFoodSuffix = feedFoodSuffix ?: Suffix.KILOGRAM_DAY,
             weightAll = weightAll,
             weightSuffix = weightSuffix ?: Suffix.KILOGRAM,
+            remainingFood = remainingFood,
             percentFloat = percent,
             animalList = animals,
             daysEnd = daysLeft
@@ -443,9 +477,9 @@ class ExpensesViewModel @Inject constructor(
         startDate: String,
         weight: Double,
         feedPerDay: Double
-    ): Pair<Float, Int> {
+    ): Triple<Float, Int, Double> {
 
-        if (feedPerDay == 0.0) return 1f to 0
+        if (feedPerDay == 0.0) return Triple(1f, 0, weight)
 
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 
@@ -458,9 +492,12 @@ class ExpensesViewModel @Inject constructor(
         val daysLeft = (totalDays - passedDays)
             .coerceAtLeast(0.0)
 
+        val remainingFood = daysLeft * feedPerDay
+            .coerceAtLeast(0.0)
+
         val percentLeft = (daysLeft / totalDays)
             .coerceIn(0.0, 1.0)
 
-        return percentLeft.toFloat() to daysLeft.toInt()
+        return Triple(percentLeft.toFloat(), daysLeft.toInt(), remainingFood)
     }
 }

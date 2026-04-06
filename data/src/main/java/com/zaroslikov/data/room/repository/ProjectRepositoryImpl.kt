@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.ProjectDao
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toDomainProjectTable
 import com.zaroslikov.data.room.mapper.table.toProjectTable
 import com.zaroslikov.domain.models.table.DomainProjectTable
@@ -11,6 +12,15 @@ import javax.inject.Inject
 
 class ProjectRepositoryImpl @Inject constructor(private val projectDao: ProjectDao) :
     ProjectRepository {
+    override fun getAllProjectTableForExport(): Flow<List<DomainProjectTable>> {
+        return projectDao.getAllProjectTableForExport()
+            .map { it -> it.map { it.toDomainProjectTable() } }
+    }
+
+    override suspend fun clearAndInsertProjectTableForImport(domainProjectTable: List<DomainProjectTable>) {
+        return projectDao.clearAndInsertAllProjectTableForImport(domainProjectTable.map { it.toProjectTable() })
+    }
+
     override fun getAllProject(): Flow<List<DomainProjectTable>> {
         return projectDao.getAllProject().map { it -> it.map { it.toDomainProjectTable() } }
     }
@@ -19,10 +29,10 @@ class ProjectRepositoryImpl @Inject constructor(private val projectDao: ProjectD
         return projectDao.getProject(id).map { it.toDomainProjectTable() }
     }
 
-   /* override fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>> {
-        return projectDao.getIncubatorListArh6(type)
-            .map { it -> it.map { it.toDomainProjectTable() } }
-    }*/
+    /* override fun getIncubatorListArh6(type: String): Flow<List<DomainProjectTable>> {
+         return projectDao.getIncubatorListArh6(type)
+             .map { it -> it.map { it.toDomainProjectTable() } }
+     }*/
 
     override fun getProjectListAct(): Flow<List<DomainProjectTable>> {
         return projectDao.getProjectListAct().map { it -> it.map { it.toDomainProjectTable() } }

@@ -4,6 +4,8 @@ import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import kotlinx.coroutines.flow.Flow
 
 interface AnimalWeightRepository {
+    fun getAllAnimalWeightTableForExport(): Flow<List<DomainAnimalWeight>>
+    suspend fun clearAndInsertAnimalWeightTableForImport(domainAnimalWeight: List<DomainAnimalWeight>)
     suspend fun insertAnimalWeightTable(animalWeightTable: DomainAnimalWeight)
     suspend fun updateAnimalWeightTable(animalWeightTable:  DomainAnimalWeight)
     suspend fun deleteAnimalWeightTable(animalWeightTable:  DomainAnimalWeight)

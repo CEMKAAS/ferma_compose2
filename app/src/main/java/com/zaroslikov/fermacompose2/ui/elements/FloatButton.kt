@@ -96,6 +96,7 @@ import androidx.compose.ui.unit.sp
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -358,7 +359,7 @@ fun NeonToggleFloatingActionButton(
     modifier: Modifier = Modifier,
     iconAdd: ImageVector = Icons.Default.Add,
     iconClose: ImageVector = Icons.Default.Close,
-    colorsCollapsed: List<Color> = listOf(Color(0xFF00A63E), Color(0xFF00E280)),
+    colorsCollapsed: List<Color> = listOf(Color(0xFF00E280), price_green),
     colorsExpanded: List<Color> = listOf(Color(0xFF4A5565), Color(0xFF314158))
 ) {
     // анимированный прогресс (0..1)
@@ -385,7 +386,7 @@ fun NeonToggleFloatingActionButton(
     val gradient = Brush.linearGradient(
         colors = animatedColors,
         start = Offset(0f, 0f),
-        end = Offset(Float.POSITIVE_INFINITY, 0f)
+        end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
     )
 
     val icon = if (progress > 0.5f) iconClose else iconAdd

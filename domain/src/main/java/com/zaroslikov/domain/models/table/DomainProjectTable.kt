@@ -1,5 +1,8 @@
 package com.zaroslikov.domain.models.table
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class DomainProjectTable(
     val id: Long = 0,
     val title: String = "",

@@ -4,6 +4,7 @@ import com.zaroslikov.data.room.dao.AnimalVaccinationDao
 import com.zaroslikov.data.room.mapper.dto.animal.toAnimalVaccinationExpensesDomain
 import com.zaroslikov.data.room.mapper.table.toAnimalVaccinationTable
 import com.zaroslikov.data.room.mapper.table.toDomainAnimalVaccination
+import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
@@ -13,6 +14,15 @@ import javax.inject.Inject
 
 class AnimalVaccinationRepositoryImpl @Inject constructor(private val animalVaccinationDao: AnimalVaccinationDao) :
     AnimalVaccinationRepository {
+    override fun getAllAnimalVaccinationTableForExport(): Flow<List<DomainAnimalVaccination>> {
+        return animalVaccinationDao.getAllAnimalVaccinationTableForExport()
+            .map { it -> it.map { it.toDomainAnimalVaccination() } }
+    }
+
+    override suspend fun clearAndInsertAnimalVaccinationTableForImport(domainAnimalVaccination: List<DomainAnimalVaccination>) {
+        return animalVaccinationDao.clearAndInsertAnimalVaccinationForImport(domainAnimalVaccination.map { it.toAnimalVaccinationTable() })
+    }
+
     override suspend fun insertAnimalVaccinationTable(animalVaccinationTable: DomainAnimalVaccination): Long {
         return animalVaccinationDao.insertAnimalVaccinationTable(animalVaccinationTable.toAnimalVaccinationTable())
     }

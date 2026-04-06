@@ -42,7 +42,7 @@ fun DropdownMenuEdit(
     onActiveClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     onArchiveClick: (() -> Unit)? = null,
-    onDeleteClick: () -> Unit
+    onDeleteClick: (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -58,7 +58,14 @@ fun DropdownMenuEdit(
         ) {
             val items = buildList {
                 onActiveClick?.let {
-                    add(MenuItemData("Активировать закладку", R.drawable.outline_edit_square_24, color, it))
+                    add(
+                        MenuItemData(
+                            "Активировать закладку",
+                            R.drawable.outline_edit_square_24,
+                            color,
+                            it
+                        )
+                    )
                 }
                 onEditClick?.let {
                     add(MenuItemData("Редактировать", R.drawable.outline_edit_square_24, color, it))
@@ -66,7 +73,9 @@ fun DropdownMenuEdit(
                 onArchiveClick?.let {
                     add(MenuItemData("Архивировать", R.drawable.baseline_archive_24, color, it))
                 }
-                add(MenuItemData("Удалить", R.drawable.icon_trash, error_base, onDeleteClick))
+                onDeleteClick?.let {
+                    add(MenuItemData("Удалить", R.drawable.icon_trash, error_base, it))
+                }
             }
 
             items.forEach { item ->
