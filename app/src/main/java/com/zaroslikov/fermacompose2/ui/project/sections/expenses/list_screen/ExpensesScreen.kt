@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.orang_1
@@ -35,6 +34,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 
 object ExpensesDestination : NavigationDestination {
@@ -59,19 +59,20 @@ fun ExpensesScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarNavigationNew(
-                scrollBehavior = scrollBehavior,
                 value = state.textSearch,
                 isGroup = state.isGroup,
                 onValueChange = {
                     viewModel.onIntent(ExpensesListIntent.SearchChanged(it))
                 },
-                onClick = { viewModel.onIntent(ExpensesListIntent.GroupClicked(it)) }
+                onClick = { viewModel.onIntent(ExpensesListIntent.GroupClicked(it)) },
+                scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                viewModel.onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(true))
-            }
+            if (!state.isArchive)
+                NeonGlowFab(colors = colors) {
+                    viewModel.onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(true))
+                }
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -89,6 +90,7 @@ fun ExpensesScreen(
                 brieflyList = state.searchBrieflyList,
                 priceSuffix = state.settings.currencySuffix,
                 details = state.isGroup,
+                isArchive = state.isArchive,
                 onDetailsCardClick = {
                     viewModel.onIntent(
                         ExpensesListIntent.OpenBottomSheetDetail(
@@ -123,6 +125,7 @@ fun ExpensesScreen(
                 list = state.brieflyList,
                 state = state.currentBriefly,
                 priceSuffix = state.settings.currencySuffix,
+                isArchive = state.isArchive,
                 onDismissRequest = {
                     viewModel.onIntent(
                         ExpensesListIntent.OpenBottomSheetGroup(null)
@@ -141,7 +144,8 @@ fun ExpensesScreen(
             state = state.currentDetail,
             priceSuffix = state.settings.currencySuffix,
             colors = colors,
-            onIntent = viewModel::onIntent
+            onIntent = viewModel::onIntent,
+            isArchive = state.isArchive
         )
 }
 
@@ -151,6 +155,7 @@ private fun ExpensesDetailBottomSheet(
     state: ExpensesTableUi?,
     priceSuffix: Suffix,
     colors: List<Color>,
+    isArchive: Boolean,
     onIntent: (ExpensesListIntent) -> Unit
 ) {
     state?.let {
@@ -180,6 +185,7 @@ private fun ExpensesDetailBottomSheet(
                     )
                 )
             },
+            isArchive = isArchive,
             onDeleteClick = { onIntent(ExpensesListIntent.Delete(state.id)) },
             onDismissRequest = { onIntent(ExpensesListIntent.OpenBottomSheetDetail(null)) },
         )
@@ -199,9 +205,9 @@ fun ExpensesContainer(
     onDetailsCardClick: (Long) -> Unit,
     onEditClick: (ExpensesTableUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
-    onDetailsClick: (String) -> Unit
+    onDetailsClick: (String) -> Unit,
+    isArchive: Boolean
 ) {
-
     InventoryBody(
         modifier = modifier,
         itemList = itemList,
@@ -224,6 +230,7 @@ fun ExpensesContainer(
                 colors = item.colors,
                 animalCountId = item.animalCountId,
                 animalVaccinationId = item.animalVaccinationId,
+                isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
@@ -245,12 +252,14 @@ fun ExpensesContainer(
                 onClick = { onDetailsClick(item.title) },
             )
         },
-        titleRes = R.string.message_no_data_title_expenses,
-        messageRes = R.string.message_no_data_message_expenses,
+        detailEmptyState = EmptyState(
+            title = R.string.message_no_data_title_expenses,
+            message = R.string.message_no_data_message_expenses,
+            icon = R.drawable.icon_sale
+        ),
         details = details,
-        iconRes = R.drawable.icon_sale,
         iconColor = orang_1,
-        backgroundColor = orang_3
+        backgroundColor = orang_3, isArchive = isArchive
     )
 }
 
@@ -265,6 +274,7 @@ fun BrieflyBottomSheetExpenses(
     onEditClick: (ExpensesTableUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
+    isArchive: Boolean,
 ) {
     state?.let { currentBriefly ->
         BrieflyBottomSheetUniversal(
@@ -293,8 +303,10 @@ fun BrieflyBottomSheetExpenses(
                     year = product.year,
                     food = product.food,
                     colors = product.colors,
+                    isArchive = isArchive,
                     animalCountId = product.animalCountId,
                     animalVaccinationId = product.animalVaccinationId,
+
                     onClick = {},
                     onDeleteClick = { onDeleteClick(product.id) },
                     onEditClick = { onEditClick(product) }

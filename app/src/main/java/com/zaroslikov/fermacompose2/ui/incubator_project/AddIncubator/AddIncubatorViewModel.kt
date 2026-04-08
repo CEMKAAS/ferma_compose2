@@ -8,6 +8,7 @@ import com.zaroslikov.domain.models.table.DomainIncubatorTable
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.domain.repository.ProjectRepository
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
@@ -29,8 +30,7 @@ class AddIncubatorViewModel @Inject constructor(
     private val itemId: Long = checkNotNull(savedStateHandle[AddIncubatorDestination.itemIdArg])
 
     init {
-
-        if (itemId != -1L) loadData() else loadDate2()
+        if (itemId != -1L) loadDataEdit() else loadDate2()
     }
 
     private fun loadDate2() {
@@ -51,11 +51,11 @@ class AddIncubatorViewModel @Inject constructor(
         }
     }
 
-    private fun loadData() {
+    private fun loadDataEdit() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
             val project = projectRepository.getProject(itemId).first()
-            val settings = incubatorTableRepository.getIncubatorById(itemId).first()
+            val settings = incubatorTableRepository.getIncubatorByIdPT(itemId).first()
             val modelList = incubatorTableRepository.getModelIncubatorList().first()
             val brandList = incubatorTableRepository.getBrandIncubatorList().first()
             updateState {
@@ -81,7 +81,9 @@ class AddIncubatorViewModel @Inject constructor(
                     DomainProjectTable(
                         title = getState().currentProduct.title.trim(),
                         date = getState().currentProduct.date,
-                        mode = false
+                        mode = false,
+                        imagePath = getState().currentProduct.imagePath,
+                        currentIcon = getState().currentProduct.currentIcon
                     )
                 )
                 incubatorTableRepository.insertIncubator(
@@ -100,7 +102,9 @@ class AddIncubatorViewModel @Inject constructor(
                 projectRepository.updateProject(
                     getState().currentProject.copy(
                         title = getState().currentProduct.title.trim(),
-                        date = getState().currentProduct.date
+                        date = getState().currentProduct.date,
+                        imagePath = getState().currentProduct.imagePath,
+                        currentIcon = getState().currentProduct.currentIcon
                     )
                 )
                 Log.i(
@@ -132,6 +136,8 @@ class AddIncubatorViewModel @Inject constructor(
 
     override fun onIntent(intent: AddIncubatorIntent) {
         return when (intent) {
+            is AddIncubatorIntent.IconClicked -> updateIcon(intent.value)
+            is AddIncubatorIntent.ImagePathClicked -> updateImagePath(intent.value)
             is AddIncubatorIntent.TitleChanged -> updateTitle(intent.value)
             is AddIncubatorIntent.BrandChanged -> updateBrand(intent.value)
             is AddIncubatorIntent.ModelChanged -> updateModel(intent.value)
@@ -145,6 +151,14 @@ class AddIncubatorViewModel @Inject constructor(
             AddIncubatorIntent.Insert -> insert()
             AddIncubatorIntent.Update -> update()
         }
+    }
+
+    private fun updateIcon(currentIcon: Int) {
+        updateState { state -> state.copy(currentProduct = state.currentProduct.copy(currentIcon = currentIcon)) }
+    }
+
+    private fun updateImagePath(imagePath: String?) {
+        updateState { state -> state.copy(currentProduct = state.currentProduct.copy(imagePath = imagePath)) }
     }
 
     private fun updateTitle(title: String) {
@@ -219,7 +233,6 @@ class AddIncubatorViewModel @Inject constructor(
     }
 
     private fun updateAutoRotation(isAutoRotation: Boolean) {
-
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
@@ -268,7 +281,9 @@ class AddIncubatorViewModel @Inject constructor(
             isAutoVentilation = domain.isAutoVentilation,
             currencySuffix = domain.currencySuffix,
             brandList = brandList,
-            modelList = modelList
+            modelList = modelList,
+            imagePath = domainProjectTable.imagePath,
+            currentIcon = domainProjectTable.currentIcon ?: R.drawable.outline_egg_24
         )
     }
 
@@ -290,6 +305,8 @@ class AddIncubatorViewModel @Inject constructor(
 }
 
 sealed class AddIncubatorIntent() : BaseIntent {
+    data class IconClicked(val value: Int) : AddIncubatorIntent()
+    data class ImagePathClicked(val value: String?) : AddIncubatorIntent()
     data class TitleChanged(val value: String) : AddIncubatorIntent()
     data class BrandChanged(val value: String) : AddIncubatorIntent()
     data class ModelChanged(val value: String) : AddIncubatorIntent()

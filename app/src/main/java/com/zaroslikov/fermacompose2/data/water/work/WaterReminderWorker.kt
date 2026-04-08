@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.data.water.work
 
-import android.app.Notification
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -13,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.zaroslikov.fermacompose2.MainActivity
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.data.water.WorkManagerWaterRepository
 
 class WaterReminderWorker(
     context: Context,
@@ -21,19 +21,20 @@ class WaterReminderWorker(
 
     override suspend fun doWork(): Result {
 
-        val name = inputData.getString("name")
-        val id = inputData.getString("CHANNEL_ID")
-        val title = inputData.getString("NOTIFICATION_TITLE")
-        val notification = inputData.getInt("NOTIFICATION_ID", 2)
-
+        val name = inputData.getString("name") ?: "Инкубатор"
+        val time = inputData.getString("time") ?: return Result.success()
 
         makePlantReminderNotification(
-            name ?: "Инкубатор",
-            id ?: "Мое Хозяйство",
-            title?: "Пора внести товар и расходы за сегодня!",
-            notification,
-            applicationContext,
+            name,
+            "channel_id",
+            "Пора проверить закладку",
+            1,
+            applicationContext
         )
+
+        val repository = WorkManagerWaterRepository(applicationContext)
+
+        repository.scheduleReminder(listOf(time), name)
 
         return Result.success()
     }

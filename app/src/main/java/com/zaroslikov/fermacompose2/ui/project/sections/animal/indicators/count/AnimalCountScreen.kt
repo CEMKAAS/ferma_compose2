@@ -57,10 +57,11 @@ fun AnimalCountScreen(
             )
         },
         floatingActionButton = {
-            FabMenu2(
-                isListEmpty = state.countList.isNotEmpty(),
-                onClick = { viewModel.onIntent(AnimalCountIntent.DialogClicked(true, it)) }
-            )
+            if (!state.isArchive)
+                FabMenu2(
+                    isListEmpty = state.countList.isNotEmpty(),
+                    onClick = { viewModel.onIntent(AnimalCountIntent.DialogClicked(true, it)) }
+                )
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -72,6 +73,7 @@ fun AnimalCountScreen(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
                 titleRes = title,
                 itemList = state.countList,
+                isArchive = state.isArchive,
                 onEditClick = {
                     viewModel.onIntent(
                         AnimalCountIntent.DialogClicked(true, item = it)
@@ -162,6 +164,7 @@ private fun AnimalCountContainer2(
     itemList: List<DomainAnimalCountPriceUi>,
     onEditClick: (DomainAnimalCountPriceUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
+    isArchive: Boolean,
 ) {
     InventoryAnimalBody(
         modifier = modifier,
@@ -172,6 +175,7 @@ private fun AnimalCountContainer2(
         iconRes = R.drawable.baseline_spoke_24,
         iconColor = animal_1,
         backgroundColor = green_15,
+        isArchive = isArchive,
         detailCard = { item ->
             AnimalCountCardNew(
                 icon = item.version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
@@ -181,6 +185,7 @@ private fun AnimalCountContainer2(
                 price = item.priceAll ?: item.price,
                 date = item.date,
                 note = item.note,
+                isArchive = isArchive,
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
                 indicationStatus = item.version?.toIndicationStatus()

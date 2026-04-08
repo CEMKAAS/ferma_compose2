@@ -21,6 +21,10 @@ class ProjectRepositoryImpl @Inject constructor(private val projectDao: ProjectD
         return projectDao.clearAndInsertAllProjectTableForImport(domainProjectTable.map { it.toProjectTable() })
     }
 
+    override fun getIsArchiveProject(id: Long): Flow<Boolean> {
+        return projectDao.getIsArchiveProject(id)
+    }
+
     override fun getAllProject(): Flow<List<DomainProjectTable>> {
         return projectDao.getAllProject().map { it -> it.map { it.toDomainProjectTable() } }
     }

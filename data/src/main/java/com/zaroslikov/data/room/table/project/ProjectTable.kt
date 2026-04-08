@@ -15,4 +15,6 @@ data class ProjectTable(
     val dateEnd: String,
     val mode: Boolean, //Инкубатор = 0, Хозяйство = 1
     val archive: Boolean,  //не архив = 0, Архив = 1
+    val imagePath: String?,
+    val currentIcon: Int?
 )

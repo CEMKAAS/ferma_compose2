@@ -118,7 +118,10 @@ fun JournalScreen(
         topBar = {
             TopAppBarBack(
                 intRes = R.string.journal_screen_title,
-                onSettingsClick = { navigateToEdit(state.idPT) },
+                onSettingsClick = if (state.isArchive) null
+                else {
+                    { navigateToEdit(state.projectId) }
+                },
                 scrollBehavior = scrollBehavior
             )
         }
@@ -186,7 +189,7 @@ private fun JournalContainer(
         )
         HistoryConclusions(
             list = state.domainBookmarkList,
-            onClick = { },
+            isArchive = state.isArchive,
             onActiveClick = { onIntent(JournalIntent.ActiveBookmarkClicked(it.first, it.second)) },
             onDeleteClick = { onIntent(JournalIntent.DeleteBookmarkClicked(it.first, it.second)) },
         )
@@ -589,7 +592,7 @@ private fun SliderStatistics(
 @Composable
 private fun HistoryConclusions(
     list: List<BookmarkUi>,
-    onClick: () -> Unit,
+    isArchive: Boolean,
     onActiveClick: (Pair<Long, String>) -> Unit,
     onDeleteClick: (Pair<Long, String>) -> Unit,
 ) {
@@ -627,7 +630,7 @@ private fun HistoryConclusions(
                         endDate = history.endDate,
                         egg = history.egg,
                         rejectedEgg = history.rejectedEgg,
-                        onClick = onClick,
+                        isArchive = isArchive,
                         onActiveClick = { onActiveClick(history.id to history.title) },
                         onDeleteClick = { onDeleteClick(history.id to history.title) }
                     )
@@ -647,13 +650,12 @@ private fun HistoryCard(
     endDate: String,
     egg: Int,
     rejectedEgg: Int,
-    onClick: () -> Unit,
+    isArchive: Boolean,
     onActiveClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
     CardFieldNew(
-        padding = PaddingValues(16.dp),
-        onClick = onClick
+        padding = PaddingValues(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -684,10 +686,11 @@ private fun HistoryCard(
                 horizontalArrangement = Arrangement.End
             ) {
                 CompleteStatus(isEarlyCompletionStatus)
-                DropdownMenuEdit(
-                    onActiveClick = { onActiveClick() },
-                    onDeleteClick = { onDeleteClick() }
-                )
+                if (!isArchive)
+                    DropdownMenuEdit(
+                        onActiveClick = { onActiveClick() },
+                        onDeleteClick = { onDeleteClick() }
+                    )
             }
         }
         Row(

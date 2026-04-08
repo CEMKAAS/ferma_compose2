@@ -135,12 +135,14 @@ fun SettingsScreen(
     if (state.isOpenImportBottomSheet)
         ImportWarning(
             onDismissRequest = { viewModel.onIntent(SettingsIntent.OpenImportBottomSheetClick(false)) },
-            onImportDatabase = { viewModel.onIntent(SettingsIntent.ImportDatabasePress(it)) }
+            onImportDatabase = {
+                viewModel.onIntent(SettingsIntent.ImportDatabasePress(it, context))
+            }
         )
     if (state.isOpenDeleteBottomSheet)
         DeleteWarning(
             onDismissRequest = { viewModel.onIntent(SettingsIntent.OpenDeleteBottomSheetClick(false)) },
-            onDeleteDatabaseClick = { viewModel.onIntent(SettingsIntent.DeleteDatabasePress)}
+            onDeleteDatabaseClick = { viewModel.onIntent(SettingsIntent.DeleteDatabasePress) }
         )
 }
 
@@ -299,7 +301,9 @@ private fun SD(
             .fillMaxWidth()
             .then(
                 onClick?.let {
-                    Modifier.clip(shape = RoundedCornerShape(10.dp)).clickable { it() }
+                    Modifier
+                        .clip(shape = RoundedCornerShape(10.dp))
+                        .clickable { it() }
                 } ?: Modifier
             ),
         verticalAlignment = Alignment.CenterVertically,

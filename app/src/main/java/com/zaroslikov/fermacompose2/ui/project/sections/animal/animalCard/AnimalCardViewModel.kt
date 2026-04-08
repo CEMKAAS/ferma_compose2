@@ -15,6 +15,7 @@ import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
@@ -22,6 +23,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.component1
@@ -36,7 +38,8 @@ class AnimalCardViewModel @Inject constructor(
     private val animalWeightRepository: AnimalWeightRepository,
     private val animalVaccinationRepository: AnimalVaccinationRepository,
     private val addRepository: AddRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val projectRepository: ProjectRepository
 ) : BaseViewModel2<AnimalCardState, AnimalCardIntent, AnimalCardReduce>(
     AnimalCardState(), AnimalCardReduce()
 ) {
@@ -59,6 +62,7 @@ class AnimalCardViewModel @Inject constructor(
     }
 
     private suspend fun loadData() {
+        val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
         combine(
             animalRepository.getAnimal(itemId),
             animalCountRepository.getCountAnimalLimit(itemId),
@@ -92,7 +96,8 @@ class AnimalCardViewModel @Inject constructor(
                     itemId = itemId,
                     itemIdPT = itemIdPT,
                     productList = data.productList,
-                    settings = data.settings
+                    settings = data.settings,
+                    isArchive = isArchive || data.animal.archive
                 )
             }
         }

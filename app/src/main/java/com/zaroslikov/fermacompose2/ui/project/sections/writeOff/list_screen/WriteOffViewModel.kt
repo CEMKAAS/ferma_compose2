@@ -8,6 +8,7 @@ import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.AddRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
@@ -37,7 +38,8 @@ class WriteOffViewModel @Inject constructor(
     private val writeOffRepository: WriteOffRepository,
     private val warehouseRepository: WarehouseRepository,
     private val settingsRepository: SettingsRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<WriteOffListState, WriteOffListIntent, WriteOffListReduce>(
     WriteOffListState(),
     WriteOffListReduce(resourceProvider)
@@ -70,6 +72,7 @@ class WriteOffViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
             combine(
                 writeOffRepository.getAllWriteOffItems(itemIdPT),
                 addRepository.getItemsTitleAddList(itemIdPT),
@@ -87,7 +90,8 @@ class WriteOffViewModel @Inject constructor(
                         searchBrieflyList = briefly,
                         writeOffBoolean = titleList.isNotEmpty(),
                         settings = setting,
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchive
                     )
                 }
             }

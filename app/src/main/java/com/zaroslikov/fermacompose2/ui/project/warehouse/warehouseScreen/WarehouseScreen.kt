@@ -123,7 +123,9 @@ fun WarehouseScreen(
                 intRes = R.string.warehouse_screen_title,
                 scrollBehavior = scrollBehavior,
                 onNavigateBackClick = navigateToStart,
-                onSettingsClick = { navigateToEdit(state.idPT) },
+                onSettingsClick = if (state.isArchive) null else {
+                    { navigateToEdit(state.idPT) }
+                },
                 onNoteClick = { navigateToNote(state.idPT) }
             )
         }
@@ -188,9 +190,12 @@ private fun WarehouseContainer(
             .padding(bottom = 10.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        FastAdd(
-            state.isShowFastAddProduct, state.fastAddList,
-            { onShowFastAddClick(it) }) { onFastAddClick(it) }
+        if (!state.isArchive)
+            FastAdd(
+                isShowFastAddProduct = state.isShowFastAddProduct, list = state.fastAddList,
+                onShowClick = { onShowFastAddClick(it) },
+                onClick = { onFastAddClick(it) }
+            )
         if (state.productList.isEmpty() && state.expensesList.isEmpty())
             Box(
                 modifier = Modifier
@@ -240,7 +245,9 @@ private fun WarehouseContainer(
                         weightAll = item.weightAll,
                         weightSuffix = item.weightSuffix,
                         percentFloat = item.percentFloat,
-                        onWriteOffClick = { onWriteOffClick(item.id) }
+                        onWriteOffClick = if (state.isArchive) null else {
+                            { onWriteOffClick(item.id) }
+                        }
                     )
                 }
             if (state.expensesList.isNotEmpty())

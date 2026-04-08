@@ -28,7 +28,10 @@ interface ProjectDao {
         insertAllProjectTable(projectTable)
     }
 
-    @Query("SELECT * from project_table ORDER BY archive ASC")
+    @Query("SELECT archive FROM project_table WHERE id=:id ")
+    fun getIsArchiveProject(id: Long): Flow<Boolean>
+
+    @Query("SELECT * from project_table")
     fun getAllProject(): Flow<List<ProjectTable>>
 
     @Query("SELECT * from project_table Where id=:id")

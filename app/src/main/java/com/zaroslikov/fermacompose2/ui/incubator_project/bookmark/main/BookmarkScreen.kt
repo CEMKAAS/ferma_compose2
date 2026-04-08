@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.main
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -131,14 +132,17 @@ fun BookmarkScreen(
             TopAppBarBack(
                 title = state.domainBookmark.title,
                 onNavigateBackClick = navigateToBack,
-                onSettingsClick = {
-                    state.idBookmark?.let { onSettingsClick(state.incubatorId to it) }
+                onSettingsClick = if (!state.isActivityBookmark && state.isArchive) null
+                else {
+                    {
+                        state.idBookmark?.let { onSettingsClick(state.incubatorId to it) }
+                    }
                 },
                 scrollBehavior = scrollBehavior
             )
         },
         floatingActionButton = {
-            if (!state.isActivityBookmark)
+            if (!state.isActivityBookmark && !state.isArchive)
                 NeonGlowFab(colors = listOf(orang_9, orang_15)) {
                     onClick(state.incubatorId)
                 }
@@ -158,13 +162,14 @@ fun BookmarkScreen(
             else EmptyBookmark(
                 modifier = Modifier.padding(innerPadding),
                 iconRes = R.drawable.outline_egg_24,
-                title = R.string.message_no_date_empty,
-                supportText = R.string.message_no_date_empty_egg_1,
+                title = R.string.message_no_data_title_bookmark,
+                supportText = R.string.message_no_data_message_bookmark,
+                supportSecondText = if (state.isArchive) R.string.message_no_data_message_archive else null,
                 iconColor = orang_2,
                 backgroundColor = orang_8,
                 plusColor = orang_12
             )
-
+        Log.i("bookmark", "BookmarkScreen: ${state.isArchive}")
         if (state.isOpenBottomSheet)
             ParametersBottomSheet(
                 currentDay = state.currentDay,
@@ -257,6 +262,7 @@ private fun BookmarkContainer(
             )
             NoteWidget(
                 intRes = R.string.bookmark_screen_current_note,
+                isArchive = false,
                 note = state.currentParameterDay.note
             ) {
                 onIntent(BookmarkIntent.NoteChanged(it))

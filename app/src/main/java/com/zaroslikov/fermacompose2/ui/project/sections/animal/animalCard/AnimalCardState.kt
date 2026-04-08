@@ -28,6 +28,7 @@ data class AnimalCardState(
     val settings: DomainSettings = DomainSettings(),
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
+    val isArchive: Boolean = false
 ) : BaseState
 
 data class LoadDataAnimalCard(

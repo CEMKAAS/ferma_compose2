@@ -14,7 +14,7 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
         intent: AnimalListIntent
     ): AnimalListState {
         return when (intent) {
-            is AnimalListIntent.GroupClicked -> state.updateGroup(intent.value)
+            is AnimalListIntent.ArchiveClicked -> state.updateAnimalArchive(intent.value)
             is AnimalListIntent.SearchChanged -> state.updateSearch(intent.value)
 
             is AnimalListIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
@@ -70,6 +70,12 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
             currentProduct = currentProduct.copy(
                 hasAnyError = baseValid
             )
+        )
+    }
+
+    private fun AnimalListState.updateAnimalArchive(isArchive: Boolean): AnimalListState {
+        return copy(
+            isArchive = isArchive
         )
     }
 

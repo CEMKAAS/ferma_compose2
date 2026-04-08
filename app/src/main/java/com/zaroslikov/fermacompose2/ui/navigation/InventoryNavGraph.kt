@@ -32,16 +32,11 @@ import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 @Composable
 fun InventoryNavHost(
     navController: NavHostController,
-    drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    isFirstStart: Boolean,
-    isFirstEnd: () -> Unit,
 ) {
     NavHost(
         navController = navController,
-        startDestination =
-//            if (isFirstStart) ChoiseProjectDestination.route else
-            FirstDestination.route,
+        startDestination = FirstDestination.route,
         modifier = modifier
     ) {
         composable(route = FirstDestination.route) {

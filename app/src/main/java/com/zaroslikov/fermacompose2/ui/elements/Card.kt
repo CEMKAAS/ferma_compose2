@@ -480,6 +480,7 @@ fun DetailProductCardNew(
     colors: List<Color>? = null,
     animalVaccinationId: Long? = null,
     animalCountId: Long? = null,
+    isArchive: Boolean,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: (() -> Unit)?,
@@ -515,6 +516,7 @@ fun DetailProductCardNew(
                         CountColorCard(it, priceSuffix, price_green)
                     }
                 }
+                if (!isArchive)
                 DropdownMenuEdit(
                     onEditClick = onEditClick,
                     onDeleteClick = onDeleteProductClick
@@ -977,13 +979,13 @@ fun CardClips(
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             icon?.let {
                 colorIcon?.let { contentDescription ->
                     Icon(
                         painterResource(it),
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(12.dp),
                         tint = contentDescription,
                         contentDescription = null
                     )

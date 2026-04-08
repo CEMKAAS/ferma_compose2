@@ -121,6 +121,34 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
           """.trimIndent()
         )
 
+        //==================== Миграция TimeNotificationTable ====================
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS time_notification_table(
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                time TEXT NOT NULL,
+                note TEXT,
+                bookmark_id INTEGER NOT NULL
+                )
+        """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+              INSERT INTO time_notification_table(
+                time, note, bookmark_id
+              )
+                SELECT _id,'12:00',null,id FROM МyINCUBATOR WHERE mode = 0
+          """.trimIndent()
+        )
+
+        db.execSQL(
+            """
+            INSERT INTO app_settings_table(last_version_app, current_version_app, is_first_launch) 
+            VALUES (NULL, '1', 1)
+        """.trimIndent()
+        )
+
         //==================== Миграция IncubatorParameters ====================
         db.execSQL(
             """

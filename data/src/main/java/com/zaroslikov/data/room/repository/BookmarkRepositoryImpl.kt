@@ -78,6 +78,10 @@ class BookmarkRepositoryImpl @Inject constructor(private val bookmarkDao: Bookma
         return bookmarkDao.getActivityBookmark(idPT = idPT).map { it?.toDomainBookmark() }
     }
 
+    override fun getActivityBookmarkByIdPT(idPT: Long): Flow<DomainBookmark?> {
+        return bookmarkDao.getActivityBookmarkByIdPT(idPT).map { it?.toDomainBookmark() }
+    }
+
     override suspend fun insert(item: DomainBookmark): Long {
         return bookmarkDao.insert(item.toBookmarkTable())
     }

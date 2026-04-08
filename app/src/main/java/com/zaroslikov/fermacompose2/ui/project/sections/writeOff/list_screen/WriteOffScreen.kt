@@ -38,6 +38,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.violet_1
@@ -67,15 +68,15 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarNavigationNew(
-                scrollBehavior = scrollBehavior,
                 value = state.textSearch,
                 isGroup = state.isGroup,
+                onValueChange = { viewModel.onIntent(WriteOffListIntent.SearchChanged(it)) },
                 onClick = { viewModel.onIntent(WriteOffListIntent.GroupClicked(it)) },
-                onValueChange = { viewModel.onIntent(WriteOffListIntent.SearchChanged(it)) }
+                scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
-            if (writeOffBoolean) NeonGlowFab(colors = colors) {
+            if (!state.isArchive && writeOffBoolean) NeonGlowFab(colors = colors) {
                 viewModel.onIntent(WriteOffListIntent.OpenBottomSheetEntry(true))
             }
         }
@@ -88,9 +89,9 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             modifier = Modifier
                 .modifierScreenLazy(innerPadding),
             itemList = state.list,
-
             searchList = state.searchList,
             brieflyList = state.searchBrieflyList,
+            isArchive = state.isArchive,
             onDetailsCardClick = { viewModel.onIntent(WriteOffListIntent.OpenBottomSheetDetail(it)) },
             onEditClick = {
                 viewModel.onIntent(
@@ -122,6 +123,7 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
                 state = state.currentBriefly,
                 list = state.listBriefly,
                 priceSuffix = priceSuffix,
+                isArchive = state.isArchive,
                 onDismissRequest = {
                     viewModel.onIntent(WriteOffListIntent.OpenBottomSheetGroup(null))
                 },
@@ -136,7 +138,8 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             WriteOffDetailBottomSheet(
                 state = state.currentDetail,
                 colors = colors,
-                onIntent = viewModel::onIntent
+                onIntent = viewModel::onIntent,
+                isArchive = state.isArchive
             )
     }
 }
@@ -145,6 +148,7 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
 private fun WriteOffDetailBottomSheet(
     state: DomainWriteOffTable?,
     colors: List<Color>,
+    isArchive: Boolean,
     onIntent: (WriteOffListIntent) -> Unit
 ) {
     state?.let {
@@ -164,6 +168,7 @@ private fun WriteOffDetailBottomSheet(
             iconColor = violet_1,
             boxColor = Color(0xFFFAF5FF),
             colors = colors,
+            isArchive = isArchive,
             onUpdateClick = { onIntent(WriteOffListIntent.OpenBottomSheetEntry(true, state)) },
             onDeleteClick = { onIntent(WriteOffListIntent.Delete(state.id)) },
             onDismissRequest = { onIntent(WriteOffListIntent.OpenBottomSheetDetail(null)) }
@@ -178,6 +183,7 @@ private fun WriteOffContainer(
     color: Color,
     details: Boolean,
     priceSuffix: Suffix,
+    isArchive: Boolean,
     itemList: List<DomainWriteOffTable>,
     searchList: List<DomainWriteOffTable>,
     brieflyList: List<BrieflyItem>,
@@ -207,6 +213,7 @@ private fun WriteOffContainer(
                 year = item.year,
                 colors = item.animalCountId?.let { listOf(white, green_g_4) },
                 animalCountId = item.animalCountId,
+                isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
@@ -227,12 +234,14 @@ private fun WriteOffContainer(
                 colorSecondary = violet_3,
                 onClick = { onDetailsClick(item.title) })
         },
-        titleRes = R.string.message_no_data_title_write_off,
-        messageRes = R.string.message_no_data_message_write_off,
-        supportSecondText = null,
-        iconRes = iconRes,
+        detailEmptyState = EmptyState(
+            title = R.string.message_no_data_title_write_off,
+            message =  R.string.message_no_data_message_write_off,
+            icon = iconRes
+        ),
         iconColor = violet_1,
         backgroundColor = violet_3,
+        isArchive = isArchive
     )
 }
 
@@ -243,6 +252,7 @@ private fun BrieflyBottomSheetWriteOff(
     list: List<DomainWriteOffTable>,
     state: BrieflyItem?,
     color: Color,
+    isArchive: Boolean,
     priceSuffix: Suffix,
     onDismissRequest: () -> Unit,
     onEditClick: (DomainWriteOffTable) -> Unit,
@@ -265,7 +275,7 @@ private fun BrieflyBottomSheetWriteOff(
                     isCardField = false,
                     count = product.count,
                     suffix = product.countSuffix,
-                    price = product.priceAll?:product.price,
+                    price = product.priceAll ?: product.price,
                     /*category = product.category,*/
                     statusWriteOff = product.status,
                     note = product.note,
@@ -275,6 +285,7 @@ private fun BrieflyBottomSheetWriteOff(
                     year = product.year,
                     priceSuffix = priceSuffix,
                     animalCountId = product.animalCountId,
+                    isArchive = isArchive,
                     onClick = {},
                     onDeleteClick = { onDeleteClick(product.id) },
                     onEditClick = { onEditClick(product) }

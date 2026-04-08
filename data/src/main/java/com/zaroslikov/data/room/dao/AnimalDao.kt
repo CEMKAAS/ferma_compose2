@@ -39,14 +39,17 @@ interface AnimalDao {
                 "an.food_day," +
                 "an.food_day_suffix, " +
                 "ac.count AS count, " +
-                "ac.suffix AS suffix " +
+                "ac.suffix AS suffix," +
+                "an.archive," +
+                "an.image_path," +
+                "an.icon " +
                 "FROM animal_table an " +
                 "LEFT JOIN ANIMAL_COUNT_TABLE ac ON ac.id = ( " +
                 "   SELECT MAX(id) " +
                 "   FROM ANIMAL_COUNT_TABLE " +
                 "   WHERE animal_id = an.id " +
                 ") " +
-                "WHERE an.idPT = :id AND an.archive = 0 " +
+                "WHERE an.idPT = :id " +
                 "ORDER BY an.id DESC"
     )
     fun getAllAnimal(id: Long): Flow<List<AnimalWithCountDto>>
@@ -69,6 +72,9 @@ interface AnimalDao {
 
     @Query("DELETE FROM animal_table WHERE id =:id")
     suspend fun deleteAnimalTable(id: Long)
+
+    @Query("UPDATE animal_table SET archive =:isArchive WHERE id = :id")
+    suspend fun updateArchiveAnimalTableById(isArchive: Boolean, id: Long)
 
     /*@Query("SELECT name as title," +
             " COALESCE(SUM(0), 0.0) AS priceAll" +

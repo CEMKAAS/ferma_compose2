@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -65,6 +66,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -446,6 +448,20 @@ fun uriToByteArray(context: Context, uri: Uri?): ByteArray? {
 
     // Преобразуем Bitmap в ByteArray
     val byteArrayOutputStream = ByteArrayOutputStream()
-    bitmap?.compress(Bitmap.CompressFormat.JPEG, 15, byteArrayOutputStream)
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)
     return byteArrayOutputStream.toByteArray()
+}
+
+fun saveImageToInternalStorage(
+    context: Context,
+    bytes: ByteArray
+): String {
+    val file = File(
+        context.filesDir,
+        "project_${System.currentTimeMillis()}.jpg"
+    )
+
+    file.writeBytes(bytes)
+
+    return file.absolutePath
 }

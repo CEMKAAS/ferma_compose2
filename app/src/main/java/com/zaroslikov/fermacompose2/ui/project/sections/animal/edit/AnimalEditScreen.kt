@@ -31,6 +31,7 @@ import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.DateFactoryCardNew
@@ -44,6 +45,8 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
+import com.zaroslikov.fermacompose2.ui.warehouse.MainSettingsCard
+import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditIntent
 
 
 object AnimalEditDestination : NavigationDestination {
@@ -105,6 +108,14 @@ fun AnimalEntryContainer(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        MainSettingsCard(
+            currentIcon = state.currentIcon,
+            imagePath = state.imagePath,
+            iconList = state.iconList,
+            iconBoxColor = price_green_2,
+            onImageSelected = { onIntent(AnimalEditIntent.ImagePathClicked(it)) },
+            onIconSelected = { onIntent(AnimalEditIntent.IconClicked(it)) },
+        )
         AnimalNameOutlinedTextNew(
             value = state.name,
             onValueChange = {

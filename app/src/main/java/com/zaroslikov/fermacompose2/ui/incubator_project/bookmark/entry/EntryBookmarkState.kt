@@ -46,7 +46,7 @@ data class EntryBookmark(
     val isTemplatesPlan: Boolean = true,
     val incubatorCount: Int = 0,
 
-) : BaseProduct() {
+    ) : BaseProduct() {
     override val hasAnyError: Boolean
         get() = error.hasAnyError
 
@@ -60,10 +60,12 @@ data class EntryBookmark(
 }
 
 data class NotificationParameters(
+    val id: Long = 0,
     val time: String = "12:00",
     val note: String = "",
     val isEntry: Boolean = true,
-    val isVisibility: Boolean = true
+    val isVisibility: Boolean = true,
+    val bookmarkId: Long = 0
 )
 
 data class ParameterDay(

@@ -37,7 +37,8 @@ data class BookmarkState(
     val isCompleteModeEnd: Boolean = false,
     val completeState: CompleteState = CompleteState(),
     override val isLoading: Boolean = true,
-    override val navigate: UiEvent? = null
+    override val navigate: UiEvent? = null,
+    val isArchive: Boolean = false
 ) : BaseState {
     fun enabledOvoscopyButton(): Boolean {
         val isEnabled = (currentEgg - rejectedEgg.toConvertZero()) > 0
@@ -48,7 +49,7 @@ data class BookmarkState(
 
 data class CompleteState(
     val chicksBred: String = "",
-    val chicksPrice: String ="",
+    val chicksPrice: String = "",
     val precentCompleted: Double = 0.0,
     val precentFloatCompleted: Float = 0f,
     val rejectedEggCompleted: Int = 0,

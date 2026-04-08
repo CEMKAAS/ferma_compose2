@@ -23,6 +23,7 @@ import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
+import com.zaroslikov.data.room.dao.TimeNotificationDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.database.migration.MIGRATION_1_2
@@ -161,6 +162,12 @@ object DatabaseModule {
     @Singleton
     fun provideBookmarkTableDao(database: AppDatabase): BookmarkDao {
         return database.bookmarkTableDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTimeNotificationTableDao(database: AppDatabase): TimeNotificationDao {
+        return database.timeNotificationDao()
     }
 
     @Provides

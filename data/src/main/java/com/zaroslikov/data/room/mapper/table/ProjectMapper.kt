@@ -10,7 +10,9 @@ fun ProjectTable.toDomainProjectTable(): DomainProjectTable {
         date = date,
         dateEnd = dateEnd,
         mode = mode,
-        archive = archive
+        archive = archive,
+        imagePath = imagePath,
+        currentIcon = currentIcon
     )
 }
 
@@ -21,6 +23,8 @@ fun DomainProjectTable.toProjectTable(): ProjectTable {
         date = date,
         dateEnd = dateEnd,
         mode = mode,
-        archive = archive
+        archive = archive,
+        imagePath = imagePath,
+        currentIcon = currentIcon
     )
 }

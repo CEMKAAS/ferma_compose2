@@ -13,5 +13,8 @@ data class DomainAnimalWithCount(
     val count: String?,
     val suffix: String?,
     val foodDay: Double,
-    val foodDaySuffix: Suffix
+    val foodDaySuffix: Suffix,
+    val isArchive: Boolean,
+    val imagePath: String?,
+    val currentIcon: Int?
 )

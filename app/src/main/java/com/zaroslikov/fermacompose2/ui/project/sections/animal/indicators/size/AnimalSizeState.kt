@@ -17,7 +17,8 @@ data class AnimalSizeState(
     override val isEntry: Boolean = false,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
-    override val currentProduct: CurrentAnimalSize = CurrentAnimalSize()
+    override val currentProduct: CurrentAnimalSize = CurrentAnimalSize(),
+    val isArchive: Boolean = false
 ) : EntryNewState()
 
 data class CurrentAnimalSize(

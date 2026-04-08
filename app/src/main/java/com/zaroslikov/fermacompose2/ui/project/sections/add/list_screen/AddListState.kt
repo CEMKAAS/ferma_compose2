@@ -36,7 +36,8 @@ data class AddListState(
     override val isEntry: Boolean = false,
     override val currentProduct: AddEntryState2 = AddEntryState2(),
     override val isLoading: Boolean = true,
-    override val navigate: UiEvent? = null
+    override val navigate: UiEvent? = null,
+    val isArchive: Boolean = false
 ) : EntryNewState()
 
 

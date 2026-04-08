@@ -27,7 +27,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.fermacompose2.white
+import java.io.File
 
 @Composable
 fun IconDone() {
@@ -136,10 +138,14 @@ fun IconGradient(
 fun IconTransaction2(
     modifier: Modifier = Modifier,
     sizeCard: Dp = 40.dp,
-    image: Painter,
+    imagePath: String?,
+    currentIcon: Int,
     color: Color,
-    isPainter: Boolean
 ) {
+    val painter = when {
+        imagePath != null -> rememberAsyncImagePainter(File(imagePath))
+        else -> painterResource(currentIcon)
+    }
     val shape = RoundedCornerShape(10.dp)
     Box(
         modifier = modifier
@@ -149,13 +155,12 @@ fun IconTransaction2(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = image,
+            painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .background(color = color, shape = shape)
                 .then(
-                    if (!isPainter) Modifier.size(sizeCard / 2) else Modifier
+                    if (imagePath == null) Modifier.size(sizeCard * 0.75f) else Modifier
                 )
         )
     }

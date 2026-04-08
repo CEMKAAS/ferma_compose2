@@ -17,5 +17,7 @@ data class DomainAnimalTable(
     val archive: Boolean = false,
     val foodDay: Double = 0.0,
     val foodDaySuffix: Suffix = Suffix.GRAM,
+    val imagePath: String? = null,
+    val currentIcon: Int? = null,
     val idPT: Long = 0
 )

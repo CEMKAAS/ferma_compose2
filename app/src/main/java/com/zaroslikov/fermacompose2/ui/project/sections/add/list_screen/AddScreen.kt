@@ -42,6 +42,7 @@ import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.white
@@ -70,17 +71,18 @@ fun AddScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarNavigationNew(
-                scrollBehavior = scrollBehavior,
                 value = state.textSearch,
                 isGroup = state.isGroup,
                 onValueChange = { viewModel.onIntent(AddListIntent.SearchChanged(it)) },
-                onClick = { viewModel.onIntent(AddListIntent.GroupClicked(it)) }
+                onClick = { viewModel.onIntent(AddListIntent.GroupClicked(it)) },
+                scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true))
-            }
+            if (!state.isArchive)
+                NeonGlowFab(colors = colors) {
+                    viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true))
+                }
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -96,6 +98,7 @@ fun AddScreen(
                 searchList = state.searchList,
                 brieflyList = state.searchBrieflyList,
                 details = state.isGroup,
+                isArchive = state.isArchive,
                 onDetailsCardClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDetail(it)) },
                 onEditClick = {
                     viewModel.onIntent(
@@ -125,6 +128,7 @@ fun AddScreen(
                         AddListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
+                isArchive = state.isArchive,
                 onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
                 onAnalysisClick = { navigationToAnalysis(Triple(idProject, it.first, it.second)) }
             )
@@ -132,7 +136,8 @@ fun AddScreen(
             AddDetailBottomSheet(
                 state = state.currentDetail,
                 colors = colors,
-                onIntent = viewModel::onIntent
+                onIntent = viewModel::onIntent,
+                isArchive = state.isArchive
             )
     }
 }
@@ -141,7 +146,8 @@ fun AddScreen(
 private fun AddDetailBottomSheet(
     state: DomainAddItemDto?,
     colors: List<Color>,
-    onIntent: (AddListIntent) -> Unit
+    onIntent: (AddListIntent) -> Unit,
+    isArchive: Boolean
 ) {
     state?.let {
         val monthText = stringResource(id = monthToResString(state.month))
@@ -158,6 +164,7 @@ private fun AddDetailBottomSheet(
             iconColor = green_shamrock,
             boxColor = alabaster,
             colors = colors,
+            isArchive = isArchive,
             onUpdateClick = { onIntent(AddListIntent.OpenBottomSheetEntry(true, state)) },
             onDeleteClick = { onIntent(AddListIntent.Delete(state.id)) },
             onDismissRequest = { onIntent(AddListIntent.OpenBottomSheetDetail(null)) },
@@ -171,6 +178,7 @@ fun AddContainer2(
     modifier: Modifier = Modifier,
     @DrawableRes iconRes: Int,
     details: Boolean,
+    isArchive: Boolean,
     itemList: List<DomainAddItemDto>,
     searchList: List<DomainAddItemDto>,
     brieflyList: List<BrieflyItem>,
@@ -197,6 +205,7 @@ fun AddContainer2(
                 month = item.month,
                 year = item.year,
                 colors = item.animalCountId?.let { listOf(white, red_15) },
+                isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
@@ -218,12 +227,14 @@ fun AddContainer2(
                 rowCount = item.rowCount,
             )
         },
-        titleRes = R.string.message_no_data_title_add,
-        messageRes = R.string.message_no_data_message_add,
+        detailEmptyState = EmptyState(
+            title = R.string.message_no_data_title_add,
+            message = R.string.message_no_data_message_add,
+            icon = iconRes
+        ),
         details = details,
-        iconRes = iconRes,
         iconColor = green_shamrock,
-        backgroundColor = green_g_1
+        backgroundColor = green_g_1,isArchive = isArchive
     )
 }
 
@@ -231,6 +242,7 @@ fun AddContainer2(
 fun BrieflyBottomSheetAdd(
     @DrawableRes iconRes: Int,
     list: List<DomainAddItemDto>,
+    isArchive: Boolean,
     state: BrieflyItem?,
     onEditClick: (DomainAddItemDto) -> Unit,
     onDeleteClick: (Long) -> Unit,
@@ -262,6 +274,7 @@ fun BrieflyBottomSheetAdd(
                     day = product.day,
                     month = product.month,
                     year = product.year,
+                    isArchive = isArchive,
                     onDeleteClick = { onDeleteClick(product.id) },
                     onEditClick = { onEditClick(product) },
                     onClick = { }

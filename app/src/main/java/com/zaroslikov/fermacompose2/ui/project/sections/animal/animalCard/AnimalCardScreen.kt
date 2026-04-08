@@ -116,7 +116,9 @@ fun AnimalCardProduct(
             TopAppBarBack(
                 intRes = R.string.animal_card_screen_animal_card,
                 onNavigateBackClick = navigateBack,
-                onSettingsClick = { onNavigateSetting(state.itemIdPT to state.itemId) },
+                onSettingsClick = if (state.isArchive) null else {
+                    { onNavigateSetting(state.itemIdPT to state.itemId) }
+                },
                 scrollBehavior = scrollBehavior
             )
         }) { innerPadding ->
@@ -164,7 +166,8 @@ fun AnimalCardContainer(
             onNavigateWeight = onNavigateWeight,
             onNavigateVaccination = onNavigateVaccination
         )
-        NoteWidget(note = state.animal.note) { onIntent(AnimalCardIntent.NoteChanged(it)) }
+        NoteWidget(note = state.animal.note, isArchive = state.isArchive)
+        { onIntent(AnimalCardIntent.NoteChanged(it)) }
         PullOutCardNew(
             icon = R.drawable.baseline_analytics_24,
             intRes = R.string.animal_card_screen_animal_card_product,
@@ -199,10 +202,6 @@ fun AnimalCardContainer(
            ) {
                Pair(it.title, "${it.priceAll} ${it.suffix}")
            }*/
-        BigBorderButton(
-            icon = R.drawable.baseline_archive_24,
-            text = R.string.button_archive
-        ) { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(true)) }
         if (state.isOpenArchiveDialog)
             AlertDialogArchiveAnimal(
                 onConfirmation = { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(false)) },
@@ -222,7 +221,11 @@ private fun DataCardOne(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Top,
         ) {
-            IconAnimal(sex = animal.sex)
+            IconAnimal(
+                sex = animal.sex,
+                currentIcon = animal.currentIcon ?: R.drawable.baseline_pets_24,
+                imagePath = animal.imagePath
+            )
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -356,20 +359,24 @@ private fun DataCardTwo(
 fun NoteWidget(
     @StringRes intRes: Int = R.string.outlined_text_note,
     note: String,
+    isArchive: Boolean,
     updateNote: (String) -> Unit
 ) {
     SecondAnimalCard(
         icon = R.drawable.baseline_sticky_note_2_24,
         intRes = intRes,
     ) {
-        OutlinedTextNoteNew(
-            value = note,
-            onValueChange = { updateNote(it) },
-            leadingIconRes = null,
-            labelIntRes = null,
-            supportingText = R.string.support_text_widget_animal_note_tooltip,
-            isBorderCard = false
-        )
+        if (isArchive)
+            Text(note, style = text_14, color = marengo)
+        else
+            OutlinedTextNoteNew(
+                value = note,
+                onValueChange = { updateNote(it) },
+                leadingIconRes = null,
+                labelIntRes = null,
+                supportingText = R.string.support_text_widget_animal_note_tooltip,
+                isBorderCard = false
+            )
     }
 }
 

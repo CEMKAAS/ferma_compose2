@@ -20,7 +20,8 @@ data class NoteListState(
     override val isEntry: Boolean = false,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
-    override val currentProduct: NoteEntryState2 = NoteEntryState2()
+    override val currentProduct: NoteEntryState2 = NoteEntryState2(),
+    val isArchive: Boolean = false
 ) : EntryNewState()
 
 data class NoteEntryState2(

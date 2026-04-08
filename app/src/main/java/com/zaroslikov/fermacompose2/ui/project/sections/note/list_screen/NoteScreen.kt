@@ -52,6 +52,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.DetailBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
@@ -93,9 +94,10 @@ fun NoteScreen(
             )
         },
         floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true))
-            }
+            if (!state.isArchive)
+                NeonGlowFab(colors = colors) {
+                    viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true))
+                }
         },
     ) { innerPadding ->
         if (state.isLoading)
@@ -109,6 +111,7 @@ fun NoteScreen(
                 itemList = state.list,
                 color = colors.first(),
                 searchList = state.searchList,
+                isArchive = state.isArchive,
                 onEditClick = { viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true, it)) },
                 onDeleteClick = { viewModel.onIntent(NoteListIntent.Delete(it)) },
                 onDetailClick = {
@@ -125,6 +128,7 @@ fun NoteScreen(
             NoteDetailBottomSheet(
                 state = state.detailDomainNoteTable,
                 colors = colors,
+                isArchive = state.isArchive,
                 onIntent = viewModel::onIntent
             )
     }
@@ -134,6 +138,7 @@ fun NoteScreen(
 private fun NoteContainer(
     modifier: Modifier = Modifier,
     color: Color = blue_1,
+    isArchive: Boolean,
     itemList: List<DomainNoteTable>,
     searchList: List<DomainNoteTable>,
     onEditClick: (DomainNoteTable) -> Unit,
@@ -152,17 +157,20 @@ private fun NoteContainer(
                 note = item.note,
                 date = item.date,
                 color = color,
+                isArchive = isArchive,
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
                 onDetailClick = { onDetailClick(item.id) }
             )
         },
         brieflyCard = {},
-        titleRes = R.string.message_no_data_title_note,
-        messageRes = R.string.message_no_data_message_note,
-        iconRes = R.drawable.baseline_sticky_note_2_24,
+        detailEmptyState = EmptyState(
+            title = R.string.message_no_data_title_note,
+            message = R.string.message_no_data_message_note,
+            icon = R.drawable.baseline_sticky_note_2_24
+        ),
         iconColor = orang_7,
-        backgroundColor = orang_13
+        backgroundColor = orang_13, isArchive = isArchive
     )
 }
 
@@ -172,6 +180,7 @@ fun NoteCard(
     note: String,
     date: String,
     color: Color,
+    isArchive: Boolean,
     onDetailClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
@@ -208,10 +217,11 @@ fun NoteCard(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                DropdownMenuEdit(
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick
-                )
+                if (!isArchive)
+                    DropdownMenuEdit(
+                        onEditClick = onEditClick,
+                        onDeleteClick = onDeleteClick
+                    )
             }
             Text(
                 text = note, style = text_16, color = marengo, maxLines = 2,
@@ -272,6 +282,7 @@ private fun NoteEntryBottomSheet(
 @Composable
 private fun NoteDetailBottomSheet(
     state: DomainNoteTable,
+    isArchive: Boolean,
     colors: List<Color>,
     onIntent: (NoteListIntent) -> Unit
 ) {
@@ -281,6 +292,7 @@ private fun NoteDetailBottomSheet(
     DetailBottomSheet(
         title = state.title,
         colors = colors,
+        isArchive = isArchive,
         onUpdateClick = { onIntent(NoteListIntent.OpenBottomSheetEntry(true, state)) },
         onDeleteClick = {
             onIntent(NoteListIntent.Delete(state.id))
@@ -290,7 +302,11 @@ private fun NoteDetailBottomSheet(
             onIntent(NoteListIntent.OpenBottomSheetDetail(null))
         }
     ) {
-        Text(text = dateBuilder(date[0].toInt(), monthText, date[2].toInt()), style = text_14, color = grey_3)
+        Text(
+            text = dateBuilder(date[0].toInt(), monthText, date[2].toInt()),
+            style = text_14,
+            color = grey_3
+        )
         BorderCard(
             modifier = Modifier.fillMaxWidth(),
             padding = PaddingValues(26.dp),

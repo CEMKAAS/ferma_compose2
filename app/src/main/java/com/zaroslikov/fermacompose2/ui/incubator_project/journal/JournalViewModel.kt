@@ -11,6 +11,7 @@ import com.zaroslikov.domain.models.table.DomainBookmark
 import com.zaroslikov.domain.models.table.DomainIncubatorTable
 import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -30,6 +31,7 @@ class JournalViewModel @Inject constructor(
     private val incubatorTableRepository: IncubatorTableRepository,
     private val bookmarkRepository: BookmarkRepository,
     private val resourceProvider: ResourceProvider,
+    private val projectRepository: ProjectRepository
 ) : BaseViewModel<JournalState, JournalIntent>(
     JournalState()
 ) {
@@ -43,6 +45,7 @@ class JournalViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             val incubator = incubatorTableRepository.getIncubatorByIdPT(itemIdPT).first()
+            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
             combine(
                 incubatorTableRepository.getIncubatorByIdPT(itemIdPT),
                 bookmarkRepository.getBookmarkListByIdPT(incubator.id),
@@ -66,7 +69,9 @@ class JournalViewModel @Inject constructor(
                         domainBookmarkList = combine.domainBookmarkList,
                         typeList = combine.typeList,
                         idPT = incubator.id,
-                        isLoading = false
+                        projectId = itemIdPT,
+                        isLoading = false,
+                        isArchive = isArchive
                     )
                 }
             }

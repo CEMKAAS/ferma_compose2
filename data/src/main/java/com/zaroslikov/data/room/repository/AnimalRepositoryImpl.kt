@@ -4,7 +4,6 @@ import com.zaroslikov.data.room.dao.AnimalDao
 import com.zaroslikov.data.room.mapper.AnimaMapper.dto.toDomain
 import com.zaroslikov.data.room.mapper.dto.animal.toAnimalForAddDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
-import com.zaroslikov.data.room.mapper.table.toDomainProfileTable
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
@@ -52,6 +51,10 @@ class AnimalRepositoryImpl @Inject constructor(private val animalDao: AnimalDao)
 
     override suspend fun deleteAnimalTable(id: Long) {
         return animalDao.deleteAnimalTable(id)
+    }
+
+    override suspend fun updateArchiveAnimalTableById(isArchive: Boolean, id: Long) {
+        return animalDao.updateArchiveAnimalTableById(isArchive = isArchive, id = id)
     }
 
     /* override fun getExpensesAnimalAllList(id: Long): Flow<List<Fin>> {

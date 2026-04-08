@@ -56,6 +56,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.warehouse.CurrencySettingsCard
+import com.zaroslikov.fermacompose2.ui.warehouse.MainSettingsCard
 
 object AddIncubatorDestination : NavigationDestination {
     override val route = "Add_incubator"
@@ -116,7 +117,14 @@ private fun AddIncubatorContainer(
         modifier = modifier.padding(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        ImageCard()
+        MainSettingsCard(
+            iconList = state.iconList,
+            imagePath = state.currentProduct.imagePath,
+            currentIcon = state.currentProduct.currentIcon,
+            iconBoxColor = orang_8,
+            onImageSelected = { onIntent(AddIncubatorIntent.ImagePathClicked(it)) },
+            onIconSelected = { onIntent(AddIncubatorIntent.IconClicked(it)) },
+        )
         CurrencySettingsCard(state.currentProduct.currencySuffix) {
             onIntent(AddIncubatorIntent.CurrencyClicked(it))
         }

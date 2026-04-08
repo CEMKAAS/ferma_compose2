@@ -33,8 +33,9 @@ sealed class AnimalListIntent : BaseIntent {
     data class NoteChanged(val value: String) : AnimalListIntent()
 
     data object Insert : AnimalListIntent()
+    data class Archive(val id: Long, val isArchive: Boolean) : AnimalListIntent()
     data class Delete(val value: Long) : AnimalListIntent()
 
-    data class GroupClicked(val value: Boolean) : AnimalListIntent()
+    data class ArchiveClicked(val value: Boolean) : AnimalListIntent()
     data class SearchChanged(val value: String) : AnimalListIntent()
 }

@@ -92,14 +92,20 @@ fun <T, B> InventoryBody(
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
     // ресурсы строк для пустого состояния
-    @StringRes titleRes: Int,
-    @StringRes messageRes: Int,
-    @StringRes supportSecondText: Int? = null,
-    @DrawableRes iconRes: Int,
+    isArchive: Boolean,
+    detailEmptyState: EmptyState,
+    brieflyEmptyState: EmptyState? = null,
     iconColor: Color,
-    backgroundColor: Color
+    backgroundColor: Color,
+    isBorderCard: Boolean = true
 ) {
-    if (itemList.isNotEmpty()) {
+    val currentListIsNotEmpty = if (details) {
+        itemList.isNotEmpty()
+    } else {
+        brieflyList.isNotEmpty()
+    }
+
+    if (currentListIsNotEmpty) {
         if (searchList.isNotEmpty())
             InventoryList(
                 modifier = modifier,
@@ -118,18 +124,32 @@ fun <T, B> InventoryBody(
             iconColor = iconColor,
             backgroundColor = backgroundColor,
         )
-    } else
+    } else {
+        val (titleRes, messageRes, support, icon) =
+            if (details) detailEmptyState else brieflyEmptyState ?: detailEmptyState
+
+        val supportSecondTextArchive =
+            if (isArchive) R.string.message_no_data_message_archive_project else support
+
         MessageNoData2(
             modifier = modifier,
             titleRes = titleRes,
             messageRes = messageRes,
-            supportSecondText = supportSecondText,
-            iconRes = iconRes,
+            supportSecondText = supportSecondTextArchive,
+            iconRes = icon,
             iconColor = iconColor,
             backgroundColor = backgroundColor,
+            isBorderCard = isBorderCard
         )
+    }
 }
 
+data class EmptyState(
+    @StringRes val title: Int,
+    @StringRes val message: Int,
+    @StringRes val support: Int? = null,
+    @DrawableRes val icon: Int
+)
 
 @Composable
 private fun <T, B> InventoryList(
@@ -363,6 +383,7 @@ fun DetailSectionBottomSheet(
     animalId: Long? = null,
     animalVaccinationId: Long? = null,
     animalCountId: Long? = null,
+    isArchive: Boolean,
     onUpdateClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDismissRequest: () -> Unit
@@ -373,6 +394,7 @@ fun DetailSectionBottomSheet(
         enabledButton = !(animalVaccinationId != null || animalCountId != null),
         onUpdateClick = onUpdateClick,
         onDeleteClick = onDeleteClick,
+        isArchive = isArchive,
         onDismissRequest = onDismissRequest
     ) {
         if (animalVaccinationId != null)

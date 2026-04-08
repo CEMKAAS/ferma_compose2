@@ -43,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -51,7 +50,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixCurrencyList
 import com.zaroslikov.domain.models.list.suffixHeightList
@@ -75,6 +73,7 @@ import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_10
 import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_6
+import com.zaroslikov.fermacompose2.orang_8
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
@@ -83,7 +82,7 @@ import com.zaroslikov.fermacompose2.supportFun.toFullResId
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
-import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
+import com.zaroslikov.fermacompose2.ui.add.saveImageToInternalStorage
 import com.zaroslikov.fermacompose2.ui.add.uriToByteArray
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
@@ -162,13 +161,16 @@ private fun WarehouseEditBody(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         MainSettingsCard(
-            nameProject = state.currentProject.title, onValueChange = {
+            nameProject = state.currentProject.title,
+            onValueChange = {
                 onIntent(WarehouseEditIntent.NameProjectChanged(it))
             },
             currentIcon = state.currentIcon,
-            imageData = state.imageData,
-            onImageSelected = { onIntent(WarehouseEditIntent.IconClicked(it)) },
-            onAddImageClicked = { /*onIntent(WarehouseEditIntent.IconClicked(it))*/ }
+            imagePath = state.imagePath,
+            iconList = state.iconList,
+            iconBoxColor = price_green_2,
+            onImageSelected = { onIntent(WarehouseEditIntent.ImagePathClicked(it)) },
+            onIconSelected = { onIntent(WarehouseEditIntent.IconClicked(it)) },
         )
         DateSettingsCard(state.currentProject.date) {
             onIntent(
@@ -210,46 +212,27 @@ private fun WarehouseEditBody(
 
 
 @Composable
-private fun MainSettingsCard(
-    nameProject: String,
+fun MainSettingsCard(
+    iconList: List<Int>,
+    nameProject: String? = null,
+    imagePath: String?,
     currentIcon: Int,
-    imageData: ImageBitmap?,
-    onValueChange: (String) -> Unit,
-    onImageSelected: (Int) -> Unit,
-    onAddImageClicked: () -> Unit,
+    iconBoxColor: Color,
+    onValueChange: (String) -> Unit = {},
+    onImageSelected: (String?) -> Unit,
+    onIconSelected: (Int) -> Unit,
 ) {
-    val imageResources = listOf(
-        R.drawable.livestock,
-        R.drawable.icons_chicken_s,
-        R.drawable.icons_goat,
-        R.drawable.icons_cow,
-        R.drawable.icons_pig,
-        R.drawable.icons_sheep,
-        R.drawable.icons_hourse,
-        R.drawable.icons_rabbit,
-        R.drawable.icons_farming_pets,
-        R.drawable.icons_pets,
-        R.drawable.icons_plant,
-        R.drawable.icons_farming_1,
-        R.drawable.icons_farming_2,
-        R.drawable.baseline_add_photo_alternate_24
-    )
-
     val context = LocalContext.current
-    var byteArray by remember { mutableStateOf(imageData ?: byteArrayOf()) }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            imageUri = uri
-            byteArray = (uriToByteArray(context, imageUri) ?: getByteArrayFromDrawable(
-                context,
-                imageResources[0]
-            ))
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri ?: return@rememberLauncherForActivityResult
+        val bytes = uriToByteArray(context, uri)
+        val path = bytes?.let {
+            saveImageToInternalStorage(context, it)
         }
-    val painter = rememberAsyncImagePainter(model = imageUri)
-    val (painter2, isPainter) = when {
-        currentIcon == R.drawable.baseline_add_photo_alternate_24 && imageUri != null -> painter to true
-        else -> painterResource(currentIcon) to false
+        onImageSelected(path)
+        onIconSelected(0)
     }
     var expanded by remember { mutableStateOf(false) }
 
@@ -259,29 +242,31 @@ private fun MainSettingsCard(
             verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (imageData != null) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 IconTransaction2(
-                    modifier = Modifier.clickable(onClick = { expanded = !expanded }),
-                    image = imageData,
-                    color = price_green_2,
-                    sizeCard = 80.dp,
-                    isPainter = isPainter
+                    modifier = Modifier.clickable { expanded = !expanded },
+                    imagePath = imagePath,
+                    currentIcon = currentIcon,
+                    color = iconBoxColor,
+                    sizeCard = 128.dp
                 )
-            } else
-                IconTransaction2(
-                    modifier = Modifier.clickable(onClick = { expanded = !expanded }),
-                    image = painter2,
-                    color = price_green_2,
-                    sizeCard = 80.dp,
-                    isPainter = isPainter
+                Text(
+                    stringResource(R.string.add_incubator_screen_download_image),
+                    style = text_14,
+                    color = gray_7
                 )
-            OutlinedTextNew(
-                value = nameProject,
-                onValueChange = onValueChange,
-                labelIntRes = R.string.warehouse_edit_screen_name_project,
-                supportingText = R.string.warehouse_edit_screen_name_project_support,
-                isBorderCard = false
-            )
+            }
+            if (nameProject != null)
+                OutlinedTextNew(
+                    value = nameProject,
+                    onValueChange = onValueChange,
+                    labelIntRes = R.string.warehouse_edit_screen_name_project,
+                    supportingText = R.string.warehouse_edit_screen_name_project_support,
+                    isBorderCard = false
+                )
             AnimatedVisibility(
                 modifier = Modifier.fillMaxWidth(),
                 visible = expanded
@@ -301,10 +286,13 @@ private fun MainSettingsCard(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         itemVerticalAlignment = Alignment.CenterVertically
                     ) {
-                        imageResources.forEachIndexed { index, it ->
-                            ImageCard(painterResource(it), isSelected = it == currentIcon) {
-                                if (index == imageResources.lastIndex) launcher.launch("image/*")
-                                onImageSelected(it)
+                        iconList.forEachIndexed { index, icon ->
+                            ImageCard(painterResource(icon), isSelected = icon == currentIcon) {
+                                if (index == iconList.lastIndex) launcher.launch("image/*")
+                                else {
+                                    onIconSelected(icon)
+                                    onImageSelected(null)
+                                }
                             }
                         }
                     }

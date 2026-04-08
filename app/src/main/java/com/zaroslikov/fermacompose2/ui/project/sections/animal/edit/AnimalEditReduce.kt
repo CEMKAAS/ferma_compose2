@@ -19,10 +19,27 @@ class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
             is AnimalEditIntent.SexClicked -> state.updateSex(intent.value)
             is AnimalEditIntent.LoadDate -> state.updateLoadData(intent.value).updateValid()
             is AnimalEditIntent.LoadingChanged -> state.copy(isLoading = intent.value)
+            is AnimalEditIntent.IconClicked -> state.updateIcon(intent.value)
+            is AnimalEditIntent.ImagePathClicked -> state.updateImagePath(intent.value)
             else -> state
         }
     }
 
+    private fun AnimalEditState.updateIcon(currentIcon: Int): AnimalEditState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                currentIcon = currentIcon
+            )
+        )
+    }
+
+    private fun AnimalEditState.updateImagePath(imagePath: String?): AnimalEditState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                imagePath = imagePath
+            )
+        )
+    }
 
     private fun AnimalEditState.updateLoadData(value: AnimalUi): AnimalEditState {
         return copy(

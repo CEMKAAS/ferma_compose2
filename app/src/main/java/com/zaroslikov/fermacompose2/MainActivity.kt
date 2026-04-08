@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 //        val startBoolean = isFirstLaunch(this)
 
 //        if (startBoolean) {
-//            WorkManagerWaterRepository(this).setupDailyReminder()
+//            WorkManagerWaterRepository(this). setupDailyReminder()
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
 //        }
 
@@ -78,11 +78,7 @@ class MainActivity : ComponentActivity() {
                 }*/
 //                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
 
-                InventoryApp(
-//                    isFirstStart = openFirstDialog,
-//                    isFirstEnd = { openFirstDialog = false }
-                )
-
+                InventoryApp()
             }
         }
     }
@@ -257,53 +253,3 @@ class MainActivity : ComponentActivity() {
         "unknown"
     }
 }*/
-
-@Composable
-fun AlterDialigStart(
-    isFirstStart: Boolean,
-    dialogTitle: String,
-    dialogText: String,
-    textAppMetrica: String,
-    boolean: Boolean = false,
-    isFirstEndConfig: () -> Unit = {},
-) {
-    var openFirstDialog by rememberSaveable { mutableStateOf(isFirstStart) }
-
-    if (openFirstDialog) {
-        AlertDialog(
-            icon = {
-                Icon(
-                    painterResource(R.drawable.icon_info), contentDescription =
-                        "Example Icon"
-                )
-            },
-            title = { Text(text = dialogTitle) },
-            text = { Text(text = dialogText, textAlign = TextAlign.Justify) },
-            onDismissRequest = {
-                openFirstDialog = false
-                AppMetrica.reportEvent("-" + textAppMetrica)
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (!boolean) isFirstEndConfig()
-                    AppMetrica.reportEvent(textAppMetrica)
-                    openFirstDialog = false
-                })
-                { Text("Отлично!") }
-            },
-            dismissButton = {
-                if (boolean) {
-                    TextButton(onClick = {
-                        isFirstEndConfig()
-                        AppMetrica.reportEvent("Завершить обучение")
-                        openFirstDialog = false
-                    })
-                    { Text("Завершить обучение") }
-                }
-
-            }
-
-        )
-    }
-}
-

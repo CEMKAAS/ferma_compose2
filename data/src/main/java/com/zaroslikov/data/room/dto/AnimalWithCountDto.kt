@@ -18,5 +18,11 @@ data class AnimalWithCountDto(
     @ColumnInfo(name = "food_day")
     val foodDay: Double,
     @ColumnInfo(name = "food_day_suffix")
-    val foodDaySuffix: Suffix
+    val foodDaySuffix: Suffix,
+    @ColumnInfo(name = "archive")
+    val isArchive: Boolean,
+    @ColumnInfo(name = "image_path")
+    val imagePath: String?,
+    @ColumnInfo(name = "icon")
+    val currentIcon: Int?
 )

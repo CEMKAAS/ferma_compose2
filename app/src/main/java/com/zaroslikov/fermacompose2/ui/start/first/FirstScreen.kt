@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.start.first
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -38,21 +39,40 @@ import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.error_base
+import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_11
+import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_8
 import com.zaroslikov.fermacompose2.green_9
+import com.zaroslikov.fermacompose2.green_g_1
+import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.orang_15
+import com.zaroslikov.fermacompose2.orang_17
+import com.zaroslikov.fermacompose2.orang_18
+import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_3
 import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.orang_6
+import com.zaroslikov.fermacompose2.orang_8
+import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
+import com.zaroslikov.fermacompose2.red_11
+import com.zaroslikov.fermacompose2.red_13
+import com.zaroslikov.fermacompose2.red_14
+import com.zaroslikov.fermacompose2.red_15
+import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
+import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DrawerSheetNew
+import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
@@ -62,6 +82,8 @@ import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
+import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import kotlinx.coroutines.launch
 
@@ -78,7 +100,6 @@ fun FirstScreen(
     navigateToItemIncubator: (Long) -> Unit,
     navigateToProject: (Long) -> Unit,
     navigateToIncubator: (Long) -> Unit,
-
     navigateToProfile: () -> Unit,
     navigateToAboutApp: () -> Unit,
     navigateToSettings: () -> Unit,
@@ -88,6 +109,7 @@ fun FirstScreen(
     val colors = listOf(price_green, green_9)
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    var showBottomSheet by remember { mutableStateOf(false) }
     val drawerClose = {
         scope.launch {
             drawerState.apply {
@@ -96,44 +118,11 @@ fun FirstScreen(
         }
     }
 
-
-    /*  val bottomSheetClose = {
-          scope.launch {
-              bottomSheetState.apply {
-                  if (isVisible) is
-              }
-          }
-      }*/
-
-    /* var infoBottomSheet by remember { mutableStateOf(false) }
-     var showDialogTime by remember { mutableStateOf(false) }
-     var arhivBoolean by remember { mutableStateOf(false) }*/
-
-
-    /*if (showDialogTime) {
-        TimePicker(time = if (viewModel.time == "") "20:00" else viewModel.time, showDialog = {
-            viewModel.onUpdate(time1 = it)
-            showDialogTime = false
-        })
-    }*/
-
-    /*AlterDialigStart(
-        isFirstStart = isFirstStart,
-        dialogTitle = "Главный экран",
-        dialogText = "Здесь отображаются текущие и архивные проекты. В нижнем правом углу можно добавить новый проект, а в верхнем углу находятся настройки. Перейдем к созданному проекту.\nДля получения дополнительной информации по использованию приложения обращайтесь в нашу группу ВКонтакте.\n" +
-                "\nУдачи.",
-        textAppMetrica = "Окончание обучения",
-        isFirstEndConfig = isFirstEnd
-    )*/
-
-    var showBottomSheet by remember { mutableStateOf(false) }
-
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             DrawerSheetNew(
-                onProfileClick = {navigateToProfile()},
+                onProfileClick = { navigateToProfile() },
                 onSettingsClick = { navigateToSettings() },
                 onAboutAppClick = { navigateToAboutApp() },
                 onCloseClick = { drawerClose() }
@@ -144,9 +133,9 @@ fun FirstScreen(
             topBar = {
                 TopAppBarStart2(
                     title = R.string.start_screen_title,
+                    isArchive = state.isArchive,
                     infoBottomSheet = { drawerClose() },
-                    archiveButton = {},
-                    boolean = true
+                    onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveModeClicked) }
                 )
             },
             floatingActionButton = {
@@ -155,7 +144,6 @@ fun FirstScreen(
                     onClick = { showBottomSheet = true })
             }
         ) { innerPadding ->
-
             if (state.isLoading)
                 CircularProgress(
                     modifier = Modifier.padding(innerPadding),
@@ -164,19 +152,46 @@ fun FirstScreen(
                 StartScreenContainer2(
                     modifier = Modifier.modifierScreenLazy(innerPadding),
                     itemList = state.list,
-                    brieflyList = state.list,
-                    onEditClick = { navigateToProject(it) },
+                    brieflyList = state.archiveList,
+                    isArchiveMode = state.isArchive,
+                    onEditProjectClick = { navigateToProject(it) },
+                    onEditIncubatorClick = { navigateToIncubator(it) },
                     onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveClicked(it)) },
-                    onDeleteClick = { viewModel.onIntent(FirstIntent.DeleteClicked(it)) },
+                    onArchiveIncubatorClick = {
+                        viewModel.onIntent(
+                            FirstIntent.OpenArchiveIncubatorBottomSheetClicked(true, it)
+                        )
+                    },
+                    onUnarchiveClick = { viewModel.onIntent(FirstIntent.UnarchiveClicked(it)) },
+                    onDeleteClick = {
+                        viewModel.onIntent(FirstIntent.OpenDeleteBottomSheetClicked(true, it))
+                    },
                     onNavigationProject = { navigateToItemProject(it) },
-                    onNavigationIncubator = { navigateToItemIncubator(it) }
-                )
-
+                    onNavigationIncubator = { navigateToItemIncubator(it) })
             if (showBottomSheet)
                 ChoiceProjectBottomSheet(
                     onDismissRequest = { showBottomSheet = false },
                     onIncubatorProject = { navigateToIncubator(-1) },
                     onAddProject = { navigateToProject(-1) }
+                )
+
+            if (state.isOpenArchiveIncubatorBottomSheet)
+                WarningArchiveBottomSheet(
+                    onDismissRequest = {
+                        viewModel.onIntent(FirstIntent.OpenArchiveIncubatorBottomSheetClicked(false))
+                    },
+                    onArchiveIncubatorClick = {
+                        viewModel.onIntent(FirstIntent.ArchiveClicked(null))
+                    }
+                )
+
+            if (state.isOpenDeleteBottomSheet)
+                WarningDeleteBottomSheet(
+                    isProject = state.currentProjectTable?.mode ?: true,
+                    onDismissRequest = {
+                        viewModel.onIntent(FirstIntent.OpenDeleteBottomSheetClicked(false))
+                    },
+                    onDeleteDatabaseClick = { viewModel.onIntent(FirstIntent.DeleteClicked) }
                 )
         }
     }
@@ -185,51 +200,87 @@ fun FirstScreen(
 @Composable
 private fun StartScreenContainer2(
     modifier: Modifier = Modifier,
+    isArchiveMode: Boolean,
     itemList: List<DomainProjectTable>,
     brieflyList: List<DomainProjectTable>,
-    onEditClick: (Long) -> Unit,
+    onEditProjectClick: (Long) -> Unit,
+    onEditIncubatorClick: (Long) -> Unit,
     onDeleteClick: (DomainProjectTable) -> Unit,
     onArchiveClick: (DomainProjectTable) -> Unit,
+    onArchiveIncubatorClick: (DomainProjectTable) -> Unit,
     onNavigationProject: (Long) -> Unit,
-    onNavigationIncubator: (Long) -> Unit
+    onNavigationIncubator: (Long) -> Unit,
+    onUnarchiveClick: (DomainProjectTable) -> Unit
 ) {
     InventoryBody(
         modifier = modifier,
-        details = true,
+        details = !isArchiveMode,
         itemList = itemList,
         searchList = itemList,
         brieflyList = brieflyList,
         detailCard = { index, item ->
             ProjectCard(
                 projectTable = item,
-                onEditClick = { onEditClick(item.id) },
+                onEditClick = {
+                    if (item.mode) onEditProjectClick(item.id)
+                    else onEditIncubatorClick(item.id)
+
+                    Log.i("edit", "StartScreenContainer2: ${item.id}")
+                },
+                onArchiveClick = {
+                    if (item.mode) onArchiveClick(item)
+                    else onArchiveIncubatorClick(item)
+                },
                 onDeleteClick = { onDeleteClick(item) },
-                onArchiveClick = { onArchiveClick(item) },
                 onNavigationProject = {
                     if (item.mode) onNavigationProject(item.id)
                     else onNavigationIncubator(item.id)
                 }
             )
         },
-        brieflyCard = {},
-        titleRes = R.string.start_screen_positions_message_no_date_title,
-        messageRes = R.string.start_screen_positions_message_no_date_message,
-        iconRes = R.drawable.icon_money,
-        iconColor = orang_5,
-        backgroundColor = orang_4
+        brieflyCard = { item ->
+            ProjectCard(
+                projectTable = item,
+                onUnarchiveClick = { onUnarchiveClick(item) },
+                onDeleteClick = { onDeleteClick(item) },
+                onNavigationProject = {
+                    if (item.mode) onNavigationProject(item.id)
+                    else onNavigationIncubator(item.id)
+                }
+            )
+        },
+        detailEmptyState = EmptyState(
+            title = R.string.start_screen_no_data_title,
+            message = R.string.start_screen_no_data_message,
+            icon = R.drawable.ic_stat_name
+        ),
+        brieflyEmptyState = EmptyState(
+            title = R.string.start_screen_no_data_archive_title,
+            message = R.string.start_screen_no_data_archive_message,
+            support = R.string.is_empty,
+            icon = R.drawable.baseline_archive_24
+        ),
+        iconColor = green_shamrock,
+        backgroundColor = green_g_1,
+        isArchive = false,
+        isBorderCard = false
     )
 }
 
 @Composable
 private fun ProjectCard(
     projectTable: DomainProjectTable,
-    onEditClick: () -> Unit,
+    onEditClick: (() -> Unit)? = null,
     onDeleteClick: () -> Unit,
-    onArchiveClick: () -> Unit,
+    onArchiveClick: (() -> Unit)? = null,
+    onUnarchiveClick: (() -> Unit)? = null,
     onNavigationProject: () -> Unit
 ) {
+    val (iconProject, iconColor) = if (projectTable.mode) R.drawable.livestock to price_green_2 else R.drawable.outline_egg_24 to orang_8
     CardFieldNew(
-        onClick = onNavigationProject
+        onClick = onNavigationProject,
+        colors = if (projectTable.mode) listOf(green_6, green_shamrock)
+        else listOf(orang_9, orang_15)
     ) {
         Row(
             modifier = Modifier
@@ -241,10 +292,10 @@ private fun ProjectCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 IconTransaction2(
-                    image = painterResource(R.drawable.livestock),
-                    color = price_green_2,
+                    imagePath = projectTable.imagePath,
+                    currentIcon = projectTable.currentIcon ?: iconProject,
+                    color = iconColor,
                     sizeCard = 64.dp,
-                    isPainter = true
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -253,6 +304,14 @@ private fun ProjectCard(
                         text = projectTable.title,
                         style = text_16,
                         color = black_2
+                    )
+                    CardClips(
+                        colorBackground = if (projectTable.mode) price_green_2 else orang_4,
+                        colorBorder = if (projectTable.mode) green_11 else orang_5,
+                        colorText = if (projectTable.mode) green_9 else orang_6,
+                        value = stringResource(if (projectTable.mode) R.string.start_screen_common_project else R.string.bottom_bar_incubator),
+                        icon = if (projectTable.mode) R.drawable.outline_work_24 else R.drawable.outline_egg_24,
+                        colorIcon = if (projectTable.mode) green_9 else orang_6
                     )
                     IconAndTextNew(
                         iconRes = R.drawable.baseline_calendar_month_24,
@@ -264,6 +323,7 @@ private fun ProjectCard(
             DropdownMenuEdit(
                 onEditClick = onEditClick,
                 onArchiveClick = onArchiveClick,
+                onUnarchiveClick = onUnarchiveClick,
                 onDeleteClick = onDeleteClick
             )
         }
@@ -377,325 +437,96 @@ private fun ChoiceProjectCard(
 }
 
 
-/*@Composable
-private fun ProjectCard(
-    projectTable: DomainProjectTable
-) {
-    CardFieldNew() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .border(
-                        width = 3.dp,
-                        color = if (projectTable.arhive == "0") MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = 0.5f
-                        ),
-                        shape = CircleShape
-                    )
-            ) {
-                if (projectTable.imageData != null) {
-                    *//*    Image(
-                            bitmap = projectTable.imageData,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.align(Alignment.Center),
-                            colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
-                                Color.Gray
-                            )
-                        )*//*
-                } else {
-                    Image(
-                        painter = painterResource(setImage(projectTable)),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.size(194.dp),
-                        colorFilter = if (projectTable.arhive == "0") null else ColorFilter.tint(
-                            Color.Gray
-                        )
-                    )
-                }
-            }
-
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                Text(
-                    text = projectTable.titleProject,
-                    modifier = Modifier
-                        .padding(horizontal = 3.dp, vertical = 6.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 26.sp
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painterResource(R.drawable.icon_date_range), contentDescription = "Дата")
-                    Text(
-                        text = if (projectTable.arhive == "0") projectTable.data else "Завершен",
-                        modifier = Modifier
-                            .padding(horizontal = 6.dp)
-                    )
-                }
-            }
-        }
-    }
-}*/
-
-
-/*
 @Composable
-fun StartScreenContainer(
-    modifier: Modifier,
-    navigateToItemProject: (Int) -> Unit,
-    navigateToItemIncubator: (Int) -> Unit,
-    navigateToItemProjectArh: (Int) -> Unit,
-    navigateToItemIncubatorArh: (Int) -> Unit,
-    projectList: List<ProjectTableStartScreen>,
-    navigationToNewYear: () -> Unit,
-    navController: NavController,
-    arhivBoolean: Boolean
+private fun WarningArchiveBottomSheet(
+    onDismissRequest: () -> Unit,
+    onArchiveIncubatorClick: () -> Unit
 ) {
-
-    if (projectList.isNotEmpty()) {
-        Column(modifier = modifier) {
-
-            */
-/*  if (newYearBoolean()) {
-                  Button(
-                      onClick = {
-                          navigationToNewYear()
-                          AppMetrica.reportEvent("Итоги года общий")
-                      },
-                      modifier = Modifier
-                          .fillMaxWidth()
-                          .padding(vertical = 5.dp, horizontal = 15.dp)
-                  ) {
-                      Text(text = "Итоги года!")
-                  }
-              }*//*
-
-
-            LazyColumn(contentPadding = PaddingValues(8.dp)) {
-                items(items = projectList, key = { it.id }) {
-                    if (arhivBoolean && it.arhive == "1" || !arhivBoolean && it.arhive == "0") {
-                        CardFerma(
-                            projectTable = it, modifier = Modifier
-                                .padding(8.dp)
-                                .clickable {
-                                    when (it.arhive) {
-                                        "1" -> {
-                                            if (it.mode == 0) navigateToItemIncubatorArh(it.id)
-                                            else navigateToItemProjectArh(it.id)
-                                        }
-
-                                        "0" -> {
-                                            if (it.mode == 0) navigateToItemIncubator(it.id)
-                                            else navigateToItemProject(it.id)
-                                        }
-                                    }
-                                }
-                        )
-                    }
-                }
-            }
-        }
-    } else {
-        Column(modifier = modifier.padding(10.dp)) {
-            Text(
-                text = "Добро пожаловать!\nМое Хозяйство 2",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                fontSize = 20.sp,
-            )
-            Text(
-                text = "Здесь Вы сможете увидеть все Ваши проекты (инкубаторы и хозяйства). У Вас есть возможность создавать несколько проектов, каждый из которых будет иметь свою уникальную экономику и склад и д.р., что позволит эффективно управлять каждым Вашим бизнесом!",
-                textAlign = TextAlign.Justify,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                fontSize = 20.sp,
-            )
-            Text(
-                text = "Сейчас нет проектов:(\nНажмите + чтобы добавить\nили ",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth(),
-                fontSize = 20.sp,
-            )
-            Button(
-                onClick = {
-                    navController.navigate(
-//                    ChoiseProjectDestination.route
-                        ProjectAddDestination.route
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 20.dp)
-
-            ) {
-                Text(text = "Добавить проект!")
-            }
-        }
-    }
-}
-*/
-/*
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InfoBottomSheet(
-    infoBottomSheet: () -> Unit,
-    sheetState: SheetState,
-    time: String,
-    showDialogTime: () -> Unit,
-    saveBottomSheet: () -> Unit,
-    clearTime: () -> Unit
-) {
-
-//    val anonotatedString = buildAnnotatedString {
-//        pushStringAnnotation(tag = "URL", annotation = "https://vk.com/myfermaapp")
-//        withStyle(
-//            style = SpanStyle(
-//                color = Color.Blue,
-//                fontSize = 20.sp
-//            )
-//        ) {
-//            append("Присоединиться!")
-//        }
-//        pop()
-//    }
-
-    ModalBottomSheet(
-        onDismissRequest = infoBottomSheet,
-        sheetState = sheetState
+    BaseBottomSheet(
+        title = stringResource(R.string.settings_screen_warning),
+        supText = stringResource(R.string.start_screen_archive_incubator),
+        skipPartiallyExpanded = false,
+        onDismissRequest = onDismissRequest,
     ) {
-        Column(modifier = Modifier.padding(15.dp)) {
-            Text(
-                text = "Мое Хозяйство v2.17a",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 24.sp,
-                textAlign = TextAlign.Center
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            WarningCard(
+                colorBackground = orang_4,
+                colorBorder = orang_5,
+                colorIcon = orang_18,
+                colorTitle = orang_18,
+                colorText = orang_6,
+                icon = R.drawable.outline_info_24,
+                title = R.string.start_screen_archive_incubator_title,
+                text = R.string.start_screen_archive_incubator_text
             )
-            Text(
-                text = "Привет, дорогой друг!",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp),
-                fontSize = 15.sp,
-                textAlign = TextAlign.Center
-            )
-
-            Text(
-                text = "Присоединяйcя к нашей группе ВКонтакте! Это отличный способ оставаться в курсе новостей, делиться впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство еще лучше!",
-                modifier = Modifier.fillMaxWidth(),
-                fontSize = 15.sp,
-                textAlign = TextAlign.Justify
-            )
-
-//            val uriHandler = LocalUriHandler.current
-//            ClickableText(
-//                text = anonotatedString,
-//                style = TextStyle(
-//                    textAlign = TextAlign.Justify
-//                ),
-//                onClick = { offset ->
-//                    val uri = anonotatedString.getStringAnnotations(
-//                        tag = "URL",
-//                        start = offset,
-//                        end = offset
-//                    ).firstOrNull()?.item
-//                    if (uri != null) {
-//                        uriHandler.openUri(uri)
-//                    }
-//                },
-//                modifier = Modifier
-//                    .align(Alignment.CenterHorizontally)
-//                    .padding(vertical = 15.dp),
-//            )
-            val context = LocalContext.current
-            TextButton(
-                onClick = {
-                    AppMetrica.reportEvent("Переход в группу из инфо")
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/myfermaapp"))
-                    context.startActivity(intent)
-                }, modifier = Modifier.fillMaxWidth()
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(text = "Присоединиться!", fontSize = 20.sp)
-            }
-
-            OutlinedTextField(
-                value = time,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Уведомление") },
-                supportingText = {
-                    Text("Чтобы отключить ежедневные уведомления, нажмите на \"Х\" и \"Спасибо!\"")
-                },
-                leadingIcon = {
-                    IconButton(onClick = showDialogTime) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_access_time_24),
-                            contentDescription = "Показать меню"
-                        )
-                    }
-                },
-                trailingIcon = {
-                    IconButton(onClick = clearTime) {
-                        Icon(
-                            painterResource(R.drawable.baseline_clear_24),
-                            contentDescription = "Удалить"
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDialogTime() }
-                    .padding(vertical = 5.dp)
-            )
-
-
-            Button(
-                onClick = saveBottomSheet, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 20.dp)
-
-            ) {
-                Text(text = "Спасибо!")
+                GradientButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.start_screen_in_archive),
+                    onClick = { onArchiveIncubatorClick() },
+                    paddingValues = PaddingValues(16.dp),
+                    colors = listOf(orang_2, orang_2)
+                )
+                GradientButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.button_text_cancel),
+                    onClick = onDismissRequest,
+                    paddingValues = PaddingValues(16.dp),
+                    colors = listOf(gray_6, gray_6), textColor = dark
+                )
             }
         }
     }
 }
 
 
-fun setImage(projectTable: ProjectTableStartScreen): Int {
-    return if (projectTable.mode == 0) {
-        when (projectTable.type) {
-            "Курицы" -> R.drawable.chicken
-            "Гуси" -> R.drawable.external_goose_birds_icongeek26_outline_icongeek26
-            "Перепела" -> R.drawable.quail
-            "Утки" -> R.drawable.duck
-            "Индюки" -> R.drawable.turkeycock
-            else -> R.drawable.chicken
+@Composable
+private fun WarningDeleteBottomSheet(
+    isProject: Boolean,
+    onDismissRequest: () -> Unit,
+    onDeleteDatabaseClick: () -> Unit
+) {
+    BaseBottomSheet(
+        title = stringResource(R.string.settings_screen_warning_delete),
+        supText = stringResource(if (isProject) R.string.start_screen_delete_project else R.string.start_screen_delete_incubator),
+        skipPartiallyExpanded = false,
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            WarningCard(
+                colorBackground = red_11,
+                colorBorder = red_15,
+                colorIcon = orang_17,
+                colorTitle = orang_17,
+                colorText = red_14,
+                icon = R.drawable.baseline_delete_24,
+                title = R.string.start_screen_delete_title,
+                text = if (isProject) R.string.start_screen_delete_project_text else R.string.start_screen_delete_incubator_text
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                GradientButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.start_screen_delete),
+                    onClick = { onDeleteDatabaseClick() },
+                    paddingValues = PaddingValues(16.dp),
+                    colors = listOf(red_13, error_base)
+                )
+                GradientButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.button_text_cancel),
+                    onClick = onDismissRequest,
+                    paddingValues = PaddingValues(16.dp),
+                    colors = listOf(gray_6, gray_6), textColor = dark
+                )
+            }
         }
-    } else {
-        return R.drawable.livestock
     }
-}*/
+}

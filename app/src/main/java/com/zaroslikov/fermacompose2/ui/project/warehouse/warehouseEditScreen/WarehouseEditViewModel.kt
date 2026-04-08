@@ -9,6 +9,7 @@ import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
@@ -42,6 +43,7 @@ class WarehouseEditViewModel @Inject constructor(
             is WarehouseEditIntent.DateClicked -> updateDateProject(intent.value)
             WarehouseEditIntent.InsertClicked -> insertProject()
             WarehouseEditIntent.EditClicked -> editProject()
+            is WarehouseEditIntent.ImagePathClicked -> updateImagePath(intent.value)
         }
     }
 
@@ -51,14 +53,13 @@ class WarehouseEditViewModel @Inject constructor(
             updateState { it.copy(isLoading = true) }
             val project = projectRepository.getProject(itemId).first()
             val settings = settingsRepository.getSettings(itemId).first()
-            /* val imageBitmap = project.imageData?.let {
-                 BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
-             }*/
             updateState {
                 it.copy(
                     isLoading = false,
                     nameProject = project.title,
                     dateProject = project.date,
+                    currentIcon = project.currentIcon ?: R.drawable.livestock,
+                    imagePath = project.imagePath,
                     currentProject = project,
                     currentSettings = settings,
                     idPT = itemId
@@ -76,6 +77,10 @@ class WarehouseEditViewModel @Inject constructor(
 
     private fun updateIcon(currentIcon: Int) {
         updateState { it.copy(currentIcon = currentIcon) }
+    }
+
+    private fun updateImagePath(imagePath: String?) {
+        updateState { it.copy(imagePath = imagePath) }
     }
 
     private fun updateDateProject(dateProject: String) {
@@ -120,6 +125,8 @@ class WarehouseEditViewModel @Inject constructor(
             date = currentProject.date,
             dateEnd = currentProject.dateEnd,
             mode = true,
+            currentIcon = getState().currentIcon,
+            imagePath = getState().imagePath
         )
     }
 
@@ -140,6 +147,7 @@ class WarehouseEditViewModel @Inject constructor(
 sealed class WarehouseEditIntent() : BaseIntent {
     data class NameProjectChanged(val value: String) : WarehouseEditIntent()
     data class IconClicked(val value: Int) : WarehouseEditIntent()
+    data class ImagePathClicked(val value: String?) : WarehouseEditIntent()
     data class DateClicked(val value: String) : WarehouseEditIntent()
     data class CurrencyClicked(val value: Suffix) : WarehouseEditIntent()
     data class WeightClicked(val value: Suffix) : WarehouseEditIntent()

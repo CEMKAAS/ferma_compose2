@@ -39,7 +39,8 @@ data class WriteOffListState(
     override val isEntry: Boolean = false,
     override val currentProduct: WriteOffEntryState2 = WriteOffEntryState2(),
     override val isLoading: Boolean = false,
-    override val navigate: UiEvent? = null
+    override val navigate: UiEvent? = null,
+    val isArchive: Boolean = false
 ) : EntryNewState()
 
 data class WriteOffEntryState2(

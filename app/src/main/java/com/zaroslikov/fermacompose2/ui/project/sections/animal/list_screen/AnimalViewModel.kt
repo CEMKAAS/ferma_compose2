@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 
-import android.content.Context
-import androidx.core.content.ContextCompat.getString
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
@@ -13,9 +12,9 @@ import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
-import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -35,7 +34,8 @@ class AnimalViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
     private val animalCountRepository: AnimalCountRepository,
     private val expensesRepository: ExpensesRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<AnimalListState, AnimalListIntent, AnimalListReduce>(
     AnimalListState(),
     AnimalListReduce(resourceProvider)
@@ -53,23 +53,35 @@ class AnimalViewModel @Inject constructor(
                 loadDataForEntryOrEdit(intent.value, intent.isSaveStateForBottomSheet)
 
             AnimalListIntent.Insert -> insert()
+            is AnimalListIntent.Archive -> archive(intent.id, intent.isArchive)
             is AnimalListIntent.Delete -> delete(intent.value)
 
             else -> Unit
         }
     }
 
+    private fun archive(id: Long, isArchive: Boolean) {
+        viewModelScope.launch {
+            animalRepository.updateArchiveAnimalTableById(isArchive, id)
+        }
+    }
+
     private fun loadDate() {
         viewModelScope.launch {
+            val isArchiveProject = projectRepository.getIsArchiveProject(itemIdPT).first()
             animalRepository.getAllAnimal(itemIdPT).collectLatest { list ->
-                val animalList = list.map { animal -> animal.toUi() }
+                val baseList = list.map { animal -> animal.toUi() }
+                val archiveAnimalList = baseList.filter { it.isArchive }
+                val animalList = baseList.filter { !it.isArchive }
                 updateState {
                     it.copy(
                         idPT = itemIdPT,
                         list = animalList,
                         searchList = animalList,
-                        archiveList = animalList,
-                        isLoading = false
+                        archiveList = archiveAnimalList,
+                        searchArchiveList = archiveAnimalList,
+                        isLoading = false,
+                        isArchiveProject = isArchiveProject
                     )
                 }
             }
@@ -214,7 +226,10 @@ class AnimalViewModel @Inject constructor(
             count = animalCount?.count?.let { if (it.toInt() > 1) it else null },
             suffix = animalCount?.suffix ?: Suffix.KILOGRAM_DAY,
             foodDay = foodDay,
-            foodDaySuffix = foodDaySuffix
+            foodDaySuffix = foodDaySuffix,
+            isArchive = isArchive,
+            imagePath = imagePath,
+            currentIcon = currentIcon ?: R.drawable.baseline_pets_24
         )
     }
 

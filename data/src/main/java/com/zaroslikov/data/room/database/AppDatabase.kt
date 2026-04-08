@@ -25,6 +25,7 @@ import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
+import com.zaroslikov.data.room.dao.TimeNotificationDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
@@ -43,6 +44,7 @@ import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
+import com.zaroslikov.data.room.table.incubator.TimeNotificationTable
 import com.zaroslikov.data.room.table.profile.ProfileTable
 import com.zaroslikov.data.room.table.project.SettingsTable
 
@@ -63,6 +65,7 @@ import com.zaroslikov.data.room.table.project.SettingsTable
         ExpensesAnimalTable::class,
         IncubatorTable::class,
         BookmarkTable::class,
+        TimeNotificationTable::class,
         IncubatorParameters::class,
         AppSettingsTable::class,
         ProfileTable::class,
@@ -95,10 +98,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun settingsDao(): SettingsDao
     abstract fun incubatorTableDao(): IncubatorTableDao
     abstract fun bookmarkTableDao(): BookmarkDao
-
+    abstract fun timeNotificationDao(): TimeNotificationDao
     abstract fun appSettingsDao(): AppSettingsDao
-    abstract fun profileTableDao(): ProfileDao
 
+    abstract fun profileTableDao(): ProfileDao
 
     companion object {
         @Volatile

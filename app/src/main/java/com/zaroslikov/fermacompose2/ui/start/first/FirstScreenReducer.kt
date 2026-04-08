@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.start.first
 
+import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 
 class FirstScreenReducer : BaseReducer<FirstState, FirstIntent>() {
@@ -9,7 +10,22 @@ class FirstScreenReducer : BaseReducer<FirstState, FirstIntent>() {
     ): FirstState {
         return when (intent) {
             is FirstIntent.LoadingClicked -> state.copy(isLoading = intent.value)
+            is FirstIntent.ArchiveModeClicked -> state.copy(isArchive = !state.isArchive)
+            is FirstIntent.OpenArchiveIncubatorBottomSheetClicked ->
+                state.updateOpenArchiveIncubatorBottomSheet(intent.value, intent.domainProjectTable)
+
+            is FirstIntent.OpenDeleteBottomSheetClicked -> state.copy(isOpenDeleteBottomSheet = intent.value)
             else -> state
         }
+    }
+
+    private fun FirstState.updateOpenArchiveIncubatorBottomSheet(
+        isOpenArchiveIncubatorBottomSheet: Boolean,
+        domainProjectTable: DomainProjectTable?
+    ): FirstState {
+        return copy(
+            isOpenArchiveIncubatorBottomSheet = isOpenArchiveIncubatorBottomSheet,
+            currentProjectTable = if (isOpenArchiveIncubatorBottomSheet) domainProjectTable else null
+        )
     }
 }

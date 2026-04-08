@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.warehouse
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
@@ -12,6 +13,7 @@ import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
@@ -31,6 +33,7 @@ import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.Warehou
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -48,7 +51,8 @@ class WarehouseViewModel @Inject constructor(
     private val addRepository: AddRepository,
     private val settingsRepository: SettingsRepository,
     private val writeOffRepository: WriteOffRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val projectRepository: ProjectRepository
 ) : BaseViewModel2<WarehouseState, WarehouseIntent, WarehouseReduce>(
     WarehouseState(),
     WarehouseReduce()
@@ -72,6 +76,7 @@ class WarehouseViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
+            val isArchive = projectRepository.getIsArchiveProject(itemId).first()
             combine(
                 warehouseRepository.getCurrentBalanceWarehouse(itemId),
                 expensesRepository.getCurrentFoodWarehouse(itemId),
@@ -88,7 +93,8 @@ class WarehouseViewModel @Inject constructor(
                         expensesList = newState.expensesList,
                         fastAddList = newState.fastAddList,
                         foodList = newState.foodList,
-                        idPT = itemId
+                        idPT = itemId,
+                        isArchive = isArchive
                     )
                 }
             }

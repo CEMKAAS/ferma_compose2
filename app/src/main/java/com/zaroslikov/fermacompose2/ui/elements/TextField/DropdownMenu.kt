@@ -42,6 +42,7 @@ fun DropdownMenuEdit(
     onActiveClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     onArchiveClick: (() -> Unit)? = null,
+    onUnarchiveClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -72,6 +73,9 @@ fun DropdownMenuEdit(
                 }
                 onArchiveClick?.let {
                     add(MenuItemData("Архивировать", R.drawable.baseline_archive_24, color, it))
+                }
+                onUnarchiveClick?.let {
+                    add(MenuItemData("Разархивировать", R.drawable.baseline_unarchive_24, color, it))
                 }
                 onDeleteClick?.let {
                     add(MenuItemData("Удалить", R.drawable.icon_trash, error_base, it))

@@ -17,6 +17,7 @@ import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
@@ -49,7 +50,8 @@ class AnimalCountViewModel @Inject constructor(
     private val animalWeightRepository: AnimalWeightRepository,
     private val animalRepository: AnimalRepository,
     private val resourceProvider: ResourceProvider,
-    private val warehouseRepository: WarehouseRepository
+    private val warehouseRepository: WarehouseRepository,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<AnimalCountState, AnimalCountIntent, AnimalCountReduce>(
     AnimalCountState(),
     AnimalCountReduce()
@@ -112,6 +114,8 @@ class AnimalCountViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             val weight = animalWeightRepository.getWeightAnimalLimit(itemId).first()
+            val isArchiveProject = projectRepository.getIsArchiveProject(itemIdPT).first()
+            val isArchiveAnimal = animalRepository.getAnimal(itemId).first().archive
             combine(
                 animalRepository.getAnimal(itemId),
                 animalCountRepository.getCountAnimalLimit(itemId),
@@ -131,7 +135,8 @@ class AnimalCountViewModel @Inject constructor(
                         countAnimalSuffix = data.second?.suffix ?: Suffix.PIECES,
                         countList = data.third,
                         weight = weight,
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchiveProject || isArchiveAnimal
                     )
                 }
             }

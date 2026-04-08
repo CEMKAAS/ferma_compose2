@@ -11,6 +11,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 data class AnimalListState(
     val textSearch: String = "",
     val isArchive: Boolean = true,
+    val isArchiveProject: Boolean = false,
     val idPT: Long = 0,
     val openBottomSheetEntry: Boolean = false,
     val list: List<AnimalListUi> = emptyList(),
@@ -21,7 +22,7 @@ data class AnimalListState(
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
     override val isEntry: Boolean = true,
-    override val currentProduct: AnimalEntryState2 = AnimalEntryState2()
+    override val currentProduct: AnimalEntryState2 = AnimalEntryState2(),
 ) : EntryNewState()
 
 data class AnimalEntryState2(
@@ -64,7 +65,10 @@ data class AnimalListUi(
     val count: String?,
     val suffix: Suffix,
     val foodDay: Double,
-    val foodDaySuffix: Suffix
+    val foodDaySuffix: Suffix,
+    val isArchive: Boolean,
+    val imagePath: String?,
+    val currentIcon: Int
 )
 
 

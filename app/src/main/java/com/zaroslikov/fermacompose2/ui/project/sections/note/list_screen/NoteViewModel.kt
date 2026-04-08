@@ -4,12 +4,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainNoteTable
 import com.zaroslikov.domain.repository.NoteRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,7 +19,8 @@ import javax.inject.Inject
 class NoteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val noteRepository: NoteRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<NoteListState, NoteListIntent, NoteListReduce>(
     NoteListState(),
     NoteListReduce(resourceProvider)
@@ -47,9 +50,11 @@ class NoteViewModel @Inject constructor(
     private fun loadDate() {
         viewModelScope.launch {
             sendIntent(NoteListIntent.LoadingChanged(true))
+            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
             noteRepository.getAllNote(itemIdPT).collectLatest { list ->
                 sendIntent(NoteListIntent.LoadData(list))
-//                sendIntent(NoteListIntent.LoadingChanged(false))
+                updateState { state -> state.copy(isArchive = isArchive) }
+                sendIntent(NoteListIntent.LoadingChanged(false))
             }
         }
     }

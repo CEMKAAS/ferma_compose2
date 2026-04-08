@@ -8,16 +8,11 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
@@ -54,7 +49,6 @@ import androidx.compose.ui.unit.dp
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.room.util.TableInfo
 //import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
@@ -66,9 +60,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    isFirstStart: Boolean = false,
-    isFirstEnd: () -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -111,10 +102,7 @@ fun InventoryApp(
     ) {
         InventoryNavHost(
             navController = navController,
-            drawerState = drawerState,
             modifier = Modifier.padding(it),
-            isFirstStart = isFirstStart,
-            isFirstEnd = isFirstEnd,
         )
     }
 }
@@ -321,8 +309,8 @@ fun TopAppBarStart(
 fun TopAppBarStart2(
     @StringRes title: Int,
     infoBottomSheet: () -> Unit,
-    archiveButton: () -> Unit,
-    boolean: Boolean,
+    onArchiveClick: () -> Unit,
+    isArchive: Boolean,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     TopAppBar(
@@ -338,12 +326,11 @@ fun TopAppBarStart2(
         },
         windowInsets = WindowInsets(0),
         actions = {
-            IconButton(onClick = archiveButton) {
+            IconButton(onClick = onArchiveClick) {
                 Icon(
-                    painter = painterResource(id = if (boolean) R.drawable.baseline_unarchive_24 else R.drawable.baseline_archive_24),
+                    painter = painterResource(id = if (isArchive) R.drawable.baseline_unarchive_24 else R.drawable.baseline_archive_24),
                     contentDescription = "Localized description",
                 )
-
             }
         }
     )
@@ -483,10 +470,3 @@ fun TopAppBarNewFilter(
         }
     )
 }
-
-/*
-contentPadding = PaddingValues(
-end = dimensionResource(id = R.dimen.padding_medium),
-top = 16.dp,
-bottom = 8.dp
-),*/

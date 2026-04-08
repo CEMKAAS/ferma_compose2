@@ -71,10 +71,12 @@ class BookmarkViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             val incubator = incubatorTableRepository.getIncubatorByIdPT(itemIdPT).first()
+            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
             updateState { state ->
                 state.copy(
                     itemIdPT = itemIdPT,
-                    incubatorId = incubator.id
+                    incubatorId = incubator.id,
+                    isArchive = isArchive
                 )
             }
             bookmarkRepository.getActivityBookmark(incubator.id)
@@ -133,7 +135,8 @@ class BookmarkViewModel @Inject constructor(
                             currentParameterDay = currentParameter,
                             tomorrowParameterDay = tomorrowParameter,
                             isLoading = false,
-                            isCompleteModeEnd = currentDay > numberDays - 1
+                            isCompleteModeEnd = currentDay > numberDays - 1,
+
                         )
                     }
                     if (isBookmarkCompleted) updateCompleteIncubationBottomSheet(true)

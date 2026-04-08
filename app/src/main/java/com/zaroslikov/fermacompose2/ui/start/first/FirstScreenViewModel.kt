@@ -2,18 +2,21 @@ package com.zaroslikov.fermacompose2.ui.start.first
 
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.table.DomainProjectTable
+import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
-import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FirstScreenViewModel @Inject constructor(
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val bookmarkRepository: BookmarkRepository
 ) : BaseViewModel2<FirstState, FirstIntent, FirstScreenReducer>(
     FirstState(),
     FirstScreenReducer()
@@ -25,11 +28,14 @@ class FirstScreenViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
-            projectRepository.getAllProject().collect { list ->
+            projectRepository.getAllProject().collect { baseList ->
+                val list = baseList.filter { !it.archive }
+                val archiveList = baseList.filter { it.archive }
                 updateState {
                     it.copy(
                         isLoading = false,
-                        list = list
+                        list = list,
+                        archiveList = archiveList
                     )
                 }
             }
@@ -38,21 +44,45 @@ class FirstScreenViewModel @Inject constructor(
 
     fun onIntent(intent: FirstIntent) {
         return when (intent) {
-            is FirstIntent.DeleteClicked -> deleteProject(intent.domainProjectTable)
-            is FirstIntent.ArchiveClicked -> archiveProject(intent.domainProjectTable)
+            is FirstIntent.DeleteClicked -> deleteProject()
+            is FirstIntent.ArchiveClicked -> archiveProject(intent.value)
+            is FirstIntent.UnarchiveClicked -> unarchiveProject(intent.value)
             else -> sendIntent(intent)
         }
     }
 
-    private fun archiveProject(domainProjectTable: DomainProjectTable) {
+    private fun unarchiveProject(domainProjectTable: DomainProjectTable) {
         viewModelScope.launch {
-            projectRepository.updateProject(domainProjectTable.copy(mode = false))
+            projectRepository.updateProject(domainProjectTable.copy(archive = false))
         }
     }
 
-    private fun deleteProject(domainProjectTable: DomainProjectTable) {
+    private fun archiveProject(domainProjectTable: DomainProjectTable?) {
         viewModelScope.launch {
-            projectRepository.deleteProject(domainProjectTable)
+            val domain = domainProjectTable ?: getState().currentProjectTable
+            domain?.let {
+                projectRepository.updateProject(it.copy(archive = true))
+                val bookmark = bookmarkRepository.getActivityBookmarkByIdPT(it.id).first()
+                bookmark?.let {
+                    bookmarkRepository.update(
+                        bookmark.copy(
+                            isActivityBookmark = false, endDate = dateToday(),
+                            isEarlyCompletionStatus = true,
+                            rejectedCount = bookmark.count
+                        )
+                    )
+                }
+                sendIntent(FirstIntent.OpenArchiveIncubatorBottomSheetClicked(false))
+            }
+        }
+    }
+
+    private fun deleteProject() {
+        viewModelScope.launch {
+            getState().currentProjectTable?.let {
+                projectRepository.deleteProject(it)
+                sendIntent(FirstIntent.OpenDeleteBottomSheetClicked(false))
+            }
         }
     }
 
@@ -131,7 +161,19 @@ class FirstScreenViewModel @Inject constructor(
 }
 
 sealed class FirstIntent() : BaseIntent {
-    data class DeleteClicked(val domainProjectTable: DomainProjectTable) : FirstIntent()
-    data class ArchiveClicked(val domainProjectTable: DomainProjectTable) : FirstIntent()
+    data object DeleteClicked : FirstIntent()
+    data class ArchiveClicked(val value: DomainProjectTable?) : FirstIntent()
+    data class UnarchiveClicked(val value: DomainProjectTable) : FirstIntent()
+    data class OpenArchiveIncubatorBottomSheetClicked(
+        val value: Boolean,
+        val domainProjectTable: DomainProjectTable? = null
+    ) : FirstIntent()
+
+    data class OpenDeleteBottomSheetClicked(
+        val value: Boolean,
+        val domainProjectTable: DomainProjectTable? = null
+    ) : FirstIntent()
+
+    data object ArchiveModeClicked : FirstIntent()
     data class LoadingClicked(val value: Boolean) : FirstIntent()
 }

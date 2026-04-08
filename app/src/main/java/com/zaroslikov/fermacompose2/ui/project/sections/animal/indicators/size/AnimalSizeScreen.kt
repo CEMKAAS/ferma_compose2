@@ -64,9 +64,10 @@ fun AnimalSizeScreen(
             )
         },
         floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true))
-            }
+            if (!state.isArchive)
+                NeonGlowFab(colors = colors) {
+                    viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true))
+                }
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -79,6 +80,7 @@ fun AnimalSizeScreen(
                 icon = icon,
                 itemList = state.sizeList,
                 colors = colors,
+                isArchive = state.isArchive,
                 onEditClick = {
                     viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true, it))
                 },
@@ -107,6 +109,7 @@ private fun AnimalSizeContainer2(
     itemList: List<AnimalSizeUi>,
     onEditClick: (AnimalSizeUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
+    isArchive: Boolean,
 ) {
     InventoryAnimalBody(
         modifier = modifier,
@@ -116,7 +119,8 @@ private fun AnimalSizeContainer2(
         messageRes = R.string.message_no_date_message_height,
         iconRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
         iconColor = orang_2,
-        backgroundColor =  orang_14,
+        backgroundColor = orang_14,
+        isArchive = isArchive,
         detailCard = { item ->
             AnimalIndicatorsCardNew(
                 icon = icon,
@@ -126,11 +130,12 @@ private fun AnimalSizeContainer2(
                 date = item.date,
                 note = item.note,
                 totalValues = item.totalValue,
+                isArchive = isArchive,
                 indicationStatus = item.indicationStatus,
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
-        }
+        },
     )
 }
 

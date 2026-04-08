@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.table.DomainSettings
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
@@ -34,7 +35,8 @@ class SaleViewModel @Inject constructor(
     private val saleRepository: SaleRepository,
     private val warehouseRepository: WarehouseRepository,
     private val settingsRepository: SettingsRepository,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<SaleListState, SaleListIntent, SaleListReduce>(
     SaleListState(),
     SaleListReduce(resourceProvider)
@@ -69,6 +71,7 @@ class SaleViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
             combine(
                 saleRepository.getAllSaleItems(itemIdPT),
                 settingsRepository.getSettings(itemIdPT)
@@ -84,7 +87,8 @@ class SaleViewModel @Inject constructor(
                         briefly = briefly,
                         searchBrieflyList = briefly,
                         settings = settings,
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchive
                     )
                 }
             }

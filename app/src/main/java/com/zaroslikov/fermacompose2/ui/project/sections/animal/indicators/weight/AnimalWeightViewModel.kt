@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
+import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
@@ -13,6 +15,7 @@ import com.zaroslikov.fermacompose2.supportFun.toFormatNumber2
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.absoluteValue
@@ -21,6 +24,8 @@ import kotlin.math.absoluteValue
 class AnimalWeightViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val animalWeightRepository: AnimalWeightRepository,
+    private val projectRepository: ProjectRepository,
+    private val animalRepository: AnimalRepository,
 ) : EntryNewViewModel2<AnimalWeightState, AnimalWeightIntent, AnimalWeightReduce>(
     AnimalWeightState(),
     AnimalWeightReduce()
@@ -50,12 +55,15 @@ class AnimalWeightViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            val isArchiveProject = projectRepository.getIsArchiveProject(itemIdPT).first()
+            val isArchiveAnimal = animalRepository.getAnimal(itemId).first().archive
             animalWeightRepository.getWeightAnimal(itemId).collectLatest { weightList ->
                 updateState {
                     it.copy(
                         idPT = itemIdPT,
                         weightList = settingsList(weightList),
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchiveProject || isArchiveAnimal
                     )
                 }
             }

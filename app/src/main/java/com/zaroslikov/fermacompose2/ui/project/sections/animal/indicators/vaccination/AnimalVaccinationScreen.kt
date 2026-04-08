@@ -68,11 +68,12 @@ fun AnimalVaccinationScreen(
             )
         },
         floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                viewModel.onIntent(
-                    AnimalVaccinationIntent.OpenEntryBottomSheetByItem(true)
-                )
-            }
+            if (!state.isArchive)
+                NeonGlowFab(colors = colors) {
+                    viewModel.onIntent(
+                        AnimalVaccinationIntent.OpenEntryBottomSheetByItem(true)
+                    )
+                }
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -86,6 +87,7 @@ fun AnimalVaccinationScreen(
                 titleRes = title,
                 colors = colors,
                 itemList = state.vaccinationList,
+                isArchive = state.isArchive,
                 onEditClick = {
                     viewModel.onIntent(
                         AnimalVaccinationIntent.OpenEntryBottomSheetByItem(
@@ -114,17 +116,22 @@ private fun AnimalVaccinationContainer2(
     @DrawableRes icon: Int,
     @StringRes titleRes: Int,
     colors: List<Color>,
+    isArchive: Boolean,
     itemList: List<AnimalVaccinationExpensesDomain>,
     onEditClick: (AnimalVaccinationExpensesDomain) -> Unit,
     onDeleteClick: (Long) -> Unit,
 ) {
     InventoryAnimalBody(
         modifier = modifier,
+        isVaccination = true,
         itemList = itemList,
         titleRes2 = titleRes,
-        isVaccination = true,
         titleRes = R.string.message_no_date_title_vaccination,
         messageRes = R.string.message_no_date_message_vaccination,
+        iconRes = R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
+        iconColor = violet_1,
+        backgroundColor = violet_3,
+        isArchive = isArchive,
         detailCard = { item ->
             AnimalVaccinationCardNew(
                 icon = icon,
@@ -137,12 +144,10 @@ private fun AnimalVaccinationContainer2(
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
                 nextDate = item.nextDate,
+                isArchive = isArchive,
                 price = item.priceAll ?: item.price,
             )
         },
-        iconRes =  R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24,
-        iconColor = violet_1,
-        backgroundColor = violet_3,
     )
 }
 

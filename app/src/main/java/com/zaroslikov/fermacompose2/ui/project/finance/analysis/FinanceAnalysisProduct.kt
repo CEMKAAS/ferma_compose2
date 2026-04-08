@@ -524,8 +524,11 @@ private fun AnimalProducerSlider(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-
-                IconAnimal(sex = true, size = 40.dp)
+                IconAnimal(
+                    sex = true, sizeIcon = 40.dp,
+                    imagePath = TODO(),
+                    currentIcon = TODO()
+                )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {

@@ -8,13 +8,15 @@ data class JournalState(
     override val idPT: Long = 0,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
+    val projectId: Long = 0,
     val domainIncubator: IncubatorUi = IncubatorUi(),
     val domainBookmarkList: List<BookmarkUi> = emptyList(),
     val typeList: List<TypeUi> = emptyList(),
     val breedList: List<BreedUi> = emptyList(),
     val isShowActiveAlertDialog: Boolean = false,
     val isShowDeleteAlertDialog: Boolean = false,
-    val choiceNameBookmark: String = ""
+    val choiceNameBookmark: String = "",
+    val isArchive: Boolean = false
 ) : ListState()
 
 data class JournalCombined(
@@ -28,7 +30,7 @@ data class BookmarkUi(
     val id: Long,
     val title: String,
     val textSup: String,
-    val  isEarlyCompletionStatus: Boolean,
+    val isEarlyCompletionStatus: Boolean,
     val percent: Double,
     val percentFloat: Float,
     val startDate: String,

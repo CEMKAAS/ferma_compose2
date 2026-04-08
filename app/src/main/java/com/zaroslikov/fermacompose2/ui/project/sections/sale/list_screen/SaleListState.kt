@@ -38,6 +38,7 @@ data class SaleListState(
     override val currentProduct: SaleEntryState2 = SaleEntryState2(),
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
+    val isArchive: Boolean = false
 ) : EntryNewState()
 
 data class SaleEntryState2(

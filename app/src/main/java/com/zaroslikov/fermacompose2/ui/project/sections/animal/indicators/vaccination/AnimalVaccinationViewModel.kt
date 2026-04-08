@@ -10,6 +10,7 @@ import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
@@ -35,6 +36,7 @@ class AnimalVaccinationViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val resourceProvider: ResourceProvider,
     private val settingsRepository: SettingsRepository,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<AnimalVaccinationState, AnimalVaccinationIntent, AnimalVaccinationReduce>(
     AnimalVaccinationState(),
     AnimalVaccinationReduce()
@@ -65,6 +67,8 @@ class AnimalVaccinationViewModel @Inject constructor(
 
     fun loadData() {
         viewModelScope.launch {
+            val isArchiveProject = projectRepository.getIsArchiveProject(itemIdPT).first()
+            val isArchiveAnimal = animalRepository.getAnimal(itemId).first().archive
             combine(
                 animalVaccinationRepository.getTitleVaccinationAnimalList(itemId),
                 animalVaccinationRepository.getVaccinationExpensesAnimal(itemId)
@@ -76,7 +80,8 @@ class AnimalVaccinationViewModel @Inject constructor(
                         vaccinationList = data.second,
                         titleVaccinationList = data.first,
                         idPT = itemIdPT,
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchiveProject || isArchiveAnimal
                     )
                 }
             }

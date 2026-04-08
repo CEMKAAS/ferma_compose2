@@ -65,9 +65,10 @@ fun AnimalWeightScreen(
             )
         },
         floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(true))
-            }
+            if (!state.isArchive)
+                NeonGlowFab(colors = colors) {
+                    viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(true))
+                }
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -80,6 +81,7 @@ fun AnimalWeightScreen(
                 icon = icon,
                 colors = colors,
                 itemList = state.weightList,
+                isArchive = state.isArchive,
                 onInsertClick = {
                     viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(true))
                 },
@@ -112,6 +114,7 @@ private fun AnimalWeightContainer2(
     onInsertClick: () -> Unit,
     onEditClick: (AnimalWeightUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
+    isArchive: Boolean,
 ) {
     InventoryAnimalBody(
         modifier = modifier,
@@ -120,8 +123,9 @@ private fun AnimalWeightContainer2(
         titleRes = R.string.message_no_date_title_weight,
         messageRes = R.string.message_no_date_message_weight,
         iconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
-        iconColor =  blue_1,
+        iconColor = blue_1,
         backgroundColor = blue_3,
+        isArchive = isArchive,
         detailCard = { item ->
             AnimalIndicatorsCardNew(
                 icon = icon,
@@ -132,11 +136,11 @@ private fun AnimalWeightContainer2(
                 note = item.note,
                 totalValues = item.totalValue,
                 indicationStatus = item.indicationStatus,
+                isArchive = isArchive,
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
         },
-
     )
 }
 

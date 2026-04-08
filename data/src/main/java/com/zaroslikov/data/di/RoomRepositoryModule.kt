@@ -18,6 +18,7 @@ import com.zaroslikov.data.room.repository.ProfileTableRepositoryImpl
 import com.zaroslikov.data.room.repository.ProjectRepositoryImpl
 import com.zaroslikov.data.room.repository.SaleRepositoryImpl
 import com.zaroslikov.data.room.repository.SettingsRepositoryImpl
+import com.zaroslikov.data.room.repository.TimeNotificationRepositoryImpl
 import com.zaroslikov.data.room.repository.WarehouseRepositoryImpl
 import com.zaroslikov.data.room.repository.WriteOffRepositoryImpl
 import com.zaroslikov.domain.repository.AddRepository
@@ -38,6 +39,7 @@ import com.zaroslikov.domain.repository.ProfileRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
+import com.zaroslikov.domain.repository.TimeNotificationRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import dagger.Binds
@@ -121,6 +123,12 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBookmarkTableRepository(bookmarkRepositoryImpl: BookmarkRepositoryImpl): BookmarkRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTimeNotificationTableRepository(
+        timeNotificationRepositoryImpl: TimeNotificationRepositoryImpl
+    ): TimeNotificationRepository
 
     @Binds
     @Singleton

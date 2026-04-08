@@ -88,6 +88,7 @@
 
     // Search
     <string name="search_section">Поиск продукции...</string>
+    <string name="search_section_animal">Поиск животных...</string>
     <string name="search_section_search_nothing">Ничего нет</string>
     <string name="search_section_search_nothing_sup">Поиск не дал результатов</string>
     <string name="search_section_search_nothing_sup_2">Попробуйте написать по‑другому</string>
@@ -377,10 +378,30 @@
     <string name="start_screen_incubator_project">Инкубатор</string>
     <string name="start_screen_incubator_project_support">Учет инкубации яиц и вывода молодняка</string>
 
+    <string name="start_screen_no_data_archive_title">Нет архивных проектов</string>
+    <string name="start_screen_no_data_archive_message">Здесь будут отображаться архивные проекты</string>
+
+    <string name="start_screen_no_data_title">Нет проектов</string>
+    <string name="start_screen_no_data_message">Создайте свой первый проект для учета фермерского хозяйства</string>
+
+    <string name="start_screen_archive_incubator">Архивирование инкубатора</string>
+    <string name="start_screen_archive_incubator_title">Это действие повлияет на:</string>
+    <string name="start_screen_archive_incubator_text">• Все активные закладки будут завершены\n• Данные сохранятся, но проект станет неактивным\n• Проект можно будет вернуть из архива позже</string>
+    <string name="start_screen_in_archive">Архивировать</string>
+
+    <string name="start_screen_delete_incubator">Удаление инкубатора</string>
+    <string name="start_screen_delete_title">Это действие необратимо!</string>
+    <string name="start_screen_delete_incubator_text">• Все закладки и их данные будут удалены\n• История инкубации будет потеряна\n• Статистика и отчеты станут недоступны\n• Восстановление невозможно</string>
+    <string name="start_screen_delete">Да, удалить навсегда</string>
+
+    <string name="start_screen_delete_project">Удаление проекта</string>
+    <string name="start_screen_delete_project_text">• Все данные проекта будут удалены\n• Журнал записей будет потерян\n• Данные склада и финансов удалятся\n• Восстановление невозможно</string>
+
+
     //AddIncubatorScreen
     <string name="add_incubator_screen_title">Создание инкубатора</string>
     <string name="add_incubator_screen_title_edit">Настройка инкубатора</string>
-    <string name="add_incubator_screen_download_image">Загрузите фото инкубатора (необязательно)</string>
+    <string name="add_incubator_screen_download_image">Загрузите или выберите фото для проекта</string>
     <string name="add_incubator_screen_name_incubator">Название инкубатора</string>
     <string name="add_incubator_screen_name_incubator_support">Например: Инкубатор №1</string>
     <string name="add_incubator_screen_brand">Марка</string>
@@ -798,8 +819,18 @@
     <string name="message_no_data_title_animals">Нет животных</string>
     <string name="message_no_data_message_animals">Начните вести учет ваших животных.</string>
 
+    <string name="message_no_data_title_animals_archive">Архив пуст</string>
+    <string name="message_no_data_message_animals_archive">У вас нет архивированных животных</string>
+    <string name="message_no_data_message_support_animals_archive">Переместите животных в архив, чтобы увидеть их здесь</string>
+
     <string name="message_no_data_title_note">Нет заметок</string>
     <string name="message_no_data_message_note">Начните вести свои заметки</string>
+
+    <string name="message_no_data_message_archive_project">Разархивируйте проект для ввода данных</string>
+    <string name="message_no_data_message_archive">Разархивируйте для ввода данных</string>
+
+    <string name="message_no_data_title_bookmark">Нет закладки</string>
+    <string name="message_no_data_message_bookmark">Здесь появиться ваша текущая закладка</string>
 
 
     //AlertDialogInfo

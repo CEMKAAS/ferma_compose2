@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.start.settings
 
+import android.content.Context
+import android.util.Base64
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.zaroslikov.data.room.database.AppDatabase
@@ -20,6 +22,7 @@ import com.zaroslikov.domain.repository.ProfileRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
+import com.zaroslikov.domain.repository.TimeNotificationRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.ui.navigation.EventFile
@@ -30,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,6 +59,7 @@ class SettingsViewModel @Inject constructor(
     private val incubatorTableRepository: IncubatorTableRepository,
     private val bookmarkRepository: BookmarkRepository,
     private val incubatorParametersRepository: IncubatorParametersRepository,
+    private val timeNotificationRepository: TimeNotificationRepository,
 
     private val profileRepository: ProfileRepository,
     private val appSettingsRepository: AppSettingsRepository
@@ -76,7 +81,7 @@ class SettingsViewModel @Inject constructor(
         sendIntent(intent)
         when (intent) {
             is SettingsIntent.OpenExportBottomSheetClick -> createDatabaseForUploading(intent.value)
-            is SettingsIntent.ImportDatabasePress -> setAllData(intent.value)
+            is SettingsIntent.ImportDatabasePress -> setAllData(intent.value, intent.context)
             is SettingsIntent.ExportDatabasePress -> shapeExportDatabase()
             is SettingsIntent.DeleteDatabasePress -> deleteDatabase()
             else -> Unit
@@ -136,6 +141,8 @@ class SettingsViewModel @Inject constructor(
 
             val incubatorTable = incubatorTableRepository.getAllIncubatorTableForExport().first()
             val bookmarkTable = bookmarkRepository.getAllBookmarkTableForExport().first()
+            val timeNotificationTable =
+                timeNotificationRepository.getAllTimeNotificationTableForExport().first()
             val incubatorParameters =
                 incubatorParametersRepository.getAllIncubatorParameterTableForExport().first()
             val profileTable = profileRepository.getAllProfileTableForExport().first()
@@ -143,7 +150,18 @@ class SettingsViewModel @Inject constructor(
 
             val backupData = BackupData(
                 version = 1,
-                projectTable = projectTable,
+                projectTable = projectTable.map { project ->
+                    val base64 = project.imagePath?.let { path ->
+                        val file = File(path)
+                        if (file.exists()) {
+                            val bytes = file.readBytes()
+                            Base64.encodeToString(bytes, Base64.DEFAULT)
+                        } else null
+                    }
+                    project.copy(
+                        imagePath = base64 // может быть null — это нормально
+                    )
+                },
                 settingsTable = settingsTable,
                 addTable = addTable,
                 saleTable = saleTable,
@@ -151,7 +169,18 @@ class SettingsViewModel @Inject constructor(
                 expensesTable = expensesTable,
                 expensesAnimal = expensesAnimalTable,
                 noteTable = noteTable,
-                animalTable = animalTable,
+                animalTable = animalTable.map { project ->
+                    val base64 = project.imagePath?.let { path ->
+                        val file = File(path)
+                        if (file.exists()) {
+                            val bytes = file.readBytes()
+                            Base64.encodeToString(bytes, Base64.DEFAULT)
+                        } else null
+                    }
+                    project.copy(
+                        imagePath = base64 // может быть null — это нормально
+                    )
+                },
                 animalCountTable = animalCountTable,
                 animalWeightTable = animalWeightTable,
                 animalSizeTable = animalSizeTable,
@@ -159,15 +188,17 @@ class SettingsViewModel @Inject constructor(
                 incubatorTable = incubatorTable,
                 bookmarkTable = bookmarkTable,
                 incubatorParameters = incubatorParameters,
+                timeNotificationTable = timeNotificationTable,
                 profileTable = profileTable,
                 appSettingsTable = appSettingsTable
             )
             val json = Json.encodeToString(backupData)
             updateState { state -> state.copy(backupDataText = json) }
+            return@launch
         }
     }
 
-    private fun setAllData(value: String?) {
+    private fun setAllData(value: String?, context: Context) {
         viewModelScope.launch {
             sendIntent(SettingsIntent.OpenImportBottomSheetClick(false))
             if (value == null) {
@@ -183,9 +214,47 @@ class SettingsViewModel @Inject constructor(
                 return@launch
             }
 
-            projectRepository.clearAndInsertProjectTableForImport(backup.projectTable)
+            projectRepository.clearAndInsertProjectTableForImport(backup.projectTable.map { project ->
+                val newPath = project.imagePath?.let { base64 ->
+                    try {
+                        val bytes = Base64.decode(base64, Base64.DEFAULT)
+
+                        val file = File(
+                            context.filesDir,
+                            "project_${System.currentTimeMillis()}_${project.id}.jpg"
+                        )
+
+                        file.writeBytes(bytes)
+                        file.absolutePath
+
+                    } catch (e: Exception) {
+                        null // если картинка битая — просто игнорируем
+                    }
+                }
+                project.copy(
+                    imagePath = newPath
+                )
+            })
             settingsRepository.clearAndInsertSettingsTableForImport(backup.settingsTable)
-            animalRepository.clearAndInsertAnimalTableForImport(backup.animalTable)
+            animalRepository.clearAndInsertAnimalTableForImport(backup.animalTable.map { animalTable ->
+                val newPath = animalTable.imagePath?.let { base64 ->
+                    try {
+                        val bytes = Base64.decode(base64, Base64.DEFAULT)
+                        val file = File(
+                            context.filesDir,
+                            "project_${System.currentTimeMillis()}_${animalTable.id}.jpg"
+                        )
+                        file.writeBytes(bytes)
+                        file.absolutePath
+
+                    } catch (e: Exception) {
+                        null // если картинка битая — просто игнорируем
+                    }
+                }
+                animalTable.copy(
+                    imagePath = newPath
+                )
+            })
 
             addRepository.clearAndInsertAddTableForImport(backup.addTable)
             saleRepository.clearAndInsertSaleTableForImport(backup.saleTable)
@@ -203,11 +272,13 @@ class SettingsViewModel @Inject constructor(
             incubatorTableRepository.clearAndInsertIncubatorTableForImport(backup.incubatorTable)
             bookmarkRepository.clearAndInsertBookmarkTableForImport(backup.bookmarkTable)
             incubatorParametersRepository.clearAndInsertIncubatorParametersTableForImport(backup.incubatorParameters)
+            timeNotificationRepository.clearAndInsertTimeNotificationTableForImport(backup.timeNotificationTable)
 
             profileRepository.clearAndInsertProfileTableForImport(backup.profileTable)
             appSettingsRepository.clearAndInsertAppSettingsTableForImport(backup.appSettingsTable)
 
             showMessage("Ипорт прошел успешно")
+            return@launch
         }
     }
 }

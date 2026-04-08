@@ -141,6 +141,12 @@ interface BookmarkDao {
     @Query("SELECT * FROM bookmark_incubator WHERE is_activity_bookmark = 1 and idPT =:idPT")
     fun getActivityBookmark(idPT: Long): Flow<BookmarkTable?>
 
+    @Query("SELECT b.* FROM bookmark_incubator b" +
+            "    INNER JOIN incubator_table i ON b.idPT = i.id" +
+            "    WHERE b.is_activity_bookmark = 1" +
+            "    AND i.idPT = :idPT")
+    fun getActivityBookmarkByIdPT(idPT: Long): Flow<BookmarkTable?>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: BookmarkTable): Long
 

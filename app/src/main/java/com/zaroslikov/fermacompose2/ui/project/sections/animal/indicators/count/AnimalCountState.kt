@@ -48,6 +48,7 @@ data class AnimalCountState(
     override val navigate: UiEvent? = null,
     override val isEntry: Boolean = false,
     override val currentProduct: CountItem = CountItem(),
+    val isArchive: Boolean = false
 ) : EntryNewState()
 
 data class CountItem(

@@ -9,6 +9,7 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
@@ -46,6 +47,7 @@ class ExpensesViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val settingsRepository: SettingsRepository,
     private val resourceProvider: ResourceProvider,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<ExpensesListState, ExpensesListIntent, ExpensesListReduce>(
     initialState = ExpensesListState(),
     ExpensesListReduce(resourceProvider)
@@ -80,6 +82,7 @@ class ExpensesViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
             combine(
                 expensesRepository.getAllExpensesItems(itemIdPT),
                 settingsRepository.getSettings(itemIdPT)
@@ -100,7 +103,8 @@ class ExpensesViewModel @Inject constructor(
                         currentDetail = currentDetail?.let { detail ->
                             expensesList.find { it.id == detail.id }
                         },
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchive
                     )
                 }
             }

@@ -16,7 +16,8 @@ data class WarehouseState(
     val fastAddList: List<DomainFastAddProduct> = emptyList(),
     override val idPT: Long = 0,
     override val isLoading: Boolean = false,
-    override val navigate: UiEvent? = null
+    override val navigate: UiEvent? = null,
+    val isArchive: Boolean = false
 ) : ListState()
 
 data class FoodListUi(

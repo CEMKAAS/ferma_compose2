@@ -66,7 +66,7 @@ fun EntryBookmarkOneScreen(
         )
         NotificationCard(
             state = state,
-            notificationList = state.notificationList,
+            notificationList = state.notificationList.filter { it.isVisibility },
             onIntent = onIntent
         )
         NoteCard(state.note) { onIntent(EntryBookmarkIntent.NoteChanged(it)) }
@@ -245,7 +245,6 @@ private fun NotificationCard(
                     }
                     HorizontalDivider(thickness = 1.dp, color = orang_5)
                 }
-
             TimeOutlinedTextFieldNew(
                 time = state.currentNotification.time,
                 onValueChange = { onIntent(EntryBookmarkIntent.TimeNotificationChanged(it)) },

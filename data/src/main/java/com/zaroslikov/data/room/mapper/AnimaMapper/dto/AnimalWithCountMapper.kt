@@ -16,6 +16,9 @@ fun DomainAnimalWithCount.toRoom(): AnimalWithCountDto = AnimalWithCountDto(
     suffix = suffix,
     foodDay = foodDay,
     foodDaySuffix = foodDaySuffix,
+    isArchive = isArchive,
+    imagePath = imagePath,
+    currentIcon = currentIcon
 )
 
 fun AnimalWithCountDto.toDomain(): DomainAnimalWithCount = DomainAnimalWithCount(
@@ -30,4 +33,7 @@ fun AnimalWithCountDto.toDomain(): DomainAnimalWithCount = DomainAnimalWithCount
     suffix = suffix,
     foodDay = foodDay,
     foodDaySuffix = foodDaySuffix,
+    isArchive = isArchive,
+    imagePath = imagePath,
+    currentIcon = currentIcon
 )

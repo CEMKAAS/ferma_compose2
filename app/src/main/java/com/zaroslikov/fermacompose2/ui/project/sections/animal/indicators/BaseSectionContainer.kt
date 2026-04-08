@@ -2,32 +2,22 @@
 
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators
 
-import android.text.style.BackgroundColorSpan
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +33,6 @@ import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.blue_3
-import com.zaroslikov.fermacompose2.blue_4
 import com.zaroslikov.fermacompose2.blue_5
 import com.zaroslikov.fermacompose2.blue_6
 import com.zaroslikov.fermacompose2.blue_7
@@ -72,14 +61,10 @@ import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
 import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData
 import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
-import com.zaroslikov.fermacompose2.ui.elements.TextLine
-import com.zaroslikov.fermacompose2.ui.elements.modifierBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
-import com.zaroslikov.fermacompose2.ui.elements.textBold_20
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelDetailNew
@@ -102,7 +87,8 @@ fun <T> InventoryAnimalBody(
     @DrawableRes iconRes: Int,
     iconColor: Color,
     backgroundColor: Color,
-    detailCard: @Composable (item: T) -> Unit
+    detailCard: @Composable (item: T) -> Unit,
+    isArchive: Boolean
 ) {
     if (itemList.isNotEmpty())
         InventoryList(
@@ -112,15 +98,19 @@ fun <T> InventoryAnimalBody(
             isVaccination = isVaccination,
             detailCard = detailCard,
         )
-    else
+    else {
+        val supportSecondTextArchive =
+            if (isArchive) R.string.message_no_data_message_archive else null
         EmptyBookmark(
             iconRes = iconRes,
             title = titleRes,
             supportText = messageRes,
+            supportSecondText = supportSecondTextArchive,
             iconColor = iconColor,
             backgroundColor = backgroundColor,
             plusColor = iconColor
         )
+    }
 }
 
 
@@ -193,6 +183,7 @@ fun DetailBottomSheet(
     title: String,
     colors: List<Color>,
     enabledButton: Boolean = true,
+    isArchive: Boolean,
     onDismissRequest: () -> Unit,
     onDeleteClick: () -> Unit,
     onUpdateClick: () -> Unit,
@@ -201,14 +192,16 @@ fun DetailBottomSheet(
     BaseBottomSheet(
         title = title,
         onDismissRequest = onDismissRequest,
-        contentBottom = {
-            ButtonPanelDetailNew(
-                modifier = Modifier.fillMaxWidth(),
-                colors = colors,
-                enabled = enabledButton,
-                onClickUpdate = onUpdateClick,
-                onClickDelete = onDeleteClick
-            )
+        contentBottom = if (isArchive) null else {
+            {
+                ButtonPanelDetailNew(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = colors,
+                    enabled = enabledButton,
+                    onClickUpdate = onUpdateClick,
+                    onClickDelete = onDeleteClick
+                )
+            }
         }
     ) {
         Column(
@@ -229,6 +222,7 @@ fun AnimalIndicatorsCardBase(
     date: String,
     vaccinationDate: String? = null,
     nextVaccinationDate: String? = null,
+    isArchive: Boolean,
     noteContainer: @Composable (ColumnScope.() -> Unit)? = null,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -272,10 +266,11 @@ fun AnimalIndicatorsCardBase(
                         style = textBold_16,
                         textAlign = TextAlign.Center
                     )
-                    DropdownMenuEdit(
-                        onEditClick = onEditClick,
-                        onDeleteClick = onDeleteClick
-                    )
+                    if (!isArchive)
+                        DropdownMenuEdit(
+                            onEditClick = onEditClick,
+                            onDeleteClick = onDeleteClick
+                        )
                 }
             }
             vaccinationDate?.let {
@@ -306,6 +301,7 @@ fun AnimalIndicatorsCardNew(
     note: String,
     totalValues: String,
     indicationStatus: IndicationStatus,
+    isArchive: Boolean,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -316,6 +312,7 @@ fun AnimalIndicatorsCardNew(
         colors = colors,
         value = "$value ${stringResource(suffix.toResId())}",
         date = date,
+        isArchive = isArchive,
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailClick = { details = !details },
@@ -344,6 +341,7 @@ fun AnimalCountCardNew(
     suffix: Suffix,
     date: String,
     note: String,
+    isArchive: Boolean,
     productKill: List<ProductKill>,
     indicationStatus: IndicationStatus,
     onEditClick: () -> Unit,
@@ -358,6 +356,7 @@ fun AnimalCountCardNew(
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailClick = { details = !details },
+        isArchive = isArchive,
         noteContainer = {
             AnimatedVisibility(
                 modifier = Modifier.fillMaxWidth(),
@@ -387,6 +386,7 @@ fun AnimalVaccinationCardNew(
     date: String,
     nextDate: String?,
     note: String,
+    isArchive: Boolean,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
@@ -399,6 +399,7 @@ fun AnimalVaccinationCardNew(
         date = "$count ${stringResource(suffix.toResId())}",
         vaccinationDate = date,
         nextVaccinationDate = nextDate,
+        isArchive = isArchive,
         onEditClick = onEditClick,
         onDeleteClick = onDeleteClick,
         onDetailClick = { details = !details },

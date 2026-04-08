@@ -5,13 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalSize
+import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalSizeRepository
+import com.zaroslikov.domain.repository.ProjectRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.convertSize
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.absoluteValue
@@ -20,6 +24,8 @@ import kotlin.math.absoluteValue
 class AnimalSizeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val animalSizeRepository: AnimalSizeRepository,
+    private val projectRepository: ProjectRepository,
+    private val animalRepository: AnimalRepository
 ) : EntryNewViewModel2<AnimalSizeState, AnimalSizeIntent, AnimalSizeReduce>(
     AnimalSizeState(),
     AnimalSizeReduce()
@@ -49,12 +55,15 @@ class AnimalSizeViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            val isArchiveProject = projectRepository.getIsArchiveProject(itemIdPT).first()
+            val isArchiveAnimal = animalRepository.getAnimal(itemId).first().archive
             animalSizeRepository.getSizeAnimal(itemId).collectLatest { sizeList ->
                 updateState {
                     it.copy(
                         idPT = itemIdPT,
                         sizeList = settingsList(sizeList),
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchiveProject || isArchiveAnimal
                     )
                 }
             }

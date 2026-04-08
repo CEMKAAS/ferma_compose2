@@ -25,6 +25,7 @@ interface BookmarkRepository {
     fun getBookmarkList(type: TypeEgg, idPT: Long): Flow<List<DomainBookmark>>
     fun getBookmarkListByIdPT(idPT: Long): Flow<List<DomainBookmark>>
     fun getActivityBookmark(idPT: Long): Flow<DomainBookmark?>
+    fun getActivityBookmarkByIdPT(idPT: Long): Flow<DomainBookmark?>
     suspend fun insert(item: DomainBookmark): Long
     suspend fun update(item: DomainBookmark)
     suspend fun deleteBookmarkById(id: Long)

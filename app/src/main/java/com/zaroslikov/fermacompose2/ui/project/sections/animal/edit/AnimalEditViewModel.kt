@@ -81,9 +81,10 @@ class AnimalEditViewModel @Inject constructor(
             note = note,
             foodDay = foodDay.formatNumber(),
             foodDaySuffix = foodDaySuffix,
-            image = image,
             archive = archive,
             idPT = idPT,
+            imagePath = imagePath,
+            currentIcon = currentIcon ?: R.drawable.baseline_pets_24,
             pickList = PickAnimalEditList(
                 typeList = typeList
             )
@@ -104,7 +105,9 @@ class AnimalEditViewModel @Inject constructor(
             archive = archive,
             foodDay = if (foodDay.isBlank()) 0.0 else foodDay.toConvertDbDouble(),
             foodDaySuffix = foodDaySuffix,
-            idPT = idPT
+            idPT = idPT,
+            imagePath = imagePath,
+            currentIcon = if (imagePath != null) null else currentIcon
         )
     }
 

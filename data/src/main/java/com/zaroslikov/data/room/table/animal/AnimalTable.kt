@@ -31,7 +31,10 @@ data class AnimalTable(
     val isGroup: Boolean,//groop = true, one = false
     val sex: Boolean,
     val note : String,
-    val image:String?,
+    @ColumnInfo(name = "image_path")
+    val imagePath: String? = null,
+    @ColumnInfo(name = "icon")
+    val currentIcon: Int? = null,
     val archive: Boolean,
     @ColumnInfo(name = "food_day")
     val foodDay:Double,

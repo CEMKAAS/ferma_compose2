@@ -17,8 +17,8 @@ fun SettingsTable.toDomainSettings(): DomainSettings {
 fun DomainSettings.toSettingsTable(): SettingsTable {
     return SettingsTable(
         id = this.id,
-        linearSuffix = this.linearSuffix,
         currencySuffix = this.currencySuffix,
+        linearSuffix = this.linearSuffix,
         weightSuffix = this.weightSuffix,
         idPT = this.idPT,
         volumeSuffix = this.volumeSuffix,

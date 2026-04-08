@@ -7,6 +7,7 @@ import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
@@ -37,6 +38,7 @@ class AddViewModel @Inject constructor(
     private val warehouseRepository: WarehouseRepository,
     private val resourceProvider: ResourceProvider,
     private val settingsRepository: SettingsRepository,
+    private val projectRepository: ProjectRepository
 ) : EntryNewViewModel2<AddListState, AddListIntent, AddListReduce>(
     AddListState(),
     AddListReduce(resourceProvider)
@@ -69,6 +71,7 @@ class AddViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
             combine(
                 addRepository.getAllItems(itemIdPT),
                 settingsRepository.getSettings(itemIdPT)
@@ -88,7 +91,8 @@ class AddViewModel @Inject constructor(
                         currentDetail = currentDetail?.let { detail ->
                             addList.find { it.id == detail.id }
                         },
-                        isLoading = false
+                        isLoading = false,
+                        isArchive = isArchive
                     )
                 }
             }

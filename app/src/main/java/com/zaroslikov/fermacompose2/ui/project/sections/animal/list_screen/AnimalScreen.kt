@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,7 +32,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.rememberAsyncImagePainter
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.domain.models.list.suffixWeightDayList
@@ -78,8 +82,10 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
+import java.io.File
 
 
 object AnimalDestination : NavigationDestination {
@@ -105,17 +111,19 @@ fun AnimalScreen(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarNavigationNew(
-                scrollBehavior = scrollBehavior,
                 value = state.textSearch,
                 isGroup = state.isArchive,
-                onClick = { viewModel.onIntent(AnimalListIntent.GroupClicked(it)) },
-                onValueChange = { viewModel.onIntent(AnimalListIntent.SearchChanged(it)) }
+                isAnimal = true,
+                onValueChange = { viewModel.onIntent(AnimalListIntent.SearchChanged(it)) },
+                onClick = { viewModel.onIntent(AnimalListIntent.ArchiveClicked(it)) },
+                scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
-            NeonGlowFab(colors = colors) {
-                viewModel.onIntent(AnimalListIntent.OpenBottomSheetEntry(true))
-            }
+            if (!state.isArchiveProject)
+                NeonGlowFab(colors = colors) {
+                    viewModel.onIntent(AnimalListIntent.OpenBottomSheetEntry(true))
+                }
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -131,14 +139,18 @@ fun AnimalScreen(
                 details = state.isArchive,
                 searchList = state.searchList,
                 brieflyList = state.searchArchiveList,
+                isArchiveProject = state.isArchiveProject,
                 onClick = { navigateToItemCard(state.idPT to it) },
+                onArchiveClick = {
+                    viewModel.onIntent(AnimalListIntent.Archive(it.first, it.second))
+                },
                 onDeleteClick = { viewModel.onIntent(AnimalListIntent.Delete(it)) }
             )
         if (state.openBottomSheetEntry)
             AnimalEntryBottomSheet(
                 state = state.currentProduct,
                 colors = colors,
-                onIntent = viewModel::onIntent
+                onIntent = viewModel::onIntent,
             )
     }
 }
@@ -277,11 +289,13 @@ private fun AnimalContainer(
     modifier: Modifier = Modifier,
     color: Color,
     details: Boolean,
+    isArchiveProject: Boolean,
     itemList: List<AnimalListUi>,
     searchList: List<AnimalListUi>,
     brieflyList: List<AnimalListUi>,
     onClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
+    onArchiveClick: (Pair<Long, Boolean>) -> Unit,
 ) {
     InventoryBody(
         modifier = modifier,
@@ -293,21 +307,32 @@ private fun AnimalContainer(
             AnimalCard(
                 animal = item,
                 onClick = { onClick(item.id) },
-                onArchive = { TODO() },
+                onArchiveClick = { onArchiveClick(item.id to true) },
+                isArchive = isArchiveProject,
                 onDeleteClick = { onDeleteClick(item.id) })
         },
         brieflyCard = { item ->
             AnimalCard(
                 animal = item,
-                onClick = { TODO() },
-                onArchive = { TODO() },
+                onClick = { onClick(item.id) },
+                onUnarchiveClick = { onArchiveClick(item.id to false) },
+                isArchive = isArchiveProject,
                 onDeleteClick = { onDeleteClick(item.id) })
         },
-        titleRes = R.string.message_no_data_title_animals,
-        messageRes = R.string.message_no_data_message_animals,
-        iconRes = R.drawable.baseline_pets_24,
+        detailEmptyState = EmptyState(
+            title = R.string.message_no_data_title_animals,
+            message = R.string.message_no_data_message_animals,
+            icon = R.drawable.baseline_pets_24
+        ),
+        brieflyEmptyState = EmptyState(
+            title = R.string.message_no_data_title_animals_archive,
+            message = R.string.message_no_data_message_animals_archive,
+            support = R.string.message_no_data_message_support_animals_archive,
+            icon = R.drawable.baseline_archive_24
+        ),
         iconColor = orang_5,
-        backgroundColor = orang_1
+        backgroundColor = orang_1,
+        isArchive = isArchiveProject
     )
 }
 
@@ -315,8 +340,10 @@ private fun AnimalContainer(
 @Composable
 fun AnimalCard(
     animal: AnimalListUi,
+    isArchive: Boolean,
     onClick: () -> Unit,
-    onArchive: () -> Unit,
+    onArchiveClick: (() -> Unit)? = null,
+    onUnarchiveClick: (() -> Unit)? = null,
     onDeleteClick: () -> Unit,
 ) {
     CardFieldNew(
@@ -326,7 +353,11 @@ fun AnimalCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top,
             ) {
-                IconAnimal(sex = animal.sex)
+                IconAnimal(
+                    sex = animal.sex,
+                    imagePath = animal.imagePath,
+                    currentIcon = animal.currentIcon,
+                )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -366,10 +397,12 @@ fun AnimalCard(
                                 }
                             }
                         }
-                        DropdownMenuEdit(
-                            onArchiveClick = onArchive,
-                            onDeleteClick = onDeleteClick
-                        )
+                        if (!isArchive)
+                            DropdownMenuEdit(
+                                onArchiveClick = onArchiveClick,
+                                onUnarchiveClick = onUnarchiveClick,
+                                onDeleteClick = onDeleteClick
+                            )
                     }
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -509,11 +542,11 @@ fun AnimalParameter(
 @Composable
 fun IconAnimal(
     modifier: Modifier = Modifier,
-    size: Dp = 64.dp,
+    sizeIcon: Dp = 64.dp,
     sex: Boolean?,
+    imagePath: String?,
+    currentIcon: Int,
 ) {
-    val glowColor = Color(0xFF00A63E)
-
     val colors = when (sex) {
         true -> listOf(Color(0xFF51A2FF), Color(0xFF615FFF))
         false -> listOf(Color(0xFFFB64B6), Color(0xFFFF2056))
@@ -525,17 +558,13 @@ fun IconAnimal(
         start = Offset(0f, 0f),
         end = Offset(Float.POSITIVE_INFINITY, 0f)
     )
+    val painter = when {
+        imagePath != null -> rememberAsyncImagePainter(File(imagePath))
+        else -> painterResource(currentIcon)
+    }
     Box(
         modifier = modifier
-            .size(size)
-            /*.graphicsLayer {
-                // имитация неонового свечения
-                shadowElevation = 20f
-                shape = CircleShape
-                clip = false
-                ambientShadowColor = glowColor.copy(alpha = 0.8f)
-                spotShadowColor = glowColor.copy(alpha = 0.8f)
-            }*/
+            .size(sizeIcon)
             .clip(CircleShape)
             .background(brush = gradient)
             .border(
@@ -545,11 +574,15 @@ fun IconAnimal(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            painterResource(R.drawable.baseline_pets_24),
-            contentDescription = "Добавить",
-            tint = Color.White,
-            modifier = Modifier.size(size / 2)
+        Image(
+            painter = painter,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            colorFilter = if (imagePath == null) ColorFilter.tint(Color.White) else null,
+            modifier = Modifier
+                .then(
+                    if (imagePath == null) Modifier.size(sizeIcon / 2) else Modifier
+                )
         )
     }
 }

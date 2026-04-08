@@ -33,6 +33,9 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
+import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
+import com.zaroslikov.fermacompose2.ui.elements.TextField.BaseOutlinedTextNew
 import com.zaroslikov.fermacompose2.white
 
 @Composable
@@ -94,9 +97,10 @@ fun MessageNoData2(
     @StringRes supportSecondText: Int? = null,
     @DrawableRes iconRes: Int,
     iconColor: Color,
-    backgroundColor: Color
+    backgroundColor: Color,
+    isBorderCard: Boolean = true
 ) {
-    BorderCard(modifier) {
+    val content: @Composable () -> Unit = {
         EmptyBookmark(
             iconRes = iconRes,
             title = titleRes,
@@ -107,6 +111,10 @@ fun MessageNoData2(
             plusColor = iconColor
         )
     }
+
+    if (isBorderCard) BorderCard(modifier) {
+        content()
+    } else content()
 }
 
 @Composable
