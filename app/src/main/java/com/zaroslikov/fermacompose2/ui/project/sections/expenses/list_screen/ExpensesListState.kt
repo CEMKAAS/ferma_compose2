@@ -6,6 +6,7 @@ import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.list.suffixWeightList
 import com.zaroslikov.domain.models.table.DomainSettings
@@ -24,6 +25,7 @@ data class ExpensesListState(
     val isOpenGroupBottomSheet: Boolean = false,
     val isOpenEntryBottomSheet: Boolean = false,
     val isOpenBottomSheetDetail: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
     val isSaveStateForEntry: Boolean = false,
 
     val currentDetail: ExpensesTableUi? = null,
@@ -97,18 +99,18 @@ data class ExpensesEntryState2(
 
 data class ExpensesTableUi(
     val id: Long = 0,
-    val title: String, // название
-    val count: Double, // Кол-во
-    val day: Int,  // день
-    val month: Int, // месяц
-    val year: Int, // время
-    val price: Double,
+    val title: String = "", // название
+    val count: Double = 0.0, // Кол-во
+    val day: Int = 0,  // день
+    val month: Int = 0, // месяц
+    val year: Int = 0, // время
+    val price: Double = 0.0,
     val priceAll: Double? = null,
-    val countSuffix: Suffix,
-    val category: String,
-    val note: String,
-    val isFood: Boolean,
-    val isShowFood: Boolean, // Показывать на складе еду
+    val countSuffix: Suffix = Suffix.PIECES,
+    val category: String = "",
+    val note: String = "",
+    val isFood: Boolean = false,
+    val isShowFood: Boolean = false, // Показывать на складе еду
     val feedFood: Double? = null, // Ежедневный расход еды
     val feedFoodSuffix: Suffix? = null, // Суффикс ежедневного расхода
     val countAnimal: Int? = null, // Кол-во животных
@@ -116,12 +118,12 @@ data class ExpensesTableUi(
     val lastDayFood: String? = null, //Последний день еды
     val weight: Double? = null,
     val weightSuffix: Suffix? = null,
-    val idPT: Long,
+    val idPT: Long = 0,
     val animalId: Long? = null,
     val animalVaccinationId: Long? = null,
     val animalCountId: Long? = null,
     val food: Food? = null,
-    val colors: List<Color>? = null
+    val typeProduct: TypeProduct? = null
 )
 
 data class Food(

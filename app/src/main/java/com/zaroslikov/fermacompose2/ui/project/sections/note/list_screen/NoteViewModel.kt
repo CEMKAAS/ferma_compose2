@@ -3,11 +3,13 @@ package com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainNoteTable
+import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.repository.NoteRepository
 import com.zaroslikov.domain.repository.ProjectRepository
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.dateToday
-import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -20,7 +22,8 @@ class NoteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val noteRepository: NoteRepository,
     private val resourceProvider: ResourceProvider,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<NoteListState, NoteListIntent, NoteListReduce>(
     NoteListState(),
     NoteListReduce(resourceProvider)
@@ -42,7 +45,7 @@ class NoteViewModel @Inject constructor(
 
             NoteListIntent.Insert -> insert()
             NoteListIntent.Update -> update()
-            is NoteListIntent.Delete -> delete(intent.value)
+            is NoteListIntent.Delete -> delete(0)
             else -> Unit
         }
     }
@@ -58,7 +61,6 @@ class NoteViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun loadDataForEntryOrEdit(
         isOpen: Boolean,
@@ -93,44 +95,49 @@ class NoteViewModel @Inject constructor(
     override fun insert() {
         viewModelScope.launch {
             noteRepository.insertNote(getState().currentProduct.toDomain())
+            showSnackbar(ProductOperation.ADD)
+            yandexMetricRepository.metricalNote(getState().currentProduct.title)
             loadDataForEntryOrEdit(false, null)
-            /* showMessage(
-                 resourceProvider.getString(R.string.toast_delete_s)
-                     .format(
-                         getState().domainNoteTable.title,
-                     )
-             )*/
         }
-//            metricaNote(title)
     }
 
     override fun update() {
         viewModelScope.launch {
             noteRepository.updateNote(getState().currentProduct.toDomain())
             updateState { it.copy(detailDomainNoteTable = getState().currentProduct.toDomain()) }
+            showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
-            /* navigateTo(UiEvent.NavigateBack)*/
-            /* showMessage(
-                 resourceProvider.getString(R.string.toast_delete_s)
-                     .format(
-                         getState().domainNoteTable.title,
-                     )
-             )*/
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
-            noteRepository.deleteNoteById(id)
-            navigateTo(UiEvent.NavigateBack)
-
-            /*  showMessage(
-                  resourceProvider.getString(R.string.toast_delete_s)
-                      .format(
-                          getState().domainNoteTable.title,
-                      )
-              )*/
+            getState().detailDomainNoteTable.let { product ->
+                noteRepository.deleteNoteById(product.id)
+                showSnackbar(ProductOperation.DELETE)
+                sendIntent(NoteListIntent.OpenBottomSheetDelete(null))
+            }
         }
+    }
+
+    private fun showSnackbar(productOperation: ProductOperation) {
+        val title =
+            if (productOperation == ProductOperation.DELETE)
+                getState().detailDomainNoteTable.title
+            else getState().currentProduct.title
+
+        showMessage(
+            when (productOperation) {
+                ProductOperation.ADD -> resourceProvider.getString(R.string.snackbar_note_add)
+                    .format(title)
+
+                ProductOperation.EDIT -> resourceProvider.getString(R.string.snackbar_note_update)
+                    .format(title)
+
+                else -> resourceProvider.getString(R.string.snackbar_note_delete)
+                    .format(title)
+            }
+        )
     }
 
     private fun DomainNoteTable.toUi(): NoteEntryState2 {

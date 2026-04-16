@@ -27,6 +27,7 @@ sealed class AddListIntent : BaseIntent {
         val value: Long? = null
     ) : AddListIntent()
 
+    data class OpenBottomSheetDelete(val value: Long? = null) : AddListIntent()
 
     data class GroupClicked(val value: Boolean) : AddListIntent()
     data class TitleChanged(val value: String) : AddListIntent()
@@ -42,5 +43,5 @@ sealed class AddListIntent : BaseIntent {
     data class SearchChanged(val value: String) : AddListIntent()
     data object Insert : AddListIntent()
     data object Update : AddListIntent()
-    data class Delete(val value: Long) : AddListIntent()
+    data object  Delete : AddListIntent()
 }

@@ -43,7 +43,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddViewModel
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalListScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffScreen
@@ -157,7 +157,7 @@ fun SectionWorkspaceScreen(
                 Page.SALE -> SaleScreen()
                 Page.EXPENSES -> ExpensesScreen()
                 Page.WRITE_OFF -> WriteOffScreen()
-                Page.ANIMAL -> AnimalScreen(navigateToItemCard = navigateToItemCard)
+                Page.ANIMAL -> AnimalListScreen(navigateToItemCard = navigateToItemCard)
             }
         }
     }

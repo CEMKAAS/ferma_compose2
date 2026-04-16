@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.main
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
@@ -20,12 +21,13 @@ import com.zaroslikov.domain.repository.IncubatorParametersRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
+import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel
+import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
 import com.zaroslikov.fermacompose2.supportFun.currentTime
 import com.zaroslikov.fermacompose2.supportFun.dateToday
-import com.zaroslikov.fermacompose2.supportFun.toConvertDb
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
@@ -60,9 +62,12 @@ class BookmarkViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
     private val expensesRepository: ExpensesRepository,
     private val animalCountRepository: AnimalCountRepository,
+    private val timeNotificationIncubatorRepository: TimeNotificationIncubatorRepository,
+    private val workManagerRepository: WorkManagerRepository
 ) : BaseViewModel<BookmarkState, BookmarkIntent>(BookmarkState()) {
 
     private val itemIdPT: Long = checkNotNull(savedStateHandle[BookmarkDestination.itemIdPT])
+
 
     init {
         loadData()
@@ -76,6 +81,7 @@ class BookmarkViewModel @Inject constructor(
                 state.copy(
                     itemIdPT = itemIdPT,
                     incubatorId = incubator.id,
+                    incubatorName = incubator.title,
                     isArchive = isArchive
                 )
             }
@@ -83,9 +89,7 @@ class BookmarkViewModel @Inject constructor(
                 .flatMapLatest { bookmark ->
                     if (bookmark == null) flowOf(null to emptyList())
                     else incubatorParametersRepository.getIncubatorList(bookmark.id)
-                        .map { parameters ->
-                            bookmark to parameters
-                        }
+                        .map { parameters -> bookmark to parameters }
                 }
                 .collect { (bookmark, parameters) ->
                     if (bookmark == null) {
@@ -97,6 +101,8 @@ class BookmarkViewModel @Inject constructor(
                         }
                         return@collect
                     }
+                    if (parameters.isEmpty()) return@collect
+
                     val numberDays = parameters.size
                     val (currentDay, startDay, endDay) = dayNumberWithTime(
                         startDate = bookmark.startDate,
@@ -117,6 +123,9 @@ class BookmarkViewModel @Inject constructor(
                         numberDays = numberDays
                     )
                     val isBookmarkCompleted = currentDay > numberDays
+                    Log.i("bookmark_screen", "currentDay: $currentDay ")
+                    Log.i("bookmark_screen", "numberDays: $numberDays ")
+                    Log.i("bookmark_screen", "isBookmarkCompleted: $isBookmarkCompleted ")
                     updateState { state ->
                         state.copy(
                             domainBookmark = bookmark,
@@ -136,10 +145,14 @@ class BookmarkViewModel @Inject constructor(
                             tomorrowParameterDay = tomorrowParameter,
                             isLoading = false,
                             isCompleteModeEnd = currentDay > numberDays - 1,
-
                         )
                     }
-                    if (isBookmarkCompleted) updateCompleteIncubationBottomSheet(true)
+                    if (isBookmarkCompleted && !getState().isBookmarkCompleted) {
+                        updateState { state ->
+                            state.copy(isBookmarkCompleted = true)
+                        }
+                        updateCompleteIncubationBottomSheet(true)
+                    }
                 }
         }
     }
@@ -654,7 +667,7 @@ class BookmarkViewModel @Inject constructor(
     private suspend fun insertIntoNewProject() {
         val id = projectRepository.insertProjectLong(insertDomainProject())
         settingsRepository.insertSettings(insertDomainSettings(id))
-        insertAnimalToProject(id)
+        insertIntoProjectAnimal(id)
     }
 
     private suspend fun insertIntoProjectAnimal(idPT: Long) {
@@ -681,6 +694,7 @@ class BookmarkViewModel @Inject constructor(
         val rejectedCount = if (isEarlyCompletionStatus) getState().domainBookmark.count
         else getState().completeState.rejectedEggCompleted
 
+        Log.i("bookmark_early", "bookmarkToArchive: ${getState().domainBookmark }")
         bookmarkRepository.update(
             getState().domainBookmark.copy(
                 isActivityBookmark = false,
@@ -691,22 +705,44 @@ class BookmarkViewModel @Inject constructor(
                 note = note ?: getState().domainBookmark.note
             )
         )
+        updateState { state ->state.copy(
+            domainBookmark = DomainBookmark()
+        ) }
+        updateNotifications()
     }
 
     private fun insertDomainProject(): DomainProjectTable {
         return DomainProjectTable(
             title = getState().completeState.newNameProject,
             date = dateToday(),
-            mode = false
+            mode = true
         )
     }
 
     private fun insertDomainSettings(idPT: Long): DomainSettings {
         return DomainSettings(
-            /* currencySuffix = incubatorRepository,*/ //TODO Рубли или тенге
+            currencySuffix = getState().currencySuffix,
             idPT = idPT
         )
     }
+
+    suspend fun updateNotifications() {
+        timeNotificationIncubatorRepository.getTimeNotificationInAllActiveBookmark()
+            .first()
+            .let { list ->
+                workManagerRepository.cancelAllNotifications()
+                list.forEach { item ->
+                    workManagerRepository.scheduleReminderIncubator(
+                        name = item.nameBookmark,
+                        time = item.time,
+                        bookmarkId = item.bookmarkId,
+                        note = item.note,
+                        projectId = item.projectId
+                    )
+                }
+            }
+    }
+
 
     private fun BookmarkState.updateForSave(
         idAnimal: Long,
@@ -719,27 +755,30 @@ class BookmarkViewModel @Inject constructor(
             count = domainBookmark.count.toString(),
             suffix = Suffix.PIECES,
             date = dateToday(),
-            note = "",// Добавлено через инкубатор
-            version = AnimalCountVersion.ADD,
+            note = resourceProvider.getString(R.string.bookmark_screen_animal_count),
+            version = AnimalCountVersion.INCUBATOR,
             idAnimal = idAnimal
         ) to
-                if (domainBookmark.price != null)
+                domainBookmark.price?.let {
                     DomainExpensesTable(
-                        title = domainBookmark.title, // TODO
+                        title = domainBookmark.title,
                         count = domainBookmark.count.toDouble(),
                         day = dateList[0].toInt(),
                         month = dateList[0].toInt(),
                         year = dateList[0].toInt(),
-                        price = domainBookmark.price!!, //TODO
-                        priceAll = null, //TODO
+                        price = it,
+                        priceAll = domainBookmark.priceAll,
                         countSuffix = Suffix.PIECES,
-                        category = "", // //TODO Затраты на инкубатор
-                        note = "", // //TODO Затраты на инкубатор
+                        category = resourceProvider.getString(R.string.bookmark_screen_expenses_animal_category)
+                            .format(incubatorName),
+                        note = resourceProvider.getString(R.string.bookmark_screen_expenses_animal_note)
+                            .format(incubatorName),
                         isShowFood = false,
                         idPT = itemIdPT,
                         animalId = idAnimal,
                         isFood = false,
-                    ) else null
+                    )
+                }
     }
 
 
@@ -754,7 +793,7 @@ class BookmarkViewModel @Inject constructor(
             group = true,
             sex = false,
             note = note,
-            image = null,
+            currentIcon = iconByTypeEgg(type),
             archive = false,
             foodDay = 0.0,
             foodDaySuffix = Suffix.GRAM_DAY,
@@ -796,6 +835,16 @@ class BookmarkViewModel @Inject constructor(
             note = note,
             idPT = idPT
         )
+    }
+
+    private fun iconByTypeEgg(typeEgg: TypeEgg): Int {
+        return when (typeEgg) {
+            TypeEgg.CHICKENS -> R.drawable.chiken
+            TypeEgg.GEESE -> R.drawable.external_goose_birds_icongeek26_outline_icongeek26
+            TypeEgg.QUAILS -> R.drawable.quail
+            TypeEgg.TURKEYS -> R.drawable.turkeycock
+            TypeEgg.DUCKS -> R.drawable.duck
+        }
     }
 }
 

@@ -82,7 +82,6 @@ import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CategoryBorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
-import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconFinance
 import com.zaroslikov.fermacompose2.ui.elements.IconText
@@ -99,6 +98,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.CircleShape
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.finance.TransactionFinanceCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.formatNumber
@@ -174,7 +174,7 @@ fun FinanceCategoryScreen2(
                 onDateRangeSelected = {
                     viewModel.onIntent(FinanceCategoryIntent.CurrentPeriodClicked(it))
                 },
-                onDismiss = {
+                onDismissRequest = {
                     viewModel.onIntent(FinanceCategoryIntent.OpenCalendarDialogClicked(false))
                 }
             )

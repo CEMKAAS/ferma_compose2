@@ -29,10 +29,13 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsCardNew
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsDeleteCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.InventoryAnimalBody
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.AnimalWeightUi
 
 
 object AnimalSizeDestination : NavigationDestination {
@@ -84,7 +87,7 @@ fun AnimalSizeScreen(
                 onEditClick = {
                     viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true, it))
                 },
-                onDeleteClick = { viewModel.onIntent(AnimalSizeIntent.DeletePressed(it)) },
+                onDeleteClick = { viewModel.onIntent(AnimalSizeIntent.OpenBottomSheetDelete(it)) },
                 titleRes = title
             )
 
@@ -95,6 +98,13 @@ fun AnimalSizeScreen(
                 colors = colors,
                 icon = icon,
                 titleRes = title,
+            )
+        if (state.isOpenBottomSheetDelete)
+            WarningDeleteSizeBottomSheet(
+                color = colors.first(),
+                state = state.deleteSize,
+                onDeleteClick = { viewModel.onIntent(AnimalSizeIntent.DeletePressed) },
+                onDismissRequest = { viewModel.onIntent(AnimalSizeIntent.OpenBottomSheetDelete(null)) }
             )
     }
 }
@@ -137,6 +147,33 @@ private fun AnimalSizeContainer2(
             )
         },
     )
+}
+
+@Composable
+private fun WarningDeleteSizeBottomSheet(
+    color: Color,
+    state: AnimalSizeUi?,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.base_section_delete_size,
+        supportRes = R.string.base_section_delete_support_size,
+        textRes = R.string.base_section_warning_size,
+        textButtonRes = R.string.base_section_button_delete_size
+    ) {
+        state?.let {
+            AnimalIndicatorsDeleteCard(
+                color = color,
+                value = state.size.toFormatNumber(),
+                suffix = state.suffix,
+                date = state.date,
+                note = state.note,
+            )
+        }
+    }
 }
 
 @Composable

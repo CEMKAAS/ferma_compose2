@@ -50,6 +50,7 @@ import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_17
+import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.red_11
@@ -88,6 +89,7 @@ fun <T, B> InventoryBody(
     itemList: List<T>,
     searchList: List<T>,
     brieflyList: List<B>,
+    searchBrieflyList: List<B>,
     // карточки передаются как composable-функции
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
@@ -105,13 +107,15 @@ fun <T, B> InventoryBody(
         brieflyList.isNotEmpty()
     }
 
+    val currentList = if (details) searchList else searchBrieflyList
+
     if (currentListIsNotEmpty) {
-        if (searchList.isNotEmpty())
+        if (currentList.isNotEmpty())
             InventoryList(
                 modifier = modifier,
                 details = details,
                 itemList = searchList,
-                brieflyList = brieflyList,
+                brieflyList = searchBrieflyList,
                 detailCard = detailCard,
                 brieflyCard = brieflyCard,
             )
@@ -315,7 +319,7 @@ private fun AnalysisButton(onAnalysisClick: () -> Unit) {
         text = stringResource(R.string.briefly_detail_card_analysis),
         onClick = onAnalysisClick,
         colors = listOf(price_green, green_shamrock),
-        iconRes = R.drawable.baseline_analytics_24,
+        prefixIconRes = R.drawable.baseline_analytics_24,
         paddingValues = PaddingValues(vertical = 14.dp)
     )
 }
@@ -551,6 +555,13 @@ private fun ValueFood(
     remainingFood: Double,
     animalList: List<AnimalExpensesDomain>
 ) {
+
+    val colorOfResidue = when {
+        percentFloat > 0.45f -> green_6
+        percentFloat < 0.45f && percentFloat > 0.25f -> orang_9
+        else -> error_base
+    }
+
     BorderCard(
         borderColor = grey_2,
         containerColor = white,
@@ -563,7 +574,7 @@ private fun ValueFood(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             IconTransaction2(
-                icon = R.drawable.outline_work_24,
+                icon = R.drawable.wheat_24dp_000000_fill0_wght400_grad0_opsz24,
                 boxColor = boxColor,
                 iconColor = iconColor
             )
@@ -606,7 +617,7 @@ private fun ValueFood(
                 firstValue = "${weightAll.formatNumber()} ${stringResource(weightSuffix.toResId())}",
                 firstIconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
                 firstIconColor = blue_1,
-                secondIconColor = blue_1,
+                secondIconColor = colorOfResidue,
                 secondIconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
                 secondValue = "${remainingFood.formatNumber()} ${stringResource(weightSuffix.toResId())}",
                 secondTitleRes = R.string.detail_card_rest_weight
@@ -614,8 +625,8 @@ private fun ValueFood(
             TwoBorderValueCard(
                 firstTitleRes = R.string.detail_card_food_feel,
                 firstValue = "${feedFood.formatNumber()} ${stringResource(feedFoodSuffix.toResId())}",
-                firstIconRes = R.drawable.baseline_shopping_basket_24,
-                firstIconColor = green_shamrock,
+                firstIconRes = R.drawable.outline_restaurant_24,
+                firstIconColor = orang_6,
 
                 secondIconColor = violet_1,
                 secondIconRes = R.drawable.baseline_access_time_24,
@@ -645,11 +656,7 @@ private fun ValueFood(
             BaseSlider(
                 modifier = Modifier,
                 percentFloat = percentFloat,
-                color = when {
-                    percentFloat > 0.45f -> green_6
-                    percentFloat < 0.45f && percentFloat > 0.25f -> orang_9
-                    else -> error_base
-                }
+                color = colorOfResidue
             )
         }
     }
@@ -672,6 +679,7 @@ private fun AnimalFoodCard(
         padding = PaddingValues(12.dp)
     ) {
         Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -823,4 +831,3 @@ private fun ValueStandardCard(
         }
     }
 }
-

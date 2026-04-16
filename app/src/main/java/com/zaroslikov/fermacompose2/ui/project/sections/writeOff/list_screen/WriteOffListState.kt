@@ -23,6 +23,8 @@ data class WriteOffListState(
     val isOpenGroupBottomSheet: Boolean = false,
     val isOpenEntryBottomSheet: Boolean = false,
     val isOpenBottomSheetDetail: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
+
     val isSaveStateForBottomSheet: Boolean = false,
 
     val currentDetail: DomainWriteOffTable? = null,

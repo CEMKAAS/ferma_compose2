@@ -28,9 +28,11 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextVaccinationNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsDeleteCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalVaccinationCardNew
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.InventoryAnimalBody
 import com.zaroslikov.fermacompose2.violet_1
@@ -89,14 +91,11 @@ fun AnimalVaccinationScreen(
                 itemList = state.vaccinationList,
                 isArchive = state.isArchive,
                 onEditClick = {
-                    viewModel.onIntent(
-                        AnimalVaccinationIntent.OpenEntryBottomSheetByItem(
-                            true,
-                            it
-                        )
-                    )
+                    viewModel.onIntent(AnimalVaccinationIntent.OpenEntryBottomSheetByItem(true, it))
                 },
-                onDeleteClick = { viewModel.onIntent(AnimalVaccinationIntent.DeletePressed(it)) }
+                onDeleteClick = {
+                    viewModel.onIntent(AnimalVaccinationIntent.OpenBottomSheetDelete(it))
+                }
             )
         if (state.isOpenDialog)
             VaccinationBottomSheet(
@@ -106,6 +105,15 @@ fun AnimalVaccinationScreen(
                 icon = icon,
                 titleRes = title,
                 titleList = state.titleVaccinationList,
+            )
+        if (state.isOpenBottomSheetDelete)
+            WarningDeleteVaccinationBottomSheet(
+                color = colors.first(),
+                state = state.deleteVaccination,
+                onDismissRequest = {
+                    viewModel.onIntent(AnimalVaccinationIntent.OpenBottomSheetDelete(null))
+                },
+                onDeleteClick = { viewModel.onIntent(AnimalVaccinationIntent.DeletePressed) }
             )
     }
 }
@@ -147,9 +155,38 @@ private fun AnimalVaccinationContainer2(
                 isArchive = isArchive,
                 price = item.priceAll ?: item.price,
             )
-        },
+        }
     )
 }
+
+
+@Composable
+private fun WarningDeleteVaccinationBottomSheet(
+    color: Color,
+    state: AnimalVaccinationExpensesDomain?,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.base_section_delete_vaccination,
+        supportRes = R.string.base_section_delete_support_vaccination,
+        textRes = R.string.base_section_warning_vaccination,
+        textButtonRes = R.string.base_section_button_delete_vaccination
+    ) {
+        state?.let {
+            AnimalIndicatorsDeleteCard(
+                value = state.vaccination,
+                suffix = null,
+                date = state.date,
+                note = state.note,
+                color = color,
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun VaccinationBottomSheet(

@@ -2,6 +2,8 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weigh
 
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
 
 class AnimalWeightReduce : BaseReducer<AnimalWeightState, AnimalWeightIntent>() {
     override fun reducer(
@@ -13,11 +15,27 @@ class AnimalWeightReduce : BaseReducer<AnimalWeightState, AnimalWeightIntent>() 
                 intent.isOpen,
                 intent.state, intent.isSaveStateForBottomSheet
             ).updateValid()
+            is AnimalWeightIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
             is AnimalWeightIntent.WeightChanged -> state.updateWeight(intent.value).updateValid()
             is AnimalWeightIntent.DateClicked -> state.updateDate(intent.value)
             is AnimalWeightIntent.NoteChanged -> state.updateNote(intent.value)
             is AnimalWeightIntent.SuffixClicked -> state.updateSuffix(intent.value)
             else -> state
+        }
+    }
+
+    private fun AnimalWeightState.updateOpenBottomSheetDelete(id: Long?): AnimalWeightState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDelete = false,
+                deleteWeight = null
+            )
+        else {
+            val domain = weightList.find { it.id == id }
+            copy(
+                isOpenBottomSheetDelete = domain?.let { true } ?: false,
+                deleteWeight = domain
+            )
         }
     }
 

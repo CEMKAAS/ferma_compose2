@@ -16,6 +16,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
+import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.green_g_4
@@ -33,6 +35,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedWriteOffStatus
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
@@ -62,7 +65,7 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
     val primeColor = violet_1
     val priceSuffix = state.settings.currencySuffix
     val writeOffBoolean = state.writeOffBoolean
-    val iconRes = R.drawable.icon_trash
+    val iconRes = R.drawable.baseline_edit_note_24
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -90,7 +93,8 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
                 .modifierScreenLazy(innerPadding),
             itemList = state.list,
             searchList = state.searchList,
-            brieflyList = state.searchBrieflyList,
+            brieflyList = state.briefly,
+            searchBrieflyList = state.searchBrieflyList,
             isArchive = state.isArchive,
             onDetailsCardClick = { viewModel.onIntent(WriteOffListIntent.OpenBottomSheetDetail(it)) },
             onEditClick = {
@@ -98,7 +102,7 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
                     WriteOffListIntent.OpenBottomSheetEntry(true, it)
                 )
             },
-            onDeleteClick = { viewModel.onIntent(WriteOffListIntent.Delete(it)) },
+            onDeleteClick = { viewModel.onIntent(WriteOffListIntent.OpenBottomSheetDelete(it)) },
             onDetailsClick = {
                 viewModel.onIntent(
                     WriteOffListIntent.OpenBottomSheetGroup(it)
@@ -108,6 +112,7 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             details = state.isGroup,
             priceSuffix = priceSuffix,
             iconRes = iconRes,
+            writeOffBoolean = writeOffBoolean
         )
         if (state.isOpenEntryBottomSheet)
             WriteOffEntryBottomSheet(
@@ -132,7 +137,7 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
                         WriteOffListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(WriteOffListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(WriteOffListIntent.OpenBottomSheetDelete(it)) },
             )
         if (state.isOpenBottomSheetDetail)
             WriteOffDetailBottomSheet(
@@ -140,6 +145,16 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
                 colors = colors,
                 onIntent = viewModel::onIntent,
                 isArchive = state.isArchive
+            )
+        if (state.isOpenBottomSheetDelete)
+            WarningDeleteWriteOffBottomSheet(
+                state = state.currentDetail,
+                color = colors.first(),
+                priceSuffix = priceSuffix,
+                onDismissRequest = {
+                    viewModel.onIntent(WriteOffListIntent.OpenBottomSheetDelete(null))
+                },
+                onDeleteClick = { viewModel.onIntent(WriteOffListIntent.Delete) }
             )
     }
 }
@@ -170,9 +185,45 @@ private fun WriteOffDetailBottomSheet(
             colors = colors,
             isArchive = isArchive,
             onUpdateClick = { onIntent(WriteOffListIntent.OpenBottomSheetEntry(true, state)) },
-            onDeleteClick = { onIntent(WriteOffListIntent.Delete(state.id)) },
+            onDeleteClick = { onIntent(WriteOffListIntent.OpenBottomSheetDelete(state.id)) },
             onDismissRequest = { onIntent(WriteOffListIntent.OpenBottomSheetDetail(null)) }
         )
+    }
+}
+
+@Composable
+private fun WarningDeleteWriteOffBottomSheet(
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit,
+    state: DomainWriteOffTable?,
+    color: Color,
+    priceSuffix: Suffix
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.base_section_delete_write_off,
+        supportRes = R.string.base_section_delete_support_write_off,
+        textButtonRes = R.string.base_section_button_delete_write_off
+    ) {
+        state?.let { product ->
+            DetailProductCardNew(
+                title = product.title,
+                count = product.count,
+                suffix = product.countSuffix,
+                price = product.priceAll ?: product.price,
+                statusWriteOff = product.status,
+                note = product.note,
+                color = color,
+                day = product.day,
+                month = product.month,
+                year = product.year,
+                priceSuffix = priceSuffix,
+                animalCountId = product.animalCountId,
+                isArchive = true,
+                isCardField = false,
+            )
+        }
     }
 }
 
@@ -187,17 +238,19 @@ private fun WriteOffContainer(
     itemList: List<DomainWriteOffTable>,
     searchList: List<DomainWriteOffTable>,
     brieflyList: List<BrieflyItem>,
+    searchBrieflyList: List<BrieflyItem>,
     onEditClick: (DomainWriteOffTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (String) -> Unit,
-    onDetailsCardClick: (Long) -> Unit
+    onDetailsCardClick: (Long) -> Unit,
+    writeOffBoolean: Boolean
 ) {
     InventoryBody(
         modifier = modifier,
         details = details,
         itemList = itemList,
         searchList = searchList,
-        brieflyList = brieflyList,
+        brieflyList = brieflyList, searchBrieflyList = searchBrieflyList,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -211,7 +264,7 @@ private fun WriteOffContainer(
                 day = item.day,
                 month = item.month,
                 year = item.year,
-                colors = item.animalCountId?.let { listOf(white, green_g_4) },
+                typeProduct = item.animalCountId?.let { TypeProduct.ANIMAL },
                 animalCountId = item.animalCountId,
                 isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
@@ -236,7 +289,8 @@ private fun WriteOffContainer(
         },
         detailEmptyState = EmptyState(
             title = R.string.message_no_data_title_write_off,
-            message =  R.string.message_no_data_message_write_off,
+            message = R.string.message_no_data_message_write_off,
+            support = if (writeOffBoolean) null else R.string.message_no_data_message_write_off_support,
             icon = iconRes
         ),
         iconColor = violet_1,
@@ -271,7 +325,6 @@ private fun BrieflyBottomSheetWriteOff(
             onDismissRequest = onDismissRequest,
             itemCard = { product ->
                 DetailProductCardNew(
-                    modifier = Modifier,
                     isCardField = false,
                     count = product.count,
                     suffix = product.countSuffix,
@@ -286,7 +339,6 @@ private fun BrieflyBottomSheetWriteOff(
                     priceSuffix = priceSuffix,
                     animalCountId = product.animalCountId,
                     isArchive = isArchive,
-                    onClick = {},
                     onDeleteClick = { onDeleteClick(product.id) },
                     onEditClick = { onEditClick(product) }
                 )
@@ -345,7 +397,7 @@ private fun WriteOffEntryBottomSheet(
             isError = state.error.isErrorCount,
             suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product_write_off,
-            suffixList = suffixWeightDayList,
+            suffixList = suffixAllList,
             enabled = !state.isIndicatorsValue,
         )
         if (!state.isIndicatorsValue)

@@ -1,10 +1,14 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 
+import android.util.Log
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalUi
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 
 class AnimalListReduce(private val resourceProvider: ResourceProvider) :
@@ -16,6 +20,8 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
         return when (intent) {
             is AnimalListIntent.ArchiveClicked -> state.updateAnimalArchive(intent.value)
             is AnimalListIntent.SearchChanged -> state.updateSearch(intent.value)
+
+            is AnimalListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
 
             is AnimalListIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
                 intent.isOpen,
@@ -73,6 +79,24 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
         )
     }
 
+    //TODO сделать null
+    private fun AnimalListState.updateOpenBottomSheetDelete(id: Long?): AnimalListState {
+        Log.i("animal_list", "updateOpenBottomSheetDelete: $id")
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDelete = false,
+                currentAnimal = AnimalListUi()
+            )
+        else {
+            val currentList = if (isArchive) list else archiveList
+            val domain = currentList.find { it.id == id }
+            copy(
+                isOpenBottomSheetDelete = domain?.let { true } ?: false,
+                currentAnimal = domain ?: AnimalListUi()
+            )
+        }
+    }
+
     private fun AnimalListState.updateAnimalArchive(isArchive: Boolean): AnimalListState {
         return copy(
             isArchive = isArchive
@@ -85,7 +109,6 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
         val searchList = if (query.isBlank() && !isArchive) list
         else
             list.filter { item ->
-
                 item.name.lowercase().contains(query) ||
                         item.type.lowercase().contains(query) ||
                         item.date.lowercase().contains(query) ||
@@ -96,10 +119,9 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
                          (item.priceAll ?: item.price).toString().lowercase().contains(query)*/
             } //TODO
 
-        val searchArchiveList = if (query.isBlank() && isArchive) list
+        val searchArchiveList = if (query.isBlank() && isArchive) archiveList
         else
-            list.filter { item ->
-
+            archiveList.filter { item ->
                 item.name.lowercase().contains(query) ||
                         item.type.lowercase().contains(query) ||
                         item.date.lowercase().contains(query) ||

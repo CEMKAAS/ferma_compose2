@@ -8,6 +8,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.text.lowercase
 
@@ -24,10 +25,11 @@ class SaleListReduce(
                 isSaveStateForEntry = intent.isSaveStateForBottomSheet,
                 entryState2 = intent.state
             ).updateValid()
+            is SaleListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
+            is SaleListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
 
             is SaleListIntent.SearchChanged -> state.updateSearch(intent.value)
             is SaleListIntent.GroupClicked -> state.updateGroup(intent.value)
-            is SaleListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
             is SaleListIntent.TitleChanged -> state.updateTitle(intent.value).updateValid()
             is SaleListIntent.TitleAndSuffixClicked ->
                 state.updateTitleAndSuffix(intent.title, intent.suffix).updateValid()
@@ -64,6 +66,20 @@ class SaleListReduce(
             val domain = list.find { it.id == id }
             copy(
                 isOpenBottomSheetDetail = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
+        }
+    }
+    private fun SaleListState.updateOpenBottomSheetDelete(id: Long?): SaleListState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDelete = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDelete = domain?.let { true } ?: false,
                 currentDetail = domain
             )
         }

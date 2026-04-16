@@ -25,6 +25,9 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
                 isSaveStateForEntry = intent.isSaveStateForBottomSheet
             ).updateValid()
 
+            is AddListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
+            is AddListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
+
             is AddListIntent.TitleChanged -> state.updateTitle(intent.value).updateValid()
             is AddListIntent.TitleAndSuffix -> state.updateTitleAndSuffix(intent.pair).updateValid()
             is AddListIntent.RefreshWarehouseCount -> state.updateWarehouseList(intent.value)
@@ -38,7 +41,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.AnimalNameById -> state.updateAnimal(intent.value)
 
 
-            is AddListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
+
             else -> state
         }
     }
@@ -58,6 +61,21 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
                 currentDetail = domain
             )
         }
+    }
+
+    private fun AddListState.updateOpenBottomSheetDelete( id: Long?): AddListState {
+        return if (id == null)
+                copy(
+                    isOpenBottomSheetDelete = false,
+                    currentDetail = null
+                )
+            else {
+                val domain = list.find { it.id == id }
+                copy(
+                    isOpenBottomSheetDelete = domain?.let { true } ?: false,
+                    currentDetail = domain
+                )
+            }
     }
 
     private fun AddListState.updateValid(): AddListState {

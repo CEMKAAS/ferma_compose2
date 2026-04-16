@@ -1,10 +1,12 @@
 package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.main
 
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainBookmark
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 data class BookmarkState(
     val isOpenBottomSheet: Boolean = false,
@@ -24,10 +26,12 @@ data class BookmarkState(
     val endDay: String = "",
     val itemIdPT: Long = 0,
     val incubatorId: Long = 0,
+    val incubatorName: String = "",
     val isActivityBookmark: Boolean = false,
     val currentDay: Int = 0,
     val currentEgg: Int = 0,
     val reasonNote: String = "",
+    val currencySuffix: Suffix = Suffix.RUBLE,
     val parameterDayList: List<ParametersIncubatorUi> = emptyList(),
     val editParameterDay: ParametersIncubatorUi = ParametersIncubatorUi(),
     val currentParameterDay: ParametersIncubatorUi = ParametersIncubatorUi(),

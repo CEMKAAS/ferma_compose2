@@ -75,7 +75,14 @@ fun DropdownMenuEdit(
                     add(MenuItemData("Архивировать", R.drawable.baseline_archive_24, color, it))
                 }
                 onUnarchiveClick?.let {
-                    add(MenuItemData("Разархивировать", R.drawable.baseline_unarchive_24, color, it))
+                    add(
+                        MenuItemData(
+                            "Разархивировать",
+                            R.drawable.baseline_unarchive_24,
+                            color,
+                            it
+                        )
+                    )
                 }
                 onDeleteClick?.let {
                     add(MenuItemData("Удалить", R.drawable.icon_trash, error_base, it))
@@ -186,7 +193,8 @@ fun ExposedDropdownMenuProduct(
         title = title,
         labelSelector = { it.title },
         list = titleList,
-        content = content
+        content = content,
+        enableDropMenu = enableDropMenu,
     ) { index, item, closeMenu ->
         val trailingIcon: @Composable (() -> Unit)? = if (item.title == title) {
             { Icon(Icons.Default.Done, contentDescription = null) }

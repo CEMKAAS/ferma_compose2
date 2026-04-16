@@ -24,7 +24,7 @@ fun AnimalCountVersion.toDrawRes(): Int {
         AnimalCountVersion.KILL -> R.drawable.icons8__meat60
         AnimalCountVersion.WRITE_OFF -> R.drawable.baseline_edit_note_24
         AnimalCountVersion.ADD -> R.drawable.baseline_add_circle_outline_24
-        AnimalCountVersion.INCUBATOR -> R.drawable.baseline_pets_24
+        AnimalCountVersion.INCUBATOR -> R.drawable.outline_egg_24
     }
 }
 
@@ -45,6 +45,7 @@ fun Destination.toDrawRes(): Int {
         Destination.FINANCE -> R.drawable.icon_money
     }
 }
+
 fun DestinationIncubator.toDrawRes(): Int {
     return when (this) {
         DestinationIncubator.JOURNAL -> R.drawable.outline_book_5_24

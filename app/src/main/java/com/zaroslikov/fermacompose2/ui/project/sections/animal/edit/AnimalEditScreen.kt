@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,7 +45,7 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.warehouse.MainSettingsCard
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditIntent
+
 
 
 object AnimalEditDestination : NavigationDestination {
@@ -168,6 +167,7 @@ fun AnimalEntryContainer(
                 onIntent(AnimalEditIntent.FoodDaySuffixClicked(it))
             },
             suffixList = suffixWeightDayList,
+            drawableRes = R.drawable.outline_restaurant_24,
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
             suffix = state.foodDaySuffix,

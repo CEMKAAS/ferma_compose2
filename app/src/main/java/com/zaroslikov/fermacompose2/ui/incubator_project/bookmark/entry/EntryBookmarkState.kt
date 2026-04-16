@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry
 
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainBookmark
 import com.zaroslikov.fermacompose2.base.state.BaseError
@@ -35,7 +36,7 @@ data class EntryBookmark(
     val autoVentilation: Boolean = false,
     val parameterDayList: List<ParameterDay> = emptyList(),
     val breedList: List<String> = emptyList(),
-    val indexNotification: Int = 0,
+    val indexNotification: Long = 0,
     val notificationList: List<NotificationParameters> = emptyList(),
     val currentNotification: NotificationParameters = NotificationParameters(),
     val error: ErrorBookmark = ErrorBookmark(),
@@ -45,6 +46,7 @@ data class EntryBookmark(
     val indexBookmark: Long = 0,
     val isTemplatesPlan: Boolean = true,
     val incubatorCount: Int = 0,
+    val currencySuffix: Suffix = Suffix.RUBLE,
 
     ) : BaseProduct() {
     override val hasAnyError: Boolean
@@ -61,6 +63,7 @@ data class EntryBookmark(
 
 data class NotificationParameters(
     val id: Long = 0,
+    val localId: Long = System.currentTimeMillis(),
     val time: String = "12:00",
     val note: String = "",
     val isEntry: Boolean = true,

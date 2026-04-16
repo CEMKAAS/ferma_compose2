@@ -22,12 +22,11 @@ sealed class ExpensesListIntent : BaseIntent {
         val isSaveStateForBottomSheet: Boolean = false
     ) :
         ExpensesListIntent()
-    data class RefreshWarehouseCount(val value: List<DomainCountSuffix>): ExpensesListIntent()
 
-    data class OpenBottomSheetDetail(
-        val value: Long? = null
-    ) :  ExpensesListIntent()
+    data class RefreshWarehouseCount(val value: List<DomainCountSuffix>) : ExpensesListIntent()
 
+    data class OpenBottomSheetDetail(val value: Long? = null) : ExpensesListIntent()
+    data class OpenBottomSheetDelete(val value: Long? = null) : ExpensesListIntent()
 
     data class FoodClicked(val value: Boolean) : ExpensesListIntent()
     data class PercentClicked(val value: Boolean) : ExpensesListIntent()
@@ -63,5 +62,5 @@ sealed class ExpensesListIntent : BaseIntent {
     data class SearchChanged(val value: String) : ExpensesListIntent()
     data object Insert : ExpensesListIntent()
     data object Update : ExpensesListIntent()
-    data class Delete(val value: Long) : ExpensesListIntent()
+    data object Delete : ExpensesListIntent()
 }

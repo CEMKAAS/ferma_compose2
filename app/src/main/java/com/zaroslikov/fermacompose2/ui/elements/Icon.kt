@@ -18,8 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
@@ -28,6 +30,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
+import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.white
 import java.io.File
 
@@ -141,11 +146,21 @@ fun IconTransaction2(
     imagePath: String?,
     currentIcon: Int,
     color: Color,
+    isArchive: Boolean = false
 ) {
     val painter = when {
         imagePath != null -> rememberAsyncImagePainter(File(imagePath))
         else -> painterResource(currentIcon)
     }
+
+    val colorFilter = when {
+        isArchive && imagePath != null -> ColorFilter.tint(Color.Gray, BlendMode.Saturation)
+        isArchive && imagePath == null -> ColorFilter.tint(Color.Gray, BlendMode.SrcIn)
+        else -> null
+    }
+
+    val color = if (isArchive) ghostly_white else color
+
     val shape = RoundedCornerShape(10.dp)
     Box(
         modifier = modifier
@@ -158,6 +173,7 @@ fun IconTransaction2(
             painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
+            colorFilter = colorFilter,
             modifier = Modifier
                 .then(
                     if (imagePath == null) Modifier.size(sizeCard * 0.75f) else Modifier

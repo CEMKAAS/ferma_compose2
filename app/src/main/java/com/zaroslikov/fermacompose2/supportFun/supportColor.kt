@@ -6,6 +6,9 @@ import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
+import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
+import com.zaroslikov.fermacompose2.animal_1
+import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_10
 import com.zaroslikov.fermacompose2.blue_11
@@ -24,6 +27,7 @@ import com.zaroslikov.fermacompose2.green_7
 import com.zaroslikov.fermacompose2.green_8
 import com.zaroslikov.fermacompose2.green_9
 import com.zaroslikov.fermacompose2.green_g_2
+import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.green_g_5
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey_2
@@ -40,6 +44,8 @@ import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.red_11
 import com.zaroslikov.fermacompose2.red_12
+import com.zaroslikov.fermacompose2.red_13
+import com.zaroslikov.fermacompose2.red_15
 import com.zaroslikov.fermacompose2.red_18
 import com.zaroslikov.fermacompose2.red_3
 import com.zaroslikov.fermacompose2.red_4
@@ -54,6 +60,7 @@ import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
 import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_4
+import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_7
 import com.zaroslikov.fermacompose2.white
 
@@ -71,7 +78,7 @@ fun Page.toColorList(): Color {
         Page.EXPENSES -> orang_1
         Page.SALE -> blue_1
         Page.WRITE_OFF -> violet_1
-        Page.ANIMAL -> violet_2
+        Page.ANIMAL -> animal_1
     }
 }
 
@@ -150,6 +157,26 @@ fun FinanceCategory.toColorList(): List<Color> {
         FinanceCategory.PROFIT -> /*listOf(blue_1, animal_2)*/ listOf(blue_10, blue_11, blue_12)
     }
 }
+
+
+/*fun TypeProduct.toColorList(): List<Color> {
+    return when (this) {
+        TypeProduct.ANIMAL -> listOf(animal_1, animal_2)
+        TypeProduct.FOOD -> listOf(orang_8, orang_9 )
+        TypeProduct.VACCINATION -> listOf(violet_4, violet_2)
+        TypeProduct.KILL -> listOf(red_4, red_5)
+    }
+}*/
+
+fun TypeProduct.toColorList(): List<Color> {
+    return when (this) {
+        TypeProduct.ANIMAL -> listOf( green_g_4, animal_1)
+        TypeProduct.FOOD -> listOf(orang_8, orang_9)
+        TypeProduct.VACCINATION -> listOf(violet_5, violet_4)
+        TypeProduct.KILL -> listOf( red_15, red_4)
+    }
+}
+
 
 /*fun FinanceCategory.toColor(): Color {
     return when (this) {

@@ -64,6 +64,7 @@ import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString2
 import com.zaroslikov.fermacompose2.ui.monthToResString3
 import com.zaroslikov.fermacompose2.white
+import io.appmetrica.analytics.AppMetrica
 import java.time.LocalDate
 
 object FinanceDestination : NavigationDestination {
@@ -139,18 +140,25 @@ private fun FinanceBody(
             expensesMount = expensesMount,
             incomeMount = incomeMount,
             suffix = suffix,
-            onDetailClick = { navigate(FinanceCategory.PROFIT) }
+            onDetailClick = {
+                navigate(FinanceCategory.PROFIT)
+                AppMetrica.reportEvent("Переход в полный анализ текущего баланса")
+            }
         )
-        IncomeExpensesCards(
-            income = income,
-            expenses = expenses,
-            suffix = suffix
-        ) { navigate(it) }
-        WriteOffFinanceCards(
-            scrap = scrap,
-            ownNeed = ownNeed,
-            suffix = suffix
-        ) { navigate(it) }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            IncomeExpensesCards(
+                income = income,
+                expenses = expenses,
+                suffix = suffix
+            ) { navigate(it) }
+            WriteOffFinanceCards(
+                scrap = scrap,
+                ownNeed = ownNeed,
+                suffix = suffix
+            ) { navigate(it) }
+        }
         TransactionList(incomeExpensesList, suffix)
     }
 }
@@ -297,7 +305,10 @@ private fun IncomeExpensesCards(
     ) {
         CardFinanceNew(
             modifier = Modifier.weight(1f),
-            onClick = { navigate(FinanceCategory.SALE) },
+            onClick = {
+                navigate(FinanceCategory.SALE)
+                AppMetrica.reportEvent("Переход в анализ дохода")
+            },
             titleRes = R.string.card_income,
             value = income,
             icon = R.drawable.icon_arrow_up,
@@ -307,7 +318,10 @@ private fun IncomeExpensesCards(
         )
         CardFinanceNew(
             modifier = Modifier.weight(1f),
-            onClick = { navigate(FinanceCategory.EXPENSES) },
+            onClick = {
+                navigate(FinanceCategory.EXPENSES)
+                AppMetrica.reportEvent("Переход в полный анализ расходов")
+            },
             titleRes = R.string.card_expenditure,
             value = expenses,
             icon = R.drawable.icon_arrow_down,
@@ -331,7 +345,10 @@ private fun WriteOffFinanceCards(
     ) {
         CardFinanceNew(
             modifier = Modifier.weight(1f),
-            onClick = { navigation(FinanceCategory.OWN_NEED) },
+            onClick = {
+                navigation(FinanceCategory.OWN_NEED)
+                AppMetrica.reportEvent("Переход в полный анализ сэкономленно")
+            },
             titleRes = R.string.card_own_need,
             value = ownNeed,
             icon = R.drawable.outline_savings_24,
@@ -341,7 +358,10 @@ private fun WriteOffFinanceCards(
         )
         CardFinanceNew(
             modifier = Modifier.weight(1f),
-            onClick = { navigation(FinanceCategory.SCRAP) },
+            onClick = {
+                navigation(FinanceCategory.SCRAP)
+                AppMetrica.reportEvent("Переход в полный анализ списаний")
+            },
             titleRes = R.string.card_scrap,
             value = scrap,
             icon = R.drawable.baseline_delete_24,
@@ -408,67 +428,73 @@ fun TransactionFinanceCard(
     CardFieldNew(
         padding = PaddingValues(16.dp),
         onClick = onDetailClick,
-       contentColumn = {
-           Row {
-               Row(
-                   modifier = Modifier.fillMaxWidth(),
-                   horizontalArrangement = Arrangement.SpaceBetween,
-                   verticalAlignment = Alignment.CenterVertically
-               ) {
-                   Row(
-                       verticalAlignment = Alignment.CenterVertically,
-                       horizontalArrangement = Arrangement.spacedBy(12.dp)
-                   ) {
+        contentColumn = {
+            Row {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
 
-                       Column(
-                           verticalArrangement = Arrangement.spacedBy(4.dp)
-                       ) {
-                           Text(
-                               text = title,
-                               style = text_16,
-                               color = black_2
-                           )
-                           count?.let {
-                               CountColorCard(
-                                   count = it,
-                                   suffix = suffix,
-                                   colorCard = suffix.toColorList()
-                               )
-                           }
-                       }
-                   }
-                   Column(
-                       verticalArrangement = Arrangement.spacedBy(4.dp),
-                       horizontalAlignment = Alignment.CenterHorizontally
-                   ) {
-                       Text(
-                           "${price.formatNumber()} ${stringResource(suffixCurrency.toResId())}",
-                           textAlign = TextAlign.Center,
-                           style = textBold_16,
-                           color = if (positive) price_green else error_base
-                       )
-                       date?.let {
-                           Row(
-                               verticalAlignment = Alignment.CenterVertically,
-                               horizontalArrangement = Arrangement.spacedBy(4.dp)
-                           ) {
-                               Icon(
-                                   painterResource(R.drawable.baseline_calendar_month_24),
-                                   modifier = Modifier.size(12.dp),
-                                   contentDescription = null,
-                                   tint = gray_7
-                               )
-                               val dateList = it.split(".")
-                               Text(
-                                   text = "${dateList[0]} ${stringResource(monthToResString2(dateList[1].toInt()))}",
-                                   style = text_14,
-                                   color = gray_7
-                               )
-                           }
-                       }
-                   }
-               }
-           }
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = title,
+                                style = text_16,
+                                color = black_2
+                            )
+                            count?.let {
+                                CountColorCard(
+                                    count = it,
+                                    suffix = suffix,
+                                    colorCard = suffix.toColorList()
+                                )
+                            }
+                        }
+                    }
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "${price.formatNumber()} ${stringResource(suffixCurrency.toResId())}",
+                            textAlign = TextAlign.Center,
+                            style = textBold_16,
+                            color = if (positive) price_green else error_base
+                        )
+                        date?.let {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    painterResource(R.drawable.baseline_calendar_month_24),
+                                    modifier = Modifier.size(12.dp),
+                                    contentDescription = null,
+                                    tint = gray_7
+                                )
+                                val dateList = it.split(".")
+                                Text(
+                                    text = "${dateList[0]} ${
+                                        stringResource(
+                                            monthToResString2(
+                                                dateList[1].toInt()
+                                            )
+                                        )
+                                    }",
+                                    style = text_14,
+                                    color = gray_7
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     )
 }

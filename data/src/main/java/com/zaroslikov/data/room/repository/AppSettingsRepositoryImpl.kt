@@ -28,4 +28,12 @@ class AppSettingsRepositoryImpl @Inject constructor(private val appSettingsDao: 
     override fun getAppSettings(): Flow<DomainAppSettings> {
         return appSettingsDao.getAppSettings().map { it.toDomainAppSettings() }
     }
+
+    override fun getFirstLaunch(): Flow<Boolean> {
+        return appSettingsDao.getFirstLaunch()
+    }
+
+    override suspend fun createAppSettings(domainAppSettings: DomainAppSettings) {
+        return appSettingsDao.createAppSettings(domainAppSettings.toAppSettingsTable())
+    }
 }

@@ -96,7 +96,7 @@ fun BottomSheetKillAnimal(
             onIntent(
                 AnimalCountIntent.DialogClicked(
                     false,
-                    isSaveStateForBottomSheet =  state.isEntry,
+                    isSaveStateForBottomSheet = state.isEntry,
                     version = state.version
                 )
             )
@@ -142,7 +142,7 @@ fun BottomSheetKillAnimal(
             onDismissRequest = { onIntent(AnimalCountIntent.OpenWeightAlertDialogClicked(false)) },
             colors = state.version.toColorList(),
             weight = state.totalWeight ?: 0.0,
-            weightSuffix =  state.weightSuffix,
+            weightSuffix = state.weightSuffix,
             countAnimal = state.count.toConvertZeroDbInt(),
             onClick = {
                 onIntent(AnimalCountIntent.WeightChanged(it))
@@ -395,6 +395,7 @@ fun ProductKillCard(
     onDeleteClick: () -> Unit
 ) {
     val (containerColor, borderColor) = if (isEditMode) orang_4 to orang_7 else green_g_2 to green_1
+    val suffixText = suffix?.let { stringResource(it.toResId()) } ?: ""
     BorderCard(
         padding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
         containerColor = containerColor,
@@ -412,14 +413,16 @@ fun ProductKillCard(
             ) {
                 Text("$number.", style = text_14, color = marengo)
                 Column(
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(name, style = text_14, color = black_1)
-                    Text(
-                        "$value " + suffix?.let { stringResource(it.toResId()) },
-                        style = text_12,
-                        color = green_shamrock
-                    )
+                    if (value.isNotBlank())
+                        Text(
+                            "$value $suffixText",
+                            style = text_12,
+                            color = green_shamrock
+                        )
                 }
             }
             IconButton(

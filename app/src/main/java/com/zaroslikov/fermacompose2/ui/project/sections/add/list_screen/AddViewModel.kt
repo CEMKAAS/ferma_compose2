@@ -4,6 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
+import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalRepository
@@ -12,9 +15,12 @@ import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
+import com.zaroslikov.fermacompose2.supportFun.conversation3
+import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
-import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
@@ -29,6 +35,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @HiltViewModel
 class AddViewModel @Inject constructor(
@@ -38,7 +46,8 @@ class AddViewModel @Inject constructor(
     private val warehouseRepository: WarehouseRepository,
     private val resourceProvider: ResourceProvider,
     private val settingsRepository: SettingsRepository,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<AddListState, AddListIntent, AddListReduce>(
     AddListState(),
     AddListReduce(resourceProvider)
@@ -64,7 +73,7 @@ class AddViewModel @Inject constructor(
             is AddListIntent.TitleAndSuffix -> updateWarehouseUiState(intent.pair.first)
             AddListIntent.Insert -> insert()
             AddListIntent.Update -> update()
-            is AddListIntent.Delete -> delete(intent.value)
+            is AddListIntent.Delete -> delete(0)
             else -> Unit
         }
     }
@@ -191,57 +200,77 @@ class AddViewModel @Inject constructor(
 
     private suspend fun updateWarehouseUiStateSync(name: String) {
         val pair = warehouseRepository
-            .getCurrentBalanceProductList(name, itemIdPT)
-            .filterNotNull()
-            .firstOrNull()
-        pair?.let {
-            onIntent(AddListIntent.RefreshWarehouseCount(pair))
-        }
+            .getCurrentBalanceProductList(name, itemIdPT).first()
+            .build(getState().settings)
+        onIntent(AddListIntent.RefreshWarehouseCount(pair))
+    }
+
+    private fun List<DomainCountSuffix>.build(
+        settings: DomainSettings
+    ): List<DomainCountSuffix> {
+        return this.groupBy { it.suffix.conversation4(settings) }
+            .map { (suffix, items) ->
+                val totalCount = items.sumOf {
+                    it.count.conversation3(it.suffix, settings)
+                }
+                DomainCountSuffix(
+                    count = totalCount,
+                    suffix = suffix
+                )
+            }
     }
 
     override fun insert() {
         viewModelScope.launch {
             addRepository.insertAdd(getState().currentProduct.toDomainMap())
+            yandexMetricRepository.metricAdd(getState().currentProduct)
+            showSnackbar(ProductOperation.ADD)
             loadDataForEntryOrEdit(false, null)
-            showMessage(
-                resourceProvider.getString(R.string.toast_add_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    )
-            )
         }
     }
 
     override fun update() {
         viewModelScope.launch {
             addRepository.updateAdd(getState().currentProduct.toDomainMap())
+            /*  if (getState().currentDetail != null)
+                  updateState { it.copy(currentDetail = getState().currentProduct.toDomainMap()) }*/
+            showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
-            showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    )
-            )
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
-            addRepository.deleteAddById(id)
-            navigateTo(UiEvent.NavigateBack)
-            showMessage(
-                resourceProvider.getString(R.string.toast_delete_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    )
-            )
+            getState().currentDetail?.let { product ->
+                addRepository.deleteAddById(product.id)
+                showSnackbar(ProductOperation.DELETE)
+                sendIntent(AddListIntent.OpenBottomSheetDelete(null))
+            }
         }
+    }
+
+    private fun showSnackbar(productOperation: ProductOperation) {
+        val (title, count, countSuffix) =
+            if (productOperation == ProductOperation.DELETE) {
+                val product = getState().currentDetail ?: DomainAddItemDto()
+                Triple(product.title, product.count.formatNumber(), product.countSuffix)
+            } else {
+                val product = getState().currentProduct
+                Triple(product.title, product.count, product.countSuffix)
+            }
+        val suffix = resourceProvider.getString(countSuffix.toResId())
+        showMessage(
+            when (productOperation) {
+                ProductOperation.ADD -> resourceProvider.getString(R.string.snackbar_product_add)
+                    .format(title, count, suffix)
+
+                ProductOperation.EDIT -> resourceProvider.getString(R.string.snackbar_product_update)
+                    .format(title, count, suffix)
+
+                else -> resourceProvider.getString(R.string.snackbar_product_delete)
+                    .format(title, count, suffix)
+            }
+        )
     }
 
     private fun AddEntryState2.toUiMap22(domain: DomainAddItemDto): AddEntryState2 {

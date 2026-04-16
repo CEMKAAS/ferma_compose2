@@ -12,6 +12,7 @@ import com.zaroslikov.data.room.dto.add.AnimalCountSuffixDto
 import com.zaroslikov.data.room.dto.add.BrieflyAddDto
 import com.zaroslikov.data.room.dto.add.FastAddProductDto
 import com.zaroslikov.data.room.dto.add.TitleAndSuffixDto
+import com.zaroslikov.data.room.dto.finance.AnimalWitchCountAndImageDto
 import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
 import com.zaroslikov.data.room.table.ferma.AddTable
@@ -162,7 +163,7 @@ interface AddDao {
     )
     fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<CountSuffixDto?>
 
-    @Query(
+   /* @Query(
         "SELECT" +
                 " (SELECT name FROM animal_table WHERE id = animal_id) as title," +
                 " (SELECT type FROM animal_table WHERE id = animal_id) as type, " +
@@ -176,7 +177,7 @@ interface AddDao {
     fun getAnalysisAddAnimalAllTime(
         id: Long,
         name: String
-    ): Flow<List<AnimalCountSuffixDto>>
+    ): Flow<List<AnimalCountSuffixDto>>*/
 
     @Query(
         "SELECT count," +
@@ -218,7 +219,9 @@ interface AddDao {
                 " at.name AS title," +
                 " at.type AS type," +
                 " a.count," +
-                " a.count_suffix AS suffix" +
+                " a.count_suffix AS suffix," +
+                " at.icon as current_icon," +
+                " at.image_path as image_path" +
                 " FROM add_table a" +
                 " JOIN animal_table at ON at.id = a.animal_id " +
                 " WHERE a.idPT=:id AND a.title=:name" +
@@ -230,7 +233,7 @@ interface AddDao {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<AnimalCountSuffixDto>>
+    ): Flow<List<AnimalWitchCountAndImageDto>>
 
     @Query(
         "SELECT" +

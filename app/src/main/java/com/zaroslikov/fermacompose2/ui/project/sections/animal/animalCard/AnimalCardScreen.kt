@@ -166,25 +166,27 @@ fun AnimalCardContainer(
             onNavigateWeight = onNavigateWeight,
             onNavigateVaccination = onNavigateVaccination
         )
-        NoteWidget(note = state.animal.note, isArchive = state.isArchive)
-        { onIntent(AnimalCardIntent.NoteChanged(it)) }
-        PullOutCardNew(
-            icon = R.drawable.baseline_analytics_24,
-            intRes = R.string.animal_card_screen_animal_card_product,
-            intTitleText = R.string.alert_dialog_info_title_product_add,
-            intText = R.string.alert_dialog_info_text_product_add,
-            list = state.productList,
-            primalColor = animal_1
-        ) { item, index ->
-            ProductKillInfoCard(
-                number = index + 1,
-                name = item.title,
-                weight = item.weight,
-                linear = item.linear,
-                volume = item.volume,
-                pieces = item.pieces
-            )
-        }
+        if (!state.animal.archive || state.animal.note.isNotEmpty())
+            NoteWidget(note = state.animal.note, isArchive = state.isArchive)
+            { onIntent(AnimalCardIntent.NoteChanged(it)) }
+        if (state.productList.isNotEmpty())
+            PullOutCardNew(
+                icon = R.drawable.baseline_analytics_24,
+                intRes = R.string.animal_card_screen_animal_card_product,
+                intTitleText = R.string.alert_dialog_info_title_product_add,
+                intText = R.string.alert_dialog_info_text_product_add,
+                list = state.productList,
+                primalColor = animal_1
+            ) { item, index ->
+                ProductKillInfoCard(
+                    number = index + 1,
+                    name = item.title,
+                    weight = item.weight,
+                    linear = item.linear,
+                    volume = item.volume,
+                    pieces = item.pieces
+                )
+            }
         /*PullOutCard(
             intRes = R.string.animal_card_screen_animal_card_product_sale,
             intTitleText = R.string.alert_dialog_info_title_product_sale,
@@ -222,7 +224,7 @@ private fun DataCardOne(
             verticalAlignment = Alignment.Top,
         ) {
             IconAnimal(
-                sex = animal.sex,
+                sex = if (animal.group) null else animal.sex,
                 currentIcon = animal.currentIcon ?: R.drawable.baseline_pets_24,
                 imagePath = animal.imagePath
             )
@@ -275,7 +277,7 @@ private fun DataCardOne(
                 AnimalParameter(
                     titleParameter = R.string.animal_list_food,
                     parameter = "${animal.foodDay.formatNumber()} ${stringResource(animal.foodDaySuffix.toResId())}",
-                    icon = R.drawable.baseline_shopping_basket_24,
+                    icon = R.drawable.outline_restaurant_24,
                     iconColor = Color(0xFFD08700),
                     iconColorSecond = orang_13
                 )

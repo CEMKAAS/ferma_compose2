@@ -2,6 +2,11 @@
 
 package com.zaroslikov.fermacompose2.ui.start.settings
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -36,6 +41,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
@@ -62,7 +68,6 @@ import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.red_11
-import com.zaroslikov.fermacompose2.red_12
 import com.zaroslikov.fermacompose2.red_13
 import com.zaroslikov.fermacompose2.red_14
 import com.zaroslikov.fermacompose2.red_15
@@ -157,7 +162,7 @@ private fun SettingsContainer(
         modifier = modifier.padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        AppearanceCard()
+        /*AppearanceCard()*/
         NotificationCard()
         LanguageCard()
         DataManagementCard(
@@ -192,23 +197,57 @@ private fun AppearanceCard() {
 
 @Composable
 private fun NotificationCard() {
-    var re by remember { mutableStateOf(true) }
+
+    val context = LocalContext.current
+
+    var enabled by remember {
+        mutableStateOf(
+            NotificationManagerCompat.from(context).areNotificationsEnabled()
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        enabled = isGranted
+    }
+
     CardNewWithTitle(
         titleRes = R.string.settings_screen_notification
     ) {
         SD(
             titleRes = R.string.settings_screen_push_notification,
-            supportText = stringResource(if (re) R.string.settings_screen_on_s else R.string.settings_screen_off_s),
+            supportText = stringResource(
+                if (enabled) R.string.settings_screen_on_s
+                else R.string.settings_screen_off_s
+            ),
             icon = R.drawable.baseline_notifications_none_24,
             color = orang_5,
             iconColor = orang_6
         ) {
             Switch(
-                checked = re,
-                onCheckedChange = { re = !re }
+                checked = enabled,
+                onCheckedChange = {
+                    if (enabled) {
+                        openNotificationSettings(context)
+                    } else {
+                        if (Build.VERSION.SDK_INT >= 33) {
+                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            openNotificationSettings(context)
+                        }
+                    }
+                }
             )
         }
     }
+}
+
+private fun openNotificationSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+    }
+    context.startActivity(intent)
 }
 
 @Composable
@@ -286,9 +325,9 @@ private fun DataStorageCard() {
 }
 
 @Composable
-private fun SD(
+fun SD(
     @StringRes titleRes: Int,
-    supportText: String,
+    supportText: String? = null,
     @DrawableRes icon: Int,
     color: Color,
     iconColor: Color,
@@ -310,7 +349,8 @@ private fun SD(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconTransaction2(
                 sizeCard = 36.dp,
@@ -319,10 +359,12 @@ private fun SD(
                 boxColor = color
             )
             Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(stringResource(titleRes), style = text_16, color = titleColor)
-                Text(supportText, style = text_14, color = gray_7)
+                supportText?.let {
+                    Text(it, style = text_14, color = gray_7)
+                }
             }
         }
         content?.let {
@@ -434,7 +476,7 @@ fun ImportWarning(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.settings_screen_confirm_and_select_file),
                     onClick = { loadLauncher.launch("application/json") },
-                    iconRes = R.drawable.outline_check_circle_24,
+                    prefixIconRes = R.drawable.outline_check_circle_24,
                     paddingValues = PaddingValues(16.dp),
                     colors = listOf(Color(0xFF00A63E), Color(0xFF009966))
                 )
@@ -482,7 +524,7 @@ fun DeleteWarning(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.settings_screen_delete_all_data),
                     onClick = { onDeleteDatabaseClick() },
-                    iconRes = R.drawable.baseline_delete_24,
+                    prefixIconRes = R.drawable.baseline_delete_24,
                     paddingValues = PaddingValues(16.dp),
                     colors = listOf(red_13, error_base)
                 )

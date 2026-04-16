@@ -14,4 +14,6 @@ interface ProfileRepository {
     fun getProfile(): Flow<DomainProfileTable>
 
     fun getAllCurrenciesSorted(): Flow<List<Suffix>>
+
+    fun createProfile(profileTable: DomainProfileTable)
 }

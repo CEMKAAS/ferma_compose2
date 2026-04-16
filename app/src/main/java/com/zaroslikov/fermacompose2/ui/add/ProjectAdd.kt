@@ -5,14 +5,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +31,7 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +39,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -58,11 +61,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.rememberAsyncImagePainter
-import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 import com.zaroslikov.domain.models.table.DomainProjectTable
+import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.green_6
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.grey_2
+import com.zaroslikov.fermacompose2.marengo
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogStandard
+import com.zaroslikov.fermacompose2.ui.elements.GradientButton
+import com.zaroslikov.fermacompose2.ui.elements.IconGradient
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.white
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -86,13 +103,6 @@ fun AddProject(
     navigateToStart: () -> Unit,
     viewModel: ProjectAddViewModel = hiltViewModel()
 ) {
-    AlterDialigStart(
-        isFirstStart = false,
-        dialogTitle = "Установка проекта",
-        dialogText = "Придумайте оригинальное название для вашего проекта, например: \"Козоводство\" или \"Кролиководство\". Укажите дату начала проекта и нажмите \"Начать\".",
-        textAppMetrica = "Установка проекта"
-    )
-
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
@@ -367,66 +377,7 @@ fun SelectableImageWithIcon(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialogSample(
-    datePickerState: DatePickerState,
-    dateToday: String,
-    onDateSelected: (String) -> Unit,
-) {
-    DatePickerDialog(
-        onDismissRequest = {
-            onDateSelected(dateToday)
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val format = SimpleDateFormat("dd.MM.yyyy")
-                    val formattedDate: String =
-                        format.format(datePickerState.selectedDateMillis)
-                    onDateSelected(formattedDate)
-                },
-            ) { Text("Выбрать") }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDateSelected(dateToday)
-                }
-            ) { Text("Назад") }
-        }
-    ) {
-        DatePicker(state = datePickerState, dateFormatter = DatePickerDefaults.dateFormatter())
-    }
-}
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-object PastOrPresentSelectableDates : SelectableDates {
-    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-        return utcTimeMillis <= System.currentTimeMillis()
-    }
-
-    override fun isSelectableYear(year: Int): Boolean {
-        return year <= LocalDate.now().year
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-class MinDateSelectableDates(
-    private val minDateMillis: Long
-) : SelectableDates {
-    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-        return utcTimeMillis >= minDateMillis
-    }
-
-    override fun isSelectableYear(year: Int): Boolean {
-        // Можно ограничить и года (чтобы не проматывали слишком далеко назад)
-        val minYear = Instant.ofEpochMilli(minDateMillis)
-            .atZone(ZoneId.systemDefault()).year
-        return year >= minYear
-    }
-}
 
 //
 fun getByteArrayFromDrawable(context: Context, drawableResId: Int): ByteArray {

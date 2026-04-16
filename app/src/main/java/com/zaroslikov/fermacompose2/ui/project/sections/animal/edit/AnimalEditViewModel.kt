@@ -56,15 +56,10 @@ class AnimalEditViewModel @Inject constructor(
     override fun update() {
         viewModelScope.launch {
             animalRepository.updateAnimalTable(getState().currentProduct.toDomain())
-            navigateTo(UiEvent.NavigateBack)
             showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s_s)
-                    .format(
-                        getState().currentProduct.name,
-                        getState().currentProduct.type,
-                        getState().currentProduct.note
-                    )
+                resourceProvider.getString(if (getState().currentProduct.isAnimalGroup) R.string.snackbar_animal_update_multiple else R.string.snackbar_animal_update_single)
             )
+            navigateTo(UiEvent.NavigateBack)
         }
     }
 

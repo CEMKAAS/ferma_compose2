@@ -40,6 +40,7 @@ fun Suffix.toResId(): Int {
         Suffix.TENGE -> R.string.currency_tenge
         Suffix.DOLLAR -> R.string.currency_dollar
         Suffix.EURO -> R.string.currency_euro
+
         Suffix.GRAM_DAY -> R.string.suffix_gram_day
         Suffix.KILOGRAM_DAY -> R.string.suffix_kilogram_day
         Suffix.TONS_DAY -> R.string.suffix_tons_day

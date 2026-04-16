@@ -29,6 +29,7 @@ import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
@@ -87,7 +88,8 @@ fun ExpensesScreen(
                 iconRes = iconRes,
                 itemList = state.list,
                 searchList = state.searchList,
-                brieflyList = state.searchBrieflyList,
+                brieflyList = state.briefly,
+                searchBrieflyList = state.searchBrieflyList,
                 priceSuffix = state.settings.currencySuffix,
                 details = state.isGroup,
                 isArchive = state.isArchive,
@@ -103,7 +105,7 @@ fun ExpensesScreen(
                         ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(it)) },
                 onDetailsClick = {
                     viewModel.onIntent(
                         ExpensesListIntent.OpenBottomSheetGroup(it)
@@ -136,7 +138,7 @@ fun ExpensesScreen(
                         ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(it)) },
             )
     }
     if (state.isOpenBottomSheetDetail)
@@ -146,6 +148,14 @@ fun ExpensesScreen(
             colors = colors,
             onIntent = viewModel::onIntent,
             isArchive = state.isArchive
+        )
+    if (state.isOpenBottomSheetDelete)
+        WarningDeleteExpensesBottomSheet(
+            onDismissRequest = { viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(null)) },
+            onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete) },
+            state = state.currentDetail,
+            color = colors.first(),
+            priceSuffix = state.settings.currencySuffix
         )
 }
 
@@ -186,9 +196,49 @@ private fun ExpensesDetailBottomSheet(
                 )
             },
             isArchive = isArchive,
-            onDeleteClick = { onIntent(ExpensesListIntent.Delete(state.id)) },
+            onDeleteClick = { onIntent(ExpensesListIntent.OpenBottomSheetDelete(state.id)) },
             onDismissRequest = { onIntent(ExpensesListIntent.OpenBottomSheetDetail(null)) },
         )
+    }
+}
+
+
+@Composable
+private fun WarningDeleteExpensesBottomSheet(
+    state: ExpensesTableUi?,
+    color: Color,
+    priceSuffix: Suffix,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.base_section_delete_expenses,
+        supportRes = R.string.base_section_delete_support_expenses,
+        textButtonRes = R.string.base_section_button_delete_expenses
+    ) {
+        state?.let { product ->
+            DetailProductCardNew(
+                title = product.title,
+                count = product.count,
+                suffix = product.countSuffix,
+                price = product.priceAll ?: product.price,
+                priceSuffix = priceSuffix,
+                category = product.category,
+                note = product.note,
+                color = color,
+                day = product.day,
+                month = product.month,
+                year = product.year,
+                food = product.food,
+                typeProduct = product.typeProduct,
+                animalCountId = product.animalCountId,
+                animalVaccinationId = product.animalVaccinationId,
+                isArchive = true,
+                isCardField = false
+            )
+        }
     }
 }
 
@@ -202,6 +252,7 @@ fun ExpensesContainer(
     itemList: List<ExpensesTableUi>,
     searchList: List<ExpensesTableUi>,
     brieflyList: List<BrieflyItem>,
+    searchBrieflyList: List<BrieflyItem>,
     onDetailsCardClick: (Long) -> Unit,
     onEditClick: (ExpensesTableUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
@@ -212,7 +263,7 @@ fun ExpensesContainer(
         modifier = modifier,
         itemList = itemList,
         searchList = searchList,
-        brieflyList = brieflyList,
+        brieflyList = brieflyList, searchBrieflyList = searchBrieflyList,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -227,7 +278,7 @@ fun ExpensesContainer(
                 month = item.month,
                 year = item.year,
                 food = item.food,
-                colors = item.colors,
+                typeProduct = item.typeProduct,
                 animalCountId = item.animalCountId,
                 animalVaccinationId = item.animalVaccinationId,
                 isArchive = isArchive,
@@ -289,7 +340,6 @@ fun BrieflyBottomSheetExpenses(
             onDismissRequest = onDismissRequest,
             itemCard = { product ->
                 DetailProductCardNew(
-                    modifier = Modifier,
                     isCardField = false,
                     count = product.count,
                     suffix = product.countSuffix,
@@ -302,12 +352,10 @@ fun BrieflyBottomSheetExpenses(
                     month = product.month,
                     year = product.year,
                     food = product.food,
-                    colors = product.colors,
+                    typeProduct = product.typeProduct,
                     isArchive = isArchive,
                     animalCountId = product.animalCountId,
                     animalVaccinationId = product.animalVaccinationId,
-
-                    onClick = {},
                     onDeleteClick = { onDeleteClick(product.id) },
                     onEditClick = { onEditClick(product) }
                 )

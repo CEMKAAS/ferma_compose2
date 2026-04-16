@@ -25,7 +25,8 @@ import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
-import com.zaroslikov.data.room.dao.TimeNotificationDao
+import com.zaroslikov.data.room.dao.TimeNotificationIncubatorDao
+import com.zaroslikov.data.room.dao.TimeNotificationProjectDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
@@ -44,9 +45,10 @@ import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
-import com.zaroslikov.data.room.table.incubator.TimeNotificationTable
+import com.zaroslikov.data.room.table.incubator.TimeNotificationIncubatorTable
 import com.zaroslikov.data.room.table.profile.ProfileTable
 import com.zaroslikov.data.room.table.project.SettingsTable
+import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
 
 @Database(
     entities = [
@@ -65,7 +67,8 @@ import com.zaroslikov.data.room.table.project.SettingsTable
         ExpensesAnimalTable::class,
         IncubatorTable::class,
         BookmarkTable::class,
-        TimeNotificationTable::class,
+        TimeNotificationProjectTable::class,
+        TimeNotificationIncubatorTable::class,
         IncubatorParameters::class,
         AppSettingsTable::class,
         ProfileTable::class,
@@ -89,18 +92,18 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun expensesAnimalDao(): ExpensesAnimalDao
     abstract fun expensesDao(): ExpensesDao
     abstract fun financeDao(): FinanceDao
-    abstract fun incubatorParametersDao(): IncubatorParametersDao
     abstract fun noteDao(): NoteDao
     abstract fun projectDao(): ProjectDao
+    abstract fun timeNotificationProjectDao(): TimeNotificationProjectDao
     abstract fun saleDao(): SaleDao
     abstract fun warehouseDao(): WarehouseDao
     abstract fun writeOffDao(): WriteOffDao
     abstract fun settingsDao(): SettingsDao
     abstract fun incubatorTableDao(): IncubatorTableDao
     abstract fun bookmarkTableDao(): BookmarkDao
-    abstract fun timeNotificationDao(): TimeNotificationDao
+    abstract fun timeNotificationIncubatorDao(): TimeNotificationIncubatorDao
+    abstract fun incubatorParametersDao(): IncubatorParametersDao
     abstract fun appSettingsDao(): AppSettingsDao
-
     abstract fun profileTableDao(): ProfileDao
 
     companion object {

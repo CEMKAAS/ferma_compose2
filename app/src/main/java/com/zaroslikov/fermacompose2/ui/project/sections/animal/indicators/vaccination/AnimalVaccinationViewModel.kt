@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
+import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.repository.AnimalCountRepository
@@ -14,6 +15,7 @@ import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.dateTodayNextYear
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
@@ -36,7 +38,8 @@ class AnimalVaccinationViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val resourceProvider: ResourceProvider,
     private val settingsRepository: SettingsRepository,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<AnimalVaccinationState, AnimalVaccinationIntent, AnimalVaccinationReduce>(
     AnimalVaccinationState(),
     AnimalVaccinationReduce()
@@ -60,7 +63,7 @@ class AnimalVaccinationViewModel @Inject constructor(
 
             AnimalVaccinationIntent.InsertPressed -> insert()
             AnimalVaccinationIntent.UpdatePressed -> update()
-            is AnimalVaccinationIntent.DeletePressed -> delete(intent.value)
+            is AnimalVaccinationIntent.DeletePressed -> delete(0)
             else -> Unit
         }
     }
@@ -95,8 +98,9 @@ class AnimalVaccinationViewModel @Inject constructor(
                 animalVaccinationRepository.insertAnimalVaccinationTable(vaccination.toDomainMap())
             if (vaccination.price.isNotBlank())
                 expensesRepository.insertExpenses(vaccination.toDomainExpensesTable(vaccinationId))
+            yandexMetricRepository.metricalAnimalVaccination(getState().currentProduct)
+            showSnackbar(ProductOperation.ADD)
             loadDataForEntryOrEdit(false, null)
-            showMessage("Добавлен размер")
         }
     }
 
@@ -114,16 +118,38 @@ class AnimalVaccinationViewModel @Inject constructor(
                 vaccination.idExpenses != null && vaccination.price.isBlank() ->
                     expensesRepository.deleteExpensesById(vaccination.idExpenses)
             }
+            showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
-            showMessage("Редактировать размер")
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
-            animalVaccinationRepository.deleteAnimalVaccinationTableById(id)
-            showMessage("Удалить размер")
+            getState().deleteVaccination?.let {
+                animalVaccinationRepository.deleteAnimalVaccinationTableById(it.id)
+                showSnackbar(ProductOperation.DELETE)
+                sendIntent(AnimalVaccinationIntent.OpenBottomSheetDelete(null))
+            }
         }
+    }
+
+    private fun showSnackbar(productOperation: ProductOperation) {
+        val count =
+            if (productOperation == ProductOperation.DELETE)
+                getState().deleteVaccination?.vaccination ?: ""
+            else getState().currentProduct.vaccination
+
+        showMessage(
+            when (productOperation) {
+                ProductOperation.ADD -> resourceProvider.getString(R.string.snackbar_vaccine_add)
+                    .format(count)
+
+                ProductOperation.EDIT -> resourceProvider.getString(R.string.snackbar_vaccine_update)
+                    .format(count)
+
+                else -> resourceProvider.getString(R.string.snackbar_vaccine_delete).format(count)
+            }
+        )
     }
 
     private fun loadDataForEntryOrEdit(

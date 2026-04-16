@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count
 
+import androidx.annotation.StringRes
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
@@ -7,6 +8,7 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
@@ -26,7 +28,7 @@ data class AnimalCountState(
     val openWarningDialog: Boolean = false,
     val openWarningDeleteDialog: Boolean = false,
     val statusWarningDialog: WarningAnimalCount = WarningAnimalCount.UPDATE_KILL,
-    val textWarning: String = "",
+    @StringRes val textWarning: Int = R.string.is_empty,
 
     val openArchiveDialog: Boolean = false,
     val openSoloDialog: Boolean = false,

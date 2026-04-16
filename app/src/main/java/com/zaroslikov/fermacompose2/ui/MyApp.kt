@@ -1,154 +1,12 @@
 package com.zaroslikov.fermacompose2.ui
 
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffDestination
-import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
-import io.appmetrica.analytics.AppMetrica
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-
-@Composable
-fun DrawerSheet(
-    scope: CoroutineScope,
-    navigateToStart: () -> Unit,
-    navigateToModalSheet: (DrawerNavigation) -> Unit,
-    drawerState: DrawerState,
-    x: Int,
-    idPTNavigation: String
-) {
-    val context = LocalContext.current
-    val drawerItems = listOf(
-
-        DrawerItems(
-            R.drawable.baseline_arrow_back_24, "Вернуться к проектам", FirstDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_warehouse_24,
-            "Мой Склад",
-            HomeDestination.route //WarehouseDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_currency_ruble_24, "Мои Финансы", FinanceDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_add_circle_outline_24, "Моя Продукция", HomeDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_add_card_24, "Мои Продажи", SaleDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_add_shopping_cart_24, "Мои Покупки", ExpensesDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_edit_note_24, "Мои Списания", WriteOffDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_cruelty_free_24, "Мои Животные", AnimalDestination.route
-        ),
-        DrawerItems(
-            R.drawable.baseline_edit_document_24, "Мои Заметки", NoteDestination.route
-        )
-
-    )
-
-    var selectedItem by remember {
-        mutableStateOf(drawerItems[x])
-    }
-
-    ModalDrawerSheet {
-        drawerItems.forEach {
-            NavigationDrawerItem(
-                label = {
-                    Text(
-                        text = it.text,
-                        fontSize = if (it.icon == R.drawable.baseline_arrow_back_24) 20.sp
-                        else TextUnit.Unspecified
-                    )
-                },
-                selected = it == selectedItem,
-                icon = {
-                    Image(painter = painterResource(id = it.icon), contentDescription = it.text)
-                },
-                onClick = {
-                    selectedItem = it
-                    scope.launch {
-                        if (it.route == FirstDestination.route) {
-                            navigateToStart()
-                        } else {
-                            navigateToModalSheet(
-                                DrawerNavigation(
-                                    it.route,
-                                    idPTNavigation
-                                )
-                            )
-                            AppMetrica.reportEvent("Переход ${it.text}")
-                        }
-                        drawerState.apply {
-                            if (isClosed) open() else close()
-                        }
-                    }
-                }
-            )
-        }
-
-        Button(
-            onClick = {
-                AppMetrica.reportEvent("Переход в группу")
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/myfermaapp"))
-                context.startActivity(intent)
-            }, modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ) {
-            Text(text = "Вступить в группу VK!")
-        }
-    }
-}
-
-
-fun formatter(number: Double): String {
-    val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
-    numberFormat.minimumFractionDigits = 0
-    numberFormat.maximumFractionDigits = 2
-    return numberFormat.format(number).toString()
-}
 
 fun Double.formatNumber(isGroupingUsed: Boolean = true): String {
     val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
@@ -174,13 +32,6 @@ fun dateBuilder(day: Int, month: String, year: Int): String {
     return "%02d %s %04d".format(day, month, year)
 }
 
-fun dateBuilderFinance(date: String): String {
-    val dateList = date.split(".")
-    val day = dateList[0]
-    val mount = dateList[1].toInt()
-    val mount2 = monthToResString2(mount)
-    return "%02d".format(day) + " $mount2"
-}
 
 fun monthToResString(month: Int): Int {
     return when (month) {
@@ -255,36 +106,6 @@ fun dateLong(data: String): Long {
         dateLong?.time ?: calendar.timeInMillis
     }
 }
-
-
-@Composable
-fun AlertDialogInfo(
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String,
-) {
-    AlertDialog(
-        icon = {
-            Icon(painterResource(R.drawable.icon_info), contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText, textAlign = TextAlign.Justify)
-        },
-        onDismissRequest = onConfirmation,
-        confirmButton = {
-            TextButton(
-                onClick = onConfirmation
-
-            ) {
-                Text("Отлично!")
-            }
-        }
-    )
-}
-
 
 data class DrawerItems(
     val icon: Int,

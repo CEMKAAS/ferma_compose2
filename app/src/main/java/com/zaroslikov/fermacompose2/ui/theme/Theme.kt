@@ -57,9 +57,9 @@ private val lightScheme = lightColorScheme(
 )
 
 private val lightScheme2 = lightColorScheme(
-    primary = primaryLight,
+    primary = primaryLight2,
     onPrimary = onPrimaryLight,
-    primaryContainer = primaryContainerLight,
+    primaryContainer = primaryContainerLight2,
     onPrimaryContainer = onPrimaryContainerLight,
     secondary = secondaryLight,
     onSecondary = onSecondaryLight,
@@ -67,7 +67,7 @@ private val lightScheme2 = lightColorScheme(
     onSecondaryContainer = onSecondaryContainerLight,
     tertiary = tertiaryLight,
     onTertiary = onTertiaryLight,
-    tertiaryContainer = tertiaryContainerLight,
+    tertiaryContainer = tertiaryContainerLight2,
     onTertiaryContainer = onTertiaryContainerLight,
     error = errorLight,
     onError = onErrorLight,
@@ -77,20 +77,20 @@ private val lightScheme2 = lightColorScheme(
     onBackground = onBackgroundLight,
     surface = surfaceLight2,
     onSurface = onSurfaceLight,
-    surfaceVariant = surfaceVariantLight,
+    surfaceVariant = surfaceVariantLight2,
     onSurfaceVariant = onSurfaceVariantLight,
     outline = outlineLight,
-    outlineVariant = outlineVariantLight,
+    outlineVariant = outlineVariantLight2,
     scrim = scrimLight,
     inverseSurface = inverseSurfaceLight,
-    inverseOnSurface = inverseOnSurfaceLight,
+    inverseOnSurface = inverseOnSurfaceLight2,
     inversePrimary = inversePrimaryLight,
     surfaceDim = surfaceDimLight,
     surfaceBright = surfaceBrightLight2,
     surfaceContainerLowest = surfaceContainerLowestLight,
     surfaceContainerLow = surfaceContainerLowLight2,
     surfaceContainer = surfaceContainerLight2,
-    surfaceContainerHigh = surfaceContainerHighLight,
+    surfaceContainerHigh = surfaceContainerHighLight2,
     surfaceContainerHighest = surfaceContainerHighestLight2,
 )
 
@@ -303,7 +303,7 @@ fun FermaCompose2Theme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+  /*  val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -311,18 +311,18 @@ fun FermaCompose2Theme(
 
         darkTheme -> darkScheme
         else -> lightScheme2
-    }
+    }*/
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+//            window.statusBarColor = colorScheme.primary.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = lightScheme2,
         typography = Typography,
         content = content
     )

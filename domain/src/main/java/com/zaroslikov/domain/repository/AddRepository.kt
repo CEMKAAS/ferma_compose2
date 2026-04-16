@@ -7,6 +7,7 @@ import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
+import com.zaroslikov.domain.models.dto.finance.DomainAnimalWitchCountAndImage
 import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffixDate
@@ -33,10 +34,10 @@ interface AddRepository {
     fun getFastAddProduct(id: Long): Flow<List<DomainFastAddProduct>>
     fun getAnalysisAddAllTime(id: Long, name: String): Flow<DomainCountSuffix?>
     fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<DomainCountSuffix?>
-    fun getAnalysisAddAnimalAllTime(
-        id: Long,
-        name: String
-    ): Flow<List<DomainAnimalCountSuffix>>
+    /*  fun getAnalysisAddAnimalAllTime(
+          id: Long,
+          name: String
+      ): Flow<List<DomainAnimalCountSuffix>>*/
 
     fun getAnalysisAddRangeList(
         id: Long,
@@ -57,7 +58,7 @@ interface AddRepository {
         name: String,
         dateBegin: String,
         dateEnd: String
-    ): Flow<List<DomainAnimalCountSuffix>>
+    ): Flow<List<DomainAnimalWitchCountAndImage>>
 
     fun getProductAnimal(idAnimal: Long): Flow<List<DomainAnimalCountSuffix>>
     fun getProductKillList(id: Long): Flow<List<DomainAddTable>>

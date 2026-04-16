@@ -11,6 +11,7 @@ import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
@@ -24,7 +25,8 @@ import javax.inject.Inject
 class AddIncubatorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val projectRepository: ProjectRepository,
-    private val incubatorTableRepository: IncubatorTableRepository
+    private val incubatorTableRepository: IncubatorTableRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel<AddIncubatorState, AddIncubatorIntent>(AddIncubatorState()) {
 
     private val itemId: Long = checkNotNull(savedStateHandle[AddIncubatorDestination.itemIdArg])
@@ -91,6 +93,7 @@ class AddIncubatorViewModel @Inject constructor(
                         id
                     )
                 )
+                yandexMetricRepository.metricalIncubator(getState().currentProduct)
                 navigateTo(UiEvent.NavigateBack)
             }
         }

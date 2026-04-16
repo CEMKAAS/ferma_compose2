@@ -4,6 +4,8 @@ import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
 
 
 class AnimalVaccinationReduce : BaseReducer<AnimalVaccinationState, AnimalVaccinationIntent>() {
@@ -15,6 +17,11 @@ class AnimalVaccinationReduce : BaseReducer<AnimalVaccinationState, AnimalVaccin
             is AnimalVaccinationIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
                 intent.isOpen, intent.state, intent.isSaveStateForBottomSheet
             ).updateValid()
+
+
+            is AnimalVaccinationIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(
+                intent.value
+            )
 
             is AnimalVaccinationIntent.VaccinationChanged ->
                 state.updateVaccination(intent.value).updateValid()
@@ -33,6 +40,21 @@ class AnimalVaccinationReduce : BaseReducer<AnimalVaccinationState, AnimalVaccin
             is AnimalVaccinationIntent.NoteChanged -> state.updateNote(intent.value)
             is AnimalVaccinationIntent.DateFactoryClicked -> state.updateIsDateFactory(intent.value)
             else -> state
+        }
+    }
+
+    private fun AnimalVaccinationState.updateOpenBottomSheetDelete(id: Long?): AnimalVaccinationState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDelete = false,
+                deleteVaccination  = null
+            )
+        else {
+            val domain = vaccinationList.find { it.id == id }
+            copy(
+                isOpenBottomSheetDelete = domain?.let { true } ?: false,
+                deleteVaccination = domain
+                )
         }
     }
 

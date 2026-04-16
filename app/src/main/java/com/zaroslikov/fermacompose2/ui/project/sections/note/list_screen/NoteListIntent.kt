@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen
 
 import com.zaroslikov.domain.models.DomainNoteTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 sealed class NoteListIntent() : BaseIntent {
     data class LoadingChanged(val value: Boolean) : NoteListIntent()
@@ -16,6 +17,8 @@ sealed class NoteListIntent() : BaseIntent {
         val isSaveStateForBottomSheet: Boolean = false
     ) : NoteListIntent()
 
+    data class OpenBottomSheetDelete(val value: Long? = null) : NoteListIntent()
+
     data class RefreshEntryBottomSheetState(
         val isOpen: Boolean,
         val state: NoteEntryState2,
@@ -28,5 +31,5 @@ sealed class NoteListIntent() : BaseIntent {
 
     data object Insert : NoteListIntent()
     data object Update : NoteListIntent()
-    data class Delete(val value: Long) : NoteListIntent()
+    data object Delete : NoteListIntent()
 }

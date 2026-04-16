@@ -17,6 +17,7 @@ interface BookmarkRepository {
     fun getAllBookmarkTableForExport(): Flow<List<DomainBookmark>>
     suspend fun clearAndInsertBookmarkTableForImport(domainBookmark: List<DomainBookmark>)
     fun getBookmark(id: Long): Flow<DomainBookmark>
+    fun getBookmarkForWork(id: Long): DomainBookmark?
     fun getAllBookmark(id: Long): Flow<List<DomainBookmark>>
     fun getBreedBookmark(type: TypeEgg): Flow<List<String>>
     fun getBreedStatisticList(typeEgg: TypeEgg, idPT: Long): Flow<List<DomainTitleCount>>

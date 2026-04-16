@@ -3,7 +3,10 @@ package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
@@ -11,8 +14,12 @@ import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
+import com.zaroslikov.fermacompose2.supportFun.conversation3
+import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
@@ -36,7 +43,8 @@ class SaleViewModel @Inject constructor(
     private val warehouseRepository: WarehouseRepository,
     private val settingsRepository: SettingsRepository,
     private val resourceProvider: ResourceProvider,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<SaleListState, SaleListIntent, SaleListReduce>(
     SaleListState(),
     SaleListReduce(resourceProvider)
@@ -64,7 +72,7 @@ class SaleViewModel @Inject constructor(
 
             SaleListIntent.Insert -> insert()
             SaleListIntent.Update -> update()
-            is SaleListIntent.Delete -> delete(intent.value)
+            SaleListIntent.Delete -> delete(0)
             else -> Unit
         }
     }
@@ -190,31 +198,37 @@ class SaleViewModel @Inject constructor(
 
     private suspend fun updateWarehouseUiStateSync(name: String, category: Category) {
         val pair = if (category == Category.EXPENSES)
-            warehouseRepository.getCurrentExpensesProductList(name, itemIdPT)
-                .filterNotNull()
-                .firstOrNull()
+            warehouseRepository.getCurrentExpensesProductList(name, itemIdPT).first()
+                .build(getState().settings)
         else
             warehouseRepository
-                .getCurrentBalanceProductList(name, itemIdPT)
-                .filterNotNull()
-                .firstOrNull()
-        if (pair != null)
-            onIntent(SaleListIntent.RefreshWarehouseCount(pair))
+                .getCurrentBalanceProductList(name, itemIdPT).first()
+                .build(getState().settings)
+
+        onIntent(SaleListIntent.RefreshWarehouseCount(pair))
+    }
+
+    private fun List<DomainCountSuffix>.build(
+        settings: DomainSettings
+    ): List<DomainCountSuffix> {
+        return this.groupBy { it.suffix.conversation4(settings) }
+            .map { (suffix, items) ->
+                val totalCount = items.sumOf {
+                    it.count.conversation3(it.suffix, settings)
+                }
+                DomainCountSuffix(
+                    count = totalCount,
+                    suffix = suffix
+                )
+            }
     }
 
     override fun insert() {
         viewModelScope.launch {
             saleRepository.insertSale(getState().currentProduct.toDomainMap())
-//                metricaSale(saleUiState.copy(priceAll = autoCalculate()))
+            yandexMetricRepository.metricSale(getState().currentProduct)
+            showSnackbar(ProductOperation.ADD)
             loadDataForEntryOrEdit(false, null)
-            showMessage(
-                resourceProvider.getString(R.string.toast_sale_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    ) //Todo Обновить название
-            )
         }
     }
 
@@ -223,30 +237,43 @@ class SaleViewModel @Inject constructor(
             saleRepository.updateSale(getState().currentProduct.toDomainMap())
             if (getState().currentDetail != null)
                 updateState { it.copy(currentDetail = getState().currentProduct.toDomainMap()) }
+            showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
-            showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    ) //Todo Обновить название
-            )
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
-            saleRepository.deleteSaleById(id)
-            showMessage(
-                resourceProvider.getString(R.string.toast_delete_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    ) //Todo Обновить название
-            )
+            getState().currentDetail?.let { product ->
+                saleRepository.deleteSaleById(product.id)
+                showSnackbar(ProductOperation.DELETE)
+                sendIntent(SaleListIntent.OpenBottomSheetDelete(null))
+            }
         }
+    }
+
+    private fun showSnackbar(productOperation: ProductOperation) {
+        val (title, count) =
+            if (productOperation == ProductOperation.DELETE) {
+                val product = getState().currentDetail ?: DomainAddItemDto()
+                product.title to product.count.formatNumber()
+            } else {
+                val product = getState().currentProduct
+                product.title to product.count
+            }
+        val suffix = resourceProvider.getString(getState().settings.currencySuffix.toResId())
+        showMessage(
+            when (productOperation) {
+                ProductOperation.ADD -> resourceProvider.getString(R.string.snackbar_sale_add)
+                    .format(title, count, suffix)
+
+                ProductOperation.EDIT -> resourceProvider.getString(R.string.snackbar_sale_update)
+                    .format(title, count, suffix)
+
+                else -> resourceProvider.getString(R.string.snackbar_sale_delete)
+                    .format(title, count, suffix)
+            }
+        )
     }
 
     private fun SaleEntryState2.toUiMap22(domain: DomainSaleTable): SaleEntryState2 {

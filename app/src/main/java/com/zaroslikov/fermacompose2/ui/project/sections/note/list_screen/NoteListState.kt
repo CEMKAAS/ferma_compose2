@@ -14,6 +14,7 @@ data class NoteListState(
     val searchList: List<DomainNoteTable> = emptyList(),
     val isOpenBottomSheetEntry: Boolean = false,
     val isOpenBottomSheetDetail: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
     val detailDomainNoteTable: DomainNoteTable = DomainNoteTable(),
     val index: Long = 0,
     val isSaveStateForBottomSheet: Boolean = false,

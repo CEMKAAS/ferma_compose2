@@ -12,4 +12,7 @@ interface AppSettingsRepository {
     suspend fun updateAppSettings(domainAppSettings: DomainAppSettings)
 
     fun getAppSettings(): Flow<DomainAppSettings>
+
+    fun getFirstLaunch(): Flow<Boolean>
+    suspend fun createAppSettings(domainAppSettings: DomainAppSettings)
 }

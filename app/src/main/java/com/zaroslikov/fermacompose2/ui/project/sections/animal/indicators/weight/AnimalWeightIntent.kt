@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weigh
 
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 
 sealed class AnimalWeightIntent : BaseIntent {
@@ -18,12 +19,12 @@ sealed class AnimalWeightIntent : BaseIntent {
         val isSaveStateForBottomSheet: Boolean = false
     ) : AnimalWeightIntent()
 
-
+    data class OpenBottomSheetDelete(val value: Long? = null) : AnimalWeightIntent()
     data class WeightChanged(val value: String) : AnimalWeightIntent()
     data class SuffixClicked(val value: Suffix) : AnimalWeightIntent()
     data class DateClicked(val value: String) : AnimalWeightIntent()
     data class NoteChanged(val value: String) : AnimalWeightIntent()
     data object InsertPressed : AnimalWeightIntent()
     data object UpdatePressed : AnimalWeightIntent()
-    data class DeletePressed(val value: Long) : AnimalWeightIntent()
+    data object DeletePressed : AnimalWeightIntent()
 }

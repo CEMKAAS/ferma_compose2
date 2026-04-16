@@ -25,9 +25,8 @@ sealed class WriteOffListIntent : BaseIntent {
 
     data class RefreshWarehouseCount(val value: List<DomainCountSuffix>) : WriteOffListIntent()
 
-    data class OpenBottomSheetDetail(
-        val value: Long? = null
-    ) : WriteOffListIntent()
+    data class OpenBottomSheetDetail(val value: Long? = null) : WriteOffListIntent()
+    data class OpenBottomSheetDelete(val value: Long? = null) : WriteOffListIntent()
 
     data class TitleAndSuffix(
         val title: String, val suffix: Suffix,
@@ -42,7 +41,7 @@ sealed class WriteOffListIntent : BaseIntent {
     data class StatusClicked(val value: Boolean) : WriteOffListIntent()
     data object Insert : WriteOffListIntent()
     data object Update : WriteOffListIntent()
-    data class Delete(val value: Long) : WriteOffListIntent()
+    data object Delete : WriteOffListIntent()
 
     data class CountWarehouse(val value: List<DomainCountSuffix>) : WriteOffListIntent()
     data class GroupClicked(val value: Boolean) : WriteOffListIntent()

@@ -51,6 +51,7 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.text_14
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
@@ -113,7 +114,7 @@ fun NoteScreen(
                 searchList = state.searchList,
                 isArchive = state.isArchive,
                 onEditClick = { viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true, it)) },
-                onDeleteClick = { viewModel.onIntent(NoteListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(NoteListIntent.OpenBottomSheetDelete(it)) },
                 onDetailClick = {
                     viewModel.onIntent(NoteListIntent.OpenBottomSheetDetail(it))
                 }
@@ -130,6 +131,13 @@ fun NoteScreen(
                 colors = colors,
                 isArchive = state.isArchive,
                 onIntent = viewModel::onIntent
+            )
+        if (state.isOpenBottomSheetDelete)
+            WarningDeleteNoteBottomSheet(
+                state = state.detailDomainNoteTable,
+                color = colors.first(),
+                onDismissRequest = { viewModel.onIntent(NoteListIntent.OpenBottomSheetDelete(null)) },
+                onDeleteClick = { viewModel.onIntent(NoteListIntent.Delete) }
             )
     }
 }
@@ -150,7 +158,7 @@ private fun NoteContainer(
         details = true,
         itemList = itemList,
         searchList = searchList,
-        brieflyList = emptyList<Int>(),
+        brieflyList = emptyList<Int>(), searchBrieflyList = emptyList(),
         detailCard = { index, item ->
             NoteCard(
                 title = item.title,
@@ -175,22 +183,46 @@ private fun NoteContainer(
 }
 
 @Composable
+private fun WarningDeleteNoteBottomSheet(
+    state: DomainNoteTable,
+    color: Color,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.base_section_delete_note,
+        supportRes = R.string.base_section_delete_support_note,
+        textRes = R.string.base_section_warning_note,
+        textButtonRes = R.string.base_section_button_delete_note
+    ) {
+        NoteCard(
+            title = state.title,
+            note = state.note,
+            date = state.date,
+            color = color,
+            isArchive = true,
+        )
+    }
+}
+
+
+@Composable
 fun NoteCard(
     title: String,
     note: String,
     date: String,
     color: Color,
     isArchive: Boolean,
-    onDetailClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDetailClick: (() -> Unit)? = null,
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     val date = date.split(".")
     val monthText = stringResource(id = monthToResString(date[1].toInt()))
     val date2 = dateBuilder(date[0].toInt(), monthText, date[2].toInt())
-    CardFieldNew(
-        onClick = onDetailClick
-    ) {
+    val cardField: @Composable () -> Unit = {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             horizontalAlignment = Alignment.Start
@@ -234,6 +266,12 @@ fun NoteCard(
             )
         }
     }
+    if (onDetailClick != null)
+        CardFieldNew(
+            onClick = onDetailClick
+        ) { cardField() }
+    else BorderCard { cardField() }
+
 }
 
 @Composable
@@ -295,7 +333,7 @@ private fun NoteDetailBottomSheet(
         isArchive = isArchive,
         onUpdateClick = { onIntent(NoteListIntent.OpenBottomSheetEntry(true, state)) },
         onDeleteClick = {
-            onIntent(NoteListIntent.Delete(state.id))
+            onIntent(NoteListIntent.OpenBottomSheetDelete(state.id))
             onIntent(NoteListIntent.OpenBottomSheetDetail(null))
         },
         onDismissRequest = {

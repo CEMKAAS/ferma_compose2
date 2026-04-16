@@ -22,6 +22,7 @@ data class SaleListState(
     val isOpenBottomSheetGroup: Boolean = false,
     val isOpenBottomSheetEntry: Boolean = false,
     val isOpenBottomSheetDetail: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
 
     val currentDetail: DomainSaleTable? = null,

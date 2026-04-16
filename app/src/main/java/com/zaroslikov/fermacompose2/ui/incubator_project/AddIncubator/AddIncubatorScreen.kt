@@ -218,7 +218,7 @@ private fun EnterValue(
                 onValueChange = { onIntent(AddIncubatorIntent.PriceChanged(it)) },
                 intRes = R.string.add_incubator_screen_incubator_sell,
                 intResSup = R.string.add_incubator_screen_incubator_sell_support,
-                suffix = Suffix.PIECES,
+                suffix = state.currencySuffix,
                 isBorderCard = false
             )
             OutlinedTextDateNew(

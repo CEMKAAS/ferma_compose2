@@ -3,7 +3,6 @@ package com.zaroslikov.fermacompose2.ui.warehouse
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
@@ -19,11 +18,14 @@ import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.conversation3
 import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
+import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.LoadDataWarehouse
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
@@ -52,7 +54,8 @@ class WarehouseViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val writeOffRepository: WriteOffRepository,
     private val resourceProvider: ResourceProvider,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : BaseViewModel2<WarehouseState, WarehouseIntent, WarehouseReduce>(
     WarehouseState(),
     WarehouseReduce()
@@ -106,8 +109,9 @@ class WarehouseViewModel @Inject constructor(
             val currentFoodOnWriteOff = getState().currentFoodOnWriteOff ?: return@launch
             expensesRepository.updateFoodOnWriteOffWarehouse(currentFoodOnWriteOff.id)
             writeOffRepository.insertWriteOff(currentFoodOnWriteOff.toUi())
+            showMessage(resourceProvider.getString(R.string.warehouse_screen_write_off))
+            yandexMetricRepository.metricalWriteOffFood(currentFoodOnWriteOff)
             sendIntent(WarehouseIntent.OpenWarningWriteOffAlterDialogClicked(null))
-            showMessage("Продукция списана")
         }
     }
 
@@ -123,21 +127,22 @@ class WarehouseViewModel @Inject constructor(
                     month = dateList[1].toInt(),
                     year = dateList[2].toInt(),
                     price = 0.0,
-                    category = domain.category ?: "TODO()", //FIXME
+                    category = domain.category ?: "",
                     animalId = domain.idAnimal,
-                    note = "TODO()", //TODO
+                    note = resourceProvider.getString(R.string.warehouse_screen_fast_add_note),
                     idPT = itemId
                 )
             )
+            yandexMetricRepository.metricalFastAdd(domain)
+            showMessage(
+                resourceProvider.getString(R.string.snackbar_product_add)
+                    .format(
+                        domain.title,
+                        domain.count.formatNumber(),
+                        resourceProvider.getString(domain.suffix.toResId())
+                    )
+            )
             sendIntent(WarehouseIntent.ShowFastAddClicked(true))
-            /* showMessage(
-                 resourceProvider.getString(R.string.toast_add_s)
-                     .format(
-                         getState().currentProduct.title,
-                         getState().currentProduct.count,
-                         getState().currentProduct.countSuffix
-                     )
-             )*/
         }
     }
 

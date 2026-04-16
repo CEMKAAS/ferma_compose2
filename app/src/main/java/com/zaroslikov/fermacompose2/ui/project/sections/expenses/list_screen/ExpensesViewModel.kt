@@ -5,7 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.models.DomainExpensesTable
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.ExpensesAnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
@@ -14,17 +18,18 @@ import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
-import com.zaroslikov.fermacompose2.green_g_4
-import com.zaroslikov.fermacompose2.orang_8
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
+import com.zaroslikov.fermacompose2.supportFun.conversation3
+import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbOnlyInt
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleListIntent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
-import com.zaroslikov.fermacompose2.violet_5
-import com.zaroslikov.fermacompose2.white
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
@@ -47,7 +52,8 @@ class ExpensesViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val settingsRepository: SettingsRepository,
     private val resourceProvider: ResourceProvider,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<ExpensesListState, ExpensesListIntent, ExpensesListReduce>(
     initialState = ExpensesListState(),
     ExpensesListReduce(resourceProvider)
@@ -75,7 +81,7 @@ class ExpensesViewModel @Inject constructor(
             is ExpensesListIntent.TitleAndSuffixClicked -> updateWarehouseUiState(intent.title)
             ExpensesListIntent.Insert -> insert()
             ExpensesListIntent.Update -> update()
-            is ExpensesListIntent.Delete -> delete(intent.value)
+            is ExpensesListIntent.Delete -> delete(0)
             else -> Unit
         }
     }
@@ -130,7 +136,7 @@ class ExpensesViewModel @Inject constructor(
         viewModelScope.launch {
             if (title == null) {
                 updateState { state ->
-                    state.copy(isOpenGroupBottomSheet  = false)
+                    state.copy(isOpenGroupBottomSheet = false)
                 }
                 return@launch
             }
@@ -190,37 +196,45 @@ class ExpensesViewModel @Inject constructor(
                     true, newState
                 )
             )
-            updateWarehouseUiState(newState.title)
+            updateWarehouseUiStateSync(newState.title)
         }
     }
 
-    //TODO разделить на две функции
     private fun updateWarehouseUiState(name: String) {
         viewModelScope.launch {
-            val pair = warehouseRepository
-                .getCurrentExpensesProductList(name, itemIdPT)
-                .firstOrNull()
-            pair?.let {
-                onIntent(ExpensesListIntent.RefreshWarehouseCount(pair))
-            }
+            updateWarehouseUiStateSync(name)
         }
+    }
+
+    private suspend fun updateWarehouseUiStateSync(name: String) {
+        val pair = warehouseRepository
+            .getCurrentExpensesProductList(name, itemIdPT).first().build(getState().settings)
+
+        onIntent(ExpensesListIntent.RefreshWarehouseCount(pair))
+    }
+
+    private fun List<DomainCountSuffix>.build(
+        settings: DomainSettings
+    ): List<DomainCountSuffix> {
+        return this.groupBy { it.suffix.conversation4(settings) }
+            .map { (suffix, items) ->
+                val totalCount = items.sumOf {
+                    it.count.conversation3(it.suffix, settings)
+                }
+                DomainCountSuffix(
+                    count = totalCount,
+                    suffix = suffix
+                )
+            }
     }
 
     override fun insert() {
         viewModelScope.launch {
             val id = expensesRepository.insertExpenses(getState().currentProduct.toDomainMap(true))
             setExpensesAnimal(id)
-//                metricalExpenses() TODO Нужно придумать, как грамотно сохранять
+            yandexMetricRepository.metricalExpenses(getState().currentProduct)
+            showSnackbar(ProductOperation.ADD)
             loadDataForEntryOrEdit(false, null)
-
-            showMessage(
-                resourceProvider.getString(R.string.toast_expenses_s_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    )
-            )
         }
     }
 
@@ -228,31 +242,19 @@ class ExpensesViewModel @Inject constructor(
         viewModelScope.launch {
             expensesRepository.updateExpenses(getState().currentProduct.toDomainMap(false))
             saveExpensesAnimal()
+            showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
-
-            showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    )
-            )
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
-            expensesRepository.deleteExpensesById(id)
-            deleteExpensesAnimalById(id) //TODO удаление через id
-            showMessage(
-                resourceProvider.getString(R.string.toast_delete_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    )
-            )
+            getState().currentDetail?.let { product ->
+                expensesRepository.deleteExpensesById(product.id)
+                showSnackbar(ProductOperation.DELETE)
+                deleteExpensesAnimalById(product.id)
+                sendIntent(ExpensesListIntent.OpenBottomSheetDelete(null))
+            }
         }
     }
 
@@ -292,6 +294,31 @@ class ExpensesViewModel @Inject constructor(
 
     private suspend fun deleteExpensesAnimalById(id: Long) {
         expensesAnimalRepository.deleteExpensesAnimalById(id)
+    }
+
+
+    private fun showSnackbar(productOperation: ProductOperation) {
+        val (title, count) =
+            if (productOperation == ProductOperation.DELETE) {
+                val product = getState().currentDetail ?: ExpensesTableUi()
+                product.title to product.count.formatNumber()
+            } else {
+                val product = getState().currentProduct
+                product.title to product.count
+            }
+        val suffix = resourceProvider.getString(getState().settings.currencySuffix.toResId())
+        showMessage(
+            when (productOperation) {
+                ProductOperation.ADD -> resourceProvider.getString(R.string.snackbar_expense_add)
+                    .format(title, count, suffix)
+
+                ProductOperation.EDIT -> resourceProvider.getString(R.string.snackbar_expense_update)
+                    .format(title, count, suffix)
+
+                else -> resourceProvider.getString(R.string.snackbar_expense_delete)
+                    .format(title, count, suffix)
+            }
+        )
     }
 
     fun ExpensesEntryState2.toUiMap(
@@ -404,10 +431,10 @@ class ExpensesViewModel @Inject constructor(
     }
 
     private suspend fun DomainExpensesTable.toUi(): ExpensesTableUi {
-        val colors = when {
-            isFood -> listOf(white, orang_8)
-            animalVaccinationId != null -> listOf(white, violet_5)
-            animalId != null -> listOf(white, green_g_4)
+        val typeProduct = when {
+            isFood -> TypeProduct.FOOD
+            animalVaccinationId != null -> TypeProduct.VACCINATION
+            animalId != null -> TypeProduct.ANIMAL
             else -> null
         }
 
@@ -437,7 +464,7 @@ class ExpensesViewModel @Inject constructor(
             weight = weight,
             weightSuffix = weightSuffix,
             food = this.food(),
-            colors = colors,
+            typeProduct = typeProduct,
         )
     }
 

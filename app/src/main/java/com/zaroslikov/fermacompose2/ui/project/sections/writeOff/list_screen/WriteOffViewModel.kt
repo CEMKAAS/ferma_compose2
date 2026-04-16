@@ -3,8 +3,9 @@ package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
-import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.AddRepository
@@ -14,8 +15,12 @@ import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
+import com.zaroslikov.fermacompose2.supportFun.conversation3
+import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
@@ -39,7 +44,8 @@ class WriteOffViewModel @Inject constructor(
     private val warehouseRepository: WarehouseRepository,
     private val settingsRepository: SettingsRepository,
     private val resourceProvider: ResourceProvider,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<WriteOffListState, WriteOffListIntent, WriteOffListReduce>(
     WriteOffListState(),
     WriteOffListReduce(resourceProvider)
@@ -65,7 +71,7 @@ class WriteOffViewModel @Inject constructor(
 
             WriteOffListIntent.Insert -> insert()
             WriteOffListIntent.Update -> update()
-            is WriteOffListIntent.Delete -> delete(intent.value)
+            is WriteOffListIntent.Delete -> delete(0)
             else -> Unit
         }
     }
@@ -117,16 +123,9 @@ class WriteOffViewModel @Inject constructor(
     override fun insert() {
         viewModelScope.launch {
             writeOffRepository.insertWriteOff(getState().currentProduct.updateForSave())
-//            metricaWriteOff(writeOffUiState.copy(priceAll = autoCalculate()))
+            yandexMetricRepository.metricalWriteOff(getState().currentProduct)
+            showSnackbar(ProductOperation.ADD)
             loadDataForEntryOrEdit(false, null)
-            showMessage(
-                resourceProvider.getString(R.string.toast_sale_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    ) //Todo Обновить название
-            )
         }
     }
 
@@ -135,31 +134,18 @@ class WriteOffViewModel @Inject constructor(
             writeOffRepository.updateWriteOff(getState().currentProduct.updateForSave())
             if (getState().currentDetail != null)
                 updateState { it.copy(currentDetail = getState().currentProduct.updateForSave()) }
+            showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
-
-            showMessage(
-                resourceProvider.getString(R.string.toast_refresh_s_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    ) //Todo Обновить название
-            )
         }
     }
 
     override fun delete(id: Long) {
         viewModelScope.launch {
-            writeOffRepository.deleteWriteOff(id)
-            loadDataForEntryOrEdit(false, null)
-            showMessage(
-                resourceProvider.getString(R.string.toast_delete_s)
-                    .format(
-                        getState().currentProduct.title,
-                        getState().currentProduct.count,
-                        getState().currentProduct.countSuffix
-                    ) //Todo Обновить название
-            )
+            getState().currentDetail?.let { product ->
+                writeOffRepository.deleteWriteOff(product.id)
+                showSnackbar(ProductOperation.DELETE)
+                sendIntent(WriteOffListIntent.OpenBottomSheetDelete(null))
+            }
         }
     }
 
@@ -232,17 +218,52 @@ class WriteOffViewModel @Inject constructor(
 
     private suspend fun updateWarehouseUiStateSync(name: String, category: Category) {
         val pair = if (category == Category.EXPENSES)
-            warehouseRepository.getCurrentExpensesProductList(name, itemIdPT)
-                .filterNotNull()
-                .firstOrNull()
+            warehouseRepository.getCurrentExpensesProductList(name, itemIdPT).first()
+                .build(getState().settings)
         else
             warehouseRepository
-                .getCurrentBalanceProductList(name, itemIdPT)
-                .filterNotNull()
-                .firstOrNull()
+                .getCurrentBalanceProductList(name, itemIdPT).first().build(getState().settings)
 
-        if (pair != null)
-            onIntent(WriteOffListIntent.RefreshWarehouseCount(pair))
+        onIntent(WriteOffListIntent.RefreshWarehouseCount(pair))
+    }
+
+    private fun List<DomainCountSuffix>.build(
+        settings: DomainSettings
+    ): List<DomainCountSuffix> {
+        return this.groupBy { it.suffix.conversation4(settings) }
+            .map { (suffix, items) ->
+                val totalCount = items.sumOf {
+                    it.count.conversation3(it.suffix, settings)
+                }
+                DomainCountSuffix(
+                    count = totalCount,
+                    suffix = suffix
+                )
+            }
+    }
+
+    private fun showSnackbar(productOperation: ProductOperation) {
+        val (title, count, countSuffix) =
+            if (productOperation == ProductOperation.DELETE) {
+                val product = getState().currentDetail ?: DomainAddItemDto()
+                Triple(product.title, product.count.formatNumber(), product.countSuffix)
+            } else {
+                val product = getState().currentProduct
+                Triple(product.title, product.count, product.countSuffix)
+            }
+        val suffix = resourceProvider.getString(countSuffix.toResId())
+        showMessage(
+            when (productOperation) {
+                ProductOperation.ADD -> resourceProvider.getString(R.string.snackbar_write_off_add)
+                    .format(title, count, suffix)
+
+                ProductOperation.EDIT -> resourceProvider.getString(R.string.snackbar_write_off_update)
+                    .format(title, count, suffix)
+
+                else -> resourceProvider.getString(R.string.snackbar_write_off_delete)
+                    .format(title, count, suffix)
+            }
+        )
     }
 
     private fun WriteOffEntryState2.updateFromDomain(domain: DomainWriteOffTable): WriteOffEntryState2 {

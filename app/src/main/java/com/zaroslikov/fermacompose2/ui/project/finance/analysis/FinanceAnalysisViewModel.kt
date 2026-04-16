@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
+import com.zaroslikov.domain.models.dto.finance.DomainAnimalWitchCountAndImage
 import com.zaroslikov.domain.models.dto.finance.DomainTransaction
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
@@ -15,6 +16,7 @@ import com.zaroslikov.domain.repository.FinanceRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import com.zaroslikov.fermacompose2.supportFun.DomainChartPoint
@@ -98,7 +100,7 @@ class FinanceAnalysisViewModel @Inject constructor(
                 buildUiState(
                     transactionList = values[0] as List<DomainTransaction>,
                     buyersList = values[1] as List<DomainBuyerPrice>,
-                    animalProducerList = values[2] as List<DomainAnimalCountSuffix>,
+                    animalProducerList = values[2] as List<DomainAnimalWitchCountAndImage>,
                     productList = values[3] as List<DomainCountSuffixPriceDate>,
                     totalOwnNeed = values[4] as List<DomainCountSuffixPriceDate>,
                     totalScrap = values[5] as List<DomainCountSuffixPriceDate>,
@@ -135,7 +137,7 @@ class FinanceAnalysisViewModel @Inject constructor(
     private fun buildUiState(
         transactionList: List<DomainTransaction>,
         buyersList: List<DomainBuyerPrice>,
-        animalProducerList: List<DomainAnimalCountSuffix>,
+        animalProducerList: List<DomainAnimalWitchCountAndImage>,
         productList: List<DomainCountSuffixPriceDate>,
         totalOwnNeed: List<DomainCountSuffixPriceDate>,
         totalScrap: List<DomainCountSuffixPriceDate>,
@@ -237,7 +239,7 @@ class FinanceAnalysisViewModel @Inject constructor(
     }
 
     private fun animalProducerList(
-        animalProducerList: List<DomainAnimalCountSuffix>,
+        animalProducerList: List<DomainAnimalWitchCountAndImage>,
         domainSettings: DomainSettings
     ): List<AnimalProducer> {
         val groupedAnimalProducerList = animalProducerList
@@ -258,6 +260,8 @@ class FinanceAnalysisViewModel @Inject constructor(
                     suffix = baseSuffix,
                     percentDouble = 0.0, // временно, заполним позже
                     percentFloat = 0f,
+                    imagePath = items.first().imagePath,
+                    currentIcon = items.first().currentIcon ?: R.drawable.baseline_pets_24,
                 )
             }
         val totalAllAnimals = groupedAnimalProducerList.sumOf { it.count }

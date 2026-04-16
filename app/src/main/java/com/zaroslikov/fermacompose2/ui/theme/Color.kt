@@ -1,6 +1,8 @@
 package com.zaroslikov.fermacompose2.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.white
 
 val primaryLight = Color(0xFF4C662B)
@@ -219,9 +221,9 @@ val surfaceContainerDarkHighContrast = Color(0xFF1E201A)
 val surfaceContainerHighDarkHighContrast = Color(0xFF282B24)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF33362E)
 
-val primaryLight2 = Color(0xFF4C662B)
+val primaryLight2 = Color(0xFF00C950)
 val onPrimaryLight2 = Color(0xFFFFFFFF)
-val primaryContainerLight2 = Color(0xFFCDEDA3)
+val primaryContainerLight2 = Color(0xFF00C950)
 val onPrimaryContainerLight2 = Color(0xFF102000)
 val secondaryLight2 = Color(0xFF586249)
 val onSecondaryLight2 = Color(0xFFFFFFFF)
@@ -229,7 +231,7 @@ val secondaryContainerLight2 = white
 val onSecondaryContainerLight2 = Color(0xFF151E0B)
 val tertiaryLight2 = Color(0xFF3F6836)
 val onTertiaryLight2 = Color(0xFFFFFFFF)
-val tertiaryContainerLight2 = Color(0xFFBFEFB1)
+val tertiaryContainerLight2 = Color(0xFF4db6ff)
 val onTertiaryContainerLight2 = Color(0xFF002201)
 val errorLight2 = Color(0xFFBA1A1A)
 val onErrorLight2 = Color(0xFFFFFFFF)
@@ -239,7 +241,7 @@ val backgroundLight2 = white
 val onBackgroundLight2 = Color(0xFF1A1C16)
 val surfaceLight2 = white
 val onSurfaceLight2 = Color(0xFF1A1C16)
-val surfaceVariantLight2 = Color(0xFFE1E4D5)
+val surfaceVariantLight2 = Color(0xFFa8f5ab)
 val onSurfaceVariantLight2 = Color(0xFF44483D)
 val outlineLight2 = Color(0xFF75796C)
 val outlineVariantLight2 = Color(0xFFC5C8BA)
@@ -252,5 +254,5 @@ val surfaceBrightLight2 = white
 val surfaceContainerLowestLight2 = Color(0xFFFFFFFF)
 val surfaceContainerLowLight2 = white // Цвет BottomSheet
 val surfaceContainerLight2 = white  // Цвет BottomNavigation
-val surfaceContainerHighLight2 = Color(0xFFE8E9DE)
+val surfaceContainerHighLight2 = white // Цвет календаря и радиус часов
 val surfaceContainerHighestLight2 = white  // Цвет фона AlertDialog

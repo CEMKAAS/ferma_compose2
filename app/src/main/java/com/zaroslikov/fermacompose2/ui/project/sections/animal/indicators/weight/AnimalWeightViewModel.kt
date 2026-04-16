@@ -3,16 +3,21 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weigh
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.IndicationStatus
+import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalWeightRepository
 import com.zaroslikov.domain.repository.ProjectRepository
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.convertWeight
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber2
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -26,6 +31,8 @@ class AnimalWeightViewModel @Inject constructor(
     private val animalWeightRepository: AnimalWeightRepository,
     private val projectRepository: ProjectRepository,
     private val animalRepository: AnimalRepository,
+    private val resourceProvider: ResourceProvider,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<AnimalWeightState, AnimalWeightIntent, AnimalWeightReduce>(
     AnimalWeightState(),
     AnimalWeightReduce()
@@ -48,7 +55,7 @@ class AnimalWeightViewModel @Inject constructor(
 
             AnimalWeightIntent.InsertPressed -> insert()
             AnimalWeightIntent.UpdatePressed -> update()
-            is AnimalWeightIntent.DeletePressed -> delete(intent.value)
+            is AnimalWeightIntent.DeletePressed -> delete(0)
             else -> Unit
         }
     }
@@ -101,64 +108,59 @@ class AnimalWeightViewModel @Inject constructor(
         }
     }
 
-
     override fun insert() {
         viewModelScope.launch {
             animalWeightRepository.insertAnimalWeightTable(
                 getState().currentProduct.toDomain()
             )
+            yandexMetricRepository.metricalAnimalWeight(getState().currentProduct)
+            showSnackbar(ProductOperation.ADD)
             loadDataForEntryOrEdit(false, null)
-            showMessage("Добавлен размер")
         }
     }
-
 
     override fun update() {
         viewModelScope.launch {
             animalWeightRepository.updateAnimalWeightTable(
                 getState().currentProduct.toDomain()
             )
+            showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
-            showMessage("Редактировать размер")
         }
     }
-
 
     override fun delete(id: Long) {
         viewModelScope.launch {
-            animalWeightRepository.deleteAnimalWeightTableById(id)
-            loadDataForEntryOrEdit(false, null)
-            showMessage("Удалить размер")
+            getState().deleteWeight?.let {
+                animalWeightRepository.deleteAnimalWeightTableById(it.id)
+                showSnackbar(ProductOperation.DELETE)
+                sendIntent(AnimalWeightIntent.OpenBottomSheetDelete(null))
+            }
         }
     }
 
-    fun positeive(
-        domainAnimalWeight: DomainAnimalWeight,
-        previousDomainAnimalWeight: DomainAnimalWeight?
-    ): Pair<String, IndicationStatus> {
-        if (previousDomainAnimalWeight == null) return domainAnimalWeight.weight.toFormatNumber2() to IndicationStatus.POSITIVE
-        else {
-            val size = domainAnimalWeight.weight.toConvertZeroDouble()
-            val previousSize = previousDomainAnimalWeight.weight.toConvertZeroDouble()
-
-            val suffix = domainAnimalWeight.suffix
-            val suffixPrevious = previousDomainAnimalWeight.suffix
-
-            val sizeConverted = size.convertWeight(suffix, to = Suffix.GRAM)
-            val previousCountConverted =
-                previousSize.convertWeight(suffixPrevious, to = Suffix.GRAM)
-
-            val totalValue = (sizeConverted - previousCountConverted).convertWeight(
-                Suffix.GRAM,
-                suffix
-            ).absoluteValue.formatNumber()
-            val status = when {
-                sizeConverted > previousCountConverted -> IndicationStatus.POSITIVE
-                sizeConverted == previousCountConverted -> IndicationStatus.NEUTRAL
-                else -> IndicationStatus.NEGATIVE
+    private fun showSnackbar(productOperation: ProductOperation) {
+        val (count, countSuffix) =
+            if (productOperation == ProductOperation.DELETE) {
+                val product = getState().deleteWeight ?: AnimalWeightUi()
+                product.weight to product.suffix
+            } else {
+                val product = getState().currentProduct
+                product.weight to product.suffix
             }
-            return totalValue to status
-        }
+        val suffix = resourceProvider.getString(countSuffix.toResId())
+        showMessage(
+            when (productOperation) {
+                ProductOperation.ADD -> resourceProvider.getString(R.string.snackbar_weight_add)
+                    .format(count, suffix)
+
+                ProductOperation.EDIT -> resourceProvider.getString(R.string.snackbar_weight_update)
+                    .format(count, suffix)
+
+                else -> resourceProvider.getString(R.string.snackbar_weight_delete)
+                    .format(count, suffix)
+            }
+        )
     }
 
     private fun settingsList(list: List<DomainAnimalWeight>): List<AnimalWeightUi> {

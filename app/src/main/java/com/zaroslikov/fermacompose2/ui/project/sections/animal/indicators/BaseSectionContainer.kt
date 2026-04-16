@@ -57,16 +57,20 @@ import com.zaroslikov.fermacompose2.red_2
 import com.zaroslikov.fermacompose2.red_3
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
+import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
+import com.zaroslikov.fermacompose2.ui.elements.NoteColorCard
 import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
+import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelDetailNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.ui.formatNumber
@@ -292,6 +296,38 @@ fun AnimalIndicatorsCardBase(
 
 
 @Composable
+fun AnimalIndicatorsDeleteCard(
+    color: Color,
+    value: String,
+    suffix: Suffix?,
+    date: String,
+    note: String
+) {
+    val suffixRes = suffix?.let { stringResource(suffix.toResId()) } ?: ""
+    BorderCard(
+        padding = PaddingValues(17.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "$value $suffixRes",
+                style = textBold_16,
+                textAlign = TextAlign.Center
+            )
+            IconAndTextNew(
+                iconRes = R.drawable.baseline_calendar_month_24,
+                valueString = date,
+                iconColor = color
+            )
+            if (note != "") NoteColorCard(note, color)
+        }
+    }
+}
+
+
+@Composable
 fun AnimalIndicatorsCardNew(
     @DrawableRes icon: Int,
     colors: List<Color>,
@@ -305,7 +341,7 @@ fun AnimalIndicatorsCardNew(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    var details by rememberSaveable() { mutableStateOf(false) }
+    var details by rememberSaveable { mutableStateOf(false) }
     AnimalIndicatorsCardBase(
         modifier = Modifier,
         icon = icon,

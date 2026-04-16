@@ -5,6 +5,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 sealed class SaleListIntent : BaseIntent {
     data class OpenBottomSheetGroup(val value: String?) : SaleListIntent()
@@ -24,6 +25,8 @@ sealed class SaleListIntent : BaseIntent {
     data class OpenBottomSheetDetail(
         val value: Long? = null
     ) : SaleListIntent()
+
+    data class OpenBottomSheetDelete(val value: Long? = null) : SaleListIntent()
 
     data class TitleChanged(val value: String) : SaleListIntent()
     data class TitleAndSuffixClicked(
@@ -47,5 +50,5 @@ sealed class SaleListIntent : BaseIntent {
     data class SearchChanged(val value: String) : SaleListIntent()
     data object Insert : SaleListIntent()
     data object Update : SaleListIntent()
-    data class Delete(val value: Long) : SaleListIntent()
+    data object Delete : SaleListIntent()
 }

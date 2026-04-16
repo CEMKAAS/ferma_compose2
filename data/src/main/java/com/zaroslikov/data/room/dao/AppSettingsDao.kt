@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
 
 import androidx.room.Query
 import androidx.room.Transaction
@@ -31,4 +32,11 @@ interface AppSettingsDao {
 
     @Query("SELECT * FROM app_settings_table WHERE id= 1")
     fun getAppSettings(): Flow<AppSettingsTable>
+
+    @Query("SELECT is_first_launch FROM app_settings_table WHERE id= 1")
+    fun getFirstLaunch(): Flow<Boolean>
+
+    @Insert
+    suspend fun createAppSettings(appSettingsTable: AppSettingsTable)
+
 }

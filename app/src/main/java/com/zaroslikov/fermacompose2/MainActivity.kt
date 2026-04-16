@@ -50,21 +50,18 @@ class MainActivity : ComponentActivity() {
         const val REQUEST_CODE_NOTIFICATION_PERMISSIONS = 11
     }
 
-   /* private var appOpenAd: AppOpenAd? = null
-    private var isAdShownOnColdStart = false
+    /* private var appOpenAd: AppOpenAd? = null
+     private var isAdShownOnColdStart = false
 
-    private var interstitialAd: InterstitialAd? = null
-    private var interstitialAdLoader: InterstitialAdLoader? = null*/
+     private var interstitialAd: InterstitialAd? = null
+     private var interstitialAdLoader: InterstitialAdLoader? = null*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val action = intent?.action
+        val projectId = intent?.getLongExtra("itemIdPT", -1L) ?: -1L
 
-//        val startBoolean = isFirstLaunch(this)
-
-//        if (startBoolean) {
-//            WorkManagerWaterRepository(this). setupDailyReminder()
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
-//        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
 
 
         setContent {
@@ -78,13 +75,13 @@ class MainActivity : ComponentActivity() {
                 }*/
 //                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
 
-                InventoryApp()
+                InventoryApp(action = action, projectId = projectId)
             }
         }
     }
 
 
-    private fun getNotificationPermissions() {
+    /*private fun getNotificationPermissions() {
         try {
             val hasAccessNotificationPolicyPermission =
                 checkSelfPermission(Manifest.permission.ACCESS_NOTIFICATION_POLICY) == PackageManager.PERMISSION_GRANTED
@@ -106,7 +103,7 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
+    }*/
 
     /* override fun onRequestPermissionsResult(
          requestCode: Int,

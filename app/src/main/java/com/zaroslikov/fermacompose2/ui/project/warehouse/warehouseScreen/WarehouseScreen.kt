@@ -94,6 +94,7 @@ import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
+import io.appmetrica.analytics.AppMetrica
 
 object WarehouseDestination : NavigationDestination {
     override val route = "warehouse"
@@ -114,7 +115,6 @@ fun WarehouseScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -199,9 +199,9 @@ private fun WarehouseContainer(
         if (state.productList.isEmpty() && state.expensesList.isEmpty())
             Box(
                 modifier = Modifier
-                    .weight(1f)              // ← занимает всё оставшееся место
+                    .weight(1f)
                     .fillMaxWidth(),
-                contentAlignment = Alignment.Center // ← центр
+                contentAlignment = Alignment.Center
             ) {
                 EmptyBookmark(
                     iconRes = R.drawable.icon_open_box,
@@ -227,12 +227,15 @@ private fun WarehouseContainer(
                         title = item.title,
                         value = item.count,
                         suffix = item.suffix
-                    ) { onAnalysisNavClick(item.title to item.suffix) }
+                    ) {
+                        onAnalysisNavClick(item.title to item.suffix)
+                        AppMetrica.reportEvent("Переход в полный анализ продукта со склада")
+                    }
                 }
             if (state.foodList.isNotEmpty())
                 WarehouseSection(
                     titleRes = R.string.warehouse_screen_warehouse_foods,
-                    iconRes = R.drawable.icon_add_product,
+                    iconRes = R.drawable.wheat_24dp_000000_fill0_wght400_grad0_opsz24,
                     list = state.foodList,
                     textColor = orang_6,
                     borderColor = orang_5,
@@ -427,17 +430,18 @@ private fun <T> WarehouseSection(
                     }
                 }
             }
-            /*AnimatedVisibility(
-                    modifier = Modifier.fillMaxWidth(),
-            visible = isManyCount
-            ) {*/
-            if (list.size >= 4)
-                BorderShowAllButton(
-                    listSize = list.size,
-                    textColor = textColor,
-                    borderColor = borderColor,
-                    isShowMore = expanded
-                ) { expanded = !expanded }
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = expanded
+            ) {
+                if (list.size > 4)
+                    BorderShowAllButton(
+                        listSize = list.size,
+                        textColor = textColor,
+                        borderColor = borderColor,
+                        isShowMore = expanded
+                    ) { expanded = !expanded }
+            }
         }
     }
 }

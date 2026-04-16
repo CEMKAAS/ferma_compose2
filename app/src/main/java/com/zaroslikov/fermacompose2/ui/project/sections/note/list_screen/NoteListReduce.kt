@@ -4,6 +4,8 @@ import com.zaroslikov.domain.models.DomainNoteTable
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.ui.dateBuilder
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.collections.find
 
@@ -19,6 +21,7 @@ class NoteListReduce(
             is NoteListIntent.LoadData -> state.updateLoadData(intent.value)
 
             is NoteListIntent.OpenBottomSheetDetail -> state.openBottomSheetDetail(intent.value)
+            is NoteListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
 
             is NoteListIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
                 isOpenEntryBottomSheet = intent.isOpen,
@@ -32,6 +35,22 @@ class NoteListReduce(
             is NoteListIntent.NoteChanged -> state.updateNote(intent.value)
             else -> state
 
+        }
+    }
+
+    private fun NoteListState.updateOpenBottomSheetDelete(id: Long?): NoteListState {
+        return if (id == null)
+            copy(isOpenBottomSheetDelete = false)
+        else {
+            val domain = list.find { it.id == id }
+           domain?.let {
+                copy(
+                    isOpenBottomSheetDelete  = true,
+                    detailDomainNoteTable = domain
+                )
+            } ?: copy(
+               isOpenBottomSheetDelete  = false
+            )
         }
     }
 

@@ -2,14 +2,9 @@ package com.zaroslikov.fermacompose2.ui.elements
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -37,15 +32,15 @@ fun Modifier.toButton(): Modifier {
 @Composable
 fun Modifier.modifierScreen(
     innerPadding: PaddingValues,
-    horizontalPaddingValues: Dp = dimensionResource(id = R.dimen.padding_medium)
+    horizontalPaddingValues: Dp = dimensionResource(id = R.dimen.padding_medium),
+    verticalPaddingValues: Dp = dimensionResource(R.dimen.padding_small)
 ): Modifier {
     val focusManager = LocalFocusManager.current
     return this
         .fillMaxHeight()
         .padding(top = innerPadding.calculateTopPadding())
         .padding(
-            horizontal = horizontalPaddingValues,
-//            vertical = dimensionResource(R.dimen.padding_small)
+            horizontal = horizontalPaddingValues
         )
         .verticalScroll(rememberScrollState())
         .pointerInput(Unit) {
@@ -53,6 +48,7 @@ fun Modifier.modifierScreen(
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область
             })
         }
+        .padding(vertical = verticalPaddingValues)
 
 }
 
@@ -60,19 +56,12 @@ fun Modifier.modifierScreen(
 fun Modifier.modifierScreenLazy(
     innerPadding: PaddingValues
 ): Modifier {
-//    val focusManager = LocalFocusManager.current
     return this
+        .fillMaxHeight()
         .padding(top = innerPadding.calculateTopPadding())
         .padding(
             horizontal = dimensionResource(id = R.dimen.padding_medium),
-            vertical = dimensionResource(R.dimen.padding_small)
         )
-        .fillMaxHeight()
-//        .pointerInput(Unit) {
-//            detectTapGestures(onTap = {
-//                focusManager.clearFocus() // Убираем фокус при тапе в любую область
-//            })
-//        }
 }
 
 @Composable

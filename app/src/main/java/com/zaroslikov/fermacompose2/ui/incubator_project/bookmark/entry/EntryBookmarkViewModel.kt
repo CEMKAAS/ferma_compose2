@@ -7,15 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainBookmark
 import com.zaroslikov.domain.models.table.DomainIncubatorParameters
-import com.zaroslikov.domain.models.table.incubator.DomainTimeNotification
+import com.zaroslikov.domain.models.table.incubator.DomainTimeNotificationIncubator
 import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.IncubatorParametersRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
-import com.zaroslikov.domain.repository.TimeNotificationRepository
+import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
-import com.zaroslikov.fermacompose2.data.water.WaterRepository
+import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
@@ -35,8 +36,9 @@ class EntryBookmarkViewModel @Inject constructor(
     private val bookmarkRepository: BookmarkRepository,
     private val incubatorTableRepository: IncubatorTableRepository,
     private val incubatorParametersRepository: IncubatorParametersRepository,
-    private val timeNotificationRepository: TimeNotificationRepository,
-    private val waterRepository: WaterRepository
+    private val timeNotificationIncubatorRepository: TimeNotificationIncubatorRepository,
+    private val workManagerRepository: WorkManagerRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel<EntryBookmarkState, EntryBookmarkIntent>(EntryBookmarkState()) {
 
     private val itemIdPT: Long = checkNotNull(savedStateHandle[EntryBookmarkDestination.itemIdPT])
@@ -98,7 +100,8 @@ class EntryBookmarkViewModel @Inject constructor(
                             parameterDayList = setIncubator(state.currentProduct.type),
                             breed = resourceProvider.getString(R.string.entry_bookmark_not_specified),
                             autoRotation = incubatorTable.isAutoRotation,
-                            autoVentilation = incubatorTable.isAutoVentilation
+                            autoVentilation = incubatorTable.isAutoVentilation,
+                            currencySuffix = incubatorTable.currencySuffix
                         )
                     )
                 }
@@ -106,7 +109,8 @@ class EntryBookmarkViewModel @Inject constructor(
                 val bookmark = bookmarkRepository.getBookmark(itemId).first()
                 val parameter = incubatorParametersRepository.getIncubatorList(itemId).first()
                 val timeNotification =
-                    timeNotificationRepository.getTimeNotificationByBookmarkId(itemIdPT).first()
+                    timeNotificationIncubatorRepository.getTimeNotificationByBookmarkId(itemId)
+                        .first()
                 val parameterDayList =
                     parameter.map { domainIncubator -> domainIncubator.toUiBookmark() }
                 updateState { state ->
@@ -395,7 +399,7 @@ class EntryBookmarkViewModel @Inject constructor(
             state.copy(
                 currentProduct = state.currentProduct.copy(
                     notificationList = state.currentProduct.notificationList.mapIndexed { i, item ->
-                        if (i == state.currentProduct.indexNotification) state.currentProduct.currentNotification
+                        if (item.localId == state.currentProduct.indexNotification) state.currentProduct.currentNotification
                         else item
                     },
                     currentNotification = NotificationParameters()
@@ -404,12 +408,12 @@ class EntryBookmarkViewModel @Inject constructor(
         }
     }
 
-    private fun updateRemoveNotification(index: Int) {
+    private fun updateRemoveNotification(index: Long) {
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
                     notificationList = state.currentProduct.notificationList.mapIndexed { i, notification ->
-                        if (i == index) notification.copy(isVisibility = false) else notification.copy(
+                        if (notification.localId == index) notification.copy(isVisibility = false) else notification.copy(
                             isEntry = false
                         )
                     },
@@ -419,17 +423,20 @@ class EntryBookmarkViewModel @Inject constructor(
         }
     }
 
-    private fun updateChoiceNotification(index: Int) {
+    private fun updateChoiceNotification(index: Long) {
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
                     notificationList = state.currentProduct.notificationList.mapIndexed { i, item ->
-                        if (i == index) {
+                        if (item.localId == index) {
                             if (item.isEntry) item.copy(isEntry = false) else item.copy(isEntry = true)
                         } else item.copy(isEntry = false)
                     },
-                    currentNotification = if (state.currentProduct.notificationList[index].isEntry)
-                        NotificationParameters() else state.currentProduct.notificationList[index],
+                    currentNotification = if (state.currentProduct.notificationList.find { it.localId == index }?.isEntry
+                            ?: false
+                    )
+                        NotificationParameters() else state.currentProduct.notificationList.find { it.localId == index }
+                        ?: NotificationParameters(),
                     indexNotification = index
                 )
             )
@@ -441,7 +448,9 @@ class EntryBookmarkViewModel @Inject constructor(
             state.copy(
                 currentProduct = state.currentProduct.copy(
                     notificationList = state.currentProduct.notificationList.mapIndexed { i, item ->
-                        if (i == state.currentProduct.indexNotification) item.copy(isEntry = false)
+                        if (item.localId == state.currentProduct.indexNotification) item.copy(
+                            isEntry = false
+                        )
                         else item
                     },
                     currentNotification = NotificationParameters()
@@ -514,11 +523,10 @@ class EntryBookmarkViewModel @Inject constructor(
                 )
                 val id = bookmarkRepository.insert(bookmark.toDomainBookmark(itemIdPT = itemIdPT))
                 bookmark.notificationList.filter { it.isVisibility }.forEach {
-                    timeNotificationRepository.insertTimeNotification(it.toUi(id))
+                    timeNotificationIncubatorRepository.insertTimeNotification(it.toDomain(id))
                 }
-
-                waterRepository.scheduleReminder()
-
+                yandexMetricRepository.metricalBookmark(bookmark)
+                updateNotifications()
                 getState().currentProduct.parameterDayList.forEach {
                     val domain = it.toDomainParameter(
                         itemId = 0,
@@ -550,21 +558,24 @@ class EntryBookmarkViewModel @Inject constructor(
                 bookmarkRepository.update(bookmark.toDomainBookmark(itemIdPT = itemIdPT))
                 Log.i("bookmark", "id: ${bookmark.notificationList}")
                 bookmark.notificationList.forEach {
-                    Log.i("bookmark", "id: ${it.id}")
-                    Log.i("bookmark", "vis: ${it.isVisibility}")
                     when {
                         it.id == 0L && it.isVisibility ->
-                            timeNotificationRepository.insertTimeNotification(it.toUi(newBookmarkId = bookmark.id))
+                            timeNotificationIncubatorRepository.insertTimeNotification(
+                                it.toDomain(
+                                    newBookmarkId = bookmark.id
+                                )
+                            )
 
                         it.id != 0L && it.isVisibility ->
-                            timeNotificationRepository.updateTimeNotification(it.toUi())
+                            timeNotificationIncubatorRepository.updateTimeNotification(it.toDomain())
 
                         it.id != 0L && !it.isVisibility ->
-                            timeNotificationRepository.deleteTimeNotificationById(it.id)
+                            timeNotificationIncubatorRepository.deleteTimeNotificationById(it.id)
 
                         else -> Unit
                     }
                 }
+                updateNotifications()
                 bookmark.parameterDayList.forEach {
                     val domain = it.toDomainParameter(
                         itemIdPT = itemId,
@@ -578,6 +589,24 @@ class EntryBookmarkViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun updateNotifications() {
+        timeNotificationIncubatorRepository.getTimeNotificationInAllActiveBookmark()// Переделать список!
+            .first()
+            .let { list ->
+                workManagerRepository.cancelIncubatorNotification()
+                list.forEach { item ->
+                    workManagerRepository.scheduleReminderIncubator(
+                        name = item.nameBookmark,
+                        time = item.time,
+                        bookmarkId = item.bookmarkId,
+                        note = item.note,
+                        projectId = item.projectId
+                    )
+                }
+            }
+    }
+
 
     override fun delete(id: Long) {
         TODO("Not yet implemented")
@@ -660,7 +689,7 @@ class EntryBookmarkViewModel @Inject constructor(
 
     private fun DomainBookmark.toUiBookmark(
         parameterDayList: List<ParameterDay>,
-        domainTimeNotification: List<DomainTimeNotification>
+        domainTimeNotificationIncubator: List<DomainTimeNotificationIncubator>
     ): EntryBookmark {
         return EntryBookmark(
             id = id,
@@ -675,17 +704,17 @@ class EntryBookmarkViewModel @Inject constructor(
             price = price?.formatNumber(false) ?: "",
             priceAll = priceAll?.formatNumber(false) ?: "",
             isAutoPrice = priceAll != null,
-            parameterDayList = parameterDayList,
             note = note,
             autoRotation = isAutoRotation,
             autoVentilation = isAutoVentilation,
+            parameterDayList = parameterDayList,
+            notificationList = domainTimeNotificationIncubator.map { it.toUi() },
             isActivityBookmark = isActivityBookmark,
-            notificationList = domainTimeNotification.map { it.toUi() },
-            idPT = idPT
+            idPT = idPT,
         )
     }
 
-    private fun DomainTimeNotification.toUi(): NotificationParameters {
+    private fun DomainTimeNotificationIncubator.toUi(): NotificationParameters {
         return NotificationParameters(
             id = id,
             time = time,
@@ -696,8 +725,8 @@ class EntryBookmarkViewModel @Inject constructor(
         )
     }
 
-    private fun NotificationParameters.toUi(newBookmarkId: Long? = null): DomainTimeNotification {
-        return DomainTimeNotification(
+    private fun NotificationParameters.toDomain(newBookmarkId: Long? = null): DomainTimeNotificationIncubator {
+        return DomainTimeNotificationIncubator(
             id = id,
             time = time,
             note = note.ifBlank { null },
@@ -873,8 +902,8 @@ sealed class EntryBookmarkIntent() : BaseIntent {
     //Notification
     data class TimeNotificationChanged(val value: String) : EntryBookmarkIntent()
     data class NoteNotificationChanged(val value: String) : EntryBookmarkIntent()
-    data class ChoiceNotificationClicked(val index: Int) : EntryBookmarkIntent()
-    data class RemoveNotificationClicked(val index: Int) : EntryBookmarkIntent()
+    data class ChoiceNotificationClicked(val index: Long) : EntryBookmarkIntent()
+    data class RemoveNotificationClicked(val index: Long) : EntryBookmarkIntent()
     data object CancelNotificationClicked : EntryBookmarkIntent()
     data object AddNotificationClicked : EntryBookmarkIntent()
     data object EditNotificationClicked : EntryBookmarkIntent()

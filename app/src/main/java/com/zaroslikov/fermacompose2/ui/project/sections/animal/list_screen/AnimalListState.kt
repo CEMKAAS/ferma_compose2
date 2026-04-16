@@ -14,6 +14,8 @@ data class AnimalListState(
     val isArchiveProject: Boolean = false,
     val idPT: Long = 0,
     val openBottomSheetEntry: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
+    val currentAnimal: AnimalListUi = AnimalListUi(),
     val list: List<AnimalListUi> = emptyList(),
     val archiveList: List<AnimalListUi> = emptyList(),
     val searchList: List<AnimalListUi> = emptyList(),
@@ -56,19 +58,19 @@ data class AnimalEntryState2(
 
 
 data class AnimalListUi(
-    val id: Long,
-    val name: String,
-    val type: String,
-    val date: String,
-    val isGroup: Boolean,
-    val sex: Boolean?,
-    val count: String?,
-    val suffix: Suffix,
-    val foodDay: Double,
-    val foodDaySuffix: Suffix,
-    val isArchive: Boolean,
-    val imagePath: String?,
-    val currentIcon: Int
+    val id: Long = 0,
+    val name: String = "",
+    val type: String = "",
+    val date: String = "",
+    val isGroup: Boolean = false,
+    val sex: Boolean? = null,
+    val count: String? = null,
+    val suffix: Suffix = Suffix.PIECES,
+    val foodDay: Double = 0.0,
+    val foodDaySuffix: Suffix = Suffix.KILOGRAM_DAY,
+    val isArchive: Boolean = false,
+    val imagePath: String? = null,
+    val currentIcon: Int = 0
 )
 
 

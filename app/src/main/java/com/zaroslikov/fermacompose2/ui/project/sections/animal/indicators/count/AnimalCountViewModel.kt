@@ -23,9 +23,11 @@ import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
+import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,7 +53,8 @@ class AnimalCountViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
     private val resourceProvider: ResourceProvider,
     private val warehouseRepository: WarehouseRepository,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<AnimalCountState, AnimalCountIntent, AnimalCountReduce>(
     AnimalCountState(),
     AnimalCountReduce()
@@ -223,6 +226,7 @@ class AnimalCountViewModel @Inject constructor(
             if (confirmed) {
                 mainAction()
                 loadDataForEntryOrEdit(false, null)
+                showSnackbar(transaction)
                 transferToIndividual()
             }
         }
@@ -235,6 +239,7 @@ class AnimalCountViewModel @Inject constructor(
             if (confirmed) {
                 animalCountRepository.deleteAnimalCountTable(id)
                 transferToIndividual()
+                showSnackbar(Transaction.DELETE)
             }
         }
     }
@@ -244,6 +249,7 @@ class AnimalCountViewModel @Inject constructor(
         viewModelScope.launch {
             animalCountRepository.insertAnimalCountTable(domainAnimalCount())
             animalRepository.updateAnimalTable(getState().animal.copy(group = true))
+            yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
             loadDataForEntryOrEdit(false, null)
             transferToIndividual()
         }
@@ -265,6 +271,7 @@ class AnimalCountViewModel @Inject constructor(
             mainAction = {
                 val countId =
                     animalCountRepository.insertAnimalCountTable(domainAnimalCount())
+                yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
                 saleRepository.insertSale(domainSale(countId))
             }
         )
@@ -286,6 +293,7 @@ class AnimalCountViewModel @Inject constructor(
             transaction = Transaction.INSERT,
             mainAction = {
                 val countId = animalCountRepository.insertAnimalCountTable(domainAnimalCount())
+                yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
                 writeOffRepository.insertWriteOff(domainWriteOff(countId))
             }
         )
@@ -308,6 +316,7 @@ class AnimalCountViewModel @Inject constructor(
             mainAction = {
                 val countId = animalCountRepository.insertAnimalCountTable(domainAnimalCount())
                 expensesRepository.insertExpenses(domainExpenses(countId))
+                yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
                 animalRepository.updateAnimalTable(getState().animal.copy(group = true))
             }
         )
@@ -337,6 +346,7 @@ class AnimalCountViewModel @Inject constructor(
                         reasonNote(productList)
                     )
                 )
+                yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
                 productList.forEach { product ->
                     addRepository.insertAdd(domainAdd(product, countId))
                 }
@@ -451,7 +461,7 @@ class AnimalCountViewModel @Inject constructor(
             return
         }
 
-        val textWarning = resourceProvider.getString(
+        val textWarning =
             when (statusWarning) {
                 WarningAnimalCount.DELETE_KILL -> R.string.animal_count_screen_warning_product_delete_all_text
                 WarningAnimalCount.DELETE_MINUS_KILL -> R.string.animal_count_screen_warning_minus_and_delete_text
@@ -464,7 +474,6 @@ class AnimalCountViewModel @Inject constructor(
 
                 WarningAnimalCount.UPDATE_MINUS -> R.string.animal_count_screen_warning_text
             }
-        )
         updateState {
             it.copy(
                 openWarningDialog = isOpenWarningsDialog,
@@ -530,13 +539,30 @@ class AnimalCountViewModel @Inject constructor(
     private fun saveSoloAnimal() {
         viewModelScope.launch {
             animalRepository.updateAnimalTable(getState().animal.copy(group = false))
-            showMessage("Пол изменен")
+            showMessage(resourceProvider.getString(R.string.snackbar_animal_sex))
         }
     }
 
     override fun insert() {}
     override fun update() {}
     override fun delete(id: Long) {}
+
+    private fun showSnackbar(transaction: Transaction) {
+        val (count, suffix) = getState().currentProduct.count to
+                resourceProvider.getString(getState().currentProduct.suffix.toResId())
+        showMessage(
+            when (transaction) {
+                Transaction.INSERT -> resourceProvider.getString(R.string.snackbar_count_add)
+                    .format(count, suffix)
+
+                Transaction.UPDATE -> resourceProvider.getString(R.string.snackbar_count_update)
+                    .format(count, suffix)
+
+                Transaction.DELETE -> resourceProvider.getString(R.string.snackbar_count_delete)
+            }
+        )
+    }
+
 
     private fun CountItem.toUiMap22(
         domain: DomainAnimalCountPriceUi

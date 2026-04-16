@@ -8,6 +8,8 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 
 class WriteOffListReduce(
@@ -46,7 +48,7 @@ class WriteOffListReduce(
             is WriteOffListIntent.SearchChanged -> state.updateSearch(intent.value)
             is WriteOffListIntent.GroupClicked -> state.updateGroup(intent.value)
             is WriteOffListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
-
+            is WriteOffListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
             else -> state
         }
     }
@@ -61,6 +63,21 @@ class WriteOffListReduce(
             val domain = list.find { it.id == id }
             copy(
                 isOpenBottomSheetDetail = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
+        }
+    }
+
+    private fun WriteOffListState.updateOpenBottomSheetDelete(id: Long?): WriteOffListState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDelete = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDelete = domain?.let { true } ?: false,
                 currentDetail = domain
             )
         }

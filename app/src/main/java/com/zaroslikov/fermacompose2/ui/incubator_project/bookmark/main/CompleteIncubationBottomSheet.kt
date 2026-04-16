@@ -311,7 +311,7 @@ private fun IconText(
 
 
 @Composable
-fun CompleteIncubationBottomSheet2(
+fun EarlyCompleteIncubationBottomSheet(
     currentDay: Int,
     daysToEnd: Int,
     reasonNote: String,
@@ -324,7 +324,7 @@ fun CompleteIncubationBottomSheet2(
         contentBottom = {
             BottomPanel(
                 enabled = true,
-                colors = listOf(red_13, orang_15),
+                colors = listOf(orang_15, red_13),
                 iconRes = R.drawable.outline_cancel_24,
                 onCloseClick = {
                     onIntent(BookmarkIntent.OpenCompleteIncubationBottomSheetClick(false))

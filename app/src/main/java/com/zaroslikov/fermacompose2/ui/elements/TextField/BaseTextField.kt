@@ -245,31 +245,32 @@ fun BaseOutlinedTextNew(
                         style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
                     )
                 }
+                if (enabled)
                 // ИКОНКА: фиксированного размера, не будет ужиматься
-                when (isMore) {
-                    true -> Icon(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .wrapContentWidth(),
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = null,
-                        tint = Color(0xFF9A9A9A)
-                    )
+                    when (isMore) {
+                        true -> Icon(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .wrapContentWidth(),
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = Color(0xFF9A9A9A)
+                        )
 
-                    false -> Icon(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .wrapContentWidth()
-                            .clickable {
-                                onClear()
-                            },
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = null,
-                        tint = Color(0xFF9A9A9A)
-                    )
+                        false -> Icon(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .wrapContentWidth()
+                                .clickable {
+                                    onClear()
+                                },
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = null,
+                            tint = Color(0xFF9A9A9A)
+                        )
 
-                    else -> {}
-                }
+                        else -> {}
+                    }
 
             }
         }

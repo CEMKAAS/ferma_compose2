@@ -37,6 +37,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.TimeOutlinedTextFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.NotificationFun
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.FunctionIncubatorCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.ProductKillCard
 
@@ -152,7 +153,7 @@ private fun EntryValue(
                 },
                 count = state.count,
                 countSuffix = Suffix.PIECES,
-                priceSuffix = Suffix.RUBLE,
+                priceSuffix = state.currencySuffix,
                 leadingIconRes = null,
                 supportTextRes = R.string.entry_bookmark_support_text_all_price,
                 supportTextResAutoCal = R.string.entry_bookmark_support_text_price,
@@ -202,72 +203,19 @@ private fun NotificationCard(
     CardNewWithTitle(
         titleRes = R.string.entry_bookmark_notification
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            notificationList.forEachIndexed { index, product ->
-                ProductKillCard(
-                    number = index + 1,
-                    name = product.time,
-                    value = product.note,
-                    suffix = null,
-                    isEditMode = product.isEntry,
-                    onClick = { onIntent(EntryBookmarkIntent.ChoiceNotificationClicked(index)) },
-                ) { onIntent(EntryBookmarkIntent.RemoveNotificationClicked(index)) }
-            }
-            if (notificationList.isNotEmpty())
-                HorizontalDivider(thickness = 1.dp, color = gray_5)
-
-            if (!state.currentNotification.isEntry)
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(R.string.animal_count_screen_edit_mode),
-                            style = text_14,
-                            color = orang_6
-                        )
-                        TextButton(
-                            onClick = { onIntent(EntryBookmarkIntent.CancelNotificationClicked) }
-                        ) {
-                            Text(
-                                stringResource(R.string.button_text_cancel_2),
-                                style = text_12,
-                                color = gray_7
-                            )
-                        }
-                    }
-                    HorizontalDivider(thickness = 1.dp, color = orang_5)
-                }
-            TimeOutlinedTextFieldNew(
-                time = state.currentNotification.time,
-                onValueChange = { onIntent(EntryBookmarkIntent.TimeNotificationChanged(it)) },
-                intRes = R.string.entry_bookmark_time_notification,
-                isBorderCard = false
-            )
-            OutlinedTextNoteNew(
-                value = state.currentNotification.note,
-                onValueChange = { onIntent(EntryBookmarkIntent.NoteNotificationChanged(it)) },
-                labelIntRes = R.string.entry_bookmark_text_notification,
-                supportingText = R.string.entry_bookmark_support_text_notification,
-                minLines = 2,
-                isBorderCard = false
-            )
-        }
-        OutlineIconButtonNew(
-            enabled = true,
+        NotificationFun(
+            notificationList = notificationList,
+            time = state.currentNotification.time,
+            note = state.currentNotification.note,
             isEntry = state.currentNotification.isEntry,
-            intRes = R.string.button_text_add_notification
-        ) {
-            if (state.currentNotification.isEntry) onIntent(EntryBookmarkIntent.AddNotificationClicked)
-            else onIntent(EntryBookmarkIntent.EditNotificationClicked)
-        }
+            onChoiceClick = { onIntent(EntryBookmarkIntent.ChoiceNotificationClicked(it)) },
+            onRemoveClick = { onIntent(EntryBookmarkIntent.RemoveNotificationClicked(it)) },
+            onCancelClick = { onIntent(EntryBookmarkIntent.CancelNotificationClicked) },
+            onTimeChange = { onIntent(EntryBookmarkIntent.TimeNotificationChanged(it)) },
+            onNoteChange = { onIntent(EntryBookmarkIntent.NoteNotificationChanged(it)) },
+            onAddClick = { onIntent(EntryBookmarkIntent.AddNotificationClicked) },
+            onEditClick = { onIntent(EntryBookmarkIntent.EditNotificationClicked) }
+        )
     }
 }
 

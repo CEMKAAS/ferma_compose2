@@ -65,6 +65,7 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.core.net.toUri
+import io.appmetrica.analytics.AppMetrica
 
 object AboutAppDestination : NavigationDestination {
     override val route = "About_App"
@@ -178,7 +179,7 @@ private fun ContactCard() {
                 color = red_15,
                 colorIcon = red_14
             ) {
-
+                AppMetrica.reportEvent("Переход в почту")
             }
             Contact(
                 titleRes = R.string.about_app_screen_telegram,
@@ -186,7 +187,9 @@ private fun ContactCard() {
                 icon = R.drawable.ic_telegram,
                 color = blue_19,
                 colorIcon = white
-            ) {}
+            ) {
+                AppMetrica.reportEvent("Переход в телеграмм")
+            }
             Contact(
                 titleRes = R.string.about_app_screen_vk,
                 supportText = "vk.com/myfermaapp",
@@ -196,6 +199,7 @@ private fun ContactCard() {
             ) {
                 val intent = Intent(Intent.ACTION_VIEW, "https://vk.com/myfermaapp".toUri())
                 context.startActivity(intent)
+                AppMetrica.reportEvent("Переход в группу ВК")
             }
         }
     }

@@ -45,9 +45,12 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
+
     // Hilt
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
+    implementation("androidx.hilt:hilt-work:1.3.0")
     ksp(libs.hilt.compiler)
 
     //Room

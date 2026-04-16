@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vacci
 
 import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 sealed class AnimalVaccinationIntent : BaseIntent {
     data class OpenEntryBottomSheetByItem(
@@ -17,6 +18,8 @@ sealed class AnimalVaccinationIntent : BaseIntent {
         val isSaveStateForBottomSheet: Boolean = false
     ) : AnimalVaccinationIntent()
 
+    data class OpenBottomSheetDelete(val value: Long? = null) : AnimalVaccinationIntent()
+
     data class VaccinationChanged(val value: String) : AnimalVaccinationIntent()
     data class CountChanged(val value: String) : AnimalVaccinationIntent()
     data class PriceChanged(val value: String) : AnimalVaccinationIntent()
@@ -27,5 +30,5 @@ sealed class AnimalVaccinationIntent : BaseIntent {
     data class NoteChanged(val value: String) : AnimalVaccinationIntent()
     data object InsertPressed : AnimalVaccinationIntent()
     data object UpdatePressed : AnimalVaccinationIntent()
-    data class DeletePressed(val value: Long) : AnimalVaccinationIntent()
+    data object DeletePressed : AnimalVaccinationIntent()
 }

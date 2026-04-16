@@ -6,6 +6,7 @@ import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.state.ListState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.NotificationParameters
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class WarehouseEditState(
@@ -16,9 +17,17 @@ data class WarehouseEditState(
     val isInsertProject: Boolean = true,
     val currentProject: DomainProjectTable = DomainProjectTable(date = dateToday()),
     val currentSettings: DomainSettings = DomainSettings(),
+    val isShowNotification: Boolean = false,
+
+    val notificationList: List<NotificationParameters> = emptyList(),
+    val currentNotification: NotificationParameters = NotificationParameters(),
+    val indexNotification: Long = 0,
+
+    override val navigate: UiEvent? = null,
+
     override val idPT: Long = 0,
     override val isLoading: Boolean = false,
-    override val navigate: UiEvent? = null,
+    val hasAnyError: Boolean = false,
     val iconList: List<Int> = listOf(
         R.drawable.livestock,
         R.drawable.icons_chicken_s,
@@ -35,10 +44,4 @@ data class WarehouseEditState(
         R.drawable.icons_farming_2,
         R.drawable.baseline_add_photo_alternate_24
     )
-) : ListState() {
-
-    fun enabledButton(): Boolean {
-        val isEnabled = currentProject.title.isNotBlank()
-        return isEnabled
-    }
-}
+) : ListState()

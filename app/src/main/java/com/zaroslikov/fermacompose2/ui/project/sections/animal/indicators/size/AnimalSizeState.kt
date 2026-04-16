@@ -2,7 +2,6 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size
 
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
@@ -13,12 +12,15 @@ data class AnimalSizeState(
     val sizeList: List<AnimalSizeUi> = emptyList(),
     val idPT: Long = 0,
     val isOpenEntryBottomSheet: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
+    val deleteSize: AnimalSizeUi? = null,
     val isSaveStateForEntry: Boolean = false,
     override val isEntry: Boolean = false,
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
     override val currentProduct: CurrentAnimalSize = CurrentAnimalSize(),
-    val isArchive: Boolean = false
+    val isArchive: Boolean = false,
+    val isGroup: Boolean = false
 ) : EntryNewState()
 
 data class CurrentAnimalSize(
@@ -37,7 +39,7 @@ data class AnimalSizeUi(
     val id: Long = 0,
     val size: String = "",
     val suffix: Suffix = Suffix.MILLIMETERS,
-    val date: String ="",
+    val date: String = "",
     val idAnimal: Long = 0,
     val note: String = "",
     val totalValue: String = "",

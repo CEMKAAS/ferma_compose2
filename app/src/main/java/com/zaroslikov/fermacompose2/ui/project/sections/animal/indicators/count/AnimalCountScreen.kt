@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,16 +19,20 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.green_15
+import com.zaroslikov.fermacompose2.red_4
 import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
+import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toIndicationStatus
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.FabMenu2
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalCountCardNew
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsDeleteCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.InventoryAnimalBody
 
 object AnimalCountDestination : NavigationDestination {
@@ -117,14 +122,12 @@ fun AnimalCountScreen(
                         onIntent = viewModel::onIntent,
                     )
 
-                AnimalCountVersion.ADD ->
+                AnimalCountVersion.ADD, AnimalCountVersion.INCUBATOR  ->
                     BottomSheetAddAnimal(
                         state = state.currentProduct,
                         countAllAnimal = state.countAnimal,
                         onIntent = viewModel::onIntent
                     )
-
-                AnimalCountVersion.INCUBATOR -> Unit
             }
         }
         if (state.openSoloDialog)
@@ -141,19 +144,38 @@ fun AnimalCountScreen(
                 onSave = { viewModel.onIntent(AnimalCountIntent.SaveGroupPressed) }
             )
         if (state.openWarningDialog)
-            AlertDialogWarningAnimal(
+            WarningDeleteCountBottomSheet(
+                statusWarningAnimalCount = state.statusWarningDialog,
                 textWarning = state.textWarning,
-                onConfirmationClick = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.WarningEndDialogClicked(true)
-                    )
-                },
                 onDismissRequest = {
-                    viewModel.onIntent(
-                        AnimalCountIntent.WarningEndDialogClicked(false)
-                    )
+                    viewModel.onIntent(AnimalCountIntent.WarningEndDialogClicked(false))
+                },
+                onDeleteClick = {
+                    viewModel.onIntent(AnimalCountIntent.WarningEndDialogClicked(true))
                 }
             )
+        /*AlertDialogWarningAnimal(
+            textWarning = state.textWarning,
+            onConfirmationClick = {
+                viewModel.onIntent(
+                    AnimalCountIntent.WarningEndDialogClicked(true)
+                )
+            },
+            onDismissRequest = {
+                viewModel.onIntent(
+                    AnimalCountIntent.WarningEndDialogClicked(false)
+                )
+            }
+        )*/
+        /* if (state.isOpenBottomSheetDelete)
+             WarningDeleteCountBottomSheet(
+                 color = red_4,
+                 state = state.deleteCount,
+                 onDismissRequest = {
+                     viewModel.onIntent(AnimalCountIntent.OpenBottomSheetDelete(null))
+                 },
+                 onDeleteClick = { viewModel.onIntent(AnimalCountIntent.DeleteCountPressed) },
+             )*/
     }
 }
 
@@ -194,4 +216,36 @@ private fun AnimalCountContainer2(
             )
         }
     )
+}
+
+@Composable
+private fun WarningDeleteCountBottomSheet(
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit,
+    textWarning: Int,
+    statusWarningAnimalCount: WarningAnimalCount
+) {
+    val (titleRes, supportRes, textButtonRes) = when (statusWarningAnimalCount) {
+        WarningAnimalCount.DELETE, WarningAnimalCount.DELETE_MINUS, WarningAnimalCount.DELETE_MINUS_KILL, WarningAnimalCount.DELETE_KILL ->
+            Triple(
+                R.string.base_section_delete_count,
+                R.string.base_section_delete_support_count,
+                R.string.base_section_button_delete_count
+            )
+
+        else -> Triple(
+            R.string.base_section_update_count,
+            R.string.base_section_update_support_count,
+            R.string.base_section_button_update_count
+        )
+    }
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = titleRes,
+        supportRes = supportRes,
+        textRes = textWarning,
+        textButtonRes = textButtonRes
+    ) {
+    }
 }

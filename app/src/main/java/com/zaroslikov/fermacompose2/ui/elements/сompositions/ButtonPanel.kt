@@ -103,7 +103,7 @@ fun ButtonPanelNew(
 @Composable
 fun ButtonPanelDetailNew(
     modifier: Modifier,
-    colors: List<Color> = listOf(price_green,  green_shamrock),
+    colors: List<Color> = listOf(price_green, green_shamrock),
     enabled: Boolean = true,
     onClickUpdate: () -> Unit,
     onClickDelete: () -> Unit
@@ -126,7 +126,7 @@ fun ButtonPanelDetailNew(
 
             GradientButton(
                 text = stringResource(R.string.button_edit),
-                iconRes = R.drawable.icon_edit,
+                prefixIconRes = R.drawable.icon_edit,
                 onClick = onClickUpdate,
                 enabled = true,
                 modifier = Modifier.weight(1f),

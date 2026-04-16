@@ -22,13 +22,6 @@ class WarehouseRepositoryImpl @Inject constructor(private val warehouseDao: Ware
             .map { it -> it.map { it.toDomainTitleCountSuffix() } }
     }
 
-    override fun getCurrentBalanceProduct(
-        name: String,
-        id: Long
-    ): Flow<DomainCountSuffix> {
-        return warehouseDao.getCurrentBalanceProduct(name, id).map { it.toDomainCountSuffix() }
-    }
-
     override fun getCurrentBalanceProductList(
         name: String,
         id: Long

@@ -2,7 +2,6 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.edit
 
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditIntent
 
 sealed class AnimalEditIntent : BaseIntent {
     data class LoadDate(val value: AnimalUi) : AnimalEditIntent()

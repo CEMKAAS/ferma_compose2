@@ -2,7 +2,6 @@ package com.zaroslikov.fermacompose2
 
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -11,12 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-
 import androidx.compose.foundation.layout.padding
-
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,36 +25,30 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
-
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-//import com.zaroslikov.fermacompose2.ui.Banner
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
 import com.zaroslikov.fermacompose2.utils.SnackbarController
-
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
+    action: String?,
+    projectId: Long
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -103,206 +92,11 @@ fun InventoryApp(
         InventoryNavHost(
             navController = navController,
             modifier = Modifier.padding(it),
+            action = action, projectId = projectId
         )
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InventoryTopAppBar(
-    title: String,
-    canNavigateBack: Boolean,
-    modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    navigateUp: () -> Unit = {}
-) {
-    CenterAlignedTopAppBar(
-        title = { Text(title) },
-        modifier = modifier,
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        painterResource(R.drawable.baseline_arrow_back_24),
-                        contentDescription = stringResource(R.string.back_button)
-                    )
-                }
-            }
-        }
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBarFermaFilter(
-    title: String,
-    scope: CoroutineScope,
-    drawerState: DrawerState,
-    showBottomFilter: MutableState<Boolean>,
-    filterSheet: Boolean,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Text(text = title)
-        },
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            IconButton(onClick = {
-                scope.launch {
-                    drawerState.apply {
-                        if (isClosed) open() else close()
-                    }
-                }
-            }) {
-                Icon(
-                    painterResource(R.drawable.icon_menu),
-                    contentDescription = "Меню"
-                )
-            }
-        },
-        actions = {
-
-            IconButton(onClick = {
-                showBottomFilter.value = true
-            }) {
-                if (filterSheet) {
-                    Image(
-                        painter = painterResource(id = R.drawable.baseline_filter_list_24),
-                        contentDescription = "Фильтр"
-                    )
-                } else {
-                    Icon(
-                        painterResource(R.drawable.icon_setting),
-                        contentDescription = "Настройка"
-                    )
-                }
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBarFerma(
-    title: String,
-    scope: CoroutineScope,
-    drawerState: DrawerState,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Text(text = title)
-        },
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            IconButton(onClick = {
-                scope.launch {
-                    drawerState.apply {
-                        if (isClosed) open() else close()
-                    }
-                }
-            }) {
-                Icon(
-                    painterResource(R.drawable.icon_menu),
-                    contentDescription = "Меню"
-                )
-            }
-        },
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBarFermaWarehouse(
-    title: String,
-    scope: CoroutineScope,
-    drawerState: DrawerState,
-    navigateToEdit: () -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Text(text = title)
-        },
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            IconButton(onClick = {
-                scope.launch {
-                    drawerState.apply {
-                        if (isClosed) open() else close()
-                    }
-                }
-            }) {
-                Icon(
-                    painterResource(R.drawable.icon_menu),
-                    contentDescription = "Меню"
-                )
-            }
-        },
-        actions = {
-            IconButton(
-                onClick = navigateToEdit
-            ) {
-                Icon(
-                    painterResource(R.drawable.icon_setting),
-                    contentDescription = "Настройка"
-                )
-            }
-        }
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBarStart(
-    title: String,
-    settingBoolean: Boolean,
-    navigateUp: () -> Unit = {},
-    settingUp: () -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Text(text = title)
-        },
-        scrollBehavior = scrollBehavior,
-        navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(
-                    painterResource(R.drawable.baseline_arrow_back_24),
-                    contentDescription = "Назад"
-                )
-            }
-        },
-        actions = {
-            if (settingBoolean) {
-                IconButton(onClick = settingUp) {
-                    Icon(
-                        painterResource(R.drawable.icon_setting),
-                        contentDescription = "Настройка"
-                    )
-                }
-            }
-        }
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -331,42 +125,6 @@ fun TopAppBarStart2(
                     painter = painterResource(id = if (isArchive) R.drawable.baseline_unarchive_24 else R.drawable.baseline_archive_24),
                     contentDescription = "Localized description",
                 )
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopAppBarCalendar(
-    title: String,
-    settingBoolean: Boolean,
-    navigateUp: () -> Unit = {},
-    settingUp: () -> Unit = {}
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = {
-            Text(text = title)
-        },
-        navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(
-                    painterResource(R.drawable.icon_setting),
-                    contentDescription = "Назад"
-                )
-            }
-        },
-        actions = {
-            if (settingBoolean) {
-                IconButton(onClick = settingUp) {
-                    Icon(
-                        painterResource(R.drawable.icon_date_range),
-                        contentDescription = "Настройка"
-                    )
-                }
             }
         }
     )

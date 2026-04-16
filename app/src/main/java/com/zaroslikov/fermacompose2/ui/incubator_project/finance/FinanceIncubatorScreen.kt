@@ -109,7 +109,7 @@ fun FinanceIncubatorScreen(
             else
                 EmptyBookmark(
                     modifier = Modifier.padding(innerPadding),
-                    iconRes = R.drawable.baseline_currency_ruble_24,
+                    iconRes = R.drawable.icon_money,
                     title = R.string.message_no_date_empty,
                     supportText = R.string.finance_incubator_screen_message_no_date_empty,
                     iconColor = green_9,

@@ -21,6 +21,7 @@ data class AddListState(
     val openBottomSheetGroup: Boolean = false,
     val openBottomSheetEntry: Boolean = false,
     val isOpenBottomSheetDetail: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
 
     val currentDetail: DomainAddItemDto? = null,

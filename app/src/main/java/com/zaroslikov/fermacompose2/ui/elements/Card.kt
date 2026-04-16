@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -51,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.black_1
@@ -180,7 +179,7 @@ fun CardFieldNew(
     containerColor: Color = white,
     colors: List<Color>? = null,
     padding: PaddingValues = PaddingValues(20.dp),
-    elevation: Dp = 2.dp,
+    elevation: Dp = 5.dp,
     shape: Shape = RoundedCornerShape(14.dp),
     contentColumn: @Composable ColumnScope.() -> Unit
 ) {
@@ -348,15 +347,20 @@ fun CardFinanceNew(
         onDetailClick = onClick,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         content = {
-            IconFinance(
-                icon = icon,
-                color = Color(0x20FFFFFF)
-            )
-            Text(
-                text = stringResource(titleRes),
-                style = text_12,
-                color = Color(0x80FFFFFF)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                IconFinance(
+                    icon = icon,
+                    color = Color(0x20FFFFFF)
+                )
+                Text(
+                    text = stringResource(titleRes),
+                    style = text_12,
+                    color = Color(0x80FFFFFF)
+                )
+            }
             Text(
                 text = "${value.formatNumber()} ${stringResource(suffix.toResId())}",
                 style = text_20,
@@ -477,13 +481,13 @@ fun DetailProductCardNew(
     year: Int,
     buyer: String? = null,
     food: Food? = null,
-    colors: List<Color>? = null,
+    typeProduct: TypeProduct? = null,
     animalVaccinationId: Long? = null,
     animalCountId: Long? = null,
     isArchive: Boolean,
-    onClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: (() -> Unit)?,
+    onClick: () -> Unit = {},
+    onEditClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null,
     isCardField: Boolean = true
 ) {
     val monthText = stringResource(id = monthToResString(month))
@@ -517,10 +521,10 @@ fun DetailProductCardNew(
                     }
                 }
                 if (!isArchive)
-                DropdownMenuEdit(
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteProductClick
-                )
+                    DropdownMenuEdit(
+                        onEditClick = onEditClick,
+                        onDeleteClick = onDeleteProductClick
+                    )
             }
             statusWriteOff?.let { status ->
                 val (iconRes, valueString) = if (status)
@@ -577,7 +581,7 @@ fun DetailProductCardNew(
     if (isCardField)
         CardFieldNew(
             modifier = modifier,
-            colors = colors,
+            colors = typeProduct?.toColorList(),
             onClick = onClick
         ) { cardField() }
     else BorderCard { cardField() }
@@ -619,7 +623,7 @@ private fun SliderFood(
                 textStyle = text_12
             )
             IconAndTextNew(
-                iconRes = R.drawable.baseline_shopping_basket_24,
+                iconRes = R.drawable.outline_restaurant_24,
                 valueString = "${feedFood.formatNumber()} ${stringResource(feedFoodSuffix.toResId())}",
                 iconColor = green_shamrock,
                 iconSize = 14.dp,
@@ -834,7 +838,7 @@ fun AnimalFoodClips(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Icon(
-                painter = painterResource(R.drawable.baseline_shopping_basket_24),
+                painter = painterResource(R.drawable.baseline_pets_24),
                 contentDescription = null,
                 tint = green_shamrock,
                 modifier = Modifier.size(12.dp)

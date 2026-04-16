@@ -12,5 +12,4 @@ data class DomainAnimalCountSuffix(
 
     override val price: Double?,
     override val priceAll: Double?
-
 ) : BaseProductSection

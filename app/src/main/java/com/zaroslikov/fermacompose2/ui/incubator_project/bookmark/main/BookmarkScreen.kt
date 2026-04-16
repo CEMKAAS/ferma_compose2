@@ -130,15 +130,15 @@ fun BookmarkScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarBack(
-                title = state.domainBookmark.title,
+                title = state.domainBookmark.title.ifBlank { stringResource(R.string.bookmark_screen_title) },
                 onNavigateBackClick = navigateToBack,
-                onSettingsClick = if (!state.isActivityBookmark && state.isArchive) null
+                onSettingsClick = if (!state.isActivityBookmark || state.isArchive) null
                 else {
                     {
                         state.idBookmark?.let { onSettingsClick(state.incubatorId to it) }
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = if(!state.isActivityBookmark) null else scrollBehavior
             )
         },
         floatingActionButton = {
@@ -218,7 +218,7 @@ fun BookmarkScreen(
                 chicksPrice = state.completeState.chicksPrice
             )
         if (state.isOpenEarlyCompleteIncubationBottomSheet)
-            CompleteIncubationBottomSheet2(
+            EarlyCompleteIncubationBottomSheet(
                 currentDay = state.currentDay,
                 daysToEnd = state.daysToEnd,
                 reasonNote = state.reasonNote,
@@ -283,7 +283,7 @@ private fun BookmarkContainer(
             colors = if (state.isCompleteModeEnd) listOf(green_6, green_5)
             else listOf(orang_15, red_13),
             text = stringResource(R.string.bookmark_screen_сomplete_incubation),
-            iconRes = R.drawable.icon_check,
+            prefixIconRes = R.drawable.icon_check,
             isShadow = true,
             paddingValues = PaddingValues(vertical = 14.dp)
         ) {
@@ -875,7 +875,7 @@ fun BottomPanel(
             shape = RoundedCornerShape(8.dp),
             colors = colors,
             text = stringResource(stringRes),
-            iconRes = iconRes,
+            prefixIconRes = iconRes,
             enabled = enabled,
             onClick = onSaveClick
         )

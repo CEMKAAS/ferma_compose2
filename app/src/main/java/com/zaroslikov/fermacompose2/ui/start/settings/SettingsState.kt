@@ -17,9 +17,9 @@ import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
-import com.zaroslikov.domain.models.table.incubator.DomainTimeNotification
+import com.zaroslikov.domain.models.table.incubator.DomainTimeNotificationIncubator
 import com.zaroslikov.domain.models.table.profile.DomainProfileTable
-import com.zaroslikov.domain.repository.TimeNotificationRepository
+import com.zaroslikov.domain.models.table.project.DomainTimeNotificationProject
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import kotlinx.serialization.Serializable
@@ -39,6 +39,7 @@ data class BackupData(
     val version: Int,
     val projectTable: List<DomainProjectTable> = emptyList(),
     val settingsTable: List<DomainSettings> = emptyList(),
+    val timeNotificationProjectTable: List<DomainTimeNotificationProject> = emptyList(),
 
     val addTable: List<DomainAddTable> = emptyList(),
     val saleTable: List<DomainSaleTable> = emptyList(),
@@ -57,7 +58,7 @@ data class BackupData(
     val incubatorTable: List<DomainIncubatorTable> = emptyList(),
     val bookmarkTable: List<DomainBookmark> = emptyList(),
     val incubatorParameters: List<DomainIncubatorParameters> = emptyList(),
-    val timeNotificationTable: List<DomainTimeNotification> = emptyList(),
+    val timeNotificationIncubatorTable: List<DomainTimeNotificationIncubator> = emptyList(),
     val profileTable: List<DomainProfileTable> = emptyList(),
     val appSettingsTable: List<DomainAppSettings> = emptyList(),
 )

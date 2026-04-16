@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.alabaster
 import com.zaroslikov.fermacompose2.green_g_1
 import com.zaroslikov.fermacompose2.green_shamrock
@@ -38,6 +39,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNe
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
@@ -46,6 +48,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.white
+import io.appmetrica.analytics.AppMetrica
 
 /*object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -57,7 +60,6 @@ import com.zaroslikov.fermacompose2.white
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
-    /* navigationToAnalysis: (Pair<Long, String>) -> Unit */
     viewModel: AddViewModel = hiltViewModel(),
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
 ) {
@@ -96,8 +98,9 @@ fun AddScreen(
                 iconRes = iconRes,
                 itemList = state.list,
                 searchList = state.searchList,
-                brieflyList = state.searchBrieflyList,
+                brieflyList = state.briefly,
                 details = state.isGroup,
+                searchBrieflyList = state.searchBrieflyList,
                 isArchive = state.isArchive,
                 onDetailsCardClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDetail(it)) },
                 onEditClick = {
@@ -105,7 +108,7 @@ fun AddScreen(
                         AddListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(it)) },
                 onDetailsClick = {
                     viewModel.onIntent(
                         AddListIntent.OpenBottomSheetGroup(it)
@@ -129,8 +132,11 @@ fun AddScreen(
                     )
                 },
                 isArchive = state.isArchive,
-                onDeleteClick = { viewModel.onIntent(AddListIntent.Delete(it)) },
-                onAnalysisClick = { navigationToAnalysis(Triple(idProject, it.first, it.second)) }
+                onDeleteClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(it)) },
+                onAnalysisClick = {
+                    navigationToAnalysis(Triple(idProject, it.first, it.second))
+                    AppMetrica.reportEvent("Переход в полный анализ продукта")
+                }
             )
         if (state.isOpenBottomSheetDetail)
             AddDetailBottomSheet(
@@ -138,6 +144,12 @@ fun AddScreen(
                 colors = colors,
                 onIntent = viewModel::onIntent,
                 isArchive = state.isArchive
+            )
+        if (state.isOpenBottomSheetDelete)
+            WarningDeleteAddBottomSheet(
+                onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(null)) },
+                onDeleteClick = { viewModel.onIntent(AddListIntent.Delete) },
+                state = state.currentDetail,
             )
     }
 }
@@ -166,12 +178,40 @@ private fun AddDetailBottomSheet(
             colors = colors,
             isArchive = isArchive,
             onUpdateClick = { onIntent(AddListIntent.OpenBottomSheetEntry(true, state)) },
-            onDeleteClick = { onIntent(AddListIntent.Delete(state.id)) },
+            onDeleteClick = { onIntent(AddListIntent.OpenBottomSheetDelete(state.id)) },
             onDismissRequest = { onIntent(AddListIntent.OpenBottomSheetDetail(null)) },
         )
     }
 }
 
+@Composable
+private fun WarningDeleteAddBottomSheet(
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit,
+    state: DomainAddItemDto?,
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick
+    ) {
+        state?.let { product ->
+            DetailProductCardNew(
+                isCardField = false,
+                title = product.title,
+                count = product.count,
+                suffix = product.countSuffix,
+                category = product.category,
+                note = product.note,
+                animal = product.nameAnimal,
+                color = green_shamrock,
+                day = product.day,
+                month = product.month,
+                year = product.year,
+                isArchive = true
+            )
+        }
+    }
+}
 
 @Composable
 fun AddContainer2(
@@ -182,6 +222,7 @@ fun AddContainer2(
     itemList: List<DomainAddItemDto>,
     searchList: List<DomainAddItemDto>,
     brieflyList: List<BrieflyItem>,
+    searchBrieflyList: List<BrieflyItem>,
     onDetailsCardClick: (Long) -> Unit,
     onEditClick: (DomainAddItemDto) -> Unit,
     onDeleteClick: (Long) -> Unit,
@@ -192,6 +233,7 @@ fun AddContainer2(
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList,
+        searchBrieflyList = searchBrieflyList,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -204,7 +246,7 @@ fun AddContainer2(
                 day = item.day,
                 month = item.month,
                 year = item.year,
-                colors = item.animalCountId?.let { listOf(white, red_15) },
+                typeProduct = item.animalCountId?.let { TypeProduct.KILL },
                 isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item) },
@@ -234,7 +276,7 @@ fun AddContainer2(
         ),
         details = details,
         iconColor = green_shamrock,
-        backgroundColor = green_g_1,isArchive = isArchive
+        backgroundColor = green_g_1, isArchive = isArchive
     )
 }
 
@@ -333,12 +375,11 @@ fun AddEntryBottomSheet(
                 title = state.title,
                 warehouseList = state.pickList.warehouseList
             )
-        if (!state.isIndicatorsValue)
-            OutlinedTextCategoryNew(
-                value = state.category,
-                onValueChange = { onIntent(AddListIntent.CategoryChanged(it)) },
-                titleList = state.pickList.categoryList,
-            )
+        OutlinedTextCategoryNew(
+            value = state.category,
+            onValueChange = { onIntent(AddListIntent.CategoryChanged(it)) },
+            titleList = state.pickList.categoryList,
+        )
         if (!state.isIndicatorsValue)
             OutlinedTextDateNew(
                 value = state.date,

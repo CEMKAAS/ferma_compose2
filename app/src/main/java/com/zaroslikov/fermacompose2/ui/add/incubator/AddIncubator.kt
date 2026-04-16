@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -30,6 +32,11 @@ import androidx.compose.ui.unit.dp
 //import com.zaroslikov.fermacompose2.ui.incubator.IncubatorProjectEditState
 import androidx.compose.ui.window.Dialog
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.gray_6
+import com.zaroslikov.fermacompose2.green_6
+import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogStandard
 //import com.zaroslikov.fermacompose2.ui.add.getByteArrayFromDrawable
 import com.zaroslikov.fermacompose2.ui.formatterTime
 
@@ -539,16 +546,8 @@ fun TimeOutlinedTextFieldNew(
     }
 }*/
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TimePicker(time: String, showDialog: (String) -> Unit) {
 
-    val timsa = time.split(":")
-    val timeState = rememberTimePickerState(
-        initialHour = timsa[0].toInt(),
-        initialMinute = timsa[1].toInt()
-    )
-    Dialog(
+    /*Dialog(
         onDismissRequest = { showDialog(time) }
     ) {
         Card(
@@ -558,7 +557,6 @@ fun TimePicker(time: String, showDialog: (String) -> Unit) {
         ) {
             Column(
                 modifier = Modifier
-                    .background(color = Color.LightGray)
                     .padding(top = 28.dp, start = 20.dp, end = 20.dp, bottom = 12.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -583,8 +581,8 @@ fun TimePicker(time: String, showDialog: (String) -> Unit) {
                 }
             }
         }
-    }
-}
+    }*/
+
 //
 //fun getByteArray(context : Context, type: String): ByteArray {
 //    return when (type) {

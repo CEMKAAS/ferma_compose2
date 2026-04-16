@@ -44,11 +44,7 @@ fun CircularProgress(
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize()
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.padding_medium),
-                vertical = dimensionResource(R.dimen.padding_small)
-            ),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()

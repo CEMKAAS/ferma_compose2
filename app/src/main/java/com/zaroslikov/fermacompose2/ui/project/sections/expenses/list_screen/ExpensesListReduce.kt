@@ -13,6 +13,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -129,6 +130,7 @@ class ExpensesListReduce(private val resourceProvider: ResourceProvider) :
             )
 
             is ExpensesListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
+            is ExpensesListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
             else -> state
         }
         return newState.updateValid()
@@ -146,6 +148,21 @@ class ExpensesListReduce(private val resourceProvider: ResourceProvider) :
             val domain = list.find { it.id == id }
             copy(
                 isOpenBottomSheetDetail = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
+        }
+    }
+
+    private fun ExpensesListState.updateOpenBottomSheetDelete(id: Long?): ExpensesListState {
+        return if (id == null)
+            copy(
+                isOpenBottomSheetDelete = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDelete = domain?.let { true } ?: false,
                 currentDetail = domain
             )
         }

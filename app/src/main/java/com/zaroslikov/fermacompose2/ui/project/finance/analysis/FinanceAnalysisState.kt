@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.project.finance.analysis
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import androidx.room.ColumnInfo
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 import com.zaroslikov.domain.models.dto.finance.DomainTransaction
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
@@ -81,6 +82,8 @@ data class AnimalProducer(
     val suffix: Suffix,
     val percentDouble: Double,
     val percentFloat: Float,
+    val imagePath: String?,
+    val currentIcon: Int,
 )
 
 data class FinanceAnalysis(

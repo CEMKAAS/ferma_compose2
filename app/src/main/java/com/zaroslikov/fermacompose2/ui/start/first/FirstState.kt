@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.start.first
 
 import com.zaroslikov.domain.models.table.DomainProjectTable
+import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.fermacompose2.base.state.ListState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
@@ -13,5 +14,7 @@ data class FirstState(
     val isArchive: Boolean = false,
     val isOpenArchiveIncubatorBottomSheet: Boolean = false,
     val isOpenDeleteBottomSheet: Boolean = false,
-    val currentProjectTable: DomainProjectTable? = null
+    val currentProjectTable: DomainProjectTable? = null,
+    val appSettings: DomainAppSettings = DomainAppSettings(),
+    val isNotificationAsked: Boolean = false
 ) : ListState()

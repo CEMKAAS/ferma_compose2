@@ -193,7 +193,8 @@ fun GradientButton(
     modifier: Modifier = Modifier,
     colors: List<Color>,
     text: String,
-    @DrawableRes iconRes: Int? = null,
+    @DrawableRes prefixIconRes: Int? = null,
+    @DrawableRes postfixIconRes: Int? = null,
     isShadow: Boolean = false,
     enabled: Boolean = true,
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -225,7 +226,7 @@ fun GradientButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            iconRes?.let {
+            prefixIconRes?.let {
                 Icon(
                     painterResource(it),
                     contentDescription = null,
@@ -238,6 +239,14 @@ fun GradientButton(
                 color = textColor,
                 style = text_14
             )
+            postfixIconRes?.let {
+                Icon(
+                    painterResource(it),
+                    contentDescription = null,
+                    tint = textColor,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }
@@ -247,7 +256,7 @@ fun BorderButton(
     modifier: Modifier = Modifier,
     text: String,
     @DrawableRes iconRes: Int? = null,
-    enabled: Boolean = false,
+    enabled: Boolean = true,
     backgroundColor: Color = white,
     borderColor: Color = gray_8,
     textColor: Color = black,

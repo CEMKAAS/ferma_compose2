@@ -32,6 +32,10 @@ sealed class UiEvent {
     data object NavigateBack : UiEvent()
 }
 
+sealed class UiNotification {
+    data object Notification : UiNotification()
+}
+
 
 sealed class EventFile {
     data class File(val value: String) : EventFile()

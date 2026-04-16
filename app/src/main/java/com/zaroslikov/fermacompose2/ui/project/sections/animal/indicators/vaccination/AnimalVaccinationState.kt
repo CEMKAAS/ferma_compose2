@@ -11,9 +11,11 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class AnimalVaccinationState(
     val vaccinationList: List<AnimalVaccinationExpensesDomain> = emptyList(),
+    val deleteVaccination: AnimalVaccinationExpensesDomain? = null,
     val titleVaccinationList: List<String> = emptyList(),
     val idPT: Long = 0,
     val isOpenDialog: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
     override val isEntry: Boolean = false,
     override val currentProduct: Vaccination = Vaccination(),

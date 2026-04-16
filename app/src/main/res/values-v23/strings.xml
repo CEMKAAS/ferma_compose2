@@ -19,6 +19,10 @@
     <string name="count_screen_title">Количество</string>
     <string name="vaccination_screen_title">Прививки</string>
     <string name="warehouse_screen_title">Мой Склад</string>
+    <string name="time_picker_title">Установка времени</string>
+    <string name="date_picker_title">Установка даты</string>
+    <string name="date_picker_range_title">Выберите период</string>
+
 
     <string name="add_screen_title2">Продукция</string>
     <string name="sale_screen_title2">Продажи</string>
@@ -123,6 +127,8 @@
     <string name="button_by_default">По умолчанию</string>
     <string name="button_reset">Сбросить</string>
     <string name="button_confirm">Подтвердить</string>
+    <string name="button_further">Далее</string>
+    <string name="button_begin_work">Начать работу</string>
 
     //DataPicker
     <string name="data_picker_ok">Принять</string>
@@ -156,6 +162,7 @@
     <string name="button_text_edit">Изменить!</string>
     <string name="button_text_write_off">Списать!</string>
     <string name="button_text_take">Принять</string>
+    <string name="button_text_skip">Пропустить</string>
 
     //widget
     <string name="widget_briefly">Кратко</string>
@@ -289,6 +296,43 @@
     <string name="support_text_all_weight">Общий вес составит:</string>
     <string name="support_text_empty">Не указано</string>
 
+    //TrainingScreen
+    <string name="training_screen_main_title_app_bar">Мое хозяйство</string>
+    <string name="training_screen_main_welcome_title">Добро пожаловать в Мое хозяйство!</string>
+    <string name="training_screen_main_welcome_title_sup">Управляйте своей фермой легко и эффективно</string>
+    <string name="training_screen_main_welcome_row_1">Простой и понятный интерфейс</string>
+    <string name="training_screen_main_welcome_row_2">Полный контроль над хозяйством</string>
+    <string name="training_screen_main_welcome_row_3">Автоматические расчеты и аналитика</string>
+
+    <string name="training_screen_main_ferma_title">Хозяйство</string>
+    <string name="training_screen_main_ferma_title_sup">Контролируйте доходы и расходы</string>
+    <string name="training_screen_main_ferma_row_1">Учет продукции и товаров</string>
+    <string name="training_screen_main_ferma_row_2">Отслеживание поступлений и списаний</string>
+    <string name="training_screen_main_ferma_row_3">Карточки всех ваших животных</string>
+    <string name="training_screen_main_ferma_row_4">Отслеживание веса, размера и количества</string>
+    <string name="training_screen_main_ferma_row_5">История вакцинаций</string>
+
+    <string name="training_screen_main_incubator_title">Инкубатор</string>
+    <string name="training_screen_main_incubator_title_sup">Контролируйте доходы и расходы</string>
+    <string name="training_screen_main_incubator_row_1">Общая статистика по всем закладкам</string>
+    <string name="training_screen_main_incubator_row_2">Процент выводимости по каждой закладке</string>
+    <string name="training_screen_main_incubator_row_3">Настраиваемые уведомления</string>
+    <string name="training_screen_main_incubator_row_4">5 видов птиц</string>
+
+    <string name="training_screen_main_finance_title">Финансы</string>
+    <string name="training_screen_main_finance_title_sup">Контролируйте доходы и расходы</string>
+    <string name="training_screen_main_finance_row_1">Аналитика прибыли и убытковс\</string>
+    <string name="training_screen_main_finance_row_2">Отслеживание доходов и расходов</string>
+    <string name="training_screen_main_finance_row_3">Сохраненные и потерянные средства</string>
+    <string name="training_screen_main_finance_row_4">Детальная финансовая отчетность</string>
+
+    <string name="training_screen_main_end_title">Начните прямо сейчас!</string>
+    <string name="training_screen_main_end_title_sup">Создайте свой первый проект и начните управлять хозяйством</string>
+    <string name="training_screen_main_end_row_1">Создавайте неограниченное количество проектов</string>
+    <string name="training_screen_main_end_row_2">Настраивайте уведомления</string>
+    <string name="training_screen_main_end_row_3">Архивируйте завершенные проекты</string>
+    <string name="training_screen_main_end_row_4">Экспортируйте данные в любое время</string>
+
     //DrawerSheet
     <string name="drawer_sheer_menu">Меню</string>
     <string name="drawer_sheer_profile">Профиль</string>
@@ -297,9 +341,11 @@
     <string name="drawer_sheer_settings_support">Настройки приложения</string>
     <string name="drawer_sheer_about_app">О приложении</string>
     <string name="drawer_sheer_about_app_support">Версия и контакты</string>
+    <string name="drawer_sheer_app_version_s">Мое Хозяйство %s</string>
 
     //Profile
     <string name="profile_screen_title">Профиль</string>
+    <string name="profile_screen_base">Фермер</string>
     <string name="profile_screen_owner_of_farms">Владелец хозяйств</string>
     <string name="profile_screen_current_balance">Текущий баланс</string>
     <string name="profile_screen_analysis_project">Аналитика по проектам</string>
@@ -475,6 +521,7 @@
 
 
     //BookmarkScreen
+    <string name="bookmark_screen_title">Активная закладка</string>
     <string name="book_mark_screen_day_incubator">День инкубации</string>
     <string name="book_mark_screen_progress">Прогресс</string>
     <string name="bookmark_screen_current_parametrs_s">Текущие параметры (День %s)</string>
@@ -513,6 +560,9 @@
     <string name="bookmark_screen_complete_support">Пришло время подвести итоги и зафиксировать результаты</string>
     <string name="bookmark_screen_egg_success">Успешность вывода</string>
     <string name="bookmark_screen_toggle_all_egg">Всего заложено яиц в инкубатор</string>
+    <string name="bookmark_screen_animal_count">Добавлено из инкубатора</string>
+    <string name="bookmark_screen_expenses_animal_category">Инкубатор — %s</string>
+    <string name="bookmark_screen_expenses_animal_note">Добавлено из инкубатора — %s</string>
 
 
     //BookmarkScreen - Ovospopy
@@ -603,6 +653,8 @@
     <string name="warehouse_screen_positions">позиции</string>
     <string name="warehouse_screen_products">Товары</string>
     <string name="warehouse_screen_fast_add">Быстрое добавление</string>
+    <string name="warehouse_screen_fast_add_note">Добавлено через \"Быстрое добавление\"</string>
+    <string name="warehouse_screen_write_off">Продукция списана</string>
     <string name="warehouse_screen_welcome">Добро пожаловать!</string>
     <string name="warehouse_screen_welcome_support_text">Начните вести учет вашей продукции</string>
     <string name="warehouse_screen_welcome_support_second_text">Добавьте первый товар, чтобы отслеживать остатки на складе</string>
@@ -622,6 +674,7 @@
     <string name="warehouse_edit_screen_name_project_support">Ферма "Бузина"</string>
     <string name="warehouse_edit_screen_choice_icon_project">Выберите иконку проекта</string>
     <string name="warehouse_edit_screen_project_creation_date">Дата создания проекта</string>
+    <string name="warehouse_edit_screen_notification">Уведомления</string>
 
     <string name="warehouse_edit_screen_currency">Валюта</string>
     <string name="warehouse_edit_screen_default_units_measurement">Единицы измерения по умолчанию</string>
@@ -635,7 +688,7 @@
     //BrieflyCard
     <string name="briefly_card_row">Записи</string>
 
-    <string name="briefly_detail_card_analysis">Посмотреть полный анализ подукта</string>
+    <string name="briefly_detail_card_analysis">Посмотреть полный анализ продукта</string>
     <string name="briefly_detail_card_total_price">Общая стоимость:</string>
 
 
@@ -663,6 +716,71 @@
     <string name="detail_card_animal_warning_text">Этота позиция животное, здесь вы можете изменить только цену, основую информацию можно изменить в самом животном</string>
     <string name="detail_card_animal_kill_warning">Продукция от забоя</string>
     <string name="detail_card_animal_kill_warning_text">Этота позиция от забоя животного, осноную информацию можно изменить вы можете изменить здесь, кроме даты забоя</string>
+
+    //Section Delete
+    <string name="base_section_warning">Внимание</string>
+    <string name="base_section_warning_text">• Запись будет удалена навсегда\n• Это действие нельзя отменить\n• Все связанные данные будут потеряны</string>
+
+    //Add
+    <string name="base_section_delete_add">Удалить продукцию?</string>
+    <string name="base_section_delete_support_add">Вы действительно хотите удалить эту продукцию?</string>
+    <string name="base_section_button_delete_add">Удалить продукцию</string>
+
+    //Sale
+    <string name="base_section_delete_sale">Удалить продажу?</string>
+    <string name="base_section_delete_support_sale">Вы действительно хотите удалить эту продажу?</string>
+    <string name="base_section_button_delete_sale">Удалить продажу</string>
+
+    //WriteOff
+    <string name="base_section_delete_write_off">Удалить списание?</string>
+    <string name="base_section_delete_support_write_off">Вы действительно хотите удалить это списание?</string>
+    <string name="base_section_button_delete_write_off">Удалить списание</string>
+
+    //Expenses
+    <string name="base_section_delete_expenses">Удалить покупку?</string>
+    <string name="base_section_delete_support_expenses">Вы действительно хотите удалить эту покупку?</string>
+    <string name="base_section_button_delete_expenses">Удалить покупку</string>
+
+    //Note
+    <string name="base_section_delete_note">Удалить заметку?</string>
+    <string name="base_section_delete_support_note">Вы действительно хотите удалить эту заметку?</string>
+    <string name="base_section_warning_note">• Заметка будет удалена навсегда\n• Это действие нельзя отменить</string>
+    <string name="base_section_button_delete_note">Удалить заметку</string>
+
+    //Animal
+    <string name="base_section_delete_animal">Удалить животного?</string>
+    <string name="base_section_delete_support_animal">Вы действительно хотите удалить эту животного?</string>
+    <string name="base_section_warning_animal">• Животное будет удалено навсегда\n• Это действие нельзя отменить\n• Все связанные данные будут потеряны(кроме полученной продукции)</string>
+    <string name="base_section_button_delete_animal">Удалить животного</string>
+
+    //Animal_weight
+    <string name="base_section_delete_weight">Удалить запись о весе?</string>
+    <string name="base_section_delete_support_weight">Вы действительно хотите удалить эту запись о весе?</string>
+    <string name="base_section_warning_weight">• Запись о весе будет удалена навсегда\n• Это действие нельзя отменить</string>
+    <string name="base_section_button_delete_weight">Удалить запись о весе</string>
+
+    //Animal_size
+    <string name="base_section_delete_size">Удалить запись о размере?</string>
+    <string name="base_section_delete_support_size">Вы действительно хотите удалить эту запись о размере?</string>
+    <string name="base_section_warning_size">• Запись о размере будет удалена навсегда\n• Это действие нельзя отменить</string>
+    <string name="base_section_button_delete_size">Удалить запись о размере</string>
+
+    //Animal_vaccination
+    <string name="base_section_delete_vaccination">Удалить запись о вакцинации?</string>
+    <string name="base_section_delete_support_vaccination">Вы действительно хотите удалить эту запись о вакцинации?</string>
+    <string name="base_section_warning_vaccination">• Запись о вакцинации будет удалена навсегда\n• Это действие нельзя отменить\n• Все связанные данные будут потеряны</string>
+    <string name="base_section_button_delete_vaccination">Удалить запись о весе</string>
+
+    //Animal_count_delete
+    <string name="base_section_delete_count">Удалить запись о количестве?</string>
+    <string name="base_section_delete_support_count">Вы действительно хотите удалить эту запись о колличестве?</string>
+    <string name="base_section_button_delete_count">Удалить запись</string>
+
+    //Animal_count_update
+    <string name="base_section_update_count">Обновить запись о количестве?</string>
+    <string name="base_section_update_support_count">Вы действительно хотите обновить эту запись о колличестве?</string>
+    <string name="base_section_button_update_count">Обновить запись</string>
+
 
     //Add
     <string name="add_screen_title_entry">Добавить продукцию</string>
@@ -737,15 +855,67 @@
     <string name="error_count_zero_animals">Нельзя указывать 0</string>
     <string name="error_show_food">Выберите животное!</string>
 
-    //Toast
-    <string name="toast_add_s">Добавлено: %s %s %s</string>
-    <string name="toast_refresh_s">Обновлено: %s %s %s</string>
-    <string name="toast_delete_s">Продукция %s %s %s удалена!</string>
-    <string name="toast_sale_s">Продано: %s за %s %s</string>
-    <string name="toast_refresh_s_s">Обновлено: %s за %s %s</string>
-    <string name="toast_expenses_s_s">Куплено: %s за %s %s</string>
-    <string name="toast_write_off_s">Списано: %s</string>
-    <string name="toast_refresh_note_s">Запись %s обновлена</string>
+    //SnackBar
+    <!-- ПРОДУКЦИЯ -->
+    <string name="snackbar_product_add">Продукция %1$s %2$s %3$s добавлена</string>
+    <string name="snackbar_product_update">Продукция обновлена на: %1$s %2$s %3$s</string>
+    <string name="snackbar_product_delete">Продукция %1$s %2$s %3$s удалена</string>
+
+    <!-- ПРОДАЖА -->
+    <string name="snackbar_sale_add">Продано: %1$s за %2$s %3$s</string>
+    <string name="snackbar_sale_update">Продажа обновлена на: %1$s за %2$s %3$s</string>
+    <string name="snackbar_sale_delete">Продажа %1$s за %2$s %3$s удалена</string>
+
+    <!-- РАСХОДЫ -->
+    <string name="snackbar_expense_add">Товар %1$s куплен за %2$s %3$s</string>
+    <string name="snackbar_expense_update">Покупка обновлена на: %1$s за %2$s %3$s</string>
+    <string name="snackbar_expense_delete">Покупка %1$s за %2$s %3$s удалена</string>
+
+    <!-- СПИСАНИЕ -->
+    <string name="snackbar_write_off_add">Списано: %1$s %2$s %3$s</string>
+    <string name="snackbar_write_off_update">Списание обновлено на: %1$s %2$s %3$s</string>
+    <string name="snackbar_write_off_delete">Списание %1$s %2$s %3$s удалено</string>
+
+    <!-- ЗАМЕТКИ -->
+    <string name="snackbar_note_add">Заметка %1$s добавлена</string>
+    <string name="snackbar_note_update">Заметка %1$s обновлена</string>
+    <string name="snackbar_note_delete">Заметка %1$s удалена</string>
+
+    <!-- ЖИВОТНЫЕ -->
+    <string name="snackbar_animal_add_single">Животное %1$s добавлено</string>
+    <string name="snackbar_animal_add_multiple">Животные %1$s добавлены</string>
+
+    <string name="snackbar_animal_archive_single">Животное перемещено в архив</string>
+    <string name="snackbar_animal_archive_multiple">Животные перемещены в архив</string>
+
+    <string name="snackbar_animal_unarchive_single">Животное восстановлено</string>
+    <string name="snackbar_animal_unarchive_multiple">Животные восстановлены</string>
+
+    <string name="snackbar_animal_update_single">Животное обновлено</string>
+    <string name="snackbar_animal_update_multiple">Животные обновлено</string>
+
+    <string name="snackbar_animal_delete_single">Животное %1$s удалено</string>
+    <string name="snackbar_animal_delete_multiple">Животные %1$s удалены</string>
+
+    <!-- ПАРАМЕТРЫ ЖИВОТНЫХ -->
+    <string name="snackbar_size_add">Размер %1$s %2$s  добавлен</string>
+    <string name="snackbar_size_update">Размер обновлён на: %1$s %2$s</string>
+    <string name="snackbar_size_delete">Размер %1$s %2$s удалён</string>
+
+    <string name="snackbar_weight_add">Вес %1$s %2$s добавлен</string>
+    <string name="snackbar_weight_update">Вес обновлён на: %1$s %2$s</string>
+    <string name="snackbar_weight_delete">Вес %1$s %2$s удалён</string>
+
+    <string name="snackbar_vaccine_add">Вакцинация %1$s добавлена</string>
+    <string name="snackbar_vaccine_update">Вакцинация обновлена на: %1$s</string>
+    <string name="snackbar_vaccine_delete">Вакцинация %1$s удалена</string>
+
+    <string name="snackbar_count_add">Количество %1$s %2$s  добавлено</string>
+    <string name="snackbar_count_update">Количество обновлено на: %1$s %2$s</string>
+    <string name="snackbar_count_delete">Количество удалено</string>
+
+    <string name="snackbar_animal_sex">Пол изменен</string>
+
 
     //Tooltip
     <string name="tooltip_animals_born">Дата рождения является приоритетной для расчета возраста</string>
@@ -815,6 +985,7 @@
 
     <string name="message_no_data_title_write_off">Нет списаний</string>
     <string name="message_no_data_message_write_off">Начните вести учет ваших списаний</string>
+    <string name="message_no_data_message_write_off_support">Добавьте товар для списания</string>
 
     <string name="message_no_data_title_animals">Нет животных</string>
     <string name="message_no_data_message_animals">Начните вести учет ваших животных.</string>
@@ -1104,7 +1275,7 @@
     <string name="animal_count_screen_warning_product_update_kill">Если вы измените продукцию она также удалиться или измениться в разделе моя продукция, вы действительно хотите обновить?</string>
     <string name="animal_count_screen_warning_product_update_minus_kill">Если вы продолжите данную операцию, количество животных уйдет в минус\nТакже удаленная или измененная продукцию, также удалиться или измениться в разделе мои продукция, вы действительно хотите обновить?</string>
 
-    <string name="animal_count_screen_warning_delete">Вы действительно хотите удалить данную запись?</string>
+    <string name="animal_count_screen_warning_delete">• Запись о колличестве будет удалена навсегда\n• Это действие нельзя отменить\n• Все связанные данные будут потеряны</string>
     <string name="animal_count_screen_warning_delete_minus">Если вы продолжите данную операцию, количество животных уйдет в минус\n Вы действительно хотите обновить?</string>
 
     <string name="animal_count_screen_kill_animal">Забито животных:</string>

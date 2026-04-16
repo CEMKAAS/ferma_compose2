@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 sealed class AnimalListIntent : BaseIntent {
     data class OpenBottomSheetEntry(
@@ -16,6 +17,8 @@ sealed class AnimalListIntent : BaseIntent {
         val state: AnimalEntryState2,
         val isSaveStateForBottomSheet: Boolean = false
     ) : AnimalListIntent()
+
+    data class OpenBottomSheetDelete(val value: Long? = null) : AnimalListIntent()
 
     data class AnimalGroupClicked(val value: Boolean) : AnimalListIntent()
     data class TitleChanged(val value: String) : AnimalListIntent()
@@ -33,8 +36,8 @@ sealed class AnimalListIntent : BaseIntent {
     data class NoteChanged(val value: String) : AnimalListIntent()
 
     data object Insert : AnimalListIntent()
+    data object Delete : AnimalListIntent()
     data class Archive(val id: Long, val isArchive: Boolean) : AnimalListIntent()
-    data class Delete(val value: Long) : AnimalListIntent()
 
     data class ArchiveClicked(val value: Boolean) : AnimalListIntent()
     data class SearchChanged(val value: String) : AnimalListIntent()

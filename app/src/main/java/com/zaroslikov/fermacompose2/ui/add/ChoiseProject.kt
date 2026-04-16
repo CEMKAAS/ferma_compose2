@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zaroslikov.fermacompose2.AlterDialigStart
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarEdit
 //import com.zaroslikov.fermacompose2.ui.Banner
@@ -49,15 +48,6 @@ fun ChoiseProject(
     isFirstStart: Boolean,
     isFirstEnd: () -> Unit,
 ) {
-    AlterDialigStart(
-        isFirstStart = isFirstStart,
-        dialogTitle = "Добро пожаловать!",
-        dialogText = "Для начала работы пройдем короткое обучение. При выходе из приложения во время обучения обучение завершается автоматически.\nВыберите тип проекта: Инкубатор для инкубирования, Хозяйство для контроля подсобного хозяйства\nЕсли Вы опытный пользователь нажмите \"Завершить обучение\", чтобы выйти из режима обучения.",
-        textAppMetrica = "Выбор проекта",
-        boolean = true,
-        isFirstEndConfig = isFirstEnd
-    )
-
     Scaffold(
         topBar = {
             TopAppBarEdit(title = "Выбор проекта", navigateUp = navigateBack)

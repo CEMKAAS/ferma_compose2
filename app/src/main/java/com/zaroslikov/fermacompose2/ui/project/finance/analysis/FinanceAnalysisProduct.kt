@@ -64,7 +64,6 @@ import com.zaroslikov.fermacompose2.ui.elements.CardNewWithTitle
 import com.zaroslikov.fermacompose2.ui.elements.CategoryBorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
-import com.zaroslikov.fermacompose2.ui.elements.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconCircle
 import com.zaroslikov.fermacompose2.ui.elements.IconCircleText
@@ -83,6 +82,7 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.CustomLineChart
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.FilterDateElement
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.formatNumber
 import com.zaroslikov.fermacompose2.ui.monthToResString2
@@ -148,7 +148,7 @@ fun FinanceAnalysisProduct(
                 onDateRangeSelected = {
                     viewModel.onIntent(FinanceAnalysisIntent.CurrentPeriodClicked(it))
                 },
-                onDismiss = {
+                onDismissRequest = {
                     viewModel.onIntent(FinanceAnalysisIntent.OpenCalendarDialogClicked(false))
                 }
             )
@@ -497,7 +497,9 @@ private fun AnimalProducers(
                         count = it.count,
                         suffix = it.suffix,
                         percentDouble = it.percentDouble,
-                        percentFloat = it.percentFloat
+                        percentFloat = it.percentFloat,
+                        currentIcon = it.currentIcon,
+                        imagePath = it.imagePath,
                     )
                 }
 
@@ -513,6 +515,8 @@ private fun AnimalProducerSlider(
     suffix: Suffix,
     percentDouble: Double,
     percentFloat: Float,
+    currentIcon: Int,
+    imagePath: String?,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
@@ -525,9 +529,9 @@ private fun AnimalProducerSlider(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 IconAnimal(
-                    sex = true, sizeIcon = 40.dp,
-                    imagePath = TODO(),
-                    currentIcon = TODO()
+                    sex = null, sizeIcon = 40.dp,
+                    imagePath = imagePath,
+                    currentIcon = currentIcon
                 )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -540,7 +544,7 @@ private fun AnimalProducerSlider(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalAlignment = Alignment.End
             ) {
-                Text("$count ${stringResource(suffix.toResId())}", style = text_14, color = black_2)
+                Text("${count.formatNumber()} ${stringResource(suffix.toResId())}", style = text_14, color = black_2)
                 TextMiniCard(
                     "${percentDouble.formatNumber()}%",
                     textColor = FinanceAnalysisEnum.SALE.colorTextPercent,

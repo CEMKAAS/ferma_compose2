@@ -72,10 +72,20 @@ interface WriteOffDao {
     )
     fun getBrieflyDetailsItemWriteOffScrap(id: Long, name: String): Flow<List<WriteOffTable>>
 
+    /*   @Query(
+           "SELECT title, count_suffix AS suffix, 0 AS category from add_table Where idPT=:id group by title, count_suffix" +
+                   " UNION ALL" +
+                   " SELECT title,  count_suffix AS suffix, 1 AS category from expenses_table Where idPT=:id group by title, count_suffix"
+       )
+       fun getItemsWriteOffList(id: Long): Flow<List<TitleSuffixCategoryDto>>*/
     @Query(
-        "SELECT title, count_suffix AS suffix, 0 AS category from add_table Where idPT=:id group by title, count_suffix" +
-                " UNION ALL" +
-                " SELECT title,  count_suffix AS suffix, 1 AS category from expenses_table Where idPT=:id group by title, count_suffix"
+        "SELECT DISTINCT a.title, a.count_suffix AS suffix, 0 AS category FROM add_table a WHERE a.idPT=:id  " +
+
+                " UNION ALL " +
+
+                " SELECT DISTINCT e.title, e.count_suffix AS suffix, 1 AS category " +
+                " FROM expenses_table e" +
+                " WHERE e.idPT=:id and e.is_food = 0 and e.animalId IS NULL and e.animal_vaccination_id IS NULL and e.animal_count_id IS NULL "
     )
     fun getItemsWriteOffList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 

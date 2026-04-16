@@ -2,18 +2,17 @@ package com.zaroslikov.fermacompose2
 
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-//import com.yandex.mobile.ads.common.MobileAds
-import com.zaroslikov.fermacompose2.data.AppContainer
-import com.zaroslikov.fermacompose2.data.AppDataContainer
 import dagger.hilt.android.HiltAndroidApp
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
+import javax.inject.Inject
 
 @HiltAndroidApp
-class InventoryApplication : Application()/*, Configuration.Provider*/ {
-
-    lateinit var container: AppContainer
+class InventoryApplication : Application(), Configuration.Provider {
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
@@ -21,14 +20,12 @@ class InventoryApplication : Application()/*, Configuration.Provider*/ {
             AppMetricaConfig.newConfigBuilder("7bc20e66-fc56-4002-ac33-4cc15dd28213").build()
         AppMetrica.activate(this, config)
 //        MobileAds.initialize(this) { }
-        container = AppDataContainer(this)
+//        container = AppDataContainer(this)
     }
 
-//    fun getWorkManagerConfiguration() = Configuration.Builder()
-//        .setMinimumLoggingLevel(android.util.Log.INFO)
-//        .build()
-//
-//    override val workManagerConfiguration: Configuration
-//        get() = getWorkManagerConfiguration()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }
 

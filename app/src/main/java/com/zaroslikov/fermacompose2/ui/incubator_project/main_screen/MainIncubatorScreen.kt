@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.incubator_project.main_screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -46,6 +47,7 @@ fun MainIncubatorScreen(
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0),
         bottomBar = {
             Column {
                 HorizontalDivider(thickness = 1.dp, color = gray_6)

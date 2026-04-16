@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.fermacompose2.BuildConfig
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.blue_8
@@ -128,7 +129,9 @@ fun DrawerSheetNew(
             ) {
                 HorizontalDivider(thickness = 1.dp, color = gray_6)
                 Text(
-                    text = "Мое хозяйство v1.0.0", style = text_12, color = grey,
+                    text = stringResource(R.string.drawer_sheer_app_version_s).format(BuildConfig.VERSION_NAME),
+                    style = text_12,
+                    color = grey,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()

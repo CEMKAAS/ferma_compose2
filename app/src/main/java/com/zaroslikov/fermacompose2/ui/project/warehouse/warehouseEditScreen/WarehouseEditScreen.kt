@@ -30,11 +30,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,17 +73,16 @@ import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_10
+import com.zaroslikov.fermacompose2.orang_20
+import com.zaroslikov.fermacompose2.orang_21
 import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_6
-import com.zaroslikov.fermacompose2.orang_8
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.toFullResId
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.add.DatePickerDialogSample
-import com.zaroslikov.fermacompose2.ui.add.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.add.saveImageToInternalStorage
 import com.zaroslikov.fermacompose2.ui.add.uriToByteArray
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
@@ -98,9 +99,16 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.DatePickerDialogSample
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.NotificationFun
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.PastOrPresentSelectableDates
+import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.NotificationParameters
 import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
+import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditIntent
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
+import com.zaroslikov.fermacompose2.ui.start.settings.SD
 import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_4
 import com.zaroslikov.fermacompose2.violet_5
@@ -126,6 +134,15 @@ fun WarehouseEditScreen(
     val titleRes = if (state.isInsertProject) R.string.warehouse_edit_screen_title_add else
         R.string.warehouse_edit_screen_title_edit
 
+    val eventFlow = viewModel.navigation
+    LaunchedEffect(Unit) {
+        eventFlow.collect { event ->
+            when (event) {
+                is UiEvent.NavigateBack -> navigateBack()
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -144,7 +161,6 @@ fun WarehouseEditScreen(
             modifier = Modifier.modifierScreen(innerPadding),
             state = state,
             onIntent = viewModel::onIntent,
-            onNavigateBackClick = navigateBack
         )
     }
 }
@@ -153,11 +169,10 @@ fun WarehouseEditScreen(
 private fun WarehouseEditBody(
     modifier: Modifier,
     state: WarehouseEditState,
-    onIntent: (WarehouseEditIntent) -> Unit,
-    onNavigateBackClick: () -> Unit
+    onIntent: (WarehouseEditIntent) -> Unit
 ) {
     Column(
-        modifier = modifier.padding(bottom = 16.dp),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         MainSettingsCard(
@@ -173,12 +188,14 @@ private fun WarehouseEditBody(
             onIconSelected = { onIntent(WarehouseEditIntent.IconClicked(it)) },
         )
         DateSettingsCard(state.currentProject.date) {
-            onIntent(
-                WarehouseEditIntent.DateClicked(
-                    it
-                )
-            )
+            onIntent(WarehouseEditIntent.DateClicked(it))
         }
+        NotificationCard(
+            isShowNotification = state.isShowNotification,
+            currentNotification = state.currentNotification,
+            notificationList = state.notificationList,
+            onIntent = onIntent
+        )
         CurrencySettingsCard(state.currentSettings.currencySuffix) {
             onIntent(WarehouseEditIntent.CurrencyClicked(it))
         }
@@ -203,9 +220,8 @@ private fun WarehouseEditBody(
         )
         SaveButton(
             isInsertProject = state.isInsertProject,
-            enabledButton = state.enabledButton(),
-            onIntent = onIntent,
-            onNavigateBackClick = onNavigateBackClick
+            enabledButton = state.hasAnyError,
+            onIntent = onIntent
         )
     }
 }
@@ -355,6 +371,50 @@ private fun DateSettingsCard(
                     text = dateText,
                     style = text_14,
                     color = gray_7
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotificationCard(
+    isShowNotification: Boolean,
+    currentNotification: NotificationParameters,
+    notificationList: List<NotificationParameters>,
+    onIntent: (WarehouseEditIntent) -> Unit
+) {
+    CardFieldNew(padding = PaddingValues(horizontal = 20.dp, vertical = 15.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SD(
+                titleRes = R.string.warehouse_edit_screen_notification,
+                icon = R.drawable.baseline_notifications_none_24,
+                color = orang_20,
+                iconColor = orang_21,
+            ) {
+                Switch(
+                    checked = isShowNotification,
+                    onCheckedChange = { onIntent(WarehouseEditIntent.ShowNotificationClicked(it)) }
+                )
+            }
+            AnimatedVisibility(
+                visible = isShowNotification
+            ) {
+                NotificationFun(
+                    notificationList = notificationList.filter { it.isVisibility },
+                    time = currentNotification.time,
+                    note = currentNotification.note,
+                    isEntry = currentNotification.isEntry,
+                    maxCount = 2,
+                    onChoiceClick = { onIntent(WarehouseEditIntent.ChoiceNotificationClicked(it)) },
+                    onRemoveClick = { onIntent(WarehouseEditIntent.RemoveNotificationClicked(it)) },
+                    onCancelClick = { onIntent(WarehouseEditIntent.CancelNotificationClicked) },
+                    onTimeChange = { onIntent(WarehouseEditIntent.TimeNotificationChanged(it)) },
+                    onNoteChange = { onIntent(WarehouseEditIntent.NoteNotificationChanged(it)) },
+                    onAddClick = { onIntent(WarehouseEditIntent.AddNotificationClicked) },
+                    onEditClick = { onIntent(WarehouseEditIntent.EditNotificationClicked) }
                 )
             }
         }
@@ -653,7 +713,6 @@ private fun SaveButton(
     isInsertProject: Boolean,
     enabledButton: Boolean,
     onIntent: (WarehouseEditIntent) -> Unit,
-    onNavigateBackClick: () -> Unit
 ) {
     GradientButton(
         modifier = Modifier.fillMaxWidth(),
@@ -661,7 +720,6 @@ private fun SaveButton(
         onClick = {
             if (isInsertProject) onIntent(WarehouseEditIntent.InsertClicked)
             else onIntent(WarehouseEditIntent.EditClicked)
-            onNavigateBackClick()
         },
         colors = listOf(Color(0xFF00A63E), Color(0xFF009966)),
         enabled = enabledButton,

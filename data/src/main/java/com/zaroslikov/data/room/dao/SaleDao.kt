@@ -63,14 +63,23 @@ interface SaleDao {
 
 
     @Query(
-        "SELECT title, count_suffix AS suffix, 0 AS category FROM add_table WHERE idPT=:id" +
+        "SELECT DISTINCT a.title, a.count_suffix AS suffix, 0 AS category FROM add_table a WHERE a.idPT=:id  " +
+
+                " UNION ALL " +
+
+                " SELECT DISTINCT e.title, e.count_suffix AS suffix, 1 AS category " +
+                " FROM expenses_table e" +
+                " WHERE e.idPT=:id and e.is_food = 0 and e.animalId IS NULL and e.animal_vaccination_id IS NULL and e.animal_count_id IS NULL " +
+
+                " UNION ALL" +
+
+                " SELECT DISTINCT s.title, s.count_suffix AS suffix, 2 AS category" +
+                " FROM sale_table s" +
+                " WHERE s.idPT=:id and s.animal_count_id IS NULL and s.animal_id IS NULL" +
+                " AND (s.title, s.count_suffix) NOT IN (" +
+                " SELECT ans.title, ans.count_suffix from add_table ans Where ans.idPT=:id " +
                 " UNION " +
-                " SELECT title, count_suffix AS suffix, 1 AS catefory FROM expenses_table WHERE idPT=:id AND is_show_food != 1 GROUP BY title" +
-                " UNION " +
-                " SELECT title, count_suffix AS suffix, 2 AS catefory FROM sale_table WHERE idPT=:id" +
-                " AND title NOT IN (SELECT title from add_table Where idPT=:id" +
-                " UNION " +
-                " SELECT title FROM expenses_table WHERE idPT=:id AND is_show_food != 1 GROUP BY title)"
+                " SELECT es.title, es.count_suffix FROM expenses_table es WHERE es.idPT=:id and es.is_food = 0 and es.animalId IS NULL and es.animal_vaccination_id IS NULL and es.animal_count_id IS NULL)"
     )
     fun getItemsTitleSaleList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 

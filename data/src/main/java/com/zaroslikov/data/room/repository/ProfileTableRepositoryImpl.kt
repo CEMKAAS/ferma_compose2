@@ -34,4 +34,8 @@ class ProfileTableRepositoryImpl @Inject constructor(private val profileDao: Pro
     override fun getAllCurrenciesSorted(): Flow<List<Suffix>> {
         return profileDao.getAllCurrenciesSorted()
     }
+
+    override fun createProfile(profileTable: DomainProfileTable) {
+        return profileDao.createProfile(profileTable.toProfileTable())
+    }
 }

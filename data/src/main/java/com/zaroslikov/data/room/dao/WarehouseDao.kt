@@ -8,30 +8,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WarehouseDao {
-   /* @Query(
-        "SELECT title," +
-                " SUM(AddCount) - COALESCE(SUM(SaleCount), 0) - COALESCE(SUM(WriteOffCount), 0) AS count," +
-                " count_suffix AS suffix " +
-                " FROM (" +
-                "    SELECT title,count_suffix, SUM(count) AS AddCount, 0 AS SaleCount, 0 AS WriteOffCount" +
-                "    FROM add_table" +
-                "    WHERE idPT = :id" +
-                "    GROUP BY Title" +
-                "    UNION ALL" +
-                "    SELECT title, count_suffix, 0 AS AddCount, SUM(count) AS SaleCount, 0 AS WriteOffCount" +
-                "    FROM sale_table" +
-                "    WHERE idPT = :id" +
-                "    GROUP BY title" +
-                "    UNION ALL" +
-                "    SELECT title, count_suffix as suffix, 0 AS AddCount, 0 AS SaleCount, SUM(count) AS WriteOffCount" +
-                "    FROM write_off_table" +
-                "    WHERE idPT = :id" +
-                "    GROUP BY title" +
-                ")" +
-                "  GROUP BY Title HAVING count > 0 ORDER BY count DESC "
-    )
-    fun getCurrentBalanceWarehouse(id: Long): Flow<List<TitleCountSuffixDto>>*/
-
     @Query(
         "SELECT title, count, suffix " +
                 " FROM (  " +
@@ -44,12 +20,12 @@ interface WarehouseDao {
                 " UNION All " +
                 " SELECT title, -count as count, count_suffix AS suffix " +
                 " FROM sale_table" +
-                " WHERE idPT=:id" +
+                " WHERE idPT=:id  and animal_count_id IS NULL and animal_id IS NULL" +
 
                 " UNION All" +
                 " SELECT title, -count as count, count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id" +
+                " WHERE idPT=:id and animal_count_id IS NULL" +
                 ") " +
                 ")"
     )
@@ -63,111 +39,67 @@ interface WarehouseDao {
                 " FROM ( " +
                 " SELECT title, count as count, count_suffix AS suffix" +
                 " FROM expenses_table" +
-                " WHERE idPT=:id and is_show_food != 1" +
+                " WHERE idPT=:id and is_food = 0 and animalId IS NULL and animal_vaccination_id IS NULL and animal_count_id IS NULL" +
 
                 " UNION All " +
                 " SELECT title, -count as count, count_suffix AS suffix " +
                 " FROM sale_table" +
-                " WHERE idPT=:id" +
+                " WHERE idPT=:id and animal_count_id IS NULL and animal_id IS NULL" +
 
                 " UNION All" +
                 " SELECT title, -count as count, count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id" +
+                " WHERE idPT=:id and animal_count_id IS NULL" +
                 ") " +
                 ")"
     )
     fun getCurrentExpensesWarehouse(id: Long): Flow<List<TitleCountSuffixDto>>
 
     @Query(
-        "SELECT title," +
-                " SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount) , 0) - COALESCE(SUM(SaleCount), 0) AS count, " +
-                " suffix " +
-                " FROM (" +
-                "    SELECT title, count_suffix as suffix, SUM(count) AS ExpensesCount, 0 AS WriteOffCount, 0 AS SaleCount" +
-                "    FROM expenses_table" +
-                "    WHERE idPT = :id and is_food = 0" +
-                "    GROUP BY title" +
-                "    UNION ALL" +
-                "    SELECT title, count_suffix as suffix, 0 AS ExpensesCoun, SUM(count) AS WriteOffCount, 0 AS SaleCount" +
-                "    FROM write_off_table" +
-                "    WHERE idPT = :id" +
-                "    GROUP BY title" +
-                "    UNION ALL" +
-                "    SELECT title, count_suffix, 0 AS ExpensesCoun, 0 AS WriteOffCount, SUM(count) AS SaleCount" +
-                "    FROM sale_table" +
-                "    WHERE idPT = :id" +
-                "    GROUP BY title" +
-                " ) " +
-                " GROUP BY title HAVING count > 0 ORDER BY count DESC"
-    )
-    fun getCurrentExpensesWarehouse2(id: Long): Flow<List<TitleCountSuffixDto>>
-
-    @Query(
         "SELECT " +
-                " grouped.total_count AS count, " +
-                " grouped.suffix AS suffix " +
-                "FROM (" +
-                "    SELECT " +
-                "        base.suffix, " +
-                "        SUM(base.count) - " +
-                "        COALESCE((SELECT SUM(s.count) FROM sale_table s WHERE s.title = base.title AND s.count_suffix = base.suffix AND s.idPT = :id), 0) - " +
-                "        COALESCE((SELECT SUM(w.count) FROM write_off_table w WHERE w.title = base.title AND w.count_suffix = base.suffix AND w.idPT = :id), 0) " +
-                "        AS total_count " +
-                "    FROM (" +
-                "        SELECT title, count, count_suffix AS suffix FROM add_table WHERE idPT = :id AND title = :name " +
-                "        UNION ALL " +
-                "        SELECT title, -count, count_suffix FROM sale_table WHERE idPT = :id AND title = :name " +
-                "        UNION ALL " +
-                "        SELECT title, -count, count_suffix as suffix FROM write_off_table WHERE idPT = :id AND title = :name " +
-                "    ) AS base " +
-                "    GROUP BY base.suffix " +
-                "    HAVING total_count > 0 " +
-                ") AS grouped"
-    )
-    fun getCurrentBalanceProduct(name: String, id: Long): Flow<CountSuffixDto>
-
-
-    @Query(
-        "SELECT " +
-                " SUM(base.count) AS count," +
+                " base.count AS count," +
                 " base.suffix AS suffix " +
                 "FROM (" +
-                "    SELECT title, count, count_suffix AS suffix " +
+                "    SELECT count AS count, count_suffix AS suffix " +
                 "    FROM add_table " +
                 "    WHERE idPT = :id AND title = :name " +
+
                 "    UNION ALL " +
-                "    SELECT title, -count, count_suffix " +
+
+                "    SELECT -count AS count, count_suffix as suffix " +
                 "    FROM sale_table " +
-                "    WHERE idPT = :id AND title = :name " +
+                "    WHERE idPT = :id AND title = :name and animal_count_id IS NULL and animal_id IS NULL " +
+
                 "    UNION ALL " +
-                "    SELECT title, -count, count_suffix as suffix " +
+
+                "    SELECT -count AS count, count_suffix as suffix " +
                 "    FROM write_off_table " +
-                "    WHERE idPT = :id AND title = :name " +
-                ") AS base " +
-                "GROUP BY base.suffix"
+                "    WHERE idPT = :id AND title = :name  and animal_count_id IS NULL " +
+                ") AS base "
     )
     fun getCurrentBalanceProductList(name: String, id: Long): Flow<List<CountSuffixDto>>
 
     @Query(
-        "SELECT SUM(ExpensesCount) - COALESCE(SUM(WriteOffCount), 0) - COALESCE(SUM(SaleCount), 0) AS count, suffix " +
+        "SELECT " +
+                " base.count AS count," +
+                " base.suffix AS suffix " +
                 "FROM (" +
-                "   SELECT title, count_suffix AS suffix, SUM(count) AS ExpensesCount, 0 AS WriteOffCount, 0 AS SaleCount " +
-                "   FROM expenses_table " +
-                "   WHERE title = :name AND idPT = :id AND is_show_food != 1 " +
-                "   GROUP BY title, count_suffix " +
-                "   UNION ALL " +
-                "   SELECT title AS title, count_suffix as suffix, 0 AS ExpensesCount, SUM(count) AS WriteOffCount, 0 AS SaleCount " +
-                "   FROM write_off_table " +
-                "   WHERE idPT = :id AND title = :name " +
-                "   GROUP BY title, suffix " +
-                "   UNION ALL " +
-                "   SELECT title, count_suffix AS suffix, 0 AS ExpensesCount, 0 AS WriteOffCount, SUM(count) AS SaleCount " +
-                "   FROM sale_table " +
-                "   WHERE idPT = :id AND title = :name " +
-                "   GROUP BY title, count_suffix" +
-                ") " +
-                "GROUP BY suffix"
+                "    SELECT count AS count, count_suffix AS suffix " +
+                "    FROM expenses_table " +
+                "    WHERE idPT = :id AND title = :name and is_food = 0 and animalId IS NULL and animal_vaccination_id IS NULL and animal_count_id IS NULL" +
+
+                "    UNION ALL " +
+
+                "    SELECT -count AS count, count_suffix as suffix " +
+                "    FROM sale_table " +
+                "    WHERE idPT = :id AND title = :name and animal_count_id IS NULL and animal_id IS NULL " +
+
+                "    UNION ALL " +
+
+                "    SELECT  -count AS count, count_suffix as suffix " +
+                "    FROM write_off_table " +
+                "    WHERE idPT = :id AND title = :name and animal_count_id IS NULL " +
+                ") AS base "
     )
     fun getCurrentExpensesProductList(name: String, id: Long): Flow<List<CountSuffixDto>>
 
@@ -378,6 +310,4 @@ interface WarehouseDao {
             dateBegin: String,
             dateEnd: String
         ): Flow<Fin>*/
-
-
 }

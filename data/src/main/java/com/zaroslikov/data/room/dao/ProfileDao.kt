@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -43,4 +44,7 @@ interface ProfileDao {
                 " ORDER BY COUNT(*) DESC"
     )
     fun getAllCurrenciesSorted(): Flow<List<Suffix>>
+
+    @Insert
+    fun createProfile(profileTable: ProfileTable)
 }

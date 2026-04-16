@@ -26,7 +26,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 12
-        versionName = "v1.17bG"
+        versionName = "v3.0.0G"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -112,11 +112,13 @@ dependencies {
 
     // AppMetrica SDK.
     implementation("io.appmetrica.analytics:analytics:7.13.0")
-    implementation("androidx.work:work-runtime-ktx:2.10.5")
+
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
 
     // Hilt
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation("androidx.hilt:hilt-work:1.3.0")
 
 }

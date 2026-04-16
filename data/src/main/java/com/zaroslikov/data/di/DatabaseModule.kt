@@ -2,6 +2,8 @@ package com.zaroslikov.data.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.dao.AnimalCountDao
 import com.zaroslikov.data.room.dao.AnimalDao
@@ -17,13 +19,13 @@ import com.zaroslikov.data.room.dao.IncubatorParametersDao
 //import com.zaroslikov.data.room.dao.IncubatorDao
 import com.zaroslikov.data.room.dao.IncubatorTableDao
 import com.zaroslikov.data.room.database.AppDatabase
-import com.zaroslikov.data.room.database.AppDatabase.Companion.Instance
 import com.zaroslikov.data.room.dao.NoteDao
 import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
-import com.zaroslikov.data.room.dao.TimeNotificationDao
+import com.zaroslikov.data.room.dao.TimeNotificationIncubatorDao
+import com.zaroslikov.data.room.dao.TimeNotificationProjectDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.database.migration.MIGRATION_1_2
@@ -45,15 +47,26 @@ object DatabaseModule {
     fun provideDatabase(
         @ApplicationContext context: Context,
     ): AppDatabase {
-        return Instance ?: synchronized(this) {
-            Room.databaseBuilder(context, AppDatabase::class.java, "item_database")
-                .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_1_2)
-                .addMigrations(MIGRATION_2_3)
-                .addMigrations(MIGRATION_3_4)
-                .build()
-                .also { Instance = it }
-        }
+        return Room.databaseBuilder(context, AppDatabase::class.java, "item_database")
+            .fallbackToDestructiveMigration()
+            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_3_4)
+            .addCallback(object : RoomDatabase.Callback() {
+
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+
+                    db.execSQL("""
+                    INSERT INTO app_settings_table 
+                    (id, last_version_app, current_version_app, is_first_launch) 
+                    VALUES (1, NULL, '3.0.0', 1)
+                """.trimIndent()
+                    )
+                }
+            })
+            .build()
+
     }
 
     @Provides
@@ -154,6 +167,12 @@ object DatabaseModule {
 
     @Provides
     @Singleton
+    fun provideTimeNotificationProjectTableDao(database: AppDatabase): TimeNotificationProjectDao {
+        return database.timeNotificationProjectDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideIncubatorTableDao(database: AppDatabase): IncubatorTableDao {
         return database.incubatorTableDao()
     }
@@ -166,8 +185,8 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideTimeNotificationTableDao(database: AppDatabase): TimeNotificationDao {
-        return database.timeNotificationDao()
+    fun provideTimeNotificationTableDao(database: AppDatabase): TimeNotificationIncubatorDao {
+        return database.timeNotificationIncubatorDao()
     }
 
     @Provides

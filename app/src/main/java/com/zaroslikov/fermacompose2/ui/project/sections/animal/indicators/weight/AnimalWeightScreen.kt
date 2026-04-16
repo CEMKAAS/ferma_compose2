@@ -30,9 +30,11 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsCardNew
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsDeleteCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.InventoryAnimalBody
 
 
@@ -90,7 +92,7 @@ fun AnimalWeightScreen(
                         AnimalWeightIntent.OpenDialogClicked(true, it)
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(AnimalWeightIntent.DeletePressed(it)) },
+                onDeleteClick = { viewModel.onIntent(AnimalWeightIntent.OpenBottomSheetDelete(it)) },
                 titleRes = title
             )
         if (state.isOpenEntryBottomSheet)
@@ -100,6 +102,15 @@ fun AnimalWeightScreen(
                 colors = colors,
                 icon = icon,
                 titleRes = title,
+            )
+        if (state.isOpenBottomSheetDelete)
+            WarningDeleteWeightBottomSheet(
+                onDismissRequest = {
+                    viewModel.onIntent(AnimalWeightIntent.OpenBottomSheetDelete(null))
+                },
+                onDeleteClick = { viewModel.onIntent(AnimalWeightIntent.DeletePressed) },
+                color = colors.first(),
+                state = state.deleteWeight
             )
     }
 }
@@ -140,8 +151,35 @@ private fun AnimalWeightContainer2(
                 onEditClick = { onEditClick(item) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
-        },
+        }
     )
+}
+
+@Composable
+private fun WarningDeleteWeightBottomSheet(
+    color: Color,
+    state: AnimalWeightUi?,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.base_section_delete_weight,
+        supportRes = R.string.base_section_delete_support_weight,
+        textRes = R.string.base_section_warning_weight,
+        textButtonRes = R.string.base_section_button_delete_weight
+    ) {
+        state?.let {
+            AnimalIndicatorsDeleteCard(
+                value = state.weight.toFormatNumber(),
+                suffix = state.suffix,
+                date = state.date,
+                note = state.note,
+                color = color
+            )
+        }
+    }
 }
 
 @Composable

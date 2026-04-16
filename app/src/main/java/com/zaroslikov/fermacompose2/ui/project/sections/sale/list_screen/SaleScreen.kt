@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.blue_3
@@ -36,6 +37,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleSaleN
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
@@ -92,7 +94,8 @@ fun SaleScreen(
                 details = state.isGroup,
                 itemList = state.list,
                 searchList = state.searchList,
-                brieflyList = state.searchBrieflyList,
+                brieflyList = state.briefly,
+                searchBrieflyList = state.searchBrieflyList,
                 isArchive = state.isArchive,
                 onDetailsCardClick = { viewModel.onIntent(SaleListIntent.OpenBottomSheetDetail(it)) },
                 onEditClick = {
@@ -100,7 +103,7 @@ fun SaleScreen(
                         SaleListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(SaleListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(SaleListIntent.OpenBottomSheetDelete(it)) },
                 onDetailsClick = {
                     viewModel.onIntent(SaleListIntent.OpenBottomSheetGroup(it))
                 }
@@ -121,7 +124,7 @@ fun SaleScreen(
                         SaleListIntent.OpenBottomSheetEntry(true, it)
                     )
                 },
-                onDeleteClick = { viewModel.onIntent(SaleListIntent.Delete(it)) },
+                onDeleteClick = { viewModel.onIntent(SaleListIntent.OpenBottomSheetDelete(it)) },
                 iconRes = iconRes,
                 color = colors.first(),
                 isArchive = state.isArchive,
@@ -133,6 +136,14 @@ fun SaleScreen(
                 colors = colors,
                 onIntent = viewModel::onIntent,
                 isArchive = state.isArchive
+            )
+        if (state.isOpenBottomSheetDelete)
+            WarningDeleteSaleBottomSheet(
+                onDismissRequest = { viewModel.onIntent(SaleListIntent.OpenBottomSheetDelete(null)) },
+                onDeleteClick = { viewModel.onIntent(SaleListIntent.Delete) },
+                state = state.currentDetail,
+                color = colors.first(),
+                priceSuffix = state.settings.currencySuffix
             )
     }
 }
@@ -163,9 +174,46 @@ private fun SaleDetailBottomSheet(
             colors = colors,
             isArchive = isArchive,
             onUpdateClick = { onIntent(SaleListIntent.OpenBottomSheetEntry(true, state)) },
-            onDeleteClick = { onIntent(SaleListIntent.Delete(state.id)) },
+            onDeleteClick = { onIntent(SaleListIntent.OpenBottomSheetDelete(state.id)) },
             onDismissRequest = { onIntent(SaleListIntent.OpenBottomSheetDetail(null)) },
         )
+    }
+}
+
+@Composable
+private fun WarningDeleteSaleBottomSheet(
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit,
+    state: DomainSaleTable?,
+    color: Color,
+    priceSuffix: Suffix
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick,
+        titleRes = R.string.base_section_delete_sale,
+        supportRes = R.string.base_section_delete_support_sale,
+        textButtonRes = R.string.base_section_button_delete_sale
+    ) {
+        state?.let { product ->
+            DetailProductCardNew(
+                title = product.title,
+                count = product.count,
+                suffix = product.countSuffix,
+                price = product.priceAll ?: product.price,
+                priceSuffix = priceSuffix,
+                note = product.note,
+                buyer = product.buyer,
+                color = color,
+                day = product.day,
+                month = product.month,
+                year = product.year,
+                animalCountId = product.animalCountId,
+                typeProduct = product.animalCountId?.let { TypeProduct.ANIMAL },
+                isArchive = true,
+                isCardField = false
+            )
+        }
     }
 }
 
@@ -179,6 +227,7 @@ private fun SaleContainer(
     itemList: List<DomainSaleTable>,
     searchList: List<DomainSaleTable>,
     brieflyList: List<BrieflyItem>,
+    searchBrieflyList: List<BrieflyItem>,
     onDetailsCardClick: (Long) -> Unit,
     onEditClick: (DomainSaleTable) -> Unit,
     onDeleteClick: (Long) -> Unit,
@@ -189,7 +238,7 @@ private fun SaleContainer(
         details = details,
         itemList = itemList,
         searchList = searchList,
-        brieflyList = brieflyList,
+        brieflyList = brieflyList, searchBrieflyList = searchBrieflyList,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -204,7 +253,7 @@ private fun SaleContainer(
                 year = item.year,
                 buyer = item.buyer,
                 animalCountId = item.animalCountId,
-                colors = item.animalCountId?.let { listOf(white, green_g_4) },
+                typeProduct = item.animalCountId?.let { TypeProduct.ANIMAL },
                 isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item) },
@@ -233,7 +282,7 @@ private fun SaleContainer(
             icon = iconRes
         ),
         iconColor = blue_1,
-        backgroundColor = blue_3,isArchive = isArchive
+        backgroundColor = blue_3, isArchive = isArchive
     )
 }
 
@@ -261,7 +310,6 @@ private fun BrieflyBottomSheetSale(
             onDismissRequest = onDismissRequest,
             itemCard = { product ->
                 DetailProductCardNew(
-                    modifier = Modifier,
                     isCardField = false,
                     count = product.count,
                     suffix = product.countSuffix,
@@ -274,8 +322,7 @@ private fun BrieflyBottomSheetSale(
                     year = product.year,
                     animalCountId = product.animalCountId,
                     isArchive = isArchive,
-                    colors = product.animalCountId?.let { listOf(white, green_g_4) },
-                    onClick = {},
+                    typeProduct = product.animalCountId?.let { TypeProduct.ANIMAL },
                     onDeleteClick = { onDeleteClick(product.id) },
                     onEditClick = { onEditClick(product) },
                 )
@@ -356,12 +403,11 @@ private fun SaleEntryBottomSheet(
             countSuffix = state.countSuffix,
             priceSuffix = priceSuffix,
         )
-        if (!state.isIndicatorsValue)
-            OutlinedTextCategoryNew(
-                value = state.category,
-                onValueChange = { onIntent(SaleListIntent.CategoryChanged(it)) },
-                titleList = state.pickList.categoryList,
-            )
+        OutlinedTextCategoryNew(
+            value = state.category,
+            onValueChange = { onIntent(SaleListIntent.CategoryChanged(it)) },
+            titleList = state.pickList.categoryList,
+        )
         if (!state.isIndicatorsValue)
             OutlinedTextDateNew(
                 value = state.date,

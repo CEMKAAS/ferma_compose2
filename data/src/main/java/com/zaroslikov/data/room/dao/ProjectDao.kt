@@ -40,7 +40,7 @@ interface ProjectDao {
     /*  @Query("SELECT * from project_table Where TYPE =:type and mode = 0 and archive = 1")
       fun getIncubatorListArh6(type: String): Flow<List<ProjectTable>>
   */
-    @Query("SELECT * from project_table Where mode = 0 and archive = 0")
+    @Query("SELECT * from project_table Where mode = 1 and archive = 0")
     fun getProjectListAct(): Flow<List<ProjectTable>>
 
     @Query("SELECT COUNT(*) AS row_count from project_table Where mode = 0")

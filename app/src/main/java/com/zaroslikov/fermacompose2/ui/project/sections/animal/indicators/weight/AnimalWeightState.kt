@@ -10,8 +10,10 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class AnimalWeightState(
     val weightList: List<AnimalWeightUi> = emptyList(),
+    val deleteWeight: AnimalWeightUi? = null,
     val idPT: Long = 0,
     val isOpenEntryBottomSheet: Boolean = false,
+    val isOpenBottomSheetDelete: Boolean = false,
     val isSaveStateForEntry: Boolean = false,
     override val isEntry: Boolean = false,
     override val isLoading: Boolean = true,
