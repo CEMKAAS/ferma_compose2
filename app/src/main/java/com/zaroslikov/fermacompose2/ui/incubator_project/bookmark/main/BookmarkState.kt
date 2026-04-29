@@ -16,6 +16,7 @@ data class BookmarkState(
     val isOpenCompleteIncubationBottomSheet: Boolean = false,
     val isOpenEarlyCompleteIncubationBottomSheet: Boolean = false,
     val isBookmarkCompleted: Boolean = false,
+    val isCompletedEventHandled: Boolean = false,
     val domainBookmark: DomainBookmark = DomainBookmark(),
     val numberDays: Int = 0,
     val percent: Double = 0.0,

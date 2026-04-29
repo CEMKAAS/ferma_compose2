@@ -27,7 +27,11 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             INSERT INTO project_table(
                 id, title, date, date_end, mode, archive, imagePath, currentIcon
             )
-            SELECT _id, NAME, DATA, DATAEND, mode, NULL, NULL FROM МyINCUBATOR WHERE mode = 1
+            SELECT _id, NAME, DATA, DATAEND, mode, 
+            CASE
+               WHEN arhive = '0' THEN 0
+               ELSE 1
+            END, NULL, NULL FROM МyINCUBATOR WHERE mode = 1
         """.trimIndent()
         )
 
@@ -140,7 +144,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
               INSERT INTO time_notification_table(
                 time, note, bookmark_id
               )
-                SELECT _id,'12:00',null,id FROM МyINCUBATOR WHERE mode = 0
+                SELECT '12:00',null,_id FROM МyINCUBATOR WHERE mode = 0
           """.trimIndent()
         )
 
@@ -424,7 +428,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             """
             INSERT INTO write_off_table (
-                _id, title, count, count_suffix, price, price_all, price_suffix category, day, month, year,
+                _id, title, count, count_suffix, price, price_all, price_suffix, category, day, month, year,
                 status, note, idPT, animal_count_id
             )
             SELECT _id, titleWRITEOFF, discWRITEOFF, 
@@ -626,6 +630,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 count_suffix,
                 category,
                 note,
+                is_food,
                 is_show_food,
                 feed_food,
                 feed_food_suffix,
@@ -655,6 +660,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 1 AS count_suffix,
                 'Покупка животных' AS category,
                 note,
+                0 AS isFood,
                 0 AS is_show_food,
                 NULL AS feed_food,
                 NULL AS feed_food_suffix,

@@ -94,6 +94,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.compose.animation.core)
     testImplementation("org.testng:testng:6.9.6")
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")

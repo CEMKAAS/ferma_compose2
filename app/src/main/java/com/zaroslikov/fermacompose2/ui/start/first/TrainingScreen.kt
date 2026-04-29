@@ -2,6 +2,8 @@ package com.zaroslikov.fermacompose2.ui.start.first
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -368,30 +370,36 @@ private fun ButtonBar(
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (!isFirst)
-                BorderCard(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .wrapContentWidth(),
-                    onClick = onLastClick,
-                    padding = PaddingValues(14.dp)
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+            AnimatedVisibility(
+                visible = !isFirst
+            ) {
+                Row {
+                    BorderCard(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .wrapContentWidth(),
+                        onClick = onLastClick,
+                        padding = PaddingValues(14.dp)
                     ) {
-                        Icon(
-                            painterResource(R.drawable.outline_keyboard_arrow_left_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.outline_keyboard_arrow_left_24),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
+                    Spacer(modifier = Modifier.padding(horizontal = 6.dp))
                 }
+            }
             GradientButton(
                 modifier = Modifier
-                    .weight(1f),
+                    .weight(1f)
+                    .animateContentSize(),
                 paddingValues = PaddingValues(vertical = 16.dp),
                 colors = listOf(green_6, green_shamrock),
                 text = stringResource(if (!isLast) R.string.button_further else R.string.button_begin_work),

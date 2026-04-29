@@ -148,9 +148,9 @@ class BookmarkViewModel @Inject constructor(
                             isCompleteModeEnd = currentDay > numberDays - 1,
                         )
                     }
-                    if (isBookmarkCompleted && !getState().isBookmarkCompleted) {
+                    if (isBookmarkCompleted && !getState().isCompletedEventHandled) {
                         updateState { state ->
-                            state.copy(isBookmarkCompleted = true)
+                            state.copy(isCompletedEventHandled = true)
                         }
                         updateCompleteIncubationBottomSheet(true)
                     }
@@ -779,7 +779,7 @@ class BookmarkViewModel @Inject constructor(
                         year = dateList[2].toInt(),
                         price = it,
                         priceAll = domainBookmark.priceAll,
-                        priceSuffix = if (isInsertNewProject) currencySuffix else currencySuffix , //TODO
+                        priceSuffix = if (isInsertNewProject) currencySuffix else currencySuffix, //TODO
                         countSuffix = Suffix.PIECES,
                         category = resourceProvider.getString(R.string.bookmark_screen_expenses_animal_category)
                             .format(incubatorName),

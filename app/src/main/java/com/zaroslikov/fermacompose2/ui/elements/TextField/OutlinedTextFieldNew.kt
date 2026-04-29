@@ -525,15 +525,14 @@ fun OutlinedTextDateNew(
     }
     val textField: @Composable () -> Unit = {
         BaseOutlinedTextNew(
-            modifier = Modifier.clickable(onClick = { openDialog = !openDialog }),
+            onClick = {openDialog = !openDialog },
             value = date,
-            onValueChange = { openDialog = !openDialog },
+            onValueChange = {  },
             readOnly = true,
             enabled = enable,
             labelIntRes = intRes,
             intResSup = intResSup,
             leadingIconRes = drawableRes,
-            leadingIconClick = { openDialog = !openDialog }
         )
     }
     if (isBorderCard) BorderCard(

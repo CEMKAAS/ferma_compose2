@@ -381,6 +381,7 @@ fun AddEntryBottomSheet(
         if (!state.isIndicatorsValue)
             OutlinedTextDateNew(
                 value = state.date,
+
                 onValueChange = { onIntent(AddListIntent.Date(it)) }
             )
         if (!state.isIndicatorsValue)

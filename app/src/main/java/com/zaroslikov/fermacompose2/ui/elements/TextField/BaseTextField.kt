@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.elements.TextField
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -64,6 +65,7 @@ fun BaseOutlinedTextNew(
     onSuffixChance: ((Suffix) -> Unit)? = null,
     trailingIcon: Int? = null,
     onTrailingChance: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
     onClear: () -> Unit = {},
     versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     isError: Boolean = false,
@@ -92,39 +94,6 @@ fun BaseOutlinedTextNew(
 ) {
 
     val isDisabled = !enabled
-    val leadingIcon: @Composable (() -> Unit)? = if (leadingIconRes != null) {
-        {
-            IconButton(onClick = { leadingIconClick() }) {
-                Icon(
-                    painter = painterResource(leadingIconRes),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 5.dp)
-                )
-            }
-        }
-    } else null
-
-
-    val trailingIcon: @Composable (() -> Unit)? = when {
-        onSuffixChance != null -> {
-            { GetDropDownMenu(versionDropMenu) { onSuffixChance(it) } }
-        }
-
-        onTrailingChance != null -> {
-            {
-                IconButton(onClick = { onTrailingChance() }) {
-                    trailingIcon?.let {
-                        Icon(
-                            painter = painterResource(it),
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        }
-
-        else -> null
-    }
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
@@ -163,6 +132,13 @@ fun BaseOutlinedTextNew(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(
+                    enabled = enabled,
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onClick?.invoke()
+                }
                 .background(
                     color = when {
                         isDisabled -> Color(0xFFF2F2F2)
@@ -218,8 +194,8 @@ fun BaseOutlinedTextNew(
                     ),
                     cursorBrush = SolidColor(Color(0xFF007AFF)),
                     singleLine = singleLine,
-                    readOnly = readOnly,
-                    enabled = enabled,
+                    readOnly = if (onClick != null) true else readOnly,
+                    enabled = if (onClick != null) false else enabled,
                     interactionSource = interactionSource,
                     decorationBox = { innerTextField ->
                         Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {

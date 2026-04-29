@@ -4,6 +4,15 @@ package com.zaroslikov.fermacompose2.ui.project.sections
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -164,15 +173,51 @@ private fun <T, B> InventoryList(
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
 ) {
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        if (details)
-            itemsIndexed(items = itemList) { index, item -> detailCard(index, item) }
-        else
-            items(items = brieflyList) { item -> brieflyCard(item) }
+    AnimatedContent(
+        targetState = details,
+        transitionSpec = {
+
+            val enter = fadeIn(
+                animationSpec = spring(
+                    dampingRatio = 0.8f, // было ~0.5–0.6 → меньше bounce
+                    stiffness = 500f
+                )
+            ) + scaleIn(
+                initialScale = 0.97f, // было 0.9 → теперь почти незаметно
+                animationSpec = spring(
+                    dampingRatio = 0.8f,
+                    stiffness = 500f
+                )
+            ) + slideInVertically(
+                initialOffsetY = { it / 24 } // было /3 → теперь слабее
+            )
+
+            val exit = fadeOut(
+                animationSpec = tween(150)
+            ) + scaleOut(
+                targetScale = 0.95f
+            )
+
+            enter togetherWith exit
+        },
+        label = ""
+    ) { targetDetails ->
+
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = PaddingValues(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (targetDetails) {
+                itemsIndexed(itemList) { index, item ->
+                    detailCard(index, item)
+                }
+            } else {
+                items(brieflyList) { item ->
+                    brieflyCard(item)
+                }
+            }
+        }
     }
 }
 
