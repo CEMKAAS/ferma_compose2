@@ -70,10 +70,9 @@ import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
-import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelDetailNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.ProductKill
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_3
@@ -354,14 +353,13 @@ fun AnimalIndicatorsCardNew(
         onDetailClick = { details = !details },
         noteContainer = {
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
                 visible = details
             ) {
                 BaseDetailsAnimalIndication(
                     value = totalValues,
                     suffix = suffix,
+                    note = note,
                     status = indicationStatus,
-                    note = note
                 )
             }
         }
@@ -381,7 +379,8 @@ fun AnimalCountCardNew(
     productKill: List<ProductKill>,
     indicationStatus: IndicationStatus,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    currencyPriceSuffix: Suffix
 ) {
     var details by rememberSaveable { mutableStateOf(false) }
     AnimalIndicatorsCardBase(
@@ -395,7 +394,6 @@ fun AnimalCountCardNew(
         isArchive = isArchive,
         noteContainer = {
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
                 visible = details
             ) {
                 BaseDetailsAnimalIndication(
@@ -403,6 +401,7 @@ fun AnimalCountCardNew(
                     suffix = suffix,
                     price = price?.formatNumber(),
                     status = indicationStatus,
+                    currencyPriceSuffix = currencyPriceSuffix,
                     note = note,
                     productKill = productKill
                 )
@@ -447,8 +446,8 @@ fun AnimalVaccinationCardNew(
                 BaseDetailsAnimalIndication(
                     value = price?.formatNumber(),
                     suffix = suffix,
-                    status = IndicationStatus.PRICE,
                     note = note,
+                    status = IndicationStatus.PRICE,
                 )
             }
         }
@@ -460,9 +459,10 @@ fun BaseDetailsAnimalIndication(
     value: String?,
     suffix: Suffix,
     price: String? = null,
+    currencyPriceSuffix: Suffix? = null,
     note: String,
     status: IndicationStatus,
-    productKill: List<ProductKill> = emptyList()
+    productKill: List<ProductKill> = emptyList(),
 ) {
     HorizontalDivider(
         modifier = Modifier.fillMaxWidth(),
@@ -477,15 +477,14 @@ fun BaseDetailsAnimalIndication(
     ) {
         value?.let {
             when (status) {
-                IndicationStatus.EXPENSES, IndicationStatus.SALE, IndicationStatus.WRITE_OFF -> {
+                IndicationStatus.EXPENSES, IndicationStatus.SALE, IndicationStatus.WRITE_OFF, IndicationStatus.INCUBATOR -> {
                     CardIndicationChangeChoice(value, suffix, status)
-                    price?.let {
+                    if (price != null && currencyPriceSuffix != null)
                         CardIndicationChangeChoice(
                             price,
-                            Suffix.RUBLE,
+                            currencyPriceSuffix,
                             IndicationStatus.PRICE
                         )
-                    }
                 }
 
                 IndicationStatus.KILL -> {
@@ -570,7 +569,7 @@ fun CardIndicationChangeChoice(
     status: IndicationStatus
 ) {
     val colors = when (status) {
-        IndicationStatus.POSITIVE, IndicationStatus.PRICE, IndicationStatus.ADD, IndicationStatus.ALL_WEIGHT ->
+        IndicationStatus.POSITIVE, IndicationStatus.PRICE, IndicationStatus.ADD, IndicationStatus.ALL_WEIGHT, IndicationStatus.INCUBATOR ->
             Triple(green_g_2, green_1, green_2)
 
         IndicationStatus.NEUTRAL -> Triple(grey_2, grey, grey_3)
@@ -603,6 +602,7 @@ fun CardIndicationChangeChoice(
             IndicationStatus.KILL -> R.string.animal_count_screen_kill_animal
             IndicationStatus.ALL_WEIGHT -> R.string.animal_card_screen_animal_card_info_weight_all
             IndicationStatus.EXPENSES -> R.string.animal_count_screen_expenses_animal
+            IndicationStatus.INCUBATOR -> R.string.animal_count_screen_incubator_animal
             else -> R.string.animal_indicators_changed
         }
     )

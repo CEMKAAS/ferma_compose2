@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -92,11 +93,11 @@ fun EntryBookmarkTwoScreen(
         modifier = modifier
             .padding(horizontal = 16.dp)
             .padding(bottom = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (bookmarkList.isNotEmpty())
             TemplatesCard(indexBookmark, isTemplatesPlan, bookmarkList, onIntent)
         WarningCard(indexBookmark)
+        Spacer(Modifier.padding(vertical = 8.dp))
         CardFieldNew(padding = PaddingValues()) {
             TitleRow()
             parametersDayList.forEachIndexed { index, parameter ->
@@ -133,32 +134,33 @@ private fun TemplatesCard(
         shape = RoundedCornerShape(14.dp),
         onClick = { isShowFastAddProduct = !isShowFastAddProduct }
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    stringResource(R.string.entry_bookmark_templates_previous_bookmarks),
-                    style = text_16,
-                    color = black_2
-                )
-                Icon(
-                    painterResource(icon),
-                    contentDescription = null,
-                    tint = gray_7
-                )
+        Column {
+            Column {
+                Spacer(Modifier.padding(vertical = 2.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        stringResource(R.string.entry_bookmark_templates_previous_bookmarks),
+                        style = text_16,
+                        color = black_2
+                    )
+                    Icon(
+                        painterResource(icon),
+                        contentDescription = null,
+                        tint = gray_7
+                    )
+                }
             }
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
                 visible = isShowFastAddProduct
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    Spacer(Modifier.padding(vertical = 2.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -395,19 +397,21 @@ private fun WarningCard(
     indexBookmark: Long
 ) {
     AnimatedVisibility(
-        modifier = Modifier.fillMaxWidth(),
         visible = indexBookmark == 0L
     ) {
-        WarningCard(
-            colorBackground = orang_4,
-            colorBorder = orang_5,
-            colorIcon = orang_2,
-            colorIconBackground = Color(0xFFFEF3C6),
-            colorTitle = Color(0xFF7B3306),
-            colorText = orang_6,
-            icon = R.drawable.icon_warning,
-            title = R.string.entry_bookmark_warning_title,
-            text = R.string.entry_bookmark_warning_text
-        )
+        Column {
+            Spacer(modifier = Modifier.padding(vertical = 8.dp))
+            WarningCard(
+                colorBackground = orang_4,
+                colorBorder = orang_5,
+                colorIcon = orang_2,
+                colorIconBackground = Color(0xFFFEF3C6),
+                colorTitle = Color(0xFF7B3306),
+                colorText = orang_6,
+                icon = R.drawable.icon_warning,
+                title = R.string.entry_bookmark_warning_title,
+                text = R.string.entry_bookmark_warning_text
+            )
+        }
     }
 }

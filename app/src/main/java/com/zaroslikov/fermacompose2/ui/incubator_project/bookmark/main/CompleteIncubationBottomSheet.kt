@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_2
@@ -64,7 +65,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.IconToggle
 import com.zaroslikov.fermacompose2.white
 import kotlin.collections.forEach
@@ -85,6 +86,7 @@ fun CompleteIncubationBottomSheet(
     precent: Double,
     percentFloat: Float,
     isErrorCompleted: Boolean,
+    currencySuffix: Suffix,
     projectList: List<DomainProjectTable>,
     onIntent: (BookmarkIntent) -> Unit
 ) {
@@ -214,7 +216,8 @@ fun CompleteIncubationBottomSheet(
                 onValueChange = { onIntent(BookmarkIntent.ChicksPriceChanged(it)) },
                 intRes = R.string.bookmark_screen_price_chick,
                 intResSup = R.string.bookmark_screen_support_price_chick,
-                drawableRes = R.drawable.icon_money
+                drawableRes = R.drawable.icon_money,
+                suffix = currencySuffix
             )
             AnimatedVisibility(
                 modifier = Modifier.fillMaxWidth(),

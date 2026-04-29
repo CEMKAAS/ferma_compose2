@@ -40,6 +40,8 @@ data class WriteOffTable(
     val price: Double?,
     @ColumnInfo(name = "price_all")
     val priceAll: Double?,
+    @ColumnInfo(name = "price_suffix")
+    val priceSuffix: Suffix?,
     @ColumnInfo(name = "category")
     val category: String,
     @ColumnInfo(name = "day")

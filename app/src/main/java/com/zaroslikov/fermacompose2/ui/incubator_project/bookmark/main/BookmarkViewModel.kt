@@ -82,7 +82,8 @@ class BookmarkViewModel @Inject constructor(
                     itemIdPT = itemIdPT,
                     incubatorId = incubator.id,
                     incubatorName = incubator.title,
-                    isArchive = isArchive
+                    isArchive = isArchive,
+                    currencySuffix = incubator.currencySuffix
                 )
             }
             bookmarkRepository.getActivityBookmark(incubator.id)
@@ -657,7 +658,7 @@ class BookmarkViewModel @Inject constructor(
         viewModelScope.launch {
             when (getState().completeState.isChoiceProjectMode) {
                 true -> insertIntoNewProject()
-                false -> insertIntoProjectAnimal(getState().completeState.indexProject)
+                false -> insertIntoProjectAnimal(getState().completeState.indexProject, false)
                 null -> bookmarkToArchive()
             }
             updateCompleteIncubationBottomSheet(false)
@@ -667,21 +668,27 @@ class BookmarkViewModel @Inject constructor(
     private suspend fun insertIntoNewProject() {
         val id = projectRepository.insertProjectLong(insertDomainProject())
         settingsRepository.insertSettings(insertDomainSettings(id))
-        insertIntoProjectAnimal(id)
+        insertIntoProjectAnimal(id, true)
     }
 
-    private suspend fun insertIntoProjectAnimal(idPT: Long) {
-        insertAnimalToProject(itemIdPT = idPT)
+    private suspend fun insertIntoProjectAnimal(idPT: Long, isInsertNewProject: Boolean) {
+        insertAnimalToProject(itemIdPT = idPT, isInsertNewProject)
         bookmarkToArchive()
     }
 
-    private suspend fun insertAnimalToProject(itemIdPT: Long) {
+    private suspend fun insertAnimalToProject(itemIdPT: Long, isInsertNewProject: Boolean) {
         val idAnimal = animalRepository.insertAnimalTable(
             getState().domainBookmark.toDomainAnimalTable(itemIdPT = itemIdPT)
         )
-        val pair = getState().updateForSave(idAnimal, itemIdPT)
-        animalCountRepository.insertAnimalCountTable(pair.first)
-        pair.second?.let { expensesRepository.insertExpenses(it) }
+        val pair = getState().updateForSave(idAnimal, itemIdPT, isInsertNewProject)
+        val animalCountId = animalCountRepository.insertAnimalCountTable(pair.first)
+        pair.second?.let {
+            expensesRepository.insertExpenses(
+                it.copy(
+                    animalCountId = animalCountId
+                )
+            )
+        }
     }
 
     private suspend fun bookmarkToArchive(
@@ -694,7 +701,7 @@ class BookmarkViewModel @Inject constructor(
         val rejectedCount = if (isEarlyCompletionStatus) getState().domainBookmark.count
         else getState().completeState.rejectedEggCompleted
 
-        Log.i("bookmark_early", "bookmarkToArchive: ${getState().domainBookmark }")
+        Log.i("bookmark_early", "bookmarkToArchive: ${getState().domainBookmark}")
         bookmarkRepository.update(
             getState().domainBookmark.copy(
                 isActivityBookmark = false,
@@ -705,9 +712,11 @@ class BookmarkViewModel @Inject constructor(
                 note = note ?: getState().domainBookmark.note
             )
         )
-        updateState { state ->state.copy(
-            domainBookmark = DomainBookmark()
-        ) }
+        updateState { state ->
+            state.copy(
+                domainBookmark = DomainBookmark()
+            )
+        }
         updateNotifications()
     }
 
@@ -746,7 +755,8 @@ class BookmarkViewModel @Inject constructor(
 
     private fun BookmarkState.updateForSave(
         idAnimal: Long,
-        itemIdPT: Long
+        itemIdPT: Long,
+        isInsertNewProject: Boolean
     ): Pair<DomainAnimalCount, DomainExpensesTable?> {
         val dateFactory2 = dateToday()
         val dateList = dateFactory2.split(".")
@@ -755,7 +765,8 @@ class BookmarkViewModel @Inject constructor(
             count = domainBookmark.count.toString(),
             suffix = Suffix.PIECES,
             date = dateToday(),
-            note = resourceProvider.getString(R.string.bookmark_screen_animal_count),
+            note = resourceProvider.getString(R.string.bookmark_screen_expenses_animal_note)
+                .format(incubatorName),
             version = AnimalCountVersion.INCUBATOR,
             idAnimal = idAnimal
         ) to
@@ -764,10 +775,11 @@ class BookmarkViewModel @Inject constructor(
                         title = domainBookmark.title,
                         count = domainBookmark.count.toDouble(),
                         day = dateList[0].toInt(),
-                        month = dateList[0].toInt(),
-                        year = dateList[0].toInt(),
+                        month = dateList[1].toInt(),
+                        year = dateList[2].toInt(),
                         price = it,
                         priceAll = domainBookmark.priceAll,
+                        priceSuffix = if (isInsertNewProject) currencySuffix else currencySuffix , //TODO
                         countSuffix = Suffix.PIECES,
                         category = resourceProvider.getString(R.string.bookmark_screen_expenses_animal_category)
                             .format(incubatorName),

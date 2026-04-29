@@ -53,7 +53,7 @@ interface AnimalCountDao {
                 ELSE
                    COALESCE((SELECT SUM(
                         CASE
-                            WHEN version IN (1, 4) THEN count
+                            WHEN version IN (1, 4, 5) THEN count
                             WHEN version IN (0, 2, 3) THEN -count
                             ELSE 0
                         END
@@ -77,13 +77,13 @@ interface AnimalCountDao {
         "SELECT id, count, suffix, date, animal_id, note, version," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)" +
-                "        WHEN version = 1 THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)" +
+                "        WHEN version IN (1, 5) THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT price FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS price," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT price_all FROM sale_table WHERE animal_count_id = id)" +
-                "        WHEN version = 1 THEN (SELECT price_all FROM expenses_table WHERE animal_count_id = id)" +
+                "        WHEN version IN (1, 5) THEN (SELECT price_all FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT price_all FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS price_all," +
@@ -93,13 +93,13 @@ interface AnimalCountDao {
                 "    END AS buyer," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT _id FROM sale_table WHERE animal_count_id = id)" +
-                "        WHEN version = 1 THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)" +
+                "        WHEN version IN (1, 5) THEN (SELECT _id FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT _id FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS table_id," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT idPT FROM sale_table WHERE animal_count_id = id)" +
-                "        WHEN version = 1 THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)" +
+                "        WHEN version IN (1, 5) THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
                 "    END AS idPT" +

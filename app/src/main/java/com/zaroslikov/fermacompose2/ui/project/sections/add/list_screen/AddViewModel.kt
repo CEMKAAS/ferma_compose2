@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
 import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AddRepository
@@ -21,7 +20,7 @@ import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
@@ -30,9 +29,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.component1
@@ -307,6 +304,7 @@ class AddViewModel @Inject constructor(
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
             countSuffix = countSuffix,
+            priceSuffix = getState().settings.currencySuffix,
             category = category.trim(),
             animalId = animalId,
             note = note.trim(),

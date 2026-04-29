@@ -8,6 +8,7 @@ import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
@@ -42,6 +43,8 @@ data class AnimalCountState(
     val countAnimal: String? = "",
     val countAnimalSuffix: Suffix = Suffix.PIECES,
 
+    val settings: DomainSettings = DomainSettings(),
+
     val countList: List<DomainAnimalCountPriceUi> = emptyList(),
     val isSaveStateForEntry: Boolean = false,
     val saveAnimalCountVersion: AnimalCountVersion? = null,
@@ -65,7 +68,7 @@ data class CountItem(
     val priceAll: String = "",
     val isAutoCalculate: Boolean = false,
     val buyer: String = "",
-    val tableId: Long = 0,
+    val tableId: Long? = null,
     val itemIdPT: Long = 0,
     val isEntry: Boolean = true,
     val error: ErrorCount = ErrorCount(),
@@ -122,4 +125,11 @@ data class DomainAnimalCountPriceUi(
     val tableId: Long? = null,
     val idPT: Long? = null,
     val productKill: List<ProductKill> = emptyList()
+)
+
+data class LoadDataAnimalCount(
+    val animal: DomainAnimalTable,
+    val count: DomainAnimalCount?,
+    val uiCountList: List<DomainAnimalCountPriceUi>,
+    val settings: DomainSettings
 )

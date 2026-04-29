@@ -5,10 +5,7 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalUi
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 
 class AnimalListReduce(private val resourceProvider: ResourceProvider) :

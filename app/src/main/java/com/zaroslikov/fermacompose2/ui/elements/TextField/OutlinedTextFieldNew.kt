@@ -69,13 +69,13 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.AutoCalculateCheckbox
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.text_14
-import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.AutoWeightCheckbox
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.MinDateSelectableDates
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.TimePicker
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.violet_1
 
 @Composable

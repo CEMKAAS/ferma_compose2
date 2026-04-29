@@ -13,6 +13,7 @@ data class DomainWriteOffTable(
     override val countSuffix: Suffix,
     override val price: Double? = null,
     override val priceAll: Double? = null,
+    val priceSuffix: Suffix? = null,
     val category: String = "",
     val day: Int,
     val month: Int,

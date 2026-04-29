@@ -9,6 +9,7 @@ fun AnimalCountVersion.toIndicationStatus(): IndicationStatus {
         AnimalCountVersion.EXPENSES -> IndicationStatus.EXPENSES
         AnimalCountVersion.KILL -> IndicationStatus.KILL
         AnimalCountVersion.WRITE_OFF -> IndicationStatus.WRITE_OFF
-        else -> IndicationStatus.ADD
+        AnimalCountVersion.INCUBATOR -> IndicationStatus.INCUBATOR
+        AnimalCountVersion.ADD -> IndicationStatus.ADD
     }
 }

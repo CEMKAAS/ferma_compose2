@@ -39,7 +39,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedNumberNew
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 
 @Composable
 fun AlertDialogWeightAnimal(

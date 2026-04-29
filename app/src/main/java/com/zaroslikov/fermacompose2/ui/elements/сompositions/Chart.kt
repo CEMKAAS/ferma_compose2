@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import kotlin.math.roundToInt
 
 

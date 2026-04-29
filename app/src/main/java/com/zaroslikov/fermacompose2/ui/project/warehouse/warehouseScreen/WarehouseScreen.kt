@@ -4,12 +4,17 @@ package com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -90,7 +95,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseViewModel
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
@@ -458,6 +463,7 @@ private fun FastAdd(
         if (isShowFastAddProduct) R.drawable.icon_keyboard_arrow_up else R.drawable.icon_keyboard_arrow_down
 
     Card(
+        modifier = Modifier,
         onClick = { onShowClick(!isShowFastAddProduct) },
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
@@ -469,8 +475,7 @@ private fun FastAdd(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -498,13 +503,15 @@ private fun FastAdd(
                     tint = blue_1
                 )
             }
+
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
-                visible = isShowFastAddProduct
+                visible = isShowFastAddProduct,
             ) {
                 Column(
+                    modifier = Modifier.animateContentSize(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    Spacer(Modifier.padding(vertical = 8.dp))
                     list.forEach {
                         FastAddCard(
                             title = it.title,

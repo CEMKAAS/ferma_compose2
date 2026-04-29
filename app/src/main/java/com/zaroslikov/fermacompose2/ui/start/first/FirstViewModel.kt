@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.start.first
 
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
@@ -18,6 +19,8 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -87,9 +90,12 @@ class FirstViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
-            var appSettings = appSettingsRepository.getAppSettings().first()
-            appSettings = updateLastVersion(appSettings)
-            projectRepository.getAllProject().collect { baseList ->
+            combine(
+                appSettingsRepository.getAppSettings(),
+                projectRepository.getAllProject()
+            ) { appSettings, projects ->
+                updateLastVersion(appSettings) to projects
+            }.collectLatest { (appSettings, baseList) ->
                 val list = baseList.filter { !it.archive }
                 val archiveList = baseList.filter { it.archive }
                 updateState {
@@ -204,7 +210,13 @@ class FirstViewModel @Inject constructor(
 
     private fun updateFirstLaunch() {
         viewModelScope.launch {
-            updateSettings()
+            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
+            updateSettings(
+                domainAppSettings = getState().appSettings.copy(
+                    isFirstLaunch = false
+                )
+            )
+            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
             _notification.emit(UiNotification.Notification)
         }
     }

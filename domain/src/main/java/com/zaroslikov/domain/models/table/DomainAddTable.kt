@@ -13,6 +13,7 @@ data class DomainAddTable(
     val year: Int,
     val price: Double,
     val countSuffix: Suffix,
+    val priceSuffix: Suffix = Suffix.RUBLE,
     val category: String,
     val animalId: Long? = null,
     val note: String,

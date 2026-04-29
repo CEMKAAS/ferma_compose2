@@ -7,5 +7,5 @@ data class DomainAppSettings(
     val id: Long = 0,
     val lastVersionApp: String? = null,
     val currentVersionApp: String = "3.0.0",
-    val isFirstLaunch: Boolean = true
+    val isFirstLaunch: Boolean = false
 )

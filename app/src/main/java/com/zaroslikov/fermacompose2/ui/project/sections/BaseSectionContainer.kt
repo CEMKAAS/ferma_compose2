@@ -70,7 +70,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.DetailBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food

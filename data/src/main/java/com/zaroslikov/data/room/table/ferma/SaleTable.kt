@@ -47,6 +47,8 @@ data class SaleTable(
     val price: Double,
     @ColumnInfo(name = "price_all")
     val priceAll: Double?,
+    @ColumnInfo(name = "price_suffix")
+    val priceSuffix: Suffix,
     @ColumnInfo(name = "day")
     val day: Int,  // день
     @ColumnInfo(name = "month")

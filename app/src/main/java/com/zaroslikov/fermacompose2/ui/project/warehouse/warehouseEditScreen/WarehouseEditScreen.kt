@@ -2,6 +2,9 @@
 
 package com.zaroslikov.fermacompose2.ui.warehouse
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,12 +16,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +34,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +44,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -83,8 +86,6 @@ import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.toFullResId
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.add.saveImageToInternalStorage
-import com.zaroslikov.fermacompose2.ui.add.uriToByteArray
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
@@ -98,12 +99,12 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_20
-import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.DatePickerDialogSample
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.NotificationFun
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.PastOrPresentSelectableDates
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.NotificationParameters
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditIntent
@@ -115,6 +116,8 @@ import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_6
 import com.zaroslikov.fermacompose2.violet_7
 import com.zaroslikov.fermacompose2.white
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 
 object WarehouseEditDestination : NavigationDestination {
@@ -253,38 +256,39 @@ fun MainSettingsCard(
     var expanded by remember { mutableStateOf(false) }
 
     CardFieldNew {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column {
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconTransaction2(
-                    modifier = Modifier.clickable { expanded = !expanded },
-                    imagePath = imagePath,
-                    currentIcon = currentIcon,
-                    color = iconBoxColor,
-                    sizeCard = 128.dp
-                )
-                Text(
-                    stringResource(R.string.add_incubator_screen_download_image),
-                    style = text_14,
-                    color = gray_7
-                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconTransaction2(
+                        modifier = Modifier.clickable { expanded = !expanded },
+                        imagePath = imagePath,
+                        currentIcon = currentIcon,
+                        color = iconBoxColor,
+                        sizeCard = 128.dp
+                    )
+                    Text(
+                        stringResource(R.string.add_incubator_screen_download_image),
+                        style = text_14,
+                        color = gray_7
+                    )
+                }
+                if (nameProject != null)
+                    OutlinedTextNew(
+                        value = nameProject,
+                        onValueChange = onValueChange,
+                        labelIntRes = R.string.warehouse_edit_screen_name_project,
+                        supportingText = R.string.warehouse_edit_screen_name_project_support,
+                        isBorderCard = false
+                    )
             }
-            if (nameProject != null)
-                OutlinedTextNew(
-                    value = nameProject,
-                    onValueChange = onValueChange,
-                    labelIntRes = R.string.warehouse_edit_screen_name_project,
-                    supportingText = R.string.warehouse_edit_screen_name_project_support,
-                    isBorderCard = false
-                )
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
                 visible = expanded
             ) {
                 Column(
@@ -317,6 +321,7 @@ fun MainSettingsCard(
         }
     }
 }
+
 
 @Composable
 private fun DateSettingsCard(
@@ -385,9 +390,7 @@ private fun NotificationCard(
     onIntent: (WarehouseEditIntent) -> Unit
 ) {
     CardFieldNew(padding = PaddingValues(horizontal = 20.dp, vertical = 15.dp)) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column {
             SD(
                 titleRes = R.string.warehouse_edit_screen_notification,
                 icon = R.drawable.baseline_notifications_none_24,
@@ -402,20 +405,23 @@ private fun NotificationCard(
             AnimatedVisibility(
                 visible = isShowNotification
             ) {
-                NotificationFun(
-                    notificationList = notificationList.filter { it.isVisibility },
-                    time = currentNotification.time,
-                    note = currentNotification.note,
-                    isEntry = currentNotification.isEntry,
-                    maxCount = 2,
-                    onChoiceClick = { onIntent(WarehouseEditIntent.ChoiceNotificationClicked(it)) },
-                    onRemoveClick = { onIntent(WarehouseEditIntent.RemoveNotificationClicked(it)) },
-                    onCancelClick = { onIntent(WarehouseEditIntent.CancelNotificationClicked) },
-                    onTimeChange = { onIntent(WarehouseEditIntent.TimeNotificationChanged(it)) },
-                    onNoteChange = { onIntent(WarehouseEditIntent.NoteNotificationChanged(it)) },
-                    onAddClick = { onIntent(WarehouseEditIntent.AddNotificationClicked) },
-                    onEditClick = { onIntent(WarehouseEditIntent.EditNotificationClicked) }
-                )
+                Column {
+                    Spacer(modifier = Modifier.padding(vertical = 8.dp))
+                    NotificationFun(
+                        notificationList = notificationList.filter { it.isVisibility },
+                        time = currentNotification.time,
+                        note = currentNotification.note,
+                        isEntry = currentNotification.isEntry,
+                        maxCount = 2,
+                        onChoiceClick = { onIntent(WarehouseEditIntent.ChoiceNotificationClicked(it)) },
+                        onRemoveClick = { onIntent(WarehouseEditIntent.RemoveNotificationClicked(it)) },
+                        onCancelClick = { onIntent(WarehouseEditIntent.CancelNotificationClicked) },
+                        onTimeChange = { onIntent(WarehouseEditIntent.TimeNotificationChanged(it)) },
+                        onNoteChange = { onIntent(WarehouseEditIntent.NoteNotificationChanged(it)) },
+                        onAddClick = { onIntent(WarehouseEditIntent.AddNotificationClicked) },
+                        onEditClick = { onIntent(WarehouseEditIntent.EditNotificationClicked) }
+                    )
+                }
             }
         }
     }
@@ -429,50 +435,52 @@ fun CurrencySettingsCard(
     onClick: (Suffix) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+
     CardFieldNew(
         onClick = { expanded = !expanded }
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+        Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconTransaction2(
-                        icon = R.drawable.icon_money,
-                        iconColor = baseColor,
-                        boxColor = secondColor,
-                        sizeCard = 36.dp
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            stringResource(R.string.warehouse_edit_screen_currency),
-                            style = text_16,
-                            color = black_2
+                        IconTransaction2(
+                            icon = R.drawable.icon_money,
+                            iconColor = baseColor,
+                            boxColor = secondColor,
+                            sizeCard = 36.dp
                         )
-                        Text(
-                            stringResource(currentCurrency.toFullResId()),
-                            style = text_14,
-                            color = gray_7
-                        )
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text(
+                                stringResource(R.string.warehouse_edit_screen_currency),
+                                style = text_16,
+                                color = black_2
+                            )
+                            Text(
+                                stringResource(currentCurrency.toFullResId()),
+                                style = text_14,
+                                color = gray_7
+                            )
+                        }
                     }
+                    TextMiniCard(
+                        value = stringResource(currentCurrency.toResId()),
+                        textColor = baseColor,
+                        backgroundColor = secondColor
+                    )
                 }
-                TextMiniCard(
-                    value = stringResource(currentCurrency.toResId()),
-                    textColor = baseColor,
-                    backgroundColor = secondColor
-                )
             }
             AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
                 visible = expanded
             ) {
                 Column(
@@ -500,6 +508,7 @@ fun CurrencySettingsCard(
         }
     }
 }
+
 
 @Composable
 private fun ImageCard(
@@ -644,63 +653,63 @@ private fun UnitsMeasurement(
     onClick: (Suffix) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-
-    Row(
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        VerticalDivider(modifier = Modifier.fillMaxHeight(), thickness = 4.dp, color = driverColor)
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = { expanded = !expanded }),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    Text(
-                        stringResource(titleRes),
-                        style = text_16,
-                        color = black_2
-                    )
-                    Text(
-                        stringResource(currentSuffix.toFullResId()) +
-                                " (${stringResource(currentSuffix.toResId())})",
-                        style = text_14,
-                        color = gray_7
-                    )
-                }
-                TextMiniCard(
-                    value = stringResource(currentSuffix.toResId()),
-                    textColor = textColor,
-                    backgroundColor = backgroundColor
+            .drawBehind {
+                val strokeWidth = 4.dp.toPx()
+                drawRect(
+                    color = driverColor,
+                    topLeft = Offset.Zero,
+                    size = Size(strokeWidth, size.height)
                 )
             }
-            AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
-                visible = expanded
+            .padding(start = 16.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listSuffix.forEach {
-                        CurrencyCard(
-                            isDone = currentSuffix == it,
-                            suffix = it,
-                            backgroundColor = backgroundColor,
-                            borderColor = borderColor,
-                            isCurrency = false
-                        ) {
-                            onClick(it)
-                            expanded = !expanded
-                        }
+                Text(
+                    text = stringResource(titleRes),
+                    style = text_16,
+                    color = black_2
+                )
+                Text(
+                    text = stringResource(currentSuffix.toFullResId()) +
+                            " (${stringResource(currentSuffix.toResId())})",
+                    style = text_14,
+                    color = gray_7
+                )
+            }
+            TextMiniCard(
+                value = stringResource(currentSuffix.toResId()),
+                textColor = textColor,
+                backgroundColor = backgroundColor
+            )
+        }
+        AnimatedVisibility(
+            visible = expanded
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Spacer(Modifier.padding(2.dp))
+                listSuffix.forEach { suffix ->
+                    CurrencyCard(
+                        isDone = currentSuffix == suffix,
+                        suffix = suffix,
+                        backgroundColor = backgroundColor,
+                        borderColor = borderColor,
+                        isCurrency = false
+                    ) {
+                        onClick(suffix)
+                        expanded = false
                     }
                 }
             }
@@ -725,4 +734,31 @@ private fun SaveButton(
         enabled = enabledButton,
         paddingValues = PaddingValues(vertical = 14.dp)
     )
+}
+
+fun uriToByteArray(context: Context, uri: Uri?): ByteArray? {
+    if (uri == null) return null
+
+    // Загружаем Bitmap из URI
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val bitmap = BitmapFactory.decodeStream(inputStream)
+
+    // Преобразуем Bitmap в ByteArray
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)
+    return byteArrayOutputStream.toByteArray()
+}
+
+fun saveImageToInternalStorage(
+    context: Context,
+    bytes: ByteArray
+): String {
+    val file = File(
+        context.filesDir,
+        "project_${System.currentTimeMillis()}.jpg"
+    )
+
+    file.writeBytes(bytes)
+
+    return file.absolutePath
 }

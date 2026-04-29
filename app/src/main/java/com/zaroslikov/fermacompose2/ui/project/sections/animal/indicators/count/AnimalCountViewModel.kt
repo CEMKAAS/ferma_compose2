@@ -19,6 +19,7 @@ import com.zaroslikov.domain.repository.AnimalWeightRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.R
@@ -28,7 +29,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CompletableDeferred
@@ -54,7 +55,8 @@ class AnimalCountViewModel @Inject constructor(
     private val resourceProvider: ResourceProvider,
     private val warehouseRepository: WarehouseRepository,
     private val projectRepository: ProjectRepository,
-    private val yandexMetricRepository: YandexMetricRepository
+    private val yandexMetricRepository: YandexMetricRepository,
+    private val settingRepository: SettingsRepository
 ) : EntryNewViewModel2<AnimalCountState, AnimalCountIntent, AnimalCountReduce>(
     AnimalCountState(),
     AnimalCountReduce()
@@ -107,6 +109,9 @@ class AnimalCountViewModel @Inject constructor(
             AnimalCountIntent.InsertExpensesPressed -> insertExpensesAnimal()
             AnimalCountIntent.UpdateExpensesPressed -> editExpensesAnimal()
 
+            // Incubator Animal
+            AnimalCountIntent.UpdateIncubatorPressed -> editIncubatorAnimal()
+
             // Kill Count Animal
             AnimalCountIntent.InsertKillChanged -> insertKillAnimal()
             AnimalCountIntent.EditKillChanged -> editKillAnimal()
@@ -122,22 +127,24 @@ class AnimalCountViewModel @Inject constructor(
             combine(
                 animalRepository.getAnimal(itemId),
                 animalCountRepository.getCountAnimalLimit(itemId),
-                animalCountRepository.getCountAnimal(itemId)
-            ) { animal, count, countList ->
+                animalCountRepository.getCountAnimal(itemId),
+                settingRepository.getSettings(itemIdPT)
+            ) { animal, count, countList, settings ->
                 val uiCountList = countList.map { item ->
                     val kills = updateOpenKillDialog(item.id)
                     item.toUi(productKill = kills)
                 }
-                Triple(animal, count, uiCountList)
+                LoadDataAnimalCount(animal, count, uiCountList, settings)
             }.collectLatest { data ->
                 updateState {
                     it.copy(
                         idPT = itemIdPT,
-                        animal = data.first,
-                        countAnimal = data.second?.count,
-                        countAnimalSuffix = data.second?.suffix ?: Suffix.PIECES,
-                        countList = data.third,
+                        animal = data.animal,
+                        countAnimal = data.count?.count,
+                        countAnimalSuffix = data.count?.suffix ?: Suffix.PIECES,
+                        countList = data.uiCountList,
                         weight = weight,
+                        settings = data.settings,
                         isLoading = false,
                         isArchive = isArchiveProject || isArchiveAnimal
                     )
@@ -328,6 +335,28 @@ class AnimalCountViewModel @Inject constructor(
             mainAction = {
                 animalCountRepository.updateAnimalCountTable(domainAnimalCount())
                 expensesRepository.updateExpenses(domainExpenses())
+            }
+        )
+    }
+
+    private fun editIncubatorAnimal() {
+        validation(
+            transaction = Transaction.UPDATE,
+            mainAction = {
+                animalCountRepository.updateAnimalCountTable(domainAnimalCount())
+                val expensesId = getState().currentProduct.tableId
+                val isNotPrice = getState().currentProduct.price.isBlank()
+
+                when {
+                    expensesId == null && isNotPrice ->
+                        expensesRepository.insertExpenses(domainExpenses())
+
+                    expensesId != null && !isNotPrice ->
+                        expensesRepository.updateExpenses(domainExpenses())
+
+                    expensesId != null && isNotPrice ->
+                        expensesRepository.deleteExpensesById(expensesId)
+                }
             }
         )
     }
@@ -610,6 +639,7 @@ class AnimalCountViewModel @Inject constructor(
             title = productKill.title,
             count = productKill.countProduct.toConvertZeroDouble(),
             countSuffix = productKill.suffixProduct,
+            priceSuffix = getState().settings.currencySuffix,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
@@ -631,28 +661,29 @@ class AnimalCountViewModel @Inject constructor(
         val state = getState().currentProduct
         val dateList = state.date.split(".")
         return DomainWriteOffTable(
-            id = state.tableId,
+            id = state.tableId ?: 0,
             title = getState().animal.name,
             count = state.count.toConvertDbDouble(),
             countSuffix = state.suffix,
             price = if (state.price.isBlank()) null else state.price.toConvertDbDouble(),
-            priceAll = if (state.isAutoCalculate) state.priceAll.toConvertDbDouble() else null,
+            priceAll = if (state.price.isBlank()) null else if (state.isAutoCalculate) state.priceAll.toConvertDbDouble() else null,
+            priceSuffix = if (state.price.isBlank()) null else getState().settings.currencySuffix,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
             status = true,
-            note = note
+            note = note?.trim()
                 ?: resourceProvider.getString(R.string.animal_card_screen_note_sale),
             idPT = itemIdPT,
             animalCountId = countId ?: state.id
         )
     }
 
-    private fun domainExpenses(countId: Long? = null): DomainExpensesTable {
+    private fun domainExpenses(animalCountId: Long? = null): DomainExpensesTable {
         val state = getState().currentProduct
         val dateList = state.date.split(".")
         return DomainExpensesTable(
-            id = state.tableId,
+            id = state.tableId ?: 0,
             title = getState().animal.name,
             count = state.count.toConvertDbDouble(),
             day = dateList[0].toInt(),
@@ -660,13 +691,14 @@ class AnimalCountViewModel @Inject constructor(
             year = dateList[2].toInt(),
             price = state.price.toConvertZeroDouble(),
             priceAll = if (state.isAutoCalculate) state.priceAll.toConvertDbDouble() else null,
+            priceSuffix = getState().settings.currencySuffix,
             countSuffix = state.suffix,
             category = resourceProvider.getString(R.string.animal_card_screen_add_category_expenses),
             note = resourceProvider.getString(R.string.animal_card_screen_note_expenses),
             isShowFood = false,
             idPT = itemIdPT,
             animalId = itemId,
-            animalCountId = countId ?: state.id,
+            animalCountId = animalCountId ?: state.id,
             isFood = false
         )
     }
@@ -675,12 +707,13 @@ class AnimalCountViewModel @Inject constructor(
         val state = getState().currentProduct
         val dateList = state.date.split(".")
         return DomainSaleTable(
-            id = state.tableId,
+            id = state.tableId ?: 0,
             title = getState().animal.name,
             count = state.count.toConvertDbDouble(),
             countSuffix = state.suffix,
             price = state.price.toConvertZeroDouble(),
             priceAll = if (state.isAutoCalculate) state.priceAll.toConvertDbDouble() else null,
+            priceSuffix = getState().settings.currencySuffix,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),

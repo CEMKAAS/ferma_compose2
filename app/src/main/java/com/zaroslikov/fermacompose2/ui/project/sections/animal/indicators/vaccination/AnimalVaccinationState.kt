@@ -2,17 +2,20 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vacci
 
 import com.zaroslikov.domain.models.dto.animal.AnimalVaccinationExpensesDomain
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.dateTodayNextYear
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import okhttp3.internal.http2.Settings
 
 data class AnimalVaccinationState(
     val vaccinationList: List<AnimalVaccinationExpensesDomain> = emptyList(),
     val deleteVaccination: AnimalVaccinationExpensesDomain? = null,
     val titleVaccinationList: List<String> = emptyList(),
+    val settings: DomainSettings = DomainSettings(),
     val idPT: Long = 0,
     val isOpenDialog: Boolean = false,
     val isOpenBottomSheetDelete: Boolean = false,

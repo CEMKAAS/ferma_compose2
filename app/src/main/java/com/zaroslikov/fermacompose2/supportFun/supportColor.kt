@@ -89,7 +89,7 @@ fun AnimalCountVersion.toColorList(): List<Color> {
         AnimalCountVersion.KILL -> listOf(red_4, red_5)
         AnimalCountVersion.WRITE_OFF -> listOf(violet_1, violet_2)
         AnimalCountVersion.ADD -> listOf(Color(0xFF00A63E), Color(0xFF009966))
-        AnimalCountVersion.INCUBATOR -> listOf(Color(0xFF009966), Color(0xFF00A63E))
+        AnimalCountVersion.INCUBATOR -> listOf(orang_2, orang_1)
     }
 }
 

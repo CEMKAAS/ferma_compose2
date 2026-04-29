@@ -3,7 +3,6 @@ package com.zaroslikov.fermacompose2.supportFun
 import android.content.Context
 import androidx.core.content.ContextCompat.getString
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.ui.formatNumber
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate

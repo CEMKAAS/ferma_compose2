@@ -121,9 +121,9 @@ fun FirstScreen(
     viewModel: FirstViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val notificationFlow = viewModel.notification
     val colors = listOf(price_green, green_9)
     val scope = rememberCoroutineScope()
-    val notificationFlow = viewModel.notification
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var showBottomSheet by remember { mutableStateOf(false) }
     val drawerClose = {

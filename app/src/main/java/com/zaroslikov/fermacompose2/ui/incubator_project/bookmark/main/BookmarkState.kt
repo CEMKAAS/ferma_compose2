@@ -42,7 +42,7 @@ data class BookmarkState(
     val completeState: CompleteState = CompleteState(),
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
-    val isArchive: Boolean = false
+    val isArchive: Boolean = false,
 ) : BaseState {
     fun enabledOvoscopyButton(): Boolean {
         val isEnabled = (currentEgg - rejectedEgg.toConvertZero()) > 0

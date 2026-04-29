@@ -74,10 +74,10 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.HeadingAnimalCard
-import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
-import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.ValueItem
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
 import com.zaroslikov.fermacompose2.violet_1
@@ -143,12 +143,12 @@ fun CardFieldNew(
             defaultElevation = elevation
         )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-        ) {
-            if (colors != null) {
+        if (colors != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+            ) {
                 Box(
                     modifier = Modifier
                         .width(6.dp)
@@ -169,9 +169,17 @@ fun CardFieldNew(
             ) {
                 contentColumn()
             }
-        }
+        } else
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(padding)
+            ) {
+                contentColumn()
+            }
     }
 }
+
 
 @Composable
 fun CardFieldNew(

@@ -22,7 +22,7 @@ import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_3
-import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
@@ -30,7 +30,7 @@ import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem

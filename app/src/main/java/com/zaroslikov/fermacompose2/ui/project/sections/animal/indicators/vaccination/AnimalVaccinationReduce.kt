@@ -3,9 +3,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vacci
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 
 
 class AnimalVaccinationReduce : BaseReducer<AnimalVaccinationState, AnimalVaccinationIntent>() {

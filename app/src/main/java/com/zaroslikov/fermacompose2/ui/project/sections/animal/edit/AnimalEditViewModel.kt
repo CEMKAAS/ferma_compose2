@@ -8,7 +8,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel

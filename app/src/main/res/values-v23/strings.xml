@@ -781,6 +781,8 @@
     <string name="base_section_update_support_count">Вы действительно хотите обновить эту запись о колличестве?</string>
     <string name="base_section_button_update_count">Обновить запись</string>
 
+    //Animal_count_incubator
+    <string name="base_section_incubator_title">Данные из инкубатора</string>
 
     //Add
     <string name="add_screen_title_entry">Добавить продукцию</string>
@@ -1280,6 +1282,7 @@
 
     <string name="animal_count_screen_kill_animal">Забито животных:</string>
     <string name="animal_count_screen_expenses_animal">Куплено животных:</string>
+    <string name="animal_count_screen_incubator_animal">Выведено птенцов:</string>
     <string name="animal_count_screen_sale_animal">Продано животных:</string>
     <string name="animal_count_screen_write_off_animal">Списано животных:</string>
     <string name="animal_count_screen_add_animal">Добавлено животных:</string>

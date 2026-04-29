@@ -6,7 +6,6 @@ import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
@@ -25,17 +24,15 @@ import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbOnlyInt
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
-import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleListIntent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -397,6 +394,7 @@ class ExpensesViewModel @Inject constructor(
             year = dateList[2].toInt(),
             price = price.toConvertDbDouble(),
             priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
+            priceSuffix = getState().settings.currencySuffix,
             category = category.trim(),
             note = note.trim(),
             isShowFood = if (isFood && isEntry) true else isShowFood,

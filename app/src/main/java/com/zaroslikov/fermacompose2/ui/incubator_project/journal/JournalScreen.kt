@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -92,7 +93,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.IconTitle
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.white
@@ -437,7 +438,8 @@ private fun StatisticsCard(
                         colorSup = gray_7
                     )
                     if (breedList.isNotEmpty())
-                        TextButton(onClick = onResetClick) {
+                        TextButton(
+                            onClick = onResetClick) {
                             Text(
                                 stringResource(R.string.button_reset),
                                 style = text_12,
@@ -461,10 +463,12 @@ private fun StatisticsCard(
                         onClick = { onChoiceClick(type.typeEgg) }
                     )
                 }
-                AnimatedVisibility(
-                    modifier = Modifier.fillMaxWidth(),
-                    visible = breedList.isNotEmpty()
-                ) {
+            }
+            AnimatedVisibility(
+                visible = breedList.isNotEmpty()
+            ) {
+                Column {
+                    Spacer(Modifier.padding(vertical = 4.dp))
                     StatisticList(
                         title = R.string.journal_screen_breeds,
                         list = breedList

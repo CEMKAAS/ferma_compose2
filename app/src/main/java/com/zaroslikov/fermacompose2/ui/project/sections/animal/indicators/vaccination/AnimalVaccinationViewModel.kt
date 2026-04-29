@@ -18,7 +18,7 @@ import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.dateTodayNextYear
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -74,12 +74,14 @@ class AnimalVaccinationViewModel @Inject constructor(
             val isArchiveAnimal = animalRepository.getAnimal(itemId).first().archive
             combine(
                 animalVaccinationRepository.getTitleVaccinationAnimalList(itemId),
-                animalVaccinationRepository.getVaccinationExpensesAnimal(itemId)
-            ) { titleVaccinationList, vaccination ->
-                titleVaccinationList to vaccination
+                animalVaccinationRepository.getVaccinationExpensesAnimal(itemId),
+                settingsRepository.getSettings(itemIdPT)
+            ) { titleVaccinationList, vaccination, settings ->
+                Triple(titleVaccinationList, vaccination, settings)
             }.collectLatest { data ->
                 updateState {
                     it.copy(
+                        settings = data.third,
                         vaccinationList = data.second,
                         titleVaccinationList = data.first,
                         idPT = itemIdPT,
@@ -209,6 +211,7 @@ class AnimalVaccinationViewModel @Inject constructor(
             year = dateList[2].toInt(),
             price = price.toConvertZeroDouble(),
             priceAll = if (isAutoCalculate) priceAll.toConvertZeroDouble() else null,
+            priceSuffix = getState().settings.currencySuffix,
             countSuffix = animalSuffix,
             category = category,
             note = note,

@@ -1,7 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 
+import android.provider.Settings
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
@@ -21,6 +23,7 @@ data class AnimalListState(
     val searchList: List<AnimalListUi> = emptyList(),
     val searchArchiveList: List<AnimalListUi> = emptyList(),
     val isSaveStateForEntry: Boolean = false,
+    val settings: DomainSettings = DomainSettings(),
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
     override val isEntry: Boolean = true,

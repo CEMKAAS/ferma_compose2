@@ -1,12 +1,8 @@
-package com.zaroslikov.fermacompose2.ui
+package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.fermacompose2.R
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
 fun Double.formatNumber(isGroupingUsed: Boolean = true): String {
     val numberFormat = NumberFormat.getInstance(Locale("ru", "RU"))
@@ -95,27 +91,5 @@ fun formatterTime(hour: Int, minute: Int): String {
     return "$formattedHour:$formattedMinute"
 }
 
-fun dateLong(data: String): Long {
-    val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-
-    return if (data == "") {
-        calendar.timeInMillis
-    } else {
-        val dateLong: Date? = format.parse(data)
-        dateLong?.time ?: calendar.timeInMillis
-    }
-}
-
-data class DrawerItems(
-    val icon: Int,
-    val text: String,
-    val route: String
-)
-
-data class DrawerNavigation(
-    val routeDrawer: String,
-    val idProjectDrawer: String
-)
 
 

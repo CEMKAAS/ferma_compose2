@@ -60,6 +60,8 @@ data class ExpensesTable(
     val priceAll: Double?,
     @ColumnInfo(name = "count_suffix")
     val countSuffix: Suffix,
+    @ColumnInfo(name = "price_suffix")
+    val priceSuffix: Suffix,
     val category: String,
     val note: String,
     @ColumnInfo(name = "is_food")

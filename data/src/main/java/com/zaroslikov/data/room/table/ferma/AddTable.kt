@@ -52,6 +52,8 @@ data class AddTable(
     val price: Double,
     @ColumnInfo(name = "count_suffix")
     val countSuffix: Suffix,
+    @ColumnInfo(name = "price_suffix")
+    val priceSuffix: Suffix,
     val category: String,
     @ColumnInfo(name = "animal_id")
     val animalId: Long?,

@@ -49,10 +49,10 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.SearchBar
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.text_16
-import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.DetailBottomSheet

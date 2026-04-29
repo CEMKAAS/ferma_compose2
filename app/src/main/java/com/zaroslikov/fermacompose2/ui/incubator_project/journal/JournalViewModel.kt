@@ -71,7 +71,8 @@ class JournalViewModel @Inject constructor(
                         idPT = incubator.id,
                         projectId = itemIdPT,
                         isLoading = false,
-                        isArchive = isArchive
+                        isArchive = isArchive,
+                        currentSuffix = incubator.currencySuffix
                     )
                 }
             }

@@ -11,7 +11,7 @@ import com.zaroslikov.fermacompose2.supportFun.isAnimalCountZero
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble2
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 
 
 class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
@@ -92,10 +92,8 @@ class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
             AnimalCountVersion.SALE, AnimalCountVersion.EXPENSES ->
                 count.isNotBlank() && price.isNotBlank() && !isAnimalCountZero(count)/* isErrorCountZero*/
 
-            AnimalCountVersion.KILL, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.ADD ->
+            AnimalCountVersion.KILL, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.ADD, AnimalCountVersion.INCUBATOR  ->
                 count.isNotBlank() && !isAnimalCountZero(count)
-
-            AnimalCountVersion.INCUBATOR -> TODO()
         }
 
         return copy(

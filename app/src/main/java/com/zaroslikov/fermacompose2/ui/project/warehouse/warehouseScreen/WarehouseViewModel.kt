@@ -25,7 +25,7 @@ import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.LoadDataWarehouse
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
@@ -97,7 +97,8 @@ class WarehouseViewModel @Inject constructor(
                         fastAddList = newState.fastAddList,
                         foodList = newState.foodList,
                         idPT = itemId,
-                        isArchive = isArchive
+                        isArchive = isArchive,
+                        settings = newState.settings
                     )
                 }
             }
@@ -127,6 +128,7 @@ class WarehouseViewModel @Inject constructor(
                     month = dateList[1].toInt(),
                     year = dateList[2].toInt(),
                     price = 0.0,
+                    priceSuffix = getState().settings.currencySuffix,
                     category = domain.category ?: "",
                     animalId = domain.idAnimal,
                     note = resourceProvider.getString(R.string.warehouse_screen_fast_add_note),
@@ -157,7 +159,8 @@ class WarehouseViewModel @Inject constructor(
             productList = build(productList, settings),
             expensesList = build(expensesList, settings),
             fastAddList = fastAddList,
-            foodList = foodWriteOff(foodList)
+            foodList = foodWriteOff(foodList),
+            settings = settings
         )
     }
 
@@ -185,6 +188,7 @@ class WarehouseViewModel @Inject constructor(
             title = title,
             count = weightAll,
             countSuffix = weightSuffix,
+            priceSuffix = getState().settings.currencySuffix,
             price = price,
             category = resourceProvider.getString(R.string.warehouse_screen_warehouse_food_write_off),
             day = date[0],

@@ -15,6 +15,7 @@ data class DomainExpensesTable(
     val year: Int = 0, // время
     override val price: Double = 0.0,
     override val priceAll: Double? = null,
+    val priceSuffix: Suffix = Suffix.RUBLE,
     val category: String ="",
     val note: String ="",
     val isFood: Boolean = false,

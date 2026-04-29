@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.navigation
 
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,8 +8,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.zaroslikov.fermacompose2.ui.add.AddProject
-import com.zaroslikov.fermacompose2.ui.add.ProjectAddDestination
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.AddIncubatorDestination
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.AddIncubatorScreen
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorDestination
@@ -83,15 +80,6 @@ fun InventoryNavHost(
             val itemId = backStackEntry.arguments!!.getLong(MainProjectsDestination.itemIdArg)
             MainProjectScreen(navController, itemId)
         }
-
-
-        composable(route = ProjectAddDestination.route) {
-            AddProject(
-                navigateBack = { navController.popBackStack() },
-                navigateToStart = { navController.navigate(FirstDestination.route) },
-            )
-        }
-
         composable(
             route = WarehouseEditDestination.routeWithArgs,
             arguments = listOf(navArgument(WarehouseEditDestination.itemIdArg) {

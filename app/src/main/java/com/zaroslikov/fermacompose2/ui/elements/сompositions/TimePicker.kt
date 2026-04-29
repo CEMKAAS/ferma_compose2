@@ -15,7 +15,7 @@ import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogStandard
-import com.zaroslikov.fermacompose2.ui.formatterTime
+import com.zaroslikov.fermacompose2.supportFun.formatterTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

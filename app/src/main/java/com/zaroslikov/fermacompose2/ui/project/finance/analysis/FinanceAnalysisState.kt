@@ -33,6 +33,7 @@ import com.zaroslikov.fermacompose2.supportFun.DomainChartPoint
 import com.zaroslikov.fermacompose2.supportFun.firstDayOfMonth
 import com.zaroslikov.fermacompose2.supportFun.todayOfMonth
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import okhttp3.internal.http2.Settings
 
 data class FinanceAnalysisState(
     val baseSuffix: Suffix = Suffix.LITERS,
@@ -110,6 +111,7 @@ data class AnalysisUiCalculatedState(
     val averagePrice: Double = 0.0,
     val transactionList: List<DomainTransaction>,
     val charFilter: List<Pair<List<DomainChartPoint>, FinanceAnalysisEnum>> = emptyList(),
+    val settings: DomainSettings = DomainSettings()
 )
 
 

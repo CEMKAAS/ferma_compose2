@@ -21,16 +21,14 @@ import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.component1
@@ -299,7 +297,8 @@ class WriteOffViewModel @Inject constructor(
             count = count.toConvertDbDouble(),
             countSuffix = countSuffix,
             price = if (price.isBlank()) null else price.toConvertDbDouble(),
-            priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
+            priceAll = if (price.isBlank()) null else if (isAutoPrice) priceAll.toConvertDbDouble() else null,
+            priceSuffix = if (price.isBlank()) null else getState().settings.currencySuffix,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),

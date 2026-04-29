@@ -1,5 +1,6 @@
 package com.zaroslikov.data.room.repository
 
+import android.util.Log
 import com.zaroslikov.data.room.dao.AppSettingsDao
 import com.zaroslikov.data.room.mapper.table.toAppSettingsTable
 import com.zaroslikov.data.room.mapper.table.toDomainAppSettings

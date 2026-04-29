@@ -11,18 +11,16 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.green_15
-import com.zaroslikov.fermacompose2.red_4
 import com.zaroslikov.fermacompose2.supportFun.toColorList
 import com.zaroslikov.fermacompose2.supportFun.toDrawRes
-import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.supportFun.toIndicationStatus
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogGroupToSolo
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -32,7 +30,6 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalCountCardNew
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsDeleteCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.InventoryAnimalBody
 
 object AnimalCountDestination : NavigationDestination {
@@ -77,6 +74,7 @@ fun AnimalCountScreen(
             AnimalCountContainer2(
                 modifier = Modifier.modifierScreenLazy(innerPadding),
                 titleRes = title,
+                currencyPriceSuffix = state.settings.currencySuffix,
                 itemList = state.countList,
                 isArchive = state.isArchive,
                 onEditClick = {
@@ -96,6 +94,7 @@ fun AnimalCountScreen(
                         state = state.currentProduct,
                         onIntent = viewModel::onIntent,
                         countAllAnimal = state.countAnimal,
+                        currencyPrice = state.settings.currencySuffix,
                     )
 
                 AnimalCountVersion.EXPENSES ->
@@ -103,6 +102,7 @@ fun AnimalCountScreen(
                         state = state.currentProduct,
                         countAllAnimal = state.countAnimal,
                         countSuffix = state.countAnimalSuffix,
+                        currencyPrice = state.settings.currencySuffix,
                         onIntent = viewModel::onIntent,
                     )
 
@@ -111,7 +111,7 @@ fun AnimalCountScreen(
                         state = state.currentProduct,
                         onIntent = viewModel::onIntent,
                         countAnimalAll = state.countAnimal,
-                        countSuffix = state.countAnimalSuffix
+                        countSuffix = state.countAnimalSuffix,
                     )
 
                 AnimalCountVersion.WRITE_OFF ->
@@ -119,14 +119,24 @@ fun AnimalCountScreen(
                         state = state.currentProduct,
                         countAllAnimal = state.countAnimal,
                         countSuffix = state.countAnimalSuffix,
+                        currencyPrice = state.settings.currencySuffix,
                         onIntent = viewModel::onIntent,
                     )
 
-                AnimalCountVersion.ADD, AnimalCountVersion.INCUBATOR  ->
+                AnimalCountVersion.ADD ->
                     BottomSheetAddAnimal(
                         state = state.currentProduct,
                         countAllAnimal = state.countAnimal,
                         onIntent = viewModel::onIntent
+                    )
+
+                AnimalCountVersion.INCUBATOR ->
+                    BottomSheetIncubatorAnimal(
+                        state = state.currentProduct,
+                        countAllAnimal = state.countAnimal,
+                        countSuffix = state.countAnimalSuffix,
+                        currencyPrice = state.settings.currencySuffix,
+                        onIntent = viewModel::onIntent,
                     )
             }
         }
@@ -187,6 +197,7 @@ private fun AnimalCountContainer2(
     onEditClick: (DomainAnimalCountPriceUi) -> Unit,
     onDeleteClick: (Long) -> Unit,
     isArchive: Boolean,
+    currencyPriceSuffix: Suffix,
 ) {
     InventoryAnimalBody(
         modifier = modifier,
@@ -205,6 +216,7 @@ private fun AnimalCountContainer2(
                 value = item.count,
                 suffix = item.suffix,
                 price = item.priceAll ?: item.price,
+                currencyPriceSuffix = currencyPriceSuffix,
                 date = item.date,
                 note = item.note,
                 isArchive = isArchive,

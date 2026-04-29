@@ -20,8 +20,7 @@ import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.blue_3
-import com.zaroslikov.fermacompose2.green_g_4
-import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -38,14 +37,13 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
-import com.zaroslikov.fermacompose2.white
 
 object SaleDestination : NavigationDestination {
     override val route = "Sale"
@@ -91,6 +89,7 @@ fun SaleScreen(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
                 iconRes = iconRes,
+                priceSuffix = state.settings.currencySuffix,
                 details = state.isGroup,
                 itemList = state.list,
                 searchList = state.searchList,
@@ -133,6 +132,7 @@ fun SaleScreen(
         if (state.isOpenBottomSheetDetail)
             SaleDetailBottomSheet(
                 state = state.currentDetail,
+                priceSuffix = state.settings.currencySuffix,
                 colors = colors,
                 onIntent = viewModel::onIntent,
                 isArchive = state.isArchive
@@ -151,6 +151,7 @@ fun SaleScreen(
 @Composable
 private fun SaleDetailBottomSheet(
     state: DomainSaleTable?,
+    priceSuffix: Suffix,
     colors: List<Color>,
     onIntent: (SaleListIntent) -> Unit,
     isArchive: Boolean
@@ -164,6 +165,7 @@ private fun SaleDetailBottomSheet(
             countSuffix = state.countSuffix,
             price = state.price,
             priceAll = state.priceAll,
+            priceSuffix = priceSuffix,
             category = state.category,
             buyer = state.buyer,
             date = date,
@@ -222,6 +224,7 @@ private fun SaleContainer(
     modifier: Modifier = Modifier,
     @DrawableRes iconRes: Int,
     details: Boolean,
+    priceSuffix: Suffix,
     color: Color = blue_1,
     isArchive: Boolean,
     itemList: List<DomainSaleTable>,
@@ -245,7 +248,7 @@ private fun SaleContainer(
                 count = item.count,
                 suffix = item.countSuffix,
                 price = item.priceAll ?: item.price,
-                priceSuffix = Suffix.RUBLE,
+                priceSuffix = priceSuffix,
                 note = item.note,
                 color = color,
                 day = item.day,

@@ -60,9 +60,9 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.monthToResString2
-import com.zaroslikov.fermacompose2.ui.monthToResString3
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.monthToResString2
+import com.zaroslikov.fermacompose2.supportFun.monthToResString3
 import com.zaroslikov.fermacompose2.white
 import io.appmetrica.analytics.AppMetrica
 import java.time.LocalDate
@@ -175,7 +175,7 @@ private fun CurrentBalance(
     val month = LocalDate.now().monthValue
     val currentBalanceMount = incomeMount - expensesMount
     val positiveMount = currentBalanceMount > 0
-
+    val currencySuffix = " ${stringResource(suffix.toResId())}"
     BigColorCard(
         glowColor = blue_11,
         colors = listOf(blue_10, blue_11, blue_12),
@@ -195,7 +195,7 @@ private fun CurrentBalance(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     IconFinance(
-                        icon = R.drawable.baseline_currency_ruble_24,
+                        icon = R.drawable.icon_money,
                         color = Color(0x20FFFFFF)
                     )
                     Text(
@@ -214,7 +214,7 @@ private fun CurrentBalance(
                 )
             }
             Text(
-                text = "${currentBalance.formatNumber()} ${stringResource(suffix.toResId())}",
+                text = currentBalance.formatNumber() + currencySuffix,
                 style = text_36,
                 color = white
             )
@@ -235,57 +235,37 @@ private fun CurrentBalance(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Start,
-                        text = stringResource(monthToResString3(month)),
-                        style = text_12,
-                        color = Color(0x50FFFFFF)
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Start,
-                        text = stringResource(R.string.finance_income),
-                        style = text_12,
-                        color = Color(0x50FFFFFF),
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Start,
-                        text = stringResource(R.string.finance_expenses),
-                        style = text_12,
-                        color = Color(0x50FFFFFF)
-                    )
+                    listOf(
+                        monthToResString3(month),
+                        R.string.finance_income,
+                        R.string.finance_expenses
+                    ).forEach {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            text = stringResource(it),
+                            style = text_12,
+                            color = Color(0x50FFFFFF)
+                        )
+                    }
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Start,
-                        text = (if (positiveMount) "+" else "-") +
-                                currentBalanceMount.formatNumber() +
-                                " ${stringResource(suffix.toResId())}",
-                        style = text_14,
-                        color = white,
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Start,
-                        text = incomeMount.formatNumber() +
-                                " ${stringResource(suffix.toResId())}",
-                        style = text_14,
-                        color = green_7,
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Start,
-                        text = expensesMount.formatNumber() +
-                                " ${stringResource(suffix.toResId())}",
-                        style = text_14,
-                        color = red_10,
-                    )
+                    val month = (if (positiveMount) "+" else "") +
+                            currentBalanceMount.formatNumber() + currencySuffix to white
+                    val incomeMonth = incomeMount.formatNumber() + currencySuffix to green_7
+                    val expensesMonth = expensesMount.formatNumber() + currencySuffix to red_10
+                    listOf(month, incomeMonth, expensesMonth).forEach {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            text = it.first,
+                            style = text_14,
+                            color = it.second
+                        )
+                    }
                 }
             }
         }

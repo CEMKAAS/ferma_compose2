@@ -91,7 +91,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.incubator_project.journal.TranslucentCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.NoteWidget
@@ -138,7 +138,7 @@ fun BookmarkScreen(
                         state.idBookmark?.let { onSettingsClick(state.incubatorId to it) }
                     }
                 },
-                scrollBehavior = if(!state.isActivityBookmark) null else scrollBehavior
+                scrollBehavior = if (!state.isActivityBookmark) null else scrollBehavior
             )
         },
         floatingActionButton = {
@@ -215,7 +215,8 @@ fun BookmarkScreen(
                 enabled = state.completeState.isEnabledCompleteButton,
                 enabledTwo = state.completeState.isEnabledCompleteButtonTwo,
                 onIntent = viewModel::onIntent,
-                chicksPrice = state.completeState.chicksPrice
+                chicksPrice = state.completeState.chicksPrice,
+                currencySuffix = state.currencySuffix
             )
         if (state.isOpenEarlyCompleteIncubationBottomSheet)
             EarlyCompleteIncubationBottomSheet(

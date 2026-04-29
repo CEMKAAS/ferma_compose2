@@ -2,10 +2,8 @@ package com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen
 
 import com.zaroslikov.domain.models.DomainNoteTable
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
-import com.zaroslikov.fermacompose2.ui.dateBuilder
-import com.zaroslikov.fermacompose2.ui.monthToResString
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.collections.find
 

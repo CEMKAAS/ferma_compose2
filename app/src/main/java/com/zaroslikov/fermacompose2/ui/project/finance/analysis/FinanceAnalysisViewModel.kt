@@ -126,7 +126,8 @@ class FinanceAnalysisViewModel @Inject constructor(
                         soldLost = newState.soldLost,
                         transactionList = newState.transactionList,
                         charFilter = newState.charFilter,
-                        baseSuffix = baseSuffix
+                        baseSuffix = baseSuffix,
+                        settings = newState.settings
                     )
                 }
             }
@@ -235,6 +236,7 @@ class FinanceAnalysisViewModel @Inject constructor(
             stock = totalStock,
             transactionList = transactionList2,
             averagePrice = resultAnimalProducer2[0].averagePrice,
+            settings = settings
         )
     }
 
@@ -295,7 +297,7 @@ class FinanceAnalysisViewModel @Inject constructor(
                     count = totalCount,
                     suffix = baseSuffix,
                     price = totalPrice,
-                    priceSuffix = Suffix.RUBLE,
+                    priceSuffix = domainSettings.currencySuffix,
                     countTransaction = items.size
                 )
             }

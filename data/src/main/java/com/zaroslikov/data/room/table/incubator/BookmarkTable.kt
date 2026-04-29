@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.project.ProjectTable
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 
 @Entity(
@@ -38,6 +39,8 @@ data class BookmarkTable(
     val price: Double?,
     @ColumnInfo(name = "price_all")
     val priceAll: Double?,
+    @ColumnInfo(name = "price_suffix")
+    val priceSuffix: Suffix?,
     @ColumnInfo(name = "chick_price")
     val chickPrice: Double?,
     val note: String,

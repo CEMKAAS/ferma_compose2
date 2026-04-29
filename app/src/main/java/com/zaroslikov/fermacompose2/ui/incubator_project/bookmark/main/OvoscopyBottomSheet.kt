@@ -167,45 +167,45 @@ fun OvoscopBottomSheet(
                     )
                 }
             }
-        }
-        WarningCard(
-            colorBackground = orang_4,
-            colorBorder = orang_5,
-            colorIcon = orang_2,
-            colorIconBackground = Color(0xFFFEF3C6),
-            colorTitle = Color(0xFF7B3306),
-            colorText = orang_6,
-            icon = R.drawable.icon_warning,
-            title = R.string.entry_bookmark_warning_title,
-            text = R.string.bookmark_screen_warning_text
-        )
-        InfoCard(
-            colorBackground = blue_3,
-            colorBorder = blue_9,
-            colorIcon = blue_1,
-            colorIconBackground = blue_13,
-            colorTitle = blue_14,
-            icon = R.drawable.outline_book_5_24,
-            title = R.string.bookmark_screen_hint_ovoscopy_title
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                hintListTwo.forEach {
-                    LineWithMarker(blue_20, it)
+            WarningCard(
+                colorBackground = orang_4,
+                colorBorder = orang_5,
+                colorIcon = orang_2,
+                colorIconBackground = Color(0xFFFEF3C6),
+                colorTitle = Color(0xFF7B3306),
+                colorText = orang_6,
+                icon = R.drawable.icon_warning,
+                title = R.string.entry_bookmark_warning_title,
+                text = R.string.bookmark_screen_warning_text
+            )
+            InfoCard(
+                colorBackground = blue_3,
+                colorBorder = blue_9,
+                colorIcon = blue_1,
+                colorIconBackground = blue_13,
+                colorTitle = blue_14,
+                icon = R.drawable.outline_book_5_24,
+                title = R.string.bookmark_screen_hint_ovoscopy_title
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    hintListTwo.forEach {
+                        LineWithMarker(blue_20, it)
+                    }
                 }
             }
-        }
-        InfoCard(
-            colorBackground = Color(0xFFF0FDF4),
-            colorBorder = Color(0xFFB9F8CF),
-            colorIcon = price_green,
-            colorIconBackground = Color(0xFFDCFCE7),
-            colorTitle = Color(0xFF008236),
-            icon = R.drawable.outline_info_24,
-            title = R.string.bookmark_screen_hint_remember_title,
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                hintList.forEach {
-                    LineWithMarker(green_9, it)
+            InfoCard(
+                colorBackground = Color(0xFFF0FDF4),
+                colorBorder = Color(0xFFB9F8CF),
+                colorIcon = price_green,
+                colorIconBackground = Color(0xFFDCFCE7),
+                colorTitle = Color(0xFF008236),
+                icon = R.drawable.outline_info_24,
+                title = R.string.bookmark_screen_hint_remember_title,
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    hintList.forEach {
+                        LineWithMarker(green_9, it)
+                    }
                 }
             }
         }

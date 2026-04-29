@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.incubator_project.journal
 
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.fermacompose2.base.state.ListState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
@@ -16,7 +17,8 @@ data class JournalState(
     val isShowActiveAlertDialog: Boolean = false,
     val isShowDeleteAlertDialog: Boolean = false,
     val choiceNameBookmark: String = "",
-    val isArchive: Boolean = false
+    val isArchive: Boolean = false,
+    val currentSuffix: Suffix = Suffix.RUBLE
 ) : ListState()
 
 data class JournalCombined(

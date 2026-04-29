@@ -30,7 +30,7 @@ interface AppSettingsDao {
     @Update
     suspend fun updateAppSettings(appSettingsTable: AppSettingsTable)
 
-    @Query("SELECT * FROM app_settings_table WHERE id= 1")
+    @Query("SELECT * FROM app_settings_table LIMIT 1")
     fun getAppSettings(): Flow<AppSettingsTable>
 
     @Query("SELECT is_first_launch FROM app_settings_table WHERE id= 1")

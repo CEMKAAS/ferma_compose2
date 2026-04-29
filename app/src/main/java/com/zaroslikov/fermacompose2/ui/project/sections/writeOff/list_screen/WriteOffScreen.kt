@@ -18,10 +18,8 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.domain.models.list.suffixAllList
-import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
-import com.zaroslikov.fermacompose2.green_g_4
-import com.zaroslikov.fermacompose2.ui.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
@@ -36,7 +34,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
@@ -47,7 +45,6 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryB
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
 import com.zaroslikov.fermacompose2.violet_3
-import com.zaroslikov.fermacompose2.white
 
 object WriteOffDestination : NavigationDestination {
     override val route = "WriteOff"
@@ -143,8 +140,9 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             WriteOffDetailBottomSheet(
                 state = state.currentDetail,
                 colors = colors,
+                isArchive = state.isArchive,
                 onIntent = viewModel::onIntent,
-                isArchive = state.isArchive
+                priceSuffix = state.settings.currencySuffix
             )
         if (state.isOpenBottomSheetDelete)
             WarningDeleteWriteOffBottomSheet(
@@ -164,7 +162,8 @@ private fun WriteOffDetailBottomSheet(
     state: DomainWriteOffTable?,
     colors: List<Color>,
     isArchive: Boolean,
-    onIntent: (WriteOffListIntent) -> Unit
+    onIntent: (WriteOffListIntent) -> Unit,
+    priceSuffix: Suffix
 ) {
     state?.let {
         val monthText = stringResource(id = monthToResString(state.month))
@@ -175,6 +174,7 @@ private fun WriteOffDetailBottomSheet(
             countSuffix = state.countSuffix,
             price = state.price,
             priceAll = state.priceAll,
+            priceSuffix = priceSuffix,
             category = state.category, //TODO
             date = date,
             note = state.note,

@@ -30,7 +30,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsDeleteCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalVaccinationCardNew
@@ -88,6 +88,7 @@ fun AnimalVaccinationScreen(
                 icon = icon,
                 titleRes = title,
                 colors = colors,
+                currencyPriceSuffix = state.settings.currencySuffix,
                 itemList = state.vaccinationList,
                 isArchive = state.isArchive,
                 onEditClick = {
@@ -99,12 +100,13 @@ fun AnimalVaccinationScreen(
             )
         if (state.isOpenDialog)
             VaccinationBottomSheet(
+                icon = icon,
+                colors = colors,
+                titleRes = title,
                 state = state.currentProduct,
                 onIntent = viewModel::onIntent,
-                colors = colors,
-                icon = icon,
-                titleRes = title,
                 titleList = state.titleVaccinationList,
+                currencyPriceSuffix = state.settings.currencySuffix,
             )
         if (state.isOpenBottomSheetDelete)
             WarningDeleteVaccinationBottomSheet(
@@ -125,6 +127,7 @@ private fun AnimalVaccinationContainer2(
     @StringRes titleRes: Int,
     colors: List<Color>,
     isArchive: Boolean,
+    currencyPriceSuffix: Suffix,
     itemList: List<AnimalVaccinationExpensesDomain>,
     onEditClick: (AnimalVaccinationExpensesDomain) -> Unit,
     onDeleteClick: (Long) -> Unit,
@@ -146,7 +149,7 @@ private fun AnimalVaccinationContainer2(
                 colors = colors,
                 value = item.vaccination,
                 count = item.countVaccination.formatNumber(),
-                suffix = Suffix.RUBLE,
+                suffix = currencyPriceSuffix,
                 date = item.date,
                 note = item.note,
                 onEditClick = { onEditClick(item) },
@@ -191,6 +194,7 @@ private fun WarningDeleteVaccinationBottomSheet(
 @Composable
 private fun VaccinationBottomSheet(
     state: Vaccination,
+    currencyPriceSuffix: Suffix,
     colors: List<Color>,
     @DrawableRes icon: Int,
     @StringRes titleRes: Int,
@@ -251,7 +255,7 @@ private fun VaccinationBottomSheet(
             supportTextResAutoCal = R.string.animal_vaccination_price,
             count = state.countVaccination,
             countSuffix = Suffix.PIECES,
-            priceSuffix = Suffix.RUBLE
+            priceSuffix = currencyPriceSuffix
         )
         OutlinedTextDateNew(
             value = state.date,

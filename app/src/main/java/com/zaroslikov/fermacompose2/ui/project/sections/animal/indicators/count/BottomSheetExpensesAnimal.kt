@@ -23,7 +23,8 @@ fun BottomSheetExpensesAnimal(
     state: CountItem,
     countAllAnimal: String?,
     countSuffix: Suffix,
-    onIntent: (AnimalCountIntent) -> Unit
+    onIntent: (AnimalCountIntent) -> Unit,
+    currencyPrice: Suffix
 ) {
     val focusRequester =
         remember { FocusRequester() } // ✅ нужно помнить, иначе при recomposition фокус сбрасывается
@@ -79,7 +80,7 @@ fun BottomSheetExpensesAnimal(
             isNecessarily = true,
             count = state.count,
             countSuffix = state.suffix,
-            priceSuffix = Suffix.RUBLE
+            priceSuffix = currencyPrice
         )
         OutlinedTextDateNew(
             value = state.date,

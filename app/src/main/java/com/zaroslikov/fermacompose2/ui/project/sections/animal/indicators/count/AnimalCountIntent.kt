@@ -56,6 +56,8 @@ sealed class AnimalCountIntent : BaseIntent {
     // Expenses Count Animal
     data object InsertExpensesPressed : AnimalCountIntent()
     data object UpdateExpensesPressed : AnimalCountIntent()
+    // Incubator Count Animal
+    data object UpdateIncubatorPressed : AnimalCountIntent()
 
     // Kill Count Animal
     data class OpenWeightAlertDialogClicked(val value: Boolean) : AnimalCountIntent()

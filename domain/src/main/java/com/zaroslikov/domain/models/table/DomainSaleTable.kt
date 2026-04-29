@@ -12,6 +12,7 @@ data class DomainSaleTable(
     override val countSuffix: Suffix,
     override val price: Double,
     override val priceAll: Double? = null,
+    val priceSuffix: Suffix = Suffix.RUBLE,
     val day: Int,
     val month: Int,
     val year: Int,
@@ -21,4 +22,4 @@ data class DomainSaleTable(
     val idPT: Long,
     val animalId: Long? = null,
     val animalCountId: Long? = null,
-): BaseProductSection
+) : BaseProductSection

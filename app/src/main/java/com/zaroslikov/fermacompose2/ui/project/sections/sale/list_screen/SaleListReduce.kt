@@ -6,9 +6,8 @@ import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
-import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.monthToResString
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.text.lowercase
 

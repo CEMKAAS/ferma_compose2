@@ -84,8 +84,8 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
-import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.monthToResString2
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.monthToResString2
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.IconAnimal
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_6
@@ -137,6 +137,7 @@ fun FinanceAnalysisProduct(
                 modifier = Modifier
                     .modifierScreen(innerPadding),
                 state = state,
+
                 onCharSelectionClick = {
                     viewModel.onIntent(FinanceAnalysisIntent.CharSelectionClicked(it))
                 }
@@ -502,7 +503,6 @@ private fun AnimalProducers(
                         imagePath = it.imagePath,
                     )
                 }
-
             }
         }
 }
@@ -544,7 +544,11 @@ private fun AnimalProducerSlider(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalAlignment = Alignment.End
             ) {
-                Text("${count.formatNumber()} ${stringResource(suffix.toResId())}", style = text_14, color = black_2)
+                Text(
+                    "${count.formatNumber()} ${stringResource(suffix.toResId())}",
+                    style = text_14,
+                    color = black_2
+                )
                 TextMiniCard(
                     "${percentDouble.formatNumber()}%",
                     textColor = FinanceAnalysisEnum.SALE.colorTextPercent,
@@ -657,7 +661,7 @@ private fun Chart(
         ?.map { it.value } ?: emptyList()
     val labelsList = chartFilter
         .find { it.second == charSelection }?.first
-        ?.map { it.date.toString() } ?: emptyList()
+        ?.map { it.date } ?: emptyList()
 
     CardNewWithTitle(
         titleRes = charSelection.titleChar

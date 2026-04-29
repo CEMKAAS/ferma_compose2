@@ -89,7 +89,7 @@ fun AnimalCountVersion.toResId(): Int {
         AnimalCountVersion.KILL -> R.string.button_kill
         AnimalCountVersion.WRITE_OFF -> R.string.button_write_off
         AnimalCountVersion.ADD -> R.string.button_add
-        AnimalCountVersion.INCUBATOR -> R.string.button_add
+        AnimalCountVersion.INCUBATOR -> R.string.base_section_incubator_title
     }
 }
 

@@ -13,6 +13,7 @@ import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.ProjectRepository
+import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
@@ -22,6 +23,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -38,7 +40,8 @@ class AnimalListViewModel @Inject constructor(
     private val expensesRepository: ExpensesRepository,
     private val resourceProvider: ResourceProvider,
     private val projectRepository: ProjectRepository,
-    private val yandexMetricRepository: YandexMetricRepository
+    private val yandexMetricRepository: YandexMetricRepository,
+    private val settingsRepository: SettingsRepository
 ) : EntryNewViewModel2<AnimalListState, AnimalListIntent, AnimalListReduce>(
     AnimalListState(),
     AnimalListReduce(resourceProvider)
@@ -73,7 +76,12 @@ class AnimalListViewModel @Inject constructor(
     private fun loadDate() {
         viewModelScope.launch {
             val isArchiveProject = projectRepository.getIsArchiveProject(itemIdPT).first()
-            animalRepository.getAllAnimal(itemIdPT).collectLatest { list ->
+            combine(
+                animalRepository.getAllAnimal(itemIdPT),
+                settingsRepository.getSettings(itemIdPT)
+            ) { animalList, settings ->
+                animalList to settings
+            }.collectLatest { (list, settings) ->
                 val baseList = list.map { animal -> animal.toUi() }
                 val animalList = baseList.filter { !it.isArchive }
                 val archiveAnimalList = baseList.filter { it.isArchive }
@@ -85,7 +93,8 @@ class AnimalListViewModel @Inject constructor(
                         archiveList = archiveAnimalList,
                         searchArchiveList = archiveAnimalList,
                         isLoading = false,
-                        isArchiveProject = isArchiveProject
+                        isArchiveProject = isArchiveProject,
+                        settings = settings
                     )
                 }
             }
@@ -215,6 +224,7 @@ class AnimalListViewModel @Inject constructor(
                         year = dateList[2].toInt(),
                         price = price.toConvertDbDouble(),
                         priceAll = if (isAutoPrice && isAnimalGroup) priceAll.toConvertDbDouble() else null,
+                        priceSuffix = getState().settings.currencySuffix,
                         countSuffix = countSuffix,
                         category = resourceProvider.getString(R.string.animal_card_screen_add_category_expenses),
                         note = "",

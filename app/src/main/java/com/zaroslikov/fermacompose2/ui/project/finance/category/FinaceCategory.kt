@@ -101,8 +101,8 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.DateRangePickerModal
 import com.zaroslikov.fermacompose2.ui.finance.TransactionFinanceCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.formatNumber
-import com.zaroslikov.fermacompose2.ui.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
 
@@ -162,7 +162,7 @@ fun FinanceCategoryScreen2(
                 category = state.financeCategory,
                 currentTitleProduct = state.currentProduct.first,
                 currentBalanceProduct = state.currentProduct.second,
-                suffixPrice = state.suffixPrice,
+                priceSuffix = state.suffixPrice,
                 onDismissRequest = {
                     viewModel.onIntent(FinanceCategoryIntent.OpenBottomSheetGroup())
                 }
@@ -479,7 +479,7 @@ private fun BottomSheet(
     currentTitleProduct: String,
     currentBalanceProduct: Double,
     category: FinanceCategory,
-    suffixPrice: Suffix = Suffix.RUBLE,
+    priceSuffix: Suffix = Suffix.RUBLE,
     onDismissRequest: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -544,7 +544,7 @@ private fun BottomSheet(
                 CurrentBalanceCard(
                     currentBalance = currentBalanceProduct,
                     totalOperation = list.size,
-                    suffix = suffixPrice,
+                    suffix = priceSuffix,
                     colors = category.toColorList(),
                     category = category,
                     isGroup = true
@@ -577,7 +577,7 @@ private fun BottomSheet(
                             suffix = it.suffix,
                             price = it.price,
                             priceAll = it.priceAll,
-                            priceSuffix = Suffix.RUBLE,
+                            priceSuffix = priceSuffix,
                             category = it.category,
                             statusWriteOff = it.status,
                             animal = null,

@@ -54,13 +54,10 @@ import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_13
 import com.zaroslikov.fermacompose2.orang_3
-import com.zaroslikov.fermacompose2.price_green
-import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.supportFun.getAgeFromDate
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogArchiveAnimal
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
-import com.zaroslikov.fermacompose2.ui.elements.BigBorderButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorGradientCard
@@ -73,7 +70,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalParameter
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.IconAnimal
 import com.zaroslikov.fermacompose2.violet_1

@@ -25,6 +25,7 @@ fun BottomSheetSaleAnimal(
     state: CountItem,
     onIntent: (AnimalCountIntent) -> Unit,
     countAllAnimal: String?,
+    currencyPrice: Suffix,
 ) {
     val focusRequester =
         remember { FocusRequester() } // ✅ нужно помнить, иначе при recomposition фокус сбрасывается
@@ -42,7 +43,7 @@ fun BottomSheetSaleAnimal(
             onIntent(
                 AnimalCountIntent.DialogClicked(
                     false,
-                    isSaveStateForBottomSheet =  state.isEntry,
+                    isSaveStateForBottomSheet = state.isEntry,
                     version = state.version
                 )
             )
@@ -81,7 +82,7 @@ fun BottomSheetSaleAnimal(
             isNecessarily = true,
             count = state.count,
             countSuffix = state.suffix,
-            priceSuffix = Suffix.RUBLE
+            priceSuffix = currencyPrice
         )
         OutlinedTextDateNew(
             value = state.date,

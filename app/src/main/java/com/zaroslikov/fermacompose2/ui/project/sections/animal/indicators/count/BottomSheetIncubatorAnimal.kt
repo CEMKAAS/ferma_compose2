@@ -19,12 +19,12 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
 
 @Composable
-fun BottomSheetWriteOffAnimal(
+fun BottomSheetIncubatorAnimal(
     state: CountItem,
     countAllAnimal: String?,
     countSuffix: Suffix,
-    onIntent: (AnimalCountIntent) -> Unit,
-    currencyPrice: Suffix
+    currencyPrice: Suffix,
+    onIntent: (AnimalCountIntent) -> Unit
 ) {
     val focusRequester =
         remember { FocusRequester() } // ✅ нужно помнить, иначе при recomposition фокус сбрасывается
@@ -42,7 +42,7 @@ fun BottomSheetWriteOffAnimal(
             onIntent(
                 AnimalCountIntent.DialogClicked(
                     false,
-                    isSaveStateForBottomSheet =  state.isEntry,
+                    isSaveStateForBottomSheet = state.isEntry,
                     version = state.version
                 )
             )
@@ -50,8 +50,8 @@ fun BottomSheetWriteOffAnimal(
         onSecondDismissRequest = {
             onIntent(AnimalCountIntent.DialogClicked(false))
         },
-        onInsertClick = { onIntent(AnimalCountIntent.InsertWriteOffPressed) },
-        onUpdateClick = { onIntent(AnimalCountIntent.UpdateWriteOffPressed) }
+        onInsertClick = { },
+        onUpdateClick = { onIntent(AnimalCountIntent.UpdateIncubatorPressed) }
     ) {
         OutlinedTextCountAnimalNew(
             value = state.count,
@@ -60,8 +60,8 @@ fun BottomSheetWriteOffAnimal(
             },
             isError = state.error.isErrorCount,
             isErrorCountZero = state.error.isErrorCountZero,
-            countAnimal = countAllAnimal,
             suffix = countSuffix,
+            countAnimal = countAllAnimal,
         )
         OutlinedPriceInputNew(
             price = state.price,
@@ -76,9 +76,10 @@ fun BottomSheetWriteOffAnimal(
             isManyCount = true,
             supportTextRes = R.string.support_text_price_animals,
             supportTextResAutoCal = R.string.support_text_price_one_animals,
+            isNecessarily = true,
             count = state.count,
-            countSuffix = countSuffix,
-            priceSuffix = currencyPrice,
+            countSuffix = state.suffix,
+            priceSuffix = currencyPrice
         )
         OutlinedTextDateNew(
             value = state.date,
@@ -86,9 +87,7 @@ fun BottomSheetWriteOffAnimal(
         )
         OutlinedTextNoteNew(
             value = state.note,
-            onValueChange = {
-                onIntent(AnimalCountIntent.NoteChanged(it))
-            }
+            onValueChange = { onIntent(AnimalCountIntent.NoteChanged(it)) }
         )
     }
 }

@@ -29,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -61,10 +60,8 @@ import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
-import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_11
 import com.zaroslikov.fermacompose2.orang_13
-import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
@@ -87,7 +84,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
@@ -156,6 +153,7 @@ fun AnimalListScreen(
         if (state.openBottomSheetEntry)
             AnimalEntryBottomSheet(
                 state = state.currentProduct,
+                priceSuffix = state.settings.currencySuffix,
                 colors = colors,
                 onIntent = viewModel::onIntent,
             )
@@ -194,7 +192,8 @@ private fun WarningDeleteAnimalBottomSheet(
 private fun AnimalEntryBottomSheet(
     colors: List<Color>,
     state: AnimalEntryState2,
-    onIntent: (AnimalListIntent) -> Unit
+    onIntent: (AnimalListIntent) -> Unit,
+    priceSuffix: Suffix
 ) {
     EntryBottomSheet(
         isEntry = true,
@@ -273,7 +272,7 @@ private fun AnimalEntryBottomSheet(
             isManyCount = state.isAnimalGroup,
             count = state.count,
             countSuffix = state.countSuffix,
-            priceSuffix = Suffix.RUBLE,
+            priceSuffix = priceSuffix,
         )
         OutlinedTextDateNew(
             value = state.dateBorn,

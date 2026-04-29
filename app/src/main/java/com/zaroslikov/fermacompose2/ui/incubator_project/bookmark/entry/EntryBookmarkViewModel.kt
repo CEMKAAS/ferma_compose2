@@ -21,7 +21,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -100,8 +100,7 @@ class EntryBookmarkViewModel @Inject constructor(
                             parameterDayList = setIncubator(state.currentProduct.type),
                             breed = resourceProvider.getString(R.string.entry_bookmark_not_specified),
                             autoRotation = incubatorTable.isAutoRotation,
-                            autoVentilation = incubatorTable.isAutoVentilation,
-                            currencySuffix = incubatorTable.currencySuffix
+                            autoVentilation = incubatorTable.isAutoVentilation
                         )
                     )
                 }
@@ -133,6 +132,7 @@ class EntryBookmarkViewModel @Inject constructor(
                         breedList = breedList,
                         templatesBookmarkList = templatesBookmarkList,
                         incubatorCount = incubatorTable.capacity,
+                        currencySuffix = incubatorTable.currencySuffix
                     )
                 )
             }
@@ -678,7 +678,8 @@ class EntryBookmarkViewModel @Inject constructor(
             endDate = endDate,
             time = time,
             price = if (price.isEmpty()) null else price.toConvertDbDouble(),
-            priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
+            priceAll = if (price.isEmpty()) null else if (isAutoPrice) priceAll.toConvertDbDouble() else null,
+            priceSuffix = if (price.isEmpty()) null else currencySuffix,
             note = note,
             isAutoRotation = autoRotation,
             isAutoVentilation = autoVentilation,

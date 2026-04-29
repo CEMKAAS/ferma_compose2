@@ -1,5 +1,6 @@
 package com.zaroslikov.domain.models.table
 
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import kotlinx.serialization.Serializable
 
@@ -17,6 +18,7 @@ data class DomainBookmark(
     val time: String = "",
     val price: Double? = null,
     val priceAll: Double? = null,
+    val priceSuffix: Suffix? = null,
     val chickPrice: Double? = null,
     val note: String = "",
     val isAutoRotation: Boolean = false,

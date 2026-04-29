@@ -68,7 +68,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.text_30
-import com.zaroslikov.fermacompose2.ui.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.incubator_project.journal.TranslucentCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.white
