@@ -1,6 +1,6 @@
 package com.zaroslikov.data.room.database.migration
 
-import android.util.Log
+
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -16,16 +16,18 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 date TEXT NOT NULL,
                 date_end TEXT NOT NULL,
                 mode INTEGER NOT NULL,
-                archive INTEGER NOT NULL
+                archive INTEGER NOT NULL,
+                imagePath TEXT,
+                currentIcon INTEGER
             )
         """.trimIndent()
         )
         db.execSQL(
             """
             INSERT INTO project_table(
-                id, title, date, date_end, mode, archive
+                id, title, date, date_end, mode, archive, imagePath, currentIcon
             )
-            SELECT _id, NAME, DATA, DATAEND, mode, 0 FROM МyINCUBATOR WHERE mode = 1
+            SELECT _id, NAME, DATA, DATAEND, mode, NULL, NULL FROM МyINCUBATOR WHERE mode = 1
         """.trimIndent()
         )
 
@@ -196,7 +198,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 is_group INTEGER NOT NULL,
                 sex INTEGER NOT NULL,
                 note TEXT NOT NULL,
-                image TEXT,
+                image_path TEXT,
+                icon INTEGER,
                 archive INTEGER NOT NULL,
                 food_day REAL NOT NULL,
                 food_day_suffix INTEGER NOT NULL,
@@ -211,11 +214,11 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             """
             INSERT INTO animal_table (
                 id, name, type, date, date_factory, is_group, sex,
-                note, image, archive, food_day, food_day_suffix, price, idPT
+                note, image_path, icon, archive, food_day, food_day_suffix, price, idPT
             )
             SELECT
                 id, name, type, data, NULL, groop, (CASE WHEN sex IS 'Мужской' THEN 0 ELSE 1 END) AS sex, 
-                note, NULL, arhiv, foodDay, 18, price, idPT
+                note, NULL, NULL, arhiv, foodDay, 18, price, idPT
             FROM AnimalTable
         """.trimIndent()
         )
@@ -255,7 +258,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             FROM AnimalCountTable
         """.trimIndent()
         )
-        db.execSQL("DROP TABLE AnimalCountTable") //TODO весия всегда добавление
+        db.execSQL("DROP TABLE AnimalCountTable")
 
         //==================== Миграция AnimalVaccinationTable ====================
         db.execSQL(
@@ -355,6 +358,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 year INTEGER NOT NULL,
                 price REAL NOT NULL,
                 count_suffix INTEGER NOT NULL,
+                price_suffix INTEGER NOT NULL,
                 category TEXT NOT NULL,
                 animal_id INTEGER,
                 note TEXT NOT NULL,
@@ -371,7 +375,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             """
             INSERT INTO add_table (
                 _id, title, count, day, month, year, price,
-                count_suffix, category, animal_id, note, idPT
+                count_suffix, price_suffix, category, animal_id, note, idPT
             )
             SELECT
                 _id, title, disc, DAY, MOUNT, YEAR, PRICE,
@@ -381,9 +385,10 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN suffix = 'Л.' THEN 8
                    ELSE 1
                 END,
-                   category, idAnimal, note, idPT
+                 13, category, NULLIF(idAnimal, 0), 
+               note, idPT
             FROM MyFerma
-        """.trimIndent() //TODO idAnimal всегда 0 или заменить на null
+        """.trimIndent()
         )
         db.execSQL("CREATE INDEX IF NOT EXISTS index_add_table_idPT ON add_table(idPT)")
         db.execSQL("CREATE INDEX IF NOT EXISTS index_add_table_animal_id ON add_table(animal_id)")
@@ -400,6 +405,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 count_suffix INTEGER NOT NULL,
                 price REAL,
                 price_all REAL,
+                price_suffix INTEGER,
                 category NOT NULL,
                 day INTEGER NOT NULL,
                 month INTEGER NOT NULL,
@@ -418,7 +424,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             """
             INSERT INTO write_off_table (
-                _id, title, count, count_suffix, price, price_all, category, day, month, year,
+                _id, title, count, count_suffix, price, price_all, price_suffix category, day, month, year,
                 status, note, idPT, animal_count_id
             )
             SELECT _id, titleWRITEOFF, discWRITEOFF, 
@@ -428,7 +434,9 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN suffix = 'Л.' THEN 8
                    ELSE 1
                END,
-            priceAll, NULL, 'Прочее', DAY, MOUNT, YEAR,
+            priceAll, NULL, 
+            CASE WHEN priceAll IS NULL THEN NULL ELSE 13 END,
+           'Прочее', DAY, MOUNT, YEAR,
             statusWRITEOFF, note, idPT, NUll
             FROM MyFermaWRITEOFF
         """.trimIndent()
@@ -451,6 +459,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 count_suffix INTEGER NOT NULL,
                 price REAL NOT NULL,
                 price_all REAL,
+                price_suffix INTEGER NOT NULL,
                 day INTEGER NOT NULL,
                 month INTEGER NOT NULL,
                 year INTEGER NOT NULL,
@@ -470,7 +479,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             """
             INSERT INTO sale_table(
-                _id, title, count, count_suffix, price, price_all,day, month, year,
+                _id, title, count, count_suffix, price, price_all, price_suffix, day, month, year,
                 category, buyer, note, idPT, animal_id, animal_count_id
             )
             SELECT
@@ -484,7 +493,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN suffix = 'М.' THEN 12
                    ELSE 1
                   END,
-                PRICE, NULL, DAY, MOUNT, YEAR, 
+                PRICE, NULL, 13, DAY, MOUNT, YEAR, 
                 category, buyer, note, idPT, NULL, NULL
             FROM MyFermaSale
         """.trimIndent()
@@ -510,6 +519,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 price REAL NOT NULL,
                 price_all REAL,
                 count_suffix INTEGER NOT NULL,
+                price_suffix INTEGER NOT NULL,
                 category TEXT NOT NULL,
                 note TEXT NOT NULL,
                 is_food INTEGER NOT NULL,
@@ -534,13 +544,13 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             """
             INSERT INTO MyFermaEXPENSES_new (
-                _id, title, count, day, month, year, price, price_all,
+                _id, title, count, day, month, year, price, price_all, price_suffix,
                 count_suffix, category, note, is_food,
                 is_show_food, feed_food, feed_food_suffix, count_animal,
                 food_designed_day, last_day_food, weight,  weight_suffix,idPT, animalId, animal_vaccination_id, animal_count_id
             )
             SELECT
-                _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES, NULL,
+                _id, titleEXPENSES, discEXPENSES, DAY, MOUNT, YEAR, countEXPENSES, NULL, 13,
                 CASE
                    WHEN suffix = 'Шт.' THEN 1
                    WHEN suffix = 'Кг.' THEN 5
@@ -612,6 +622,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 year,
                 price,
                 price_all,
+                price_suffix,
                 count_suffix,
                 category,
                 note,
@@ -640,6 +651,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 CAST(substr(date, 7, 4) AS INTEGER) AS year,
                 price,
                 NULL,
+                13,
                 1 AS count_suffix,
                 'Покупка животных' AS category,
                 note,
