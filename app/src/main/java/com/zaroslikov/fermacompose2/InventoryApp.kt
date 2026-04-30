@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2
 
 
+import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
@@ -48,12 +50,17 @@ import kotlinx.coroutines.launch
 fun InventoryApp(
     navController: NavHostController = rememberNavController(),
     action: String?,
-    projectId: Long
+    projectId: Long,
+    viewModel: InventoryAppViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val activity = LocalActivity.current
+
+    if (activity != null && !viewModel.isFirstLaunch)
+        SplashScreen(activity = activity)
 
     ObserveAsEvents(
         flow = SnackbarController.events,
@@ -73,7 +80,6 @@ fun InventoryApp(
             }
         }
     }
-
     Scaffold(
         modifier = Modifier.pointerInput(Unit) {
             detectTapGestures(onTap = {
@@ -81,13 +87,7 @@ fun InventoryApp(
             })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-//            Banner(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//            )
-        }
+        bottomBar = {}
     ) {
         InventoryNavHost(
             navController = navController,

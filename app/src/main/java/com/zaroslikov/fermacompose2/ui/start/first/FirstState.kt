@@ -16,5 +16,6 @@ data class FirstState(
     val isOpenDeleteBottomSheet: Boolean = false,
     val currentProjectTable: DomainProjectTable? = null,
     val appSettings: DomainAppSettings = DomainAppSettings(),
+    val isFirstLaunch : Boolean = false,
     val isNotificationAsked: Boolean = false //todo
 ) : ListState()

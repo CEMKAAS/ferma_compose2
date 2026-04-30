@@ -63,6 +63,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString2
 import com.zaroslikov.fermacompose2.supportFun.monthToResString3
+import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.white
 import io.appmetrica.analytics.AppMetrica
 import java.time.LocalDate
@@ -159,6 +160,7 @@ private fun FinanceBody(
                 suffix = suffix
             ) { navigate(it) }
         }
+        AdsCard()
         TransactionList(incomeExpensesList, suffix)
     }
 }

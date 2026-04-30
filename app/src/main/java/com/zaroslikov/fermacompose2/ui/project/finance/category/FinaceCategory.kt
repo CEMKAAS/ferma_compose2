@@ -103,6 +103,7 @@ import com.zaroslikov.fermacompose2.ui.finance.TransactionFinanceCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
 
@@ -222,6 +223,7 @@ private fun FinanceCategoryBody2(
                 suffixPrice = suffix,
                 color = colors.first()
             )
+            AdsCard()
             ProductListCard(productList, onDetailClick = { onDetailClick(it) }, suffix = suffix)
         }
     }

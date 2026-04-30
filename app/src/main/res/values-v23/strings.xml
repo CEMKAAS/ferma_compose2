@@ -31,6 +31,11 @@
     <string name="animal_screen_title2">Животные</string>
     <string name="is_empty"></string>
 
+    //Ads
+    <string name="yandex_banner_ads">demo-appopenad-yandex</string> //R-M-12224806-1
+    <string name="yandex_first_launch_ads">demo-appopenad-yandex</string> // R-M-12224806-2
+
+
     // BottomBarProject
     <string name="bottom_bar_magazine">Журнал</string>
     <string name="bottom_bar_warehouse">Склад</string>
@@ -365,7 +370,7 @@
     <string name="about_app_screen_love_part_1">Создано с</string>
     <string name="about_app_screen_love_part_2">для фермеров</string>
     <string name="about_app_screen_help_us_title">Помогите нам стать лучше!</string>
-    <string name="about_app_screen_help_us_text">Мы постоянно развиваем приложение и ценим мнение каждого пользователя. У вас есть идеи по улучшению? Нашли ошибку? Хотите предложить новую функцию? Напишите нам — мы всегда рады обратной связи! Присоединяйcя к нашим соцсетям! Это отличный способ оставаться в курсе новостей, делиться впечатлениями и предлагать идеи для улучшения приложения. Давайте вместе сделаем Ваше хозяйство еще лучше!</string>
+    <string name="about_app_screen_help_us_text">Мы постоянно развиваем приложение и ценим мнение каждого пользователя.\nУ вас есть идеи по улучшению? Нашли ошибку? Хотите предложить новую функцию?\nНапишите нам — мы всегда рады обратной связи! Присоединяйcя к нашим соцсетям! Это отличный способ оставаться в курсе новостей, делиться впечатлениями и предлагать идеи для улучшения приложения.\nДавайте вместе сделаем Ваше хозяйство еще лучше!</string>
 
     //SettingsScreen
     <string name="settings_screen_title">Настройки приложения</string>

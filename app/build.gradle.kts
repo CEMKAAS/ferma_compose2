@@ -103,8 +103,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
-//    implementation (libs.mobileads)
-
+    // Ads
+    implementation("com.yandex.android:mobileads:8.0.0")
+    implementation("com.yandex.android:mobileads-compose:8.0.0")
 
     //Coil
     implementation(libs.coil.compose)

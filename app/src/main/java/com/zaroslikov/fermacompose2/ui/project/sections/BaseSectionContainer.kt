@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.project.sections
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
@@ -34,12 +35,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.yandex.mobile.ads.common.AdRequest
+import com.yandex.mobile.ads.compose.BannerEvents
+import com.yandex.mobile.ads.compose.BannerSize
+import com.yandex.mobile.ads.compose.rememberBannerAdState
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -80,6 +90,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.DetailBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
@@ -173,6 +184,36 @@ private fun <T, B> InventoryList(
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
 ) {
+
+    /*val bannerState = rememberBannerAdState(
+        adSize = BannerSize.Inline(width = 330.dp, maxHeight = 75.dp),
+        events = BannerEvents(
+            onAdLoaded = {
+                Log.d("YandexAds", "Баннер загружен")
+            },
+            onAdFailedToLoad = { e ->
+                Log.e("YandexAds", e.description)
+            },
+        )
+    )
+
+    val bannerState2 = rememberBannerAdState(
+        adSize = BannerSize.Inline(width = 330.dp, maxHeight = 75.dp),
+        events = BannerEvents(
+            onAdLoaded = {
+                Log.d("YandexAds", "Баннер загружен")
+            },
+            onAdFailedToLoad = { e ->
+                Log.e("YandexAds", e.description)
+            },
+        )
+    )
+
+    LaunchedEffect(Unit) {
+        bannerState.loadAd(AdRequest.Builder("demo-banner-yandex").build())
+        bannerState2.loadAd(AdRequest.Builder("demo-banner-yandex").build())
+    }
+*/
     AnimatedContent(
         targetState = details,
         transitionSpec = {
@@ -210,11 +251,24 @@ private fun <T, B> InventoryList(
         ) {
             if (targetDetails) {
                 itemsIndexed(itemList) { index, item ->
-                    detailCard(index, item)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        detailCard(index, item)
+                        if ((index + 1) % 5 == 0 && index != itemList.lastIndex)
+                            AdsCard()
+                    }
+
                 }
             } else {
-                items(brieflyList) { item ->
-                    brieflyCard(item)
+                itemsIndexed(brieflyList) { index, item ->
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        brieflyCard(item)
+                        if ((index + 1) % 5 == 0 && index != itemList.lastIndex)
+                            AdsCard()
+                    }
                 }
             }
         }

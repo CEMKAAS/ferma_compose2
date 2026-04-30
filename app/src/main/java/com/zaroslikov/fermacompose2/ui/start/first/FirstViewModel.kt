@@ -216,6 +216,7 @@ class FirstViewModel @Inject constructor(
                     isFirstLaunch = false
                 )
             )
+            updateState { state -> state.copy(isFirstLaunch = true) }
             Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
             _notification.emit(UiNotification.Notification)
         }

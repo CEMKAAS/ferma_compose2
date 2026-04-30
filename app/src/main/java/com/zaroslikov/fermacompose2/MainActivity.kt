@@ -1,29 +1,22 @@
 package com.zaroslikov.fermacompose2
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.content.Context
-import android.content.SharedPreferences
-import android.content.pm.PackageInfo
-import android.os.Build
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import com.yandex.mobile.ads.appopenad.AppOpenAd
+import com.yandex.mobile.ads.appopenad.AppOpenAdLoadResult
+import com.yandex.mobile.ads.common.AdRequest
+import com.yandex.mobile.ads.common.YandexAds
+import com.yandex.mobile.ads.compose.rememberAppOpenAdLoader
 /*import com.yandex.mobile.ads.appopenad.AppOpenAd
 import com.yandex.mobile.ads.appopenad.AppOpenAdEventListener
 import com.yandex.mobile.ads.appopenad.AppOpenAdLoadListener
@@ -40,7 +33,6 @@ import com.yandex.mobile.ads.interstitial.InterstitialAdLoader*/
 //import com.zaroslikov.fermacompose2.ui.add.incubator.AlertDialogExample
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
 import dagger.hilt.android.AndroidEntryPoint
-import io.appmetrica.analytics.AppMetrica
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -50,11 +42,6 @@ class MainActivity : ComponentActivity() {
         const val REQUEST_CODE_NOTIFICATION_PERMISSIONS = 11
     }
 
-    /* private var appOpenAd: AppOpenAd? = null
-     private var isAdShownOnColdStart = false
-
-     private var interstitialAd: InterstitialAd? = null
-     private var interstitialAdLoader: InterstitialAdLoader? = null*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -66,187 +53,30 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             FermaCompose2Theme {
-                /*MobileAds.initialize(this) {
-                    loadAppOpenAd()
-                    val processLifecycleObserver = DefaultProcessLifecycleObserver(
-                        onProcessCaneForeground = ::showAppOpenAd
-                    )
-                    ProcessLifecycleOwner.get().lifecycle.addObserver(processLifecycleObserver)
-                }*/
-//                var openFirstDialog by rememberSaveable { mutableStateOf(startBoolean) }
-
+                YandexAds.initialize(this) {}
                 InventoryApp(action = action, projectId = projectId)
             }
         }
     }
-
-
-    /*private fun getNotificationPermissions() {
-        try {
-            val hasAccessNotificationPolicyPermission =
-                checkSelfPermission(Manifest.permission.ACCESS_NOTIFICATION_POLICY) == PackageManager.PERMISSION_GRANTED
-            val hasPostNotificationsPermission =
-                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-            when {
-                !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
-                    ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(
-                            Manifest.permission.ACCESS_NOTIFICATION_POLICY,
-                            Manifest.permission.POST_NOTIFICATIONS
-                        ), REQUEST_CODE_NOTIFICATION_PERMISSIONS
-                    )
-                }
-
-                else -> Log.d(TAG, "Notification Permissions : previously granted successfully")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }*/
-
-    /* override fun onRequestPermissionsResult(
-         requestCode: Int,
-         permissions: Array<out String>,
-         grantResults: IntArray
-     ) {
-         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-         when (requestCode) {
-             REQUEST_CODE_NOTIFICATION_PERMISSIONS -> {
-                 val hasAccessNotificationPolicyPermission =
-                     grantResults[0] == PackageManager.PERMISSION_GRANTED
-                 val hasPostNotificationsPermission =
-                     grantResults[1] == PackageManager.PERMISSION_GRANTED
-                 when {
-                     !hasAccessNotificationPolicyPermission || !hasPostNotificationsPermission -> {
-                         getNotificationPermissions()
-                     }
-                     else -> {
-                         Log.d(TAG, "Notification Permissions : Granted successfully")
-                     }
-                 }
-             }
-         }
-     }*/
-
-    /*//Реклама при клике
-    private fun loadInterstitialAd() {
-        val adRequestConfiguration =
-            AdRequestConfiguration.Builder("R-M-12224806-2").build()
-        interstitialAdLoader?.loadAd(adRequestConfiguration)
-    }
-
-    fun showAd() {
-        interstitialAd?.apply {
-            setAdEventListener(object : InterstitialAdEventListener {
-                override fun onAdShown() {}
-                override fun onAdFailedToShow(adError: AdError) {
-                    destroyInterstitialAd()
-                    loadInterstitialAd()
-                }
-
-                override fun onAdDismissed() {
-                    destroyInterstitialAd()
-                    loadInterstitialAd()
-                }
-
-                override fun onAdClicked() {}
-                override fun onAdImpression(impressionData: ImpressionData?) {}
-            })
-            show(this@MainActivity)
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        interstitialAdLoader?.setAdLoadListener(null)
-        interstitialAdLoader = null
-        destroyInterstitialAd()
-    }
-
-    private fun destroyInterstitialAd() {
-        interstitialAd?.setAdEventListener(null)
-        interstitialAd = null
-    }
-
-    //Реклама при хапуске приложения
-    private fun showAppOpenAd() {
-        val appOpenAdEventListener = AdEventListener()
-        appOpenAd?.setAdEventListener(appOpenAdEventListener)
-        appOpenAd?.show(this@MainActivity)
-    }
-
-    private inner class AdEventListener : AppOpenAdEventListener {
-        override fun onAdShown() {}
-        override fun onAdFailedToShow(adError: AdError) {
-            clearAppOpenAd()
-            loadAppOpenAd()
-        }
-
-        override fun onAdDismissed() {
-            clearAppOpenAd()
-            loadAppOpenAd()
-        }
-
-        override fun onAdClicked() {}
-        override fun onAdImpression(impressionData: ImpressionData?) {}
-    }
-
-
-    private fun clearAppOpenAd() {
-        appOpenAd?.setAdEventListener(null)
-        appOpenAd = null
-    }
-
-    private fun loadAppOpenAd() {
-        val appOpenAdLoader = AppOpenAdLoader(application)
-        val appOpenAdLoadListener = object : AppOpenAdLoadListener {
-            override fun onAdLoaded(appOpenAd: AppOpenAd) {
-                // The ad was loaded successfully. Now you can show loaded ad.
-                this@MainActivity.appOpenAd = appOpenAd
-                if (!isAdShownOnColdStart) {
-                    showAppOpenAd()
-                    isAdShownOnColdStart = true
-                }
-            }
-
-            override fun onAdFailedToLoad(adRequestError: AdRequestError) {}
-        }
-        appOpenAdLoader.setAdLoadListener(appOpenAdLoadListener)
-
-        val AD_UNIT_ID = "R-M-12224806-2"
-        val adRequestConfiguration = AdRequestConfiguration.Builder(AD_UNIT_ID).build()
-        appOpenAdLoader.loadAd(adRequestConfiguration)
-        appOpenAdLoader.loadAd(adRequestConfiguration)
-    }*/
-
 }
 
-// Функция для проверки первого запуска приложения
-/*fun isFirstLaunch(context: Context): Boolean {
-    val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-//    val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", true)
+@Composable
+fun SplashScreen(activity: Activity) {
+    var appOpenAd by remember { mutableStateOf<AppOpenAd?>(null) }
 
-    val savedVersion = sharedPreferences.getString("app_version", null)
-    val currentVersion = getCurrentAppVersion(context)
+    val loader = rememberAppOpenAdLoader()
+    val adUnitId = stringResource(R.string.yandex_first_launch_ads)
+    // Загружаем сразу при входе в composable
+    LaunchedEffect(Unit) {
 
-    val isFirstLaunch = savedVersion == null || savedVersion != currentVersion
-
-
-    if (isFirstLaunch) {
-        sharedPreferences.edit().putString("app_version", currentVersion).apply()
-        sharedPreferences.edit().putString("app_notifications", "20:00").apply()
+        val adRequest = AdRequest.Builder(adUnitId).build()
+        when (val result = loader.loadAd(adRequest)) {
+            is AppOpenAdLoadResult.Success -> appOpenAd = result.ad
+            is AppOpenAdLoadResult.Failure -> Log.e("YandexAds", result.error.description)
+        }
     }
 
-    return isFirstLaunch
-}*/
-/*private fun getCurrentAppVersion(context: Context): String {
-    return try {
-        val packageInfo: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        packageInfo.versionName
-    } catch (e: PackageManager.NameNotFoundException) {
-        "unknown"
+    LaunchedEffect(appOpenAd) {
+        appOpenAd?.show(activity)
     }
-}*/
+}

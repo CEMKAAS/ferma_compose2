@@ -181,7 +181,7 @@ private fun ContactCard() {
             ) {
                 AppMetrica.reportEvent("Переход в почту")
             }
-            Contact(
+            /*Contact(
                 titleRes = R.string.about_app_screen_telegram,
                 supportText = "@myfarmingapp",
                 icon = R.drawable.ic_telegram,
@@ -189,7 +189,7 @@ private fun ContactCard() {
                 colorIcon = white
             ) {
                 AppMetrica.reportEvent("Переход в телеграмм")
-            }
+            }*/
             Contact(
                 titleRes = R.string.about_app_screen_vk,
                 supportText = "vk.com/myfermaapp",

@@ -5,6 +5,7 @@ package com.zaroslikov.fermacompose2.ui.start.first
 import android.Manifest
 import android.os.Build
 import android.util.Log
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -48,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.SplashScreen
 import com.zaroslikov.fermacompose2.TopAppBarStart2
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.dark
@@ -145,6 +147,9 @@ fun FirstScreen(
             }
         }
     }
+
+
+
     if (state.isLoading)
         CircularProgress(
             modifier = Modifier,

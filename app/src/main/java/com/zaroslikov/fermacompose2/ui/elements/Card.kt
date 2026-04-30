@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -30,22 +31,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.yandex.mobile.ads.common.AdRequest
+import com.yandex.mobile.ads.compose.Banner
+import com.yandex.mobile.ads.compose.BannerSize
+import com.yandex.mobile.ads.compose.rememberBannerAdState
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
@@ -1382,4 +1391,38 @@ fun InfoCard(
             }
         }
     }
+}
+
+@Composable
+fun AdsCard(
+    maxHeight: Dp = 100.dp
+) {
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    val horizontalPadding = dimensionResource(id = R.dimen.padding_medium)
+    val availableWidth = screenWidthDp - (horizontalPadding * 2 + 20.dp)
+    val adUnitId = stringResource(R.string.yandex_banner_ads)
+    val bannerState = rememberBannerAdState(
+        adSize = BannerSize.Inline(width = availableWidth, maxHeight = maxHeight),
+    )
+    LaunchedEffect(Unit) {
+        bannerState.loadAd(AdRequest.Builder(adUnitId).build())
+    }
+
+    Banner(
+        state = bannerState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 5.dp,
+                shape = RoundedCornerShape(14.dp),
+                clip = false
+            )
+            .background(
+                color = white,
+                shape = RoundedCornerShape(14.dp)
+            )
+//            .padding(vertical = 15.dp, horizontal = 20.dp) // внешний отступ карточки
+    )
+
 }

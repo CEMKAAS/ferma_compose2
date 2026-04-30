@@ -92,6 +92,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.text_36
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.ui.incubator_project.journal.TranslucentCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.NoteWidget
@@ -272,6 +273,7 @@ private fun BookmarkContainer(
                 OvoscopCard(state.currentParameterDay.ovoscopyState.supportText) {
                     onIntent(BookmarkIntent.OpenOvoscopBottomSheetClick(true))
                 }
+            AdsCard()
             if (!state.isCompleteModeEnd)
                 TomorrowParameters(
                     isAutoAiring = state.domainBookmark.isAutoVentilation,

@@ -69,6 +69,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.text_24
 import com.zaroslikov.fermacompose2.ui.elements.text_30
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.ui.incubator_project.journal.TranslucentCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.white
@@ -144,6 +145,7 @@ private fun FinanceIncubatorContainer(
             averageChicksPrice = state.domainFinanceIncubatorMain.averageChicksPrice,
             costChicksPrice = state.domainFinanceIncubatorMain.costChicksPrice,
         )
+        AdsCard()
         FinanceBookmarkCardList(
             list = state.domainFinanceIncubatorHistory,
             priceSuffix = state.priceSuffix

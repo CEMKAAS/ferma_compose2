@@ -94,6 +94,7 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.IconTitle
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.white
@@ -188,6 +189,7 @@ private fun JournalContainer(
             onChoiceClick = { onIntent(JournalIntent.ChoiceTypeClicked(it)) },
             onResetClick = { onIntent(JournalIntent.ResetTypeClicked) }
         )
+        AdsCard()
         HistoryConclusions(
             list = state.domainBookmarkList,
             isArchive = state.isArchive,
