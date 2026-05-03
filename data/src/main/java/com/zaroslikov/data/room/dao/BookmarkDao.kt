@@ -45,7 +45,7 @@ interface BookmarkDao {
     @Query("SELECT * FROM bookmark_incubator WHERE idPT =:id")
     fun getAllBookmark(id: Long): Flow<List<BookmarkTable>>
 
-    @Query("SELECT breed FROM bookmark_incubator WHERE type =:type GROUP BY breed")
+    @Query("SELECT breed FROM bookmark_incubator WHERE type =:type AND breed IS NOT NULL GROUP BY breed")
     fun getBreedBookmark(type: TypeEgg): Flow<List<String>>
 
     @Query(
@@ -53,7 +53,7 @@ interface BookmarkDao {
                 " breed AS title," +
                 " SUM(count) as count " +
                 " FROM bookmark_incubator" +
-                " WHERE is_activity_bookmark = 0 and idPT =:idPT and type =:type" +
+                " WHERE is_activity_bookmark = 0 AND idPT =:idPT AND type =:type" +
                 " GROUP BY breed"
     )
     fun getBreedStatisticList(type: TypeEgg, idPT: Long): Flow<List<TitleCountDto>>

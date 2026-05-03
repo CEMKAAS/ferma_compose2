@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainProjectTable
@@ -145,6 +146,7 @@ fun CompleteIncubationBottomSheet(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(
+                            modifier = Modifier.weight(1f, fill = false),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
@@ -519,7 +521,9 @@ private fun Cards(
             Text(
                 stringResource(stringRes),
                 style = text_14,
-                color = marengo
+                color = marengo,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxHeight()
             )
         }
     }

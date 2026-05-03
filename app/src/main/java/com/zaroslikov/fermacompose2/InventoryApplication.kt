@@ -4,6 +4,7 @@ package com.zaroslikov.fermacompose2
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.yandex.mobile.ads.common.YandexAds
 import dagger.hilt.android.HiltAndroidApp
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
@@ -19,7 +20,7 @@ class InventoryApplication : Application(), Configuration.Provider {
         val config =
             AppMetricaConfig.newConfigBuilder("7bc20e66-fc56-4002-ac33-4cc15dd28213").build()
         AppMetrica.activate(this, config)
-//        MobileAds.initialize(this) { }
+        YandexAds.initialize(this) {}
 //        container = AppDataContainer(this)
     }
 

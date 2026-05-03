@@ -1,8 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.main
 
-import android.util.Log
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize

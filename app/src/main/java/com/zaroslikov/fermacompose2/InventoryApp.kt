@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2
 
 
+import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -27,8 +28,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -59,9 +64,7 @@ fun InventoryApp(
     val scope = rememberCoroutineScope()
     val activity = LocalActivity.current
 
-    if (activity != null && !viewModel.isFirstLaunch)
-        SplashScreen(activity = activity)
-
+    var showSplash by rememberSaveable { mutableStateOf(true) }
     ObserveAsEvents(
         flow = SnackbarController.events,
         snackbarHostState
@@ -87,13 +90,25 @@ fun InventoryApp(
             })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {}
     ) {
-        InventoryNavHost(
-            navController = navController,
-            modifier = Modifier.padding(it),
-            action = action, projectId = projectId
-        )
+
+        Log.i("YandexAds", "isFirst: ${!viewModel.isFirstLaunch}")
+        Log.i("YandexAds", "showSplash:  $showSplash")
+        if (activity != null && (!viewModel.isFirstLaunch && showSplash))
+            SplashScreen(
+                activity = activity,
+                onFinished = {
+                    showSplash = false
+                }
+            )
+        else
+            InventoryNavHost(
+                navController = navController,
+                modifier = Modifier.padding(it),
+                action = action,
+                projectId = projectId
+            )
+
     }
 }
 

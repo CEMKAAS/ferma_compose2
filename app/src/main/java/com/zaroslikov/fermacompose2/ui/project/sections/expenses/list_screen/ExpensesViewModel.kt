@@ -355,7 +355,7 @@ class ExpensesViewModel @Inject constructor(
                 domain.month,
                 domain.year
             ),
-            category = domain.category,
+            category = domain.category?: resourceProvider.getString(R.string.support_text_no_category),
             note = domain.note,
             isFood = domain.isFood,
             isShowFood = domain.isShowFood,
@@ -445,7 +445,7 @@ class ExpensesViewModel @Inject constructor(
             year = year,
             price = price,
             countSuffix = countSuffix,
-            category = category ?: resourceProvider.getString(R.string.support_text_no_category),
+            category = category,
             note = note,
             isFood = isFood,
             isShowFood = isShowFood,

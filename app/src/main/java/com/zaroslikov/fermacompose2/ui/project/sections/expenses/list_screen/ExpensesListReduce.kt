@@ -6,6 +6,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.list.suffixFoodList
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.convertWeightDay
 import com.zaroslikov.fermacompose2.supportFun.isSlash
@@ -172,9 +173,10 @@ class ExpensesListReduce(private val resourceProvider: ResourceProvider) :
         val searchList = if (query.isBlank() && !isGroup) list
         else
             list.filter { item ->
+               val category = item.category?: resourceProvider.getString(R.string.support_text_no_category)
                 item.title.lowercase().contains(query) ||
                         item.note.lowercase().contains(query) ||
-                        item.category.lowercase().contains(query) ||
+                        category.lowercase().contains(query) ||
                         item.count.toString().lowercase().contains(query) ||
                         resourceProvider.getString(item.countSuffix.toResId()).lowercase()
                             .contains(query) ||

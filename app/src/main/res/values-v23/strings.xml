@@ -34,6 +34,8 @@
     //Ads
     <string name="yandex_banner_ads">demo-appopenad-yandex</string> //R-M-12224806-1
     <string name="yandex_first_launch_ads">demo-appopenad-yandex</string> // R-M-12224806-2
+    //AdsSupportText
+    <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите пожалуйста...</string> // R-M-12224806-2
 
 
     // BottomBarProject
@@ -464,7 +466,7 @@
     <string name="add_incubator_screen_brand_support">Укажите или выберите марку</string>
     <string name="add_incubator_screen_model">Модель</string>
     <string name="add_incubator_screen_model_support">Укажите или выберите модель</string>
-    <string name="add_incubator_screen_capacity">Вместимость*</string>
+    <string name="add_incubator_screen_capacity">Вместимость</string>
     <string name="add_incubator_screen_capacity_egg">Укажите на сколько яйц инкубатор</string>
     <string name="add_incubator_screen_date_sale">Дата покупки</string>
     <string name="add_incubator_screen_incubator_sell">Стоимость инкубатора</string>
@@ -640,6 +642,7 @@
     <string name="journal_screen_new_date_sup">Выбранная закладка станет активной, и период инкубации начнется с сегодняшнего дня</string>
     <string name="journal_screen_delete_title">Действие необратимо</string>
     <string name="journal_screen_delete_title_sup">Все данные закладки будут безвозвратно удалены, включая историю параметров и результаты овоскопирования</string>
+    <string name="journal_screen_delete_no_breed">Не указано</string>
 
     //FinanceIncubatorScreen
     <string name="finance_incubator_screen_title">Финансы</string>

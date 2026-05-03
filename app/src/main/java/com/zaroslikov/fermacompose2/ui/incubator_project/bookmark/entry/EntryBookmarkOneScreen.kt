@@ -3,12 +3,8 @@ package com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,16 +13,11 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.typeEggList
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.gray_5
-import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.orang_15
-import com.zaroslikov.fermacompose2.orang_5
-import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CardNewWithTitle
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
-import com.zaroslikov.fermacompose2.ui.elements.OutlineIconButtonNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedNumberNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
@@ -35,11 +26,8 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDropdownMe
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.TimeOutlinedTextFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.text_12
-import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.NotificationFun
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.FunctionIncubatorCard
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.ProductKillCard
 
 @Composable
 fun EntryBookmarkOneScreen(

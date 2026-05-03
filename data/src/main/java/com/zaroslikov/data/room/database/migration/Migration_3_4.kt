@@ -470,7 +470,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             priceAll, NULL, 
             CASE WHEN priceAll IS NULL THEN NULL ELSE 13 END,
             NULL, DAY, MOUNT, YEAR,
-            statusWRITEOFF, note, idPT, NUll
+            NOT statusWRITEOFF, note, idPT, NUll
             FROM MyFermaWRITEOFF
         """.trimIndent()
         )

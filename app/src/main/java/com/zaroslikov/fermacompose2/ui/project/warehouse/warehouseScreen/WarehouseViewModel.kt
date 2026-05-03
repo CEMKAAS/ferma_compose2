@@ -129,7 +129,7 @@ class WarehouseViewModel @Inject constructor(
                     year = dateList[2].toInt(),
                     price = 0.0,
                     priceSuffix = getState().settings.currencySuffix,
-                    category = domain.category ?: "",
+                    category = domain.category,
                     animalId = domain.idAnimal,
                     note = resourceProvider.getString(R.string.warehouse_screen_fast_add_note),
                     idPT = itemId

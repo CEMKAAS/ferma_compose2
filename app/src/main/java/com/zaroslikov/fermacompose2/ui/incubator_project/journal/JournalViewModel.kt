@@ -12,6 +12,7 @@ import com.zaroslikov.domain.models.table.DomainIncubatorTable
 import com.zaroslikov.domain.repository.BookmarkRepository
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.domain.repository.ProjectRepository
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -125,6 +126,7 @@ class JournalViewModel @Inject constructor(
             val breedUi = if (!wasSelected) {
                 val domainBreedList =
                     bookmarkRepository.getBreedStatisticList(typeEgg, getState().idPT).first()
+
                 val breedSumEgg = domainBreedList.sumOf { type -> type.count }
                 domainBreedList.map { it.toBreedList(breedSumEgg) }
             } else emptyList()
@@ -273,7 +275,7 @@ class JournalViewModel @Inject constructor(
     private fun DomainTitleCount.toBreedList(countAll: Int): BreedUi {
         val (percent, percentFloat) = percentCalculate(count, countAll)
         return BreedUi(
-            breed = title,
+            breed = title ?: resourceProvider.getString(R.string.journal_screen_delete_no_breed),
             count = count,
             percent = percent,
             percentFloat = percentFloat,
@@ -293,7 +295,7 @@ class JournalViewModel @Inject constructor(
         value: String,
         valueTwo: String?
     ): String {
-        return if (valueTwo != null) value else "$value • $valueTwo"
+        return if (valueTwo == null) value else "$value • $valueTwo"
     }
 }
 

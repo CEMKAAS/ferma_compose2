@@ -107,7 +107,7 @@ data class ExpensesTableUi(
     val price: Double = 0.0,
     val priceAll: Double? = null,
     val countSuffix: Suffix = Suffix.PIECES,
-    val category: String = "",
+    val category: String? = null,
     val note: String = "",
     val isFood: Boolean = false,
     val isShowFood: Boolean = false, // Показывать на складе еду

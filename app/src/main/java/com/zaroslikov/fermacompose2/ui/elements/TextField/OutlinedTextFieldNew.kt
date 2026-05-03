@@ -212,6 +212,7 @@ fun OutlinedNumberNew(
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     maxLength: Int? = null,
     isBorderCard: Boolean = true,
+    isNecessarily: Boolean = false
     /*  colorTextField: Color = gray_9,*/
 ) {
     val textField: @Composable () -> Unit = {
@@ -228,7 +229,8 @@ fun OutlinedNumberNew(
             keyboardOptions = keyboardOptions,
             leadingIconRes2 = drawableRes2,
             leadingIconColor2 = drawableColor2,
-            maxLength = maxLength
+            maxLength = maxLength,
+            isNecessarily = isNecessarily
             /*colorTextField = colorTextField*/
         )
     }

@@ -241,7 +241,14 @@ private fun MainCard(
                         style = text_20,
                         color = white
                     )
-                    Text("$brand • $model", style = text_12, color = white.copy(alpha = 0.8f))
+                    if (brand!= null || model != null) {
+                        val point = if (brand == null || model == null) "" else " • "
+                        Text(
+                            "${(brand ?: "")}$point${(model ?: "")}",
+                            style = text_12,
+                            color = white.copy(alpha = 0.8f)
+                        )
+                    }
                 }
             }
             Column(

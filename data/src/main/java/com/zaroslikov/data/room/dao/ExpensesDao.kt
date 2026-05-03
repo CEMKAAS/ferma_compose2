@@ -73,7 +73,7 @@ interface ExpensesDao {
     )
     fun getItemsTitleExpensesList(id: Long): Flow<List<TitleAndSuffixDto>>
 
-    @Query("SELECT category FROM expenses_table WHERE idPT=:id GROUP BY category")
+    @Query("SELECT category FROM expenses_table WHERE idPT=:id AND category IS NOT NULL GROUP BY category")
     fun getItemsCategoryExpensesList(id: Long): Flow<List<String>>
 
     @Query(

@@ -84,10 +84,10 @@ interface SaleDao {
     fun getItemsTitleSaleList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 
 
-    @Query("SELECT category from sale_table Where idPT=:id group by category")
+    @Query("SELECT category from sale_table Where idPT=:id AND category IS NOT NULL GROUP BY category")
     fun getItemsCategorySaleList(id: Long): Flow<List<String>>
 
-    @Query("SELECT buyer from sale_table Where idPT=:id AND buyer IS NOT NULL group by buyer")
+    @Query("SELECT buyer from sale_table Where idPT=:id AND buyer IS NOT NULL GROUP BY buyer")
     fun getItemsBuyerSaleList(id: Long): Flow<List<String>>
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)

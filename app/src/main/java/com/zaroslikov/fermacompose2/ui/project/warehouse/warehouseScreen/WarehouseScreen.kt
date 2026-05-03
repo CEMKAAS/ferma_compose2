@@ -39,7 +39,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -272,7 +271,7 @@ private fun WarehouseContainer(
                         title = item.title,
                         value = item.count,
                         suffix = item.suffix
-                    ) { }
+                    )
                 }
         }
     }
@@ -284,15 +283,9 @@ private fun ProductCard(
     title: String,
     value: Double,
     suffix: Suffix,
-    onClick: () -> Unit
+    onClick: (() -> Unit)? = null
 ) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = ghostly_white),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = onClick
-    ) {
+    val row: @Composable () -> Unit = {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -308,6 +301,28 @@ private fun ProductCard(
             )
         }
     }
+
+    if (onClick != null)
+        CardFieldNew(
+            modifier = modifier,
+            padding = PaddingValues(),
+            shape = RoundedCornerShape(8.dp),
+            containerColor = ghostly_white,
+            elevation = 2.dp,
+            onClick = onClick
+        ) {
+            row()
+        }
+    else
+        CardFieldNew(
+            modifier = modifier,
+            padding = PaddingValues(),
+            shape = RoundedCornerShape(8.dp),
+            containerColor = ghostly_white,
+            elevation = 2.dp,
+        ) {
+            row()
+        }
 }
 
 
@@ -576,11 +591,12 @@ private fun FastAddCard(
                                 backgroundColor = green_g_3
                             )
                         }
-                        if (animal != null && category != null) Text(
-                            "•",
-                            style = text_12,
-                            color = grey
-                        )
+                        if (animal != null && category != null)
+                            Text(
+                                "•",
+                                style = text_12,
+                                color = grey
+                            )
                         category?.let {
                             Text(it, style = text_12, color = marengo)
                         }

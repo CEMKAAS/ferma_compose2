@@ -382,6 +382,7 @@ private fun RowCard(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
+            modifier = Modifier.weight(1f, false),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -411,17 +412,23 @@ private fun FinanceDoubleChicksCard(
 ) {
     val suffix = stringResource(priceSuffix.toResId())
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         FinanceChicksCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             stringRes = R.string.finance_incubator_screen_average_chicks,
             value = "${averageChicksPrice.formatNumber()} $suffix"
         )
         FinanceChicksCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             stringRes = R.string.finance_incubator_screen_chicks_price,
             value = "${costPrice.formatNumber()} $suffix"
         )
@@ -578,7 +585,8 @@ private fun FinanceBookmarkCard(
                 ) {
                     Text(title, style = text_14, color = black_2)
                     Text(
-                        "${stringResource(typeEgg.toResId())} ${breed?.let { "• $it " }}• " +
+                        "${stringResource(typeEgg.toResId())} " +
+                                (if (breed == null) "• " else "$breed • ") +
                                 "$egg ${stringResource(R.string.suffix_eggs)}",
                         style = text_12,
                         color = gray_7
@@ -655,12 +663,16 @@ private fun SupportDoubleCard(
     val suffixString = stringResource(suffix.toResId())
     val priceSuffixString = stringResource(priceSuffix.toResId())
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         SupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             iconRes = R.drawable.outline_check_circle_24,
             titleRes = R.string.finance_incubator_screen_posted,
             value = "${postedPrice.formatNumber()} $priceSuffixString",
@@ -670,7 +682,9 @@ private fun SupportDoubleCard(
             iconColor = price_green,
         )
         SupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             iconRes = R.drawable.outline_info_24,
             titleRes = R.string.finance_incubator_screen_losses,
             value = "${lossesPrice.formatNumber()} $priceSuffixString",

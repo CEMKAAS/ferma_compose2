@@ -167,7 +167,7 @@ private fun SaleDetailBottomSheet(
             priceAll = state.priceAll,
             priceSuffix = priceSuffix,
             category = state.category,
-            buyer = state.buyer,
+            buyer = state.buyer ?: stringResource(R.string.animal_card_screen_sale_note_no_buyer),
             date = date,
             note = state.note,
             iconColor = blue_1,

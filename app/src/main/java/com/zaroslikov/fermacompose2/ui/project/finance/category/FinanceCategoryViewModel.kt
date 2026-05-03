@@ -187,7 +187,8 @@ class FinanceCategoryViewModel @Inject constructor(
         return list.map { item ->
             val percent = if (total == 0.0) 0.0 else (item.price / total)
             CategoryUi(
-                category = item.category,
+                category = item.category
+                    ?: resourceProvider.getString(R.string.support_text_no_category),
                 price = item.price,
                 percentFloat = percent.toFloat(),
                 percentDouble = percent * 100.0

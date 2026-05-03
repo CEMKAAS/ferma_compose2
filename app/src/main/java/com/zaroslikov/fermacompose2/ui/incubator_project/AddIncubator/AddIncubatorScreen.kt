@@ -212,7 +212,8 @@ private fun EnterValue(
                 intResSup = R.string.add_incubator_screen_capacity_egg,
                 isError = state.error.isErrorCapacity,
                 suffix = Suffix.PIECES,
-                isBorderCard = false
+                isBorderCard = false,
+                isNecessarily = true
             )
             OutlinedNumberNew(
                 value = state.price,

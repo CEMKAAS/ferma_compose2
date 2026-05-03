@@ -5,18 +5,25 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.yandex.mobile.ads.appopenad.AppOpenAd
 import com.yandex.mobile.ads.appopenad.AppOpenAdLoadResult
 import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.YandexAds
 import com.yandex.mobile.ads.compose.rememberAppOpenAdLoader
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgressWitchText
 /*import com.yandex.mobile.ads.appopenad.AppOpenAd
 import com.yandex.mobile.ads.appopenad.AppOpenAdEventListener
 import com.yandex.mobile.ads.appopenad.AppOpenAdLoadListener
@@ -49,29 +56,52 @@ class MainActivity : ComponentActivity() {
         val projectId = intent?.getLongExtra("itemIdPT", -1L) ?: -1L
         setContent {
             FermaCompose2Theme {
-                YandexAds.initialize(this) {}
                 InventoryApp(action = action, projectId = projectId)
             }
         }
     }
 }
-
 @Composable
-fun SplashScreen(activity: Activity) {
+fun SplashScreen(
+    activity: Activity,
+    onFinished: () -> Unit
+) {
     var appOpenAd by remember { mutableStateOf<AppOpenAd?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
 
     val loader = rememberAppOpenAdLoader()
     val adUnitId = stringResource(R.string.yandex_first_launch_ads)
-    // Загружаем сразу при входе в composable
+
     LaunchedEffect(Unit) {
         val adRequest = AdRequest.Builder(adUnitId).build()
+
         when (val result = loader.loadAd(adRequest)) {
-            is AppOpenAdLoadResult.Success -> appOpenAd = result.ad
-            is AppOpenAdLoadResult.Failure -> Log.e("YandexAds", result.error.description)
+            is AppOpenAdLoadResult.Success -> {
+                appOpenAd = result.ad
+            }
+            is AppOpenAdLoadResult.Failure -> {
+                Log.e("YandexAds", result.error.description)
+            }
+        }
+
+        isLoading = false
+    }
+
+    LaunchedEffect(isLoading, appOpenAd) {
+        if (!isLoading) {
+            appOpenAd?.show(activity)
+            onFinished()
         }
     }
 
-    LaunchedEffect(appOpenAd) {
-        appOpenAd?.show(activity)
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isLoading) {
+            CircularProgressWitchText(
+                intRes = R.string.ads_support_text_load_ads
+            )
+        }
     }
 }

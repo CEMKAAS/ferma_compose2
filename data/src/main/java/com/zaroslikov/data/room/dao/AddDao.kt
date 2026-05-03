@@ -111,7 +111,7 @@ interface AddDao {
 
     @Query(
         "SELECT category FROM add_table" +
-                " WHERE idPT=:id" +
+                " WHERE idPT=:id AND category IS NOT NULL" +
                 " GROUP BY category "
     )
     fun getItemsCategoryAddList(id: Long): Flow<List<String>>

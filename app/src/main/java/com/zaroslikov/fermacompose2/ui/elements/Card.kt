@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -135,6 +134,7 @@ fun CardField(
 @Composable
 fun CardFieldNew(
     modifier: Modifier = Modifier,
+    containerColor: Color = white,
     colors: List<Color>? = null,
     padding: PaddingValues = PaddingValues(20.dp),
     elevation: Dp = 5.dp,
@@ -145,7 +145,7 @@ fun CardFieldNew(
     Card(
         onClick = { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = white
+            containerColor = containerColor
         ),
         shape = shape,
         modifier = modifier,

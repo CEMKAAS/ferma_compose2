@@ -89,7 +89,7 @@ interface WriteOffDao {
     )
     fun getItemsWriteOffList(id: Long): Flow<List<TitleSuffixCategoryDto>>
 
-    @Query("SELECT category from write_off_table Where idPT=:id group by category")
+    @Query("SELECT category from write_off_table Where idPT=:id and category IS NOT NULL GROUP BY category")
     fun getItemsCategoryWriteOffList(id: Long): Flow<List<String>>
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)

@@ -32,9 +32,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_2
+import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.white
+
 
 @Composable
 fun CircularProgress(
@@ -46,6 +48,33 @@ fun CircularProgress(
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun CircularProgressWitchText(
+    modifier: Modifier = Modifier,
+    @StringRes intRes: Int? = null
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+            if (intRes != null)
+                Text(
+                    stringResource(intRes),
+                    style = text_14,
+                    color = black_2,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+        }
     }
 }
 
