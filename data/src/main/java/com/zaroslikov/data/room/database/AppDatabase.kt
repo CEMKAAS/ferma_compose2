@@ -7,6 +7,7 @@ import com.zaroslikov.data.room.converter.AnimalCountVersionConverter
 import com.zaroslikov.data.room.converter.CategoryConverter
 import com.zaroslikov.data.room.converter.FinanceCategoryConverter
 import com.zaroslikov.data.room.converter.SuffixConverter
+import com.zaroslikov.data.room.converter.TypeEggConvert
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.dao.AnimalCountDao
 import com.zaroslikov.data.room.dao.AnimalDao
@@ -74,13 +75,14 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         ProfileTable::class,
     ],
     version = 4,
-    exportSchema = false
+    exportSchema = false,
 )
 @TypeConverters(
     CategoryConverter::class,
     FinanceCategoryConverter::class,
     SuffixConverter::class,
-    AnimalCountVersionConverter::class
+    AnimalCountVersionConverter::class,
+    TypeEggConvert::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun addDao(): AddDao
