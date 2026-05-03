@@ -168,7 +168,7 @@ fun BookmarkScreen(
                 supportSecondText = if (state.isArchive) R.string.message_no_data_message_archive else null,
                 iconColor = orang_2,
                 backgroundColor = orang_8,
-                plusColor = orang_12
+                plusColor = orang_12,
             )
         Log.i("bookmark", "BookmarkScreen: ${state.isArchive}")
         if (state.isOpenBottomSheet)
@@ -387,7 +387,7 @@ private fun MainCard(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -519,7 +519,10 @@ private fun CurrentParameters(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                stringResource(R.string.bookmark_screen_current_parametrs_s).format(currentDay),
+                stringResource(R.string.bookmark_screen_current_parametrs_s).format(
+                    currentDay
+                ),
+                modifier = Modifier.weight(1f),
                 style = text_16, color = black_2
             )
             BorderButton(
@@ -865,7 +868,10 @@ fun BottomPanel(
     onCloseClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
         BorderButton(
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(8.dp),

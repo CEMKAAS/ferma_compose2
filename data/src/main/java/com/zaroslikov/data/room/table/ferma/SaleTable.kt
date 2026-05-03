@@ -52,10 +52,10 @@ data class SaleTable(
     @ColumnInfo(name = "day")
     val day: Int,  // день
     @ColumnInfo(name = "month")
-    val mount: Int, // месяц
+    val month: Int, // месяц
     @ColumnInfo(name = "year")
     val year: Int, // время
-    val category: String,
+    val category: String?,
     val buyer: String?,
     val note: String,
     @ColumnInfo(name = "idPT")

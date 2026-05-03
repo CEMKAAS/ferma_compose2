@@ -409,7 +409,7 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun reasonNote(productList: List<ProductKill>): String {
         return resourceProvider.getString(R.string.animal_card_screen_kill_add_product) + productList.mapIndexed { index, it ->
-            "${index + 1}. ${it.title} - ${it.countProduct} ${it.suffixProduct}"
+            "${index + 1}. ${it.title} - ${it.countProduct} ${resourceProvider.getString(it.suffixProduct.toResId())}"
         }.joinToString("\n")
     }
 
@@ -622,11 +622,11 @@ class AnimalCountViewModel @Inject constructor(
         val state = getState().currentProduct
         return DomainAnimalCount(
             id = state.id,
-            count = state.count,
+            count = state.count.trim(),
             suffix = state.suffix,
             date = state.date,
             idAnimal = itemId,
-            note = state.note,
+            note = state.note.trim(),
             version = state.version
         )
     }
@@ -636,7 +636,7 @@ class AnimalCountViewModel @Inject constructor(
 
         val domain = DomainAddTable(
             id = productKill.idProduct,
-            title = productKill.title,
+            title = productKill.title.trim(),
             count = productKill.countProduct.toConvertZeroDouble(),
             countSuffix = productKill.suffixProduct,
             priceSuffix = getState().settings.currencySuffix,
@@ -662,7 +662,7 @@ class AnimalCountViewModel @Inject constructor(
         val dateList = state.date.split(".")
         return DomainWriteOffTable(
             id = state.tableId ?: 0,
-            title = getState().animal.name,
+            title = getState().animal.name.trim(),
             count = state.count.toConvertDbDouble(),
             countSuffix = state.suffix,
             price = if (state.price.isBlank()) null else state.price.toConvertDbDouble(),
@@ -673,7 +673,7 @@ class AnimalCountViewModel @Inject constructor(
             year = dateList[2].toInt(),
             status = true,
             note = note?.trim()
-                ?: resourceProvider.getString(R.string.animal_card_screen_note_sale),
+                ?: resourceProvider.getString(R.string.animal_card_screen_note_write_off),
             idPT = itemIdPT,
             animalCountId = countId ?: state.id
         )
@@ -684,7 +684,7 @@ class AnimalCountViewModel @Inject constructor(
         val dateList = state.date.split(".")
         return DomainExpensesTable(
             id = state.tableId ?: 0,
-            title = getState().animal.name,
+            title = getState().animal.name.trim(),
             count = state.count.toConvertDbDouble(),
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
@@ -708,7 +708,7 @@ class AnimalCountViewModel @Inject constructor(
         val dateList = state.date.split(".")
         return DomainSaleTable(
             id = state.tableId ?: 0,
-            title = getState().animal.name,
+            title = getState().animal.name.trim(),
             count = state.count.toConvertDbDouble(),
             countSuffix = state.suffix,
             price = state.price.toConvertZeroDouble(),
@@ -718,7 +718,7 @@ class AnimalCountViewModel @Inject constructor(
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
             category = resourceProvider.getString(R.string.animal_card_screen_category_sale),
-            buyer = state.buyer,
+            buyer = state.buyer.trim(),
             note = resourceProvider.getString(R.string.animal_card_screen_note_sale),
             idPT = itemIdPT,
             animalId = itemId,

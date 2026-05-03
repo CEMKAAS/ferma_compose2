@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -40,7 +41,6 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.AnimalNameById -> state.updateAnimal(intent.value)
 
 
-
             else -> state
         }
     }
@@ -62,19 +62,19 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         }
     }
 
-    private fun AddListState.updateOpenBottomSheetDelete( id: Long?): AddListState {
+    private fun AddListState.updateOpenBottomSheetDelete(id: Long?): AddListState {
         return if (id == null)
-                copy(
-                    isOpenBottomSheetDelete = false,
-                    currentDetail = null
-                )
-            else {
-                val domain = list.find { it.id == id }
-                copy(
-                    isOpenBottomSheetDelete = domain?.let { true } ?: false,
-                    currentDetail = domain
-                )
-            }
+            copy(
+                isOpenBottomSheetDelete = false,
+                currentDetail = null
+            )
+        else {
+            val domain = list.find { it.id == id }
+            copy(
+                isOpenBottomSheetDelete = domain?.let { true } ?: false,
+                currentDetail = domain
+            )
+        }
     }
 
     private fun AddListState.updateValid(): AddListState {
@@ -129,9 +129,12 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         val searchList = if (query.isBlank() && !isGroup) list
         else
             list.filter { item ->
+
+                val category =
+                    item.category ?: resourceProvider.getString(R.string.support_text_no_category)
                 item.title.lowercase().contains(query) ||
                         item.note.lowercase().contains(query) ||
-                        item.category.lowercase().contains(query) ||
+                        category.lowercase().contains(query) ||
                         item.count.toString().lowercase().contains(query) ||
                         resourceProvider.getString(item.countSuffix.toResId()).lowercase()
                             .contains(query) ||

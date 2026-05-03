@@ -14,7 +14,7 @@ data class AddItemDto(
     val month: Int = 0,
     val year: Int = 0,
     val price: Double = 0.0,
-    val category: String = "",
+    val category: String?,
     @ColumnInfo(name = "animal_id")
     val animalId: Long? = null,
     @ColumnInfo(name = "animal_name")

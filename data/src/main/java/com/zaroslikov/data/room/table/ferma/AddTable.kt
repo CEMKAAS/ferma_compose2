@@ -45,7 +45,7 @@ data class AddTable(
     @ColumnInfo(name = "day")
     val day: Int,  // день
     @ColumnInfo(name = "month")
-    val mount: Int, // месяц
+    val month: Int, // месяц
     @ColumnInfo(name = "year")
     val year: Int, // время
     @ColumnInfo(name = "price")
@@ -54,7 +54,7 @@ data class AddTable(
     val countSuffix: Suffix,
     @ColumnInfo(name = "price_suffix")
     val priceSuffix: Suffix,
-    val category: String,
+    val category: String?,
     @ColumnInfo(name = "animal_id")
     val animalId: Long?,
     val note: String,

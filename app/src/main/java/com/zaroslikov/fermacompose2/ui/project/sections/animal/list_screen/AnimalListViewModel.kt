@@ -184,14 +184,13 @@ class AnimalListViewModel @Inject constructor(
     private fun AnimalEntryState2.saveAnimal(): DomainAnimalTable {
         return DomainAnimalTable(
             id = itemId,
-            name = title,
-            type = type,
+            name = title.trim(),
+            type = type.trim(),
             date = dateBorn,
             dateFactory = if (isDateFactory) null else dateFactory,
             group = isAnimalGroup,
             sex = sex,
-            note = note,
-            image = null,
+            note = note.trim(),
             archive = archive,
             foodDay = if (foodDay.isBlank()) 0.0 else foodDay.toConvertDbDouble(),
             foodDaySuffix = foodDaySuffix,
@@ -217,7 +216,7 @@ class AnimalListViewModel @Inject constructor(
         ) to
                 if (price.isNotBlank())
                     DomainExpensesTable(
-                        title = title,
+                        title = title.trim(),
                         count = countAnimal.toConvertZeroDouble(),
                         day = dateList[0].toInt(),
                         month = dateList[1].toInt(),

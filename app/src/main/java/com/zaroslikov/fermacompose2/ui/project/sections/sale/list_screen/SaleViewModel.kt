@@ -289,7 +289,7 @@ class SaleViewModel @Inject constructor(
                 domain.month,
                 domain.year
             ),
-            category = domain.category,
+            category = domain.category ?: category,
             buyer = domain.buyer ?: buyer,
             note = domain.note,
             animalId = domain.animalId,
@@ -313,7 +313,7 @@ class SaleViewModel @Inject constructor(
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
-            category = category.trim(),
+            category = category.trim().ifEmpty { null },
             note = note.trim(),
             buyer = if (buyer.isBlank()) null else buyer.trim(),
             idPT = itemIdPT,

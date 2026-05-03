@@ -119,8 +119,8 @@ class AnimalVaccinationReduce : BaseReducer<AnimalVaccinationState, AnimalVaccin
             currentProduct = currentProduct.copy(
                 countVaccination = count,
                 error = currentProduct.error.copy(
-                    isErrorCount = if (isAnimalGroup) currentProduct.countVaccination.isBlank() else false,
-                    isErrorCountZero = if (isAnimalGroup) isAnimalCountZero(currentProduct.countVaccination) else false,
+                    isErrorCount = if (isAnimalGroup) count.isBlank() else false,
+                    isErrorCountZero = if (isAnimalGroup) isAnimalCountZero( count) else false,
                 )
             )
         )

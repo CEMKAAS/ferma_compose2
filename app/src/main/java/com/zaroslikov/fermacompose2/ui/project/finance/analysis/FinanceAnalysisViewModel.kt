@@ -28,6 +28,7 @@ import com.zaroslikov.fermacompose2.supportFun.conversation4
 import com.zaroslikov.fermacompose2.supportFun.dateLongToString
 import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQLPair
 import com.zaroslikov.fermacompose2.supportFun.datePeriod
+import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -44,7 +45,8 @@ class FinanceAnalysisViewModel @Inject constructor(
     private val saleRepository: SaleRepository,
     private val writeOffRepository: WriteOffRepository,
     private val financeRepository: FinanceRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val resourceProvider: ResourceProvider
 ) : ListViewModel<FinanceAnalysisState, FinanceAnalysisIntent>(FinanceAnalysisState()) {
 
     private val itemId: Long = checkNotNull(savedStateHandle[FinanceAnalysisDestination.itemIdArg])
@@ -293,7 +295,8 @@ class FinanceAnalysisViewModel @Inject constructor(
                 }
                 val totalPrice = items.sumOf { it.price }
                 Buyer(
-                    buyer = buyerName,
+                    buyer = buyerName
+                        ?: resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
                     count = totalCount,
                     suffix = baseSuffix,
                     price = totalPrice,

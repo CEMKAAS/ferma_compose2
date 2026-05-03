@@ -10,9 +10,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -38,6 +41,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -237,6 +241,7 @@ private fun AnimalEntryBottomSheet(
                 onIntent(AnimalListIntent.TypeChanged(it))
             },
             list = state.typeList,
+            intResSup = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_type_animals,
         )
         if (state.isAnimalGroup)
             OutlinedTextCountNew(
@@ -244,12 +249,11 @@ private fun AnimalEntryBottomSheet(
                 onValueChange = {
                     onIntent(AnimalListIntent.CountChanged(it))
                 },
+                suffix = state.countSuffix,
                 onSuffixChange = { onIntent(AnimalListIntent.SuffixClicked(it)) },
                 suffixList = suffixPiecesList,
-                drawableRes = R.drawable.baseline_spoke_24,
                 isError = state.error.isErrorCount,
-                suffix = state.countSuffix,
-                intRes = R.string.outlined_text_field_quantity,
+                drawableRes = R.drawable.baseline_spoke_24,
                 intResSup = R.string.support_text_count_animals,
             )
         if (!state.isAnimalGroup)
@@ -269,6 +273,8 @@ private fun AnimalEntryBottomSheet(
             onAutoCalculate = {
                 onIntent(AnimalListIntent.AutoPriceClicked(it))
             },
+            supportTextRes = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_price_animal,
+            supportTextResAutoCal = R.string.support_text_price_animal,
             isManyCount = state.isAnimalGroup,
             count = state.count,
             countSuffix = state.countSuffix,
@@ -299,15 +305,16 @@ private fun AnimalEntryBottomSheet(
             onValueChange = {
                 onIntent(AnimalListIntent.FoodDayChanged(it))
             },
-            isError = false,
+            suffix = state.foodDaySuffix,
             onSuffixChange = {
                 onIntent(AnimalListIntent.FoodDaySuffixClicked(it))
             },
+            isNecessarily = false,
             suffixList = suffixWeightDayList,
+            isError = false,
             drawableRes = R.drawable.outline_restaurant_24,
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
-            suffix = state.foodDaySuffix,
         )
         OutlinedTextNoteNew(
             value = state.note,
@@ -383,25 +390,24 @@ fun AnimalCard(
     onDeleteClick: (() -> Unit)? = null,
 ) {
     val cardField: @Composable () -> Unit = {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.Top,
-        ) {
-            IconAnimal(
-                sex = animal.sex,
-                imagePath = animal.imagePath,
-                currentIcon = animal.currentIcon,
-                isArchive = animal.isArchive
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                IconAnimal(
+                    sex = animal.sex,
+                    imagePath = animal.imagePath,
+                    currentIcon = animal.currentIcon,
+                    isArchive = animal.isArchive
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(
+                        modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
@@ -411,6 +417,7 @@ fun AnimalCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         Row(
+                            modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -419,7 +426,8 @@ fun AnimalCard(
                                 style = text_14,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                color = marengo
+                                color = marengo,
+                                modifier = Modifier.weight(1f, fill = false)
                             )
                             if (animal.sex != null)
                                 CountColorGradientCard(sex = animal.sex)
@@ -448,28 +456,21 @@ fun AnimalCard(
                             onDeleteClick = onDeleteClick
                         )
                 }
-                if (!animal.isArchive)
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        TableAnimalParameter(
-                            oneTitleParameter = R.string.animal_list_age,
-                            oneParameter = animal.date,
-                            oneIcon = R.drawable.baseline_calendar_month_24,
-                            oneIconColor = animal_1,
-                            oneIconColorSecond = green_15,
-                            twoTitleParameter = R.string.animal_list_food,
-                            twoParameter = "${animal.foodDay.formatNumber()} ${
-                                stringResource(
-                                    animal.foodDaySuffix.toResId()
-                                )
-                            }",
-                            twoIcon = R.drawable.outline_restaurant_24,
-                            twoIconColor = orang_11,
-                            twoIconColorSecond = orang_13
-                        )
-                    }
             }
+            if (!animal.isArchive)
+                TableAnimalParameter(
+                    oneTitleParameter = R.string.animal_list_age,
+                    oneParameter = animal.date,
+                    oneIcon = R.drawable.baseline_calendar_month_24,
+                    oneIconColor = animal_1,
+                    oneIconColorSecond = green_15,
+                    twoTitleParameter = R.string.animal_list_food,
+                    twoParameter = animal.foodDay.formatNumber() +
+                            " ${stringResource(animal.foodDaySuffix.toResId())}",
+                    twoIcon = R.drawable.outline_restaurant_24,
+                    twoIconColor = orang_11,
+                    twoIconColorSecond = orang_13
+                )
         }
     }
     if (onClick != null)
@@ -665,18 +666,23 @@ fun GroupCard(
                 style = text_16
             )
             Row(
+                modifier = Modifier.height(IntrinsicSize.Min),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 TypeAnimalCard(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     title = textOneRes,
                     icon = iconOneRes,
                     isAnimalGroup = !isSecondValue,
                     onClick = { onClick(!isSecondValue) }
                 )
                 TypeAnimalCard(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     title = textTwoRes,
                     icon = iconTwoRes,
                     isAnimalGroup = isSecondValue,
@@ -725,7 +731,13 @@ fun TypeAnimalCard(
                 contentDescription = null,
                 tint = colors.second
             )
-            Text(text = stringResource(title), style = text_14, color = colors.second)
+            Text(
+                text = stringResource(title),
+                style = text_14,
+                color = colors.second,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

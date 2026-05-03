@@ -363,9 +363,9 @@ fun AddEntryBottomSheet(
             onValueChange = {
                 onIntent(AddListIntent.CountChanged(it))
             },
+            suffix = state.countSuffix,
             onSuffixChange = { onIntent(AddListIntent.SuffixClicked(it)) },
             isError = state.error.isErrorCount,
-            suffix = state.countSuffix,
             intResSup = R.string.support_text_count_product,
         )
         if (!state.isIndicatorsValue)

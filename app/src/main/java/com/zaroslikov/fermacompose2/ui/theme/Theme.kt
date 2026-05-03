@@ -2,8 +2,11 @@ package com.zaroslikov.fermacompose2.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import android.view.WindowInsets
+import android.view.WindowManager
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -303,21 +306,21 @@ fun FermaCompose2Theme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-  /*  val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    /*  val colorScheme = when {
+          dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+              val context = LocalContext.current
+              if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+          }
 
-        darkTheme -> darkScheme
-        else -> lightScheme2
-    }*/
+          darkTheme -> darkScheme
+          else -> lightScheme2
+      }*/
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-//            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

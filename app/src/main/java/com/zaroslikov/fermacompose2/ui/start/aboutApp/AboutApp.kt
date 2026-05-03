@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -117,11 +118,12 @@ private fun MainCard() {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_logo),
+                painter = painterResource(id = R.drawable.ic_log),
                 contentDescription = null,
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
                     .size(80.dp)
+                    .border(1.dp, color = ghostly_white, shape = RoundedCornerShape(10.dp))
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)

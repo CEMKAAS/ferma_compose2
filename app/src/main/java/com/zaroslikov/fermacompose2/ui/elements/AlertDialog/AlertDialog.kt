@@ -321,7 +321,6 @@ fun AlertDialogStandard(
                         textColor = dark,
                         onClick = onDismissRequest
                     )
-
                 GradientButton(
                     modifier = Modifier.weight(1f),
                     colors = colors,

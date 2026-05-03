@@ -176,9 +176,10 @@ fun ExpensesEntryBottomSheet(
             onAutoCalculate = {
                 onIntent(ExpensesListIntent.AutoPriceClicked(it))
             },
+            isNecessarily = true,
             isManyCount = true,
-            supportTextRes = R.string.support_text_price_expenses,
-            supportTextResAutoCal = R.string.support_text_price_expenses,
+            supportTextRes = R.string.support_text_price_expenses_all,
+            supportTextResAutoCal = R.string.support_text_price_expenses_one,
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             count = state.count,
             countSuffix = state.countSuffix,
@@ -762,17 +763,23 @@ private fun DoubleSupportCards(
     secondValue: String,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             titleRes = titleRes,
             value = value,
         )
         SupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             titleRes = secondTitleRes,
             value = secondValue
         )

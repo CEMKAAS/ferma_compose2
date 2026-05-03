@@ -256,12 +256,12 @@ fun MainSettingsCard(
     var expanded by remember { mutableStateOf(false) }
 
     CardFieldNew {
-        Column {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -279,45 +279,49 @@ fun MainSettingsCard(
                         color = gray_7
                     )
                 }
-                if (nameProject != null)
-                    OutlinedTextNew(
-                        value = nameProject,
-                        onValueChange = onValueChange,
-                        labelIntRes = R.string.warehouse_edit_screen_name_project,
-                        supportingText = R.string.warehouse_edit_screen_name_project_support,
-                        isBorderCard = false
-                    )
-            }
-            AnimatedVisibility(
-                visible = expanded
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                AnimatedVisibility(
+                    visible = expanded
                 ) {
-                    HorizontalDivider(thickness = 1.dp, color = gray_6)
-                    Text(
-                        stringResource(R.string.warehouse_edit_screen_choice_icon_project),
-                        style = text_14,
-                        color = marengo
-                    )
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        itemVerticalAlignment = Alignment.CenterVertically
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        iconList.forEachIndexed { index, icon ->
-                            ImageCard(painterResource(icon), isSelected = icon == currentIcon) {
-                                if (index == iconList.lastIndex) launcher.launch("image/*")
-                                else {
-                                    onIconSelected(icon)
-                                    onImageSelected(null)
+                        HorizontalDivider(thickness = 1.dp, color = gray_6)
+                        Text(
+                            stringResource(R.string.warehouse_edit_screen_choice_icon_project),
+                            style = text_14,
+                            color = marengo
+                        )
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            itemVerticalAlignment = Alignment.CenterVertically
+                        ) {
+                            iconList.forEachIndexed { index, icon ->
+                                ImageCard(
+                                    painterResource(icon),
+                                    isSelected = icon == currentIcon
+                                ) {
+                                    if (index == iconList.lastIndex) launcher.launch("image/*")
+                                    else {
+                                        onIconSelected(icon)
+                                        onImageSelected(null)
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            if (nameProject != null)
+                OutlinedTextNew(
+                    value = nameProject,
+                    onValueChange = onValueChange,
+                    labelIntRes = R.string.warehouse_edit_screen_name_project,
+                    supportingText = R.string.warehouse_edit_screen_name_project_support,
+                    isNecessarily = true,
+                    isBorderCard = false
+                )
         }
     }
 }

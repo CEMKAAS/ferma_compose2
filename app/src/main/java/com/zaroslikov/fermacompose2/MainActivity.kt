@@ -47,10 +47,6 @@ class MainActivity : ComponentActivity() {
 
         val action = intent?.action
         val projectId = intent?.getLongExtra("itemIdPT", -1L) ?: -1L
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) getNotificationPermissions()
-
-
         setContent {
             FermaCompose2Theme {
                 YandexAds.initialize(this) {}
@@ -68,7 +64,6 @@ fun SplashScreen(activity: Activity) {
     val adUnitId = stringResource(R.string.yandex_first_launch_ads)
     // Загружаем сразу при входе в composable
     LaunchedEffect(Unit) {
-
         val adRequest = AdRequest.Builder(adUnitId).build()
         when (val result = loader.loadAd(adRequest)) {
             is AppOpenAdLoadResult.Success -> appOpenAd = result.ad

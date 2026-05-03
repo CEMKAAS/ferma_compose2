@@ -28,14 +28,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.grey
-import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
-import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
-import com.zaroslikov.fermacompose2.ui.elements.TextField.BaseOutlinedTextNew
 import com.zaroslikov.fermacompose2.white
 
 @Composable
@@ -94,7 +92,8 @@ fun MessageNoData2(
     @DrawableRes iconRes: Int,
     iconColor: Color,
     backgroundColor: Color,
-    isBorderCard: Boolean = true
+    isBorderCard: Boolean = true,
+    iconSize: Dp = 64.dp
 ) {
     val content: @Composable () -> Unit = {
         EmptyBookmark(
@@ -104,7 +103,8 @@ fun MessageNoData2(
             supportSecondText = supportSecondText,
             iconColor = iconColor,
             backgroundColor = backgroundColor,
-            plusColor = iconColor
+            plusColor = iconColor,
+            iconSize = iconSize
         )
     }
 
@@ -122,7 +122,8 @@ fun EmptyBookmark(
     @StringRes supportSecondText: Int? = null,
     iconColor: Color,
     backgroundColor: Color,
-    plusColor: Color = white
+    plusColor: Color = white,
+    iconSize: Dp = 64.dp
 ) {
     Column(
         modifier = modifier
@@ -143,7 +144,7 @@ fun EmptyBookmark(
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .size(64.dp),
+                    .size(iconSize),
                 tint = iconColor
             )
         }

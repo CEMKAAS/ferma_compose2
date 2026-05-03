@@ -121,7 +121,7 @@ fun IconGradient(
     val gradient = Brush.linearGradient(
         colors = colors,
         start = Offset(0f, 0f),
-        end = Offset(Float.POSITIVE_INFINITY, 0f)
+        end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
     )
     Box(
         modifier = modifier

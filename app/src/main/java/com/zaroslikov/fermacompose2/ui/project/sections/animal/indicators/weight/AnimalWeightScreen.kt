@@ -21,7 +21,6 @@ import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_4
-import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
@@ -219,13 +218,12 @@ private fun WeightBottomSheet(
             onSuffixChange = {
                 onIntent(AnimalWeightIntent.SuffixClicked(it))
             },
+            suffixList = suffixWeightList,
             isError = state.error.isErrorWeight,
             drawableRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
             intRes = R.string.weight_screen_title,
             intResSup = R.string.support_text_weight_animal,
             intResError = R.string.error_no_weight_animal,
-            keyboardOptions = keyboardOptionsNextNumber(),
-            suffixList = suffixWeightList
         )
         OutlinedTextDateNew(
             value = state.date,

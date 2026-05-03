@@ -86,6 +86,7 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.DateRangePickerMod
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString2
+import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.IconAnimal
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_6
@@ -137,7 +138,6 @@ fun FinanceAnalysisProduct(
                 modifier = Modifier
                     .modifierScreen(innerPadding),
                 state = state,
-
                 onCharSelectionClick = {
                     viewModel.onIntent(FinanceAnalysisIntent.CharSelectionClicked(it))
                 }
@@ -188,6 +188,7 @@ fun FinanceAnalysisContainer(
             onClick = onCharSelectionClick,
             suffix = state.baseSuffix
         )
+        AdsCard()
         TransactionSection(
             R.string.analysis_screen_history_transaction,
             priceSuffix,
@@ -269,6 +270,7 @@ private fun FinanceAnalysisCard(
         ) {
             Text(
                 stringResource(R.string.analysis_screen_total_price_product),
+                modifier = Modifier.weight(1f),
                 style = text_14,
                 color = marengo
             )
@@ -402,7 +404,12 @@ private fun FinanceAnalysisRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(stringResource(title), style = text_14, color = marengo)
+        Text(
+            stringResource(title),
+            style = text_14,
+            color = marengo,
+            modifier = Modifier.weight(1f)
+        )
         Text(
             text = "${count.formatNumber()} " +
                     stringResource(suffixPrice.toResId()),
@@ -685,6 +692,7 @@ private fun Chart(
                 val triple = if (it == charSelection) Triple(it.iconBackground, white, 1.dp)
                 else Triple(Color.Transparent, marengo, 0.dp)
                 ButtonForGroupButtons(
+                    modifier = Modifier.weight(1f),
                     text = it.titleButton,
                     backgroundColor = triple.first,
                     textColor = triple.second,
@@ -821,13 +829,13 @@ private fun TransitionCard(
                             iconColor = grey
                         )
                     }
-                    buyer?.let {
+                    if (FinanceCategory.SALE == categoryFinance)
                         IconAndTextNew(
                             iconRes = R.drawable.baseline_person_24,
-                            valueString = it,
+                            valueString = buyer
+                                ?: stringResource(R.string.animal_card_screen_sale_note_no_buyer),
                             iconColor = grey
                         )
-                    }
                     IconAndTextNew(
                         iconRes = R.drawable.baseline_calendar_month_24,
                         valueString = "${dateList[2]} ${stringResource(monthToResString2(dateList[1].toInt()))} ${dateList[0]}",

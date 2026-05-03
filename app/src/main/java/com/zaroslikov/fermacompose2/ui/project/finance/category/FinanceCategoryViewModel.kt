@@ -10,12 +10,14 @@ import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.ListViewModel
 import com.zaroslikov.fermacompose2.supportFun.dateLongToString
 import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQLPair
 import com.zaroslikov.fermacompose2.supportFun.datePeriod
 import com.zaroslikov.fermacompose2.supportFun.dateBuilder
+import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -31,7 +33,8 @@ class FinanceCategoryViewModel @Inject constructor(
     private val saleRepository: SaleRepository,
     private val expensesRepository: ExpensesRepository,
     private val writeOffRepository: WriteOffRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val resourceProvider: ResourceProvider
 ) : ListViewModel<FinanceCategoryState, FinanceCategoryIntent>(FinanceCategoryState()) {
 
     private val itemId: Long =
@@ -276,8 +279,10 @@ class FinanceCategoryViewModel @Inject constructor(
                 suffix = item.countSuffix,
                 price = item.price,
                 priceAll = item.priceAll,
-                category = item.category,
-                buyer = item.buyer,
+                category = item.category
+                    ?: resourceProvider.getString(R.string.support_text_no_category),
+                buyer = item.buyer
+                    ?: resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
                 data = date,
                 categoryFinance = financeCategory
             )
@@ -293,7 +298,8 @@ class FinanceCategoryViewModel @Inject constructor(
                 suffix = item.countSuffix,
                 price = item.price,
                 priceAll = item.priceAll,
-                category = item.category,
+                category = item.category
+                    ?: resourceProvider.getString(R.string.support_text_no_category),
                 data = date,
                 categoryFinance = financeCategory
             )
@@ -309,7 +315,8 @@ class FinanceCategoryViewModel @Inject constructor(
                 suffix = item.countSuffix,
                 price = item.price ?: 0.0,
                 priceAll = item.priceAll,
-                category = item.category,
+                category = item.category
+                    ?: resourceProvider.getString(R.string.support_text_no_category),
                 data = date,
                 categoryFinance = financeCategory
             )
@@ -325,7 +332,8 @@ class FinanceCategoryViewModel @Inject constructor(
                 suffix = item.countSuffix,
                 price = item.price ?: 0.0,
                 priceAll = item.priceAll,
-                category = item.category,
+                category = item.category
+                    ?: resourceProvider.getString(R.string.support_text_no_category),
                 data = date,
                 categoryFinance = financeCategory
             )

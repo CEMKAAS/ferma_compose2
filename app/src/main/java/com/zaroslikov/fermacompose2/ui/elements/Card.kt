@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -170,13 +171,13 @@ fun CardFieldNew(
                             )
                         )
                 )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(padding)
-            ) {
-                contentColumn()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding)
+                ) {
+                    contentColumn()
+                }
             }
         } else
             Column(
@@ -521,6 +522,7 @@ fun DetailProductCardNew(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
+                    modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -528,8 +530,9 @@ fun DetailProductCardNew(
                         Text(
                             text = it,
                             style = textBold_16,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                     }
                     CountColorCard(count, suffix, color)
@@ -554,14 +557,13 @@ fun DetailProductCardNew(
                     iconColor = if (status) violet_1 else error_base,
                 )
             }
-            category.takeUnless { it == "Без категории" /*|| it.isEmpty()*/ }
-                ?.let { category ->
-                    IconAndTextNew(
-                        iconRes = R.drawable.baseline_format_list_bulleted_24,
-                        valueString = category,
-                        iconColor = color
-                    )
-                }
+            category?.let {
+                IconAndTextNew(
+                    iconRes = R.drawable.baseline_format_list_bulleted_24,
+                    valueString = it,
+                    iconColor = color
+                )
+            }
             buyer?.let {
                 IconAndTextNew(
                     iconRes = R.drawable.baseline_person_24,
@@ -778,6 +780,7 @@ fun BrieflyCountCardNew(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
+                    modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -819,7 +822,10 @@ fun BrieflyCountCardNew(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(5.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         price?.let {
                             CountColorCard(it.first, it.second, price_green)
                         }
@@ -1049,29 +1055,33 @@ fun DateFactoryCardNew(
     dateFactoryChanged: (String) -> Unit
 ) {
     BorderCard {
-        CheckboxTextIcon(
-
-            checked = isDateFactory,
-            onCheckedChange = {
-                dateFactoryClicked(it)
-            },
-            intTitle = intTitle,
-            isTooltipShow = true,
-            intTooltip = intTooltip
-        )
-        AnimatedVisibility(
-            modifier = Modifier.fillMaxWidth(),
-            visible = !isDateFactory,
-        ) {
-            OutlinedTextDateNew(
-                value = dateFactory,
-                intRes = intRes,
-                intResSup = intResSup,
-                drawableRes = R.drawable.baseline_event_24,
-                onValueChange = { dateFactoryChanged(it) },
-                isBorderCard = false,
-                minDate = dateBoring
+        Column {
+            CheckboxTextIcon(
+                checked = isDateFactory,
+                onCheckedChange = {
+                    dateFactoryClicked(it)
+                },
+                intTitle = intTitle,
+                isTooltipShow = true,
+                intTooltip = intTooltip
             )
+            AnimatedVisibility(
+                modifier = Modifier.fillMaxWidth(),
+                visible = !isDateFactory,
+            ) {
+                Column {
+                    Spacer(Modifier.padding(vertical = 4.dp))
+                    OutlinedTextDateNew(
+                        value = dateFactory,
+                        intRes = intRes,
+                        intResSup = intResSup,
+                        drawableRes = R.drawable.baseline_event_24,
+                        onValueChange = { dateFactoryChanged(it) },
+                        isBorderCard = false,
+                        minDate = dateBoring
+                    )
+                }
+            }
         }
     }
 }

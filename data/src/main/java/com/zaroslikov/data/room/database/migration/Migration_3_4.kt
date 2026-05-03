@@ -363,7 +363,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 price REAL NOT NULL,
                 count_suffix INTEGER NOT NULL,
                 price_suffix INTEGER NOT NULL,
-                category TEXT NOT NULL,
+                category TEXT,
                 animal_id INTEGER,
                 note TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
@@ -389,7 +389,13 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN suffix = 'Л.' THEN 8
                    ELSE 1
                 END,
-                 13, category, NULLIF(idAnimal, 0), 
+                13, 
+                CASE
+                  WHEN category= 'Без категории' THEN NULL
+                  WHEN category = '' THEN NULL
+                  ELSE category
+                END,
+               NULLIF(idAnimal, 0), 
                note, idPT
             FROM MyFerma
         """.trimIndent()
@@ -410,7 +416,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 price REAL,
                 price_all REAL,
                 price_suffix INTEGER,
-                category NOT NULL,
+                category TEXT,
                 day INTEGER NOT NULL,
                 month INTEGER NOT NULL,
                 year INTEGER NOT NULL,
@@ -440,7 +446,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                END,
             priceAll, NULL, 
             CASE WHEN priceAll IS NULL THEN NULL ELSE 13 END,
-           'Прочее', DAY, MOUNT, YEAR,
+            NULL, DAY, MOUNT, YEAR,
             statusWRITEOFF, note, idPT, NUll
             FROM MyFermaWRITEOFF
         """.trimIndent()
@@ -467,7 +473,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 day INTEGER NOT NULL,
                 month INTEGER NOT NULL,
                 year INTEGER NOT NULL,
-                category TEXT NOT NULL,
+                category TEXT,
                 buyer TEXT,
                 note TEXT NOT NULL,
                 idPT INTEGER NOT NULL,
@@ -498,7 +504,12 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    ELSE 1
                   END,
                 PRICE, NULL, 13, DAY, MOUNT, YEAR, 
-                category, buyer, note, idPT, NULL, NULL
+                CASE
+                  WHEN category= 'Без категории' THEN 1
+                  WHEN category = '' THEN NULL
+                  ELSE category
+                END,
+                NULLIF(buyer,'Неизвестный'), note, idPT, NULL, NULL
             FROM MyFermaSale
         """.trimIndent()
         )
@@ -524,7 +535,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 price_all REAL,
                 count_suffix INTEGER NOT NULL,
                 price_suffix INTEGER NOT NULL,
-                category TEXT NOT NULL,
+                category TEXT,
                 note TEXT NOT NULL,
                 is_food INTEGER NOT NULL,
                 is_show_food INTEGER NOT NULL,
@@ -563,7 +574,13 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN suffix = 'Тн' THEN 6
                    WHEN suffix = 'М.' THEN 12
                    ELSE 1
-                END, category, note,
+                END, 
+                CASE
+                  WHEN category= 'Без категории' THEN 1
+                  WHEN category = '' THEN NULL
+                  ELSE category
+                END,
+                note,
                 showFood, showFood,
                 CASE WHEN showFood = 1 THEN dailyExpensesFood ELSE NULL END,
                 CASE WHEN showFood = 1 THEN 5 ELSE NULL END,

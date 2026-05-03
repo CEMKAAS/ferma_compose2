@@ -251,7 +251,7 @@ private fun VaccinationBottomSheet(
             },
             tooltipTextResAutoCal = R.string.animal_vaccination_auto_calculate_tool,
             isManyCount = true,
-            supportTextRes = if (state.isAutoCalculate) R.string.animal_vaccination_price_all else R.string.animal_vaccination_price,
+            supportTextRes = if (state.isAutoCalculate) R.string.animal_vaccination_price else R.string.animal_vaccination_price_all,
             supportTextResAutoCal = R.string.animal_vaccination_price,
             count = state.countVaccination,
             countSuffix = Suffix.PIECES,

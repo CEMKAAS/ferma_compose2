@@ -356,8 +356,8 @@ private fun CategorySlider(
                 style = text_12,
                 color = gray_7,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .weight(0.15f)
+                /*modifier = Modifier
+                    .weight(0.15f)*/
             )
         }
     }
@@ -744,9 +744,7 @@ private fun FinanceCategoryCard(
     val positive = when (category) {
         FinanceCategory.SALE, FinanceCategory.OWN_NEED -> "+"
         FinanceCategory.EXPENSES, FinanceCategory.SCRAP -> "-"
-        FinanceCategory.PROFIT -> {
-            if (price > 0) "" else "-"
-        }
+        FinanceCategory.PROFIT -> if (price > 0) "" else "-"
     }
     Card(
         shape = RoundedCornerShape(14.dp),
@@ -762,6 +760,7 @@ private fun FinanceCategoryCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
+                modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {

@@ -51,8 +51,8 @@ data class AnimalUi(
         R.drawable.goat,
         R.drawable.icons_rabbit,
         R.drawable.sheep,
+        R.drawable.pig,
         R.drawable.baseline_add_photo_alternate_24,
-        R.drawable.pig
     ),
     val error: Error = Error(),
     val pickList: PickAnimalEditList = PickAnimalEditList(),

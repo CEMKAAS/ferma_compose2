@@ -148,8 +148,6 @@ fun FirstScreen(
         }
     }
 
-
-
     if (state.isLoading)
         CircularProgress(
             modifier = Modifier,
@@ -310,7 +308,8 @@ private fun StartScreenContainer2(
         detailEmptyState = EmptyState(
             title = R.string.start_screen_no_data_title,
             message = R.string.start_screen_no_data_message,
-            icon = R.drawable.ic_stat_name
+            icon = R.drawable.ic_new_logo_2,
+            iconSize = 164.dp
         ),
         brieflyEmptyState = EmptyState(
             title = R.string.start_screen_no_data_archive_title,
@@ -351,6 +350,7 @@ private fun ProjectCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
+                modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 IconTransaction2(

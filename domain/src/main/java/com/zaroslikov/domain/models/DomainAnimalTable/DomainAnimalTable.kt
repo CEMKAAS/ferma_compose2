@@ -13,7 +13,6 @@ data class DomainAnimalTable(
     val group: Boolean = false,
     val sex: Boolean = false,
     val note: String = "",
-    val image: String? = null,
     val archive: Boolean = false,
     val foodDay: Double = 0.0,
     val foodDaySuffix: Suffix = Suffix.GRAM,

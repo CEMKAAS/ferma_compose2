@@ -51,7 +51,7 @@ data class ExpensesTable(
     @ColumnInfo(name = "day")
     val day: Int,
     @ColumnInfo(name = "month")
-    val mount: Int,
+    val month: Int,
     @ColumnInfo(name = "year")
     val year: Int,
     @ColumnInfo(name = "price")
@@ -62,7 +62,7 @@ data class ExpensesTable(
     val countSuffix: Suffix,
     @ColumnInfo(name = "price_suffix")
     val priceSuffix: Suffix,
-    val category: String,
+    val category: String?,
     val note: String,
     @ColumnInfo(name = "is_food")
     val isFood: Boolean,

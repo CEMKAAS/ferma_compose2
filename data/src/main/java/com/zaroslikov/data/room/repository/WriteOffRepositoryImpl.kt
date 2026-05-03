@@ -79,6 +79,10 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
             .map { it -> it.map { it.toDomainTitleSuffixCategory() } }
     }
 
+    override fun getItemsCategoryWriteOffList(id: Long): Flow<List<String>> {
+        return writeOffDao.getItemsCategoryWriteOffList(id)
+    }
+
     override suspend fun insertWriteOff(item: DomainWriteOffTable) {
         return writeOffDao.insertWriteOff(item.toRoomMap())
     }

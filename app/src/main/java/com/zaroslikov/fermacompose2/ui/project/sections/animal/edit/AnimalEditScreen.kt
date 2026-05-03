@@ -47,7 +47,6 @@ import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.warehouse.MainSettingsCard
 
 
-
 object AnimalEditDestination : NavigationDestination {
     override val route = "animal_edit"
     override val titleRes = R.string.app_name
@@ -128,6 +127,7 @@ fun AnimalEntryContainer(
             onValueChange = {
                 onIntent(AnimalEditIntent.TypeChanged(it))
             },
+            intResSup = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_type_animals,
             list = state.pickList.typeList,
         )
         if (!state.isAnimalGroup)
@@ -162,15 +162,15 @@ fun AnimalEntryContainer(
             onValueChange = {
                 onIntent(AnimalEditIntent.FoodDayChanged(it))
             },
-            isError = false,
+            suffix = state.foodDaySuffix,
             onSuffixChange = {
                 onIntent(AnimalEditIntent.FoodDaySuffixClicked(it))
             },
             suffixList = suffixWeightDayList,
+            isError = false,
             drawableRes = R.drawable.outline_restaurant_24,
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,
-            suffix = state.foodDaySuffix,
         )
         WarningCard(
             colorBackground = blue_3,

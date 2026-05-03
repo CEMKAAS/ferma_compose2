@@ -3,9 +3,12 @@ package com.zaroslikov.fermacompose2.ui.finance
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -322,11 +325,15 @@ private fun WriteOffFinanceCards(
     navigation: (FinanceCategory) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         CardFinanceNew(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             onClick = {
                 navigation(FinanceCategory.OWN_NEED)
                 AppMetrica.reportEvent("Переход в полный анализ сэкономленно")
@@ -339,7 +346,9 @@ private fun WriteOffFinanceCards(
             titleRes2 = R.string.finance_onw_need
         )
         CardFinanceNew(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             onClick = {
                 navigation(FinanceCategory.SCRAP)
                 AppMetrica.reportEvent("Переход в полный анализ списаний")

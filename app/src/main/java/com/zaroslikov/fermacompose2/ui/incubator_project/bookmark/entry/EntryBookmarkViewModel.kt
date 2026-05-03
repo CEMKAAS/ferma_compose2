@@ -398,7 +398,7 @@ class EntryBookmarkViewModel @Inject constructor(
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
-                    notificationList = state.currentProduct.notificationList.mapIndexed { i, item ->
+                    notificationList = state.currentProduct.notificationList.map { item ->
                         if (item.localId == state.currentProduct.indexNotification) state.currentProduct.currentNotification
                         else item
                     },
@@ -412,7 +412,7 @@ class EntryBookmarkViewModel @Inject constructor(
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
-                    notificationList = state.currentProduct.notificationList.mapIndexed { i, notification ->
+                    notificationList = state.currentProduct.notificationList.map { notification ->
                         if (notification.localId == index) notification.copy(isVisibility = false) else notification.copy(
                             isEntry = false
                         )
@@ -427,7 +427,7 @@ class EntryBookmarkViewModel @Inject constructor(
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
-                    notificationList = state.currentProduct.notificationList.mapIndexed { i, item ->
+                    notificationList = state.currentProduct.notificationList.map { item ->
                         if (item.localId == index) {
                             if (item.isEntry) item.copy(isEntry = false) else item.copy(isEntry = true)
                         } else item.copy(isEntry = false)
@@ -447,10 +447,9 @@ class EntryBookmarkViewModel @Inject constructor(
         updateState { state ->
             state.copy(
                 currentProduct = state.currentProduct.copy(
-                    notificationList = state.currentProduct.notificationList.mapIndexed { i, item ->
-                        if (item.localId == state.currentProduct.indexNotification) item.copy(
-                            isEntry = false
-                        )
+                    notificationList = state.currentProduct.notificationList.map { item ->
+                        if (item.localId == state.currentProduct.indexNotification)
+                            item.copy(isEntry = false)
                         else item
                     },
                     currentNotification = NotificationParameters()
@@ -550,13 +549,7 @@ class EntryBookmarkViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isError()) {
                 val bookmark = getState().currentProduct
-                Log.i("bookmark", "insert: yes")
-                Log.i(
-                    "bookmark",
-                    "insert bookmark: ${bookmark.toDomainBookmark(itemIdPT = itemIdPT)}"
-                )
                 bookmarkRepository.update(bookmark.toDomainBookmark(itemIdPT = itemIdPT))
-                Log.i("bookmark", "id: ${bookmark.notificationList}")
                 bookmark.notificationList.forEach {
                     when {
                         it.id == 0L && it.isVisibility ->
@@ -634,15 +627,15 @@ class EntryBookmarkViewModel @Inject constructor(
         return DomainIncubatorParameters(
             id = itemId ?: id,
             day = day,
-            temp = if (isTemplatesPlan) temp else tempFact,
-            damp = if (isTemplatesPlan) damp else dampFact,
-            over = if (isTemplatesPlan) over else overFact,
-            airing = if (isTemplatesPlan) airing else airingFact,
-            tempFact = if (isEntry) if (isTemplatesPlan) temp else tempFact else tempFact,
-            dampFact = if (isEntry) if (isTemplatesPlan) damp else dampFact else dampFact,
-            overFact = if (isEntry) if (isTemplatesPlan) over else overFact else overFact,
-            airingFact = if (isEntry) if (isTemplatesPlan) airing else airingFact else airingFact,
-            note = "",
+            temp = if (isTemplatesPlan) temp.trim() else tempFact.trim(),
+            damp = if (isTemplatesPlan) damp.trim() else dampFact.trim(),
+            over = if (isTemplatesPlan) over.trim() else overFact.trim(),
+            airing = if (isTemplatesPlan) airing.trim() else airingFact.trim(),
+            tempFact = if (isEntry) if (isTemplatesPlan) temp.trim() else tempFact.trim() else tempFact.trim(),
+            dampFact = if (isEntry) if (isTemplatesPlan) damp.trim() else dampFact.trim() else dampFact.trim(),
+            overFact = if (isEntry) if (isTemplatesPlan) over.trim() else overFact.trim() else overFact.trim(),
+            airingFact = if (isEntry) if (isTemplatesPlan) airing.trim() else airingFact.trim() else airingFact.trim(),
+            note = note.trim(),
             idPT = itemIdPT,
         )
     }
@@ -694,9 +687,10 @@ class EntryBookmarkViewModel @Inject constructor(
     ): EntryBookmark {
         return EntryBookmark(
             id = id,
-            title = title,
+            title = title.trim(),
             type = type,
-            breed = breed ?: resourceProvider.getString(R.string.entry_bookmark_not_specified),
+            breed = breed?.trim()
+                ?: resourceProvider.getString(R.string.entry_bookmark_not_specified),
             count = count.formatNumber(false),
             rejectedCount = rejectedCount.formatNumber(false),
             startDate = startDate,
@@ -705,7 +699,7 @@ class EntryBookmarkViewModel @Inject constructor(
             price = price?.formatNumber(false) ?: "",
             priceAll = priceAll?.formatNumber(false) ?: "",
             isAutoPrice = priceAll != null,
-            note = note,
+            note = note.trim(),
             autoRotation = isAutoRotation,
             autoVentilation = isAutoVentilation,
             parameterDayList = parameterDayList,
@@ -730,7 +724,7 @@ class EntryBookmarkViewModel @Inject constructor(
         return DomainTimeNotificationIncubator(
             id = id,
             time = time,
-            note = note.ifBlank { null },
+            note = note.trim().ifBlank { null },
             bookmarkId = newBookmarkId ?: bookmarkId
         )
     }

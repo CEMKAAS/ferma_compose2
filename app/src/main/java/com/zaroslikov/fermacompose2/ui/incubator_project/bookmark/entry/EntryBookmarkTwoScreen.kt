@@ -144,6 +144,7 @@ private fun TemplatesCard(
                 ) {
                     Text(
                         stringResource(R.string.entry_bookmark_templates_previous_bookmarks),
+                        modifier = Modifier.weight(1f),
                         style = text_16,
                         color = black_2
                     )
@@ -169,6 +170,7 @@ private fun TemplatesCard(
                         ) {
                             Text(
                                 stringResource(R.string.entry_bookmark_select_template),
+                                modifier = Modifier.weight(1f),
                                 style = text_12,
                                 color = gray_7
                             )
@@ -249,11 +251,13 @@ private fun BookmarkCard(
                         val (textColorTwo, backgroundColorTwo) = if (!isTemplatesPlan) white to green_6
                         else marengo to gray_6
                         ButtonForGroupButtons(
+                            modifier = Modifier.weight(1f),
                             text = R.string.entry_bookmark_plan,
                             backgroundColor = backgroundColor,
                             textColor = textColor
                         ) { onTemplatesClick() }
                         ButtonForGroupButtons(
+                            modifier = Modifier.weight(1f),
                             text = R.string.entry_bookmark_fact,
                             backgroundColor = backgroundColorTwo,
                             textColor = textColorTwo

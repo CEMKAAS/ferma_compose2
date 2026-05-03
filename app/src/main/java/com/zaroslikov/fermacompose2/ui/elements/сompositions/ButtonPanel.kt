@@ -81,7 +81,7 @@ fun ButtonPanelNew(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             CloseButton(
@@ -120,18 +120,9 @@ fun ButtonPanelDetailNew(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp),
+                .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            GradientButton(
-                text = stringResource(R.string.button_edit),
-                prefixIconRes = R.drawable.icon_edit,
-                onClick = onClickUpdate,
-                enabled = true,
-                modifier = Modifier.weight(1f),
-                colors = colors
-            )
             BorderButton(
                 iconRes = R.drawable.baseline_delete_24,
                 iconColor = error_base,
@@ -140,6 +131,14 @@ fun ButtonPanelDetailNew(
                 enabled = enabled,
                 onClick = onClickDelete,
                 modifier = Modifier.weight(1f)
+            )
+            GradientButton(
+                text = stringResource(R.string.button_edit_2),
+                prefixIconRes = R.drawable.icon_edit,
+                onClick = onClickUpdate,
+                enabled = true,
+                modifier = Modifier.weight(1f),
+                colors = colors
             )
         }
     }

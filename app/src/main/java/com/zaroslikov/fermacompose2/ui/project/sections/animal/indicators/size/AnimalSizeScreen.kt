@@ -20,7 +20,6 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_14
 import com.zaroslikov.fermacompose2.orang_2
-import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
 import com.zaroslikov.fermacompose2.supportFun.toFormatNumber
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
@@ -35,7 +34,6 @@ import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomShe
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsCardNew
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.AnimalIndicatorsDeleteCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.InventoryAnimalBody
-import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.AnimalWeightUi
 
 
 object AnimalSizeDestination : NavigationDestination {
@@ -213,13 +211,12 @@ private fun SizeBottomSheet(
             onSuffixChange = {
                 onIntent(AnimalSizeIntent.SuffixClicked(it))
             },
+            suffixList = suffixHeightList,
             isError = state.error.isErrorSize,
             drawableRes = R.drawable.height_24dp_000000_fill0_wght400_grad0_opsz24,
             intRes = R.string.height_screen_title,
             intResSup = R.string.support_text_height_animal,
             intResError = R.string.error_no_height_animal,
-            keyboardOptions = keyboardOptionsNextNumber(),
-            suffixList = suffixHeightList
         )
         OutlinedTextDateNew(
             value = state.date,

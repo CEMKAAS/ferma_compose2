@@ -204,6 +204,7 @@ private fun WarningDeleteSaleBottomSheet(
                 suffix = product.countSuffix,
                 price = product.priceAll ?: product.price,
                 priceSuffix = priceSuffix,
+                category = product.category,
                 note = product.note,
                 buyer = product.buyer,
                 color = color,
@@ -249,6 +250,7 @@ private fun SaleContainer(
                 suffix = item.countSuffix,
                 price = item.priceAll ?: item.price,
                 priceSuffix = priceSuffix,
+                category = item.category,
                 note = item.note,
                 color = color,
                 day = item.day,
@@ -379,11 +381,11 @@ private fun SaleEntryBottomSheet(
             onValueChange = {
                 onIntent(SaleListIntent.CountChanged(it))
             },
+            suffix = state.countSuffix,
             onSuffixChange = { onIntent(SaleListIntent.SuffixClicked(it)) },
             isError = state.error.isErrorCount,
-            suffix = state.countSuffix,
-            intResSup = R.string.support_text_count_product,
             enabled = !state.isIndicatorsValue,
+            intResSup = R.string.support_text_count_product,
         )
         if (!state.isIndicatorsValue)
             WarehouseCountCard(
@@ -401,6 +403,7 @@ private fun SaleEntryBottomSheet(
             onAutoCalculate = {
                 onIntent(SaleListIntent.AutoPriceClicked(it))
             },
+            isNecessarily = true,
             isManyCount = true,
             count = state.count,
             countSuffix = state.countSuffix,

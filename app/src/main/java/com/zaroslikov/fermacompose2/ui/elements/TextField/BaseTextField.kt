@@ -3,6 +3,10 @@ package com.zaroslikov.fermacompose2.ui.elements.TextField
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +19,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -26,7 +31,6 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,7 +48,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.dark
@@ -62,22 +65,13 @@ fun BaseOutlinedTextNew(
     value: String,
     onValueChange: (String) -> Unit,
     suffix: Suffix? = null,
-    onSuffixChance: ((Suffix) -> Unit)? = null,
-    trailingIcon: Int? = null,
-    onTrailingChance: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
     onClear: () -> Unit = {},
-    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     isError: Boolean = false,
     isErrorSlash: Boolean = false,
-    isWarehouseShow: Boolean = false,
-    warehouseList: List<DomainCountSuffix> = emptyList(),
-    isAnimal: Boolean = false,
-    countAnimal: String = "",
     leadingIconRes2: Int? = null,
     leadingIconColor2: Color = Color(0xFF9A9A9A),
     leadingIconRes: Int? = null,
-    leadingIconClick: () -> Unit = {},
     readOnly: Boolean = false,
     enabled: Boolean = true,
     @StringRes labelIntRes: Int? = null,
@@ -87,6 +81,7 @@ fun BaseOutlinedTextNew(
     singleLine: Boolean = true,
     minLines: Int = 1,
     maxLength: Int? = null,
+    isNecessarily: Boolean = false,
     colorTextField: Color = gray_9,
     focusManager: FocusManager = LocalFocusManager.current,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -102,162 +97,183 @@ fun BaseOutlinedTextNew(
         else -> 1.dp
     }
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        if (labelIntRes != null || leadingIconRes != null)
-            Row(
-                modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                leadingIconRes?.let {
-                    Icon(
-                        painter = painterResource(it), contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = Color(0xFF6A7282)
-                    )
-                }
-                labelIntRes?.let {
-                    Text(
-                        text = stringResource(it),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = text_16,
-                        color = dark
-                    )
-                }
-            }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    enabled = enabled,
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    onClick?.invoke()
-                }
-                .background(
-                    color = when {
-                        isDisabled -> Color(0xFFF2F2F2)
-                        isError -> Color(0xFFFFEAEA)
-                        else -> colorTextField
-                    },
-                    shape = RoundedCornerShape(14.dp)
-                )
-                .border(
-                    borderWidth,
-                    color = if (isDisabled) Color(0xFFE0E0E0) else Color(0xFFD1D5DC),
-                    shape = RoundedCornerShape(14.dp)
-                )
-                .padding(horizontal = 12.dp, vertical = 4.dp)
+    Column(modifier = modifier) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start // не SpaceBetween — контролируем ширины явно
-            ) {
-                leadingIconRes2?.let {
-                    Icon(
-                        painterResource(it),
-                        modifier = Modifier
-                            .size(20.dp)
-                            .wrapContentWidth()/*.padding(end = 5.dp)*/,
-                        contentDescription = null,
-                        tint = if (isDisabled) Color(0xFFB0B0B0) else leadingIconColor2
-                    )
-                    Spacer(modifier = Modifier.padding(3.dp))
+            if (labelIntRes != null || leadingIconRes != null)
+                Row(
+                    modifier = Modifier,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    leadingIconRes?.let {
+                        Icon(
+                            painter = painterResource(it), contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = Color(0xFF6A7282)
+                        )
+                    }
+                    labelIntRes?.let {
+                        Text(
+                            text = stringResource(it) + if(isNecessarily) "*" else "",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = text_16,
+                            color = dark
+                        )
+                    }
                 }
-                // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
-                BasicTextField(
-                    value = value,
-                    onValueChange = { newValue ->
-                        val filteredValue = when {
-                            maxLength == null -> newValue
-                            newValue.length <= maxLength -> newValue
-                            else -> newValue.take(maxLength)
-                        }
-                        onValueChange(filteredValue)
-                    },
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        enabled = enabled,
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onClick?.invoke()
+                    }
+                    .background(
+                        color = when {
+                            isDisabled -> Color(0xFFF2F2F2)
+                            isError -> Color(0xFFFFEAEA)
+                            else -> colorTextField
+                        },
+                        shape = RoundedCornerShape(14.dp)
+                    )
+                    .border(
+                        borderWidth,
+                        color = if (isDisabled) Color(0xFFE0E0E0) else Color(0xFFD1D5DC),
+                        shape = RoundedCornerShape(14.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            ) {
+                Row(
                     modifier = Modifier
-                        .weight(1f)           // <-- ключ: занимает свободное место
-                        .padding(end = if (isMore == true) 8.dp else 0.dp) // отступ перед иконкой
-                        .defaultMinSize(minHeight = (minLines * 26).dp)
-                        .align(Alignment.CenterVertically),
-                    textStyle = TextStyle(
-                        color = if (isDisabled) Color(0xFF9E9E9E) else Color.Black,
-                        fontSize = 16.sp,
-                        lineHeight = 26.sp
-                    ),
-                    cursorBrush = SolidColor(Color(0xFF007AFF)),
-                    singleLine = singleLine,
-                    readOnly = if (onClick != null) true else readOnly,
-                    enabled = if (onClick != null) false else enabled,
-                    interactionSource = interactionSource,
-                    decorationBox = { innerTextField ->
-                        Box(contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart) {
-                            if (value.isEmpty()) {
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start // не SpaceBetween — контролируем ширины явно
+                ) {
+                    leadingIconRes2?.let {
+                        Icon(
+                            painterResource(it),
+                            modifier = Modifier
+                                .size(20.dp)
+                                .wrapContentWidth()/*.padding(end = 5.dp)*/,
+                            contentDescription = null,
+                            tint = if (isDisabled) Color(0xFFB0B0B0) else leadingIconColor2
+                        )
+                        Spacer(modifier = Modifier.padding(3.dp))
+                    }
+                    // ТЕКСТОВОЕ ПОЛЕ: занимает всё оставшееся место
+                    BasicTextField(
+                        value = value,
+                        onValueChange = { newValue ->
+                            val filteredValue = when {
+                                maxLength == null -> newValue
+                                newValue.length <= maxLength -> newValue
+                                else -> newValue.take(maxLength)
+                            }
+                            onValueChange(filteredValue)
+                        },
+                        modifier = Modifier
+                            .weight(1f)           // <-- ключ: занимает свободное место
+                            .padding(end = if (isMore == true) 8.dp else 0.dp) // отступ перед иконкой
+                            .heightIn(min = (minLines * 26).dp)
+                            .align(Alignment.CenterVertically),
+                        textStyle = TextStyle(
+                            color = if (isDisabled) Color(0xFF9E9E9E) else Color.Black,
+                            fontSize = 16.sp,
+                            lineHeight = 26.sp
+                        ),
+                        cursorBrush = SolidColor(Color(0xFF007AFF)),
+                        singleLine = singleLine,
+                        readOnly = if (onClick != null) true else readOnly,
+                        enabled = if (onClick != null) false else enabled,
+                        interactionSource = interactionSource,
+                        decorationBox = { innerTextField ->
+                            val isEmpty = value.isEmpty()
+
+                            val maxLines by animateIntAsState(
+                                targetValue = if (isEmpty) 3 else 1,
+                                animationSpec = tween(150)
+                            )
+                            val alpha by animateFloatAsState(
+                                targetValue = if (isEmpty) 1f else 0f,
+                                animationSpec = tween(150)
+                            )
+
+                            Box(
+                                modifier = Modifier.animateContentSize(),
+                                contentAlignment = if (minLines == 1) Alignment.CenterStart else Alignment.TopStart
+                            ) {
                                 Text(
                                     text = stringResource(intResSup),
-                                    color = Color(0xFF9A9A9A),
-                                    style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
+                                    color = Color(0xFF9A9A9A).copy(alpha = alpha),
+                                    style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp),
+                                    maxLines = maxLines,
+                                    overflow = TextOverflow.Ellipsis
                                 )
+                                // Обязательно делаем innerTextField заполняющим ширину своего контейнера
+                                Box(modifier = Modifier
+                                    .wrapContentWidth()
+                                    .animateContentSize()) {
+                                    innerTextField()
+                                }
                             }
-                            // Обязательно делаем innerTextField заполняющим ширину своего контейнера
-                            Box(modifier = Modifier.wrapContentWidth()) {
-                                innerTextField()
-                            }
-                        }
-                    },
-                    keyboardOptions = keyboardOptions
-                )
-                suffix?.let {
-                    Text(
-                        text = stringResource(it.toResId()),
-                        color = Color(0xFF9A9A9A),
-                        style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
+                        },
+                        keyboardOptions = keyboardOptions
                     )
-                }
-                if (enabled)
-                // ИКОНКА: фиксированного размера, не будет ужиматься
-                    when (isMore) {
-                        true -> Icon(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .wrapContentWidth(),
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = Color(0xFF9A9A9A)
+                    suffix?.let {
+                        Text(
+                            text = stringResource(it.toResId()),
+                            color = Color(0xFF9A9A9A),
+                            style = TextStyle(fontSize = 16.sp, lineHeight = 26.sp)
                         )
-
-                        false -> Icon(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .wrapContentWidth()
-                                .clickable {
-                                    onClear()
-                                },
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = null,
-                            tint = Color(0xFF9A9A9A)
-                        )
-
-                        else -> {}
                     }
+                    if (enabled)
+                    // ИКОНКА: фиксированного размера, не будет ужиматься
+                        when (isMore) {
+                            true -> Icon(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .wrapContentWidth(),
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = Color(0xFF9A9A9A)
+                            )
 
+                            false -> Icon(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .wrapContentWidth()
+                                    .clickable {
+                                        onClear()
+                                    },
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = null,
+                                tint = Color(0xFF9A9A9A)
+                            )
+
+                            else -> Unit
+                        }
+
+                }
             }
         }
         AnimatedVisibility(
             modifier = Modifier.fillMaxWidth(),
             visible = isError
         ) {
-            Text(stringResource(intResError), style = text_12, color = error_base)
+            Column {
+                Spacer(Modifier.padding(4.dp))
+                Text(stringResource(intResError), style = text_12, color = error_base)
+            }
         }
     }
 }
+
 
 @Composable
 fun BaseOutlinedTextNew2(

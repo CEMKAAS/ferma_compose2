@@ -17,7 +17,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
-import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
@@ -35,6 +34,7 @@ import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
@@ -175,7 +175,7 @@ private fun WriteOffDetailBottomSheet(
             price = state.price,
             priceAll = state.priceAll,
             priceSuffix = priceSuffix,
-            category = state.category, //TODO
+            category = state.category,
             date = date,
             note = state.note,
             statusWriteOff = state.status,
@@ -213,6 +213,7 @@ private fun WarningDeleteWriteOffBottomSheet(
                 suffix = product.countSuffix,
                 price = product.priceAll ?: product.price,
                 statusWriteOff = product.status,
+                category = product.category,
                 note = product.note,
                 color = color,
                 day = product.day,
@@ -259,6 +260,7 @@ private fun WriteOffContainer(
                 price = item.priceAll ?: item.price,
                 priceSuffix = priceSuffix,
                 statusWriteOff = item.status,
+                category = item.category,
                 note = item.note,
                 color = color,
                 day = item.day,
@@ -329,7 +331,7 @@ private fun BrieflyBottomSheetWriteOff(
                     count = product.count,
                     suffix = product.countSuffix,
                     price = product.priceAll ?: product.price,
-                    /*category = product.category,*/
+                    category = product.category,
                     statusWriteOff = product.status,
                     note = product.note,
                     color = color,
@@ -381,6 +383,7 @@ private fun WriteOffEntryBottomSheet(
             onValueChoice = {
                 onIntent(WriteOffListIntent.TitleAndSuffix(it.title, it.suffix, it.category))
             },
+            intResSup = R.string.support_text_price_write_product,
             titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
@@ -394,11 +397,10 @@ private fun WriteOffEntryBottomSheet(
             onValueChange = {
                 onIntent(WriteOffListIntent.CountChanged(it))
             },
-            isError = state.error.isErrorCount,
             suffix = state.countSuffix,
-            intResSup = R.string.support_text_count_product_write_off,
-            suffixList = suffixAllList,
+            isError = state.error.isErrorCount,
             enabled = !state.isIndicatorsValue,
+            intResSup = R.string.support_text_count_product_write_off,
         )
         if (!state.isIndicatorsValue)
             WarehouseCountCard(
@@ -422,6 +424,11 @@ private fun WriteOffEntryBottomSheet(
             count = state.count,
             countSuffix = state.countSuffix,
             priceSuffix = priceSuffix,
+        )
+        OutlinedTextCategoryNew(
+            value = state.category,
+            onValueChange = { onIntent(WriteOffListIntent.CategoryChanged(it)) },
+            titleList = state.pickList.categoryList,
         )
         if (!state.isIndicatorsValue)
             OutlinedTextDateNew(

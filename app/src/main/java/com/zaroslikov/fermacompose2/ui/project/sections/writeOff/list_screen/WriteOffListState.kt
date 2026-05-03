@@ -55,6 +55,7 @@ data class WriteOffEntryState2(
     val isAutoPrice: Boolean = false,
     val price: String = "",
     val priceAll: String = "",
+    val category: String = "",
     val status: Boolean = false,
     val note: String = "",
     val animalCountId: Long? = null,
@@ -68,6 +69,7 @@ data class WriteOffEntryState2(
 
 data class PickWriteOffList(
     val titleList: List<DomainTitleSuffixCategory> = emptyList(),
+    val categoryList: List<String> = emptyList(),
     val warehouseList: List<DomainCountSuffix> = emptyList(),
 )
 

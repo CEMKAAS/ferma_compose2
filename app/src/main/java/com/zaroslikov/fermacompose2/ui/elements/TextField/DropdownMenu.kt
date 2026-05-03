@@ -220,9 +220,11 @@ fun ExposedDropdownMenuSuffix(
     setSuffix: (Suffix) -> Unit,
     suffixList: List<Suffix>,
     enableDropMenu: Boolean = true,
+    modifier: Modifier = Modifier,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     BaseExposedDropdownMenu(
+        modifier = modifier,
         list = suffixList,
         content = content,
         enabled = enableDropMenu,
@@ -356,7 +358,8 @@ fun ExposedDropdownMenuPair(
         title = title,
         labelSelector = { it.title },
         list = list,
-        content = content
+        content = content,
+        enableDropMenu = enableDropMenu
     ) { index, item, closeMenu ->
         val trailingIcon: @Composable (() -> Unit)? = if (item.title == title) {
             { IconDone() }

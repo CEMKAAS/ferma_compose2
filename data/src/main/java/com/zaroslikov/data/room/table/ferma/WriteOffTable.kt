@@ -7,7 +7,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import com.zaroslikov.data.room.table.project.ProjectTable
-import com.zaroslikov.domain.models.enums.Category
 import com.zaroslikov.domain.models.enums.Suffix
 
 @Entity(
@@ -43,11 +42,11 @@ data class WriteOffTable(
     @ColumnInfo(name = "price_suffix")
     val priceSuffix: Suffix?,
     @ColumnInfo(name = "category")
-    val category: String,
+    val category: String?,
     @ColumnInfo(name = "day")
     val day: Int,  // день
     @ColumnInfo(name = "month")
-    val mount: Int, // месяц
+    val month: Int, // месяц
     @ColumnInfo(name = "year")
     val year: Int, // время
     @ColumnInfo(name = "status")

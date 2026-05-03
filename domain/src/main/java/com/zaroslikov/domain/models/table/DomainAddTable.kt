@@ -14,7 +14,7 @@ data class DomainAddTable(
     val price: Double,
     val countSuffix: Suffix,
     val priceSuffix: Suffix = Suffix.RUBLE,
-    val category: String,
+    val category: String?,
     val animalId: Long? = null,
     val note: String,
     val idPT: Long,

@@ -1,12 +1,14 @@
 package com.zaroslikov.fermacompose2.ui.elements.сompositions
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
@@ -35,7 +37,12 @@ fun TimePicker(time: String, showDialog: (String) -> Unit) {
         colors = listOf(green_6, green_shamrock),
         textButtonRes = R.string.button_text_take
     ) {
-        Column(modifier = Modifier.padding(top = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             TimePicker(
                 state = timeState, colors = TimePickerDefaults.colors().copy(
                     clockDialColor = gray_6,

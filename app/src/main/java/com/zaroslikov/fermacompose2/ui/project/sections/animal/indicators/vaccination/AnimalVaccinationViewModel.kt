@@ -204,7 +204,7 @@ class AnimalVaccinationViewModel @Inject constructor(
         val category = resourceProvider.getString(R.string.vaccination_screen_title)
         return DomainExpensesTable(
             id = idExpenses ?: 0,
-            title = vaccination,
+            title = vaccination.trim(),
             count = countVaccination.toConvertZeroDouble(),
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
@@ -214,7 +214,7 @@ class AnimalVaccinationViewModel @Inject constructor(
             priceSuffix = getState().settings.currencySuffix,
             countSuffix = animalSuffix,
             category = category,
-            note = note,
+            note = note.trim(),
             isShowFood = false,
             idPT = itemIdPT,
             animalVaccinationId = animalVaccinationId ?: id,
@@ -246,12 +246,12 @@ class AnimalVaccinationViewModel @Inject constructor(
     private fun Vaccination.toDomainMap(): DomainAnimalVaccination {
         return DomainAnimalVaccination(
             id = id,
-            vaccination = vaccination,
+            vaccination = vaccination.trim(),
             countVaccination = countVaccination.toInt(),
             date = date,
             nextVaccination = if (!isDateFactory) nextDate else null,
             idAnimal = idAnimal,
-            note = note,
+            note = note.trim()
         )
     }
 }

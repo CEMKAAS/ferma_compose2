@@ -26,6 +26,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -187,12 +188,17 @@ class WriteOffViewModel @Inject constructor(
                 return@launch
             }
             val newState = if (!getState().isSaveStateForBottomSheet || domain != null) {
-                val titleList = writeOffRepository.getItemsWriteOffList(itemIdPT).first()
+                val titleDeferred =
+                    async { writeOffRepository.getItemsWriteOffList(itemIdPT).first() }
+                val categoryDeferred =
+                    async { writeOffRepository.getItemsCategoryWriteOffList(itemIdPT).first() }
 
                 val baseState = WriteOffEntryState2(
                     itemIdPT = itemIdPT,
+                    category = resourceProvider.getString(R.string.support_text_no_category),
                     pickList = PickWriteOffList(
-                        titleList = titleList
+                        titleList = titleDeferred.await(),
+                        categoryList = categoryDeferred.await()
                     )
                 )
                 if (domain == null) baseState
@@ -276,6 +282,8 @@ class WriteOffViewModel @Inject constructor(
             isAutoPrice = domain.priceAll != null,
             price = domain.price?.formatNumber(false) ?: "",
             priceAll = domain.priceAll?.formatNumber() ?: "",
+            category = domain.category
+                ?: resourceProvider.getString(R.string.support_text_no_category),
             date = formatDateToString(
                 domain.day,
                 domain.month,
@@ -299,6 +307,7 @@ class WriteOffViewModel @Inject constructor(
             price = if (price.isBlank()) null else price.toConvertDbDouble(),
             priceAll = if (price.isBlank()) null else if (isAutoPrice) priceAll.toConvertDbDouble() else null,
             priceSuffix = if (price.isBlank()) null else getState().settings.currencySuffix,
+            category = category.trim().ifEmpty { null },
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),

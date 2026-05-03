@@ -5,9 +5,12 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -94,19 +97,6 @@ fun CompleteIncubationBottomSheet(
         skipPartiallyExpanded = true,
         title = stringResource(R.string.bookmark_screen_сomplete_incubation),
         onDismissRequest = { onIntent(BookmarkIntent.OpenCompleteIncubationBottomSheetClick(false)) },
-        contentBottom = {
-            BottomPanel(
-                enabled = enabled && enabledTwo,
-                onCloseClick = {
-                    onIntent(
-                        BookmarkIntent.OpenCompleteIncubationBottomSheetClick(
-                            false
-                        )
-                    )
-                },
-                onSaveClick = { onIntent(BookmarkIntent.CompleteIncubatorClick) }
-            )
-        }
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -235,12 +225,16 @@ fun CompleteIncubationBottomSheet(
                             color = black_2
                         )
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Min),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Cards(
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
                                 enabled = isChoiceProjectMode == true,
                                 iconRes = R.drawable.icon_add,
                                 stringRes = R.string.bookmark_screen_new_project
@@ -249,7 +243,9 @@ fun CompleteIncubationBottomSheet(
                             }
                             if (projectList.isNotEmpty())
                                 Cards(
-                                    modifier = Modifier.weight(1f),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight(),
                                     enabled = isChoiceProjectMode == false,
                                     iconRes = R.drawable.outline_work_24,
                                     stringRes = R.string.bookmark_screen_existing_project
@@ -291,6 +287,17 @@ fun CompleteIncubationBottomSheet(
                     }
                 }
             }
+            BottomPanel(
+                enabled = enabled && enabledTwo,
+                onCloseClick = {
+                    onIntent(
+                        BookmarkIntent.OpenCompleteIncubationBottomSheetClick(
+                            false
+                        )
+                    )
+                },
+                onSaveClick = { onIntent(BookmarkIntent.CompleteIncubatorClick) }
+            )
         }
     }
 }
@@ -324,17 +331,6 @@ fun EarlyCompleteIncubationBottomSheet(
         skipPartiallyExpanded = true,
         title = stringResource(R.string.bookmark_screen_early_completion_incubation),
         onDismissRequest = { onIntent(BookmarkIntent.OpenCompleteIncubationBottomSheetClick(false)) },
-        contentBottom = {
-            BottomPanel(
-                enabled = true,
-                colors = listOf(orang_15, red_13),
-                iconRes = R.drawable.outline_cancel_24,
-                onCloseClick = {
-                    onIntent(BookmarkIntent.OpenCompleteIncubationBottomSheetClick(false))
-                },
-                onSaveClick = { onIntent(BookmarkIntent.EarlyCompleteIncubatorClick) }
-            )
-        }
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -400,6 +396,15 @@ fun EarlyCompleteIncubationBottomSheet(
                 onValueChange = { onIntent(BookmarkIntent.ReasonNoteChanged(it)) },
                 labelIntRes = R.string.bookmark_screen_reason_incubation_end_early,
                 supportingText = R.string.bookmark_screen_reason_sup_incubation_end_early,
+            )
+            BottomPanel(
+                enabled = true,
+                colors = listOf(orang_15, red_13),
+                iconRes = R.drawable.outline_cancel_24,
+                onCloseClick = {
+                    onIntent(BookmarkIntent.OpenCompleteIncubationBottomSheetClick(false))
+                },
+                onSaveClick = { onIntent(BookmarkIntent.EarlyCompleteIncubatorClick) }
             )
         }
     }

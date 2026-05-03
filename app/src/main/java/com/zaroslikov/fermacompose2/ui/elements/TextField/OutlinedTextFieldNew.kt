@@ -175,6 +175,7 @@ fun OutlinedTextNew(
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
     isBorderCard: Boolean = true,
+    isNecessarily: Boolean = false,
     @StringRes labelIntRes: Int? = R.string.outlined_text_note,
     @StringRes supportingText: Int = R.string.support_text_note,
 ) {
@@ -186,6 +187,7 @@ fun OutlinedTextNew(
             intResSup = supportingText,
             isError = isError,
             singleLine = false,
+            isNecessarily = isNecessarily,
             keyboardOptions = keyboardOptionsNext(),
         )
     }
@@ -260,6 +262,7 @@ fun OutlinedTextDropdownMenuNew(
                 onClear = { onValueChange("") },
                 leadingIconRes = leadingIconRes,
                 isError = false,
+                singleLine = false,
                 labelIntRes = labelIntRes,
                 intResSup = intResSup,
                 keyboardOptions = keyboardOptionsNext(),
@@ -352,7 +355,6 @@ fun OutlinedTextAnimalNew(
                 readOnly = true, isMore = value.isBlank(),
                 labelIntRes = R.string.outlined_text_animals,
                 intResSup = R.string.support_text_animal,
-                trailingIcon = R.drawable.baseline_clear_24
             )
         }
     }
@@ -389,6 +391,7 @@ fun OutlinedTextTitleAddNew(
         ) {
             BaseOutlinedTextNew(
                 modifier = it.first,
+                isNecessarily = true,
                 value = value,
                 onValueChange = { onValueChange(it) },
                 onClear = { onValueChange("") },
@@ -398,6 +401,7 @@ fun OutlinedTextTitleAddNew(
                 labelIntRes = intRes,
                 intResError = intResError,
                 intResSup = intResSup,
+                singleLine = false,
                 readOnly = readOnly, enabled = enable, isMore = value.isBlank(),
                 keyboardOptions = keyboardOptionsNext(),
                 colorTextField = colorTextField
@@ -525,9 +529,9 @@ fun OutlinedTextDateNew(
     }
     val textField: @Composable () -> Unit = {
         BaseOutlinedTextNew(
-            onClick = {openDialog = !openDialog },
+            onClick = { openDialog = !openDialog },
             value = date,
-            onValueChange = {  },
+            onValueChange = { },
             readOnly = true,
             enabled = enable,
             labelIntRes = intRes,
@@ -566,13 +570,13 @@ fun TimeOutlinedTextFieldNew(
         BaseOutlinedTextNew(
             modifier = Modifier.clickable(onClick = { openDialog = !openDialog }),
             value = time,
-            onValueChange = { openDialog = !openDialog },
+            onValueChange = { },
+            onClick = { openDialog = !openDialog },
             readOnly = true,
             enabled = enable,
             labelIntRes = intRes,
             intResSup = intResSup,
             leadingIconRes = drawableRes,
-            leadingIconClick = { openDialog = !openDialog }
         )
     }
     if (isBorderCard) BorderCard(onClick = { openDialog = !openDialog }) { textField() }
@@ -664,6 +668,8 @@ fun OutlinedTextVaccinationNew(
                 labelIntRes = R.string.animal_vaccination_title,
                 intResSup = R.string.support_text_vaccination_animals,
                 intResError = R.string.error_no_vaccination,
+                isNecessarily = true,
+                singleLine = false,
                 keyboardOptions = keyboardOptionsNext(),
                 enabled = enable,
                 readOnly = readOnly, isMore = value.isBlank()
@@ -677,32 +683,17 @@ fun OutlinedTextCountAnimalNew(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    onSuffixChange: ((Suffix) -> Unit)? = null,
     isError: Boolean,
     isErrorCountZero: Boolean,
     countAnimal: String?,
     suffix: Suffix,
-    isAnimal: Boolean = false,
-    isWarehouseShow: Boolean = true,
-    isDropMenuShow: Boolean = true,
-    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     drawableRes: Int = R.drawable.baseline_shopping_basket_24,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
-    @StringRes intResSup: Int = R.string.support_text_product,
+    @StringRes intResSup: Int = R.string.support_text_count_animals,
     @StringRes intResError: Int = R.string.error_no_count_product,
     @StringRes countZeroTextErrorRes: Int = R.string.error_count_zero_animals,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_weight,
-    countWarehouse: String = "",
-    countWarehouseSuffix: String = "",
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
-    isWeightCalculate: Boolean = false,
-    weightValue: String = "",
-    onWeightChange: (String) -> Unit = {},
-    weightSuffix: Suffix = Suffix.KILOGRAM,
-    onWeightSuffixChance: (Suffix) -> Unit = {},
-    isNecessarily: Boolean = true,
-    isAutoCalculate: Boolean = true,
-    onAutoCalculate: (Boolean) -> Unit = {},
     isBorderCard: Boolean = true,
 ) {
 
@@ -718,10 +709,8 @@ fun OutlinedTextCountAnimalNew(
             value = value,
             onValueChange = onValueChange,
             suffix = suffix,
-            onSuffixChance = onSuffixChange,
-            versionDropMenu = versionDropMenu,
             isError = isError,
-            isWarehouseShow = isWarehouseShow,
+            isNecessarily = true,
             leadingIconRes = drawableRes,
             labelIntRes = intRes,
             intResSup = intResSup,
@@ -772,89 +761,68 @@ fun OutlinedTextCountNew(
     suffixList: List<Suffix> = suffixAllList,
     isError: Boolean,
     enabled: Boolean = true,
-//    isAnimal: Boolean = false,
-//    isWarehouseShow: Boolean = true,
-//    isDropMenuShow: Boolean = true,
-//    versionDropMenu: DropdownMenu = DropdownMenu.ALL,
     drawableRes: Int = R.drawable.baseline_shopping_basket_24,
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
-    @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_weight,
-//    warehouseList: List<DomainCountSuffix> = emptyList(),
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
-//    isWeightCalculate: Boolean = false,
-//    weightValue: String = "",
-//    onWeightChange: (String) -> Unit = {},
-//    weightSuffix: Suffix = Suffix.KILOGRAM,
-//    onWeightSuffixChance: (Suffix) -> Unit = {},
-//    isAutoCalculate: Boolean = true,
-//    onAutoCalculate: (Boolean) -> Unit = {},
     isBorderCard: Boolean = true,
     colorTextField: Color = gray_9,
+    isNecessarily: Boolean = true,
 ) {
     val focusManager = LocalFocusManager.current
     val suffixText = stringResource(suffix.toResId())
     val textField: @Composable () -> Unit = {
-        BaseOutlinedTextNew(
-            modifier = modifier,
-            value = value,
-            onValueChange = onValueChange,
-            onSuffixChance = onSuffixChange,
-//                versionDropMenu = versionDropMenu,
-            isError = isError,
-//                isWarehouseShow = isWarehouseShow,
-//                warehouseList = warehouseList,
-            leadingIconRes = drawableRes,
-            labelIntRes = intRes,
-            intResSup = R.string.outlined_text_count,
-            intResError = intResError,
-            keyboardOptions = keyboardOptions,
-            colorTextField = colorTextField,
-            enabled = enabled
-        )
-    }
-
-    val textField2: @Composable () -> Unit = {
-        ExposedDropdownMenuSuffix(
-            suffix = suffix,
-            setSuffix = {
-                onSuffixChange?.let { it1 ->
-                    it1(it)
-                    focusManager.moveFocus(FocusDirection.Down)
-                }
-            },
-            suffixList = suffixList,
-            enableDropMenu = enabled
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             BaseOutlinedTextNew(
-                modifier = it.first,
-                value = suffixText,
-                onValueChange = {},
-//                    versionDropMenu = versionDropMenu,
-                leadingIconRes = R.drawable.baseline_edit_document_24,
-                labelIntRes = R.string.outlined_text_suffix,
-                intResSup = R.string.outlined_text_suffix,
+                modifier = Modifier.weight(1f),
+                value = value,
+                onValueChange = onValueChange,
+                isError = isError,
+                leadingIconRes = drawableRes,
+                labelIntRes = intRes,
+                intResSup = R.string.outlined_text_count,
+                intResError = intResError,
                 keyboardOptions = keyboardOptions,
-                enabled = enabled,
-                isMore = true,
-                readOnly = true,
-                colorTextField = colorTextField
+                colorTextField = colorTextField,
+                isNecessarily = isNecessarily,
+                enabled = enabled
+            )
+            ExposedDropdownMenuSuffix(
+                modifier = Modifier.weight(1f),
+                suffix = suffix,
+                setSuffix = {
+                    onSuffixChange?.let { it1 ->
+                        it1(it)
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                },
+                suffixList = suffixList,
+                enableDropMenu = enabled,
+                content = {
+                    BaseOutlinedTextNew(
+                        modifier = it.first,
+                        value = suffixText,
+                        onValueChange = {},
+                        leadingIconRes = R.drawable.baseline_edit_document_24,
+                        labelIntRes = R.string.outlined_text_suffix,
+                        intResSup = R.string.outlined_text_suffix,
+                        keyboardOptions = keyboardOptions,
+                        enabled = enabled,
+                        isMore = true,
+                        readOnly = true,
+                        colorTextField = colorTextField
+                    )
+                }
             )
         }
     }
-    //TODO при ошибки у них разная высота надо исправить
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        if (isBorderCard) BorderCard(modifier = Modifier.weight(1f)) {
-            textField()
-        } else Box(modifier = Modifier.weight(1f)) { textField() }
-        if (isBorderCard) BorderCard(modifier = Modifier.weight(1f)) {
-            textField2()
-        } else Box(modifier = Modifier.weight(1f)) { textField2() }
-    }
+    if (isBorderCard) BorderCard {
+        textField()
+    } else Box { textField() }
 }
 
 
@@ -1003,8 +971,8 @@ fun OutlinedPriceInputNew(
     countSuffix: Suffix,
     priceAll: String,
     priceSuffix: Suffix,
-    @StringRes supportTextRes: Int = R.string.support_text_count_product_sale,
-    @StringRes supportTextResAutoCal: Int = R.string.support_text_count_product_sale,
+    @StringRes supportTextRes: Int = R.string.support_text_price_all,
+    @StringRes supportTextResAutoCal: Int = R.string.support_text_price_one,
     @StringRes tooltipTextResAutoCal: Int = R.string.tooltip_auto_calculate_price,
     isBorderCard: Boolean = true
 ) {
@@ -1031,6 +999,7 @@ fun OutlinedPriceInputNew(
                 intResError = R.string.error_no_count_sale,
                 isError = isError,
                 suffix = priceSuffix,
+                isNecessarily = isNecessarily,
                 modifier = Modifier
                     .padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
                 leadingIconRes = leadingIconRes,
@@ -1096,10 +1065,10 @@ fun OutlinedCountInputNew(
                 onValueChange = onCountChange,
                 suffix = countSuffix,
                 onSuffixChange = onSuffixChange,
-                isError = isError,
                 suffixList = countSuffixList,
+                isError = isError,
+                enabled = enabled,
                 isBorderCard = false,
-                enabled = enabled
             )
             AnimatedVisibility(
                 modifier = Modifier.fillMaxWidth(),
@@ -1138,8 +1107,6 @@ fun WeightOutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         suffix = suffix,
-        onSuffixChance = onSuffixChance,
-        versionDropMenu = DropdownMenu.WEIGHT,
         isError = false,
         leadingIconRes = R.drawable.weight_24dp_000000_fill0_wght400_grad0_opsz24,
         labelIntRes = R.string.weight_screen_title,
@@ -1173,7 +1140,6 @@ fun WeightOutlinedTextFieldNew(
             modifier = modifier,
             value = value,
             onValueChange = onValueChange,
-            onSuffixChance = onSuffixChange,
             isError = isError,
             leadingIconRes = drawableRes,
             labelIntRes = intRes,
@@ -1193,21 +1159,22 @@ fun WeightOutlinedTextFieldNew(
                 }
             },
             suffixList = suffixList,
-            enableDropMenu = suffixEnabled
-        ) {
-            BaseOutlinedTextNew(
-                modifier = it.first,
-                value = suffixText,
-                onValueChange = {},
-                leadingIconRes = R.drawable.baseline_edit_document_24,
-                labelIntRes = R.string.outlined_text_suffix,
-                intResSup = R.string.outlined_text_suffix,
-                keyboardOptions = keyboardOptions,
-                isMore = true,
-                readOnly = true,
-                enabled = suffixEnabled
-            )
-        }
+            enableDropMenu = suffixEnabled,
+            content = {
+                BaseOutlinedTextNew(
+                    modifier = it.first,
+                    value = suffixText,
+                    onValueChange = {},
+                    leadingIconRes = R.drawable.baseline_edit_document_24,
+                    labelIntRes = R.string.outlined_text_suffix,
+                    intResSup = R.string.outlined_text_suffix,
+                    keyboardOptions = keyboardOptions,
+                    isMore = true,
+                    readOnly = true,
+                    enabled = suffixEnabled
+                )
+            },
+        )
     }
 
     Row(
@@ -1314,6 +1281,7 @@ fun OutlinedTextTitleSaleNew(
     onValueChange: (String) -> Unit = {},
     onValueChoice: (DomainTitleSuffixCategory) -> Unit = {},
     category: Category?,
+    @StringRes intResSup: Int = R.string.support_text_product,
     readOnly: Boolean = false,
     enable: Boolean = true,
     titleList: List<DomainTitleSuffixCategory>,
@@ -1332,6 +1300,7 @@ fun OutlinedTextTitleSaleNew(
                 category = it.category
                 focusManager.moveFocus(FocusDirection.Down)
             },
+            enableDropMenu = enable,
             list = titleList
         ) {
             BaseOutlinedTextNew(
@@ -1345,12 +1314,14 @@ fun OutlinedTextTitleSaleNew(
                 leadingIconColor2 = category?.toColorList() ?: Category.ADD.toColorList(),
                 labelIntRes = R.string.outlined_text_product,
                 isError = isErrorTitle, isErrorSlash = isErrorSlash,
-                intResSup = R.string.support_text_product,
+                intResSup = intResSup,
                 intResError = R.string.error_no_product,
                 readOnly = readOnly,
                 enabled = enable,
+                singleLine =false,
                 modifier = it.first,
                 isMore = isMore,
+                isNecessarily = true,
                 keyboardOptions = keyboardOptionsNext()
             )
         }
@@ -1455,11 +1426,6 @@ fun OutlinedTextBuyerNew(
                 intResSup = R.string.support_text_buyer,
                 modifier = it.first,
                 leadingIconRes = R.drawable.baseline_person_24,
-                trailingIcon = R.drawable.baseline_clear_24,
-                onTrailingChance = {
-                    onTrailingChance()
-                    focusManager.clearFocus()
-                },
                 keyboardOptions = keyboardOptionsNext(),
                 isMore = value.isBlank()
             )
@@ -1470,6 +1436,7 @@ fun OutlinedTextBuyerNew(
 @Composable
 fun OutlinedTextAnimalTypeNew(
     value: String,
+    @StringRes intResSup: Int,
     onValueChange: (String) -> Unit,
     onTrailingChance: () -> Unit = {},
     list: List<String>,
@@ -1486,14 +1453,11 @@ fun OutlinedTextAnimalTypeNew(
                 onValueChange = onValueChange,
                 onClear = { onValueChange("") },
                 labelIntRes = R.string.outlined_text_type,
-                intResSup = R.string.support_text_buyer,
+                intResSup = intResSup,
+                isNecessarily = true,
+                singleLine = false,
                 modifier = it.first,
                 leadingIconRes = R.drawable.baseline_pets_24,
-                trailingIcon = R.drawable.baseline_clear_24,
-                onTrailingChance = {
-                    onTrailingChance()
-                    focusManager.clearFocus()
-                },
                 keyboardOptions = keyboardOptionsNext(),
                 isMore = value.isBlank()
             )
@@ -1514,6 +1478,8 @@ fun AnimalNameOutlinedTextNew(
             onValueChange = onValueChange,
             labelIntRes = if (!isAnimalGroup) R.string.outlined_text_name_animal else R.string.outlined_text_name_animals,
             isError = isErrorTitle,
+            isNecessarily = true,
+            singleLine = false,
             intResSup = if (!isAnimalGroup) R.string.support_text_name_animal else R.string.support_text_names_animals,
             intResError = if (!isAnimalGroup) R.string.error_no_name_animal else R.string.error_no_name_animals,
             keyboardOptions = keyboardOptionsNext()

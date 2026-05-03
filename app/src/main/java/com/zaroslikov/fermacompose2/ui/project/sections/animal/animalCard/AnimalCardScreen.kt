@@ -216,18 +216,18 @@ private fun DataCardOne(
 ) {
     val context = LocalContext.current
     CardFieldNew() {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.Top,
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            IconAnimal(
-                sex = if (animal.group) null else animal.sex,
-                currentIcon = animal.currentIcon ?: R.drawable.baseline_pets_24,
-                imagePath = animal.imagePath
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                IconAnimal(
+                    sex = if (animal.group) null else animal.sex,
+                    currentIcon = animal.currentIcon ?: R.drawable.baseline_pets_24,
+                    imagePath = animal.imagePath
+                )
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -249,12 +249,17 @@ private fun DataCardOne(
                             text = animal.type,
                             style = text_14,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                         if (!animal.group)
                             CountColorGradientCard(sex = animal.sex)
                     }
                 }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 AnimalParameter(
                     titleParameter = R.string.animal_list_age,
                     parameter = getAgeFromDate(context, animal.date) + " (${animal.date})",
@@ -279,12 +284,12 @@ private fun DataCardOne(
                     iconColorSecond = orang_13
                 )
                 /* AnimalParameter(
-                     titleParameter = R.string.search_section,
-                     parameter = "$price",
-                     icon = R.drawable.baseline_add_card_24,
-                     iconColor = price_green,
-                     iconColorSecond = price_green_2
-                 )*/
+                         titleParameter = R.string.search_section,
+                         parameter = "$price",
+                         icon = R.drawable.baseline_add_card_24,
+                         iconColor = price_green,
+                         iconColorSecond = price_green_2
+                     )*/
             }
         }
     }

@@ -5,9 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -302,7 +300,7 @@ private fun ProductCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(title, style = text_14, color = black_2)
+            Text(title, style = text_14, color = black_2, modifier = Modifier.weight(1f))
             Text(
                 "${value.formatNumber()} " + stringResource(suffix.toResId()),
                 style = text_14,
@@ -437,18 +435,13 @@ private fun <T> WarehouseSection(
                     }
                 }
             }
-            AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
-                visible = expanded
-            ) {
-                if (list.size > 4)
-                    BorderShowAllButton(
-                        listSize = list.size,
-                        textColor = textColor,
-                        borderColor = borderColor,
-                        isShowMore = expanded
-                    ) { expanded = !expanded }
-            }
+            if (list.size > 4)
+                BorderShowAllButton(
+                    listSize = list.size,
+                    textColor = textColor,
+                    borderColor = borderColor,
+                    isShowMore = expanded
+                ) { expanded = !expanded }
         }
     }
 }
@@ -505,7 +498,6 @@ private fun FastAdd(
                     tint = blue_1
                 )
             }
-
             AnimatedVisibility(
                 visible = isShowFastAddProduct,
             ) {
@@ -554,6 +546,7 @@ private fun FastAddCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
+                modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -565,7 +558,13 @@ private fun FastAddCard(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(title, style = text_14, color = black_2)
+                    Text(
+                        title,
+                        style = text_14,
+                        color = black_2,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)

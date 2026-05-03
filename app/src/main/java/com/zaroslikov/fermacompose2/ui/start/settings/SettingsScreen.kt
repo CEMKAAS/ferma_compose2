@@ -164,7 +164,7 @@ private fun SettingsContainer(
     ) {
         /*AppearanceCard()*/
         NotificationCard()
-        LanguageCard()
+        /* LanguageCard()*/
         DataManagementCard(
             onExportDatabaseClick = { onIntent(SettingsIntent.OpenExportBottomSheetClick(true)) },
             onImportDatabaseClick = { onIntent(SettingsIntent.OpenImportBottomSheetClick(true)) },
@@ -349,6 +349,7 @@ fun SD(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
+            modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -501,7 +502,7 @@ fun DeleteWarning(
     BaseBottomSheet(
         title = stringResource(R.string.settings_screen_warning_delete),
         supText = stringResource(R.string.settings_screen_confirm_delete),
-        skipPartiallyExpanded = false,
+        skipPartiallyExpanded = true,
         onDismissRequest = onDismissRequest
     ) {
         Column(

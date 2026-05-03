@@ -53,7 +53,9 @@ fun MainProjectScreen(
         bottomBar = {
             Column {
                 HorizontalDivider(thickness = 1.dp, color = gray_6)
-                NavigationBar {
+                NavigationBar(
+                    windowInsets = WindowInsets(0)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,

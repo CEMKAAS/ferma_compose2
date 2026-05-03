@@ -116,6 +116,7 @@
     <string name="button_note">Записать</string>
     <string name="button_cancel">Отмена</string>
     <string name="button_edit">Редактировать</string>
+    <string name="button_edit_2">Изменить</string>
     <string name="button_save">Сохранить</string>
     <string name="button_wrap">Свернуть</string>
     <string name="button_сomplete">Завершить</string>
@@ -231,8 +232,12 @@
     <string name="support_text_count_product_sale">Укажите количество товара для продажи</string>
     <string name="support_text_count_product_expenses">Укажите количество товара для покупки</string>
     <string name="support_text_count_product_write_off">Укажите количество товара для списания</string>
+    <string name="support_text_price_all">Укажите стоимость за весть товар</string>
+    <string name="support_text_price_one">Укажите стоимость за один товар</string>
     <string name="support_text_price_sale">Укажите стоимость за проданный товар</string>
-    <string name="support_text_price_expenses">Укажите стоимость за купленный товар</string>
+    <string name="support_text_price_expenses_all">Укажите стоимость за весь купленный товар</string>
+    <string name="support_text_price_expenses_one">Укажите стоимость за один купленный товар</string>
+    <string name="support_text_price_write_product">Выберите товар</string>
     <string name="support_text_price_write_off_all">Укажите стоимость за весь списанный товар</string>
     <string name="support_text_price_write_off_one">Укажите стоимость за один списанный товар</string>
     <string name="support_text_price_animal">Укажите стоимость животного</string>
@@ -265,7 +270,7 @@
     <string name="support_text_add_animal_reason">Укажите причину добавления</string>
     <string name="support_text_write_off_animal_reason">Укажите причину списания</string>
 
-    <string name="support_text_product">Введите или выберите товар</string>
+    <string name="support_text_product">Укажите или выберите товар</string>
     <string name="support_text_weight">Укажите вес</string>
     <string name="support_text_title">Укажите заголовок</string>
     <string name="support_text_count_warehouse_s">Сейчас на складе:</string>
@@ -274,7 +279,7 @@
     <string name="support_text_notification">Выберите уведомление</string>
     <string name="support_text_animal">Выберите животное, которое дало вам продукцию</string>
     <string name="support_text_note">Здесь может содержаться важная информация</string>
-    <string name="support_text_buyer">Укажите или выберите имя клиента.</string>
+    <string name="support_text_buyer">Укажите или выберите имя покупателя.</string>
     <string name="support_text_choice_animal">Выберите животных для рассчета длительности корма:</string>
     <string name="support_text_no_animal">Нет животных</string>
     <string name="support_text_count_animals">Укажите количество животных</string>
@@ -453,19 +458,19 @@
     <string name="add_incubator_screen_title">Создание инкубатора</string>
     <string name="add_incubator_screen_title_edit">Настройка инкубатора</string>
     <string name="add_incubator_screen_download_image">Загрузите или выберите фото для проекта</string>
-    <string name="add_incubator_screen_name_incubator">Название инкубатора</string>
+    <string name="add_incubator_screen_name_incubator">Название инкубатора*</string>
     <string name="add_incubator_screen_name_incubator_support">Например: Инкубатор №1</string>
     <string name="add_incubator_screen_brand">Марка</string>
-    <string name="add_incubator_screen_brand_support">Укажите марку</string>
+    <string name="add_incubator_screen_brand_support">Укажите или выберите марку</string>
     <string name="add_incubator_screen_model">Модель</string>
-    <string name="add_incubator_screen_model_support">Укажите модель</string>
-    <string name="add_incubator_screen_capacity">Вместимость</string>
-    <string name="add_incubator_screen_capacity_egg">Кол-во яиц</string>
+    <string name="add_incubator_screen_model_support">Укажите или выберите модель</string>
+    <string name="add_incubator_screen_capacity">Вместимость*</string>
+    <string name="add_incubator_screen_capacity_egg">Укажите на сколько яйц инкубатор</string>
     <string name="add_incubator_screen_date_sale">Дата покупки</string>
     <string name="add_incubator_screen_incubator_sell">Стоимость инкубатора</string>
     <string name="add_incubator_screen_incubator_sell_support">Укажите стоимость инкубатора</string>
-    <string name="add_incubator_screen_note">Описание</string>
-    <string name="add_incubator_screen_note_support">Добавить описание или заметки…</string>
+    <string name="add_incubator_screen_note">Заметки</string>
+    <string name="add_incubator_screen_note_support">Здесь может сожержаться важная информация об инкубаторе</string>
     <string name="add_incubator_screen_save">Создать инкубатор</string>
     <string name="add_incubator_screen_function_incubator">Функции инкубатора</string>
     <string name="add_incubator_screen_automatic_egg_rotation">Автопереворот яиц</string>
@@ -479,7 +484,7 @@
     <string name="entry_bookmark_title">Название закладки*</string>
     <string name="entry_bookmark_type">Тип яиц</string>
     <string name="entry_bookmark_breed">Порода</string>
-    <string name="entry_bookmark_support_breed">Укажите породу</string>
+    <string name="entry_bookmark_support_breed">Укажите или выберите породу</string>
     <string name="entry_bookmark_count_egg">Количество яиц*</string>
     <string name="entry_bookmark_rejected_count_egg">Отложено яиц</string>
     <string name="entry_bookmark_support_count_egg">Укажите кол-во яиц</string>
@@ -487,7 +492,7 @@
     <string name="entry_bookmark_time">Время закладки</string>
     <string name="entry_bookmark_time_notification">Время уведомления</string>
     <string name="entry_bookmark_text_notification">Текст уведомления</string>
-    <string name="entry_bookmark_support_text_notification">Здесь можете указать текст уведомления</string>
+    <string name="entry_bookmark_support_text_notification">Укажите текст уведомления</string>
     <string name="entry_bookmark_price_egg">Цена за яйцо</string>
     <string name="entry_bookmark_title_support">Например: Закладка №1</string>
     <string name="entry_bookmark_price_support">100</string>
@@ -676,7 +681,7 @@
     <string name="warehouse_edit_screen_title_edit">Настройка проекта</string>
     <string name="warehouse_edit_screen_name_project">Название проекта</string>
     <string name="warehouse_edit_screen_name_new_project">Название нового проекта</string>
-    <string name="warehouse_edit_screen_name_project_support">Ферма "Бузина"</string>
+    <string name="warehouse_edit_screen_name_project_support">Например: Хозяйство</string>
     <string name="warehouse_edit_screen_choice_icon_project">Выберите иконку проекта</string>
     <string name="warehouse_edit_screen_project_creation_date">Дата создания проекта</string>
     <string name="warehouse_edit_screen_notification">Уведомления</string>
@@ -1178,7 +1183,7 @@
 
     // NoteScreen
     <string name="note_screen_note_title">Заголовок</string>
-    <string name="note_screen_note_support_title">Введите заголовок заметки</string>
+    <string name="note_screen_note_support_title">Укажите заголовок заметки</string>
     <string name="note_screen_note_text">Содержание</string>
     <string name="note_screen_note_support_text">Введите содержание заметки</string>
     <string name="note_screen_search_note">Поиск заметок...</string>
@@ -1201,6 +1206,7 @@
     <string name="animal_card_screen_animal_card_info_weight_all">Общий вес:</string>
     <string name="animal_card_screen_note_kill">Товар был добавлен через "Забой" животного</string>
     <string name="animal_card_screen_note_sale">Товар был продан через "Продажу" животного</string>
+    <string name="animal_card_screen_note_write_off">Товар был списан через "Списание" животного</string>
     <string name="animal_card_screen_note_expenses">Товар был куплен через "Покупку" животных</string>
     <string name="animal_card_screen_category_kill">Забой</string>
     <string name="animal_card_screen_category_sale">Продажа животных</string>

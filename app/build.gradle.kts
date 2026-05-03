@@ -5,9 +5,9 @@ plugins {
     id("com.google.devtools.ksp")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"  // Добавлено
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
+    id("io.appmetrica.analytics")
 }
-
 
 android {
     namespace = "com.zaroslikov.fermacompose2"
@@ -61,6 +61,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    appmetrica {
+        postApiKey.set("7bc20e66-fc56-4002-ac33-4cc15dd28213")
+        enable.set(!isDebugBuild())
+        enableAnalytics.set(true)
+    }
 }
 
 dependencies {
@@ -72,6 +77,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.material3.window.size.class1)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
+
     // Icon
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
@@ -111,11 +117,8 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-
     // AppMetrica SDK.
-    implementation("io.appmetrica.analytics:analytics:7.13.0")
-
-    implementation("androidx.work:work-runtime-ktx:2.11.2")
+    implementation("io.appmetrica.analytics:analytics:8.1.0")
 
     // Hilt
     implementation(libs.androidx.hilt.navigation.compose)
@@ -123,4 +126,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation("androidx.hilt:hilt-work:1.3.0")
 
+}
+
+fun isDebugBuild(): Boolean {
+    return gradle.startParameter.taskNames.any { it.contains("Debug") }
 }

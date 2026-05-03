@@ -364,14 +364,14 @@ fun ProductCard(
                     onValueChange = {
                         onIntent(AnimalCountIntent.CountProductKillChanged(it))
                     },
+                    suffix = state.currentProduct.suffixProduct,
                     onSuffixChange = {
                         onIntent(AnimalCountIntent.SuffixProductKillChanged(it))
                     },
                     isError = state.currentProduct.error.isErrorCount,
-                    suffix = state.currentProduct.suffixProduct,
                     intResSup = R.string.support_text_count_product,
                     isBorderCard = false,
-                    colorTextField = white
+                    colorTextField = white,
                 )
             }
             OutlinedCustomButton(

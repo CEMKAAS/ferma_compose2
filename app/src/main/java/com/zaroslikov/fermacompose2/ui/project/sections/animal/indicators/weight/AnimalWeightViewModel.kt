@@ -214,11 +214,11 @@ class AnimalWeightViewModel @Inject constructor(
     private fun CurrentAnimalWeight.toDomain(): DomainAnimalWeight {
         return DomainAnimalWeight(
             id = id,
-            weight = weight,
+            weight = weight.trim(),
             suffix = suffix,
             date = date,
             idAnimal = idAnimal,
-            note = note
+            note = note.trim()
         )
     }
 

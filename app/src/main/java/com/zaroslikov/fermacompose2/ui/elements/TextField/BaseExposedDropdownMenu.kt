@@ -37,6 +37,7 @@ import com.zaroslikov.fermacompose2.white
 
 @Composable
 fun <T> BaseExposedDropdownMenu(
+    modifier: Modifier = Modifier,
     type: ExposedDropdownMenuAnchorType = PrimaryNotEditable,
     list: List<T>,
     enabled: Boolean = true,
@@ -45,7 +46,7 @@ fun <T> BaseExposedDropdownMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box {
+    Box(modifier = modifier) {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }

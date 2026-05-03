@@ -6,10 +6,12 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -113,9 +115,9 @@ fun FinanceIncubatorScreen(
                     iconRes = R.drawable.icon_money,
                     title = R.string.message_no_date_empty,
                     supportText = R.string.finance_incubator_screen_message_no_date_empty,
+                    supportSecondText = R.string.finance_incubator_screen_second_message_no_date_empty,
                     iconColor = green_9,
                     backgroundColor = green_4,
-                    supportSecondText = R.string.finance_incubator_screen_second_message_no_date_empty
                 )
     }
 }
@@ -240,19 +242,25 @@ private fun FinanceDoubleCard(
     suffix: String
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         FinanceSupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             iconRes = R.drawable.icon_arrow_up,
             stringRes = R.string.card_income,
             value = "$valueOne $suffix",
             supportValue = supportValueOne
         )
         FinanceSupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             iconRes = R.drawable.icon_arrow_down,
             stringRes = R.string.card_expenditure,
             value = "$valueTwo $suffix",

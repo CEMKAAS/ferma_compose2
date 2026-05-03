@@ -36,6 +36,7 @@ sealed class WriteOffListIntent : BaseIntent {
     data class CountChanged(val value: String) : WriteOffListIntent()
     data class PriceChanged(val value: String) : WriteOffListIntent()
     data class AutoPriceClicked(val value: Boolean) : WriteOffListIntent()
+    data class CategoryChanged(val value: String) : WriteOffListIntent()
     data class DateClicked(val value: String) : WriteOffListIntent()
     data class NoteChanged(val value: String) : WriteOffListIntent()
     data class StatusClicked(val value: Boolean) : WriteOffListIntent()

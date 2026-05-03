@@ -39,6 +39,9 @@ class WriteOffListReduce(
             is WriteOffListIntent.AutoPriceClicked ->
                 state.updateIsAutoPrice(intent.value).updatePriceAll()
 
+            is WriteOffListIntent.CategoryChanged ->
+                state.updateCategory(intent.value)
+
             is WriteOffListIntent.DateClicked -> state.updateDate(intent.value)
             is WriteOffListIntent.NoteChanged -> state.updateNote(intent.value)
 
@@ -148,6 +151,12 @@ class WriteOffListReduce(
                 priceAll = if (currentProduct.isAutoPrice) (currentProduct.price.toConvertZeroDouble() * currentProduct.count.toConvertZeroDouble()).formatNumber()
                 else "0"
             )
+        )
+    }
+
+    private fun WriteOffListState.updateCategory(category: String): WriteOffListState {
+        return copy(
+            currentProduct = currentProduct.copy(category = category)
         )
     }
 

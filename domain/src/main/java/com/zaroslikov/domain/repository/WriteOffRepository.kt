@@ -28,6 +28,7 @@ interface WriteOffRepository {
 
     fun getBrieflyDetailsItemWriteOffScrap(id: Long, name: String): Flow<List<DomainWriteOffTable>>
     fun getItemsWriteOffList(id: Long): Flow<List<DomainTitleSuffixCategory>>
+    fun getItemsCategoryWriteOffList(id: Long): Flow<List<String>>
     suspend fun insertWriteOff(item: DomainWriteOffTable)
     suspend fun updateWriteOff(item: DomainWriteOffTable)
     suspend fun deleteWriteOff(id: Long)

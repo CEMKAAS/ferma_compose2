@@ -305,6 +305,7 @@ private fun NoteEntryBottomSheet(
             onValueChange = { onIntent(NoteListIntent.TitleChanged(it)) },
             isError = state.error.isErrorTitle,
             labelIntRes = R.string.note_screen_note_title,
+            isNecessarily = true,
             supportingText = R.string.note_screen_note_support_title
         )
         OutlinedTextNoteNew(

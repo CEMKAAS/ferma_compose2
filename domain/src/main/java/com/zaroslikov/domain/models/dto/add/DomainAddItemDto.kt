@@ -13,7 +13,7 @@ data class DomainAddItemDto(
     val year: Int = 0,
     override val price: Double = 0.0,
     override val priceAll: Double? = null,
-    val category: String = "",
+    val category: String? = null,
     val animalId: Long? = null,
     val nameAnimal: String? = null,
     val note: String = "",

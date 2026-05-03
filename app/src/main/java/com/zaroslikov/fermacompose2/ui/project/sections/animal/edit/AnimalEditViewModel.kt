@@ -89,14 +89,13 @@ class AnimalEditViewModel @Inject constructor(
     private fun AnimalUi.toDomain(): DomainAnimalTable {
         return DomainAnimalTable(
             id = id,
-            name = name,
-            type = type,
+            name = name.trim(),
+            type = type.trim(),
             date = dateBorn,
             dateFactory = if (isDateFactory) null else dateFactory,
             group = isAnimalGroup,
             sex = sex,
-            note = note,
-            image = null,
+            note = note.trim(),
             archive = archive,
             foodDay = if (foodDay.isBlank()) 0.0 else foodDay.toConvertDbDouble(),
             foodDaySuffix = foodDaySuffix,

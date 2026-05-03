@@ -209,11 +209,11 @@ class AnimalSizeViewModel @Inject constructor(
     private fun CurrentAnimalSize.toDomain(): DomainAnimalSize {
         return DomainAnimalSize(
             id = id,
-            size = size,
+            size = size.trim(),
             suffix = suffix,
             date = date,
             idAnimal = idAnimal,
-            note = note
+            note = note.trim()
         )
     }
 

@@ -6,6 +6,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,17 +22,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -55,6 +62,7 @@ import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
+import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 import com.zaroslikov.fermacompose2.ui.elements.text_14
@@ -68,60 +76,66 @@ fun TrainingScreen(
 ) {
     val pagerState = rememberPagerState(pageCount = { 5 })
     val scope = rememberCoroutineScope()
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        TitleAppBar(
-            titleRes = R.string.training_screen_main_title_app_bar,
-            onClick = onSkipClick,
-            iconRes = R.drawable.ic_stat_name,
-            iconColor = price_green,
-            backgroundColor = green_8
-        )
-        HorizontalPager(state = pagerState) { page ->
+    Scaffold(
+        topBar = {
+            TitleAppBar(
+                titleRes = R.string.training_screen_main_title_app_bar,
+                onClick = onSkipClick,
+                iconRes = R.drawable.ic_log,
+                iconColor = price_green,
+                backgroundColor = green_8
+            )
+        },
+        bottomBar = {
+            ButtonBar(
+                isFirst = pagerState.currentPage == 0,
+                isLast = pagerState.currentPage == 4,
+                color = price_green,
+                currentPage = pagerState.currentPage,
+                onLastClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                    }
+                },
+                onNextClick = {
+                    scope.launch {
+                        if (pagerState.currentPage == 4) onSkipClick()
+                        else pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        HorizontalPager(
+            modifier = Modifier.padding(innerPadding),
+            state = pagerState
+        ) { page ->
             when (page) {
-                0 -> TrainingScreen1()
-                1 -> TrainingScreen2()
-                2 -> TrainingScreen3()
-                3 -> TrainingScreen4()
-                4 -> TrainingScreen5()
+                0 -> TrainingScreen1(innerPadding)
+                1 -> TrainingScreen2(innerPadding)
+                2 -> TrainingScreen3(innerPadding)
+                3 -> TrainingScreen4(innerPadding)
+                4 -> TrainingScreen5(innerPadding)
             }
         }
-        ButtonBar(
-            isFirst = pagerState.currentPage == 0,
-            isLast = pagerState.currentPage == 4,
-            color = price_green,
-            currentPage = pagerState.currentPage,
-            onLastClick = {
-                scope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                }
-            },
-            onNextClick = {
-                scope.launch {
-                    if (pagerState.currentPage == 4) onSkipClick()
-                    else pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                }
-            }
-        )
     }
 }
 
 @Composable
-private fun TrainingScreen1() {
+private fun TrainingScreen1(
+    innerPadding: PaddingValues
+) {
     val listRow = listOf(
         R.drawable.baseline_favorite_24 to R.string.training_screen_main_welcome_row_1,
         R.drawable.icon_add_product to R.string.training_screen_main_welcome_row_2,
         R.drawable.outline_analytics_24 to R.string.training_screen_main_welcome_row_3
     )
     Base(
+        innerPadding = innerPadding,
         titleRes = R.string.training_screen_main_welcome_title,
         supportRes = R.string.training_screen_main_welcome_title_sup,
         list = listRow,
-        iconRes = R.drawable.ic_logo,
+        iconRes = R.drawable.ic_log,
         iconColor = price_green,
         backgroundColor = green_8,
         iconSize = 96.dp,
@@ -130,7 +144,9 @@ private fun TrainingScreen1() {
 }
 
 @Composable
-private fun TrainingScreen2() {
+private fun TrainingScreen2(
+    innerPadding: PaddingValues
+) {
     val listRow = listOf(
         R.drawable.icon_add_product to R.string.training_screen_main_ferma_row_1,
         R.drawable.baseline_delete_24 to R.string.training_screen_main_ferma_row_2,
@@ -139,6 +155,7 @@ private fun TrainingScreen2() {
         R.drawable.vaccines_24dp_000000_fill0_wght400_grad0_opsz24 to R.string.training_screen_main_ferma_row_5,
     )
     Base(
+        innerPadding = innerPadding,
         titleRes = R.string.training_screen_main_ferma_title,
         supportRes = R.string.training_screen_main_ferma_title_sup,
         list = listRow,
@@ -149,7 +166,9 @@ private fun TrainingScreen2() {
 }
 
 @Composable
-private fun TrainingScreen3() {
+private fun TrainingScreen3(
+    innerPadding: PaddingValues
+) {
     val listRow = listOf(
         R.drawable.outline_analytics_24 to R.string.training_screen_main_incubator_row_1,
         R.drawable.outline_percent_24 to R.string.training_screen_main_incubator_row_2,
@@ -157,6 +176,7 @@ private fun TrainingScreen3() {
         R.drawable.icon_list to R.string.training_screen_main_incubator_row_4
     )
     Base(
+        innerPadding = innerPadding,
         titleRes = R.string.training_screen_main_incubator_title,
         supportRes = R.string.training_screen_main_incubator_title_sup,
         list = listRow,
@@ -167,7 +187,9 @@ private fun TrainingScreen3() {
 }
 
 @Composable
-private fun TrainingScreen4() {
+private fun TrainingScreen4(
+    innerPadding: PaddingValues
+) {
     val listRow = listOf(
         R.drawable.outline_analytics_24 to R.string.training_screen_main_finance_row_1,
         R.drawable.baseline_currency_ruble_24 to R.string.training_screen_main_finance_row_2,
@@ -175,6 +197,7 @@ private fun TrainingScreen4() {
         R.drawable.baseline_sticky_note_2_24 to R.string.training_screen_main_finance_row_4
     )
     Base(
+        innerPadding = innerPadding,
         titleRes = R.string.training_screen_main_finance_title,
         supportRes = R.string.training_screen_main_finance_title_sup,
         list = listRow,
@@ -185,7 +208,9 @@ private fun TrainingScreen4() {
 }
 
 @Composable
-private fun TrainingScreen5() {
+private fun TrainingScreen5(
+    innerPadding: PaddingValues
+) {
     val listRow = listOf(
         R.drawable.icon_add to R.string.training_screen_main_end_row_1,
         R.drawable.baseline_notifications_none_24 to R.string.training_screen_main_end_row_2,
@@ -193,6 +218,7 @@ private fun TrainingScreen5() {
         R.drawable.outline_download_24 to R.string.training_screen_main_end_row_4
     )
     Base(
+        innerPadding = innerPadding,
         titleRes = R.string.training_screen_main_end_title,
         supportRes = R.string.training_screen_main_end_title_sup,
         list = listRow,
@@ -205,6 +231,7 @@ private fun TrainingScreen5() {
 
 @Composable
 private fun Base(
+    innerPadding: PaddingValues = PaddingValues(),
     @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
     @StringRes supportRes: Int,
@@ -214,9 +241,9 @@ private fun Base(
     isIcon: Boolean = true,
     boxSize: Dp = 96.dp,
     iconSize: Dp = 40.dp,
-    exampleContainer: (@Composable () -> Unit)? = null,
 ) {
     Column(
+        modifier = Modifier.modifierScreen(innerPadding),
         verticalArrangement = Arrangement.spacedBy(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -261,7 +288,6 @@ private fun Base(
                 )
             }
         }
-        exampleContainer?.let { it() }
     }
 }
 
@@ -309,7 +335,8 @@ private fun TitleAppBar(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(id = R.dimen.padding_medium)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -345,7 +372,7 @@ private fun ButtonBar(
     onNextClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier,
+        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_medium)),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -439,7 +466,7 @@ private fun IconTraining(
             )
         else
             Image(
-                painter = painterResource(R.drawable.ic_logo),
+                painter = painterResource(R.drawable.ic_log),
                 contentDescription = null,
                 modifier = Modifier.size(iconSize)
             )

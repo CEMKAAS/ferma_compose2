@@ -154,8 +154,8 @@ class NoteViewModel @Inject constructor(
     private fun NoteEntryState2.toDomain(): DomainNoteTable {
         return DomainNoteTable(
             id = itemId,
-            title = title,
-            note = note,
+            title = title.trim(),
+            note = note.trim(),
             date = dateToday(),
             idPT = itemIdPT
         )

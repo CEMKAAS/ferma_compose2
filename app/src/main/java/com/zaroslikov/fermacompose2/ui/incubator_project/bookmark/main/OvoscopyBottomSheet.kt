@@ -292,16 +292,9 @@ fun OvoscopEndBottomSheet(
 ) {
     val suffix = stringResource(R.string.bookmark_screen_eggs)
     BaseBottomSheet(
-        skipPartiallyExpanded = false,
+        skipPartiallyExpanded = true,
         title = stringResource(R.string.bookmark_screen_ovoscopy_results),
         onDismissRequest = { onIntent(BookmarkIntent.CompleteOvoscopClick(false)) },
-        contentBottom = {
-            BottomPanel(
-                enabled = enabled,
-                onCancelClick = { onIntent(BookmarkIntent.CompleteOvoscopClick(false)) },
-                onSaveClick = { onIntent(BookmarkIntent.SaveEggClick) }
-            )
-        }
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -369,6 +362,11 @@ fun OvoscopEndBottomSheet(
                 intResError = R.string.entry_bookmark_error_reject_count,
                 isError = !enabled,
                 drawableRes = R.drawable.outline_cancel_24
+            )
+            BottomPanel(
+                enabled = enabled,
+                onCancelClick = { onIntent(BookmarkIntent.CompleteOvoscopClick(false)) },
+                onSaveClick = { onIntent(BookmarkIntent.SaveEggClick) }
             )
         }
     }

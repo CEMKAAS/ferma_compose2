@@ -293,9 +293,9 @@ class AddIncubatorViewModel @Inject constructor(
     private fun AddIncubator.toDomainIncubatorTable(idPT: Long? = null): DomainIncubatorTable {
         return DomainIncubatorTable(
             id = id,
-            title = title,
-            model = model.ifBlank { null },
-            brand = brand.ifBlank { null },
+            title = title.trim(),
+            model = model.trim().ifBlank { null },
+            brand = brand.trim().ifBlank { null },
             capacity = capacity.toConvertDbInt(),
             price = if (price.isEmpty()) null else price.toConvertDbDouble(),
             note = note.trim(),

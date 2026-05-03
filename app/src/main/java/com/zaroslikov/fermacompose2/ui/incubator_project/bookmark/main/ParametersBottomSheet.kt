@@ -104,14 +104,48 @@ fun EditParametersBottomSheet(
     onIntent: (BookmarkIntent) -> Unit
 ) {
     BaseBottomSheet(
-        isScroll = false,
+        isScroll = true,
         title = stringResource(R.string.bookmark_screen_fact_parameters_s).format(state.day),
         onDismissRequest = {
             onIntent(
                 BookmarkIntent.OpenEditBottomSheetClick(false, ParametersIncubatorUi())
             )
-        },
-        contentBottom = {
+        }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            BorderCard(
+                padding = PaddingValues(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.bookmark_screen_plan_parameters),
+                        style = text_14,
+                        color = black_2
+                    )
+                    ParameterRow(state, isAutoOver = isAutoOver, isAutoAiring = isAutoAiring)
+                }
+            }
+            FactParameresCard(
+                factTemp = state.tempFact,
+                factDamp = state.dampFact,
+                factAiring = state.airingFact,
+                factOver = state.overFact,
+                isAutoAiring = isAutoAiring,
+                isAutoOver = isAutoOver,
+                onTempFactChange = { onIntent(BookmarkIntent.TempFactChanged(it)) },
+                onDampFactChange = { onIntent(BookmarkIntent.DampFactChanged(it)) },
+                onOverFactChange = { onIntent(BookmarkIntent.OverFactChanged(it)) },
+                onAiringFactChange = { onIntent(BookmarkIntent.AiringFactChanged(it)) }
+            )
+            OutlinedTextNoteNew(
+                value = state.note,
+                onValueChange = { onIntent(BookmarkIntent.NoteFactChanged(it)) },
+            )
             BottomPanel(
                 enabled = true,
                 stringRes = R.string.button_save,
@@ -123,38 +157,6 @@ fun EditParametersBottomSheet(
                 onSaveClick = { onIntent(BookmarkIntent.SaveParameterClick) }
             )
         }
-    ) {
-        BorderCard(
-            padding = PaddingValues(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    stringResource(R.string.bookmark_screen_plan_parameters),
-                    style = text_14,
-                    color = black_2
-                )
-                ParameterRow(state, isAutoOver = isAutoOver, isAutoAiring = isAutoAiring)
-            }
-        }
-        FactParameresCard(
-            factTemp = state.tempFact,
-            factDamp = state.dampFact,
-            factAiring = state.airingFact,
-            factOver = state.overFact,
-            isAutoAiring = isAutoAiring,
-            isAutoOver = isAutoOver,
-            onTempFactChange = { onIntent(BookmarkIntent.TempFactChanged(it)) },
-            onDampFactChange = { onIntent(BookmarkIntent.DampFactChanged(it)) },
-            onOverFactChange = { onIntent(BookmarkIntent.OverFactChanged(it)) },
-            onAiringFactChange = { onIntent(BookmarkIntent.AiringFactChanged(it)) }
-        )
-        OutlinedTextNoteNew(
-            value = state.note,
-            onValueChange = { onIntent(BookmarkIntent.NoteFactChanged(it)) },
-        )
     }
 }
 

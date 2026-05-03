@@ -111,7 +111,7 @@ fun <T> InventoryAnimalBody(
             supportSecondText = supportSecondTextArchive,
             iconColor = iconColor,
             backgroundColor = backgroundColor,
-            plusColor = iconColor
+            plusColor = iconColor,
         )
     }
 }
@@ -160,8 +160,12 @@ fun EntryBottomSheet(
     BaseBottomSheet(
         title = stringResource(titleRes),
         onDismissRequest = onDismissRequest,
-        onSecondDismissRequest = onSecondDismissRequest,
-        contentBottom = {
+        onSecondDismissRequest = onSecondDismissRequest
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            content()
             ButtonPanelNew(
                 modifier = Modifier.fillMaxWidth(),
                 isEntry = isEntry,
@@ -171,12 +175,6 @@ fun EntryBottomSheet(
                 onClickUpdate = onUpdateClick,
                 onClickClose = onSecondDismissRequest
             )
-        }
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            content()
         }
     }
 }

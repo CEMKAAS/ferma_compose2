@@ -8,11 +8,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -315,18 +317,24 @@ private fun JournalDoubleCard(
     valueTwo: String
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         JournalSupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             iconRes = iconResOne,
             stringRes = stringResOne,
             value = valueOne
         )
         JournalSupportCard(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             iconRes = iconResTwo,
             stringRes = stringResTwo,
             value = valueTwo
@@ -441,7 +449,8 @@ private fun StatisticsCard(
                     )
                     if (breedList.isNotEmpty())
                         TextButton(
-                            onClick = onResetClick) {
+                            onClick = onResetClick
+                        ) {
                             Text(
                                 stringResource(R.string.button_reset),
                                 style = text_12,
@@ -579,8 +588,7 @@ private fun SliderStatistics(
                     "${percent.formatNumber()}%",
                     style = text_12,
                     color = black_2,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.weight(0.15f)
+                    textAlign = TextAlign.End
                 )
             }
         }
@@ -687,7 +695,7 @@ private fun HistoryCard(
                 colorSup = gray_7
             )
             Row(
-                modifier = Modifier.weight(0.45f),
+//                modifier = Modifier.weight(0.45f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {

@@ -84,6 +84,7 @@ fun AlertDialogWeightAnimal(
                     value = totalWeight,
                     onValueChange = { totalWeight = it },
                     intRes = R.string.weight_screen_title,
+                    intResSup = R.string.support_text_weight,
                     intResError = R.string.error_no_weight_animal,
                     isError = totalWeight.isEmpty(),
                     suffix = weightSuffix,
@@ -147,6 +148,7 @@ private fun WeightAnimalList(weights: SnapshotStateList<String>, weightSuffix: S
                 onValueChange = { weights[index] = it },
                 intRes = null,
                 intResError = R.string.error_no_weight_animal,
+                intResSup = R.string.support_text_weight,
                 isError = weight.isEmpty(),
                 suffix = weightSuffix,
                 isBorderCard = false

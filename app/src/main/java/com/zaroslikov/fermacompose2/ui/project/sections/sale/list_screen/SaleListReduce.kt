@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
@@ -24,6 +25,7 @@ class SaleListReduce(
                 isSaveStateForEntry = intent.isSaveStateForBottomSheet,
                 entryState2 = intent.state
             ).updateValid()
+
             is SaleListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
             is SaleListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
 
@@ -69,6 +71,7 @@ class SaleListReduce(
             )
         }
     }
+
     private fun SaleListState.updateOpenBottomSheetDelete(id: Long?): SaleListState {
         return if (id == null)
             copy(
@@ -217,9 +220,11 @@ class SaleListReduce(
         val searchList = if (query.isBlank() && !isGroup) list
         else
             list.filter { item ->
+                val category =
+                    item.category ?: resourceProvider.getString(R.string.support_text_no_category)
                 item.title.lowercase().contains(query) ||
                         item.note.lowercase().contains(query) ||
-                        item.category.lowercase().contains(query) ||
+                        category.lowercase().contains(query) ||
                         item.count.toString().lowercase().contains(query) ||
                         resourceProvider.getString(item.countSuffix.toResId()).lowercase()
                             .contains(query) ||
