@@ -32,10 +32,10 @@
     <string name="is_empty"></string>
 
     //Ads
-    <string name="yandex_banner_ads">demo-appopenad-yandex</string> //R-M-12224806-1
-    <string name="yandex_first_launch_ads">demo-appopenad-yandex</string> // R-M-12224806-2
+    <string name="yandex_banner_ads">R-M-12224806-1</string>
+    <string name="yandex_first_launch_ads">R-M-12224806-2</string>
     //AdsSupportText
-    <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите пожалуйста...</string> // R-M-12224806-2
+    <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите пожалуйста...</string>
 
 
     // BottomBarProject

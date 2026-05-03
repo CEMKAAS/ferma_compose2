@@ -62,7 +62,7 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
         id: Long,
         name: String
     ): Flow<List<DomainWriteOffTable>> {
-        return writeOffDao.getBrieflyDetailsItemWriteOff(id, name)
+        return writeOffDao.getBrieflyDetailsItemWriteOffOwnNeed(id, name)
             .map { it -> it.map { it.toDomainMap() } }
     }
 
@@ -70,7 +70,7 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
         id: Long,
         name: String
     ): Flow<List<DomainWriteOffTable>> {
-        return writeOffDao.getBrieflyDetailsItemWriteOff(id, name)
+        return writeOffDao.getBrieflyDetailsItemWriteOffScrap(id, name)
             .map { it -> it.map { it.toDomainMap() } }
     }
 
