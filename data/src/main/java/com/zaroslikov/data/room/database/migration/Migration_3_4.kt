@@ -125,7 +125,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    is_auto_rotation, is_auto_ventilation,  is_activity_bookmark, idPT
               )
                 SELECT
-                  _id, NAME,
+                   _id, NAME,
                    CASE
                    WHEN type = 'Курицы' THEN 0
                    WHEN type = 'Гуси' THEN 1
@@ -134,8 +134,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN type = 'Индюки' THEN 4
                    ELSE 0 END,
                    NULL,
-                  EGGALL, 0, DATA, DATAEND,
-                  0, '12:00', NULL, NULL, NULL, '',
+                   EGGALL, 0, DATA, DATAEND,
+                   0, '12:00', NULL, NULL, NULL, '',
                    CASE
                    WHEN type = 'false' THEN 0
                    WHEN type = 'true' THEN 1
@@ -144,7 +144,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                    WHEN type = 'false' THEN 0
                    WHEN type = 'true' THEN 1
                    ELSE 0 END,
-                  0, 1
+                   0, 1
                   FROM МyINCUBATOR WHERE mode = 0
           """.trimIndent()
         )

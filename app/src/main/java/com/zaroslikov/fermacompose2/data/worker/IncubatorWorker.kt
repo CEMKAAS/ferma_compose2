@@ -67,7 +67,7 @@ class IncubatorWorker @AssistedInject constructor(
         }
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_stat_name)
+            .setSmallIcon(R.drawable.ic_new_logo)
             .setContentTitle(nameBookmark)
             .setContentText(note ?: text)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
