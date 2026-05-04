@@ -720,6 +720,52 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         """.trimIndent()
         )
 
+        //==================== Удаление колонки  ====================
+        db.execSQL(
+            """
+    CREATE TABLE animal_table_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL,
+        date TEXT NOT NULL,
+        date_factory TEXT,
+        is_group INTEGER NOT NULL,
+        sex INTEGER NOT NULL,
+        note TEXT NOT NULL,
+        image_path TEXT,
+        icon INTEGER,
+        archive INTEGER NOT NULL,
+        food_day REAL NOT NULL,
+        food_day_suffix INTEGER NOT NULL,
+        idPT INTEGER NOT NULL,
+        FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE
+    )
+""".trimIndent()
+        )
+
+        db.execSQL(
+            """
+    INSERT INTO animal_table_new (
+        id, name, type, date, date_factory, is_group, sex,
+        note, image_path, icon, archive, food_day, food_day_suffix, idPT
+    )
+    SELECT
+        id, name, type, date, date_factory, is_group, sex,
+        note, image_path, icon, archive, food_day, food_day_suffix, idPT
+    FROM animal_table
+""".trimIndent()
+        )
+
+        db.execSQL("DROP TABLE animal_table")
+        db.execSQL("ALTER TABLE animal_table_new RENAME TO animal_table")
+
+        db.execSQL(
+            """
+    CREATE INDEX IF NOT EXISTS index_animal_table_idPT 
+    ON animal_table(idPT)
+""".trimIndent()
+        )
+
         //==================== Миграция NoteTable ====================
         db.execSQL(
             """
