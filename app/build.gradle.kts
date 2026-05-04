@@ -25,7 +25,7 @@ android {
         applicationId = "com.zaroslikov.fermacompose2"
         minSdk = 26
         targetSdk = 36
-        versionCode = 13 //12
+        versionCode = 15 //12
         versionName = "beta-v3.0.0v"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -63,6 +63,7 @@ android {
     }
     appmetrica {
         postApiKey.set("7bc20e66-fc56-4002-ac33-4cc15dd28213")
+        offline.set(true)
         enable.set(!isDebugBuild())
         enableAnalytics.set(true)
     }

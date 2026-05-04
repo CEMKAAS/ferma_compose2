@@ -720,8 +720,6 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         """.trimIndent()
         )
 
-        db.execSQL("ALTER TABLE animal_table DROP COLUMN price")
-
         //==================== Миграция NoteTable ====================
         db.execSQL(
             """
