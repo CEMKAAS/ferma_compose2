@@ -127,6 +127,9 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation("androidx.hilt:hilt-work:1.3.0")
 
+    //RuStore SDK
+    implementation("ru.rustore.sdk:appupdate:7.0.0")
+
 }
 
 fun isDebugBuild(): Boolean {

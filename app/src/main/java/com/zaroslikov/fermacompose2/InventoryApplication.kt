@@ -2,12 +2,15 @@ package com.zaroslikov.fermacompose2
 
 
 import android.app.Application
+import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.yandex.mobile.ads.common.YandexAds
 import dagger.hilt.android.HiltAndroidApp
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
+import ru.rustore.sdk.appupdate.manager.factory.RuStoreAppUpdateManagerFactory
+import ru.rustore.sdk.appupdate.model.UpdateAvailability
 import javax.inject.Inject
 
 @HiltAndroidApp
