@@ -8,6 +8,7 @@ data class DomainFastAddProduct(
     val suffix: Suffix,
     val category: String?,
     val idAnimal: Long?,
-    val animalName: String?
+    val animalName: String?,
+    val countRow: Int
 )
 

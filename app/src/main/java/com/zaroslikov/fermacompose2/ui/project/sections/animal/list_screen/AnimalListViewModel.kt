@@ -245,7 +245,7 @@ class AnimalListViewModel @Inject constructor(
             date = getAgeFromDate(dateFactory ?: date),
             isGroup = group,
             sex = if (group) null else sex,
-            count = animalCount?.count?.let { if (it.toInt() > 1) it else null },
+            count = animalCount?.count?.let { if (it.toInt() > 0) it else null },
             suffix = animalCount?.suffix ?: Suffix.KILOGRAM_DAY,
             foodDay = foodDay,
             foodDaySuffix = foodDaySuffix,

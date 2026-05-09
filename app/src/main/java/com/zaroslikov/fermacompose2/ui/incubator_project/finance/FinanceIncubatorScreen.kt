@@ -528,7 +528,7 @@ private fun FinanceBookmarkCardList(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                list.forEach { history ->
+                list.forEachIndexed { index, history ->
                     FinanceBookmarkCard(
                         title = history.title,
                         typeEgg = history.type,
@@ -546,6 +546,8 @@ private fun FinanceBookmarkCardList(
                         lossesEgg = history.lossesEgg,
                         suffix = Suffix.PIECES
                     )
+                    if ((index + 1) % 2 == 0 && index != list.lastIndex)
+                    AdsCard()
                 }
             }
         }

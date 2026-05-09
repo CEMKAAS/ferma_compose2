@@ -31,6 +31,7 @@ import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.database.migration.MIGRATION_1_2
 import com.zaroslikov.data.room.database.migration.MIGRATION_2_3
 import com.zaroslikov.data.room.database.migration.MIGRATION_3_4
+import com.zaroslikov.data.room.database.migration.MIGRATION_4_5
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,12 +53,14 @@ object DatabaseModule {
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
             .addCallback(object : RoomDatabase.Callback() {
 
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
 
-                    db.execSQL("""
+                    db.execSQL(
+                        """
                     INSERT INTO app_settings_table 
                     (id, last_version_app, current_version_app, is_first_launch) 
                     VALUES (1, NULL, '3.0.0', 1)

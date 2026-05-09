@@ -20,12 +20,12 @@ interface WarehouseDao {
                 " UNION All " +
                 " SELECT title, -count as count, count_suffix AS suffix " +
                 " FROM sale_table" +
-                " WHERE idPT=:id  and animal_count_id IS NULL and animal_id IS NULL" +
+                " WHERE idPT=:id  and animal_count_id IS NULL and animal_id IS NULL AND product_origin = 0" +
 
                 " UNION All" +
                 " SELECT title, -count as count, count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and animal_count_id IS NULL" +
+                " WHERE idPT=:id and animal_count_id IS NULL AND product_origin = 0" +
                 ") " +
                 ")"
     )
@@ -44,12 +44,12 @@ interface WarehouseDao {
                 " UNION All " +
                 " SELECT title, -count as count, count_suffix AS suffix " +
                 " FROM sale_table" +
-                " WHERE idPT=:id and animal_count_id IS NULL and animal_id IS NULL" +
+                " WHERE idPT=:id and animal_count_id IS NULL and animal_id IS NULL AND product_origin = 1" +
 
                 " UNION All" +
                 " SELECT title, -count as count, count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and animal_count_id IS NULL" +
+                " WHERE idPT=:id and animal_count_id IS NULL AND product_origin = 1" +
                 ") " +
                 ")"
     )
@@ -68,13 +68,13 @@ interface WarehouseDao {
 
                 "    SELECT -count AS count, count_suffix as suffix " +
                 "    FROM sale_table " +
-                "    WHERE idPT = :id AND title = :name and animal_count_id IS NULL and animal_id IS NULL " +
+                "    WHERE idPT = :id AND title = :name and animal_count_id IS NULL and animal_id IS NULL AND product_origin = 0 " +
 
                 "    UNION ALL " +
 
                 "    SELECT -count AS count, count_suffix as suffix " +
                 "    FROM write_off_table " +
-                "    WHERE idPT = :id AND title = :name  and animal_count_id IS NULL " +
+                "    WHERE idPT = :id AND title = :name  and animal_count_id IS NULL AND product_origin = 0" +
                 ") AS base "
     )
     fun getCurrentBalanceProductList(name: String, id: Long): Flow<List<CountSuffixDto>>
@@ -86,19 +86,19 @@ interface WarehouseDao {
                 "FROM (" +
                 "    SELECT count AS count, count_suffix AS suffix " +
                 "    FROM expenses_table " +
-                "    WHERE idPT = :id AND title = :name and is_food = 0 and animalId IS NULL and animal_vaccination_id IS NULL and animal_count_id IS NULL" +
+                "    WHERE idPT = :id AND title = :name AND is_food = 0 AND animalId IS NULL and animal_vaccination_id IS NULL AND animal_count_id IS NULL" +
 
                 "    UNION ALL " +
 
-                "    SELECT -count AS count, count_suffix as suffix " +
+                "    SELECT -count AS count, count_suffix AS suffix " +
                 "    FROM sale_table " +
-                "    WHERE idPT = :id AND title = :name and animal_count_id IS NULL and animal_id IS NULL " +
+                "    WHERE idPT = :id AND title = :name AND animal_count_id IS NULL AND animal_id IS NULL AND product_origin = 1" +
 
                 "    UNION ALL " +
 
-                "    SELECT  -count AS count, count_suffix as suffix " +
+                "    SELECT  -count AS count, count_suffix AS suffix " +
                 "    FROM write_off_table " +
-                "    WHERE idPT = :id AND title = :name and animal_count_id IS NULL " +
+                "    WHERE idPT = :id AND title = :name AND animal_count_id IS NULL AND product_origin= 1" +
                 ") AS base "
     )
     fun getCurrentExpensesProductList(name: String, id: Long): Flow<List<CountSuffixDto>>

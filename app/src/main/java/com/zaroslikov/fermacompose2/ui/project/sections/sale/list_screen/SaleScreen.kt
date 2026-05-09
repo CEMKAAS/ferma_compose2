@@ -60,7 +60,7 @@ fun SaleScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(blue_1, blue_2)
-    val iconRes = R.drawable.icon_expenses
+    val iconRes = R.drawable.icon_sale
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -167,6 +167,7 @@ private fun SaleDetailBottomSheet(
             priceAll = state.priceAll,
             priceSuffix = priceSuffix,
             category = state.category,
+            productOrigin = state.productOrigin,
             buyer = state.buyer ?: stringResource(R.string.animal_card_screen_sale_note_no_buyer),
             date = date,
             note = state.note,
@@ -205,6 +206,7 @@ private fun WarningDeleteSaleBottomSheet(
                 price = product.priceAll ?: product.price,
                 priceSuffix = priceSuffix,
                 category = product.category,
+                productOrigin = product.productOrigin,
                 note = product.note,
                 buyer = product.buyer,
                 color = color,
@@ -251,6 +253,7 @@ private fun SaleContainer(
                 price = item.priceAll ?: item.price,
                 priceSuffix = priceSuffix,
                 category = item.category,
+                productOrigin = item.productOrigin,
                 note = item.note,
                 color = color,
                 day = item.day,
@@ -319,6 +322,7 @@ private fun BrieflyBottomSheetSale(
                     count = product.count,
                     suffix = product.countSuffix,
                     price = product.priceAll ?: product.price,
+                    priceSuffix = product.priceSuffix,
                     note = product.note,
                     buyer = product.buyer,
                     color = color,
@@ -367,9 +371,9 @@ private fun SaleEntryBottomSheet(
                 onIntent(SaleListIntent.TitleChanged(it))
             },
             onValueChoice = {
-                onIntent(SaleListIntent.TitleAndSuffixClicked(it.title, it.suffix, it.category))
+                onIntent(SaleListIntent.TitleAndSuffixClicked(it.title, it.suffix, it.productOrigin))
             },
-            category = state.saleCategory,
+            productOrigin = state.productOrigin,
             titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,

@@ -1,7 +1,7 @@
 package com.zaroslikov.domain.models.table
 
 import com.zaroslikov.domain.models.dto.BaseProductSection
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import kotlinx.serialization.Serializable
 
@@ -15,6 +15,7 @@ data class DomainWriteOffTable(
     override val priceAll: Double? = null,
     val priceSuffix: Suffix? = null,
     val category: String? = null,
+    val productOrigin: ProductOrigin?,
     val day: Int,
     val month: Int,
     val year: Int,

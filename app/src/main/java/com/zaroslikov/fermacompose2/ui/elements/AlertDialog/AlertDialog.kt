@@ -6,9 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -307,7 +310,7 @@ fun AlertDialogStandard(
             }
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().height(IntrinsicSize.Min)
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp, top = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -315,14 +318,14 @@ fun AlertDialogStandard(
             ) {
                 if (isShowCancelButton)
                     GradientButton(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                         colors = listOf(gray_6, gray_6),
                         text = stringResource(R.string.button_text_cancel_2),
                         textColor = dark,
                         onClick = onDismissRequest
                     )
                 GradientButton(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                     colors = colors,
                     enabled = enabled,
                     isShadow = true,

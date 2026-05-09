@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -429,6 +430,8 @@ fun AnimalCard(
                                 color = marengo,
                                 modifier = Modifier.weight(1f, fill = false)
                             )
+                            Log.i("animal", "animal.sex :${animal.sex}")
+                            Log.i("animal", "animal.sex :${animal.count}")
                             if (animal.sex != null)
                                 CountColorGradientCard(sex = animal.sex)
                             else animal.count?.let {

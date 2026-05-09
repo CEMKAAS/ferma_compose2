@@ -640,7 +640,7 @@ private fun HistoryConclusions(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                list.forEach { history ->
+                list.forEachIndexed { index, history ->
                     HistoryCard(
                         title = history.title,
                         textSup = history.textSup,
@@ -655,6 +655,8 @@ private fun HistoryConclusions(
                         onActiveClick = { onActiveClick(history.id to history.title) },
                         onDeleteClick = { onDeleteClick(history.id to history.title) }
                     )
+                    if ((index + 1) % 5 == 0 && index != list.lastIndex)
+                        AdsCard()
                 }
             }
         }

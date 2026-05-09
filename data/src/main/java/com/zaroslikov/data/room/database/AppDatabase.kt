@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zaroslikov.data.room.converter.AnimalCountVersionConverter
-import com.zaroslikov.data.room.converter.CategoryConverter
+import com.zaroslikov.data.room.converter.ProductOriginConverter
 import com.zaroslikov.data.room.converter.FinanceCategoryConverter
 import com.zaroslikov.data.room.converter.SuffixConverter
 import com.zaroslikov.data.room.converter.TypeEggConvert
@@ -74,11 +74,11 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         AppSettingsTable::class,
         ProfileTable::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 @TypeConverters(
-    CategoryConverter::class,
+    ProductOriginConverter::class,
     FinanceCategoryConverter::class,
     SuffixConverter::class,
     AnimalCountVersionConverter::class,

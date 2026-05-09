@@ -183,7 +183,7 @@ class EntryBookmarkViewModel @Inject constructor(
                 currentProduct = state.currentProduct.copy(
                     count = count,
                     error = state.currentProduct.error.copy(
-                        isErrorLargeCount = count.toConvertZeroDbInt() >= state.currentProduct.incubatorCount
+                        isErrorLargeCount = count.toConvertZeroDbInt() > state.currentProduct.incubatorCount
                     )
                 )
             )
@@ -590,10 +590,10 @@ class EntryBookmarkViewModel @Inject constructor(
                 workManagerRepository.cancelIncubatorNotification()
                 list.forEach { item ->
                     workManagerRepository.scheduleReminderIncubator(
-                        name = item.nameBookmark,
+                        name = item.nameBookmark.trim(),
                         time = item.time,
                         bookmarkId = item.bookmarkId,
-                        note = item.note,
+                        note = item.note?.trim(),
                         projectId = item.projectId
                     )
                 }
@@ -662,9 +662,9 @@ class EntryBookmarkViewModel @Inject constructor(
     ): DomainBookmark {
         return DomainBookmark(
             id = id,
-            title = title,
+            title = title.trim(),
             type = type,
-            breed = breed.ifEmpty { null },
+            breed = breed.trim().ifEmpty { null },
             count = count.toConvertDbInt(),
             rejectedCount = rejectedCount.toConvertZeroDbInt(),
             startDate = startDate,
@@ -673,7 +673,7 @@ class EntryBookmarkViewModel @Inject constructor(
             price = if (price.isEmpty()) null else price.toConvertDbDouble(),
             priceAll = if (price.isEmpty()) null else if (isAutoPrice) priceAll.toConvertDbDouble() else null,
             priceSuffix = if (price.isEmpty()) null else currencySuffix,
-            note = note,
+            note = note.trim(),
             isAutoRotation = autoRotation,
             isAutoVentilation = autoVentilation,
             isActivityBookmark = isActivityBookmark,

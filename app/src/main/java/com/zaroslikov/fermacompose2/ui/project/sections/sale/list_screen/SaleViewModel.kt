@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.ProjectRepository
@@ -21,6 +21,7 @@ import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -66,7 +67,7 @@ class SaleViewModel @Inject constructor(
             is SaleListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(intent.value)
 
             is SaleListIntent.TitleAndSuffixClicked ->
-                updateWarehouseUiState(intent.title, intent.category)
+                updateWarehouseUiState(intent.title, intent.productOrigin)
 
             SaleListIntent.Insert -> insert()
             SaleListIntent.Update -> update()
@@ -175,27 +176,27 @@ class SaleViewModel @Inject constructor(
                 )
                 if (domain == null) baseState
                 else {
-                    val saleCategory = baseState.pickList.titleList
+                   /* val saleCategory = baseState.pickList.titleList
                         .firstOrNull { it.title == domain.title }
-                        ?.category
+                        ?.category*/
 
-                    baseState.toUiMap22(domain).copy(saleCategory = saleCategory)
+                    baseState.toUiMap22(domain)/*.copy(saleCategory = saleCategory)*/
                 }
             } else getState().currentProduct
             onIntent(SaleListIntent.RefreshEntryBottomSheetState(true, newState))
-            newState.saleCategory?.let { updateWarehouseUiStateSync(newState.title, it) }
+            newState.productOrigin?.let { updateWarehouseUiStateSync(newState.title, it) }
         }
     }
 
 
-    private fun updateWarehouseUiState(name: String, category: Category) {
+    private fun updateWarehouseUiState(name: String, productOrigin: ProductOrigin) {
         viewModelScope.launch {
-            updateWarehouseUiStateSync(name, category)
+            updateWarehouseUiStateSync(name, productOrigin)
         }
     }
 
-    private suspend fun updateWarehouseUiStateSync(name: String, category: Category) {
-        val pair = if (category == Category.EXPENSES)
+    private suspend fun updateWarehouseUiStateSync(name: String, productOrigin: ProductOrigin) {
+        val pair = if (productOrigin == ProductOrigin.EXPENSES)
             warehouseRepository.getCurrentExpensesProductList(name, itemIdPT).first()
                 .build(getState().settings)
         else
@@ -289,6 +290,9 @@ class SaleViewModel @Inject constructor(
                 domain.month,
                 domain.year
             ),
+            pickList = pickList.copy(
+                suffixList = domain.countSuffix.toSuffixList()
+            ),
             category = domain.category ?: category,
             buyer = domain.buyer ?: buyer,
             note = domain.note,
@@ -296,12 +300,15 @@ class SaleViewModel @Inject constructor(
             animalCountId = domain.animalCountId,
             isEntry = false,
             isIndicatorsValue = isIndicatorsValue, error = ErrorSale(),
-            itemIdPT = domain.idPT
+            itemIdPT = domain.idPT,
+            productOrigin = domain.productOrigin
         )
     }
 
     private fun SaleEntryState2.toDomainMap(): DomainSaleTable {
         val dateList = date.split(".")
+        val category = category.trim()
+        val buyer = buyer.trim()
         return DomainSaleTable(
             id = itemId,
             title = title.trim(),
@@ -313,12 +320,15 @@ class SaleViewModel @Inject constructor(
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
-            category = category.trim().ifEmpty { null },
+            category = if (category.contains(resourceProvider.getString(R.string.support_text_no_category)) || category.isEmpty())
+                null else category,
             note = note.trim(),
-            buyer = if (buyer.isBlank()) null else buyer.trim(),
+            buyer = if (buyer.contains(resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer)) || buyer.isEmpty())
+                null else buyer,
             idPT = itemIdPT,
             animalId = animalId,
-            animalCountId = animalCountId
+            animalCountId = animalCountId,
+            productOrigin = productOrigin ?: ProductOrigin.SALE
         )
     }
 }

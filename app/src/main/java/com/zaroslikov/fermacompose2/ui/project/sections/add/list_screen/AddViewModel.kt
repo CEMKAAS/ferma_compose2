@@ -282,7 +282,8 @@ class AddViewModel @Inject constructor(
                 domain.year
             ),
             countSuffix = domain.countSuffix,
-            category = domain.category ?: resourceProvider.getString(R.string.support_text_no_category),
+            category = domain.category
+                ?: resourceProvider.getString(R.string.support_text_no_category),
             selectedAnimalIndex = domain.animalId ?: 0,
             animalId = domain.animalId,
             note = domain.note,
@@ -296,6 +297,7 @@ class AddViewModel @Inject constructor(
 
     private fun AddEntryState2.toDomainMap(): DomainAddTable {
         val dateList = date.split(".")
+        val category = category.trim()
         return DomainAddTable(
             id = itemId,
             title = title.trim(),
@@ -305,7 +307,8 @@ class AddViewModel @Inject constructor(
             year = dateList[2].toInt(),
             countSuffix = countSuffix,
             priceSuffix = getState().settings.currencySuffix,
-            category = category.trim().ifEmpty { null },
+            category = if (category.contains(resourceProvider.getString(R.string.support_text_no_category)) || category.isEmpty())
+                null else category,
             animalId = animalId,
             note = note.trim(),
             price = 0.0,

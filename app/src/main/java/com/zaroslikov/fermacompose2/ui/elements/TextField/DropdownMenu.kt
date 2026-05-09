@@ -24,6 +24,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.error_base
@@ -349,10 +350,12 @@ fun ExposedDropdownMenuAnimals(
 @Composable
 fun ExposedDropdownMenuPair(
     title: String,
+    suffix: Suffix,
+    productOrigin: ProductOrigin?,
     setTitle: (DomainTitleSuffixCategory) -> Unit,
     list: List<DomainTitleSuffixCategory>,
     enableDropMenu: Boolean = true,
-    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
+    content: @Composable ((Pair<Modifier, Boolean>) -> Unit)
 ) {
     BaseExposedDropdownMenu2(
         title = title,
@@ -361,21 +364,21 @@ fun ExposedDropdownMenuPair(
         content = content,
         enableDropMenu = enableDropMenu
     ) { index, item, closeMenu ->
-        val trailingIcon: @Composable (() -> Unit)? = if (item.title == title) {
+        val trailingIcon: @Composable (() -> Unit)? = if (item.title == title && item.suffix == suffix && item.productOrigin == productOrigin) {
             { IconDone() }
         } else null
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
-                    painterResource(item.category.toDrawRes()),
+                    painterResource(item.productOrigin.toDrawRes()),
                     null,
-                    tint = item.category.toColorList()
+                    tint = item.productOrigin.toColorList()
                 )
             },
             text = {
                 Text(
                     text = "${item.title}, ${stringResource(item.suffix.toResId())} " +
-                            "- ${stringResource(item.category.toResId())}",
+                            "- ${stringResource(item.productOrigin.toResId())}",
                 )
             },
             trailingIcon = trailingIcon,

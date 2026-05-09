@@ -355,7 +355,8 @@ class ExpensesViewModel @Inject constructor(
                 domain.month,
                 domain.year
             ),
-            category = domain.category?: resourceProvider.getString(R.string.support_text_no_category),
+            category = domain.category
+                ?: resourceProvider.getString(R.string.support_text_no_category),
             note = domain.note,
             isFood = domain.isFood,
             isShowFood = domain.isShowFood,
@@ -384,6 +385,7 @@ class ExpensesViewModel @Inject constructor(
         val (weight, weightSuffix) = if (isFood) {
             if (isAutoWeight) weight.toConvertDbDouble() to weightSuffix else null to null
         } else null to null
+        val category = category.trim()
         return DomainExpensesTable(
             id = itemId,
             title = title.trim(),
@@ -395,7 +397,8 @@ class ExpensesViewModel @Inject constructor(
             price = price.toConvertDbDouble(),
             priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
             priceSuffix = getState().settings.currencySuffix,
-            category = category.trim().ifEmpty { null },
+            category = if (category.contains(resourceProvider.getString(R.string.support_text_no_category)) || category.isEmpty())
+                null else category,
             note = note.trim(),
             isShowFood = if (isFood && isEntry) true else isShowFood,
             isFood = isFood,

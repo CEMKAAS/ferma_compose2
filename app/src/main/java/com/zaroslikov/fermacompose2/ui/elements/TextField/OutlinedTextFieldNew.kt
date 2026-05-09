@@ -50,7 +50,7 @@ import com.zaroslikov.fermacompose2.supportFun.KeyboardActionFocus
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
@@ -1282,7 +1282,7 @@ fun OutlinedTextTitleSaleNew(
     value: String,
     onValueChange: (String) -> Unit = {},
     onValueChoice: (DomainTitleSuffixCategory) -> Unit = {},
-    category: Category?,
+    productOrigin: ProductOrigin?,
     @StringRes intResSup: Int = R.string.support_text_product,
     readOnly: Boolean = false,
     enable: Boolean = true,
@@ -1292,41 +1292,46 @@ fun OutlinedTextTitleSaleNew(
     isErrorSlash: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
-    var category by rememberSaveable { mutableStateOf(category) }
+    var category by rememberSaveable { mutableStateOf(productOrigin) }
+    var suffix by rememberSaveable { mutableStateOf(Suffix.PIECES) }
 
     BorderCard {
         ExposedDropdownMenuPair(
             title = value,
             setTitle = {
                 onValueChoice(it)
-                category = it.category
+                category = it.productOrigin
+                suffix = it.suffix
                 focusManager.moveFocus(FocusDirection.Down)
             },
+            suffix = suffix,
+            productOrigin = category,
+            list = titleList,
             enableDropMenu = enable,
-            list = titleList
-        ) {
-            BaseOutlinedTextNew(
-                value = value,
-                onValueChange = { text -> onValueChange(text) },
-                onClear = {
-                    onValueChange("")
-                    category = null
-                },
-                leadingIconRes2 = category?.toDrawRes(),
-                leadingIconColor2 = category?.toColorList() ?: Category.ADD.toColorList(),
-                labelIntRes = R.string.outlined_text_product,
-                isError = isErrorTitle, isErrorSlash = isErrorSlash,
-                intResSup = intResSup,
-                intResError = R.string.error_no_product,
-                readOnly = readOnly,
-                enabled = enable,
-                singleLine =false,
-                modifier = it.first,
-                isMore = isMore,
-                isNecessarily = true,
-                keyboardOptions = keyboardOptionsNext()
-            )
-        }
+            content = {
+                BaseOutlinedTextNew(
+                    value = value,
+                    onValueChange = { text -> onValueChange(text) },
+                    onClear = {
+                        onValueChange("")
+                        category = null
+                    },
+                    leadingIconRes2 = category?.toDrawRes(),
+                    leadingIconColor2 = category?.toColorList() ?: ProductOrigin.ADD.toColorList(),
+                    labelIntRes = R.string.outlined_text_product,
+                    isError = isErrorTitle, isErrorSlash = isErrorSlash,
+                    intResSup = intResSup,
+                    intResError = R.string.error_no_product,
+                    readOnly = readOnly,
+                    enabled = enable,
+                    singleLine = false,
+                    modifier = it.first,
+                    isMore = isMore,
+                    isNecessarily = true,
+                    keyboardOptions = keyboardOptionsNext()
+                )
+            },
+        )
     }
 }
 

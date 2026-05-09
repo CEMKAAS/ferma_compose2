@@ -118,7 +118,7 @@ fun ExpensesEntryBottomSheet(
         if (state.pickList.animalList2.isNotEmpty() && !state.isIndicatorsValue)
             GroupCard(
                 titleRes = R.string.expenses_screen_type_expenses,
-                iconOneRes = R.drawable.icon_sale,
+                iconOneRes = R.drawable.icon_expenses,
                 iconTwoRes = R.drawable.wheat_24dp_000000_fill0_wght400_grad0_opsz24,
                 textOneRes = R.string.expenses_screen_common_expenses,
                 textTwoRes = R.string.expenses_screen_button_food,

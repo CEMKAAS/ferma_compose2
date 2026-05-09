@@ -59,6 +59,7 @@ import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_2
 import com.zaroslikov.fermacompose2.green_6
@@ -528,6 +529,7 @@ private fun FastAdd(
                             suffix = it.suffix,
                             category = it.category,
                             animal = it.animalName,
+                            countRow = it.countRow,
                             onClick = { onClick(it) }
                         )
                     }
@@ -543,6 +545,7 @@ private fun FastAddCard(
     count: Double,
     suffix: Suffix,
     animal: String?,
+    countRow: Int,
     category: String?,
     onClick: () -> Unit
 ) {
@@ -603,11 +606,21 @@ private fun FastAddCard(
                     }
                 }
             }
-            Text(
-                "${count.formatNumber()} " + stringResource(suffix.toResId()),
-                style = text_14,
-                color = black_2
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "${count.formatNumber()} " + stringResource(suffix.toResId()),
+                    style = text_14,
+                    color = black_2
+                )
+                Text(
+                    text = "${countRow.formatNumber()} ${stringResource(R.string.briefly_card_row)}",
+                    style = text_12,
+                    color = gray_7
+                )
+            }
         }
     }
 }

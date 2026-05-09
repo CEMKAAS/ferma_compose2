@@ -54,7 +54,7 @@ fun ExpensesScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(orang_1, orang_2)
     val primeColor = orang_1
-    val iconRes = R.drawable.icon_sale
+    val iconRes = R.drawable.icon_expenses
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -225,7 +225,7 @@ private fun WarningDeleteExpensesBottomSheet(
                 suffix = product.countSuffix,
                 price = product.priceAll ?: product.price,
                 priceSuffix = priceSuffix,
-                category = product.category,
+                category = product.category ?: stringResource(R.string.support_text_no_category),
                 note = product.note,
                 color = color,
                 day = product.day,

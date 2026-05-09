@@ -10,6 +10,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -209,7 +218,13 @@ fun FirstScreen(
                                     FirstIntent.OpenArchiveIncubatorBottomSheetClicked(true, it)
                                 )
                             },
-                            onUnarchiveClick = { viewModel.onIntent(FirstIntent.UnarchiveClicked(it)) },
+                            onUnarchiveClick = {
+                                viewModel.onIntent(
+                                    FirstIntent.UnarchiveClicked(
+                                        it
+                                    )
+                                )
+                            },
                             onDeleteClick = {
                                 viewModel.onIntent(
                                     FirstIntent.OpenDeleteBottomSheetClicked(
@@ -245,7 +260,11 @@ fun FirstScreen(
                         WarningDeleteBottomSheet(
                             isProject = state.currentProjectTable?.mode ?: true,
                             onDismissRequest = {
-                                viewModel.onIntent(FirstIntent.OpenDeleteBottomSheetClicked(false))
+                                viewModel.onIntent(
+                                    FirstIntent.OpenDeleteBottomSheetClicked(
+                                        false
+                                    )
+                                )
                             },
                             onDeleteDatabaseClick = { viewModel.onIntent(FirstIntent.DeleteClicked) }
                         )

@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
@@ -22,6 +22,7 @@ import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -66,7 +67,7 @@ class WriteOffViewModel @Inject constructor(
                 openBottomSheetGroup(intent.value)
 
             is WriteOffListIntent.TitleAndSuffix ->
-                updateWarehouseUiState(intent.title, intent.writeOffCategory)
+                updateWarehouseUiState(intent.title, intent.writeOffProductOrigin)
 
             WriteOffListIntent.Insert -> insert()
             WriteOffListIntent.Update -> update()
@@ -203,25 +204,25 @@ class WriteOffViewModel @Inject constructor(
                 )
                 if (domain == null) baseState
                 else {
-                    val saleCategory = baseState.pickList.titleList
+                    /*val saleCategory = baseState.pickList.titleList
                         .firstOrNull { it.title == domain.title }
-                        ?.category
-                    baseState.updateFromDomain(domain).copy(writeOffCategory = saleCategory)
+                        ?.category*/
+                    baseState.updateFromDomain(domain)/*.copy(writeOffCategory = saleCategory)*/
                 }
             } else getState().currentProduct
             onIntent(WriteOffListIntent.RefreshEntryBottomSheetState(true, newState))
-            newState.writeOffCategory?.let { updateWarehouseUiStateSync(newState.title, it) }
+            newState.writeOffProductOrigin?.let { updateWarehouseUiStateSync(newState.title, it) }
         }
     }
 
-    private fun updateWarehouseUiState(name: String, category: Category) {
+    private fun updateWarehouseUiState(name: String, productOrigin: ProductOrigin) {
         viewModelScope.launch {
-            updateWarehouseUiStateSync(name, category)
+            updateWarehouseUiStateSync(name, productOrigin)
         }
     }
 
-    private suspend fun updateWarehouseUiStateSync(name: String, category: Category) {
-        val pair = if (category == Category.EXPENSES)
+    private suspend fun updateWarehouseUiStateSync(name: String, productOrigin: ProductOrigin) {
+        val pair = if (productOrigin == ProductOrigin.EXPENSES)
             warehouseRepository.getCurrentExpensesProductList(name, itemIdPT).first()
                 .build(getState().settings)
         else
@@ -289,6 +290,10 @@ class WriteOffViewModel @Inject constructor(
                 domain.month,
                 domain.year
             ),
+            pickList = pickList.copy(
+                suffixList = domain.countSuffix.toSuffixList()
+            ),
+            writeOffProductOrigin = domain.productOrigin,
             status = domain.status,
             note = domain.note,
             animalCountId = domain.animalCountId,
@@ -299,6 +304,7 @@ class WriteOffViewModel @Inject constructor(
 
     private fun WriteOffEntryState2.updateForSave(): DomainWriteOffTable {
         val dateList = date.split(".")
+        val category = category.trim()
         return DomainWriteOffTable(
             id = itemId,
             title = title.trim(),
@@ -307,7 +313,9 @@ class WriteOffViewModel @Inject constructor(
             price = if (price.isBlank()) null else price.toConvertDbDouble(),
             priceAll = if (price.isBlank()) null else if (isAutoPrice) priceAll.toConvertDbDouble() else null,
             priceSuffix = if (price.isBlank()) null else getState().settings.currencySuffix,
-            category = category.trim().ifEmpty { null },
+            category = if (category.contains(resourceProvider.getString(R.string.support_text_no_category)) || category.isEmpty())
+                null else category,
+            productOrigin = writeOffProductOrigin,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),

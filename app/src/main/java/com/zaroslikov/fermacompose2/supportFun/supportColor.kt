@@ -2,13 +2,12 @@ package com.zaroslikov.fermacompose2.supportFun
 
 import androidx.compose.ui.graphics.Color
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.animal_1
-import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_10
 import com.zaroslikov.fermacompose2.blue_11
@@ -25,7 +24,6 @@ import com.zaroslikov.fermacompose2.green_5
 import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_7
 import com.zaroslikov.fermacompose2.green_8
-import com.zaroslikov.fermacompose2.green_9
 import com.zaroslikov.fermacompose2.green_g_2
 import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.green_g_5
@@ -44,7 +42,6 @@ import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.red_11
 import com.zaroslikov.fermacompose2.red_12
-import com.zaroslikov.fermacompose2.red_13
 import com.zaroslikov.fermacompose2.red_15
 import com.zaroslikov.fermacompose2.red_18
 import com.zaroslikov.fermacompose2.red_3
@@ -62,13 +59,12 @@ import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.violet_4
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_7
-import com.zaroslikov.fermacompose2.white
 
-fun Category.toColorList(): Color {
+fun ProductOrigin.toColorList(): Color {
     return when (this) {
-        Category.ADD -> green_shamrock
-        Category.EXPENSES -> orang_1
-        Category.SALE -> blue_1
+        ProductOrigin.ADD -> green_shamrock
+        ProductOrigin.EXPENSES -> orang_1
+        ProductOrigin.SALE -> blue_1
     }
 }
 
@@ -99,9 +95,9 @@ fun Suffix.toColorList(): Color {
         Suffix.HEADS -> Color(0xFFFFB300)    // Amber 600 — чуть теплее
         Suffix.UNITS -> Color(0xFFFFA000)    // Amber 700 — насыщеннее
 
-        Suffix.GRAM -> Color(0xFFA5D6A7)     // Light green 300 — лёгкий
-        Suffix.KILOGRAM -> Color(0xFF66BB6A) // Green 400 — стандартный
-        Suffix.TONS -> Color(0xFF2E7D32)     // Green 800 — глубокий и "тяжёлый"
+        Suffix.GRAM -> Color(0xFF80CBC4)
+        Suffix.KILOGRAM -> Color(0xFF26A69A)
+        Suffix.TONS -> Color(0xFF00695C)   // Green 800 — глубокий и "тяжёлый"
 
         // --- Объём ---
         Suffix.MILLILITRES -> Color(0xFF64B5F6)
@@ -140,11 +136,11 @@ fun DestinationIncubator.toColorList(): List<Color> {
 }
 
 
-fun Category.toColorFinance(): Color {
+fun ProductOrigin.toColorFinance(): Color {
     return when (this) {
-        Category.ADD -> blue_3
-        Category.EXPENSES -> orang_3
-        Category.SALE -> blue_3
+        ProductOrigin.ADD -> blue_3
+        ProductOrigin.EXPENSES -> orang_3
+        ProductOrigin.SALE -> blue_3
     }
 }
 

@@ -42,22 +42,22 @@ interface FinanceDao {
                 " FROM ( " +
                 " SELECT count, count_suffix, price, price_all, category, buyer, NULL AS animal, day, month, year, 0 AS category_finance" +
                 " FROM sale_table" +
-                " WHERE idPT=:id  and title=:name" +
+                " WHERE idPT=:id AND title=:name AND product_origin = 0" +
 
                 " UNION All " +
                 " SELECT count, count_suffix, NULL AS price, NULL AS price_all, category, NULL AS buyer, (SELECT a.name From animal_table a where a.id = animal_id) as animal, day, month, year, 5 AS category_finance" +
                 " FROM add_table" +
-                " WHERE idPT=:id  and title=:name" +
+                " WHERE idPT=:id  and title=:name " +
 
                 " UNION All" +
                 " SELECT count, count_suffix, price, price_all, category, NULL AS buyer, NULL AS animal, day, month, year, 3 AS category_finance" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id  and title=:name  and status = 0" +
+                " WHERE idPT=:id  and title=:name  and status = 0 AND product_origin = 0" +
 
                 " UNION All" +
                 " SELECT count, count_suffix, price, price_all, category, NULL AS buyer, NULL AS animal, day, month, year, 2 AS category_finance" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and title=:name and status = 1" +
+                " WHERE idPT=:id and title=:name and status = 1 AND product_origin = 0" +
                 ") " +
                 " WHERE DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +

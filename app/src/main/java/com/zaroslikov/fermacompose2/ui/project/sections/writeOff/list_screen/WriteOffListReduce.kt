@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen
 
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
@@ -8,6 +9,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 
 class WriteOffListReduce(
@@ -28,10 +30,13 @@ class WriteOffListReduce(
 
             is WriteOffListIntent.StatusClicked -> state.updateStatus(intent.value)
             is WriteOffListIntent.TitleAndSuffix ->
-                state.updateTitleAndSuffix(intent.title, intent.suffix).updateValid()
+                state.updateTitleAndSuffix(intent.title, intent.suffix, intent.writeOffProductOrigin)
+                    .updateValid()
 
             is WriteOffListIntent.CountChanged ->
                 state.updateCount(intent.value).updatePriceAll().updateValid()
+
+            is WriteOffListIntent.SuffixClicked -> state.updateSuffix(intent.value)
 
             is WriteOffListIntent.PriceChanged ->
                 state.updatePrice(intent.value).updatePriceAll()
@@ -108,12 +113,15 @@ class WriteOffListReduce(
 
     private fun WriteOffListState.updateTitleAndSuffix(
         title: String,
-        suffix: Suffix
+        suffix: Suffix,
+        writeOffProductOrigin: ProductOrigin
     ): WriteOffListState {
         return copy(
             currentProduct = currentProduct.copy(
                 title = title,
                 countSuffix = suffix,
+                writeOffProductOrigin = writeOffProductOrigin,
+                pickList = currentProduct.pickList.copy(suffixList = suffix.toSuffixList()),
                 error = currentProduct.error.copy(
                     isErrorTitle = title.isBlank(),
                     isErrorSlash = title.isSlash()
@@ -129,6 +137,14 @@ class WriteOffListReduce(
                 error = currentProduct.error.copy(
                     isErrorCount = count.isBlank()
                 )
+            )
+        )
+    }
+
+    private fun WriteOffListState.updateSuffix(countSuffix: Suffix): WriteOffListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                countSuffix = countSuffix
             )
         )
     }
@@ -200,9 +216,10 @@ class WriteOffListReduce(
         val searchList = if (query.isBlank() && !isGroup) list
         else
             list.filter { item ->
+                val category = item.category ?: ""
                 item.title.lowercase().contains(query) ||
                         item.note.lowercase().contains(query) ||
-                        /*  item.category.lowercase().contains(query) ||*/
+                        category.lowercase().contains(query) ||
                         item.count.toString().lowercase().contains(query) ||
                         resourceProvider.getString(item.countSuffix.toResId()).lowercase()
                             .contains(query)

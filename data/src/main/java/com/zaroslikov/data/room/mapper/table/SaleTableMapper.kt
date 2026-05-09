@@ -12,6 +12,7 @@ fun DomainSaleTable.toRoomMap(): SaleTable = SaleTable(
     price = price,
     priceAll = priceAll,
     priceSuffix = priceSuffix,
+    productOrigin = productOrigin,
     day = day,
     month = month,
     year = year,
@@ -31,6 +32,7 @@ fun SaleTable.toDomainMap(): DomainSaleTable = DomainSaleTable(
     price = price,
     priceAll = priceAll,
     priceSuffix = priceSuffix,
+    productOrigin = productOrigin,
     day = day,
     month = month,
     year = year,
@@ -39,6 +41,6 @@ fun SaleTable.toDomainMap(): DomainSaleTable = DomainSaleTable(
     note = note,
     idPT = idPT,
     animalId = animalId,
-    animalCountId = animalCountId
+    animalCountId = animalCountId,
 )
 

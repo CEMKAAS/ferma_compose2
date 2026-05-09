@@ -1,6 +1,7 @@
 package com.zaroslikov.domain.models
 
 import com.zaroslikov.domain.models.dto.BaseProductSection
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import kotlinx.serialization.Serializable
 
@@ -13,6 +14,7 @@ data class DomainSaleTable(
     override val price: Double,
     override val priceAll: Double? = null,
     val priceSuffix: Suffix = Suffix.RUBLE,
+    val productOrigin: ProductOrigin?,
     val day: Int,
     val month: Int,
     val year: Int,

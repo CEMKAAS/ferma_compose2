@@ -57,6 +57,7 @@ import com.yandex.mobile.ads.compose.BannerSize
 import com.yandex.mobile.ads.compose.rememberBannerAdState
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.R
@@ -87,6 +88,8 @@ import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.toCardDrawRes
+import com.zaroslikov.fermacompose2.supportFun.toCardResId
 import com.zaroslikov.fermacompose2.ui.project.sections.ValueItem
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
 import com.zaroslikov.fermacompose2.violet_1
@@ -493,6 +496,7 @@ fun DetailProductCardNew(
     statusWriteOff: Boolean? = null,
     note: String,
     animal: String? = null,
+    productOrigin: ProductOrigin? = null,
     color: Color,
     day: Int,
     month: Int,
@@ -534,7 +538,7 @@ fun DetailProductCardNew(
                             modifier = Modifier.weight(1f, fill = false)
                         )
                     }
-                    CountColorCard(count, suffix, color)
+                    CountColorCard(count, suffix, suffix.toColorList())
                     price?.let {
                         CountColorCard(it, priceSuffix, price_green)
                     }
@@ -554,6 +558,13 @@ fun DetailProductCardNew(
                     iconRes = iconRes,
                     valueString = stringResource(valueString),
                     iconColor = if (status) violet_1 else error_base,
+                )
+            }
+            productOrigin?.let {
+                IconAndTextNew(
+                    iconRes = it.toCardDrawRes(),
+                    valueString = stringResource(it.toCardResId()),
+                    iconColor = color
                 )
             }
             category?.let {
@@ -829,7 +840,7 @@ fun BrieflyCountCardNew(
                             CountColorCard(it.first, it.second, price_green)
                         }
                         Text(
-                            text = "$rowCount ${stringResource(R.string.briefly_card_row)}",
+                            text = "${rowCount.formatNumber()} ${stringResource(R.string.briefly_card_row)}",
                             style = text_12,
                             color = gray_7
                         )

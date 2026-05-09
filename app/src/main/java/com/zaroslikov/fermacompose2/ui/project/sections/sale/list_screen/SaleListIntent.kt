@@ -2,10 +2,9 @@ package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 
 sealed class SaleListIntent : BaseIntent {
     data class OpenBottomSheetGroup(val value: String?) : SaleListIntent()
@@ -32,7 +31,7 @@ sealed class SaleListIntent : BaseIntent {
     data class TitleAndSuffixClicked(
         val title: String,
         val suffix: Suffix,
-        val category: Category
+        val productOrigin: ProductOrigin
     ) : SaleListIntent()
 
     data class CountChanged(val value: String) : SaleListIntent()

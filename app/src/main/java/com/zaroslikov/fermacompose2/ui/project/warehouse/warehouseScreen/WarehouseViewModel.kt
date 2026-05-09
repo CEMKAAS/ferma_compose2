@@ -197,6 +197,7 @@ class WarehouseViewModel @Inject constructor(
             status = false,
             note = resourceProvider.getString(R.string.warehouse_screen_warehouse_food_write_off),
             idPT = itemId,
+            productOrigin = null
         )
     }
 

@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.project.ProjectTable
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 
 @Entity(
@@ -56,6 +57,8 @@ data class SaleTable(
     @ColumnInfo(name = "year")
     val year: Int, // время
     val category: String?,
+    @ColumnInfo(name = "product_origin")
+    val productOrigin: ProductOrigin?,
     val buyer: String?,
     val note: String,
     @ColumnInfo(name = "idPT")

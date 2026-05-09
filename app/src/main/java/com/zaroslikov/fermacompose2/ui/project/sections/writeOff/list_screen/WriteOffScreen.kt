@@ -176,6 +176,7 @@ private fun WriteOffDetailBottomSheet(
             priceAll = state.priceAll,
             priceSuffix = priceSuffix,
             category = state.category,
+            productOrigin = state.productOrigin,
             date = date,
             note = state.note,
             statusWriteOff = state.status,
@@ -214,6 +215,7 @@ private fun WarningDeleteWriteOffBottomSheet(
                 price = product.priceAll ?: product.price,
                 statusWriteOff = product.status,
                 category = product.category,
+                productOrigin = product.productOrigin,
                 note = product.note,
                 color = color,
                 day = product.day,
@@ -259,6 +261,7 @@ private fun WriteOffContainer(
                 suffix = item.countSuffix,
                 price = item.priceAll ?: item.price,
                 priceSuffix = priceSuffix,
+                productOrigin = item.productOrigin,
                 statusWriteOff = item.status,
                 category = item.category,
                 note = item.note,
@@ -381,7 +384,7 @@ private fun WriteOffEntryBottomSheet(
         OutlinedTextTitleSaleNew(
             value = state.title,
             onValueChoice = {
-                onIntent(WriteOffListIntent.TitleAndSuffix(it.title, it.suffix, it.category))
+                onIntent(WriteOffListIntent.TitleAndSuffix(it.title, it.suffix, it.productOrigin))
             },
             intResSup = R.string.support_text_price_write_product,
             titleList = state.pickList.titleList,
@@ -390,7 +393,7 @@ private fun WriteOffEntryBottomSheet(
             readOnly = state.isIndicatorsValue,
             enable = !state.isIndicatorsValue,
             isMore = true,
-            category = state.writeOffCategory
+            productOrigin = state.writeOffProductOrigin
         )
         OutlinedTextCountNew(
             value = state.count,
@@ -398,6 +401,7 @@ private fun WriteOffEntryBottomSheet(
                 onIntent(WriteOffListIntent.CountChanged(it))
             },
             suffix = state.countSuffix,
+            suffixList = state.pickList.suffixList,
             isError = state.error.isErrorCount,
             enabled = !state.isIndicatorsValue,
             intResSup = R.string.support_text_count_product_write_off,

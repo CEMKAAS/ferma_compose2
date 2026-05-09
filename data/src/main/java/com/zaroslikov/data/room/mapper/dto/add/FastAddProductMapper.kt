@@ -10,6 +10,7 @@ fun FastAddProductDto.toDomainFastAddProduct(): DomainFastAddProduct {
         suffix = this.suffix,
         category = this.category,
         idAnimal = this.idAnimal,
-        animalName = this.animalName
+        animalName = this.animalName,
+        countRow = this.countRow,
     )
 }

@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
@@ -9,6 +10,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.text.lowercase
 
@@ -33,7 +35,8 @@ class SaleListReduce(
             is SaleListIntent.GroupClicked -> state.updateGroup(intent.value)
             is SaleListIntent.TitleChanged -> state.updateTitle(intent.value).updateValid()
             is SaleListIntent.TitleAndSuffixClicked ->
-                state.updateTitleAndSuffix(intent.title, intent.suffix).updateValid()
+                state.updateTitleAndSuffix(intent.title, intent.suffix, intent.productOrigin)
+                    .updateValid()
 
             is SaleListIntent.CountChanged ->
                 state.updateCount(intent.value).updatePriceAll().updateValid()
@@ -99,11 +102,17 @@ class SaleListReduce(
         )
     }
 
-    private fun SaleListState.updateTitleAndSuffix(title: String, suffix: Suffix): SaleListState {
+    private fun SaleListState.updateTitleAndSuffix(
+        title: String,
+        suffix: Suffix,
+        productOriginProduct: ProductOrigin
+    ): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
                 title = title,
+                productOrigin = productOriginProduct,
                 countSuffix = suffix,
+                pickList = currentProduct.pickList.copy(suffixList = suffix.toSuffixList()),
                 error = currentProduct.error.copy(
                     isErrorTitle = title.isBlank(),
                     isErrorSlash = title.contains("/")

@@ -1,7 +1,7 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
@@ -74,11 +74,19 @@ fun Suffix.toFullResId(): Int {
     }
 }
 
-fun Category.toResId(): Int {
+fun ProductOrigin.toResId(): Int {
     return when (this) {
-        Category.ADD -> R.string.add_screen_title
-        Category.EXPENSES -> R.string.expenses_screen_title
-        Category.SALE -> R.string.sale_screen_title
+        ProductOrigin.ADD -> R.string.add_screen_title
+        ProductOrigin.EXPENSES -> R.string.expenses_screen_title
+        ProductOrigin.SALE -> R.string.sale_screen_title
+    }
+}
+
+fun ProductOrigin.toCardResId(): Int {
+    return when (this) {
+        ProductOrigin.ADD -> R.string.product_origin_add
+        ProductOrigin.EXPENSES -> R.string.product_origin_expenses
+        ProductOrigin.SALE -> R.string.product_origin_sale
     }
 }
 

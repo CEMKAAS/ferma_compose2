@@ -1,12 +1,12 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
-import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainSaleTable
-import com.zaroslikov.domain.models.dto.sale.BrieflySaleDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixAllList
+import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
@@ -45,7 +45,7 @@ data class SaleListState(
 data class SaleEntryState2(
     val itemId: Long = 0,
     val title: String = "",
-    val saleCategory: Category? = null,
+    val productOrigin: ProductOrigin? = null,
     val count: String = "",
     val countSuffix: Suffix = Suffix.PIECES,
     val date: String = dateToday(),
@@ -72,6 +72,7 @@ data class PickSaleList(
     val categoryList: List<String> = emptyList(),
     val buyerList: List<String> = emptyList(),
     val warehouseList: List<DomainCountSuffix> = emptyList(),
+    val suffixList: List<Suffix> = suffixAllList
 )
 
 data class ErrorSale(

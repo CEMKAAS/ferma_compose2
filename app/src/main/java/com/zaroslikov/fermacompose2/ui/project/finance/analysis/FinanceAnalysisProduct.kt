@@ -21,6 +21,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +43,7 @@ import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_2
 import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_9
@@ -87,6 +91,7 @@ import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString2
 import com.zaroslikov.fermacompose2.ui.elements.AdsCard
+import com.zaroslikov.fermacompose2.ui.elements.BorderShowAllButton
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.IconAnimal
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_6
@@ -490,25 +495,35 @@ private fun FinanceCategorySlider(
 private fun AnimalProducers(
     animalProducer: List<AnimalProducer>
 ) {
-    if (animalProducer.isNotEmpty())
+    var expanded by remember { mutableStateOf(false) }
+    val visibleList = if (expanded) animalProducer else animalProducer.take(3)
+
+    if (visibleList.isNotEmpty())
         CardNewWithTitle(
             titleRes = R.string.analysis_screen_animal_producers
         ) {
-            animalProducer.forEach {
+            visibleList.forEachIndexed { index, producer ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     AnimalProducerSlider(
-                        name = it.name,
-                        type = it.type,
-                        count = it.count,
-                        suffix = it.suffix,
-                        percentDouble = it.percentDouble,
-                        percentFloat = it.percentFloat,
-                        currentIcon = it.currentIcon,
-                        imagePath = it.imagePath,
+                        name = producer.name,
+                        type = producer.type,
+                        count = producer.count,
+                        suffix = producer.suffix,
+                        percentDouble = producer.percentDouble,
+                        percentFloat = producer.percentFloat,
+                        currentIcon = producer.currentIcon,
+                        imagePath = producer.imagePath,
                     )
+                    if (index == visibleList.lastIndex && animalProducer.size > 2)
+                        BorderShowAllButton(
+                            listSize = animalProducer.size,
+                            textColor = green_2,
+                            borderColor = green_1,
+                            isShowMore = expanded
+                        ) { expanded = !expanded }
                 }
             }
         }
@@ -574,11 +589,14 @@ private fun AnimalProducerSlider(
 private fun TopBuyers(
     buyersList: List<Buyer>
 ) {
-    if (buyersList.isNotEmpty())
+    var expanded by remember { mutableStateOf(false) }
+    val visibleList = if (expanded) buyersList else buyersList.take(3)
+
+    if (visibleList.isNotEmpty())
         CardNewWithTitle(
             titleRes = R.string.analysis_screen_byers
         ) {
-            buyersList.forEachIndexed { index, buyer ->
+            visibleList.forEachIndexed { index, buyer ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -592,6 +610,13 @@ private fun TopBuyers(
                         priceSuffix = buyer.priceSuffix,
                         countTransaction = buyer.countTransaction
                     )
+                    if (index == visibleList.lastIndex && buyersList.size > 2)
+                        BorderShowAllButton(
+                            listSize = buyersList.size,
+                            textColor = green_2,
+                            borderColor = green_1,
+                            isShowMore = expanded
+                        ) { expanded = !expanded }
                 }
             }
         }

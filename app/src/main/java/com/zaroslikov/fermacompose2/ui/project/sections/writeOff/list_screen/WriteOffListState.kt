@@ -1,12 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen
 
-import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
-import com.zaroslikov.domain.models.dto.write_off.BrieflyWriteOffDomain
-import com.zaroslikov.domain.models.enums.Category
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.base.state.BaseError
@@ -50,7 +49,7 @@ data class WriteOffEntryState2(
     val title: String = "",
     val count: String = "",
     val countSuffix: Suffix = Suffix.PIECES,
-    val writeOffCategory: Category? = null,
+    val writeOffProductOrigin: ProductOrigin? = null,
     val date: String = dateToday(),
     val isAutoPrice: Boolean = false,
     val price: String = "",
@@ -71,6 +70,7 @@ data class PickWriteOffList(
     val titleList: List<DomainTitleSuffixCategory> = emptyList(),
     val categoryList: List<String> = emptyList(),
     val warehouseList: List<DomainCountSuffix> = emptyList(),
+    val suffixList: List<Suffix> = suffixPiecesList
 )
 
 data class ErrorWriteOff(

@@ -55,7 +55,7 @@ data class EntryBookmark(
     fun enabledButton(): Boolean {
         val isEnabled =
             title.isNotBlank() && count.isNotBlank() && (count.toConvertZeroDbInt() <= incubatorCount) &&
-                    (rejectedCount.toConvertZeroDbInt() < count.toConvertZeroDbInt())
+                    (rejectedCount.toConvertZeroDbInt() <= count.toConvertZeroDbInt())
                     && !hasAnyError
         return isEnabled
     }

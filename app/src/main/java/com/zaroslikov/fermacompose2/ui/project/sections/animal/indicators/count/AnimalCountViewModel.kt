@@ -9,6 +9,7 @@ import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
@@ -675,7 +676,8 @@ class AnimalCountViewModel @Inject constructor(
             note = note?.trim()
                 ?: resourceProvider.getString(R.string.animal_card_screen_note_write_off),
             idPT = itemIdPT,
-            animalCountId = countId ?: state.id
+            animalCountId = countId ?: state.id,
+            productOrigin = null
         )
     }
 
@@ -722,7 +724,8 @@ class AnimalCountViewModel @Inject constructor(
             note = resourceProvider.getString(R.string.animal_card_screen_note_sale),
             idPT = itemIdPT,
             animalId = itemId,
-            animalCountId = countId ?: state.id
+            animalCountId = countId ?: state.id,
+            productOrigin = null
         )
     }
 

@@ -1,10 +1,12 @@
 package com.zaroslikov.data.room.dto.shared
 
-import com.zaroslikov.domain.models.enums.Category
+import androidx.room.ColumnInfo
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 
 data class TitleSuffixCategoryDto(
     val title : String,
     val suffix: Suffix,
-    val category: Category
+    @ColumnInfo(name = "product_origin")
+    val productOrigin: ProductOrigin
 )

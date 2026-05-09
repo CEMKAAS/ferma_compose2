@@ -63,17 +63,17 @@ interface SaleDao {
 
 
     @Query(
-        "SELECT DISTINCT a.title, a.count_suffix AS suffix, 0 AS category FROM add_table a WHERE a.idPT=:id  " +
+        "SELECT DISTINCT a.title, a.count_suffix AS suffix, 0 AS product_origin FROM add_table a WHERE a.idPT=:id  " +
 
                 " UNION ALL " +
 
-                " SELECT DISTINCT e.title, e.count_suffix AS suffix, 1 AS category " +
+                " SELECT DISTINCT e.title, e.count_suffix AS suffix, 1 AS product_origin" +
                 " FROM expenses_table e" +
                 " WHERE e.idPT=:id and e.is_food = 0 and e.animalId IS NULL and e.animal_vaccination_id IS NULL and e.animal_count_id IS NULL " +
 
                 " UNION ALL" +
 
-                " SELECT DISTINCT s.title, s.count_suffix AS suffix, 2 AS category" +
+                " SELECT DISTINCT s.title, s.count_suffix AS suffix, 2 AS product_origin" +
                 " FROM sale_table s" +
                 " WHERE s.idPT=:id and s.animal_count_id IS NULL and s.animal_id IS NULL" +
                 " AND (s.title, s.count_suffix) NOT IN (" +
@@ -212,7 +212,7 @@ interface SaleDao {
                 " CASE WHEN price_all IS NULL THEN price ELSE price_all END AS price," +
                 " printf('%04d-%02d-%02d', year, month, day) AS date" +
                 " FROM sale_table" +
-                " Where idPT=:id and title=:name AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " Where idPT=:id and title=:name AND product_origin = 0 AND DATE(printf('%04d-%02d-%02d', year, month, day)) " +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
     fun getAnalysisSaleRangeList(
@@ -241,7 +241,7 @@ interface SaleDao {
                 " count," +
                 " count_suffix as suffix" +
                 " FROM sale_table" +
-                " Where idPT=:id  and title =:name AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " Where idPT=:id  and title =:name AND product_origin = 0 AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
     fun getAnalysisSaleBuyerRangeList(

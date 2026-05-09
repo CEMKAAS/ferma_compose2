@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.animal_1
@@ -84,6 +85,8 @@ import com.zaroslikov.fermacompose2.ui.elements.text_20
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelNew
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.toCardDrawRes
+import com.zaroslikov.fermacompose2.supportFun.toCardResId
 import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.DetailBottomSheet
@@ -332,6 +335,7 @@ private fun Card2(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
+                modifier = Modifier.weight(1f, false),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -440,6 +444,7 @@ fun DetailSectionBottomSheet(
     priceAll: Double? = null,
     priceSuffix: Suffix = Suffix.RUBLE,
     category: String?,
+    productOrigin: ProductOrigin? = null,
     buyer: String? = null,
     date: String,
     animal: String? = null,
@@ -516,6 +521,15 @@ fun DetailSectionBottomSheet(
             iconColor = iconColor,
             boxColor = boxColor
         )
+        productOrigin?.let {
+            ValueStandardCard(
+                titleRes = R.string.detail_card_product_category,
+                value = stringResource(it.toCardResId()),
+                iconRes = it.toCardDrawRes(),
+                iconColor = iconColor,
+                boxColor = boxColor
+            )
+        }
         if (buyer != null)
             ValueStandardCard(
                 titleRes = R.string.detail_card_buyer,

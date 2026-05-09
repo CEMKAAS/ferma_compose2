@@ -65,7 +65,7 @@
     <string name="outlined_text_name_animals">Название группы</string>
     <string name="outlined_food_day_animals">Расход корма</string>
     <string name="outlined_text_type">Тип</string>
-    <string name="outlined_text_date_factory">Дата завода</string>
+    <string name="outlined_text_date_factory">Дата приобретения</string>
     <string name="outlined_text_date_born">Дата рождения</string>
     <string name="outlined_text_date_next">Следующая дата</string>
     <string name="outlined_text_out_of">%s из %s</string>
@@ -96,6 +96,11 @@
     <string name="card_pieces_s">%s шт.</string>
     <string name="card_kilogram_s">%s кг.</string>
     <string name="card_size_s">%s м.</string>
+
+    //ProductOrigin
+    <string name="product_origin_expenses">Купленый товар</string>
+    <string name="product_origin_add">Собственное производство</string>
+    <string name="product_origin_sale">Источник неизвестен</string>
 
     // Search
     <string name="search_section">Поиск продукции...</string>
@@ -151,8 +156,8 @@
     <string name="checkbox_set_hand">Указать вручную</string>
     <string name="checkbox_show_warehouse">Отображать на складе</string>
     <string name="checkbox_animals_expenses">Распределить расходы по животным</string>
-    <string name="checkbox_born">Дата рождения совпадает с датой завода животного</string>
-    <string name="checkbox_born_s">Даты рождения совпадают с датой завода животных</string>
+    <string name="checkbox_born">Дата рождения совпадает с датой приобретения животного</string>
+    <string name="checkbox_born_s">Даты рождения совпадают с датой приобретения животных</string>
     <string name="checkbox_auto_calculate">Включить авторасчет цены</string>
     <string name="checkbox_auto_weight">Рассчитать вес</string>
     <string name="checkbox_auto_calculate_kill">Включить авторасчет продукции</string>
@@ -258,10 +263,10 @@
     <string name="support_text_food_day_animals">Укажите ежедневный расход корма на голову</string>
     <string name="support_text_food_day">Укажите ежедневный расход корма</string>
 
-    <string name="support_text_date_factory">Укажите дату завода животного</string>
+    <string name="support_text_date_factory">Укажите дату приобретения животного</string>
     <string name="support_text_date_born">Укажите рождения животного</string>
 
-    <string name="support_text_date_factory_s">Укажите дату завода животных</string>
+    <string name="support_text_date_factory_s">Укажите дату приобретения животных</string>
     <string name="support_text_date_born_s">Укажите дату рождения животных</string>
 
     <string name="support_text_weight_animal">Укажите вес животного</string>
@@ -699,7 +704,7 @@
 
 
     //BrieflyCard
-    <string name="briefly_card_row">Записи</string>
+    <string name="briefly_card_row">записей</string>
 
     <string name="briefly_detail_card_analysis">Посмотреть полный анализ продукта</string>
     <string name="briefly_detail_card_total_price">Общая стоимость:</string>
@@ -711,6 +716,7 @@
     <string name="detail_card_price">Стоимость</string>
     <string name="detail_card_buyer">Покупатель</string>
     <string name="detail_card_category">Категория</string>
+    <string name="detail_card_product_category">Происхождение товара</string>
     <string name="detail_card_date">Дата</string>
     <string name="detail_card_animal">Животное</string>
     <string name="detail_card_note">Примечание</string>
@@ -1099,7 +1105,7 @@
     <string name="analysis_screen_average_price">Средняя цена</string>
 
     <string name="analysis_screen_product_distribution">Распределение продукции</string>
-    <string name="analysis_screen_animal_producers">Животные-производители</string>
+    <string name="analysis_screen_animal_producers">Продукция от животных</string>
     <string name="analysis_screen_finance_analysis">Финансовый анализ</string>
     <string name="analysis_screen_total_price_product">Общая стоимость произведенного</string>
     <string name="analysis_screen_sold">Продано</string>

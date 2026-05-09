@@ -79,11 +79,11 @@ interface WriteOffDao {
        )
        fun getItemsWriteOffList(id: Long): Flow<List<TitleSuffixCategoryDto>>*/
     @Query(
-        "SELECT DISTINCT a.title, a.count_suffix AS suffix, 0 AS category FROM add_table a WHERE a.idPT=:id  " +
+        "SELECT DISTINCT a.title, a.count_suffix AS suffix, 0 AS product_origin FROM add_table a WHERE a.idPT=:id  " +
 
                 " UNION ALL " +
 
-                " SELECT DISTINCT e.title, e.count_suffix AS suffix, 1 AS category " +
+                " SELECT DISTINCT e.title, e.count_suffix AS suffix, 1 AS product_origin " +
                 " FROM expenses_table e" +
                 " WHERE e.idPT=:id and e.is_food = 0 and e.animalId IS NULL and e.animal_vaccination_id IS NULL and e.animal_count_id IS NULL "
     )
@@ -317,7 +317,7 @@ interface WriteOffDao {
                 " COALESCE(price_all, price, 0.0) AS price," +
                 " printf('%04d-%02d-%02d', year, month, day) AS date" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and title=:name AND status=:status" +
+                " WHERE idPT=:id and title=:name AND status=:status AND product_origin = 0" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
@@ -333,7 +333,7 @@ interface WriteOffDao {
         "SELECT COALESCE(SUM(count), 0) AS count," +
                 "  count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id AND title=:name AND status=1" +
+                " WHERE idPT=:id AND title=:name AND status= 1  AND product_origin = 0" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )

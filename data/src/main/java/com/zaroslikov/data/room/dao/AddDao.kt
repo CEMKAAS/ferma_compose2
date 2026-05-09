@@ -134,7 +134,8 @@ interface AddDao {
                 " count_suffix AS suffix," +
                 " category," +
                 " animal_id AS idAnimal," +
-                " (SELECT name FROM animal_table WHERE id = animal_id) as animalName" +
+                " (SELECT name FROM animal_table WHERE id = animal_id) as animalName," +
+                " Count(*) as count_row" +
                 " FROM add_table" +
                 " WHERE idPT=:id" +
                 " GROUP BY title, count, idAnimal, category" +

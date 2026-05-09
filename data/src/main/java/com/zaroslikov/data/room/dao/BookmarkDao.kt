@@ -82,24 +82,61 @@ interface BookmarkDao {
 
     @Query(
         "SELECT " +
-                " SUM((COALESCE(chick_price, 0.0) * (count - rejected_count)) - (count * COALESCE(price_all, b.price, 0.0))) - COALESCE(i.price, 0.0) AS profit, " +
+                //Profit
+                " SUM(COALESCE(chick_price, 0.0) * (count - rejected_count)) -" +
+                " SUM(CASE" +
+                "    WHEN price_all IS NOT NULL THEN price_all" +
+                "    ELSE COALESCE(b.price, 0.0) * count" +
+                " END) " +
+                "- COALESCE(i.price, 0.0) AS profit, " +
+
                 " SUM(COALESCE(chick_price, 0.0) * (count - rejected_count)) AS income, " +
                 " SUM(count - rejected_count) AS chicks, " +
-                " SUM(count * COALESCE(price_all, b.price, 0.0)) + COALESCE(i.price, 0.0) AS expenses, " +
+
+                " SUM(CASE" +
+                "    WHEN price_all IS NOT NULL THEN price_all" +
+                "    ELSE COALESCE(b.price, 0.0) * count" +
+                " END) + COALESCE(i.price, 0.0) AS expenses, " +
+
                 " COALESCE(i.price, 0.0) AS incubator, " +
-                " SUM(COALESCE(price_all, b.price, 0.0) * count) AS eggs_price, " +
-                " SUM(COALESCE(price_all, b.price, 0.0) * (count - rejected_count)) AS posted_price, " +
-                " SUM(COALESCE(price_all, b.price, 0.0) * rejected_count) AS losses_price, " +
+
+                " SUM(CASE" +
+                "    WHEN price_all IS NOT NULL THEN price_all" +
+                "    ELSE COALESCE(b.price, 0.0) * count" +
+                " END) AS eggs_price, " +
+
+                " SUM(CASE" +
+                "    WHEN price_all IS NOT NULL AND count != 0" +
+                "    THEN price_all * 1.0 / count " +
+                "    ELSE COALESCE(b.price, 0.0) " +
+                " END * (count - rejected_count)) AS posted_price, " +
+
+                " SUM(CASE" +
+                "    WHEN price_all IS NOT NULL AND count != 0" +
+                "    THEN price_all * 1.0 / count" +
+                "    ELSE COALESCE(b.price, 0.0)" +
+                " END  * rejected_count ) AS losses_price, " +
+
                 " SUM(count - rejected_count) AS posted_egg, " +
                 " SUM(rejected_count) AS losses_egg, " +
+
                 " CASE WHEN SUM(count) = 0 THEN 0.0 " +
-                "      ELSE SUM(COALESCE(price_all, b.price, 0.0) * count) / SUM(count) " +
+                "      ELSE " +
+                "        SUM(CASE" +
+                "             WHEN price_all IS NOT NULL THEN price_all" +
+                "             ELSE COALESCE(b.price, 0.0) * count" +
+                "            END) / SUM(count) " +
                 " END AS average_egg_price, " +
                 " CASE WHEN SUM(count - rejected_count) = 0 THEN 0.0 " +
                 "      ELSE SUM(COALESCE(chick_price, 0.0) * (count - rejected_count)) / SUM(count - rejected_count) " +
                 " END AS average_chicks_price, " +
                 " CASE WHEN SUM(count - rejected_count) = 0 THEN 0.0 " +
-                "      ELSE (SUM(count * COALESCE(price_all, b.price, 0.0)) + COALESCE(i.price, 0.0)) / SUM(count - rejected_count)" +
+                "      ELSE " +
+                "        (SUM " +
+                "         (CASE" +
+                "           WHEN price_all IS NOT NULL THEN price_all" +
+                "           ELSE COALESCE(b.price, 0.0) * count" +
+                "         END) + COALESCE(i.price, 0.0)) / SUM(count - rejected_count)" +
                 " END AS cost_chicks_price" +
                 " FROM bookmark_incubator b " +
                 " JOIN incubator_table i ON i.id = :idPT " +
@@ -113,13 +150,34 @@ interface BookmarkDao {
                 " type," +
                 " breed," +
                 " count,  " +
-                " (COALESCE(chick_price, 0.0) * (count - rejected_count)) - (count * COALESCE(price_all, price, 0.0)) AS profit," +
+                " (COALESCE(chick_price, 0.0) * (count - rejected_count)) - " +
+                " (CASE" +
+                "    WHEN price_all IS NOT NULL THEN price_all" +
+                "    ELSE COALESCE(price, 0.0) * count" +
+                " END) as profit," +
+
                 " COALESCE(chick_price, 0.0) * (count - rejected_count) AS income, " +
                 " count - rejected_count AS chicks, " +
-                " count * COALESCE(price_all, price, 0.0) AS expenses, " +
+
+                " CASE" +
+                "    WHEN price_all IS NOT NULL THEN price_all" +
+                "    ELSE COALESCE(price, 0.0) * count" +
+                " END AS expenses, " +
+
                 " COALESCE(CASE WHEN price_all IS NULL THEN price/count ELSE price_all END, 0.0) AS price_one_egg," +
-                " COALESCE(price_all, price, 0.0) * (count - rejected_count) AS posted_price, " +
-                " COALESCE(price_all, price, 0.0) * rejected_count AS losses_price, " +
+
+                " CASE" +
+                "    WHEN price_all IS NOT NULL AND count != 0" +
+                "    THEN price_all * 1.0 / count" +
+                "    ELSE COALESCE(price, 0.0)" +
+                " END  * (count - rejected_count) AS posted_price, " +
+
+                " CASE" +
+                "    WHEN price_all IS NOT NULL AND count != 0" +
+                "    THEN price_all * 1.0 / count" +
+                "     ELSE COALESCE(price, 0.0)" +
+                " END * rejected_count AS losses_price, " +
+
                 " count - rejected_count AS posted_egg, " +
                 " rejected_count AS losses_egg " +
                 " FROM bookmark_incubator " +
@@ -132,7 +190,10 @@ interface BookmarkDao {
     @Query(
         "SELECT " +
                 " SUM(COALESCE(chick_price, 0.0) * (count - rejected_count)) AS income, " +
-                " SUM(count * COALESCE(price_all, b.price, 0.0)) + COALESCE(i.price, 0.0) AS expenses, " +
+                " SUM(CASE" +
+                "      WHEN price_all IS NOT NULL THEN price_all" +
+                "      ELSE COALESCE(b.price, 0.0) * count" +
+                "     END) + COALESCE(i.price, 0.0) AS expenses, " +
                 " SUM(count - rejected_count) AS posted_egg, " +
                 " SUM(rejected_count) AS losses_egg " +
                 " FROM bookmark_incubator b " +

@@ -7,6 +7,6 @@ fun TitleSuffixCategoryDto.toDomainTitleSuffixCategory(): DomainTitleSuffixCateg
     return DomainTitleSuffixCategory(
         title = this.title,
         suffix =  this.suffix,
-        category = this.category,
+        productOrigin = this.productOrigin,
     )
 }

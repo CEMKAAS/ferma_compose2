@@ -174,6 +174,7 @@ class JournalViewModel @Inject constructor(
                 domainActive?.let {
                     bookmarkRepository.update(
                         it.copy(
+                            rejectedCount = it.count,
                             endDate = dateToday(),
                             isActivityBookmark = false
                         )
