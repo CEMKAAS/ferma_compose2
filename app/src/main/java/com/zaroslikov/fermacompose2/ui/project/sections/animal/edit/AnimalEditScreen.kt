@@ -168,6 +168,7 @@ fun AnimalEntryContainer(
             },
             suffixList = suffixWeightDayList,
             isError = false,
+            isNecessarily = false,
             drawableRes = R.drawable.outline_restaurant_24,
             intRes = R.string.outlined_food_day_animals,
             intResSup = if (!state.isAnimalGroup) R.string.support_text_food_day_animal else R.string.support_text_food_day_animals,

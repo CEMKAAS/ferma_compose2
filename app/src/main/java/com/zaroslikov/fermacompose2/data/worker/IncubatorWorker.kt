@@ -1,14 +1,17 @@
 package com.zaroslikov.fermacompose2.data.worker
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -76,8 +79,12 @@ class IncubatorWorker @AssistedInject constructor(
             .setAutoCancel(true)
             .build()
 
-        NotificationManagerCompat.from(context)
-            .notify(System.currentTimeMillis().toInt(), notification)
+        if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+            NotificationManagerCompat.from(context)
+                .notify(System.currentTimeMillis().toInt(), notification)
     }
 
     fun createPendingIntent(appContext: Context, projectId: Long): PendingIntent {

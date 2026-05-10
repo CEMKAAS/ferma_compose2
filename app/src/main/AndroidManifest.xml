@@ -8,7 +8,10 @@
     <uses-feature
         android:name="android.hardware.camera.flash"
         android:required="false" />
-<!--    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <!--    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
 <!--    <uses-permission android:name="android.permission.QUICKBOOT_POWERON" />-->
 
     <application

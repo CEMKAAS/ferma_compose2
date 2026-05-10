@@ -295,6 +295,7 @@ fun MainSettingsCard(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
+                            maxItemsInEachRow = 4,
                             itemVerticalAlignment = Alignment.CenterVertically
                         ) {
                             iconList.forEachIndexed { index, icon ->
@@ -523,7 +524,7 @@ private fun ImageCard(
     val (borderColor, containerColor) = if (isSelected) green_6 to price_green_2
     else grey_2 to white
     BorderCard(
-        padding = PaddingValues(17.dp),
+        padding = PaddingValues(16.dp),
         borderColor = borderColor,
         containerColor = containerColor,
         onClick = onClick
@@ -531,7 +532,7 @@ private fun ImageCard(
         Image(
             painter = image,
             contentDescription = null,
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier.size(34.dp)
         )
     }
 }

@@ -1,14 +1,17 @@
 package com.zaroslikov.fermacompose2.data.worker
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -54,16 +57,14 @@ class ProjectWorker @AssistedInject constructor(
         val channelId = "project_channel"
         val text = "Проверьте инкубатор"
         Log.i("work_incubator", "Notification channel created: $channelId")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                text,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply { description = "Напоминания по активным проектам" }
+        val channel = NotificationChannel(
+            channelId,
+            text,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply { description = "Напоминания по активным проектам" }
 
-            context.getSystemService(NotificationManager::class.java)
-                ?.createNotificationChannel(channel)
-        }
+        context.getSystemService(NotificationManager::class.java)
+            ?.createNotificationChannel(channel)
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_new_logo)
@@ -75,8 +76,13 @@ class ProjectWorker @AssistedInject constructor(
             .setAutoCancel(true)
             .build()
 
-        NotificationManagerCompat.from(context)
-            .notify(System.currentTimeMillis().toInt(), notification)
+        if (
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+            NotificationManagerCompat.from(context)
+                .notify(System.currentTimeMillis().toInt(), notification)
     }
 
     fun createPendingIntent(appContext: Context, projectId: Long): PendingIntent {
@@ -87,9 +93,7 @@ class ProjectWorker @AssistedInject constructor(
         }
 
         var flags = PendingIntent.FLAG_UPDATE_CURRENT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            flags = flags or PendingIntent.FLAG_IMMUTABLE
-        }
+        flags = flags or PendingIntent.FLAG_IMMUTABLE
 
         return PendingIntent.getActivity(
             appContext,
