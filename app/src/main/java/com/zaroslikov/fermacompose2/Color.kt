@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 val green_shamrock = Color(0xFF009966)
 val alabaster = Color(0xFFECFDF5)
 val ghostly_white = Color(0xFFF9FAFB)
+val vkColor = Color(0xFF0077FF)
 val white = Color(0xFFFFFFFF)
 val marengo = Color(0xFF4A5565)
 val dark = Color(0xFF364153)

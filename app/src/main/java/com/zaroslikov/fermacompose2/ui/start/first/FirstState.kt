@@ -14,6 +14,7 @@ data class FirstState(
     val isArchive: Boolean = false,
     val isOpenArchiveIncubatorBottomSheet: Boolean = false,
     val isOpenDeleteBottomSheet: Boolean = false,
+    val isOpenDownloadingUpdate: Boolean = false,
     val currentProjectTable: DomainProjectTable? = null,
     val appSettings: DomainAppSettings = DomainAppSettings(),
     val isFirstLaunch : Boolean = false,

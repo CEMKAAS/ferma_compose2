@@ -2,7 +2,12 @@
 
 package com.zaroslikov.fermacompose2.ui.start.aboutApp
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -66,6 +71,8 @@ import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.core.net.toUri
+import com.zaroslikov.fermacompose2.red_7
+import com.zaroslikov.fermacompose2.vkColor
 import io.appmetrica.analytics.AppMetrica
 
 object AboutAppDestination : NavigationDestination {
@@ -174,14 +181,35 @@ private fun ContactCard() {
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            val email = stringResource(R.string.about_app_screen_email_website)
+            val emailError = stringResource(R.string.about_app_screen_email_error_s).format(email)
             Contact(
                 titleRes = R.string.about_app_screen_email,
-                supportText = "s.zaroslikov@yandex.ru",
+                supportText = email,
                 icon = R.drawable.baseline_email_24,
-                color = red_15,
-                colorIcon = red_14
+                color = red_7,
+                colorIcon = white
             ) {
                 AppMetrica.reportEvent("Переход в почту")
+                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:")
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                }
+
+                if (emailIntent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(emailIntent)
+                } else {
+                    val clipboard =
+                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Email", email)
+                    clipboard.setPrimaryClip(clip)
+
+                    Toast.makeText(
+                        context,
+                        emailError,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
             /*Contact(
                 titleRes = R.string.about_app_screen_telegram,
@@ -192,16 +220,29 @@ private fun ContactCard() {
             ) {
                 AppMetrica.reportEvent("Переход в телеграмм")
             }*/
+            val vkWebsite = stringResource(R.string.about_app_screen_vk_website_url)
+            val vkVideoWebsite = stringResource(R.string.about_app_screen_vk_video_website_url)
             Contact(
                 titleRes = R.string.about_app_screen_vk,
-                supportText = "vk.com/myfermaapp",
+                supportText = stringResource(R.string.about_app_screen_vk_website),
                 icon = R.drawable.vk_logo_white,
-                color = blue_13,
-                colorIcon = blue_18
+                color = vkColor,
+                colorIcon = white
             ) {
-                val intent = Intent(Intent.ACTION_VIEW, "https://vk.com/myfermaapp".toUri())
+                val intent = Intent(Intent.ACTION_VIEW, vkWebsite.toUri())
                 context.startActivity(intent)
                 AppMetrica.reportEvent("Переход в группу ВК")
+            }
+            Contact(
+                titleRes = R.string.about_app_screen_vk_video,
+                supportText = stringResource(R.string.about_app_screen_vk_video_website),
+                icon = R.drawable.icon_vk_video,
+                color = vkColor,
+                colorIcon = white
+            ) {
+                val intent = Intent(Intent.ACTION_VIEW, vkVideoWebsite.toUri())
+                context.startActivity(intent)
+                AppMetrica.reportEvent("Переход на видеоуроки")
             }
         }
     }

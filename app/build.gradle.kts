@@ -27,8 +27,8 @@ android {
         applicationId = "com.zaroslikov.fermacompose2"
         minSdk = 26
         targetSdk = 36
-        versionCode = 17 //12
-        versionName = "beta-v3.0.0g"
+        versionCode = 18 //12
+        versionName = "beta-v3.0.3v"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -42,6 +42,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+           /* signingConfig = signingConfigs.getByName("debug")*/
         }
     }
     compileOptions {
@@ -100,6 +101,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
+    implementation("androidx.core:core-splashscreen:1.2.0")
+
     //Room
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
     implementation("androidx.core:core-ktx:1.12.0")
@@ -115,31 +118,26 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
 
     // Ads
-    implementation("com.yandex.android:mobileads:8.0.0")
-    implementation("com.yandex.android:mobileads-compose:8.0.0")
+    implementation(libs.mobileads)
+    implementation(libs.mobileads.compose)
 
     //Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
     // AppMetrica SDK.
-    implementation("io.appmetrica.analytics:analytics:8.1.0")
+    implementation(libs.analytics)
 
     // Hilt
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation("androidx.hilt:hilt-work:1.3.0")
+    implementation(libs.androidx.hilt.work)
 
     //RuStore SDK
-    implementation("ru.rustore.sdk:appupdate:7.0.0")
+    implementation(libs.appupdate)
 
 }
-/*java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}*/
 
 fun isDebugBuild(): Boolean {
     return gradle.startParameter.taskNames.any { it.contains("Debug") }

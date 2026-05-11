@@ -390,9 +390,8 @@ private fun TransactionList(
                         price = it.price,
                         suffixCurrency = suffixCurrency,
                         date = it.date,
-                        positive = it.price > 0,
-
-                        )
+                        positive = it.price > 0
+                    )
                 }
             }
         } else Text(
@@ -452,11 +451,12 @@ fun TransactionFinanceCard(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        val (sign, color) = if (positive) "+" to price_green else "" to error_base
                         Text(
-                            "${price.formatNumber()} ${stringResource(suffixCurrency.toResId())}",
+                            "$sign${price.formatNumber()} ${stringResource(suffixCurrency.toResId())}",
                             textAlign = TextAlign.Center,
                             style = textBold_16,
-                            color = if (positive) price_green else error_base
+                            color = color
                         )
                         date?.let {
                             Row(

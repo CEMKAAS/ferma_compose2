@@ -276,6 +276,7 @@ private fun AnimalEntryBottomSheet(
             },
             supportTextRes = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_price_animal,
             supportTextResAutoCal = R.string.support_text_price_animal,
+            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
             isManyCount = state.isAnimalGroup,
             count = state.count,
             countSuffix = state.countSuffix,

@@ -233,8 +233,8 @@ class AnimalCountViewModel @Inject constructor(
             val confirmed = awaitConfirmationIfNeeded(isError)
             if (confirmed) {
                 mainAction()
-                loadDataForEntryOrEdit(false, null)
                 showSnackbar(transaction)
+                loadDataForEntryOrEdit(false, null)
                 transferToIndividual()
             }
         }
@@ -258,6 +258,7 @@ class AnimalCountViewModel @Inject constructor(
             animalCountRepository.insertAnimalCountTable(domainAnimalCount())
             animalRepository.updateAnimalTable(getState().animal.copy(group = true))
             yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
+            showSnackbar(Transaction.INSERT)
             loadDataForEntryOrEdit(false, null)
             transferToIndividual()
         }

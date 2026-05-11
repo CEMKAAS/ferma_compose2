@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.start.first
 
+import android.app.Activity
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -11,18 +13,27 @@ import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
 import com.zaroslikov.fermacompose2.BuildConfig
+import com.zaroslikov.fermacompose2.Event
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import ru.rustore.sdk.appupdate.listener.InstallStateUpdateListener
+import ru.rustore.sdk.appupdate.manager.RuStoreAppUpdateManager
+import ru.rustore.sdk.appupdate.manager.factory.RuStoreAppUpdateManagerFactory
+import ru.rustore.sdk.appupdate.model.AppUpdateOptions
+import ru.rustore.sdk.appupdate.model.AppUpdateType
+import ru.rustore.sdk.appupdate.model.InstallStatus
+import ru.rustore.sdk.appupdate.model.UpdateAvailability
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,11 +43,12 @@ class FirstViewModel @Inject constructor(
     private val workManagerRepository: WorkManagerRepository,
     private val timeNotificationIncubatorRepository: TimeNotificationIncubatorRepository,
     private val timeNotificationProjectRepository: TimeNotificationProjectRepository,
-    private val appSettingsRepository: AppSettingsRepository
+    private val appSettingsRepository: AppSettingsRepository,
 ) : BaseViewModel2<FirstState, FirstIntent, FirstReducer>(
     FirstState(),
     FirstReducer()
 ) {
+
     private val _notification = MutableSharedFlow<UiNotification>()
     val notification = _notification.asSharedFlow()
 
@@ -225,4 +237,5 @@ class FirstViewModel @Inject constructor(
     private suspend fun updateSettings(domainAppSettings: DomainAppSettings? = null) {
         appSettingsRepository.updateAppSettings(domainAppSettings ?: getState().appSettings)
     }
+
 }

@@ -315,14 +315,14 @@ fun FermaCompose2Theme(
           darkTheme -> darkScheme
           else -> lightScheme2
       }*/
-    val view = LocalView.current
+  /*  val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            WindowCompat.setDecorFitsSystemWindows(window, false)
+            WindowCompat.setDecorFitsSystemWindows(window, true)
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
-    }
+    }*/
 
     MaterialTheme(
         colorScheme = lightScheme2,

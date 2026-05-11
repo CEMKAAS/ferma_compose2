@@ -40,7 +40,17 @@
           <theme>@style/Theme.FermaCompose2</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/chatgpt_image_1_____2026_____13_01_10_3__vectorized_.xml">
+        <config>
+          <theme>@style/Theme.FermaCompose2</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_launcher_foreground.xml">
+        <config>
+          <theme>@style/Theme.FermaCompose2</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/icon.xml">
         <config>
           <theme>@style/Theme.FermaCompose2</theme>
         </config>
@@ -51,6 +61,11 @@
         </config>
       </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/icon_list.xml">
+        <config>
+          <theme>@style/Theme.FermaCompose2</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/icon_splash_screen.xml">
         <config>
           <theme>@style/Theme.FermaCompose2</theme>
         </config>
@@ -66,24 +81,45 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="35cfaaea-37a9-4a28-bf38-7617cc438d50" name="Changes" comment="Add RuStore SDK">
+    <list default="true" id="35cfaaea-37a9-4a28-bf38-7617cc438d50" name="Changes" comment="update dependencies">
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/chatgpt_image_1_____2026_____13_01_10_3__vectorized_.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/icon.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/icon_splash_screen.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/icon_vk_video.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/config.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/worker/IncubatorWorker.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/worker/IncubatorWorker.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/worker/ProjectWorker.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/data/worker/ProjectWorker.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/edit/AnimalEditScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/edit/AnimalEditScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/warehouse/warehouseEditScreen/WarehouseEditScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/warehouse/warehouseEditScreen/WarehouseEditScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/data/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/Color.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/Color.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InventoryApp.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InventoryApp.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InvertoryAppViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/InvertoryAppViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/finance/category/FinaceCategory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/finance/category/FinaceCategory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/finance/main_screen/FinanceScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/finance/main_screen/FinanceScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/BaseSectionContainer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/BaseSectionContainer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/AnimalCountViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/AnimalCountViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetExpensesAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetExpensesAnimal.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetIncubatorAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetIncubatorAnimal.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetSaleAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetSaleAnimal.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetWriteOffAnimal.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count/BottomSheetWriteOffAnimal.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/list_screen/AnimalListScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/list_screen/AnimalListScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/ExpensesViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/expenses/list_screen/ExpensesViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/aboutApp/AboutApp.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/aboutApp/AboutApp.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstIntent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstIntent.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstReducer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstReducer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/start/first/FirstViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/theme/Theme.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/zaroslikov/fermacompose2/ui/theme/Theme.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values-v23/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values-v23/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values-v23/themes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values-v23/themes.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/ExpensesDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/com/zaroslikov/data/room/dao/ExpensesDao.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,6 +177,7 @@
     <option name="KEY_STORE_PATH" value="$USER_HOME$/Desktop/Мое Хозяйство 2/Ключи/MyFerma2Key.jks" />
     <option name="KEY_ALIAS" value="key0" />
     <option name="REMEMBER_PASSWORDS" value="true" />
+    <option name="BUILD_TARGET_KEY" value="apk" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -178,57 +215,58 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Android App.app.executor&quot;: &quot;Run&quot;,
-    &quot;ApkExportedModule&quot;: &quot;FermaCompose2.app&quot;,
-    &quot;BundleExportedModule&quot;: &quot;FermaCompose2.app&quot;,
-    &quot;ExportApk.ApkPathForFermaCompose2.app&quot;: &quot;/Users/semyon/Desktop/new realese&quot;,
-    &quot;ExportBundle.BundlePathForFermaCompose2.app&quot;: &quot;/Users/semyon/Desktop&quot;,
-    &quot;PROJECT_TRUSTED_KEY&quot;: &quot;true&quot;,
-    &quot;ResourceManagerPrefKey.ModuleName&quot;: &quot;FermaCompose2.app.main&quot;,
-    &quot;ResourceManagerPrefKey.ResourceType&quot;: &quot;DRAWABLE&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ScreenRecorder.SavePath&quot;: &quot;C:\\Users\\zaros\\OneDrive\\Desktop&quot;,
-    &quot;ScreenshotViewer.SavePath&quot;: &quot;C:/Users/zaros/OneDrive/Desktop/Scrin&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;com.android.tools.idea.streaming.emulator.frame.visible&quot;: &quot;false&quot;,
-    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;new__desing&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_directory_selection&quot;: &quot;D:/Work/_Project/ferma_compose2/app/build/generated/ksp/debug/java/com/zaroslikov/fermacompose2&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/semyon/StudioProjects/ferma_compose2/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Dependencies&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.17&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;memory.settings&quot;,
-    &quot;two.files.diff.last.used.file&quot;: &quot;D:/Work/_Project/ferma_compose2/data/src/main/java/com/zaroslikov/data/room/converter/CategoryConverter.kt&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Android App.app.executor": "Run",
+    "ApkExportedModule": "FermaCompose2.app",
+    "BundleExportedModule": "FermaCompose2.app",
+    "ExportApk.ApkPathForFermaCompose2.app": "/Users/semyon/Desktop/new realese",
+    "ExportBundle.BundlePathForFermaCompose2.app": "/Users/semyon/Desktop",
+    "Gradle.Download Sources.executor": "Run",
+    "PROJECT_TRUSTED_KEY": "true",
+    "ResourceManagerPrefKey.ModuleName": "FermaCompose2.app.main",
+    "ResourceManagerPrefKey.ResourceType": "DRAWABLE",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ScreenRecorder.SavePath": "C:\\Users\\zaros\\OneDrive\\Desktop",
+    "ScreenshotViewer.SavePath": "C:/Users/zaros/OneDrive/Desktop/Scrin",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "com.android.tools.idea.streaming.emulator.frame.visible": "false",
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "git-widget-placeholder": "new__desing",
+    "kotlin-language-version-configured": "true",
+    "last_directory_selection": "D:/Work/_Project/ferma_compose2/app/build/generated/ksp/debug/java/com/zaroslikov/fermacompose2",
+    "last_opened_file_path": "/Users/semyon/StudioProjects/ferma_compose2/app/src/main/java/com/zaroslikov/fermacompose2/ui/project/sections/animal/indicators/count",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.17",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "memory.settings",
+    "two.files.diff.last.used.file": "D:/Work/_Project/ferma_compose2/data/src/main/java/com/zaroslikov/data/room/converter/CategoryConverter.kt"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;ExportApk.BuildVariants&quot;: [
-      &quot;release&quot;
+  "keyToStringList": {
+    "ExportApk.BuildVariants": [
+      "release"
     ],
-    &quot;com.android.tools.idea.sqlite.queryhistory&quot;: [
-      &quot;SELECT an.id, an.name, an.type, an.date, an.date_factory as dateFactory, an.is_group, an.sex, an.food_day,an.food_day_suffix, ac.count AS count, ac.suffix AS suffix,an.archive,an.image_path,an.icon FROM animal_table an LEFT JOIN ANIMAL_COUNT_TABLE ac ON ac.id = (    SELECT MAX(id)    FROM ANIMAL_COUNT_TABLE    WHERE animal_id = an.id ) WHERE an.idPT = '1' ORDER BY an.id DESC&quot;,
-      &quot;SELECT  title, type, breed, count,   (COALESCE(chick_price, 0.0) * (count - rejected_count)) - (count * COALESCE(price_all, price, 0.0)) AS profit, COALESCE(chick_price, 0.0) * (count - rejected_count) AS income,  count - rejected_count AS chicks,  count * COALESCE(price_all, price, 0.0) AS expenses,  COALESCE(CASE WHEN price_all IS NULL THEN price/count ELSE price_all END, 0.0) AS price_one_egg, COALESCE(price_all, price, 0.0) * (count - rejected_count) AS posted_price,  COALESCE(price_all, price, 0.0) * rejected_count AS losses_price,  count - rejected_count AS posted_egg,  rejected_count AS losses_egg  FROM bookmark_incubator  WHERE is_activity_bookmark = 0 AND idPT = '1'  ORDER BY strftime('%Y-%m-%d', substr(end_date, 7, 4) || '-' || substr(end_date, 4, 2) || '-' || substr(end_date, 1, 2)) DESC, id DESC&quot;,
-      &quot;SELECT * FROM app_settings_table WHERE id=1&quot;,
-      &quot;SELECT  base.count AS count, base.suffix AS suffix FROM (    SELECT count AS count, count_suffix AS suffix     FROM add_table     WHERE idPT = '1' AND title = '22'     UNION ALL     SELECT -count AS count, count_suffix as suffix     FROM sale_table     WHERE idPT = '1' AND title = '22' and animal_count_id IS NULL and animal_id IS NULL     UNION ALL     SELECT  -count AS count, count_suffix as suffix     FROM write_off_table     WHERE idPT = '1' AND title = '22'  and animal_count_id IS NULL ) AS base &quot;,
-      &quot;SELECT title, count, suffix  FROM (        SELECT title, count , suffix FROM (  SELECT title, count as count, count_suffix AS suffix FROM add_table WHERE idPT='1' UNION All  SELECT title, -count as count, count_suffix AS suffix  FROM sale_table WHERE idPT='1'  and animal_count_id IS NULL and animal_id IS NULL UNION All SELECT title, -count as count, count_suffix AS suffix FROM write_off_table WHERE idPT='1' and animal_count_id IS NULL) )&quot;
+    "com.android.tools.idea.sqlite.queryhistory": [
+      "SELECT an.id, an.name, an.type, an.date, an.date_factory as dateFactory, an.is_group, an.sex, an.food_day,an.food_day_suffix, ac.count AS count, ac.suffix AS suffix,an.archive,an.image_path,an.icon FROM animal_table an LEFT JOIN ANIMAL_COUNT_TABLE ac ON ac.id = (    SELECT MAX(id)    FROM ANIMAL_COUNT_TABLE    WHERE animal_id = an.id ) WHERE an.idPT = '1' ORDER BY an.id DESC",
+      "SELECT  title, type, breed, count,   (COALESCE(chick_price, 0.0) * (count - rejected_count)) - (count * COALESCE(price_all, price, 0.0)) AS profit, COALESCE(chick_price, 0.0) * (count - rejected_count) AS income,  count - rejected_count AS chicks,  count * COALESCE(price_all, price, 0.0) AS expenses,  COALESCE(CASE WHEN price_all IS NULL THEN price/count ELSE price_all END, 0.0) AS price_one_egg, COALESCE(price_all, price, 0.0) * (count - rejected_count) AS posted_price,  COALESCE(price_all, price, 0.0) * rejected_count AS losses_price,  count - rejected_count AS posted_egg,  rejected_count AS losses_egg  FROM bookmark_incubator  WHERE is_activity_bookmark = 0 AND idPT = '1'  ORDER BY strftime('%Y-%m-%d', substr(end_date, 7, 4) || '-' || substr(end_date, 4, 2) || '-' || substr(end_date, 1, 2)) DESC, id DESC",
+      "SELECT * FROM app_settings_table WHERE id=1",
+      "SELECT  base.count AS count, base.suffix AS suffix FROM (    SELECT count AS count, count_suffix AS suffix     FROM add_table     WHERE idPT = '1' AND title = '22'     UNION ALL     SELECT -count AS count, count_suffix as suffix     FROM sale_table     WHERE idPT = '1' AND title = '22' and animal_count_id IS NULL and animal_id IS NULL     UNION ALL     SELECT  -count AS count, count_suffix as suffix     FROM write_off_table     WHERE idPT = '1' AND title = '22'  and animal_count_id IS NULL ) AS base ",
+      "SELECT title, count, suffix  FROM (        SELECT title, count , suffix FROM (  SELECT title, count as count, count_suffix AS suffix FROM add_table WHERE idPT='1' UNION All  SELECT title, -count as count, count_suffix AS suffix  FROM sale_table WHERE idPT='1'  and animal_count_id IS NULL and animal_id IS NULL UNION All SELECT title, -count as count, count_suffix AS suffix FROM write_off_table WHERE idPT='1' and animal_count_id IS NULL) )"
     ],
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;KND&quot;
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "KND"
     ]
   }
-}</component>
+}]]></component>
   <component name="PsdUISettings">
     <option name="MODULE_TAB" value="Signing Configs" />
     <option name="LAST_EDITED_SIGNING_CONFIG" value="debug" />
@@ -672,7 +710,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778361609111</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="update dependencies">
+      <option name="closed" value="true" />
+      <created>1778440043105</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1778440043105</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -721,7 +767,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add AnimalCount" />
     <MESSAGE value="Fix FinanceScreen.kt" />
     <MESSAGE value="want add FabMenu" />
     <MESSAGE value="Validation Count Animal" />
@@ -746,7 +791,8 @@
     <MESSAGE value="Check migration" />
     <MESSAGE value="Migration_4_5" />
     <MESSAGE value="Add RuStore SDK" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add RuStore SDK" />
+    <MESSAGE value="update dependencies" />
+    <option name="LAST_COMMIT_MESSAGE" value="update dependencies" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -769,12 +815,12 @@
         </entry>
         <entry key="com.zaroslikov.fermacompose2">
           <value>
-            <CheckInfo lastCheckTimestamp="1778439206271" />
+            <CheckInfo lastCheckTimestamp="1778525822464" />
           </value>
         </entry>
         <entry key="com.zaroslikov.fermacompose2.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1778439206270" />
+            <CheckInfo lastCheckTimestamp="1778525822465" />
           </value>
         </entry>
       </map>

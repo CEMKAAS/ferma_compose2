@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
@@ -91,9 +92,9 @@ class ExpensesViewModel @Inject constructor(
                 settingsRepository.getSettings(itemIdPT)
             ) { addList, settings ->
                 val brieflyList = brieflyList(addList, settings)
-                Triple(addList, brieflyList, settings)
-            }.collectLatest { (addList, briefly, settings) ->
                 val expensesList = addList.map { it.toUi() }
+                Triple(expensesList, brieflyList, settings)
+            }.collectLatest { (expensesList, briefly, settings) ->
                 val currentDetail = getState().currentDetail
                 updateState { state ->
                     state.copy(
@@ -176,14 +177,14 @@ class ExpensesViewModel @Inject constructor(
                 val animalDeferred = async {
                     updateAnimalList(domain?.id)
                 }
-
+                val animalList = animalDeferred.await().map { it.toUi() }
                 val baseState = ExpensesEntryState2(
                     itemIdPT = itemIdPT,
                     category = resourceProvider.getString(R.string.support_text_no_category),
                     pickList = PickExpensesList(
                         titleList = titleDeferred.await(),
                         categoryList = categoryDeferred.await(),
-                        animalList2 = animalDeferred.await().map { it.toUi() }
+                        animalList2 = animalList
                     )
                 )
                 domain?.let { baseState.toUiMap(it) } ?: baseState

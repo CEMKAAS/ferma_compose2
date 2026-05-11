@@ -37,6 +37,8 @@
     //AdsSupportText
     <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите пожалуйста...</string>
 
+    //Update App
+    <string name="update_app_load_update">Идет загрузка обрновления , подождите пожалуйста...</string>
 
     // BottomBarProject
     <string name="bottom_bar_magazine">Журнал</string>
@@ -338,7 +340,7 @@
 
     <string name="training_screen_main_finance_title">Финансы</string>
     <string name="training_screen_main_finance_title_sup">Контролируйте доходы и расходы</string>
-    <string name="training_screen_main_finance_row_1">Аналитика прибыли и убытковс\</string>
+    <string name="training_screen_main_finance_row_1">Аналитика прибыли и убытков</string>
     <string name="training_screen_main_finance_row_2">Отслеживание доходов и расходов</string>
     <string name="training_screen_main_finance_row_3">Сохраненные и потерянные средства</string>
     <string name="training_screen_main_finance_row_4">Детальная финансовая отчетность</string>
@@ -377,8 +379,15 @@
     <string name="about_app_screen_developer_zaroslikov">Разработчик: Заросликов Семён Николаевич</string>
     <string name="about_app_screen_contacts">Контакты</string>
     <string name="about_app_screen_email">Email поддержка</string>
+    <string name="about_app_screen_email_website">s.zaroslikov@yandex.ru</string>
+    <string name="about_app_screen_email_error_s">Email скопирован в буфер обмена:%s</string>
     <string name="about_app_screen_telegram">Telegram</string>
     <string name="about_app_screen_vk">Группа в VK</string>
+    <string name="about_app_screen_vk_video">Видеоуроки</string>
+    <string name="about_app_screen_vk_website">vk.com/myfermaapp</string>
+    <string name="about_app_screen_vk_website_url">https://vk.com/myfermaapp</string>
+    <string name="about_app_screen_vk_video_website">VK Видео</string>
+    <string name="about_app_screen_vk_video_website_url">https://vkvideo.ru/@myfermaapp/playlists</string>
     <string name="about_app_screen_love_part_1">Создано с</string>
     <string name="about_app_screen_love_part_2">для фермеров</string>
     <string name="about_app_screen_help_us_title">Помогите нам стать лучше!</string>
@@ -418,7 +427,7 @@
     <string name="settings_screen_warning">Внимание!</string>
     <string name="settings_screen_confirm_action">Подтвердите действие</string>
     <string name="settings_screen_import_data_title">Импорт данных заменит все текущие проекты и настройки.</string>
-    <string name="settings_screen_import_data_text">Рекомендуем сначала создать резервную копию через "Экспорт данных". Это действие нельзя отменить.</string>
+    <string name="settings_screen_import_data_text">Рекомендуем сначала создать резервную копию через \"Экспорт данных\". Это действие нельзя отменить.</string>
     <string name="settings_screen_confirm_and_select_file">Подтвердить и выбрать файл</string>
 
     <string name="settings_screen_warning_delete">Опасное действие!</string>
@@ -527,7 +536,7 @@
     <string name="entry_bookmark_error_reject_count">В инкубаторе нет столько яиц</string>
     <string name="entry_bookmark_support_text_all_price">Укажите цену за яйца</string>
     <string name="entry_bookmark_support_text_price">Укажите цену за яйцо</string>
-    <string name="entry_bookmark_tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за все яйца, а за одно яйцо. При этом сохранится общая сумма.</string>
+    <string name="entry_bookmark_tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за все яйца, а за одно яйцо. При этом сохранится общая сумма и за одну единицу.</string>
 
     //TypeEgg
     <string name="type_egg_chickens">Курицы</string>
@@ -642,7 +651,7 @@
     <string name="journal_screen_activate_this_bookmark_now_s">Если вы активируете эту закладку (%s) сейчас:</string>
     <string name="journal_screen_delete_this_bookmark_now_s">Вы действительно хотите удалить эту закладку (%s)?</string>
     <string name="journal_screen_activate_bookmark_end">Активная закладка завершится</string>
-    <string name="journal_screen_activate_bookmark_end_sup">Текущая активная закладка будет автоматически переведена в статус "Завершена"</string>
+    <string name="journal_screen_activate_bookmark_end_sup">Текущая активная закладка будет автоматически переведена в статус \"Завершена\"</string>
     <string name="journal_screen_new_date">Новый отсчет с текущего дня</string>
     <string name="journal_screen_new_date_sup">Выбранная закладка станет активной, и период инкубации начнется с сегодняшнего дня</string>
     <string name="journal_screen_delete_title">Действие необратимо</string>
@@ -931,18 +940,19 @@
     <string name="snackbar_vaccine_update">Вакцинация обновлена на: %1$s</string>
     <string name="snackbar_vaccine_delete">Вакцинация %1$s удалена</string>
 
-    <string name="snackbar_count_add">Количество %1$s %2$s  добавлено</string>
-    <string name="snackbar_count_update">Количество обновлено на: %1$s %2$s</string>
-    <string name="snackbar_count_delete">Количество удалено</string>
+    <string name="snackbar_count_add">Добавлена запись изменения количества на: %1$s %2$s</string>
+    <string name="snackbar_count_update">Запись количества обновлено на: %1$s %2$s</string>
+    <string name="snackbar_count_delete">Запись о количестве удалена</string>
 
     <string name="snackbar_animal_sex">Пол изменен</string>
 
 
     //Tooltip
     <string name="tooltip_animals_born">Дата рождения является приоритетной для расчета возраста</string>
-    <string name="tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за всё поголовье, а за одно животное. При этом сохранится общая сумма.</string>
+    <string name="tooltip_auto_calculate_price">В случае активации этой опции необходимо указать стоимость не за всё весь товар, а за одну его единицу.</string>
     <string name="tooltip_auto_calculate_weight">В случае активации этой опции необходимо указать вес не за весь товар, а за одну единицу. При этом расчет корма будет прозводится по общей сумме.</string>
     <string name="tooltip_auto_calculate_kill">В случае активации этой опции необходимо указать кол-во товара не за всё поголовье, а за одно животное. При этом сохранится общая сумма товара.</string>
+    <string name="tooltip_auto_calculate_animal">В случае активации этой опции необходимо указать стоимость животных не за всё поголовье, а за одну голову. При этом сохранится общая сумма и за одну голову.</string>
     <string name="tooltip_weight_big_kill">Предупреждение!\nВес товаров больше, чем вес животного</string>
     <string name="tooltip_weight_big_average_kill">Предупреждение!\nВес товаров больше, чем средний вес животных</string>
 
@@ -971,11 +981,11 @@
     <string name="message_no_date_support_write_off">Добавьте товар в разделе "Мои Товар" для списания</string>
     <string name="message_no_date_support_no_write_off">"Нет списаний:(\nНажмите + чтобы добавить\nили",</string>
 
-    <string name="message_no_date_title_animals">Добро пожаловать в раздел "Мои Животные!"</string>
+    <string name="message_no_date_title_animals">Добро пожаловать в раздел \"Мои Животные!\"</string>
     <string name="message_no_date_message_animals">В этом разделе вы можете регистрировать животных, находящихся на вашей ферме! Каждое животное можно добавить как по отдельности, так и в группе. Для группового добавления укажите количество, а для отдельных животных — их вес и размер. Для всех животных необходимо указать имя, вид, информацию о прививках и дополнительные примечания. При добавлении товара в разделе "Мои Товары" внутри карточки животного, если указать конкретное животное, Вы сможете отслеживать объем произведенного им товара.</string>
     <string name="message_no_date_support_text_animals">Сейчас нет животных:(\nНажмите + чтобы добавить\nили</string>
 
-    <string name="message_no_date_title_note">Добро пожаловать в раздел "Мои Заметки!"</string>
+    <string name="message_no_date_title_note">Добро пожаловать в раздел \"Мои Заметки!\"</string>
     <string name="message_no_date_message_note">В этом разделе Вы можете добавлять заметки, по своему хозяйству</string>
     <string name="message_no_date_support_text_note">Сейчас нет заметок:(\nНажмите + чтобы добавить\nили</string>
 
@@ -1132,7 +1142,7 @@
 
     //AnimalEditScreen
     <string name="animal_edit_warning_title">Изменение стоимости и количества</string>
-    <string name="animal_edit_warning_text">Если вы хотите изменить стоимость или количество животных, перейдите в раздел "Количество" в карточке животного.</string>
+    <string name="animal_edit_warning_text">Если вы хотите изменить стоимость или количество животных, перейдите в раздел \"Количество\" в карточке животного.</string>
 
 
     //Finance
@@ -1173,7 +1183,8 @@
     <string name="finance_category_income_text">Здесь отображаются все доходы от продажи продукции вашего хозяйства. Это основной источник вашей прибыли, который формирует денежный поток и влияет на текущий баланс.</string>
 
     <string name="finance_category_profit_title">О балансе и итоге периода</string>
-    <string name="finance_category_profit_text">Текущий баланс — это реальные средства, доступные на вашем счете прямо сейчас.\nИтог периода — это финансовый результат: Доходы минус Расходы плюс Сэкономлено минус Потеряно. Он показывает эффективность хозяйства за выбранный период и может отличаться от баланса.</string>
+    <string name="finance_category_profit_text">Текущий баланс — это реальные средства, доступные на вашем счете прямо сейчас.\nИтог периода — это финансовый результат: \"Доходы\" минус \"Расходы\" плюс \"Сэкономлено\" минус \"Потеряно\". Он показывает эффективность хозяйства за выбранный период и может отличаться от баланса.</string>
+
 
 
     <string name="finance_category_total_sum">Общая сумма</string>
@@ -1213,10 +1224,10 @@
     <string name="animal_card_screen_animal_card_no_vaccination">Прививка не указана</string>
     <string name="animal_card_screen_animal_card_info_kill">Cводка:</string>
     <string name="animal_card_screen_animal_card_info_weight_all">Общий вес:</string>
-    <string name="animal_card_screen_note_kill">Товар был добавлен через "Забой" животного</string>
-    <string name="animal_card_screen_note_sale">Товар был продан через "Продажу" животного</string>
-    <string name="animal_card_screen_note_write_off">Товар был списан через "Списание" животного</string>
-    <string name="animal_card_screen_note_expenses">Товар был куплен через "Покупку" животных</string>
+    <string name="animal_card_screen_note_kill">Товар был добавлен через \"Забой\" животного</string>
+    <string name="animal_card_screen_note_sale">Товар был продан через \"Продажу\" животного</string>
+    <string name="animal_card_screen_note_write_off">Товар был списан через \"Списание\" животного</string>
+    <string name="animal_card_screen_note_expenses">Товар был куплен через \"Покупку\" животных</string>
     <string name="animal_card_screen_category_kill">Забой</string>
     <string name="animal_card_screen_category_sale">Продажа животных</string>
     <string name="animal_card_screen_add_category_expenses">Покупка животных</string>

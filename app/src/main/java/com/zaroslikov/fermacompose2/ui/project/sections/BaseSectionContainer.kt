@@ -137,7 +137,7 @@ fun <T, B> InventoryBody(
                 brieflyCard = brieflyCard,
             )
         else MessageNoData2(
-            modifier = modifier,
+            modifier = modifier.padding(bottom = 16.dp),
             titleRes = R.string.search_section_search_nothing,
             messageRes = R.string.search_section_search_nothing_sup,
             supportSecondText = R.string.search_section_search_nothing_sup_2,
@@ -153,7 +153,7 @@ fun <T, B> InventoryBody(
             if (isArchive) R.string.message_no_data_message_archive_project else support
 
         MessageNoData2(
-            modifier = modifier,
+            modifier = modifier.padding(bottom = 16.dp),
             titleRes = titleRes,
             messageRes = messageRes,
             supportSecondText = supportSecondTextArchive,

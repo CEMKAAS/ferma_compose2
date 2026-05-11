@@ -59,6 +59,7 @@ import com.zaroslikov.fermacompose2.dark
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.green_7
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
@@ -67,6 +68,7 @@ import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.red_10
 import com.zaroslikov.fermacompose2.supportFun.toBorderCard
 import com.zaroslikov.fermacompose2.supportFun.toColorIconBorderSecond
 import com.zaroslikov.fermacompose2.supportFun.toColorIconSecond
@@ -210,7 +212,9 @@ private fun FinanceCategoryBody2(
             suffix = suffix,
             colors = colors,
             isGroup = false,
-            category = category
+            category = category,
+            incomeToExpenses = if (category == FinanceCategory.PROFIT)
+                balanceStructure.income to balanceStructure.expenses else null
         )
         WarningCardByFinanceCategory(
             category = category,
@@ -428,8 +432,10 @@ private fun CurrentBalanceCard(
     category: FinanceCategory,
     colors: List<Color>,
     suffix: Suffix,
-    isGroup: Boolean
+    isGroup: Boolean,
+    incomeToExpenses: Pair<Double, Double>? = null
 ) {
+    val currencySuffix = " ${stringResource(suffix.toResId())}"
     BigColorCard(
         glowColor = colors.first(),
         colors = colors,
@@ -458,7 +464,7 @@ private fun CurrentBalanceCard(
                 )
             }
             Text(
-                text = "${currentBalance.formatNumber()} ${stringResource(suffix.toResId())}",
+                text = currentBalance.formatNumber() + currencySuffix,
                 style = if (!isGroup) text_36 else text_24,
                 color = white
             )
@@ -470,13 +476,56 @@ private fun CurrentBalanceCard(
                     color = Color(0x70FFFFFF)
                 )
             }
+            incomeToExpenses?.let { (income, expenses) ->
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    HorizontalDivider(thickness = 1.dp, color = Color(0x10FFFFFF))
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            listOf(
+                                R.string.finance_income,
+                                R.string.finance_expenses
+                            ).forEach {
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.Center,
+                                    text = stringResource(it),
+                                    style = text_12,
+                                    color = Color(0x50FFFFFF)
+                                )
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            val income = income.formatNumber() + currencySuffix to green_7
+                            val expenses = expenses.formatNumber() + currencySuffix to red_10
+                            listOf(income, expenses).forEach { (value, color) ->
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.Center,
+                                    text = value,
+                                    style = text_14,
+                                    color = color
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun BottomSheet(
-    modifier: Modifier = Modifier,
     list: List<ProductUi2>,
     currentTitleProduct: String,
     currentBalanceProduct: Double,
@@ -582,7 +631,7 @@ private fun BottomSheet(
                             priceSuffix = priceSuffix,
                             category = it.category,
                             statusWriteOff = it.status,
-                            animal = null,
+                           /* animal = null,*/
                             date = it.data,
                             buyer = it.buyer,
                             categoryFinance = it.categoryFinance
@@ -603,7 +652,7 @@ private fun TransitionGroupCard(
     priceSuffix: Suffix = Suffix.PIECES,
     category: String? = null,
     statusWriteOff: Boolean? = null,
-    animal: String? = null,
+   /* animal: String? = null,*/
     date: String,
     buyer: String? = null,
     categoryFinance: FinanceCategory
@@ -688,7 +737,7 @@ private fun BalanceStructureCard(
     expenses: Double,
     ownNeed: Double,
     scrap: Double,
-    price: Double,
+   /* price: Double,*/
     profit: Double,
     suffix: Suffix
 ) {
@@ -829,7 +878,7 @@ private fun WarningCardByFinanceCategory(
                 expenses = balanceStructure.expenses,
                 ownNeed = balanceStructure.ownNeed,
                 scrap = balanceStructure.scrap,
-                price = balanceStructure.currentBalance,
+                /*price = balanceStructure.currentBalance,*/
                 profit = balanceStructure.profit,
                 suffix = suffix
             )

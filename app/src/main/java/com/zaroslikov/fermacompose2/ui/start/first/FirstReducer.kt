@@ -20,6 +20,7 @@ class FirstReducer : BaseReducer<FirstState, FirstIntent>() {
             )
 
             is FirstIntent.SkipTrainingClicked -> state.updateSkipTraining()
+            is FirstIntent.ShowDownloadingUpdate -> state.copy(isOpenDownloadingUpdate = intent.value)
 
             else -> state
         }

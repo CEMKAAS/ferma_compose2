@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.start.first
 
 import com.zaroslikov.domain.models.table.DomainProjectTable
+import com.zaroslikov.fermacompose2.Event
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 
 sealed class FirstIntent() : BaseIntent {
@@ -21,4 +22,6 @@ sealed class FirstIntent() : BaseIntent {
 
     data object ArchiveModeClicked : FirstIntent()
     data class LoadingClicked(val value: Boolean) : FirstIntent()
+
+    data class ShowDownloadingUpdate(val value: Boolean) : FirstIntent()
 }

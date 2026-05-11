@@ -76,6 +76,7 @@ fun BottomSheetIncubatorAnimal(
             isManyCount = true,
             supportTextRes = R.string.support_text_price_animals,
             supportTextResAutoCal = R.string.support_text_price_one_animals,
+            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
             count = state.count,
             countSuffix = state.suffix,
             priceSuffix = currencyPrice

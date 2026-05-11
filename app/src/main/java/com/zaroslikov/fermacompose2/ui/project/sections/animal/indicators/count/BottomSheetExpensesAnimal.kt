@@ -77,6 +77,8 @@ fun BottomSheetExpensesAnimal(
             isManyCount = true,
             supportTextRes = R.string.support_text_price_animals,
             supportTextResAutoCal = R.string.support_text_price_one_animals,
+            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
+
             isNecessarily = true,
             count = state.count,
             countSuffix = state.suffix,

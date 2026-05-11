@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.FermaCompose2" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.FermaCompose2.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/chatgpt_image_1_____2026_____13_01_10_3__vectorized_</item>
+        <item name="postSplashScreenTheme">@style/Theme.FermaCompose2</item>
+    </style>
 </resources>

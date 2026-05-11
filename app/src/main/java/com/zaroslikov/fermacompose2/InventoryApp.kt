@@ -28,6 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,11 +46,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogBase
+import com.zaroslikov.fermacompose2.ui.elements.CircularProgressWitchText
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
 import com.zaroslikov.fermacompose2.utils.SnackbarController
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,13 +65,13 @@ fun InventoryApp(
     viewModel: InventoryAppViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current
-
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val activity = LocalActivity.current
-    viewModel.update(LocalContext.current)
 
     var showSplash by rememberSaveable { mutableStateOf(true) }
+    var adFinished by rememberSaveable { mutableStateOf(false) }
     ObserveAsEvents(
         flow = SnackbarController.events,
         snackbarHostState
@@ -93,14 +98,15 @@ fun InventoryApp(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
-
         Log.i("YandexAds", "isFirst: ${!viewModel.isFirstLaunch}")
         Log.i("YandexAds", "showSplash:  $showSplash")
         if (activity != null && (!viewModel.isFirstLaunch && showSplash))
             SplashScreen(
+                innerPadding = it,
                 activity = activity,
                 onFinished = {
                     showSplash = false
+                    adFinished = true
                 }
             )
         else
@@ -111,6 +117,24 @@ fun InventoryApp(
                 projectId = projectId
             )
 
+        LaunchedEffect(adFinished) {
+            if (adFinished) {
+                viewModel.update()
+            }
+        }
+        if (state.isOpenDownloadingUpdate)
+            LoadUpdate()
+    }
+}
+
+@Composable
+fun LoadUpdate() {
+    AlertDialogBase(
+        onDismissRequest = { }
+    ) {
+        CircularProgressWitchText(
+            intRes = R.string.update_app_load_update
+        )
     }
 }
 

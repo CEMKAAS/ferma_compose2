@@ -83,18 +83,32 @@ interface ExpensesDao {
                 " a.type as type," +
                 " a.food_day AS foodDay," +
                 " a.food_day_suffix AS foodDaySuffix," +
-                " t.count AS countAnimal," +
+                " t.calculatedCount AS countAnimal," +
                 " case when e._id NOT NULL Then e._id  else 0 end as idExpensesAnimal," +
                 " case when e.idAnimal NOT NULL Then 1 else 0 end as ps," +
                 " case when  e.percentExpenses NOT NULL Then e.percentExpenses else 0 end as presentException " +
-                " from animal_table a JOIN (" +
-                "    SELECT animal_id, count" +
-                "    FROM animal_count_table" +
-                "    WHERE id IN (" +
-                "        SELECT MAX(id)" +
-                "        FROM animal_count_table " +
-                "    GROUP by animal_id)" +
-                ") t ON a.id = t.animal_id Left Join ExpensesAnimalTable e On e.idAnimal = a.id and e.idExpenses =:idExpenses Where a.idPT=:id ORDER By ps Desc"
+                " from animal_table a LEFT JOIN (" +
+                "        SELECT" +
+                "            animal_id," +
+                "" +
+                "            CASE" +
+                "                WHEN MAX(version) IS NULL THEN" +
+                "                    COALESCE(MAX(count), 0)" +
+                "" +
+                "                ELSE" +
+                "                    COALESCE(SUM(" +
+                "                        CASE" +
+                "                            WHEN version IN (1,4,5) THEN count" +
+                "                            WHEN version IN (0,2,3) THEN -count" +
+                "                            ELSE 0" +
+                "                        END" +
+                "                    ), 0)" +
+                "            END AS calculatedCount" +
+                "" +
+                "        FROM animal_count_table" +
+                "        GROUP BY animal_id" +
+                "" +
+                "    ) t ON a.id = t.animal_id Left Join ExpensesAnimalTable e On e.idAnimal = a.id and e.idExpenses =:idExpenses Where a.idPT=:id ORDER By ps Desc"
     )
     fun getItemsAnimalExpensesList2(
         id: Long,
