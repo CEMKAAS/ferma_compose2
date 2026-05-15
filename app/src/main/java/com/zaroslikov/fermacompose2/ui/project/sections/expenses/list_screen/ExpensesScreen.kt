@@ -306,7 +306,7 @@ fun ExpensesContainer(
         detailEmptyState = EmptyState(
             title = R.string.message_no_data_title_expenses,
             message = R.string.message_no_data_message_expenses,
-            icon = R.drawable.icon_sale
+            icon = iconRes
         ),
         details = details,
         iconColor = orang_1,

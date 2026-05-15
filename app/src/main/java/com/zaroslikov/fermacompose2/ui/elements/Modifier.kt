@@ -81,9 +81,9 @@ fun Modifier.modifierDialogScreen(isScroll: Boolean): Modifier {
 }
 
 @Composable
-fun Modifier.modifierBottomSheet(isScroll: Boolean = false): Modifier {
+fun Modifier.modifierBottomSheet(isScroll: Boolean = false, paddingValues: PaddingValues = PaddingValues()): Modifier {
     val focusManager = LocalFocusManager.current
-    return this
+    return this.padding(paddingValues)
         /*.then(
             if (isScroll)
                 Modifier.verticalScroll(rememberScrollState())
