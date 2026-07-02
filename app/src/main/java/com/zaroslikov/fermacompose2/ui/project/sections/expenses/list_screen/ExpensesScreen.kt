@@ -71,7 +71,7 @@ fun ExpensesScreen(
         },
         floatingActionButton = {
             if (!state.isArchive)
-                NeonGlowFab(colors = colors) {
+                NeonGlowFab(colors = colors,) {
                     viewModel.onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(true))
                 }
         }

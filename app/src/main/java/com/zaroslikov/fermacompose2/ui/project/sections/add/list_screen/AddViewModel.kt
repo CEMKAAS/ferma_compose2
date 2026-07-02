@@ -12,6 +12,7 @@ import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
+import com.zaroslikov.domain.repository.template.AddTemplateRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
@@ -44,6 +45,7 @@ class AddViewModel @Inject constructor(
     private val resourceProvider: ResourceProvider,
     private val settingsRepository: SettingsRepository,
     private val projectRepository: ProjectRepository,
+    private val addTemplateRepository: AddTemplateRepository,
     private val yandexMetricRepository: YandexMetricRepository
 ) : EntryNewViewModel2<AddListState, AddListIntent, AddListReduce>(
     AddListState(),
@@ -59,12 +61,14 @@ class AddViewModel @Inject constructor(
         sendIntent(intent)
         when (intent) {
             is AddListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(title = intent.title)
-
             is AddListIntent.OpenBottomSheetEntry -> loadDataForEntryOrEdit(
                 intent.isOpen,
                 intent.state,
-                intent.isSaveStateForBottomSheet
+                intent.isSaveStateForBottomSheet,
+                intent.isTemplate
             )
+
+            is AddListIntent.OpenPatternsBottomSheetClick -> loadDataForTemplateBottomSheet(intent.value)
 
             is AddListIntent.TitleChanged -> updateWarehouseUiState(intent.value)
             is AddListIntent.TitleAndSuffix -> updateWarehouseUiState(intent.pair.first)
@@ -144,16 +148,17 @@ class AddViewModel @Inject constructor(
     private fun loadDataForEntryOrEdit(
         isOpen: Boolean,
         domain: DomainAddItemDto?,
-        isSaveStateForBottomSheet: Boolean = false
+        isSaveStateForBottomSheet: Boolean = false,
+        isTemplate: Boolean = false
     ) {
         viewModelScope.launch {
             if (!isOpen) {
                 val state =
                     if (isSaveStateForBottomSheet) getState().currentProduct
                     else AddEntryState2()
-                onIntent(
+                sendIntent(
                     AddListIntent.RefreshEntryBottomSheetState(
-                        false, state, isSaveStateForBottomSheet
+                        false, state, isSaveStateForBottomSheet, isTemplate
                     )
                 )
                 return@launch
@@ -194,6 +199,18 @@ class AddViewModel @Inject constructor(
             updateWarehouseUiStateSync(name)
         }
     }
+
+
+    private fun loadDataForTemplateBottomSheet(
+        isOpen: Boolean
+    ) {
+        viewModelScope.launch {
+            if (!isOpen) return@launch
+            val templateList = addTemplateRepository.getAllAddTemplateItems(itemIdPT).first()
+            sendIntent(AddListIntent.LoadDataForTemplate(templateList))
+        }
+    }
+
 
     private suspend fun updateWarehouseUiStateSync(name: String) {
         val pair = warehouseRepository

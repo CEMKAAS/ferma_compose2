@@ -1,7 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
@@ -12,13 +12,15 @@ sealed class AddListIntent : BaseIntent {
     data class OpenBottomSheetEntry(
         val isOpen: Boolean,
         val state: DomainAddItemDto? = null,
-        val isSaveStateForBottomSheet: Boolean = false
+        val isSaveStateForBottomSheet: Boolean = false,
+        val isTemplate: Boolean = false
     ) : AddListIntent()
 
     data class RefreshEntryBottomSheetState(
         val isOpen: Boolean,
         val state: AddEntryState2,
-        val isSaveStateForBottomSheet: Boolean = false
+        val isSaveStateForBottomSheet: Boolean = false,
+        val isTemplate: Boolean = false
     ) : AddListIntent()
 
     data class RefreshWarehouseCount(val value: List<DomainCountSuffix>) : AddListIntent()
@@ -43,5 +45,9 @@ sealed class AddListIntent : BaseIntent {
     data class SearchChanged(val value: String) : AddListIntent()
     data object Insert : AddListIntent()
     data object Update : AddListIntent()
-    data object  Delete : AddListIntent()
+    data object Delete : AddListIntent()
+
+    data class OpenPatternsBottomSheetClick(val value: Boolean) : AddListIntent()
+    data class LoadDataForTemplate(val value: List<DomainAddTemplateDto>) : AddListIntent()
+    data class OpenQrCodeBottomSheetClick(val value: Boolean) : AddListIntent()
 }

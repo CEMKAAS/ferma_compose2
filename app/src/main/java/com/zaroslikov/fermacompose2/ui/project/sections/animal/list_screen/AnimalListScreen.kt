@@ -129,7 +129,7 @@ fun AnimalListScreen(
         },
         floatingActionButton = {
             if (!state.isArchiveProject)
-                NeonGlowFab(colors = colors) {
+                NeonGlowFab(colors = colors,) {
                     viewModel.onIntent(AnimalListIntent.OpenBottomSheetEntry(true))
                 }
         }

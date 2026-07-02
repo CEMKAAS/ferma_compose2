@@ -71,7 +71,7 @@ fun AnimalVaccinationScreen(
         },
         floatingActionButton = {
             if (!state.isArchive)
-                NeonGlowFab(colors = colors) {
+                NeonGlowFab(colors = colors,) {
                     viewModel.onIntent(
                         AnimalVaccinationIntent.OpenEntryBottomSheetByItem(true)
                     )

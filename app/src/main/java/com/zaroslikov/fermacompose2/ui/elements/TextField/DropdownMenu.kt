@@ -44,6 +44,7 @@ fun DropdownMenuEdit(
     onEditClick: (() -> Unit)? = null,
     onArchiveClick: (() -> Unit)? = null,
     onUnarchiveClick: (() -> Unit)? = null,
+    onCreateQrCodeClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -53,7 +54,6 @@ fun DropdownMenuEdit(
             imageVector = Icons.Default.MoreVert,
             contentDescription = "More"
         )
-
         BaseDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
@@ -74,6 +74,9 @@ fun DropdownMenuEdit(
                 }
                 onArchiveClick?.let {
                     add(MenuItemData("Архивировать", R.drawable.baseline_archive_24, color, it))
+                }
+                onCreateQrCodeClick?.let {
+                    add(MenuItemData("Создать QR-код", R.drawable.outline_qr_code_24, color, it))
                 }
                 onUnarchiveClick?.let {
                     add(
@@ -364,9 +367,10 @@ fun ExposedDropdownMenuPair(
         content = content,
         enableDropMenu = enableDropMenu
     ) { index, item, closeMenu ->
-        val trailingIcon: @Composable (() -> Unit)? = if (item.title == title && item.suffix == suffix && item.productOrigin == productOrigin) {
-            { IconDone() }
-        } else null
+        val trailingIcon: @Composable (() -> Unit)? =
+            if (item.title == title && item.suffix == suffix && item.productOrigin == productOrigin) {
+                { IconDone() }
+            } else null
         DropdownMenuItem(
             leadingIcon = {
                 Icon(

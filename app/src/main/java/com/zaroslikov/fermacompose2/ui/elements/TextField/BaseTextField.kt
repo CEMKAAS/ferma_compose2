@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.elements.TextField
 
 import android.util.Log
+import android.widget.Switch
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -31,10 +32,13 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -88,6 +92,7 @@ fun BaseOutlinedTextNew(
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
 ) {
 
+    val checked by rememberSaveable() { mutableStateOf(false) }
     val isDisabled = !enabled
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -116,7 +121,7 @@ fun BaseOutlinedTextNew(
                     }
                     labelIntRes?.let {
                         Text(
-                            text = stringResource(it) + if(isNecessarily) "*" else "",
+                            text = stringResource(it) + if (isNecessarily) "*" else "",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = text_16,
@@ -184,7 +189,7 @@ fun BaseOutlinedTextNew(
                             .align(Alignment.CenterVertically),
                         textStyle = TextStyle(
                             color = if (isDisabled) Color(0xFF9E9E9E) else Color.Black,
-                            fontSize = 16.sp,
+                            fontSize = 36.sp, //TODO
                             lineHeight = 26.sp
                         ),
                         cursorBrush = SolidColor(Color(0xFF007AFF)),
@@ -216,9 +221,11 @@ fun BaseOutlinedTextNew(
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 // Обязательно делаем innerTextField заполняющим ширину своего контейнера
-                                Box(modifier = Modifier
-                                    .wrapContentWidth()
-                                    .animateContentSize()) {
+                                Box(
+                                    modifier = Modifier
+                                        .wrapContentWidth()
+                                        .animateContentSize()
+                                ) {
                                     innerTextField()
                                 }
                             }
@@ -261,6 +268,7 @@ fun BaseOutlinedTextNew(
 
                 }
             }
+
         }
         AnimatedVisibility(
             modifier = Modifier.fillMaxWidth(),
@@ -273,6 +281,9 @@ fun BaseOutlinedTextNew(
         }
     }
 }
+
+
+
 
 
 @Composable

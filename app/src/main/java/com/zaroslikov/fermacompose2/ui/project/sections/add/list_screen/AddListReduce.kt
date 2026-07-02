@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
+import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -22,11 +23,20 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
                 isOpenEntryBottomSheet = intent.isOpen,
                 entryState2 = intent.state,
-                isSaveStateForEntry = intent.isSaveStateForBottomSheet
+                isSaveStateForEntry = intent.isSaveStateForBottomSheet,
+                isTemplate = intent.isTemplate
             ).updateValid()
 
             is AddListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
             is AddListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
+            is AddListIntent.OpenPatternsBottomSheetClick ->
+                state.updateOpenPatternBottomSheet(intent.value)
+
+            is AddListIntent.LoadDataForTemplate ->
+                state.updateLoadDataForTemplate(intent.value)
+
+            is AddListIntent.OpenQrCodeBottomSheetClick ->
+                state.updateOpenQrCodeBottomSheet(intent.value)
 
             is AddListIntent.TitleChanged -> state.updateTitle(intent.value).updateValid()
             is AddListIntent.TitleAndSuffix -> state.updateTitleAndSuffix(intent.pair).updateValid()
@@ -43,6 +53,24 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
 
             else -> state
         }
+    }
+
+    private fun AddListState.updateOpenPatternBottomSheet(isOpenPatternsBottomSheet: Boolean): AddListState {
+        return copy(
+            isOpenPatternsBottomSheet = isOpenPatternsBottomSheet
+        )
+    }
+
+    private fun AddListState.updateLoadDataForTemplate(domainAddTemplateDtoList: List<DomainAddTemplateDto>): AddListState {
+        return copy(
+            isOpenPatternsBottomSheet = isOpenPatternsBottomSheet
+        )
+    }
+
+    private fun AddListState.updateOpenQrCodeBottomSheet(isOpenQrCodeBottomSheet: Boolean): AddListState {
+        return copy(
+            isOpenQrCodeBottomSheet = isOpenQrCodeBottomSheet
+        )
     }
 
     private fun AddListState.updateOpenBottomSheetDetail(
@@ -160,12 +188,13 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateEntryBottomSheet(
         isOpenEntryBottomSheet: Boolean,
         entryState2: AddEntryState2,
-        isSaveStateForEntry: Boolean
+        isSaveStateForEntry: Boolean,
+        isTemplate: Boolean
     ): AddListState {
         return copy(
             openBottomSheetEntry = isOpenEntryBottomSheet,
-            currentProduct = entryState2,
-            isSaveStateForBottomSheet = isSaveStateForEntry
+            currentProduct = entryState2.copy(isTemplate = isTemplate),
+            isSaveStateForBottomSheet = isSaveStateForEntry,
         )
     }
 

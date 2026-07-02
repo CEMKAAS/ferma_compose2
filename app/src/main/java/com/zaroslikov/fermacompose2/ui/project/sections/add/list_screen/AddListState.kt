@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
@@ -23,6 +24,11 @@ data class AddListState(
     val isOpenBottomSheetDetail: Boolean = false,
     val isOpenBottomSheetDelete: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
+    val isOpenPatternsBottomSheet: Boolean = false,
+    val isOpenQrCodeBottomSheet: Boolean = false,
+
+    val domainAddTemplateDtoList: List<DomainAddTemplateDto> = emptyList(),
+
 
     val currentDetail: DomainAddItemDto? = null,
     val currentBriefly: BrieflyItem? = null,
@@ -59,7 +65,8 @@ data class AddEntryState2(
     val error: ErrorAdd = ErrorAdd(),
     val isIndicatorsValue: Boolean = false,
     val animalCountId: Long? = null,
-    override val hasAnyError: Boolean = false
+    override val hasAnyError: Boolean = false,
+    val isTemplate: Boolean = false
 ) : BaseProduct()
 
 data class PickList(

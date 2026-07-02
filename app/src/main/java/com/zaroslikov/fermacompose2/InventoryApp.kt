@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2
 
 
+import android.os.Build
 import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -100,7 +102,7 @@ fun InventoryApp(
     ) {
         Log.i("YandexAds", "isFirst: ${!viewModel.isFirstLaunch}")
         Log.i("YandexAds", "showSplash:  $showSplash")
-        if (activity != null && (!viewModel.isFirstLaunch && showSplash))
+        if (activity != null && (!viewModel.isFirstLaunch && showSplash)&& !BuildConfig.BUILD_TYPE.contentEquals("debug"))
             SplashScreen(
                 innerPadding = it,
                 activity = activity,

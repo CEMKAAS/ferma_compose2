@@ -260,7 +260,7 @@ fun BorderButton(
     backgroundColor: Color = white,
     borderColor: Color = gray_8,
     textColor: Color = black,
-    iconColor: Color = white,
+    iconColor: Color = black,
     iconSize: Dp = 16.dp,
     paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     shape: RoundedCornerShape = RoundedCornerShape(14.dp),

@@ -144,7 +144,7 @@ fun BookmarkScreen(
         },
         floatingActionButton = {
             if (!state.isActivityBookmark && !state.isArchive)
-                NeonGlowFab(colors = listOf(orang_9, orang_15)) {
+                NeonGlowFab(colors = listOf(orang_9, orang_15),) {
                     onClick(state.incubatorId)
                 }
         }

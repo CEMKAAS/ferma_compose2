@@ -76,7 +76,7 @@ fun WriteOffScreen(viewModel: WriteOffViewModel = hiltViewModel()) {
             )
         },
         floatingActionButton = {
-            if (!state.isArchive && writeOffBoolean) NeonGlowFab(colors = colors) {
+            if (!state.isArchive && writeOffBoolean) NeonGlowFab(colors = colors,) {
                 viewModel.onIntent(WriteOffListIntent.OpenBottomSheetEntry(true))
             }
         }

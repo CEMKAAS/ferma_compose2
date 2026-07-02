@@ -40,6 +40,8 @@ import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplatesBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
@@ -80,9 +82,17 @@ fun AddScreen(
         },
         floatingActionButton = {
             if (!state.isArchive)
-                NeonGlowFab(colors = colors) {
-                    viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true))
-                }
+                NeonGlowFab(
+                    colors = colors,
+                    onClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true)) },
+                    onLongClick = {
+                        viewModel.onIntent(
+                            AddListIntent.OpenPatternsBottomSheetClick(
+                                true
+                            )
+                        )
+                    }
+                )
         }
     ) { innerPadding ->
         if (state.isLoading)
@@ -149,6 +159,28 @@ fun AddScreen(
                 onDeleteClick = { viewModel.onIntent(AddListIntent.Delete) },
                 state = state.currentDetail,
             )
+        if (state.isOpenPatternsBottomSheet)
+            TemplatesBottomSheet(
+                list = state.domainAddTemplateDtoList,
+                iconRes = iconRes,
+                colors = colors,
+                onDismissRequest = {
+                    viewModel.onIntent(AddListIntent.OpenPatternsBottomSheetClick(false))
+                },
+                onCreatePatternClick = {
+                    viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true, isTemplate = true))
+                },
+                onChoicePatternClick = { },
+                onEditPatternClick = { },
+                onCreateQrCodeClick = {
+                    viewModel.onIntent(AddListIntent.OpenQrCodeBottomSheetClick(true))
+                },
+                onDeletePatternClick = { }
+            )
+        if (state.isOpenQrCodeBottomSheet)
+            QrCodeBottomSheet(
+                colors = colors
+            ) { viewModel.onIntent(AddListIntent.OpenQrCodeBottomSheetClick(false)) }
     }
 }
 
@@ -356,7 +388,10 @@ fun AddEntryBottomSheet(
             titleList = state.pickList.titleList,
             isErrorTitle = state.error.isErrorTitle,
             isErrorSlash = state.error.isErrorSlash,
-            drawableRes = R.drawable.icon_add_product
+            drawableRes = R.drawable.icon_add_product,
+            isShowSwitch = state.isTemplate,
+            checked = true,
+            onCheckedChange = {},
         )
         OutlinedTextCountNew(
             value = state.count,
@@ -367,7 +402,16 @@ fun AddEntryBottomSheet(
             onSuffixChange = { onIntent(AddListIntent.SuffixClicked(it)) },
             isError = state.error.isErrorCount,
             intResSup = R.string.support_text_count_product,
-        )
+
+            isShowSwitchForValue = state.isTemplate,
+            checkedForValue = true,
+            onCheckedForValueChange = {},
+
+            isShowSwitchForSuffix = state.isTemplate,
+            checkedForSuffix = true,
+            onCheckedForSuffixChange = {},
+
+            )
         if (!state.isIndicatorsValue)
             WarehouseCountCard(
                 title = state.title,
@@ -377,11 +421,13 @@ fun AddEntryBottomSheet(
             value = state.category,
             onValueChange = { onIntent(AddListIntent.CategoryChanged(it)) },
             titleList = state.pickList.categoryList,
+            isShowSwitch = state.isTemplate,
+            checked = true,
+            onCheckedChange = {},
         )
         if (!state.isIndicatorsValue)
             OutlinedTextDateNew(
                 value = state.date,
-
                 onValueChange = { onIntent(AddListIntent.Date(it)) }
             )
         if (!state.isIndicatorsValue)
@@ -392,10 +438,17 @@ fun AddEntryBottomSheet(
                     selectedAnimalIndex = state.selectedAnimalIndex,
                     onClickClear = { onIntent(AddListIntent.AnimalClear(it)) },
                     animalList = state.pickList.animalList,
+
+                    isShowSwitch = state.isTemplate,
+                    checked = true,
+                    onCheckedChange = {},
                 )
         OutlinedTextNoteNew(
             value = state.note,
             onValueChange = { onIntent(AddListIntent.NoteChanged(it)) },
+            isShowSwitch = state.isTemplate,
+            checked = true,
+            onCheckedChange = {},
         )
     }
 }

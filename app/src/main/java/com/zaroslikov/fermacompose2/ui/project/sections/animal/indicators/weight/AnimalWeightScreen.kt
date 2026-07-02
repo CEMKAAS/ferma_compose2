@@ -67,7 +67,7 @@ fun AnimalWeightScreen(
         },
         floatingActionButton = {
             if (!state.isArchive)
-                NeonGlowFab(colors = colors) {
+                NeonGlowFab(colors = colors,) {
                     viewModel.onIntent(AnimalWeightIntent.OpenDialogClicked(true))
                 }
         }

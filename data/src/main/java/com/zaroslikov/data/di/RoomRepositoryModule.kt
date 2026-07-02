@@ -1,6 +1,7 @@
 package com.zaroslikov.data.di
 
 import com.zaroslikov.data.room.repository.AddRepositoryImpl
+import com.zaroslikov.data.room.repository.AddTemplateRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalCountRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalSizeRepositoryImpl
@@ -44,6 +45,7 @@ import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
+import com.zaroslikov.domain.repository.template.AddTemplateRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -57,6 +59,10 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAddRepository(addRepositoryImpl: AddRepositoryImpl): AddRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAddTemplateRepository(addTemplateRepositoryImpl: AddTemplateRepositoryImpl): AddTemplateRepository
 
     @Binds
     @Singleton

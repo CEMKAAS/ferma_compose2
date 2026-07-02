@@ -181,7 +181,7 @@ fun FirstScreen(
                     floatingActionButton = {
                         NeonGlowFab(
                             colors = colors,
-                            onClick = { showBottomSheet = true })
+                        ) { showBottomSheet = true }
                     }
                 ) { innerPadding ->
 

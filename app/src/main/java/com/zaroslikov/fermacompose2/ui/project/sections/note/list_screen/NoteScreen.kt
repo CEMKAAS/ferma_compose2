@@ -96,7 +96,7 @@ fun NoteScreen(
         },
         floatingActionButton = {
             if (!state.isArchive)
-                NeonGlowFab(colors = colors) {
+                NeonGlowFab(colors = colors,) {
                     viewModel.onIntent(NoteListIntent.OpenBottomSheetEntry(true))
                 }
         },

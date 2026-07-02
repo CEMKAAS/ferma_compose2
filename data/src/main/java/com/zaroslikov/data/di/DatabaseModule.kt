@@ -28,6 +28,7 @@ import com.zaroslikov.data.room.dao.TimeNotificationIncubatorDao
 import com.zaroslikov.data.room.dao.TimeNotificationProjectDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
+import com.zaroslikov.data.room.dao.template.AddTemplateDao
 import com.zaroslikov.data.room.database.migration.MIGRATION_1_2
 import com.zaroslikov.data.room.database.migration.MIGRATION_2_3
 import com.zaroslikov.data.room.database.migration.MIGRATION_3_4
@@ -76,6 +77,12 @@ object DatabaseModule {
     @Singleton
     fun provideAddDao(database: AppDatabase): AddDao {
         return database.addDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAddTemplateDao(database: AppDatabase): AddTemplateDao {
+        return database.addTemplateDao()
     }
 
     @Provides

@@ -66,7 +66,7 @@ fun AnimalSizeScreen(
         },
         floatingActionButton = {
             if (!state.isArchive)
-                NeonGlowFab(colors = colors) {
+                NeonGlowFab(colors = colors,) {
                     viewModel.onIntent(AnimalSizeIntent.OpenDialogClicked(isEntry = true))
                 }
         }

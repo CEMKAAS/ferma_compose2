@@ -75,7 +75,7 @@ fun SaleScreen(
         },
         floatingActionButton = {
             if (!state.isArchive)
-                NeonGlowFab(colors = colors) {
+                NeonGlowFab(colors = colors,) {
                     viewModel.onIntent(SaleListIntent.OpenBottomSheetEntry(true))
                 }
         }
