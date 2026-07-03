@@ -5,6 +5,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
+import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
@@ -50,7 +51,20 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.AnimalClear -> state.updateAnimalClear(intent.value)
             is AddListIntent.AnimalNameById -> state.updateAnimal(intent.value)
 
+            //Template
+            is AddListIntent.NameTemplateChanged -> state.updateNameTemplate(intent.value)
+                .updateValid()
 
+            is AddListIntent.TitleTemplateChanged -> state.updateTitleTemplate(intent.value)
+                .updateValid()
+
+            is AddListIntent.CountTemplateChanged -> state.updateCountTemplate(intent.value)
+                .updateValid()
+
+            is AddListIntent.SuffixTemplateClicked -> state.updateSuffixTemplate(intent.value)
+            is AddListIntent.CategoryTemplateChanged -> state.updateCategoryTemplate(intent.value)
+            is AddListIntent.AnimalTemplateChanged -> state.updateAnimalTemplate(intent.value)
+            is AddListIntent.NoteTemplateChanged -> state.updateNoteTemplate(intent.value)
             else -> state
         }
     }
@@ -63,7 +77,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
 
     private fun AddListState.updateLoadDataForTemplate(domainAddTemplateDtoList: List<DomainAddTemplateDto>): AddListState {
         return copy(
-            isOpenPatternsBottomSheet = isOpenPatternsBottomSheet
+            domainAddTemplateDtoList = domainAddTemplateDtoList
         )
     }
 
@@ -106,8 +120,19 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     }
 
     private fun AddListState.updateValid(): AddListState {
-        val baseValid = currentProduct.title.isNotBlank() && currentProduct.count.isNotBlank()
-                && !currentProduct.title.isSlash()
+        val product = currentProduct
+
+        val baseValid =
+            if (product.isTemplate) {
+                product.nameTemplate.isNotBlank() &&
+                        (product.templateState.isTitle || product.title.isNotBlank()) &&
+                        (product.templateState.isCount || product.count.isNotBlank()) &&
+                        (product.templateState.isTitle || !product.title.isSlash())
+            } else {
+                product.title.isNotBlank() &&
+                        product.count.isNotBlank() &&
+                        !product.title.isSlash()
+            }
         return copy(
             currentProduct = currentProduct.copy(
                 hasAnyError = baseValid
@@ -215,7 +240,8 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 title = title,
-                error = currentProduct.error.copy(
+                error = if (currentProduct.isTemplate) currentProduct.error
+                else currentProduct.error.copy(
                     isErrorTitle = title.isBlank(),
                     isErrorSlash = title.contains("/")
                 )
@@ -237,7 +263,8 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 count = count,
-                error = currentProduct.error.copy(isErrorCount = count.isBlank())
+                error = if (currentProduct.isTemplate) currentProduct.error
+                else currentProduct.error.copy(isErrorCount = count.isBlank())
             )
         )
     }
@@ -257,6 +284,84 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             currentProduct = currentProduct.copy(
                 animalId = null,
                 animal = animal
+            )
+        )
+    }
+
+    private fun AddListState.updateNameTemplate(nameTemplate: String): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                nameTemplate = nameTemplate,
+                error = currentProduct.error.copy(
+                    isErrorNameTemplate = nameTemplate.isBlank()
+                )
+            )
+        )
+    }
+
+    private fun AddListState.updateTitleTemplate(isTitle: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                title = if (isTitle) "" else currentProduct.title,
+                templateState = currentProduct.templateState.copy(
+                    isTitle = isTitle
+                )
+            )
+        )
+    }
+
+    private fun AddListState.updateCountTemplate(isCount: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                count = if (isCount) "" else currentProduct.count,
+                templateState = currentProduct.templateState.copy(
+                    isCount = isCount
+                )
+            )
+        )
+    }
+
+    private fun AddListState.updateSuffixTemplate(isSuffix: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                countSuffix = if (isSuffix) Suffix.PIECES else currentProduct.countSuffix,
+                templateState = currentProduct.templateState.copy(
+                    isSuffix = isSuffix
+                )
+            )
+        )
+    }
+
+    private fun AddListState.updateCategoryTemplate(isCategory: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                category = if (isCategory) "" else currentProduct.category,
+                templateState = currentProduct.templateState.copy(
+                    isCategory = isCategory
+                )
+            )
+        )
+    }
+
+    private fun AddListState.updateAnimalTemplate(isAnimal: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                animal = if (isAnimal) "" else currentProduct.animal,
+                animalId = null,
+                templateState = currentProduct.templateState.copy(
+                    isAnimal = isAnimal
+                )
+            )
+        )
+    }
+
+    private fun AddListState.updateNoteTemplate(isNote: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                note = if (isNote) "" else currentProduct.note,
+                templateState = currentProduct.templateState.copy(
+                    isNote = isNote
+                )
             )
         )
     }

@@ -168,7 +168,8 @@ fun OutlinedTextNoteNew(
                 singleLine = false,
                 keyboardOptions = keyboardOptionsNext(),
                 keyboardActions = KeyboardActionFocus.CLEAN,
-                minLines = minLines
+                minLines = minLines,
+                enabled = !checked
             )
         }
         if (isShowSwitch)
@@ -202,6 +203,33 @@ fun OutlinedTextNew(
             isError = isError,
             singleLine = false,
             isNecessarily = isNecessarily,
+            keyboardOptions = keyboardOptionsNext(),
+        )
+    }
+    if (isBorderCard) BorderCard {
+        textField()
+    } else textField()
+}
+
+
+@Composable
+fun OutlinedTextTemplate(
+    value: String,
+    onValueChange: (String) -> Unit,
+    isError: Boolean = false,
+    isBorderCard: Boolean = true,
+    @StringRes labelIntRes: Int = R.string.label_template,
+    @StringRes supportingText: Int = R.string.support_text_template_title
+) {
+    val textField: @Composable () -> Unit = {
+        BaseOutlinedTextNew(
+            value = value,
+            onValueChange = { onValueChange(it) },
+            labelIntRes = labelIntRes,
+            intResSup = supportingText,
+            isError = isError,
+            singleLine = false,
+            isNecessarily = true,
             keyboardOptions = keyboardOptionsNext(),
         )
     }
@@ -400,6 +428,7 @@ fun OutlinedTextTitleAddNew(
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_product,
     drawableRes: Int? = null,
+    isNecessarily: Boolean = true,
     readOnly: Boolean = false,
     enable: Boolean = true,
     titleList: List<TitleAndSuffixDomain>,
@@ -407,7 +436,7 @@ fun OutlinedTextTitleAddNew(
     isErrorSlash: Boolean,
     isBorderCard: Boolean = true,
     colorTextField: Color = gray_9,
-    //Pattern
+    //Template
     isShowSwitch: Boolean = false,
     checked: Boolean = false,
     onCheckedChange: (Boolean) -> Unit = {},
@@ -429,7 +458,7 @@ fun OutlinedTextTitleAddNew(
             ) {
                 BaseOutlinedTextNew(
                     modifier = it.first,
-                    isNecessarily = true,
+                    isNecessarily = isNecessarily,
                     value = value,
                     onValueChange = { onValueChange(it) },
                     onClear = { onValueChange("") },
@@ -440,7 +469,7 @@ fun OutlinedTextTitleAddNew(
                     intResError = intResError,
                     intResSup = intResSup,
                     singleLine = false,
-                    readOnly = readOnly, enabled = enable, isMore = value.isBlank(),
+                    readOnly = readOnly, enabled = !checked && enable, isMore = value.isBlank(),
                     keyboardOptions = keyboardOptionsNext(),
                     colorTextField = colorTextField
                 )
@@ -584,7 +613,7 @@ fun OutlinedTextCategoryNew(
                     labelIntRes = R.string.outlined_text_field_category,
                     intResSup = R.string.support_text_category,
                     keyboardOptions = keyboardOptionsNext(),
-                    enabled = enable,
+                    enabled = enable && !checked,
                     readOnly = readOnly, isMore = value.isBlank()
                 )
             }
@@ -783,12 +812,12 @@ fun OutlinedTextCountNew(
                     keyboardOptions = keyboardOptions,
                     colorTextField = colorTextField,
                     isNecessarily = isNecessarily,
-                    enabled = enabled
+                    enabled = enabled && !checkedForValue
                 )
                 if (isShowSwitchForValue)
                     SwitchWitchText(
                         checked = checkedForValue,
-                        onCheckedChange = onCheckedForSuffixChange,
+                        onCheckedChange = onCheckedForValueChange,
                         intRes = switchTextRes
                     )
             }
@@ -815,7 +844,7 @@ fun OutlinedTextCountNew(
                             labelIntRes = R.string.outlined_text_suffix,
                             intResSup = R.string.outlined_text_suffix,
                             keyboardOptions = keyboardOptions,
-                            enabled = enabled,
+                            enabled = enabled && !checkedForSuffix,
                             isMore = true,
                             readOnly = true,
                             colorTextField = colorTextField

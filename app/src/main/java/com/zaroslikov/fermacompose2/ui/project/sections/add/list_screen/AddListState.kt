@@ -50,6 +50,7 @@ data class AddListState(
 
 data class AddEntryState2(
     val itemId: Long = 0,
+    val nameTemplate: String = "",
     val title: String = "",
     val count: String = "",
     val date: String = dateToday(),
@@ -66,8 +67,20 @@ data class AddEntryState2(
     val isIndicatorsValue: Boolean = false,
     val animalCountId: Long? = null,
     override val hasAnyError: Boolean = false,
-    val isTemplate: Boolean = false
+    val isTemplate: Boolean = false,
+    val templateState: TemplateState = TemplateState()
 ) : BaseProduct()
+
+
+data class TemplateState(
+    val isTitle: Boolean = false,
+    val isCount: Boolean = false,
+    val isSuffix: Boolean = false,
+    val isCategory: Boolean = false,
+    val isAnimal: Boolean = false,
+    val isNote: Boolean = false
+)
+
 
 data class PickList(
     val titleList: List<TitleAndSuffixDomain> = emptyList(),
@@ -77,6 +90,7 @@ data class PickList(
 )
 
 data class ErrorAdd(
+    val isErrorNameTemplate: Boolean = false,
     val isErrorTitle: Boolean = false,
     val isErrorSlash: Boolean = false,
     val isErrorCount: Boolean = false,

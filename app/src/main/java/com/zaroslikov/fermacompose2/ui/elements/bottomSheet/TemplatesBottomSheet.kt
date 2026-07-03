@@ -61,8 +61,8 @@ fun TemplatesBottomSheet(
             list.forEach {
                 PatternCard(
                     iconRes = iconRes,
-                    title = it.title,
-                    value = it.title,
+                    title = it.nameTemplate,
+                    value = it.title?:"",
                     onClick = onChoicePatternClick,
                     onEditClick = onEditPatternClick,
                     onCreateQrCodeClick = onCreateQrCodeClick,

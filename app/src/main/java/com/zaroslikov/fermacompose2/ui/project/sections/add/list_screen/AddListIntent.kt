@@ -43,9 +43,22 @@ sealed class AddListIntent : BaseIntent {
     data class AnimalClear(val value: String) : AddListIntent()
     data class NoteChanged(val value: String) : AddListIntent()
     data class SearchChanged(val value: String) : AddListIntent()
+
     data object Insert : AddListIntent()
     data object Update : AddListIntent()
     data object Delete : AddListIntent()
+    data object InsertTemplate : AddListIntent()
+    data object UpdateTemplate : AddListIntent()
+    data object DeleteTemplate : AddListIntent()
+
+    //Template
+    data class NameTemplateChanged(val value: String) : AddListIntent()
+    data class TitleTemplateChanged(val value: Boolean) : AddListIntent()
+    data class CountTemplateChanged(val value: Boolean) : AddListIntent()
+    data class SuffixTemplateClicked(val value: Boolean) : AddListIntent()
+    data class CategoryTemplateChanged(val value: Boolean) : AddListIntent()
+    data class AnimalTemplateChanged(val value: Boolean) : AddListIntent()
+    data class NoteTemplateChanged(val value: Boolean) : AddListIntent()
 
     data class OpenPatternsBottomSheetClick(val value: Boolean) : AddListIntent()
     data class LoadDataForTemplate(val value: List<DomainAddTemplateDto>) : AddListIntent()

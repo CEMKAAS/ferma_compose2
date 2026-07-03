@@ -35,10 +35,10 @@
     <string name="yandex_banner_ads">R-M-12224806-1</string>
     <string name="yandex_first_launch_ads">R-M-12224806-2</string>
     //AdsSupportText
-    <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите пожалуйста...</string>
+    <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите, пожалуйста…</string>
 
     //Update App
-    <string name="update_app_load_update">Идет загрузка обрновления , подождите пожалуйста...</string>
+    <string name="update_app_load_update">Идет загрузка обновления, подождите, пожалуйста…</string>
 
     // BottomBarProject
     <string name="bottom_bar_magazine">Журнал</string>
@@ -48,6 +48,7 @@
     // BottomBarIncubator
     <string name="bottom_bar_incubator">Инкубатор</string>
     <string name="bottom_bar_bookmark">Закладка</string>
+
 
     //OutlinedTextField
     <string name="outlined_text_product">Товар</string>
@@ -247,6 +248,7 @@
 
 
     //SupportText
+    <string name="support_text_template_title">Укажите название шаблона</string>
     <string name="support_text_count_product">Укажите количество товара для сохранения на складе</string>
     <string name="support_text_count_product_sale">Укажите количество товара для продажи</string>
     <string name="support_text_count_product_expenses">Укажите количество товара для покупки</string>
@@ -822,6 +824,12 @@
     //Animal_count_incubator
     <string name="base_section_incubator_title">Данные из инкубатора</string>
 
+    //Template
+    <string name="template_title_entry">Добавить шаблон</string>
+    <string name="template_title_edit">Редактировать шаблон</string>
+    <string name="label_template">Название шаблона</string>
+
+
     //Add
     <string name="add_screen_title_entry">Добавить продукцию</string>
     <string name="add_screen_title_edit">Редактировать продукцию</string>
@@ -1194,7 +1202,6 @@
 
     <string name="finance_category_profit_title">О балансе и итоге периода</string>
     <string name="finance_category_profit_text">Текущий баланс — это реальные средства, доступные на вашем счете прямо сейчас.\nИтог периода — это финансовый результат: \"Доходы\" минус \"Расходы\" плюс \"Сэкономлено\" минус \"Потеряно\". Он показывает эффективность хозяйства за выбранный период и может отличаться от баланса.</string>
-
 
 
     <string name="finance_category_total_sum">Общая сумма</string>

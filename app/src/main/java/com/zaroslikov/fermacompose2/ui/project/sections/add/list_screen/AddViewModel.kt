@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAddTable
@@ -7,6 +8,7 @@ import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
+import com.zaroslikov.domain.models.table.template.DomainAddTemplateTable
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.ProjectRepository
@@ -51,7 +53,7 @@ class AddViewModel @Inject constructor(
     AddListState(),
     AddListReduce(resourceProvider)
 ) {
-    private val itemIdPT: Long = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
+    private val _itemIdPT: Long = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
     init {
         loadData()
@@ -75,16 +77,18 @@ class AddViewModel @Inject constructor(
             AddListIntent.Insert -> insert()
             AddListIntent.Update -> update()
             is AddListIntent.Delete -> delete(0)
+            is AddListIntent.InsertTemplate -> insertTemplate()
+            is AddListIntent.UpdateTemplate -> updateTemplate()
             else -> Unit
         }
     }
 
     private fun loadData() {
         viewModelScope.launch {
-            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
+            val isArchive = projectRepository.getIsArchiveProject(_itemIdPT).first()
             combine(
-                addRepository.getAllItems(itemIdPT),
-                settingsRepository.getSettings(itemIdPT)
+                addRepository.getAllItems(_itemIdPT),
+                settingsRepository.getSettings(_itemIdPT)
             ) { addList, settings ->
                 val brieflyList = brieflyList(addList, settings)
                 Triple(addList, brieflyList, settings)
@@ -92,7 +96,7 @@ class AddViewModel @Inject constructor(
                 val currentDetail = getState().currentDetail
                 updateState { state ->
                     state.copy(
-                        idPT = itemIdPT,
+                        idPT = _itemIdPT,
                         list = addList,
                         searchList = addList,
                         briefly = briefly,
@@ -142,7 +146,7 @@ class AddViewModel @Inject constructor(
     }
 
     private suspend fun getDetailsName(name: String): List<DomainAddItemDto> {
-        return addRepository.getBrieflyDetailsItemAdd(itemIdPT, name).first()
+        return addRepository.getBrieflyDetailsItemAdd(_itemIdPT, name).first()
     }
 
     private fun loadDataForEntryOrEdit(
@@ -152,28 +156,39 @@ class AddViewModel @Inject constructor(
         isTemplate: Boolean = false
     ) {
         viewModelScope.launch {
+            if (isTemplate) {
+                sendIntent(
+                    AddListIntent.RefreshEntryBottomSheetState(
+                        isOpen = true,
+                        state = AddEntryState2(),
+                        isSaveStateForBottomSheet = false,
+                        isTemplate = true
+                    )
+                )
+                return@launch
+            }
             if (!isOpen) {
                 val state =
                     if (isSaveStateForBottomSheet) getState().currentProduct
                     else AddEntryState2()
                 sendIntent(
                     AddListIntent.RefreshEntryBottomSheetState(
-                        false, state, isSaveStateForBottomSheet, isTemplate
+                        false, state, isSaveStateForBottomSheet, false
                     )
                 )
                 return@launch
             }
             val newState = if (!getState().isSaveStateForBottomSheet || domain != null) {
                 val titleDeferred =
-                    async { addRepository.getItemsTitleAddList(itemIdPT).first() }
+                    async { addRepository.getItemsTitleAddList(_itemIdPT).first() }
                 val categoryDeferred =
-                    async { addRepository.getItemsCategoryAddList(itemIdPT).first() }
+                    async { addRepository.getItemsCategoryAddList(_itemIdPT).first() }
                 val animalDeferred = async {
-                    animalRepository.getItemsAnimalAddList(itemIdPT).first()
+                    animalRepository.getItemsAnimalAddList(_itemIdPT).first()
                 }
 
                 val baseState = AddEntryState2(
-                    itemIdPT = itemIdPT,
+                    itemIdPT = _itemIdPT,
                     category = resourceProvider.getString(R.string.support_text_no_category),
                     pickList = PickList(
                         titleList = titleDeferred.await(),
@@ -206,7 +221,7 @@ class AddViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (!isOpen) return@launch
-            val templateList = addTemplateRepository.getAllAddTemplateItems(itemIdPT).first()
+            val templateList = addTemplateRepository.getAllAddTemplateItems(_itemIdPT).first()
             sendIntent(AddListIntent.LoadDataForTemplate(templateList))
         }
     }
@@ -214,7 +229,7 @@ class AddViewModel @Inject constructor(
 
     private suspend fun updateWarehouseUiStateSync(name: String) {
         val pair = warehouseRepository
-            .getCurrentBalanceProductList(name, itemIdPT).first()
+            .getCurrentBalanceProductList(name, _itemIdPT).first()
             .build(getState().settings)
         onIntent(AddListIntent.RefreshWarehouseCount(pair))
     }
@@ -243,6 +258,16 @@ class AddViewModel @Inject constructor(
         }
     }
 
+    fun insertTemplate() {
+        viewModelScope.launch {
+            Log.i("add_template", "insertTemplate: ${getState().currentProduct.toDomainTemplate()}")
+            addTemplateRepository.insert(getState().currentProduct.toDomainTemplate())
+            yandexMetricRepository.metricAdd(getState().currentProduct)
+            showSnackbar(ProductOperation.ADD)
+            loadDataForEntryOrEdit(false, null)
+        }
+    }
+
     override fun update() {
         viewModelScope.launch {
             addRepository.updateAdd(getState().currentProduct.toDomainMap())
@@ -253,7 +278,27 @@ class AddViewModel @Inject constructor(
         }
     }
 
+    fun updateTemplate() {
+        viewModelScope.launch {
+            addRepository.updateAdd(getState().currentProduct.toDomainMap())
+            /*  if (getState().currentDetail != null)
+                  updateState { it.copy(currentDetail = getState().currentProduct.toDomainMap()) }*/
+            showSnackbar(ProductOperation.EDIT)
+            loadDataForEntryOrEdit(false, null)
+        }
+    }
+
     override fun delete(id: Long) {
+        viewModelScope.launch {
+            getState().currentDetail?.let { product ->
+                addRepository.deleteAddById(product.id)
+                showSnackbar(ProductOperation.DELETE)
+                sendIntent(AddListIntent.OpenBottomSheetDelete(null))
+            }
+        }
+    }
+
+    fun deleteTemplate(id: Long) {
         viewModelScope.launch {
             getState().currentDetail?.let { product ->
                 addRepository.deleteAddById(product.id)
@@ -331,6 +376,26 @@ class AddViewModel @Inject constructor(
             price = 0.0,
             idPT = itemIdPT,
             animalCountId = animalCountId
+        )
+    }
+
+    private fun AddEntryState2.toDomainTemplate(): DomainAddTemplateTable {
+        val category = category.trim()
+
+        return DomainAddTemplateTable(
+            id = itemId,
+            nameTemplate = nameTemplate.trim(),
+            title = if (templateState.isTitle) null else title.trim(),
+            count = if (templateState.isCount) null else count.toConvertDbDouble(),
+            countSuffix = if (templateState.isSuffix) null else countSuffix,
+            priceSuffix = getState().settings.currencySuffix,
+            category = if (templateState.isCategory) null else
+                if (category.contains(resourceProvider.getString(R.string.support_text_no_category)) || category.isEmpty())
+                    null else category,
+            animalId = if (templateState.isAnimal) null else animalId,
+            note = if (templateState.isNote) null else note.trim(),
+            price = 0.0,
+            idPT = _itemIdPT,
         )
     }
 }
