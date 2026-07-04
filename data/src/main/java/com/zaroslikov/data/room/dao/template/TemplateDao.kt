@@ -8,29 +8,29 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.add.AddTemplateDto
-import com.zaroslikov.data.room.table.ferma.templateOne.AddTemplateTable
+import com.zaroslikov.data.room.table.ferma.templateOne.TemplateTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface AddTemplateDao {
+interface TemplateDao {
 
-    @Query("SELECT * from add_template_table")
-    fun getAllAddTemplateTableForExport(): Flow<List<AddTemplateTable>>
+    @Query("SELECT * from template_table")
+    fun getAllAddTemplateTableForExport(): Flow<List<TemplateTable>>
 
     @Upsert
-    suspend fun insertAllAddTemplateTable(addTable: List<AddTemplateTable>)
+    suspend fun insertAllAddTemplateTable(addTable: List<TemplateTable>)
 
-    @Query("DELETE FROM add_template_table")
+    @Query("DELETE FROM template_table")
     suspend fun deleteAllAddTemplateTable()
 
     @Transaction
-    suspend fun clearAndInsertAddTemplateTableForImport(addTable: List<AddTemplateTable>) {
+    suspend fun clearAndInsertAddTemplateTableForImport(addTable: List<TemplateTable>) {
         deleteAllAddTemplateTable()
         insertAllAddTemplateTable(addTable)
     }
 
-    @Query("SELECT * FROM add_template_table WHERE _id = :id")
-    fun getAddTemplateItem(id: Long): Flow<AddTemplateTable>
+    @Query("SELECT * FROM template_table WHERE _id = :id")
+    fun getAddTemplateItem(id: Long): Flow<TemplateTable>
 
     @Query(
         "SELECT " +
@@ -45,20 +45,20 @@ interface AddTemplateDao {
                 " at.name AS animal_name," +
                 " a.note," +
                 " a.idPT " +
-                " FROM add_template_table a" +
+                " FROM template_table a" +
                 " LEFT JOIN animal_table at ON at.id = a.animal_id" +
-                " WHERE a.idPT = :id"
+                " WHERE a.idPT = :id and a.template_type = 0"
     )
     fun getAllAddTemplateItems(id: Long): Flow<List<AddTemplateDto>>
 
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
-    suspend fun insert(item: AddTemplateTable)
+    suspend fun insert(item: TemplateTable)
 
     @Update
-    suspend fun update(item: AddTemplateTable)
+    suspend fun update(item: TemplateTable)
 
-    @Query("DELETE FROM add_template_table WHERE _id = :id")
-    suspend fun deleteAddTemplateItemById(id: Long)
+    @Query("DELETE FROM template_table WHERE _id = :id")
+    suspend fun deleteTemplateItemById(id: Long)
 
 }

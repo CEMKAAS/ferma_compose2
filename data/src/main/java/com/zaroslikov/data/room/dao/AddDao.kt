@@ -61,9 +61,6 @@ interface AddDao {
     )
     fun getAllItems(id: Long): Flow<List<AddItemDto>>
 
-    @Query("SELECT * FROM add_table WHERE _id=:id")
-    fun getItemAdd(id: Long): Flow<AddTable>
-
     @Query(
         "SELECT title," +
                 " SUM(count) as count," +
@@ -164,21 +161,21 @@ interface AddDao {
     )
     fun getAnalysisAddAverageValueAllTime(id: Long, name: String): Flow<CountSuffixDto?>
 
-   /* @Query(
-        "SELECT" +
-                " (SELECT name FROM animal_table WHERE id = animal_id) as title," +
-                " (SELECT type FROM animal_table WHERE id = animal_id) as type, " +
-                " COALESCE(SUM(count),0) AS count," +
-                " count_suffix AS suffix" +
-                " FROM add_table" +
-                " WHERE idPT=:id AND title=:name" +
-                " GROUP BY title" +
-                " ORDER BY count DESC"
-    )
-    fun getAnalysisAddAnimalAllTime(
-        id: Long,
-        name: String
-    ): Flow<List<AnimalCountSuffixDto>>*/
+    /* @Query(
+         "SELECT" +
+                 " (SELECT name FROM animal_table WHERE id = animal_id) as title," +
+                 " (SELECT type FROM animal_table WHERE id = animal_id) as type, " +
+                 " COALESCE(SUM(count),0) AS count," +
+                 " count_suffix AS suffix" +
+                 " FROM add_table" +
+                 " WHERE idPT=:id AND title=:name" +
+                 " GROUP BY title" +
+                 " ORDER BY count DESC"
+     )
+     fun getAnalysisAddAnimalAllTime(
+         id: Long,
+         name: String
+     ): Flow<List<AnimalCountSuffixDto>>*/
 
     @Query(
         "SELECT count," +

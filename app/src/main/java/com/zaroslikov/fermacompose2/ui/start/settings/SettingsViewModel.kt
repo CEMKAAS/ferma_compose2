@@ -1,18 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.start.settings
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Base64
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.zaroslikov.data.room.database.AppDatabase
-import com.zaroslikov.data.room.table.profile.ProfileTable
-import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.models.table.profile.DomainProfileTable
 import com.zaroslikov.domain.repository.AddRepository
@@ -36,7 +29,6 @@ import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.fermacompose2.R
-
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
 import com.zaroslikov.fermacompose2.ui.navigation.EventFile
@@ -298,8 +290,8 @@ class SettingsViewModel @Inject constructor(
 
                 profileRepository.clearAndInsertProfileTableForImport(backup.profileTable)
                 appSettingsRepository.clearAndInsertAppSettingsTableForImport(backup.appSettingsTable)
-                showMessage("Ипорт прошел успешно")
                 launchNotification()
+                showMessage("Импорт прошел успешно")
                 AppMetrica.reportEvent("Ипорт базы данных")
                 return@launch
             } catch (e: Exception) {

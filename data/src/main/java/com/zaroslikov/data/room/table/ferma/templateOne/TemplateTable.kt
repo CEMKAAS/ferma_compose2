@@ -8,9 +8,10 @@ import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.TemplateType
 
 @Entity(
-    tableName = "add_template_table",
+    tableName = "template_table",
     foreignKeys = [
         ForeignKey(
             entity = ProjectTable::class,
@@ -26,25 +27,34 @@ import com.zaroslikov.domain.models.enums.Suffix
         )],
     indices = [Index("idPT"), Index("animal_id")]
 )
-data class AddTemplateTable(
+data class TemplateTable(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     val id: Long = 0,
+    @ColumnInfo(name = "template_type")
+    val templateType: TemplateType,
     @ColumnInfo(name = "name_template")
     val nameTemplate: String,
+
     @ColumnInfo(name = "title")
     val title: String?,
+
     @ColumnInfo(name = "count")
     val count: Double?,
+
     @ColumnInfo(name = "count_suffix")
     val countSuffix: Suffix?,
+
     @ColumnInfo(name = "price")
     val price: Double?,
+
     @ColumnInfo(name = "price_suffix")
     val priceSuffix: Suffix?,
     val category: String?,
+
     @ColumnInfo(name = "animal_id")
     val animalId: Long?,
+
     val note: String?,
     @ColumnInfo(name = "idPT")
     val idPT: Long

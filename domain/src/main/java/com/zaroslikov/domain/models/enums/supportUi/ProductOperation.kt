@@ -4,6 +4,7 @@ enum class ProductOperation {
     ADD,
     EDIT,
     DELETE,
+
     ARCHIVE,
     UNARCHIVE
 }

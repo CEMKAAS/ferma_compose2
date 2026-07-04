@@ -1,8 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
-import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
@@ -27,8 +25,7 @@ data class AddListState(
     val isOpenPatternsBottomSheet: Boolean = false,
     val isOpenQrCodeBottomSheet: Boolean = false,
 
-    val domainAddTemplateDtoList: List<DomainAddTemplateDto> = emptyList(),
-
+    val templateList: List<TemplateItem> = emptyList(),
 
     val currentDetail: DomainAddItemDto? = null,
     val currentBriefly: BrieflyItem? = null,
@@ -68,11 +65,11 @@ data class AddEntryState2(
     val animalCountId: Long? = null,
     override val hasAnyError: Boolean = false,
     val isTemplate: Boolean = false,
-    val templateState: TemplateState = TemplateState()
+    val templateEntryState: TemplateEntryState = TemplateEntryState()
 ) : BaseProduct()
 
 
-data class TemplateState(
+data class TemplateEntryState(
     val isTitle: Boolean = false,
     val isCount: Boolean = false,
     val isSuffix: Boolean = false,
@@ -81,6 +78,11 @@ data class TemplateState(
     val isNote: Boolean = false
 )
 
+data class TemplateItem(
+    val id: Long,
+    val nameTemplate: String,
+    val description: String
+)
 
 data class PickList(
     val titleList: List<TitleAndSuffixDomain> = emptyList(),

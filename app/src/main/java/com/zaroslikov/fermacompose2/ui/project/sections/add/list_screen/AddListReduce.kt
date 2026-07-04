@@ -1,11 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
-import com.zaroslikov.fermacompose2.supportFun.isError
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
@@ -75,9 +73,9 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         )
     }
 
-    private fun AddListState.updateLoadDataForTemplate(domainAddTemplateDtoList: List<DomainAddTemplateDto>): AddListState {
+    private fun AddListState.updateLoadDataForTemplate(domainAddTemplateDtoList: List<TemplateItem>): AddListState {
         return copy(
-            domainAddTemplateDtoList = domainAddTemplateDtoList
+            templateList = domainAddTemplateDtoList
         )
     }
 
@@ -125,9 +123,9 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         val baseValid =
             if (product.isTemplate) {
                 product.nameTemplate.isNotBlank() &&
-                        (product.templateState.isTitle || product.title.isNotBlank()) &&
-                        (product.templateState.isCount || product.count.isNotBlank()) &&
-                        (product.templateState.isTitle || !product.title.isSlash())
+                        (product.templateEntryState.isTitle || product.title.isNotBlank()) &&
+                        (product.templateEntryState.isCount || product.count.isNotBlank()) &&
+                        (product.templateEntryState.isTitle || !product.title.isSlash())
             } else {
                 product.title.isNotBlank() &&
                         product.count.isNotBlank() &&
@@ -303,7 +301,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 title = if (isTitle) "" else currentProduct.title,
-                templateState = currentProduct.templateState.copy(
+                templateEntryState = currentProduct.templateEntryState.copy(
                     isTitle = isTitle
                 )
             )
@@ -314,7 +312,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 count = if (isCount) "" else currentProduct.count,
-                templateState = currentProduct.templateState.copy(
+                templateEntryState = currentProduct.templateEntryState.copy(
                     isCount = isCount
                 )
             )
@@ -325,7 +323,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 countSuffix = if (isSuffix) Suffix.PIECES else currentProduct.countSuffix,
-                templateState = currentProduct.templateState.copy(
+                templateEntryState = currentProduct.templateEntryState.copy(
                     isSuffix = isSuffix
                 )
             )
@@ -336,7 +334,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 category = if (isCategory) "" else currentProduct.category,
-                templateState = currentProduct.templateState.copy(
+                templateEntryState = currentProduct.templateEntryState.copy(
                     isCategory = isCategory
                 )
             )
@@ -348,7 +346,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             currentProduct = currentProduct.copy(
                 animal = if (isAnimal) "" else currentProduct.animal,
                 animalId = null,
-                templateState = currentProduct.templateState.copy(
+                templateEntryState = currentProduct.templateEntryState.copy(
                     isAnimal = isAnimal
                 )
             )
@@ -359,7 +357,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 note = if (isNote) "" else currentProduct.note,
-                templateState = currentProduct.templateState.copy(
+                templateEntryState = currentProduct.templateEntryState.copy(
                     isNote = isNote
                 )
             )

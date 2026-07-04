@@ -40,7 +40,6 @@ import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
-import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTemplate
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplatesBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeBottomSheet
@@ -163,21 +162,29 @@ fun AddScreen(
             )
         if (state.isOpenPatternsBottomSheet)
             TemplatesBottomSheet(
-                list = state.domainAddTemplateDtoList,
+                list = state.templateList,
                 iconRes = iconRes,
                 colors = colors,
                 onDismissRequest = {
-                    viewModel.onIntent(AddListIntent.OpenPatternsBottomSheetClick(false))
+                    viewModel.onIntent(AddListIntent.OpenPatternsBottomSheetClick(value = false))
                 },
                 onCreatePatternClick = {
-                    viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true, isTemplate = true))
+                    viewModel.onIntent(
+                        AddListIntent.OpenBottomSheetEntry(isOpen = true, isTemplate = true)
+                    )
                 },
                 onChoicePatternClick = { },
-                onEditPatternClick = { },
+                onEditTemplateClick = {
+                    viewModel.onIntent(
+                        AddListIntent.OpenBottomSheetEntry(isOpen = true, id = it, isTemplate = true)
+                    )
+                },
                 onCreateQrCodeClick = {
                     viewModel.onIntent(AddListIntent.OpenQrCodeBottomSheetClick(true))
                 },
-                onDeletePatternClick = { }
+                onDeleteTemplateClick = {
+                    viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(it))
+                }
             )
         if (state.isOpenQrCodeBottomSheet)
             QrCodeBottomSheet(
@@ -209,7 +216,7 @@ private fun AddDetailBottomSheet(
             boxColor = alabaster,
             colors = colors,
             isArchive = isArchive,
-            onUpdateClick = { onIntent(AddListIntent.OpenBottomSheetEntry(true, state)) },
+            onUpdateClick = { onIntent(AddListIntent.OpenBottomSheetEntry(true, state.id)) },
             onDeleteClick = { onIntent(AddListIntent.OpenBottomSheetDelete(state.id)) },
             onDismissRequest = { onIntent(AddListIntent.OpenBottomSheetDetail(null)) },
         )
@@ -256,7 +263,7 @@ fun AddContainer2(
     brieflyList: List<BrieflyItem>,
     searchBrieflyList: List<BrieflyItem>,
     onDetailsCardClick: (Long) -> Unit,
-    onEditClick: (DomainAddItemDto) -> Unit,
+    onEditClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (String) -> Unit
 ) {
@@ -281,7 +288,7 @@ fun AddContainer2(
                 typeProduct = item.animalCountId?.let { TypeProduct.KILL },
                 isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
-                onEditClick = { onEditClick(item) },
+                onEditClick = { onEditClick(item.id) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
         },
@@ -318,7 +325,7 @@ fun BrieflyBottomSheetAdd(
     list: List<DomainAddItemDto>,
     isArchive: Boolean,
     state: BrieflyItem?,
-    onEditClick: (DomainAddItemDto) -> Unit,
+    onEditClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
     onAnalysisClick: (Pair<String, Suffix>) -> Unit = {},
@@ -350,7 +357,7 @@ fun BrieflyBottomSheetAdd(
                     year = product.year,
                     isArchive = isArchive,
                     onDeleteClick = { onDeleteClick(product.id) },
-                    onEditClick = { onEditClick(product) },
+                    onEditClick = { onEditClick(product.id) },
                     onClick = { }
                 )
             })
@@ -363,7 +370,7 @@ fun AddEntryBottomSheet(
     colors: List<Color>,
     onIntent: (AddListIntent) -> Unit
 ) {
-    val template = state.templateState
+    val template = state.templateEntryState
     EntryBottomSheet(
         titleEntryRes = if (state.isTemplate) R.string.template_title_entry else R.string.add_screen_title_entry,
         titleEditRes = if (state.isTemplate) R.string.template_title_edit else R.string.add_screen_title_edit,

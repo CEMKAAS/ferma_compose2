@@ -20,7 +20,6 @@ interface AddRepository {
     suspend fun clearAndInsertAddTableForImport(domainAddTable: List<DomainAddTable>)
     fun getItem(id: Long): Flow<DomainAddTable>
     fun getAllItems(id: Long): Flow<List<DomainAddItemDto>>
-    fun getItemAdd(id: Long): Flow<DomainAddTable>
     fun getBrieflyItemAdd(id: Long): Flow<List<BrieflyAddDomain>>
     fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<DomainAddItemDto>>
     fun getItemsTitleAddList(id: Long): Flow<List<TitleAndSuffixDomain>>

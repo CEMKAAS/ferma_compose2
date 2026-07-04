@@ -102,7 +102,7 @@ fun InventoryApp(
     ) {
         Log.i("YandexAds", "isFirst: ${!viewModel.isFirstLaunch}")
         Log.i("YandexAds", "showSplash:  $showSplash")
-        if (activity != null && (!viewModel.isFirstLaunch && showSplash)&& !BuildConfig.BUILD_TYPE.contentEquals("debug"))
+        if (activity != null && (!viewModel.isFirstLaunch && showSplash) && !BuildConfig.BUILD_TYPE.contentEquals("debug"))
             SplashScreen(
                 innerPadding = it,
                 activity = activity,

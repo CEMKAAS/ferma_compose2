@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.ghostly_white
@@ -26,18 +25,19 @@ import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 
 @Composable
 fun TemplatesBottomSheet(
-    list: List<DomainAddTemplateDto> = emptyList(),
+    list: List<TemplateItem> = emptyList(),
     @DrawableRes iconRes: Int,
     colors: List<Color>,
     onDismissRequest: () -> Unit,
     onCreatePatternClick: () -> Unit,
     onChoicePatternClick: () -> Unit,
-    onEditPatternClick: () -> Unit,
+    onEditTemplateClick: (Long) -> Unit,
     onCreateQrCodeClick: () -> Unit,
-    onDeletePatternClick: () -> Unit
+    onDeleteTemplateClick: (Long) -> Unit
 ) {
     BaseBottomSheet(
         title = stringResource(R.string.pattern_bottom_sheet_title),
@@ -59,14 +59,14 @@ fun TemplatesBottomSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             list.forEach {
-                PatternCard(
+                TemplateCard(
                     iconRes = iconRes,
                     title = it.nameTemplate,
-                    value = it.title?:"",
+                    value = it.description.ifBlank { null },
                     onClick = onChoicePatternClick,
-                    onEditClick = onEditPatternClick,
+                    onEditClick = { onEditTemplateClick(it.id) },
                     onCreateQrCodeClick = onCreateQrCodeClick,
-                    onDeleteClick = onDeletePatternClick
+                    onDeleteClick = { onDeleteTemplateClick(it.id) }
                 )
             }
         }
@@ -74,10 +74,10 @@ fun TemplatesBottomSheet(
 }
 
 @Composable
-private fun PatternCard(
+private fun TemplateCard(
     @DrawableRes iconRes: Int,
     title: String,
-    value: String,
+    value: String?,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
     onCreateQrCodeClick: () -> Unit,
@@ -107,7 +107,8 @@ private fun PatternCard(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(title, fontSize = 14.sp, color = black_2, lineHeight = 20.sp)
-                    Text(value, fontSize = 12.sp, color = grey, lineHeight = 16.sp)
+                    if (value != null)
+                        Text(value, fontSize = 12.sp, color = grey, lineHeight = 16.sp)
                 }
             }
             DropdownMenuEdit(

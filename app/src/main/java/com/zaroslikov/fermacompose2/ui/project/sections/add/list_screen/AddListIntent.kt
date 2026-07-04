@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
-import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
@@ -11,7 +10,7 @@ sealed class AddListIntent : BaseIntent {
 
     data class OpenBottomSheetEntry(
         val isOpen: Boolean,
-        val state: DomainAddItemDto? = null,
+        val id: Long? = null,
         val isSaveStateForBottomSheet: Boolean = false,
         val isTemplate: Boolean = false
     ) : AddListIntent()
@@ -61,6 +60,6 @@ sealed class AddListIntent : BaseIntent {
     data class NoteTemplateChanged(val value: Boolean) : AddListIntent()
 
     data class OpenPatternsBottomSheetClick(val value: Boolean) : AddListIntent()
-    data class LoadDataForTemplate(val value: List<DomainAddTemplateDto>) : AddListIntent()
+    data class LoadDataForTemplate(val value: List<TemplateItem>) : AddListIntent()
     data class OpenQrCodeBottomSheetClick(val value: Boolean) : AddListIntent()
 }

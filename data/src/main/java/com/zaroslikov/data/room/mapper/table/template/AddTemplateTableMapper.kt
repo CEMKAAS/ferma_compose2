@@ -1,11 +1,12 @@
 package com.zaroslikov.data.room.mapper.table.template
 
-import com.zaroslikov.data.room.table.ferma.templateOne.AddTemplateTable
-import com.zaroslikov.domain.models.table.template.DomainAddTemplateTable
+import com.zaroslikov.data.room.table.ferma.templateOne.TemplateTable
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 
-fun DomainAddTemplateTable.toAddTemplateTable(): AddTemplateTable {
-    return AddTemplateTable(
+fun DomainTemplateTable.toAddTemplateTable(): TemplateTable {
+    return TemplateTable(
         id = this.id,
+        templateType = this.templateType,
         nameTemplate = this.nameTemplate,
         title = this.title,
         count = this.count,
@@ -19,9 +20,10 @@ fun DomainAddTemplateTable.toAddTemplateTable(): AddTemplateTable {
     )
 }
 
-fun AddTemplateTable.toDomainAddTemplateTable(): DomainAddTemplateTable {
-    return DomainAddTemplateTable(
+fun TemplateTable.toDomainAddTemplateTable(): DomainTemplateTable {
+    return DomainTemplateTable(
         id = this.id,
+        templateType = this.templateType,
         nameTemplate = this.nameTemplate,
         title = this.title,
         count = this.count,

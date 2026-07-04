@@ -42,11 +42,6 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
     override fun getAllItems(id: Long): Flow<List<DomainAddItemDto>> {
         return addDao.getAllItems(id).map { it -> it.map { it.toDomainAddItemDto() } }
     }
-
-    override fun getItemAdd(id: Long): Flow<DomainAddTable> {
-        return addDao.getItemAdd(id).map { it.toAddDomainMap() }
-    }
-
     override fun getBrieflyItemAdd(id: Long): Flow<List<BrieflyAddDomain>> {
         return addDao.getBrieflyItemAdd(id).map { it -> it.map { it.toBrieflyAddDomain() } }
     }

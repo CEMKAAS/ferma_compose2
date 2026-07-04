@@ -124,6 +124,16 @@ class YandexMetricRepositoryImpl @Inject constructor(
         AppMetrica.reportEvent("Списание продукции", eventParameters)
     }
 
+    override fun metricalTemplate(currentProduct: AddEntryState2) {
+        val eventParameters: MutableMap<String, Any> = HashMap()
+        eventParameters["Имя"] = currentProduct.title
+        eventParameters["Категория"] = currentProduct.category
+        eventParameters["Животное"] = currentProduct.animal.ifBlank { "Животное не указано" }
+        eventParameters["Примечание"] = currentProduct.note.ifBlank { "Заметка не указана" }
+        AppMetrica.reportEvent("Добавление продукции", eventParameters)
+
+    }
+
     override fun metricalNote(
         title: String,
     ) {

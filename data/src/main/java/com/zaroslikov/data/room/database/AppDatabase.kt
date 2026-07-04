@@ -7,6 +7,7 @@ import com.zaroslikov.data.room.converter.AnimalCountVersionConverter
 import com.zaroslikov.data.room.converter.ProductOriginConverter
 import com.zaroslikov.data.room.converter.FinanceCategoryConverter
 import com.zaroslikov.data.room.converter.SuffixConverter
+import com.zaroslikov.data.room.converter.TemplateTypeConvert
 import com.zaroslikov.data.room.converter.TypeEggConvert
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.dao.AnimalCountDao
@@ -30,7 +31,7 @@ import com.zaroslikov.data.room.dao.TimeNotificationIncubatorDao
 import com.zaroslikov.data.room.dao.TimeNotificationProjectDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
-import com.zaroslikov.data.room.dao.template.AddTemplateDao
+import com.zaroslikov.data.room.dao.template.TemplateDao
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import com.zaroslikov.data.room.table.animal.AnimalSizeTable
 import com.zaroslikov.data.room.table.animal.AnimalTable
@@ -44,7 +45,7 @@ import com.zaroslikov.data.room.table.incubator.IncubatorParameters
 import com.zaroslikov.data.room.table.ferma.NoteTable
 import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
-import com.zaroslikov.data.room.table.ferma.templateOne.AddTemplateTable
+import com.zaroslikov.data.room.table.ferma.templateOne.TemplateTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
@@ -58,7 +59,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         ProjectTable::class,
         SettingsTable::class,
         AddTable::class,
-        AddTemplateTable::class,
+        TemplateTable::class,
         SaleTable::class,
         ExpensesTable::class,
         WriteOffTable::class,
@@ -86,10 +87,11 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
     SuffixConverter::class,
     AnimalCountVersionConverter::class,
     TypeEggConvert::class,
+    TemplateTypeConvert::class
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun addDao(): AddDao
-    abstract fun addTemplateDao(): AddTemplateDao
+    abstract fun addTemplateDao(): TemplateDao
     abstract fun animalCountDao(): AnimalCountDao
     abstract fun animalDao(): AnimalDao
     abstract fun animalSizeDao(): AnimalSizeDao

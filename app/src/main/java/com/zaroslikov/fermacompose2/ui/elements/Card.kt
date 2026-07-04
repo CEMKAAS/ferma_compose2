@@ -60,6 +60,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
+import com.zaroslikov.fermacompose2.BuildConfig
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.black_1
@@ -1362,20 +1363,21 @@ fun AdsCard(
         bannerState.loadAd(AdRequest.Builder(adUnitId).build())
     }
 
-    Banner(
-        state = bannerState,
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 5.dp,
-                shape = RoundedCornerShape(14.dp),
-                clip = false
-            )
-            .background(
-                color = white,
-                shape = RoundedCornerShape(14.dp)
-            )
+    if (!BuildConfig.BUILD_TYPE.contentEquals("debug"))
+        Banner(
+            state = bannerState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 5.dp,
+                    shape = RoundedCornerShape(14.dp),
+                    clip = false
+                )
+                .background(
+                    color = white,
+                    shape = RoundedCornerShape(14.dp)
+                )
 //            .padding(vertical = 15.dp, horizontal = 20.dp) // внешний отступ карточки
-    )
+        )
 
 }
