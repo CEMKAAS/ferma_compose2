@@ -42,7 +42,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-           /* signingConfig = signingConfigs.getByName("debug")*/
+            /* signingConfig = signingConfigs.getByName("debug")*/
         }
     }
     compileOptions {
@@ -136,6 +136,9 @@ dependencies {
 
     //RuStore SDK
     implementation(libs.appupdate)
+
+    //QR-code
+    implementation("com.google.zxing:core:3.5.4")
 
 }
 

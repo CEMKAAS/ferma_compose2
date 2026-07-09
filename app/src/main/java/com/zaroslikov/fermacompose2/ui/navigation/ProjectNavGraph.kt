@@ -46,11 +46,12 @@ fun ProjectNavHost(
     navController: NavHostController,
     itemPT: Long,
     modifier: Modifier = Modifier,
-    rootNavController: NavController
+    rootNavController: NavController,
+    isOpenTemplate: Boolean,
 ) {
     NavHost(
         navController = navController,
-        startDestination = "${WarehouseDestination.route}/${itemPT}",
+        startDestination = if (isOpenTemplate) "${HomeDestination.route}/$itemPT" else "${WarehouseDestination.route}/${itemPT}",
         modifier = modifier
     ) {
         composable(
@@ -136,9 +137,10 @@ fun ProjectNavHost(
         // Add
         composable(
             route = HomeDestination.routeWithArgs,
-            arguments = listOf(navArgument(HomeDestination.itemIdArg) {
-                type = NavType.LongType
-            })
+            arguments = listOf(
+                navArgument(HomeDestination.itemIdArg) {
+                    type = NavType.LongType
+                })
         ) {
             SectionWorkspaceScreen(
                 navigateToItemCard = {

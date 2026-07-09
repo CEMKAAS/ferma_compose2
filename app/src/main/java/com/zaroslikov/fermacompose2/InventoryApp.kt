@@ -1,8 +1,7 @@
 package com.zaroslikov.fermacompose2
 
 
-import android.os.Build
-import android.util.Log
+import android.content.Intent
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -39,12 +38,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,17 +50,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogBase
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgressWitchText
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.EnterInPatternBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarning
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddEntryState2
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
 import com.zaroslikov.fermacompose2.utils.SnackbarController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun InventoryApp(
+    intent: Intent?,
     navController: NavHostController = rememberNavController(),
-    action: String?,
-    projectId: Long,
     viewModel: InventoryAppViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current
@@ -74,6 +74,13 @@ fun InventoryApp(
 
     var showSplash by rememberSaveable { mutableStateOf(true) }
     var adFinished by rememberSaveable { mutableStateOf(false) }
+
+    val startDestination = viewModel.startDestination
+
+    LaunchedEffect(intent) {
+        viewModel.resolveStartDestination(intent)
+    }
+
     ObserveAsEvents(
         flow = SnackbarController.events,
         snackbarHostState
@@ -100,9 +107,9 @@ fun InventoryApp(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
-        Log.i("YandexAds", "isFirst: ${!viewModel.isFirstLaunch}")
-        Log.i("YandexAds", "showSplash:  $showSplash")
-        if (activity != null && (!viewModel.isFirstLaunch && showSplash) && !BuildConfig.BUILD_TYPE.contentEquals("debug"))
+        if (activity != null && (!viewModel.isFirstLaunch && showSplash)
+            && !BuildConfig.BUILD_TYPE.contentEquals("debug")
+        )
             SplashScreen(
                 innerPadding = it,
                 activity = activity,
@@ -112,12 +119,13 @@ fun InventoryApp(
                 }
             )
         else
-            InventoryNavHost(
-                navController = navController,
-                modifier = Modifier.padding(it),
-                action = action,
-                projectId = projectId
-            )
+            if (startDestination != null)
+                InventoryNavHost(
+                    navController = navController,
+                    modifier = Modifier.padding(it),
+                    startDestination = startDestination.first,
+                    isOpenTemplate = startDestination.second
+                )
 
         LaunchedEffect(adFinished) {
             if (adFinished) {
@@ -126,6 +134,13 @@ fun InventoryApp(
         }
         if (state.isOpenDownloadingUpdate)
             LoadUpdate()
+
+        if (viewModel.isOpenQrCodeWarning)
+            QrCodeWarningBottomSheet(
+                   qrCodeWarning = QrCodeWarning.GLOBAL
+            ) {
+                viewModel.isOpenQrCodeWarning = false
+            }
     }
 }
 

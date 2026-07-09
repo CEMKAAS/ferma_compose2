@@ -766,9 +766,9 @@ fun OutlinedTextCountAnimalNew(
 @Composable
 fun OutlinedTextCountNew(
     modifier: Modifier = Modifier,
-    value: String,
+    value: String?,
     onValueChange: (String) -> Unit,
-    suffix: Suffix,
+    suffix: Suffix?,
     onSuffixChange: ((Suffix) -> Unit)? = null,
     suffixList: List<Suffix> = suffixAllList,
     isError: Boolean,
@@ -790,73 +790,75 @@ fun OutlinedTextCountNew(
     @StringRes switchTextRes: Int = R.string.support_text_enter_when_applying,
 ) {
     val focusManager = LocalFocusManager.current
-    val suffixText = stringResource(suffix.toResId())
     val textField: @Composable () -> Unit = {
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                BaseOutlinedTextNew(
-
-                    value = value,
-                    onValueChange = onValueChange,
-                    isError = isError,
-                    leadingIconRes = drawableRes,
-                    labelIntRes = intRes,
-                    intResSup = R.string.outlined_text_count,
-                    intResError = intResError,
-                    keyboardOptions = keyboardOptions,
-                    colorTextField = colorTextField,
-                    isNecessarily = isNecessarily,
-                    enabled = enabled && !checkedForValue
-                )
-                if (isShowSwitchForValue)
-                    SwitchWitchText(
-                        checked = checkedForValue,
-                        onCheckedChange = onCheckedForValueChange,
-                        intRes = switchTextRes
+            value?.let {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    BaseOutlinedTextNew(
+                        value = value,
+                        onValueChange = onValueChange,
+                        isError = isError,
+                        leadingIconRes = drawableRes,
+                        labelIntRes = intRes,
+                        intResSup = R.string.outlined_text_count,
+                        intResError = intResError,
+                        keyboardOptions = keyboardOptions,
+                        colorTextField = colorTextField,
+                        isNecessarily = isNecessarily,
+                        enabled = enabled && !checkedForValue
                     )
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ExposedDropdownMenuSuffix(
-                    suffix = suffix,
-                    setSuffix = {
-                        onSuffixChange?.let { it1 ->
-                            it1(it)
-                            focusManager.moveFocus(FocusDirection.Down)
-                        }
-                    },
-                    suffixList = suffixList,
-                    enableDropMenu = enabled,
-                    content = {
-                        BaseOutlinedTextNew(
-                            modifier = it.first,
-                            value = suffixText,
-                            onValueChange = {},
-                            leadingIconRes = R.drawable.baseline_edit_document_24,
-                            labelIntRes = R.string.outlined_text_suffix,
-                            intResSup = R.string.outlined_text_suffix,
-                            keyboardOptions = keyboardOptions,
-                            enabled = enabled && !checkedForSuffix,
-                            isMore = true,
-                            readOnly = true,
-                            colorTextField = colorTextField
+                    if (isShowSwitchForValue)
+                        SwitchWitchText(
+                            checked = checkedForValue,
+                            onCheckedChange = onCheckedForValueChange,
+                            intRes = switchTextRes
                         )
-                    }
-                )
-                if (isShowSwitchForSuffix)
-                    SwitchWitchText(
-                        checked = checkedForSuffix,
-                        onCheckedChange = onCheckedForSuffixChange,
-                        intRes = switchTextRes
+                }
+            }
+            suffix?.let {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ExposedDropdownMenuSuffix(
+                        suffix = suffix,
+                        setSuffix = {
+                            onSuffixChange?.let { it1 ->
+                                it1(it)
+                                focusManager.moveFocus(FocusDirection.Down)
+                            }
+                        },
+                        suffixList = suffixList,
+                        enableDropMenu = enabled,
+                        content = {
+                            BaseOutlinedTextNew(
+                                modifier = it.first,
+                                value = stringResource(suffix.toResId()),
+                                onValueChange = {},
+                                leadingIconRes = R.drawable.baseline_edit_document_24,
+                                labelIntRes = R.string.outlined_text_suffix,
+                                intResSup = R.string.outlined_text_suffix,
+                                keyboardOptions = keyboardOptions,
+                                enabled = enabled && !checkedForSuffix,
+                                isMore = true,
+                                readOnly = true,
+                                colorTextField = colorTextField
+                            )
+                        }
                     )
+                    if (isShowSwitchForSuffix)
+                        SwitchWitchText(
+                            checked = checkedForSuffix,
+                            onCheckedChange = onCheckedForSuffixChange,
+                            intRes = switchTextRes
+                        )
+                }
             }
         }
     }

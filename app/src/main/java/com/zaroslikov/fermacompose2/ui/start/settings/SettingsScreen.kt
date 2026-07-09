@@ -110,7 +110,8 @@ fun SettingsScreen(
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
-                is EventFile.File -> file(context, event.value)
+                is EventFile.FileUri -> file(context, event.value)
+                else -> Unit
             }
         }
     }

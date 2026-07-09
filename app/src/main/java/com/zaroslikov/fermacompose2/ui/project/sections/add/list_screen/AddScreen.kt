@@ -41,8 +41,12 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTemplate
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.EnterInPatternBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplatesBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarning
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplateCard
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
@@ -50,13 +54,6 @@ import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import io.appmetrica.analytics.AppMetrica
-
-/*object HomeDestination : NavigationDestination {
-    override val route = "home"
-    override val titleRes = R.string.app_name
-    const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
-}*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,9 +85,7 @@ fun AddScreen(
                     onClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true)) },
                     onLongClick = {
                         viewModel.onIntent(
-                            AddListIntent.OpenPatternsBottomSheetClick(
-                                true
-                            )
+                            AddListIntent.OpenPatternsBottomSheetClick(true)
                         )
                     }
                 )
@@ -154,13 +149,26 @@ fun AddScreen(
                 onIntent = viewModel::onIntent,
                 isArchive = state.isArchive
             )
-        if (state.isOpenBottomSheetDelete)
+        if (state.isOpenProductDeleteBottomSheet)
             WarningDeleteAddBottomSheet(
                 onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(null)) },
                 onDeleteClick = { viewModel.onIntent(AddListIntent.Delete) },
                 state = state.currentDetail,
             )
-        if (state.isOpenPatternsBottomSheet)
+        if (state.isOpenTemplateDeleteBottomSheet)
+            WarningDeleteTemplateBottomSheet(
+                iconRes = iconRes,
+                onDismissRequest = {
+                    viewModel.onIntent(
+                        AddListIntent.OpenTemplateDeleteBottomSheet(
+                            null
+                        )
+                    )
+                },
+                onDeleteClick = { viewModel.onIntent(AddListIntent.DeleteTemplate) },
+                templateItem = state.templateDelete
+            )
+        if (state.isOpenTemplateBottomSheet)
             TemplatesBottomSheet(
                 list = state.templateList,
                 iconRes = iconRes,
@@ -173,23 +181,52 @@ fun AddScreen(
                         AddListIntent.OpenBottomSheetEntry(isOpen = true, isTemplate = true)
                     )
                 },
-                onChoicePatternClick = { },
+                onChoicePatternClick = {
+                    viewModel.onIntent(AddListIntent.LoadDataForTemplateBottomSheetClick(it))
+                },
                 onEditTemplateClick = {
                     viewModel.onIntent(
-                        AddListIntent.OpenBottomSheetEntry(isOpen = true, id = it, isTemplate = true)
+                        AddListIntent.OpenBottomSheetEntry(
+                            isOpen = true,
+                            id = it,
+                            isTemplate = true
+                        )
                     )
                 },
-                onCreateQrCodeClick = {
-                    viewModel.onIntent(AddListIntent.OpenQrCodeBottomSheetClick(true))
-                },
+                onCreateQrCodeClick = { viewModel.onIntent(AddListIntent.CreateQrCodeClick(it)) },
                 onDeleteTemplateClick = {
-                    viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(it))
+                    viewModel.onIntent(AddListIntent.OpenTemplateDeleteBottomSheet(it))
                 }
             )
         if (state.isOpenQrCodeBottomSheet)
             QrCodeBottomSheet(
-                colors = colors
+                colors = colors,
+                triple = state.bitmap,
+                onCreateQrCodeClick = { viewModel.onIntent(AddListIntent.CreateQrCodeImageClick(it)) }
             ) { viewModel.onIntent(AddListIntent.OpenQrCodeBottomSheetClick(false)) }
+        if (state.isOpenEntryInTemplateBottomSheet)
+            EnterInPatternBottomSheet(
+                colors = colors,
+                addEntryState2 = state.currentProduct,
+                onDismissRequest = {
+                    viewModel.onIntent(AddListIntent.OpenTemplateBottomSheetClick(false))
+                },
+                onTitleChange = { viewModel.onIntent(AddListIntent.TitleChanged(it)) },
+                onTitleAndSuffix = { viewModel.onIntent(AddListIntent.TitleAndSuffix(it)) },
+                onCountChange = { viewModel.onIntent(AddListIntent.CountChanged(it)) },
+                onSuffixChange = { viewModel.onIntent(AddListIntent.SuffixClicked(it)) },
+                onCategoryChange = { viewModel.onIntent(AddListIntent.CategoryChanged(it)) },
+                onAnimalChange = { viewModel.onIntent(AddListIntent.Animal(it)) },
+                onAnimalClearChange = { viewModel.onIntent(AddListIntent.AnimalClear(it)) },
+                onNoteChange = { viewModel.onIntent(AddListIntent.NoteChanged(it)) },
+                onInsertClick = { viewModel.onIntent(AddListIntent.Insert) }
+            )
+        if (state.isOpenWarningQrCodeBottomSheet)
+            QrCodeWarningBottomSheet(
+                qrCodeWarning = QrCodeWarning.LOCAL
+            ) {
+                viewModel.onIntent(AddListIntent.OpenWarningQrCodeBottomSheetClick(false))
+            }
     }
 }
 
@@ -247,6 +284,27 @@ private fun WarningDeleteAddBottomSheet(
                 month = product.month,
                 year = product.year,
                 isArchive = true
+            )
+        }
+    }
+}
+
+@Composable
+private fun WarningDeleteTemplateBottomSheet(
+    @DrawableRes iconRes: Int,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit,
+    templateItem: TemplateItem?,
+) {
+    WarningDeleteBottomSheet(
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick
+    ) {
+        templateItem?.let { template ->
+            TemplateCard(
+                iconRes = iconRes,
+                title = template.nameTemplate,
+                value = template.description.ifBlank { null },
             )
         }
     }

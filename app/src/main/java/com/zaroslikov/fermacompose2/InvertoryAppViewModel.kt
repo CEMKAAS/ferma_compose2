@@ -2,17 +2,26 @@ package com.zaroslikov.fermacompose2
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.repository.AppSettingsRepository
+import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
+import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
+import com.zaroslikov.fermacompose2.utils.QrCodeDecoder
+import com.zaroslikov.fermacompose2.utils.QrNavigationManager
+import com.zaroslikov.fermacompose2.utils.SnackbarController
+import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
@@ -28,20 +37,69 @@ import javax.inject.Inject
 @HiltViewModel
 class InventoryAppViewModel @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    val qrNavigationManager: QrNavigationManager,
+    val projectRepository: ProjectRepository
 ) : BaseViewModel2<InvertoryAppState, Event, InvertoryAppReduce>(
     InvertoryAppState(),
     InvertoryAppReduce()
 ) {
     var isFirstLaunch by mutableStateOf(false)
+    var startDestination by mutableStateOf<Pair<String, Boolean>?>(null)
+        private set
+
+    var isOpenQrCodeWarning by mutableStateOf(false)
+
+    private var initialized = false
 
     private val ruStoreAppUpdateManager =
         RuStoreAppUpdateManagerFactory.create(context)
+
 
     init {
         viewModelScope.launch {
             val appSettings = appSettingsRepository.getAppSettings().first()
             isFirstLaunch = appSettings.isFirstLaunch
+        }
+    }
+
+    fun resolveStartDestination(intent: Intent?) {
+        if (initialized) return
+        initialized = true
+
+        viewModelScope.launch {
+            startDestination = calculateStartDestination(intent)
+        }
+    }
+
+    private suspend fun calculateStartDestination(intent: Intent?): Pair<String, Boolean> {
+
+        val action = intent?.action
+        val projectId = intent?.getLongExtra("itemIdPT", -1L) ?: -1L
+        val uri = intent?.data?.getQueryParameter("data")
+
+        return when {
+            action == "OPEN_BOOKMARK_DETAIL" && projectId != -1L ->
+                "${MainIncubatorDestination.route}/$projectId" to false
+
+            action == "OPEN_PROJECT_DETAIL" && projectId != -1L ->
+                "${MainProjectsDestination.route}/$projectId" to false
+
+            uri != null -> {
+                val payload = QrCodeDecoder.decodeForBase64(uri)
+                val projectExists = projectRepository
+                    .getIsProject(payload.idPT)
+                    .first()
+
+                if (!projectExists) {
+                    isOpenQrCodeWarning = true
+                    return FirstDestination.route to false
+                }
+                qrNavigationManager.put(payload)
+                "${MainProjectsDestination.route}/${payload.idPT}" to true
+            }
+
+            else -> FirstDestination.route to false
         }
     }
 

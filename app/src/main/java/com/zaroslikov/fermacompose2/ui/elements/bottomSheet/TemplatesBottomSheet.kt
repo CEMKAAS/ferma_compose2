@@ -34,9 +34,9 @@ fun TemplatesBottomSheet(
     colors: List<Color>,
     onDismissRequest: () -> Unit,
     onCreatePatternClick: () -> Unit,
-    onChoicePatternClick: () -> Unit,
+    onChoicePatternClick: (Long) -> Unit,
     onEditTemplateClick: (Long) -> Unit,
-    onCreateQrCodeClick: () -> Unit,
+    onCreateQrCodeClick: (Long) -> Unit,
     onDeleteTemplateClick: (Long) -> Unit
 ) {
     BaseBottomSheet(
@@ -63,9 +63,9 @@ fun TemplatesBottomSheet(
                     iconRes = iconRes,
                     title = it.nameTemplate,
                     value = it.description.ifBlank { null },
-                    onClick = onChoicePatternClick,
+                    onClick = { onChoicePatternClick(it.id) },
                     onEditClick = { onEditTemplateClick(it.id) },
-                    onCreateQrCodeClick = onCreateQrCodeClick,
+                    onCreateQrCodeClick = { onCreateQrCodeClick(it.id) },
                     onDeleteClick = { onDeleteTemplateClick(it.id) }
                 )
             }
@@ -74,14 +74,14 @@ fun TemplatesBottomSheet(
 }
 
 @Composable
-private fun TemplateCard(
+fun TemplateCard(
     @DrawableRes iconRes: Int,
     title: String,
     value: String?,
-    onClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onCreateQrCodeClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onClick: (() -> Unit)? = null,
+    onEditClick: () -> Unit = {},
+    onCreateQrCodeClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
 ) {
     CardFieldNew(
         containerColor = ghostly_white,
@@ -111,11 +111,12 @@ private fun TemplateCard(
                         Text(value, fontSize = 12.sp, color = grey, lineHeight = 16.sp)
                 }
             }
-            DropdownMenuEdit(
-                onEditClick = onEditClick,
-                onCreateQrCodeClick = onCreateQrCodeClick,
-                onDeleteClick = onDeleteClick
-            )
+            if (onClick != null)
+                DropdownMenuEdit(
+                    onEditClick = onEditClick,
+                    onCreateQrCodeClick = onCreateQrCodeClick,
+                    onDeleteClick = onDeleteClick
+                )
         }
     }
 }

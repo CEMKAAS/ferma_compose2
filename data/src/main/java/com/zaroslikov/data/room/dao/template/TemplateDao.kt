@@ -30,7 +30,7 @@ interface TemplateDao {
     }
 
     @Query("SELECT * FROM template_table WHERE _id = :id")
-    fun getAddTemplateItem(id: Long): Flow<TemplateTable>
+    fun getAddTemplateItem(id: Long): Flow<TemplateTable?>
 
     @Query(
         "SELECT " +

@@ -6,6 +6,10 @@ import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepositoryImpl
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepositoryImpl
+import com.zaroslikov.fermacompose2.utils.ImageGeneration
+import com.zaroslikov.fermacompose2.utils.ImageGenerationImpl
+import com.zaroslikov.fermacompose2.utils.QrGenerator
+import com.zaroslikov.fermacompose2.utils.QrGeneratorImpl
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.utils.ResourceProviderImpl
 import dagger.Module
@@ -25,6 +29,22 @@ object UiModule {
         @ApplicationContext context: Context
     ): ResourceProvider {
         return ResourceProviderImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideQrGeneratorProvider(
+        @ApplicationContext context: Context
+    ): QrGenerator {
+        return QrGeneratorImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageGenerationProvider(
+        @ApplicationContext context: Context
+    ): ImageGeneration {
+        return ImageGenerationImpl(context)
     }
 
     @Provides

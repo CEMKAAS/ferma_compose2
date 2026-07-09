@@ -104,6 +104,7 @@ fun BaseBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
     val bottomPadding = if (contentBottom != null) 80.dp else 0.dp
     ModalBottomSheet(
+        modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = sheetState
     ) {

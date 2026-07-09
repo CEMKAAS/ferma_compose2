@@ -121,6 +121,26 @@
     <string name="pattern_bottom_sheet_title_support">Выберите шаблон для быстрого ввода</string>
     <string name="pattern_bottom_sheet_create_pattern">Создать шаблон</string>
 
+    //TemplateQrCodeBottomSheet
+    <string name="template_qr_code_bottom_sheet_title">QR-код шаблона</string>
+    <string name="template_qr_code_bottom_sheet_data_from_template">Данные из шаблона</string>
+    <string name="template_qr_code_bottom_sheet_no_search_template">Шаблон не найдет</string>
+    <string name="template_qr_code_bottom_sheet_no_search_template_support">Возможно шаблон удален или qr-код не из вашего проекта</string>
+    <string name="template_qr_code_bottom_sheet_no_search_template_support_2">Загрузите бекаб</string>
+
+    //WarningQrCodeBottomSheet
+    <string name="warning_qr_code_bottom_sheet_no_search_project">Проект не найдет</string>>
+    <string name="warning_qr_code_bottom_sheet_no_search_project_support">Этот QR-код не относится к «Моему хозяйству» или в приложении нет этого проекта или он в архиве.</string>
+
+    //WarningQrCodeBottomSheet
+    <string name="warning_qr_code_bottom_sheet_no_search_template">Шаблон удалён</string>>
+    <string name="warning_qr_code_bottom_sheet_no_search_template_support"> Этот шаблон больше не существует на этом устройстве. Вы можете восстановить его из QR-кода.</string>
+
+
+    //QrType
+    <string name="qr_code_type_mini">Мини</string>
+    <string name="qr_code_type_standard">Стандарт</string>
+    <string name="qr_code_type_full">Подробный</string>
 
     //Button
     <string name="button_add">Добавить</string>
@@ -139,7 +159,11 @@
     <string name="button_edit_2">Изменить</string>
     <string name="button_save">Сохранить</string>
     <string name="button_wrap">Свернуть</string>
+    <string name="button_scanner_again">Сканировать еще</string>
+    <string name="button_recover">Восстановить</string>
     <string name="button_сomplete">Завершить</string>
+    <string name="button_close">Закрыть</string>
+    <string name="button_try_again">Попробовать еще раз</string>
     <string name="button_add_message_no_data">Добавить Продукцию!</string>
     <string name="button_sale_message_no_data">Добавить Продажу!</string>
     <string name="button_expenses_message_no_data">Добавить Покупку!</string>

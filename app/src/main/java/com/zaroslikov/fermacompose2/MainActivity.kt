@@ -30,15 +30,15 @@ import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.compose.rememberAppOpenAdLoader
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgressWitchText
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
+import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        val action = intent?.action
-        val projectId = intent?.getLongExtra("itemIdPT", -1L) ?: -1L
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 scrim = android.graphics.Color.WHITE,
@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             FermaCompose2Theme {
-                InventoryApp(action = action, projectId = projectId)
+                InventoryApp(intent = intent)
             }
         }
     }

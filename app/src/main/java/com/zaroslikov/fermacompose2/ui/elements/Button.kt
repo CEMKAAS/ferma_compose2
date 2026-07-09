@@ -38,8 +38,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -481,19 +483,22 @@ fun ButtonForGroupButtons(
     modifier: Modifier = Modifier,
     @StringRes text: Int,
     backgroundColor: Color,
+    style: TextStyle = text_12,
     textColor: Color,
     shadowElevation: Dp = 0.dp,
+    paddingValues: PaddingValues = PaddingValues(vertical = 8.dp, horizontal = 10.dp),
+    shape: Shape = RoundedCornerShape(4.dp),
     onClick: () -> Unit
 ) {
     Surface(
         modifier = modifier,
         color = backgroundColor,
-        shape = RoundedCornerShape(4.dp),
+        shape = shape,
         shadowElevation = shadowElevation
     ) {
         Text(
             text = stringResource(text),
-            style = text_12,
+            style = style,
             color = textColor,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -503,7 +508,7 @@ fun ButtonForGroupButtons(
                 ) {
                     onClick()
                 }
-                .padding(vertical = 8.dp, horizontal = 10.dp)
+                .padding(paddingValues = paddingValues)
         )
     }
 }

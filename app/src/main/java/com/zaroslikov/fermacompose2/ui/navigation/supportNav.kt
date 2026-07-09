@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.navigation
 
+import java.io.File
+
 fun navNull(route: String, itemOneRoute: String = "itemIdPT", itemOne: String) =
     "$route?$itemOneRoute=$itemOne"
 
@@ -38,5 +40,6 @@ sealed class UiNotification {
 
 
 sealed class EventFile {
-    data class File(val value: String) : EventFile()
+    data class FileUri(val value: String) : EventFile()
+    data class Files(val value: File) : EventFile()
 }

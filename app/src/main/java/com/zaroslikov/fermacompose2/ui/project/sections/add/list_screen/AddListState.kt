@@ -1,17 +1,21 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
+import coil3.Bitmap
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.TemplateType
 import com.zaroslikov.domain.models.table.DomainSettings
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import kotlinx.serialization.Serializable
 
 data class AddListState(
     val textSearch: String = "",
@@ -20,14 +24,19 @@ data class AddListState(
     val openBottomSheetGroup: Boolean = false,
     val openBottomSheetEntry: Boolean = false,
     val isOpenBottomSheetDetail: Boolean = false,
-    val isOpenBottomSheetDelete: Boolean = false,
+    val isOpenProductDeleteBottomSheet: Boolean = false,
+    val isOpenTemplateDeleteBottomSheet: Boolean = false,
     val isSaveStateForBottomSheet: Boolean = false,
-    val isOpenPatternsBottomSheet: Boolean = false,
+    val isOpenTemplateBottomSheet: Boolean = false,
+    val isOpenEntryInTemplateBottomSheet: Boolean = false,
+    val isOpenWarningQrCodeBottomSheet: Boolean = false,
     val isOpenQrCodeBottomSheet: Boolean = false,
+    val bitmap: Triple<DomainTemplateTable, Bitmap, Bitmap>? = null,
 
     val templateList: List<TemplateItem> = emptyList(),
 
     val currentDetail: DomainAddItemDto? = null,
+    val templateDelete: TemplateItem? = null,
     val currentBriefly: BrieflyItem? = null,
 
     val list: List<DomainAddItemDto> = emptyList(),
@@ -65,6 +74,7 @@ data class AddEntryState2(
     val animalCountId: Long? = null,
     override val hasAnyError: Boolean = false,
     val isTemplate: Boolean = false,
+    val isTemplateEntry: Boolean = false,
     val templateEntryState: TemplateEntryState = TemplateEntryState()
 ) : BaseProduct()
 
@@ -97,3 +107,12 @@ data class ErrorAdd(
     val isErrorSlash: Boolean = false,
     val isErrorCount: Boolean = false,
 ) : BaseError
+
+
+@Serializable
+data class QrPayload(
+    val templateType: TemplateType,
+    val itemId: Long,
+    val idPT: Long,
+    val backupData: DomainTemplateTable? = null
+)

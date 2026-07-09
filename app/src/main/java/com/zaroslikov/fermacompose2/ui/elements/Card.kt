@@ -143,38 +143,81 @@ fun CardFieldNew(
     padding: PaddingValues = PaddingValues(20.dp),
     elevation: Dp = 5.dp,
     shape: Shape = RoundedCornerShape(14.dp),
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     contentColumn: @Composable ColumnScope.() -> Unit
 ) {
-    Card(
-        onClick = { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor
-        ),
-        shape = shape,
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = elevation
-        )
-    ) {
-        if (colors != null) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-            ) {
-                Box(
+    if (onClick != null)
+        Card(
+            onClick = { onClick() },
+            colors = CardDefaults.cardColors(
+                containerColor = containerColor
+            ),
+            shape = shape,
+            modifier = modifier,
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = elevation
+            )
+        ) {
+            if (colors != null) {
+                Row(
                     modifier = Modifier
-                        .width(6.dp)
-                        .fillMaxHeight()
-                        .background(
-                            brush = Brush.verticalGradient(colors),
-                            shape = RoundedCornerShape(
-                                topStart = 14.dp,
-                                bottomStart = 14.dp
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(6.dp)
+                            .fillMaxHeight()
+                            .background(
+                                brush = Brush.verticalGradient(colors),
+                                shape = RoundedCornerShape(
+                                    topStart = 14.dp,
+                                    bottomStart = 14.dp
+                                )
+                            )
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding)
+                    ) {
+                        contentColumn()
+                    }
+                }
+            } else
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(padding)
+                ) {
+                    contentColumn()
+                }
+        }
+    else
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = containerColor
+            ),
+            shape = shape,
+            modifier = modifier,
+            elevation = CardDefaults.cardElevation( // Добавляем тень
+                defaultElevation = elevation
+            )
+        ) {
+            Box(
+                Modifier.then(
+                    colors?.let { colors ->
+                        val gradient = Brush.linearGradient(
+                            colorStops = arrayOf(
+                                0.0f to colors[0],
+                                0.7f to colors[0],
+                                1.0f to colors[1]
                             )
                         )
+                        Modifier.background(gradient, shape = shape)
+                    } ?: Modifier
                 )
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -183,18 +226,12 @@ fun CardFieldNew(
                     contentColumn()
                 }
             }
-        } else
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(padding)
-            ) {
-                contentColumn()
-            }
-    }
+        }
+
 }
 
 
+/*
 @Composable
 fun CardFieldNew(
     modifier: Modifier = Modifier,
@@ -239,6 +276,7 @@ fun CardFieldNew(
         }
     }
 }
+*/
 
 @Composable
 fun CardOutlined(
@@ -617,6 +655,7 @@ fun BorderCard(
     containerColor: Color = white,
     padding: PaddingValues = PaddingValues(20.dp),
     shape: Shape = RoundedCornerShape(14.dp),
+    elevation: Dp = 0.dp,
     borderWidth: Dp = 1.dp,
     borderColor: Color = grey_2,
     onClick: () -> Unit = {},
@@ -627,6 +666,9 @@ fun BorderCard(
         shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = containerColor
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = elevation
         ),
         border = BorderStroke(
             width = borderWidth,
@@ -649,6 +691,7 @@ fun BorderCard(
     containerColor: Color = white,
     padding: PaddingValues = PaddingValues(20.dp),
     shape: Shape = RoundedCornerShape(14.dp),
+    elevation: Dp = 0.dp,
     borderWidth: Dp = 1.dp,
     borderColor: Color = grey_2,
     content: @Composable ColumnScope.() -> Unit
@@ -658,6 +701,9 @@ fun BorderCard(
         shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = containerColor
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = elevation
         ),
         border = BorderStroke(
             width = borderWidth,

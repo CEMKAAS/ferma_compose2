@@ -1,8 +1,10 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.ImageBitmap
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 
 sealed class AddListIntent : BaseIntent {
@@ -29,6 +31,7 @@ sealed class AddListIntent : BaseIntent {
     ) : AddListIntent()
 
     data class OpenBottomSheetDelete(val value: Long? = null) : AddListIntent()
+    data class OpenTemplateDeleteBottomSheet(val value: Long? = null) : AddListIntent()
 
     data class GroupClicked(val value: Boolean) : AddListIntent()
     data class TitleChanged(val value: String) : AddListIntent()
@@ -61,5 +64,22 @@ sealed class AddListIntent : BaseIntent {
 
     data class OpenPatternsBottomSheetClick(val value: Boolean) : AddListIntent()
     data class LoadDataForTemplate(val value: List<TemplateItem>) : AddListIntent()
-    data class OpenQrCodeBottomSheetClick(val value: Boolean) : AddListIntent()
+    data class OpenQrCodeBottomSheetClick(
+        val value: Boolean,
+        val bitmap: Triple<DomainTemplateTable, Bitmap, Bitmap>? = null
+    ) :
+        AddListIntent()
+
+    data class CreateQrCodeClick(val value: Long) : AddListIntent()
+    data class CreateQrCodeImageClick(val value: ImageBitmap) : AddListIntent()
+    data class OpenTemplateBottomSheetClick(
+        val value: Boolean,
+        val toUiMap23: AddEntryState2 = AddEntryState2()
+    ) : AddListIntent()
+
+    data class OpenWarningQrCodeBottomSheetClick(
+        val value: Boolean,
+    ) : AddListIntent()
+
+    data class LoadDataForTemplateBottomSheetClick(val value: Long) : AddListIntent()
 }

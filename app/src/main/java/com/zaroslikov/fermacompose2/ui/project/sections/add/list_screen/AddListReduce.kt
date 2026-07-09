@@ -1,7 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
+import coil3.Bitmap
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
@@ -27,6 +29,10 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             ).updateValid()
 
             is AddListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
+            is AddListIntent.OpenTemplateDeleteBottomSheet -> state.updateOpenTemplateDeleteBottomSheet(
+                intent.value
+            )
+
             is AddListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
             is AddListIntent.OpenPatternsBottomSheetClick ->
                 state.updateOpenPatternBottomSheet(intent.value)
@@ -35,7 +41,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
                 state.updateLoadDataForTemplate(intent.value)
 
             is AddListIntent.OpenQrCodeBottomSheetClick ->
-                state.updateOpenQrCodeBottomSheet(intent.value)
+                state.updateOpenQrCodeBottomSheet(intent.value, intent.bitmap)
 
             is AddListIntent.TitleChanged -> state.updateTitle(intent.value).updateValid()
             is AddListIntent.TitleAndSuffix -> state.updateTitleAndSuffix(intent.pair).updateValid()
@@ -63,13 +69,39 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.CategoryTemplateChanged -> state.updateCategoryTemplate(intent.value)
             is AddListIntent.AnimalTemplateChanged -> state.updateAnimalTemplate(intent.value)
             is AddListIntent.NoteTemplateChanged -> state.updateNoteTemplate(intent.value)
+
+            //Templates
+            is AddListIntent.OpenTemplateBottomSheetClick ->
+                state.updateOpenEntryInTemplate(intent.value, intent.toUiMap23)
+
+            is AddListIntent.OpenWarningQrCodeBottomSheetClick ->
+                state.updateOpenWarningQrCode(intent.value)
+
             else -> state
         }
     }
 
+    private fun AddListState.updateOpenEntryInTemplate(
+        isOpenEntryInTemplateBottomSheet: Boolean,
+        value: AddEntryState2,
+    ): AddListState {
+        return copy(
+            isOpenEntryInTemplateBottomSheet = isOpenEntryInTemplateBottomSheet,
+            currentProduct = value,
+        )
+    }
+
+    private fun AddListState.updateOpenWarningQrCode(
+        bool: Boolean,
+    ): AddListState {
+        return copy(
+            isOpenWarningQrCodeBottomSheet = bool
+        )
+    }
+
     private fun AddListState.updateOpenPatternBottomSheet(isOpenPatternsBottomSheet: Boolean): AddListState {
         return copy(
-            isOpenPatternsBottomSheet = isOpenPatternsBottomSheet
+            isOpenTemplateBottomSheet = isOpenPatternsBottomSheet
         )
     }
 
@@ -79,9 +111,13 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         )
     }
 
-    private fun AddListState.updateOpenQrCodeBottomSheet(isOpenQrCodeBottomSheet: Boolean): AddListState {
+    private fun AddListState.updateOpenQrCodeBottomSheet(
+        isOpenQrCodeBottomSheet: Boolean,
+        bitmap: Triple<DomainTemplateTable, Bitmap, Bitmap>?
+    ): AddListState {
         return copy(
-            isOpenQrCodeBottomSheet = isOpenQrCodeBottomSheet
+            isOpenQrCodeBottomSheet = isOpenQrCodeBottomSheet,
+            bitmap = bitmap
         )
     }
 
@@ -105,14 +141,29 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateOpenBottomSheetDelete(id: Long?): AddListState {
         return if (id == null)
             copy(
-                isOpenBottomSheetDelete = false,
+                isOpenProductDeleteBottomSheet = false,
                 currentDetail = null
             )
         else {
             val domain = list.find { it.id == id }
             copy(
-                isOpenBottomSheetDelete = domain?.let { true } ?: false,
+                isOpenProductDeleteBottomSheet = domain?.let { true } ?: false,
                 currentDetail = domain
+            )
+        }
+    }
+
+    private fun AddListState.updateOpenTemplateDeleteBottomSheet(id: Long?): AddListState {
+        return if (id == null)
+            copy(
+                isOpenTemplateDeleteBottomSheet = false,
+                currentDetail = null
+            )
+        else {
+            val templateItem = templateList.find { it.id == id }
+            copy(
+                isOpenTemplateDeleteBottomSheet = templateItem?.let { true } ?: false,
+                templateDelete = templateItem
             )
         }
     }
@@ -121,13 +172,18 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         val product = currentProduct
 
         val baseValid =
-            if (product.isTemplate) {
-                product.nameTemplate.isNotBlank() &&
-                        (product.templateEntryState.isTitle || product.title.isNotBlank()) &&
-                        (product.templateEntryState.isCount || product.count.isNotBlank()) &&
-                        (product.templateEntryState.isTitle || !product.title.isSlash())
-            } else {
-                product.title.isNotBlank() &&
+            when {
+                product.isTemplate -> product.nameTemplate.isNotBlank() &&
+                        (product.templateEntryState.isTitle || product.title.isNotBlank()
+                                || !product.title.isSlash()) &&
+                        (product.templateEntryState.isCount || product.count.isNotBlank())
+
+                product.isTemplateEntry ->
+                    (product.templateEntryState.isTitle && product.title.isNotBlank()
+                            && !product.title.isSlash()) ||
+                            (product.templateEntryState.isCount && product.count.isNotBlank())
+
+                else -> product.title.isNotBlank() &&
                         product.count.isNotBlank() &&
                         !product.title.isSlash()
             }
@@ -364,3 +420,5 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         )
     }
 }
+
+

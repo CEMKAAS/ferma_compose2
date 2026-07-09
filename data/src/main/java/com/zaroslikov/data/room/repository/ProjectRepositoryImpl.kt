@@ -25,6 +25,10 @@ class ProjectRepositoryImpl @Inject constructor(private val projectDao: ProjectD
         return projectDao.getIsArchiveProject(id)
     }
 
+    override fun getIsProject(id: Long): Flow<Boolean> {
+        return projectDao.getIsProject(id)
+    }
+
     override fun getAllProject(): Flow<List<DomainProjectTable>> {
         return projectDao.getAllProject().map { it -> it.map { it.toDomainProjectTable() } }
     }

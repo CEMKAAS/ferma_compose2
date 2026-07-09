@@ -9,6 +9,7 @@ interface ProjectRepository {
     fun getAllProjectTableForExport(): Flow<List<DomainProjectTable>>
     suspend fun clearAndInsertProjectTableForImport(domainProjectTable: List<DomainProjectTable>)
     fun getIsArchiveProject(id: Long): Flow<Boolean>
+    fun getIsProject(id: Long): Flow<Boolean>
     fun getAllProject(): Flow<List<DomainProjectTable>>
     fun getProject(id: Long): Flow<DomainProjectTable>
 

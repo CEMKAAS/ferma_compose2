@@ -6,6 +6,7 @@ import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.base.state.EntryState
+import com.zaroslikov.fermacompose2.ui.navigation.EventFile
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent
@@ -13,9 +14,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-abstract class EntryNewViewModel2<STATE : EntryNewState, INTENT : BaseIntent, REDUCER: BaseReducer<STATE, INTENT> >(
+abstract class EntryNewViewModel2<STATE : EntryNewState, INTENT : BaseIntent, REDUCER : BaseReducer<STATE, INTENT>>(
     initialState: STATE, private val reducer: REDUCER
-) : BaseViewModel<STATE, INTENT>(initialState, ) {
+) : BaseViewModel<STATE, INTENT>(initialState) {
 
     protected abstract fun insert()
     protected abstract fun update()
@@ -24,5 +25,14 @@ abstract class EntryNewViewModel2<STATE : EntryNewState, INTENT : BaseIntent, RE
 
     protected fun sendIntent(intent: INTENT) {
         _state.value = reducer.reducer(_state.value, intent)
+    }
+
+    private val _events = MutableSharedFlow<EventFile>()
+    val events = _events.asSharedFlow()
+
+    protected fun event(eventFile: EventFile) {
+        viewModelScope.launch {
+            _events.emit(eventFile)
+        }
     }
 }

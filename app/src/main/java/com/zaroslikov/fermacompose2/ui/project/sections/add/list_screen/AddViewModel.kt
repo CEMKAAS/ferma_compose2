@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
+import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAddTable
@@ -19,6 +21,7 @@ import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.template.AddTemplateRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.utils.QrGenerator
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.conversation3
 import com.zaroslikov.fermacompose2.supportFun.conversation4
@@ -29,6 +32,9 @@ import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
+import com.zaroslikov.fermacompose2.utils.ImageGeneration
+import com.zaroslikov.fermacompose2.utils.QrCodeEncoder
+import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -43,10 +49,13 @@ import kotlin.collections.component2
 @HiltViewModel
 class AddViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val qrGenerator: QrGenerator,
     private val addRepository: AddRepository,
-    private val animalRepository: AnimalRepository,
-    private val warehouseRepository: WarehouseRepository,
+    private val imageGeneration: ImageGeneration,
     private val resourceProvider: ResourceProvider,
+    private val animalRepository: AnimalRepository,
+    private val qrNavigationManager: QrNavigationManager,
+    private val warehouseRepository: WarehouseRepository,
     private val settingsRepository: SettingsRepository,
     private val projectRepository: ProjectRepository,
     private val addTemplateRepository: AddTemplateRepository,
@@ -59,6 +68,11 @@ class AddViewModel @Inject constructor(
 
     init {
         loadData()
+        val template = qrNavigationManager.consume()
+        Log.i("template", "loadDataForTemplateBottomSheet-template: $template ")
+        if (template != null) {
+            loadDataForTemplateBottomSheet(template.itemId)
+        }
     }
 
     override fun onIntent(intent: AddListIntent) {
@@ -72,7 +86,11 @@ class AddViewModel @Inject constructor(
                 intent.isTemplate
             )
 
-            is AddListIntent.OpenPatternsBottomSheetClick -> loadDataForTemplateBottomSheet(intent.value)
+            is AddListIntent.OpenPatternsBottomSheetClick ->
+                loadDataForTemplatesBottomSheet(intent.value)
+
+            is AddListIntent.LoadDataForTemplateBottomSheetClick ->
+                loadDataForTemplateBottomSheet(intent.value)
 
             is AddListIntent.TitleChanged -> updateWarehouseUiState(intent.value)
             is AddListIntent.TitleAndSuffix -> updateWarehouseUiState(intent.pair.first)
@@ -81,7 +99,9 @@ class AddViewModel @Inject constructor(
             is AddListIntent.Delete -> delete(0)
             is AddListIntent.InsertTemplate -> insertTemplate()
             is AddListIntent.UpdateTemplate -> updateTemplate()
-            is AddListIntent.DeleteTemplate -> deleteTemplate(0)
+            is AddListIntent.DeleteTemplate -> deleteTemplate()
+            is AddListIntent.CreateQrCodeClick -> generateQrCode(intent.value)
+            is AddListIntent.CreateQrCodeImageClick -> createQrCodeImage(intent.value)
             else -> Unit
         }
     }
@@ -192,7 +212,8 @@ class AddViewModel @Inject constructor(
                     isTemplate && id == null -> baseState
 
                     isTemplate && id != null -> {
-                        val template = addTemplateRepository.getAddTemplateItem(id).first()
+                        val template =
+                            addTemplateRepository.getAddTemplateItem(id).first() ?: return@launch
                         baseState.toUiMap23(template)
                     }
 
@@ -225,7 +246,7 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    private fun loadDataForTemplateBottomSheet(
+    private fun loadDataForTemplatesBottomSheet(
         isOpen: Boolean
     ) {
         viewModelScope.launch {
@@ -235,6 +256,40 @@ class AddViewModel @Inject constructor(
             sendIntent(AddListIntent.LoadDataForTemplate(templateList))
         }
     }
+
+    private fun loadDataForTemplateBottomSheet(
+        id: Long
+    ) {
+        viewModelScope.launch {
+            val template =
+                addTemplateRepository.getAddTemplateItem(id).first() ?: return@launch sendIntent(
+                    AddListIntent.OpenWarningQrCodeBottomSheetClick(true)
+                )
+
+            val titleDeferred =
+                async { addRepository.getItemsTitleAddList(_itemIdPT).first() }
+            val categoryDeferred =
+                async { addRepository.getItemsCategoryAddList(_itemIdPT).first() }
+            val animalDeferred = async {
+                animalRepository.getItemsAnimalAddList(_itemIdPT).first()
+            }
+            val baseState = AddEntryState2(
+                itemIdPT = _itemIdPT,
+                category = resourceProvider.getString(R.string.support_text_no_category),
+                pickList = PickList(
+                    titleList = titleDeferred.await(),
+                    categoryList = categoryDeferred.await(),
+                    animalList = animalDeferred.await()
+                )
+            )
+            val currentProduct = baseState.toUiMap23(template, isTemplateEntry = true)
+            //        updateWarehouseUiState(newState.title) TODO
+            sendIntent(
+                AddListIntent.OpenTemplateBottomSheetClick(true, currentProduct)
+            )
+        }
+    }
+
 
     private suspend fun updateWarehouseUiStateSync(name: String) {
         val pair = warehouseRepository
@@ -260,14 +315,19 @@ class AddViewModel @Inject constructor(
 
     override fun insert() {
         viewModelScope.launch {
-            addRepository.insertAdd(getState().currentProduct.toDomainMap())
-            yandexMetricRepository.metricAdd(getState().currentProduct)
-            showSnackbar(ProductOperation.ADD)
-            loadDataForEntryOrEdit(false, null)
+            val currentProduct = getState().currentProduct
+            addRepository.insertAdd(currentProduct.toDomainMap())
+            yandexMetricRepository.metricAdd(currentProduct)
+            if (currentProduct.isTemplateEntry)
+                sendIntent(AddListIntent.OpenTemplateBottomSheetClick(false))
+            else {
+                loadDataForEntryOrEdit(false, null)
+                showSnackbar(ProductOperation.ADD)
+            }
         }
     }
 
-    fun insertTemplate() {
+    private fun insertTemplate() {
         viewModelScope.launch {
             addTemplateRepository.insert(getState().currentProduct.toDomainTemplate())
             yandexMetricRepository.metricAdd(getState().currentProduct)
@@ -283,7 +343,7 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    fun updateTemplate() {
+    private fun updateTemplate() {
         viewModelScope.launch {
             addTemplateRepository.update(getState().currentProduct.toDomainTemplate())
             loadDataForEntryOrEdit(false, null)
@@ -300,12 +360,36 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    fun deleteTemplate(id: Long) {
+    private fun deleteTemplate() {
         viewModelScope.launch {
-            getState().currentDetail?.let { product ->
-                addRepository.deleteAddById(product.id)
-                sendIntent(AddListIntent.OpenBottomSheetDelete(null))
+            getState().templateDelete?.let { template ->
+                addTemplateRepository.deleteAddTemplateItemById(template.id)
+                sendIntent(AddListIntent.OpenTemplateDeleteBottomSheet(null))
             }
+        }
+    }
+
+    private fun generateQrCode(id: Long) {
+        viewModelScope.launch {
+            val template = addTemplateRepository.getAddTemplateItem(id).first() ?: return@launch
+
+            val qrContent = QrCodeEncoder.encode(template.toQrPayload())
+
+            val bitmap = qrGenerator.generate(qrContent)
+            val bitmapWhichLogo = qrGenerator.generateWhichLogo(qrContent)
+
+            sendIntent(
+                AddListIntent.OpenQrCodeBottomSheetClick(
+                    true,
+                    Triple(template, bitmap, bitmapWhichLogo)
+                )
+            )
+        }
+    }
+
+    private fun createQrCodeImage(qrCodeType: ImageBitmap) {
+        viewModelScope.launch {
+            imageGeneration.generateImage(qrCodeType)
         }
     }
 
@@ -358,9 +442,12 @@ class AddViewModel @Inject constructor(
         )
     }
 
-    private fun AddEntryState2.toUiMap23(domain: DomainTemplateTable): AddEntryState2 {
+    private fun AddEntryState2.toUiMap23(
+        domain: DomainTemplateTable,
+        isTemplateEntry: Boolean = false
+    ): AddEntryState2 {
         return copy(
-            itemId = domain.id,
+            itemId = if (isTemplateEntry) itemId else domain.id,
             nameTemplate = domain.nameTemplate,
             title = domain.title ?: "",
             count = domain.count?.formatNumber(false) ?: "",
@@ -372,7 +459,8 @@ class AddViewModel @Inject constructor(
             note = domain.note ?: "",
             itemIdPT = domain.idPT,
             isEntry = false,
-            isTemplate = true,
+            isTemplate = false,
+            isTemplateEntry = isTemplateEntry,
             templateEntryState = TemplateEntryState(
                 isTitle = domain.title == null,
                 isCount = domain.count == null,
@@ -441,6 +529,14 @@ class AddViewModel @Inject constructor(
             id = id,
             nameTemplate = nameTemplate,
             description = description
+        )
+    }
+
+    private fun DomainTemplateTable.toQrPayload(): QrPayload {
+        return QrPayload(
+            templateType = templateType,
+            itemId = id,
+            idPT = idPT
         )
     }
 }

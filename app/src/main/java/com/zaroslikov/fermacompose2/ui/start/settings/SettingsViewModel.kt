@@ -136,7 +136,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun shapeExportDatabase() {
-        getState().backupDataText?.let { event(EventFile.File(it)) }
+        getState().backupDataText?.let { event(EventFile.FileUri(it)) }
         AppMetrica.reportEvent("Экспорт базы данных через отправку")
     }
 

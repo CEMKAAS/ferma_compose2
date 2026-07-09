@@ -30,21 +30,10 @@ import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 fun InventoryNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    action: String?,
-    projectId: Long
+    startDestination: String,
+    isOpenTemplate: Boolean
 ) {
 
-    val startDestination = when {
-        action == "OPEN_BOOKMARK_DETAIL" && projectId != -1L -> {
-            "${MainIncubatorDestination.route}/${projectId}"
-        }
-
-        action == "OPEN_PROJECT_DETAIL" && projectId != -1L -> {
-            "${MainProjectsDestination.route}/${projectId}"
-        }
-
-        else -> FirstDestination.route
-    }
 
     NavHost(
         navController = navController,
@@ -63,6 +52,15 @@ fun InventoryNavHost(
             )
         }
         composable(
+            route = MainProjectsDestination.routeWithArgs,
+            arguments = listOf(navArgument(MainProjectsDestination.itemIdArg) {
+                type = NavType.LongType
+            })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments!!.getLong(MainProjectsDestination.itemIdArg)
+            MainProjectScreen(navController, itemId, isOpenTemplate)
+        }
+        composable(
             route = MainIncubatorDestination.routeWithArgs,
             arguments = listOf(navArgument(MainIncubatorDestination.itemIdArg) {
                 type = NavType.LongType
@@ -70,15 +68,6 @@ fun InventoryNavHost(
         ) { backStackEntry ->
             val itemId = backStackEntry.arguments!!.getLong(MainIncubatorDestination.itemIdArg)
             MainIncubatorScreen(navController, itemId)
-        }
-        composable(
-            route = MainProjectsDestination.routeWithArgs,
-            arguments = listOf(navArgument(MainProjectsDestination.itemIdArg) {
-                type = NavType.LongType
-            })
-        ) { backStackEntry ->
-            val itemId = backStackEntry.arguments!!.getLong(MainProjectsDestination.itemIdArg)
-            MainProjectScreen(navController, itemId)
         }
         composable(
             route = WarehouseEditDestination.routeWithArgs,
@@ -119,4 +108,3 @@ fun InventoryNavHost(
         }
     }
 }
-

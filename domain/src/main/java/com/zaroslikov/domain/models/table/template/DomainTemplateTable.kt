@@ -2,7 +2,9 @@ package com.zaroslikov.domain.models.table.template
 
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TemplateType
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DomainTemplateTable(
     val id: Long = 0,
     val templateType: TemplateType,

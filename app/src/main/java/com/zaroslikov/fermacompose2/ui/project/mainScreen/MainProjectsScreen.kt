@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,10 +41,11 @@ object MainProjectsDestination : NavigationDestination {
 @Composable
 fun MainProjectScreen(
     rootNavController: NavController,
-    itemPT: Long
+    itemPT: Long,
+    ioOpenTemplate: Boolean
 ) {
     val projectNavController = rememberNavController()
-    val startDestination = Destination.WAREHOUSE
+    val startDestination = if (ioOpenTemplate) Destination.MAGAZINE else Destination.WAREHOUSE
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
     Scaffold(
@@ -86,10 +86,11 @@ fun MainProjectScreen(
         }
     ) { contentPadding ->
         ProjectNavHost(
+            modifier = Modifier.padding(contentPadding),
+            isOpenTemplate = ioOpenTemplate,
             rootNavController = rootNavController,
             navController = projectNavController,
-            itemPT = itemPT,
-            modifier = Modifier.padding(contentPadding)
+            itemPT = itemPT
         )
     }
 }

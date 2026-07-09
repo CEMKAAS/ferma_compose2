@@ -31,6 +31,15 @@ interface ProjectDao {
     @Query("SELECT archive FROM project_table WHERE id=:id ")
     fun getIsArchiveProject(id: Long): Flow<Boolean>
 
+    @Query(
+        " SELECT EXISTS(" +
+                "        SELECT 1" +
+                "        FROM project_table" +
+                "        WHERE id = :id" +
+                "    )"
+    )
+    fun getIsProject(id: Long): Flow<Boolean>
+
     @Query("SELECT * from project_table")
     fun getAllProject(): Flow<List<ProjectTable>>
 

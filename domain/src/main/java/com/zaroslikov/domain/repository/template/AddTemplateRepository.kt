@@ -16,7 +16,7 @@ interface AddTemplateRepository {
         insertAllAddTemplateTable(addTemplateTable)
     }
 
-    fun getAddTemplateItem(id: Long): Flow<DomainTemplateTable>
+    fun getAddTemplateItem(id: Long): Flow<DomainTemplateTable?>
 
 
     fun getAllAddTemplateItems(id: Long): Flow<List<DomainAddTemplateDto>>

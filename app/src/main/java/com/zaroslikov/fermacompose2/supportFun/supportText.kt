@@ -7,6 +7,7 @@ import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeType
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator.*
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
@@ -175,5 +176,13 @@ fun TypeEgg.toResId(): Int {
         TypeEgg.QUAILS -> R.string.type_egg_quails
         TypeEgg.TURKEYS -> R.string.type_egg_turkeys
         TypeEgg.DUCKS -> R.string.type_egg_ducks
+    }
+}
+
+fun QrCodeType.toResId(): Int {
+    return when (this) {
+        QrCodeType.MINI -> R.string.qr_code_type_mini
+        QrCodeType.STANDARD -> R.string.qr_code_type_standard
+        QrCodeType.FULL -> R.string.qr_code_type_full
     }
 }

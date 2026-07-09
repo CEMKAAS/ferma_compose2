@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.grey_3
@@ -55,7 +56,8 @@ object HomeDestination : NavigationDestination {
     override val route = "home"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+    const val templateArg = "template"
+    val routeWithArgs = "$route/{$itemIdArg}?$templateArg={$templateArg}"
 }
 
 @Composable
@@ -67,6 +69,7 @@ fun SectionWorkspaceScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val pages = Page.entries
+
     val pagerState = rememberPagerState(
         pageCount = { pages.size },
         initialPage = 2

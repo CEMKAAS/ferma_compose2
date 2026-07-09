@@ -30,8 +30,8 @@ class AddTemplateRepositoryImpl @Inject constructor(private val templateDao: Tem
         return templateDao.clearAndInsertAddTemplateTableForImport(addTemplateTable.map { it.toAddTemplateTable() })
     }
 
-    override fun getAddTemplateItem(id: Long): Flow<DomainTemplateTable> {
-        return templateDao.getAddTemplateItem(id).map { it.toDomainAddTemplateTable() }
+    override fun getAddTemplateItem(id: Long): Flow<DomainTemplateTable?> {
+        return templateDao.getAddTemplateItem(id).map { it?.toDomainAddTemplateTable() }
     }
 
     override fun getAllAddTemplateItems(id: Long): Flow<List<DomainAddTemplateDto>> {
