@@ -166,7 +166,7 @@ fun EmptyBookmark(
             modifier = Modifier
                 .shadow(6.dp, shape = CircleShape)
                 .background(color = backgroundColor, shape = CircleShape)
-                .size(128.dp)
+                .size(iconSize * 2)
         ) {
             Icon(
                 painter = painterResource(iconRes),
@@ -178,7 +178,7 @@ fun EmptyBookmark(
             )
         }
         Spacer(modifier = Modifier.padding(12.dp))
-        Text(stringResource(title), style = text_24, color = black_2)
+        Text(stringResource(title), style = text_24, color = black_2, textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.padding(6.dp))
         Text(
             stringResource(supportText),

@@ -58,6 +58,6 @@ data class ErrorIncubator(
     val isErrorTitle: Boolean = false,
     val isErrorCapacity: Boolean = false
 ) : BaseError {
-    val hasAnyError: Boolean
+    override val hasAnyError: Boolean
         get() = isErrorTitle || isErrorCapacity
 }

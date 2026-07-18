@@ -7,4 +7,3 @@ abstract class EntryState : BaseState {
     abstract val hasAnyError: Boolean
 }
 
-interface BaseError

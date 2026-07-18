@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -85,11 +87,16 @@ import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.ChoiceProjectBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrScannerScreen
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
@@ -106,7 +113,7 @@ object FirstDestination : NavigationDestination {
 
 @Composable
 fun FirstScreen(
-    navigateToItemProject: (Long) -> Unit,
+    navigateToItemProject: (Pair<Long, Boolean>) -> Unit,
     navigateToItemIncubator: (Long) -> Unit,
     navigateToProject: (Long) -> Unit,
     navigateToIncubator: (Long) -> Unit,
@@ -117,6 +124,7 @@ fun FirstScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val notificationFlow = viewModel.notification
+    val eventFlow = viewModel.navigation
     val colors = listOf(price_green, green_9)
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -131,12 +139,22 @@ fun FirstScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {}
+
     LaunchedEffect(Unit) {
         notificationFlow.collect { event ->
             when (event) {
                 UiNotification.Notification ->
                     if (Build.VERSION.SDK_INT >= 33 && state.isNotificationAsked)
                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        eventFlow.collect { event ->
+            when (event) {
+                is UiEvent.Navigate -> navigateToItemProject(event.value to true)
+                else -> Unit
             }
         }
     }
@@ -178,14 +196,25 @@ fun FirstScreen(
                             onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveModeClicked) }
                         )
                     },
+                    floatingActionButtonPosition = FabPosition.Center,
                     floatingActionButton = {
-                        NeonGlowFab(
-                            colors = colors,
-                        ) { showBottomSheet = true }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            NeonGlowFab(
+                                iconRes = R.drawable.outline_qr_code_scanner_24,
+                                colors = colors,
+                            ) { viewModel.onIntent(FirstIntent.OpenQrCodeScanner(true)) }
+                            NeonGlowFab(
+                                colors = colors,
+                            ) { showBottomSheet = true }
+
+                        }
                     }
                 ) { innerPadding ->
-
-
                     if (state.isLoading)
                         CircularProgress(
                             modifier = Modifier.padding(innerPadding),
@@ -201,15 +230,14 @@ fun FirstScreen(
                             onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveClicked(it)) },
                             onArchiveIncubatorClick = {
                                 viewModel.onIntent(
-                                    FirstIntent.OpenArchiveIncubatorBottomSheetClicked(true, it)
-                                )
-                            },
-                            onUnarchiveClick = {
-                                viewModel.onIntent(
-                                    FirstIntent.UnarchiveClicked(
+                                    FirstIntent.OpenArchiveIncubatorBottomSheetClicked(
+                                        true,
                                         it
                                     )
                                 )
+                            },
+                            onUnarchiveClick = {
+                                viewModel.onIntent(FirstIntent.UnarchiveClicked(it))
                             },
                             onDeleteClick = {
                                 viewModel.onIntent(
@@ -219,13 +247,21 @@ fun FirstScreen(
                                     )
                                 )
                             },
-                            onNavigationProject = { navigateToItemProject(it) },
+                            onNavigationProject = { navigateToItemProject(it to false) },
                             onNavigationIncubator = { navigateToItemIncubator(it) })
                     if (showBottomSheet)
                         ChoiceProjectBottomSheet(
                             onDismissRequest = { showBottomSheet = false },
                             onIncubatorProject = { navigateToIncubator(-1) },
                             onAddProject = { navigateToProject(-1) }
+                        )
+
+                    if (state.isOpenQrScannerBottomSheet)
+                        QrScannerScreen(
+                            onQrDetected = { viewModel.onIntent(FirstIntent.QrCodeScanner(it)) },
+                            onDismissRequest = {
+                                viewModel.onIntent(FirstIntent.OpenQrCodeScanner(false))
+                            }
                         )
 
                     if (state.isOpenArchiveIncubatorBottomSheet)
@@ -254,6 +290,23 @@ fun FirstScreen(
                             },
                             onDeleteDatabaseClick = { viewModel.onIntent(FirstIntent.DeleteClicked) }
                         )
+                    if (state.isOpenWaringQrCode)
+                        QrCodeWarningBottomSheet(
+                            qrCodeWarningType = QrCodeWarningType.GLOBAL,
+                            onDismissRequest = {
+                                viewModel.onIntent(FirstIntent.OpenWarningQrCodeClick(false))
+                            },
+                            onScannerClick = { viewModel.onIntent(FirstIntent.OpenQrCodeScanner(true)) },
+                        )
+                    if (state.isOpenChoiceProjectBottomSheet)
+                        ChoiceProjectBottomSheet(
+                            list = state.projectListForTemplate,
+                            onDismissRequest = {
+                                viewModel.onIntent(
+                                    FirstIntent.OpenMultiProjectBottomSheetClick(false)
+                                )
+                            }
+                        ) { viewModel.onIntent(FirstIntent.ChoiceProjectForTemplateClick(it)) }
                 }
             }
 }
@@ -314,7 +367,7 @@ private fun StartScreenContainer2(
             title = R.string.start_screen_no_data_title,
             message = R.string.start_screen_no_data_message,
             icon = R.drawable.ic_new_logo_2,
-            iconSize = 164.dp
+            iconSize = 64.dp
         ),
         brieflyEmptyState = EmptyState(
             title = R.string.start_screen_no_data_archive_title,

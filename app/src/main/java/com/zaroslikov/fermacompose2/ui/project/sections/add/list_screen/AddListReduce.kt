@@ -1,14 +1,17 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import coil3.Bitmap
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.text.lowercase
 
@@ -19,6 +22,11 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         intent: AddListIntent
     ): AddListState {
         return when (intent) {
+            is AddListIntent.LoadData -> state.updateLoadData(
+                intent.itemIdPT, intent.addList, intent.briefly, intent.settings,
+                intent.isLoading, intent.isArchive
+            )
+
             is AddListIntent.GroupClicked -> state.updateGroup(intent.value)
             is AddListIntent.SearchChanged -> state.updateSearch(intent.value)
             is AddListIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
@@ -28,29 +36,21 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
                 isTemplate = intent.isTemplate
             ).updateValid()
 
+            is AddListIntent.OpenBottomSheetGroup ->
+                state.updateOpenBottomSheetGroup(intent.isOpen, intent.detail, intent.productItems)
+
             is AddListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
-            is AddListIntent.OpenTemplateDeleteBottomSheet -> state.updateOpenTemplateDeleteBottomSheet(
-                intent.value
-            )
-
             is AddListIntent.OpenBottomSheetDetail -> state.updateOpenBottomSheetDetail(intent.value)
-            is AddListIntent.OpenPatternsBottomSheetClick ->
-                state.updateOpenPatternBottomSheet(intent.value)
 
-            is AddListIntent.LoadDataForTemplate ->
-                state.updateLoadDataForTemplate(intent.value)
-
-            is AddListIntent.OpenQrCodeBottomSheetClick ->
-                state.updateOpenQrCodeBottomSheet(intent.value, intent.bitmap)
 
             is AddListIntent.TitleChanged -> state.updateTitle(intent.value).updateValid()
             is AddListIntent.TitleAndSuffix -> state.updateTitleAndSuffix(intent.pair).updateValid()
             is AddListIntent.RefreshWarehouseCount -> state.updateWarehouseList(intent.value)
             is AddListIntent.CountChanged -> state.updateCount(intent.value).updateValid()
-            is AddListIntent.SuffixClicked -> state.updateSuffix(intent.value)
-            is AddListIntent.CategoryChanged -> state.updateCategory(intent.value)
+            is AddListIntent.SuffixClicked -> state.updateSuffix(intent.value).updateValid()
+            is AddListIntent.CategoryChanged -> state.updateCategory(intent.value).updateValid()
             is AddListIntent.Date -> state.updateDate(intent.value)
-            is AddListIntent.NoteChanged -> state.updateNote(intent.value)
+            is AddListIntent.NoteChanged -> state.updateNote(intent.value).updateValid()
             is AddListIntent.Animal -> state.updateAnimal(intent.animal)
             is AddListIntent.AnimalClear -> state.updateAnimalClear(intent.value)
             is AddListIntent.AnimalNameById -> state.updateAnimal(intent.value)
@@ -69,55 +69,125 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.CategoryTemplateChanged -> state.updateCategoryTemplate(intent.value)
             is AddListIntent.AnimalTemplateChanged -> state.updateAnimalTemplate(intent.value)
             is AddListIntent.NoteTemplateChanged -> state.updateNoteTemplate(intent.value)
+            is AddListIntent.MultiProjectTemplateChanged -> state.updateMultiProjectTemplate(intent.value)
 
             //Templates
             is AddListIntent.OpenTemplateBottomSheetClick ->
-                state.updateOpenEntryInTemplate(intent.value, intent.toUiMap23)
+                state.updateOpenEntryInTemplate(intent.value, intent.toUiMap23).updateValid()
 
             is AddListIntent.OpenWarningQrCodeBottomSheetClick ->
-                state.updateOpenWarningQrCode(intent.value)
+                state.updateOpenWarningQrCode(intent.value, intent.qrCodeWarningType, intent.backupData)
+
+            is AddListIntent.OpenScannerQrCodeBottomSheetClick ->
+                state.updateOpenScannerQrCode(intent.value)
+
+            is AddListIntent.OpenTemplateDeleteBottomSheet ->
+                state.updateOpenTemplateDeleteBottomSheet(intent.value)
+
+            is AddListIntent.OpenPatternsBottomSheetClick ->
+                state.updateOpenPatternBottomSheet(intent.value)
+
+            is AddListIntent.LoadDataForTemplate ->
+                state.updateLoadDataForTemplate(intent.value)
+
+            is AddListIntent.OpenQrCodeBottomSheetClick ->
+                state.updateOpenQrCodeBottomSheet(intent.value, intent.qrCode)
 
             else -> state
         }
     }
 
-    private fun AddListState.updateOpenEntryInTemplate(
-        isOpenEntryInTemplateBottomSheet: Boolean,
-        value: AddEntryState2,
+    private fun AddListState.updateLoadData(
+        itemIdPT: Long,
+        items: List<DomainAddItemDto2>,
+        brieflyItems: List<BrieflyItem>,
+        settings: DomainSettings,
+        isLoading: Boolean,
+        isArchive: Boolean
     ): AddListState {
         return copy(
-            isOpenEntryInTemplateBottomSheet = isOpenEntryInTemplateBottomSheet,
+            idPT = itemIdPT,
+            mainList = mainList.copy(
+                items = items,
+                brieflyItems = brieflyItems,
+            ),
+            searchState = searchState.copy(
+                searchResults = items,
+                searchBrieflyResults = brieflyItems
+            ),
+            productDetail = productDetail?.let { detail ->
+                items.find { it.id == detail.id }
+            }, //TODO Заменить на отдельную фукнцию
+            settings = settings,
+            isLoading = isLoading,
+            isArchive = isArchive
+        )
+    }
+
+    private fun AddListState.updateOpenEntryInTemplate(
+        isOpenEntryInTemplateBottomSheet: Boolean,
+        value: AddProductState,
+    ): AddListState {
+        return copy(
+            bottomSheetState = bottomSheetState.copy(
+                isOpenEntryInTemplate = isOpenEntryInTemplateBottomSheet
+            ),
             currentProduct = value,
+        )
+    }
+
+    private fun AddListState.updateOpenScannerQrCode(
+        bool: Boolean,
+    ): AddListState {
+        return copy(
+            bottomSheetState = bottomSheetState.copy(
+                isOpenScannerQrCode = bool
+            )
         )
     }
 
     private fun AddListState.updateOpenWarningQrCode(
         bool: Boolean,
+        warning: QrCodeWarningType,
+        backupData: DomainTemplateTable?
     ): AddListState {
         return copy(
-            isOpenWarningQrCodeBottomSheet = bool
+            bottomSheetState = bottomSheetState.copy(
+                isOpenWarningQrCode = bool,
+                isOpenScannerQrCode = false
+            ),
+            qrCodeWarning = qrCodeWarning.copy(
+                warningType = warning,
+                templateBackup = backupData
+            )
         )
     }
 
-    private fun AddListState.updateOpenPatternBottomSheet(isOpenPatternsBottomSheet: Boolean): AddListState {
+    private fun AddListState.updateOpenPatternBottomSheet(isOpenTemplates: Boolean): AddListState {
         return copy(
-            isOpenTemplateBottomSheet = isOpenPatternsBottomSheet
+            bottomSheetState = bottomSheetState.copy(
+                isOpenTemplates = isOpenTemplates
+            )
         )
     }
 
-    private fun AddListState.updateLoadDataForTemplate(domainAddTemplateDtoList: List<TemplateItem>): AddListState {
+    private fun AddListState.updateLoadDataForTemplate(templateItems: List<TemplateItem>): AddListState {
         return copy(
-            templateList = domainAddTemplateDtoList
+            templatesState = templatesState.copy(
+                templatesList = templateItems
+            )
         )
     }
 
     private fun AddListState.updateOpenQrCodeBottomSheet(
-        isOpenQrCodeBottomSheet: Boolean,
-        bitmap: Triple<DomainTemplateTable, Bitmap, Bitmap>?
+        isOpenCreateQrCode: Boolean,
+        qrCodeState: QrCodeData?
     ): AddListState {
         return copy(
-            isOpenQrCodeBottomSheet = isOpenQrCodeBottomSheet,
-            bitmap = bitmap
+            bottomSheetState = bottomSheetState.copy(
+                isOpenCreateQrCode = isOpenCreateQrCode,
+            ),
+            qrCodeState = qrCodeState,
         )
     }
 
@@ -126,29 +196,51 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     ): AddListState {
         return if (id == null)
             copy(
-                isOpenBottomSheetDetail = false,
-                currentDetail = null
+                bottomSheetState = bottomSheetState.copy(
+                    isOpenDetail = false,
+                ),
+                productDetail = null
             )
         else {
-            val domain = list.find { it.id == id }
+            val domain = mainList.items.find { it.id == id }
             copy(
-                isOpenBottomSheetDetail = domain?.let { true } ?: false,
-                currentDetail = domain
+                bottomSheetState = bottomSheetState.copy(
+                    isOpenDetail = domain?.let { true } ?: false),
+                productDetail = domain
             )
         }
+    }
+
+    private fun AddListState.updateOpenBottomSheetGroup(
+        isOpenGroup: Boolean,
+        detail: BrieflyItem?,
+        productItems: List<DomainAddItemDto2>
+    ): AddListState {
+        return copy(
+            bottomSheetState = bottomSheetState.copy(
+                isOpenGroup = isOpenGroup,
+            ),
+            detailNomenclatura = detailNomenclatura.copy(
+                detail = detail,
+                productItems = productItems
+            )
+        )
     }
 
     private fun AddListState.updateOpenBottomSheetDelete(id: Long?): AddListState {
         return if (id == null)
             copy(
-                isOpenProductDeleteBottomSheet = false,
-                currentDetail = null
+                bottomSheetState = bottomSheetState.copy(
+                    isOpenProductDelete = false
+                ),
+                productDetail = null
             )
         else {
-            val domain = list.find { it.id == id }
+            val domain = mainList.items.find { it.id == id }
             copy(
-                isOpenProductDeleteBottomSheet = domain?.let { true } ?: false,
-                currentDetail = domain
+                bottomSheetState = bottomSheetState.copy(
+                    isOpenProductDelete = domain?.let { true } ?: false),
+                productDetail = domain
             )
         }
     }
@@ -156,32 +248,33 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateOpenTemplateDeleteBottomSheet(id: Long?): AddListState {
         return if (id == null)
             copy(
-                isOpenTemplateDeleteBottomSheet = false,
-                currentDetail = null
+                bottomSheetState = bottomSheetState.copy(
+                    isOpenTemplateDelete = false
+                ),
+                productDetail = null
             )
         else {
-            val templateItem = templateList.find { it.id == id }
+            val templateItem = templatesState.templatesList.find { it.id == id }
             copy(
-                isOpenTemplateDeleteBottomSheet = templateItem?.let { true } ?: false,
-                templateDelete = templateItem
+                bottomSheetState = bottomSheetState.copy(
+                    isOpenTemplateDelete = templateItem?.let { true } ?: false),
+                templatesState = templatesState.copy(
+                    templateToDelete = templateItem
+                )
             )
         }
     }
 
     private fun AddListState.updateValid(): AddListState {
-        val product = currentProduct
+        val product = currentProduct.product
+        val template = currentProduct.template
 
         val baseValid =
             when {
-                product.isTemplate -> product.nameTemplate.isNotBlank() &&
-                        (product.templateEntryState.isTitle || product.title.isNotBlank()
+                template.isTemplate -> template.name.isNotBlank() &&
+                        (template.activeField.isTitle || product.title.isNotBlank()
                                 || !product.title.isSlash()) &&
-                        (product.templateEntryState.isCount || product.count.isNotBlank())
-
-                product.isTemplateEntry ->
-                    (product.templateEntryState.isTitle && product.title.isNotBlank()
-                            && !product.title.isSlash()) ||
-                            (product.templateEntryState.isCount && product.count.isNotBlank())
+                        (template.activeField.isCount || product.count.isNotBlank())
 
                 else -> product.title.isNotBlank() &&
                         product.count.isNotBlank() &&
@@ -189,53 +282,67 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             }
         return copy(
             currentProduct = currentProduct.copy(
-                hasAnyError = baseValid
+                errors = currentProduct.errors.copy(
+                    hasAnyError = baseValid
+                )
             )
         )
     }
 
     private fun AddListState.updateGroup(isGroup: Boolean): AddListState {
         return copy(
-            isGroup = isGroup
+            mainList = mainList.copy(
+                isGroupMode = isGroup
+            )
         )
     }
 
     private fun AddListState.updateSuffix(suffix: Suffix): AddListState {
         return copy(
-            currentProduct = currentProduct.copy(countSuffix = suffix)
+            currentProduct = currentProduct.copy(
+                product = currentProduct.product.copy(countSuffix = suffix)
+            )
         )
     }
 
     private fun AddListState.updateCategory(category: String): AddListState {
         return copy(
-            currentProduct = currentProduct.copy(category = category)
+            currentProduct = currentProduct.copy(
+                product = currentProduct.product.copy(category = category)
+            )
         )
     }
 
     private fun AddListState.updateDate(date: String): AddListState {
         return copy(
-            currentProduct = currentProduct.copy(date = date)
+            currentProduct = currentProduct.copy(
+                product = currentProduct.product.copy(date = date)
+            )
         )
     }
 
     private fun AddListState.updateNote(note: String): AddListState {
         return copy(
-            currentProduct = currentProduct.copy(note = note)
+            currentProduct = currentProduct.copy(
+                product = currentProduct.product.copy(note = note)
+            )
         )
     }
 
     private fun AddListState.updateAnimal(animal: String): AddListState {
         return copy(
-            currentProduct = currentProduct.copy(animal = animal)
+            currentProduct = currentProduct.copy(
+                product = currentProduct.product.copy(animalName = animal)
+            )
         )
     }
 
     private fun AddListState.updateSearch(search: String): AddListState {
         val query = search.trim().lowercase()
 
-        val searchList = if (query.isBlank() && !isGroup) list
+        val searchList = if (query.isBlank() && !mainList.isGroupMode) mainList.items
         else
-            list.filter { item ->
+            mainList.items.filter { item ->
 
                 val category =
                     item.category ?: resourceProvider.getString(R.string.support_text_no_category)
@@ -249,40 +356,49 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
                             .contains(query)
             }
 
-        val searchBrieflyList = if (query.isBlank() && isGroup) briefly
+        val searchBrieflyList = if (query.isBlank() && mainList.isGroupMode) mainList.brieflyItems
         else
-            briefly.filter { item ->
+            mainList.brieflyItems.filter { item ->
                 item.title.lowercase().contains(query) ||
                         item.weight.toString().lowercase().contains(query)
             }
 
-
         return copy(
-            textSearch = search,
-            searchBrieflyList = searchBrieflyList,
-            searchList = searchList
+            searchState = searchState.copy(
+                searchQuery = search,
+                searchBrieflyResults = searchBrieflyList,
+                searchResults = searchList
+            )
         )
     }
 
     private fun AddListState.updateEntryBottomSheet(
         isOpenEntryBottomSheet: Boolean,
-        entryState2: AddEntryState2,
+        entryState2: AddProductState,
         isSaveStateForEntry: Boolean,
         isTemplate: Boolean
     ): AddListState {
         return copy(
-            openBottomSheetEntry = isOpenEntryBottomSheet,
-            currentProduct = entryState2.copy(isTemplate = isTemplate),
-            isSaveStateForBottomSheet = isSaveStateForEntry,
+            bottomSheetState = bottomSheetState.copy(
+                isOpenEntry = isOpenEntryBottomSheet,
+                isSaveStateForBottomSheet = isSaveStateForEntry,
+            ),
+            currentProduct = entryState2.copy(
+                template = entryState2.template.copy(
+                    isTemplate = isTemplate
+                )
+            )
         )
     }
 
     private fun AddListState.updateTitleAndSuffix(pair: Pair<String, Suffix>): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                title = pair.first,
-                countSuffix = pair.second,
-                error = currentProduct.error.copy(
+                product = currentProduct.product.copy(
+                    title = pair.first,
+                    countSuffix = pair.second
+                ),
+                errors = currentProduct.errors.copy(
                     isErrorTitle = pair.first.isBlank(),
                     isErrorSlash = pair.first.contains("/")
                 )
@@ -293,9 +409,11 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateTitle(title: String): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                title = title,
-                error = if (currentProduct.isTemplate) currentProduct.error
-                else currentProduct.error.copy(
+                product = currentProduct.product.copy(
+                    title = title,
+                ),
+                errors = if (currentProduct.template.isTemplate) currentProduct.errors
+                else currentProduct.errors.copy(
                     isErrorTitle = title.isBlank(),
                     isErrorSlash = title.contains("/")
                 )
@@ -316,9 +434,11 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateCount(count: String): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                count = count,
-                error = if (currentProduct.isTemplate) currentProduct.error
-                else currentProduct.error.copy(isErrorCount = count.isBlank())
+                product = currentProduct.product.copy(
+                    count = count
+                ),
+                errors = if (currentProduct.template.isTemplate) currentProduct.errors
+                else currentProduct.errors.copy(isErrorCount = count.isBlank())
             )
         )
     }
@@ -326,9 +446,11 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateAnimal(animal: Pair<Long, String>): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                selectedAnimalIndex = animal.first,
-                animalId = animal.first,
-                animal = animal.second
+                product = currentProduct.product.copy(
+                    selectedAnimalIndex = animal.first,
+                    animalId = animal.first,
+                    animalName = animal.second
+                )
             )
         )
     }
@@ -336,8 +458,10 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateAnimalClear(animal: String): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                animalId = null,
-                animal = animal
+                product = currentProduct.product.copy(
+                    animalId = null,
+                    animalName = animal
+                )
             )
         )
     }
@@ -345,8 +469,10 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateNameTemplate(nameTemplate: String): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                nameTemplate = nameTemplate,
-                error = currentProduct.error.copy(
+                template = currentProduct.template.copy(
+                    name = nameTemplate
+                ),
+                errors = currentProduct.errors.copy(
                     isErrorNameTemplate = nameTemplate.isBlank()
                 )
             )
@@ -356,9 +482,13 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateTitleTemplate(isTitle: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                title = if (isTitle) "" else currentProduct.title,
-                templateEntryState = currentProduct.templateEntryState.copy(
-                    isTitle = isTitle
+                product = currentProduct.product.copy(
+                    title = if (isTitle) "" else currentProduct.product.title,
+                ),
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isTitle = isTitle
+                    )
                 )
             )
         )
@@ -367,9 +497,13 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateCountTemplate(isCount: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                count = if (isCount) "" else currentProduct.count,
-                templateEntryState = currentProduct.templateEntryState.copy(
-                    isCount = isCount
+                product = currentProduct.product.copy(
+                    title = if (isCount) "" else currentProduct.product.count,
+                ),
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isCount = isCount
+                    )
                 )
             )
         )
@@ -378,9 +512,13 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateSuffixTemplate(isSuffix: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                countSuffix = if (isSuffix) Suffix.PIECES else currentProduct.countSuffix,
-                templateEntryState = currentProduct.templateEntryState.copy(
-                    isSuffix = isSuffix
+                product = currentProduct.product.copy(
+                    countSuffix = if (isSuffix) Suffix.NO else currentProduct.product.countSuffix,
+                ),
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isSuffix = isSuffix
+                    )
                 )
             )
         )
@@ -389,9 +527,13 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateCategoryTemplate(isCategory: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                category = if (isCategory) "" else currentProduct.category,
-                templateEntryState = currentProduct.templateEntryState.copy(
-                    isCategory = isCategory
+                product = currentProduct.product.copy(
+                    category = if (isCategory) "" else currentProduct.product.category,
+                ),
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isCategory = isCategory
+                    )
                 )
             )
         )
@@ -400,10 +542,14 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateAnimalTemplate(isAnimal: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                animal = if (isAnimal) "" else currentProduct.animal,
-                animalId = null,
-                templateEntryState = currentProduct.templateEntryState.copy(
-                    isAnimal = isAnimal
+                product = currentProduct.product.copy(
+                    animalName = if (isAnimal) "" else currentProduct.product.animalName,
+                    animalId = null,
+                ),
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isAnimal = isAnimal
+                    )
                 )
             )
         )
@@ -412,9 +558,26 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateNoteTemplate(isNote: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                note = if (isNote) "" else currentProduct.note,
-                templateEntryState = currentProduct.templateEntryState.copy(
-                    isNote = isNote
+                product = currentProduct.product.copy(
+                    note = if (isNote) "" else currentProduct.product.note,
+                ),
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isNote = isNote
+                    )
+                )
+            )
+        )
+    }
+
+    private fun AddListState.updateMultiProjectTemplate(isMultiProjectTemplate: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isAnimal = true,
+                        isMultiProjectTemplate = isMultiProjectTemplate
+                    )
                 )
             )
         )

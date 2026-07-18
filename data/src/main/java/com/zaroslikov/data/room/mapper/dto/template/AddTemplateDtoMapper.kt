@@ -1,7 +1,7 @@
-package com.zaroslikov.data.room.mapper.dto.add
+package com.zaroslikov.data.room.mapper.dto.template
 
-import com.zaroslikov.data.room.dto.add.AddTemplateDto
-import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
+import com.zaroslikov.data.room.dto.template.AddTemplateDto
+import com.zaroslikov.domain.models.dto.template.DomainAddTemplateDto
 
 fun AddTemplateDto.toDomainAddTemplateDto(): DomainAddTemplateDto {
     return DomainAddTemplateDto(
@@ -16,5 +16,7 @@ fun AddTemplateDto.toDomainAddTemplateDto(): DomainAddTemplateDto {
         nameAnimal = this.nameAnimal,
         note = this.note,
         idPT = this.idPT,
+        pin = this.pin,
+        isMultiProject = this.isMultiProject
     )
 }

@@ -57,5 +57,5 @@ data class Vaccination(
 data class ErrorVaccination(
     val isErrorVaccination: Boolean = false,
     val isErrorCount: Boolean = false,
-    val isErrorCountZero: Boolean = false
+    val isErrorCountZero: Boolean = false, override val hasAnyError: Boolean = false
 ) : BaseError

@@ -12,11 +12,15 @@ fun DomainTemplateTable.toAddTemplateTable(): TemplateTable {
         count = this.count,
         countSuffix = this.countSuffix,
         price = this.price,
+        priceAll = this.priceAll,
         priceSuffix = this.priceSuffix,
         category = this.category,
         animalId = this.animalId,
+        buyer = this.buyer,
         note = this.note,
         idPT = this.idPT,
+        isPinned = this.isPinned,
+        isMultiProjectTemplate = this.isMultiProjectTemplate
     )
 }
 
@@ -29,10 +33,14 @@ fun TemplateTable.toDomainAddTemplateTable(): DomainTemplateTable {
         count = this.count,
         countSuffix = this.countSuffix,
         price = this.price,
+        priceAll = this.priceAll,
         priceSuffix = this.priceSuffix,
         category = this.category,
         animalId = this.animalId,
+        buyer = this.buyer,
         note = this.note,
         idPT = this.idPT,
+        isPinned = this.isPinned,
+        isMultiProjectTemplate = isMultiProjectTemplate
     )
 }

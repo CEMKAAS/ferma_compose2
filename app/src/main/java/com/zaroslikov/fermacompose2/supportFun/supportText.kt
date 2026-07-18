@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import androidx.compose.material3.TimePickerState
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.FilterDate
@@ -8,6 +9,7 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeType
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TitleLocation
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator.*
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
@@ -47,6 +49,8 @@ fun Suffix.toResId(): Int {
         Suffix.TONS_DAY -> R.string.suffix_tons_day
         Suffix.KILOGRAM_TO_CUBIC_METERS -> R.string.suffix_cubic_kilogram_to_meters
         Suffix.KILOGRAM_TO_LITERS -> R.string.suffix_kilogram_to_liters
+
+        Suffix.NO -> R.string.is_empty
     }
 }
 
@@ -184,5 +188,14 @@ fun QrCodeType.toResId(): Int {
         QrCodeType.MINI -> R.string.qr_code_type_mini
         QrCodeType.STANDARD -> R.string.qr_code_type_standard
         QrCodeType.FULL -> R.string.qr_code_type_full
+    }
+}
+
+fun TitleLocation.toResId(): Int {
+    return when (this) {
+        TitleLocation.UNDER -> R.string.title_location_under
+        TitleLocation.RIGHT -> R.string.title_location_right
+        TitleLocation.LEFT -> R.string.title_location_left
+        TitleLocation.NO -> R.string.title_location_no
     }
 }

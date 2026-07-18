@@ -46,5 +46,5 @@ data class AnimalWeightUi(
 )
 
 data class ErrorAnimalWeight(
-    val isErrorWeight: Boolean = false
+    val isErrorWeight: Boolean = false, override val hasAnyError: Boolean = false
 ) : BaseError

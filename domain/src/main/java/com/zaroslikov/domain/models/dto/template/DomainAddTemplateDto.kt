@@ -1,4 +1,4 @@
-package com.zaroslikov.domain.models.dto.add
+package com.zaroslikov.domain.models.dto.template
 
 import com.zaroslikov.domain.models.enums.Suffix
 
@@ -14,4 +14,6 @@ data class DomainAddTemplateDto(
     val nameAnimal: String? = null,
     val note: String? = "",
     val idPT: Long = 0,
+    val pin: Boolean = false,
+    val isMultiProject: Boolean = false
 )

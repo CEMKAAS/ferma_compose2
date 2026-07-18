@@ -24,7 +24,8 @@ import com.zaroslikov.fermacompose2.grey
 fun SwitchWitchText(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    @StringRes intRes: Int
+    enabled: Boolean = true,
+    @StringRes intRes: Int = R.string.support_text_enter_when_applying,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -34,6 +35,7 @@ fun SwitchWitchText(
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
+            enabled = enabled
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,

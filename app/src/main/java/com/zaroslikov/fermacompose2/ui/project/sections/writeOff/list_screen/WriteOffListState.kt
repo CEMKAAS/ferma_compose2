@@ -76,7 +76,7 @@ data class PickWriteOffList(
 data class ErrorWriteOff(
     val isErrorTitle: Boolean = false,
     val isErrorSlash: Boolean = false,
-    val isErrorCount: Boolean = false,
+    val isErrorCount: Boolean = false, override val hasAnyError: Boolean = false,
 ) : BaseError
 
 data class LoadDataWriteOffList(

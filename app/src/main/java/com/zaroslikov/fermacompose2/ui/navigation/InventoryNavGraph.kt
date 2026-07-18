@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.navigation
 
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,10 +32,7 @@ fun InventoryNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: String,
-    isOpenTemplate: Boolean
 ) {
-
-
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -45,7 +43,7 @@ fun InventoryNavHost(
                 navigateToProfile = { navController.navigate(ProfileDestination.route) },
                 navigateToAboutApp = { navController.navigate(AboutAppDestination.route) },
                 navigateToSettings = { navController.navigate(SettingsDestination.route) },
-                navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it}") },
+                navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it.first}?${MainProjectsDestination.templateArg}=${it.second}") },
                 navigateToItemIncubator = { navController.navigate("${MainIncubatorDestination.route}/${it}") },
                 navigateToProject = { navController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToIncubator = { navController.navigate("${AddIncubatorDestination.route}/${it}") },
@@ -53,12 +51,21 @@ fun InventoryNavHost(
         }
         composable(
             route = MainProjectsDestination.routeWithArgs,
-            arguments = listOf(navArgument(MainProjectsDestination.itemIdArg) {
-                type = NavType.LongType
-            })
+            arguments = listOf(
+                navArgument(MainProjectsDestination.itemIdArg) {
+                    type = NavType.LongType
+                },
+                navArgument(MainProjectsDestination.templateArg) {
+                    type = NavType.BoolType
+                    nullable = false
+                    defaultValue = false
+                })
         ) { backStackEntry ->
             val itemId = backStackEntry.arguments!!.getLong(MainProjectsDestination.itemIdArg)
-            MainProjectScreen(navController, itemId, isOpenTemplate)
+            val template =
+                backStackEntry.arguments?.getBoolean(MainProjectsDestination.templateArg) ?: false
+            Log.i("startDestination", "MainProjectScreen: $template ")
+            MainProjectScreen(navController, itemId, template)
         }
         composable(
             route = MainIncubatorDestination.routeWithArgs,

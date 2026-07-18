@@ -6,13 +6,13 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.AddIncubator
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.EntryBookmark
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddEntryState2
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size.CurrentAnimalSize
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vaccination.Vaccination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.CurrentAnimalWeight
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalEntryState2
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesEntryState2
-import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleEntryState2
+import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffEntryState2
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
@@ -84,17 +84,17 @@ class YandexMetricRepositoryImpl @Inject constructor(
         AppMetrica.reportEvent("Списание корма", eventParameters)
     }
 
-    override fun metricAdd(domainAddTable: AddEntryState2) {
+    override fun metricAdd(domainAddTable: AddProductState) {
         val eventParameters: MutableMap<String, Any> = HashMap()
-        eventParameters["Имя"] = domainAddTable.title
-        eventParameters["Категория"] = domainAddTable.category
-        eventParameters["Животное"] = domainAddTable.animal.ifBlank { "Животное не указано" }
-        eventParameters["Примечание"] = domainAddTable.note.ifBlank { "Заметка не указана" }
+        eventParameters["Имя"] = domainAddTable.product.title
+        eventParameters["Категория"] = domainAddTable.product.category
+        eventParameters["Животное"] = domainAddTable.product.animalName.ifBlank { "Животное не указано" }
+        eventParameters["Примечание"] = domainAddTable.product.note.ifBlank { "Заметка не указана" }
         AppMetrica.reportEvent("Добавление продукции", eventParameters)
     }
 
     override fun metricSale(
-        domainSaleTable: SaleEntryState2
+        domainSaleTable: SaleProductState
     ) {
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["Имя"] = domainSaleTable.title
@@ -124,14 +124,15 @@ class YandexMetricRepositoryImpl @Inject constructor(
         AppMetrica.reportEvent("Списание продукции", eventParameters)
     }
 
-    override fun metricalTemplate(currentProduct: AddEntryState2) {
+    override fun metricalTemplate(currentProduct: AddProductState) {
         val eventParameters: MutableMap<String, Any> = HashMap()
-        eventParameters["Имя"] = currentProduct.title
-        eventParameters["Категория"] = currentProduct.category
-        eventParameters["Животное"] = currentProduct.animal.ifBlank { "Животное не указано" }
-        eventParameters["Примечание"] = currentProduct.note.ifBlank { "Заметка не указана" }
-        AppMetrica.reportEvent("Добавление продукции", eventParameters)
-
+        eventParameters["Имя шаблона"] = currentProduct.template.name
+        eventParameters["Имя"] = currentProduct.product.title
+        eventParameters["Категория"] = currentProduct.product.category
+        eventParameters["Животное"] =
+            currentProduct.product.animalName.ifBlank { "Животное не указано" }
+        eventParameters["Примечание"] = currentProduct.product.note.ifBlank { "Заметка не указана" }
+        AppMetrica.reportEvent("Добавление шаблона", eventParameters)
     }
 
     override fun metricalNote(

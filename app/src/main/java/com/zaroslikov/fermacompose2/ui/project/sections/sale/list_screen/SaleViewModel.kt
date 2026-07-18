@@ -4,26 +4,35 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.ProductOrigin
+import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.enums.TemplateType
 import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
 import com.zaroslikov.domain.models.table.DomainSettings
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
+import com.zaroslikov.domain.repository.template.AddTemplateRepository
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
+import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel3
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
-import com.zaroslikov.fermacompose2.supportFun.conversation3
-import com.zaroslikov.fermacompose2.supportFun.conversation4
+import com.zaroslikov.fermacompose2.supportFun.build
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toConvertDbDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.toSuffixList
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrPayload
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateFieldsState
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
+import com.zaroslikov.fermacompose2.utils.QrGenerator
+import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -34,22 +43,31 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.text.trim
 
 @HiltViewModel
 class SaleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val qrGenerator: QrGenerator,
+    private val qrNavigationManager: QrNavigationManager,
+    private val addTemplateRepository: AddTemplateRepository,
     private val saleRepository: SaleRepository,
     private val warehouseRepository: WarehouseRepository,
     private val settingsRepository: SettingsRepository,
     private val resourceProvider: ResourceProvider,
     private val projectRepository: ProjectRepository,
     private val yandexMetricRepository: YandexMetricRepository
-) : EntryNewViewModel2<SaleListState, SaleListIntent, SaleListReduce>(
+) : EntryNewViewModel3<SaleListState, SaleListIntent, SaleListReduce>(
     SaleListState(),
-    SaleListReduce(resourceProvider)
+    SaleListReduce(resourceProvider),
+    qrGenerator = qrGenerator,
+    resourceProvider = resourceProvider,
+    projectRepository = projectRepository,
+    qrNavigationManager = qrNavigationManager,
+    addTemplateRepository = addTemplateRepository
 ) {
 
-    private val itemIdPT: Long = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
+    private val _itemIdPT: Long = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
 
     init {
         loadData()
@@ -71,28 +89,57 @@ class SaleViewModel @Inject constructor(
 
             SaleListIntent.Insert -> insert()
             SaleListIntent.Update -> update()
-            SaleListIntent.Delete -> delete(0)
+            SaleListIntent.Delete -> delete()
+
+            SaleListIntent.InsertTemplate -> insertTemplate()
+            SaleListIntent.UpdateTemplate -> updateTemplate()
+            SaleListIntent.DeleteTemplate -> deleteTemplate()
+
+            is SaleListIntent.QrDetected -> qrScanner(intent.value)
+            is SaleListIntent.CreateQrCodeClick -> generateQrCode(intent.value)
+            is SaleListIntent.SetPinOfTemplateClick -> setPin(intent.value)
+
+            is AddListIntent.RecoverClick -> recover(intent.value)
+            is AddListIntent.OpenPatternsBottomSheetClick ->
+                loadDataForTemplatesBottomSheet(intent.value)
+
             else -> Unit
         }
     }
 
-    private fun loadData() {
+    override fun createOpenQrIntent(data: QrCodeData): SaleListIntent {
+        TODO("Not yet implemented")
+    }
+
+    override fun createOpenQrWarningIntent(warning: QrCodeWarningType): SaleListIntent {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun onQrPayloadReceived(payload: QrPayload) {
+        TODO("Not yet implemented")
+    }
+
+    override fun loadData() {
         viewModelScope.launch {
-            val isArchive = projectRepository.getIsArchiveProject(itemIdPT).first()
+            val isArchive = projectRepository.getIsArchiveProject(_itemIdPT).first()
             combine(
-                saleRepository.getAllSaleItems(itemIdPT),
-                settingsRepository.getSettings(itemIdPT)
+                saleRepository.getAllSaleItems(_itemIdPT),
+                settingsRepository.getSettings(_itemIdPT)
             ) { addList, settings ->
                 val brieflyList = brieflyList(addList, settings)
                 Triple(addList, brieflyList, settings)
-            }.collectLatest { (addList, briefly, settings) ->
+            }.collectLatest { (saleItems, saleBrieflyItems, settings) ->
                 updateState {
                     it.copy(
-                        idPT = itemIdPT,
-                        list = addList,
-                        searchList = addList,
-                        briefly = briefly,
-                        searchBrieflyList = briefly,
+                        idPT = _itemIdPT,
+                        mainList = it.mainList.copy(
+                            items = saleItems,
+                            brieflyItems = saleBrieflyItems,
+                        ),
+                        searchState = it.searchState.copy(
+                            searchResults = saleItems,
+                            searchBrieflyResults = saleBrieflyItems
+                        ),
                         settings = settings,
                         isLoading = false,
                         isArchive = isArchive
@@ -109,7 +156,7 @@ class SaleViewModel @Inject constructor(
         return list
             .groupBy { it.title }
             .map { (title, items) ->
-                mapperToBrieflyItem(title, items, settings = settings)
+                mapperToBrieflyItem(title, items, settings)
             }
     }
 
@@ -117,25 +164,33 @@ class SaleViewModel @Inject constructor(
         viewModelScope.launch {
             if (title == null) {
                 updateState { state ->
-                    state.copy(isOpenBottomSheetGroup = false)
+                    state.copy(
+                        bottomSheetState = state.bottomSheetState.copy(
+                            isOpenGroup = false
+                        )
+                    )
                 }
                 return@launch
             }
-            val listBriefly = getDetailsName(name = title)
-            val currentBriefly =
-                mapperToBrieflyItem(title, listBriefly, settings = getState().settings)
+            val productItems = getDetailsName(name = title)
+            val detail =
+                mapperToBrieflyItem(title, productItems, settings = getState().settings)
             updateState {
                 it.copy(
-                    isOpenBottomSheetGroup = true,
-                    currentBriefly = currentBriefly,
-                    listBriefly = listBriefly
+                    bottomSheetState = it.bottomSheetState.copy(
+                        isOpenGroup = true,
+                    ),
+                    detailNomenclatura = it.detailNomenclatura.copy(
+                        detail = detail,
+                        productItems = productItems
+                    )
                 )
             }
         }
     }
 
     private suspend fun getDetailsName(name: String): List<DomainSaleTable> {
-        return saleRepository.getBrieflyDetailsItemSale(itemIdPT, name).first()
+        return saleRepository.getBrieflyDetailsItemSale(_itemIdPT, name).first()
     }
 
     private fun loadDataForEntryOrEdit(
@@ -147,7 +202,7 @@ class SaleViewModel @Inject constructor(
             if (!isOpen) {
                 val state =
                     if (isSaveStateForBottomSheet) getState().currentProduct
-                    else SaleEntryState2()
+                    else SaleProductState()
                 onIntent(
                     SaleListIntent.RefreshEntryBottomSheetState(
                         false, state, isSaveStateForBottomSheet
@@ -155,36 +210,70 @@ class SaleViewModel @Inject constructor(
                 )
                 return@launch
             }
-            val newState = if (!getState().isSaveStateForBottomSheet || domain != null) {
-                val titleDeferred =
-                    async { saleRepository.getItemsTitleSaleList(itemIdPT).first() }
-                val categoryDeferred =
-                    async { saleRepository.getItemsCategorySaleList(itemIdPT).first() }
-                val buyerDeferred = async {
-                    saleRepository.getItemsBuyerSaleList(itemIdPT).first()
-                }
+            val newState =
+                if (!getState().bottomSheetState.isSaveStateForBottomSheet || domain != null) {
+                    val titleDeferred =
+                        async { saleRepository.getItemsTitleSaleList(_itemIdPT).first() }
+                    val categoryDeferred =
+                        async { saleRepository.getItemsCategorySaleList(_itemIdPT).first() }
+                    val buyerDeferred = async {
+                        saleRepository.getItemsBuyerSaleList(_itemIdPT).first()
+                    }
 
-                val baseState = SaleEntryState2(
-                    itemIdPT = itemIdPT,
-                    category = resourceProvider.getString(R.string.support_text_no_category),
-                    buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
-                    pickList = PickSaleList(
-                        titleList = titleDeferred.await(),
-                        categoryList = categoryDeferred.await(),
-                        buyerList = buyerDeferred.await()
+                    val baseState = SaleProductState(
+                        product = SaleProduct(
+                            projectId = _itemIdPT,
+                            category = resourceProvider.getString(R.string.support_text_no_category),
+                            buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
+
+                            ),
+                        pickList = PickSaleList(
+                            titles = titleDeferred.await(),
+                            categories = categoryDeferred.await(),
+                            buyers = buyerDeferred.await()
+                        )
                     )
-                )
-                if (domain == null) baseState
-                else {
-                   /* val saleCategory = baseState.pickList.titleList
-                        .firstOrNull { it.title == domain.title }
-                        ?.category*/
+                    if (domain == null) baseState
+                    else {
+                        /* val saleCategory = baseState.pickList.titleList
+                             .firstOrNull { it.title == domain.title }
+                             ?.category*/
 
-                    baseState.toUiMap22(domain)/*.copy(saleCategory = saleCategory)*/
-                }
-            } else getState().currentProduct
+                        baseState.toUiMap22(domain)/*.copy(saleCategory = saleCategory)*/
+                    }
+                } else getState().currentProduct
             onIntent(SaleListIntent.RefreshEntryBottomSheetState(true, newState))
-            newState.productOrigin?.let { updateWarehouseUiStateSync(newState.title, it) }
+            newState.product.productOrigin?.let {
+                updateWarehouseUiStateSync(newState.product.title, it)
+            }
+        }
+    }
+
+
+    override fun recover(domainTemplateTable: DomainTemplateTable) {
+        viewModelScope.launch {
+            val baseState = loadDataForPickList()
+            val currentProduct = baseState.toUiMap23(
+                domainTemplateTable,
+                isTemplateEntry = true,
+                domainTemplateTable.isMultiProjectTemplate
+            )
+            sendIntent(
+                AddListIntent.OpenTemplateBottomSheetClick(true, currentProduct)
+            )
+            updateWarehouseUiStateSync(currentProduct.product.title)
+        }
+    }
+
+    override fun loadDataForTemplatesBottomSheet(
+        isOpen: Boolean
+    ) {
+        viewModelScope.launch {
+            if (!isOpen) return@launch
+            addTemplateRepository.getAllAddTemplateItems(_itemIdPT)
+                .collectLatest { it ->
+                    sendIntent(AddListIntent.LoadDataForTemplate(it.map { it.toTemplateItemUi() }))
+                }
         }
     }
 
@@ -197,53 +286,44 @@ class SaleViewModel @Inject constructor(
 
     private suspend fun updateWarehouseUiStateSync(name: String, productOrigin: ProductOrigin) {
         val pair = if (productOrigin == ProductOrigin.EXPENSES)
-            warehouseRepository.getCurrentExpensesProductList(name, itemIdPT).first()
+            warehouseRepository.getCurrentExpensesProductList(name, _itemIdPT).first()
                 .build(getState().settings)
         else
             warehouseRepository
-                .getCurrentBalanceProductList(name, itemIdPT).first()
+                .getCurrentBalanceProductList(name, _itemIdPT).first()
                 .build(getState().settings)
 
         onIntent(SaleListIntent.RefreshWarehouseCount(pair))
     }
 
-    private fun List<DomainCountSuffix>.build(
-        settings: DomainSettings
-    ): List<DomainCountSuffix> {
-        return this.groupBy { it.suffix.conversation4(settings) }
-            .map { (suffix, items) ->
-                val totalCount = items.sumOf {
-                    it.count.conversation3(it.suffix, settings)
-                }
-                DomainCountSuffix(
-                    count = totalCount,
-                    suffix = suffix
-                )
-            }
-    }
 
     override fun insert() {
         viewModelScope.launch {
-            saleRepository.insertSale(getState().currentProduct.toDomainMap())
-            yandexMetricRepository.metricSale(getState().currentProduct)
-            showSnackbar(ProductOperation.ADD)
-            loadDataForEntryOrEdit(false, null)
+            val currentProduct = getState().currentProduct
+            saleRepository.insertSale(currentProduct.toDomainMap())
+            yandexMetricRepository.metricSale(currentProduct)
+            if (currentProduct.template.isTemplateEntry)
+                sendIntent(SaleListIntent.OpenTemplateBottomSheetClick(false))
+            else {
+                showSnackbar(ProductOperation.ADD)
+                loadDataForEntryOrEdit(false, null)
+            }
         }
     }
 
     override fun update() {
         viewModelScope.launch {
             saleRepository.updateSale(getState().currentProduct.toDomainMap())
-            if (getState().currentDetail != null)
-                updateState { it.copy(currentDetail = getState().currentProduct.toDomainMap()) }
+            if (getState().productDetail != null)
+                updateState { it.copy(productDetail = getState().currentProduct.toDomainMap()) }
             showSnackbar(ProductOperation.EDIT)
             loadDataForEntryOrEdit(false, null)
         }
     }
 
-    override fun delete(id: Long) {
+    override fun delete() {
         viewModelScope.launch {
-            getState().currentDetail?.let { product ->
+            getState().productDetail?.let { product ->
                 saleRepository.deleteSaleById(product.id)
                 showSnackbar(ProductOperation.DELETE)
                 sendIntent(SaleListIntent.OpenBottomSheetDelete(null))
@@ -251,13 +331,37 @@ class SaleViewModel @Inject constructor(
         }
     }
 
+    override fun insertTemplate() {
+        viewModelScope.launch {
+            addTemplateRepository.insert(getState().currentProduct.toDomainTemplate())
+            yandexMetricRepository.metricalTemplate(getState().currentProduct)
+            loadDataForEntryOrEdit(false, null)
+        }
+    }
+
+    override fun updateTemplate() {
+        viewModelScope.launch {
+            addTemplateRepository.update(getState().currentProduct.toDomainTemplate())
+            loadDataForEntryOrEdit(false, null)
+        }
+    }
+
+    override fun deleteTemplate() {
+        viewModelScope.launch {
+            getState().templatesState.templateToDelete?.let { template ->
+                addTemplateRepository.deleteAddTemplateItemById(template.id)
+                sendIntent(SaleListIntent.OpenTemplateDeleteBottomSheet(null))
+            }
+        }
+    }
+
     private fun showSnackbar(productOperation: ProductOperation) {
         val (title, count) =
             if (productOperation == ProductOperation.DELETE) {
-                val product = getState().currentDetail ?: DomainAddItemDto()
+                val product = getState().productDetail ?: DomainAddItemDto()
                 product.title to product.count.formatNumber()
             } else {
-                val product = getState().currentProduct
+                val product = getState().currentProduct.product
                 product.title to product.count
             }
         val suffix = resourceProvider.getString(getState().settings.currencySuffix.toResId())
@@ -275,60 +379,138 @@ class SaleViewModel @Inject constructor(
         )
     }
 
-    private fun SaleEntryState2.toUiMap22(domain: DomainSaleTable): SaleEntryState2 {
+    private fun SaleProductState.toUiMap22(domain: DomainSaleTable): SaleProductState {
         val isIndicatorsValue = setOf(domain.animalId, domain.animalCountId).any { it != null }
         return copy(
-            itemId = domain.id,
-            title = domain.title,
-            count = domain.count.formatNumber(false),
-            countSuffix = domain.countSuffix,
-            isAutoPrice = domain.priceAll != null,
-            price = domain.price.formatNumber(false),
-            priceAll = domain.priceAll?.formatNumber() ?: "",
-            date = formatDateToString(
-                domain.day,
-                domain.month,
-                domain.year
+            product = product.copy(
+                itemId = domain.id,
+                title = domain.title,
+                count = domain.count.formatNumber(false),
+                countSuffix = domain.countSuffix,
+                isAutoPrice = domain.priceAll != null,
+                price = domain.price.formatNumber(false),
+                priceAll = domain.priceAll?.formatNumber() ?: "",
+                date = formatDateToString(
+                    domain.day,
+                    domain.month,
+                    domain.year
+                ),
+                category = domain.category ?: product.category,
+                buyer = domain.buyer ?: product.buyer,
+                note = domain.note,
+                animalId = domain.animalId,
+                animalCountId = domain.animalCountId,
+                isEntry = false,
+                isIndicatorsValue = isIndicatorsValue,
+                projectId = domain.idPT,
+                productOrigin = domain.productOrigin
             ),
             pickList = pickList.copy(
                 suffixList = domain.countSuffix.toSuffixList()
             ),
-            category = domain.category ?: category,
-            buyer = domain.buyer ?: buyer,
-            note = domain.note,
-            animalId = domain.animalId,
-            animalCountId = domain.animalCountId,
-            isEntry = false,
-            isIndicatorsValue = isIndicatorsValue, error = ErrorSale(),
-            itemIdPT = domain.idPT,
-            productOrigin = domain.productOrigin
+            errors = ErrorSale(),
         )
     }
 
-    private fun SaleEntryState2.toDomainMap(): DomainSaleTable {
-        val dateList = date.split(".")
-        val category = category.trim()
-        val buyer = buyer.trim()
+    private fun SaleProductState.toUiMap23(
+        domain: DomainTemplateTable,
+        isTemplateEntry: Boolean = false,
+        isMultiProjectTemplate: Boolean = false
+    ): SaleProductState {
+        val category =
+            domain.category?.ifBlank { resourceProvider.getString(R.string.support_text_no_category) }
+                ?: ""
+        val buyer =
+            domain.buyer?.ifBlank { resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer) }
+                ?: ""
+        return copy(
+            product = product.copy(
+                itemId = if (isTemplateEntry) product.itemId else domain.id,
+                title = domain.title ?: "",
+                count = domain.count?.formatNumber(false) ?: "",
+                countSuffix = domain.countSuffix ?: Suffix.NO,
+                isAutoPrice = domain.priceAll != null,
+                price = domain.price?.formatNumber(false) ?: "",
+                priceAll = domain.priceAll?.formatNumber() ?: "",
+                category = category,
+                buyer = buyer,
+                note = domain.note ?: "",
+                animalId = domain.animalId,
+                isEntry = false,
+                projectId = domain.idPT,
+//                productOrigin = domain.productOrigin TODO не совсем уверен, что это
+            ),
+            //TODO не припоминаю, зачем тут лист единицы измерения
+            /* pickList = pickList.copy(
+                 suffixList = domain.countSuffix.toSuffixList()
+             ),*/
+            template = template.copy(
+                name = domain.nameTemplate,
+                isTemplate = false,
+                isTemplateEntry = isTemplateEntry,
+                pin = domain.isPinned,
+                activeField = TemplateFieldsState(
+                    isTitle = domain.title == null,
+                    isCount = domain.count == null,
+                    isPrice = domain.price == null,
+                    isSuffix = domain.countSuffix == null,
+                    isCategory = domain.category == null,
+                    isBuyer = domain.buyer == null,
+                    isNote = domain.note == null,
+                    isMultiProjectTemplate = domain.isMultiProjectTemplate
+                )
+            ),
+            errors = ErrorSale(),
+        )
+    }
+
+    private fun SaleProductState.toDomainMap(): DomainSaleTable {
+        val dateList = product.date.split(".")
+        val category = product.category.trim()
+        val buyer = product.buyer.trim()
         return DomainSaleTable(
-            id = itemId,
-            title = title.trim(),
-            count = count.toConvertDbDouble(),
-            countSuffix = countSuffix,
-            price = price.toConvertDbDouble(),
-            priceAll = if (isAutoPrice) priceAll.toConvertDbDouble() else null,
+            id = product.itemId,
+            title = product.title.trim(),
+            count = product.count.toConvertDbDouble(),
+            countSuffix = product.countSuffix,
+            price = product.price.toConvertDbDouble(),
+            priceAll = if (product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
             priceSuffix = getState().settings.currencySuffix,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
             category = if (category.contains(resourceProvider.getString(R.string.support_text_no_category)) || category.isEmpty())
                 null else category,
-            note = note.trim(),
+            note = product.note.trim(),
             buyer = if (buyer.contains(resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer)) || buyer.isEmpty())
                 null else buyer,
-            idPT = itemIdPT,
-            animalId = animalId,
-            animalCountId = animalCountId,
-            productOrigin = productOrigin ?: ProductOrigin.SALE
+            idPT = _itemIdPT,
+            animalId = product.animalId,
+            animalCountId = product.animalCountId,
+            productOrigin = product.productOrigin ?: ProductOrigin.SALE
+        )
+    }
+
+    private fun SaleProductState.toDomainTemplate(): DomainTemplateTable {
+        val category = product.category.trim()
+        val activeField = template.activeField
+        return DomainTemplateTable(
+            id = product.itemId,
+            templateType = TemplateType.SALE,
+            nameTemplate = template.name.trim(),
+            title = if (activeField.isTitle) null else product.title.trim(),
+            count = if (activeField.isCount) null else product.count.toConvertDbDouble(),
+            countSuffix = if (activeField.isSuffix) null else product.countSuffix,
+            price = product.price.toConvertDbDouble(),
+            priceAll = if (product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
+            priceSuffix = getState().settings.currencySuffix,
+            category = if (activeField.isCategory) null else category,
+            animalId = if (activeField.isAnimal || activeField.isMultiProjectTemplate) null else product.animalId,
+            note = if (activeField.isNote) null else product.note.trim(),
+            buyer = if (activeField.isBuyer) null else product.buyer.trim(),
+            idPT = _itemIdPT,
+            isPinned = template.pin,
+            isMultiProjectTemplate = activeField.isMultiProjectTemplate
         )
     }
 }

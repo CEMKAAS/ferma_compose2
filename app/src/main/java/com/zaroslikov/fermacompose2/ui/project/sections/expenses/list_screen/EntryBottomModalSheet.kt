@@ -170,20 +170,20 @@ fun ExpensesEntryBottomSheet(
             onPriceChange = {
                 onIntent(ExpensesListIntent.PriceChanged(it))
             },
-            priceAll = state.priceAll,
-            isError = state.error.isErrorPrice,
             isAutoCalculate = state.isAutoPrice,
             onAutoCalculate = {
                 onIntent(ExpensesListIntent.AutoPriceClicked(it))
             },
-            isNecessarily = true,
             isManyCount = true,
-            supportTextRes = R.string.support_text_price_expenses_all,
-            supportTextResAutoCal = R.string.support_text_price_expenses_one,
-            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
+            isError = state.error.isErrorPrice,
+            isNecessarily = true,
             count = state.count,
             countSuffix = state.countSuffix,
+            priceAll = state.priceAll,
             priceSuffix = priceSuffix,
+            supportTextRes = R.string.support_text_price_expenses_all,
+            supportTextResAutoCal = R.string.support_text_price_expenses_one,
+            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,,
         )
         OutlinedTextCategoryNew(
             value = state.category,

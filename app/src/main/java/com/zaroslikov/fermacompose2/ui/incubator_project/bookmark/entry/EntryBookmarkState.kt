@@ -100,7 +100,7 @@ data class ErrorBookmark(
     val isErrorLargeCount: Boolean = false,
     val isErrorRejectedCount: Boolean = false
 ) : BaseError {
-    val hasAnyError: Boolean
+    override val hasAnyError: Boolean
         get() = isErrorTitle || isErrorCount || isErrorLargeCount || isErrorRejectedCount
 }
 

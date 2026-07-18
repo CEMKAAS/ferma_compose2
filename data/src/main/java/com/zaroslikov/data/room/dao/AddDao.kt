@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.add.AddItemDto
+import com.zaroslikov.data.room.dto.add.AddItemDto2
 import com.zaroslikov.data.room.dto.add.AnimalCountSuffixDto
 import com.zaroslikov.data.room.dto.add.BrieflyAddDto
 import com.zaroslikov.data.room.dto.add.FastAddProductDto
@@ -35,9 +36,6 @@ interface AddDao {
         insertAllAddTable(addTable)
     }
 
-    @Query("SELECT * FROM add_table WHERE _id = :id")
-    fun getItem(id: Long): Flow<AddTable>
-
     @Query(
         "SELECT " +
                 " a._id," +
@@ -56,10 +54,29 @@ interface AddDao {
                 " a.animal_count_id" +
                 " FROM add_table a" +
                 " LEFT JOIN animal_table at ON at.id = a.animal_id" +
+                " WHERE _id = :id"
+    )
+    fun getItem(id: Long): Flow<AddItemDto>
+
+    @Query(
+        "SELECT " +
+                " a._id," +
+                " a.title," +
+                " a.count," +
+                " a.count_suffix," +
+                " a.day," +
+                " a.month," +
+                " a.year," +
+                " a.category," +
+                " at.name AS animal_name," +
+                " a.note, " +
+                " a.animal_count_id " +
+                " FROM add_table a" +
+                " LEFT JOIN animal_table at ON at.id = a.animal_id" +
                 " WHERE a.idPT = :id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', a.year, a.month, a.day)) DESC, a._id DESC "
     )
-    fun getAllItems(id: Long): Flow<List<AddItemDto>>
+    fun getAllItems(id: Long): Flow<List<AddItemDto2>>
 
     @Query(
         "SELECT title," +
@@ -82,19 +99,16 @@ interface AddDao {
                 " a.day," +
                 " a.month," +
                 " a.year," +
-                " a.price," +
                 " a.category," +
-                " a.animal_id," +
                 " at.name AS animal_name," +
-                " a.note," +
-                " a.idPT," +
-                " a.animal_count_id" +
+                " a.note, " +
+                " a.animal_count_id " +
                 " FROM add_table a" +
                 " LEFT JOIN animal_table at ON at.id = a.animal_id" +
                 " WHERE a.idPT=:id AND a.title =:name" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC"
     )
-    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddItemDto>>
+    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddItemDto2>>
 
     @Query(
         "SELECT title," +

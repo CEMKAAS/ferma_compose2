@@ -108,7 +108,7 @@ data class ErrorKill(
 data class ErrorCount(
     val isErrorPrice: Boolean = false,
     val isErrorCount: Boolean = false,
-    val isErrorCountZero: Boolean = false,
+    val isErrorCountZero: Boolean = false, override val hasAnyError: Boolean =false,
 ) : BaseError
 
 data class DomainAnimalCountPriceUi(

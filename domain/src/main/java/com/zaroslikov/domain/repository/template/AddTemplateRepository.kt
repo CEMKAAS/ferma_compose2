@@ -1,6 +1,6 @@
 package com.zaroslikov.domain.repository.template
 
-import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
+import com.zaroslikov.domain.models.dto.template.DomainAddTemplateDto
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import kotlinx.coroutines.flow.Flow
 
@@ -16,8 +16,8 @@ interface AddTemplateRepository {
         insertAllAddTemplateTable(addTemplateTable)
     }
 
+   suspend fun setPinById(pin: Boolean, id: Long)
     fun getAddTemplateItem(id: Long): Flow<DomainTemplateTable?>
-
 
     fun getAllAddTemplateItems(id: Long): Flow<List<DomainAddTemplateDto>>
 

@@ -1,9 +1,9 @@
-package com.zaroslikov.data.room.dto.add
+package com.zaroslikov.data.room.dto.template
 
 import androidx.room.ColumnInfo
 import com.zaroslikov.domain.models.enums.Suffix
 
-data class AddTemplateDto(
+data class AddTemplateDto2(
     @ColumnInfo(name = "_id")
     val id: Long = 0,
     @ColumnInfo(name = "name_template")
@@ -20,4 +20,7 @@ data class AddTemplateDto(
     val nameAnimal: String? = null,
     val note: String? = "",
     val idPT: Long = 0,
+    val pin: Boolean = false,
+    @ColumnInfo(name = "is_multi_project_template")
+    val isMultiProject: Boolean = false
 )

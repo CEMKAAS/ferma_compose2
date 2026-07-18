@@ -26,13 +26,4 @@ abstract class EntryNewViewModel2<STATE : EntryNewState, INTENT : BaseIntent, RE
     protected fun sendIntent(intent: INTENT) {
         _state.value = reducer.reducer(_state.value, intent)
     }
-
-    private val _events = MutableSharedFlow<EventFile>()
-    val events = _events.asSharedFlow()
-
-    protected fun event(eventFile: EventFile) {
-        viewModelScope.launch {
-            _events.emit(eventFile)
-        }
-    }
 }

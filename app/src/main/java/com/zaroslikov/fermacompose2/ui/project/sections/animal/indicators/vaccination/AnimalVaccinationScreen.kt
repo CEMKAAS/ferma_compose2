@@ -244,18 +244,18 @@ private fun VaccinationBottomSheet(
             onPriceChange = {
                 onIntent(AnimalVaccinationIntent.PriceChanged(it))
             },
-            priceAll = state.priceAll,
             isAutoCalculate = state.isAutoCalculate,
             onAutoCalculate = {
                 onIntent(AnimalVaccinationIntent.AutoPriceClicked(it))
             },
-            tooltipTextResAutoCal = R.string.animal_vaccination_auto_calculate_tool,
             isManyCount = true,
-            supportTextRes = if (state.isAutoCalculate) R.string.animal_vaccination_price else R.string.animal_vaccination_price_all,
-            supportTextResAutoCal = R.string.animal_vaccination_price,
             count = state.countVaccination,
             countSuffix = Suffix.PIECES,
-            priceSuffix = currencyPriceSuffix
+            priceAll = state.priceAll,
+            priceSuffix = currencyPriceSuffix,
+            supportTextRes = if (state.isAutoCalculate) R.string.animal_vaccination_price else R.string.animal_vaccination_price_all,
+            supportTextResAutoCal = R.string.animal_vaccination_price,
+            tooltipTextResAutoCal = R.string.animal_vaccination_auto_calculate_tool,
         )
         OutlinedTextDateNew(
             value = state.date,

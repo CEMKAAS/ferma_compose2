@@ -45,7 +45,7 @@ class InventoryAppViewModel @Inject constructor(
     InvertoryAppReduce()
 ) {
     var isFirstLaunch by mutableStateOf(false)
-    var startDestination by mutableStateOf<Pair<String, Boolean>?>(null)
+    var startDestination by mutableStateOf<String?>(null)
         private set
 
     var isOpenQrCodeWarning by mutableStateOf(false)
@@ -72,7 +72,7 @@ class InventoryAppViewModel @Inject constructor(
         }
     }
 
-    private suspend fun calculateStartDestination(intent: Intent?): Pair<String, Boolean> {
+    private suspend fun calculateStartDestination(intent: Intent?): String {
 
         val action = intent?.action
         val projectId = intent?.getLongExtra("itemIdPT", -1L) ?: -1L
@@ -80,26 +80,29 @@ class InventoryAppViewModel @Inject constructor(
 
         return when {
             action == "OPEN_BOOKMARK_DETAIL" && projectId != -1L ->
-                "${MainIncubatorDestination.route}/$projectId" to false
+                "${MainIncubatorDestination.route}/$projectId"
 
             action == "OPEN_PROJECT_DETAIL" && projectId != -1L ->
-                "${MainProjectsDestination.route}/$projectId" to false
+                "${MainProjectsDestination.route}/$projectId"
 
             uri != null -> {
                 val payload = QrCodeDecoder.decodeForBase64(uri)
-                val projectExists = projectRepository
-                    .getIsProject(payload.idPT)
-                    .first()
 
-                if (!projectExists) {
-                    isOpenQrCodeWarning = true
-                    return FirstDestination.route to false
-                }
                 qrNavigationManager.put(payload)
-                "${MainProjectsDestination.route}/${payload.idPT}" to true
+
+                if (payload.isMultiProjectTemplate) FirstDestination.route
+                 else {
+                    val projectExists = projectRepository
+                        .getIsProject(payload.idPT)
+                        .first()
+
+                    if (!projectExists) FirstDestination.route
+                    else
+                        "${MainProjectsDestination.route}/${payload.idPT}?${MainProjectsDestination.templateArg}=true"
+                }
             }
 
-            else -> FirstDestination.route to false
+            else -> FirstDestination.route
         }
     }
 

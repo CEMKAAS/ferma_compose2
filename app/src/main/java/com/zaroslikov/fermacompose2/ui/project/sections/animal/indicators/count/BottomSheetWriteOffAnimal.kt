@@ -68,18 +68,18 @@ fun BottomSheetWriteOffAnimal(
             onPriceChange = {
                 onIntent(AnimalCountIntent.PriceChanged(it))
             },
-            priceAll = state.priceAll,
             isAutoCalculate = state.isAutoCalculate,
             onAutoCalculate = {
                 onIntent(AnimalCountIntent.AutoPriceClicked(it))
             },
             isManyCount = true,
-            supportTextRes = R.string.support_text_price_animals,
-            supportTextResAutoCal = R.string.support_text_price_one_animals,
-            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
             count = state.count,
             countSuffix = countSuffix,
+            priceAll = state.priceAll,
             priceSuffix = currencyPrice,
+            supportTextRes = R.string.support_text_price_animals,
+            supportTextResAutoCal = R.string.support_text_price_one_animals,
+            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,,
         )
         OutlinedTextDateNew(
             value = state.date,

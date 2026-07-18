@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.base.state.BaseState
+import com.zaroslikov.fermacompose2.ui.navigation.EventFile
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import com.zaroslikov.fermacompose2.utils.SnackbarEvent
@@ -29,6 +30,15 @@ abstract class BaseViewModel<STATE : BaseState, INTENT : BaseIntent>(
 
     protected fun getState(): STATE {
         return _state.value
+    }
+
+    private val _events = MutableSharedFlow<EventFile>()
+    val events = _events.asSharedFlow()
+
+    protected fun event(eventFile: EventFile) {
+        viewModelScope.launch {
+            _events.emit(eventFile)
+        }
     }
 
     private val _navigation = MutableSharedFlow<UiEvent>()

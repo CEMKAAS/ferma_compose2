@@ -13,9 +13,13 @@ data class DomainTemplateTable(
     val count: Double?,
     val countSuffix: Suffix?,
     val price: Double?,
+    val priceAll: Double? = null,
     val priceSuffix: Suffix?,
     val category: String?,
     val animalId: Long?,
     val note: String?,
+    val buyer: String? = null,
+    val isPinned: Boolean,
+    val isMultiProjectTemplate: Boolean,
     val idPT: Long
 )

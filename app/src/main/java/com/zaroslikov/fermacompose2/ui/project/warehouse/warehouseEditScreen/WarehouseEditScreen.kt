@@ -142,6 +142,7 @@ fun WarehouseEditScreen(
         eventFlow.collect { event ->
             when (event) {
                 is UiEvent.NavigateBack -> navigateBack()
+                else -> Unit
             }
         }
     }

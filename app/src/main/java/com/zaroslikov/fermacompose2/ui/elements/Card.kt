@@ -658,67 +658,57 @@ fun BorderCard(
     elevation: Dp = 0.dp,
     borderWidth: Dp = 1.dp,
     borderColor: Color = grey_2,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(
-        modifier = modifier,
-        shape = shape,
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = elevation
-        ),
-        border = BorderStroke(
-            width = borderWidth,
-            color = borderColor
-        ), onClick = onClick
-    ) {
-        Column(
-            Modifier
-                .padding(padding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+    if (onClick != null)
+        Card(
+            modifier = modifier,
+            shape = shape,
+            colors = CardDefaults.cardColors(
+                containerColor = containerColor
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = elevation
+            ),
+            border = BorderStroke(
+                width = borderWidth,
+                color = borderColor
+            ), onClick = onClick
         ) {
-            content()
+            Column(
+                Modifier
+                    .padding(padding),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                content()
+            }
         }
-    }
+    else
+        Card(
+            modifier = modifier,
+            shape = shape,
+            colors = CardDefaults.cardColors(
+                containerColor = containerColor
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = elevation
+            ),
+            border = BorderStroke(
+                width = borderWidth,
+                color = borderColor
+            ),
+        ) {
+            Column(
+                Modifier
+                    .padding(padding),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                content()
+            }
+        }
 }
 
-@Composable
-fun BorderCard(
-    modifier: Modifier = Modifier,
-    containerColor: Color = white,
-    padding: PaddingValues = PaddingValues(20.dp),
-    shape: Shape = RoundedCornerShape(14.dp),
-    elevation: Dp = 0.dp,
-    borderWidth: Dp = 1.dp,
-    borderColor: Color = grey_2,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    Card(
-        modifier = modifier,
-        shape = shape,
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = elevation
-        ),
-        border = BorderStroke(
-            width = borderWidth,
-            color = borderColor
-        ),
-    ) {
-        Column(
-            Modifier
-                .padding(padding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            content()
-        }
-    }
-}
 
 @Composable
 fun ColorCard(

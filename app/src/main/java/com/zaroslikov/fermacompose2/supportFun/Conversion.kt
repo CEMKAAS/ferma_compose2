@@ -1,8 +1,11 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainSettings
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 fun Double.conversation(suffix: Suffix, baseSuffix: Suffix): Double {
     return when (baseSuffix) {
@@ -220,4 +223,17 @@ fun Double.convertVolume(from: Suffix, to: Suffix): Double {
 }
 
 
-
+ fun List<DomainCountSuffix>.build(
+    settings: DomainSettings
+): List<DomainCountSuffix> {
+    return this.groupBy { it.suffix.conversation4(settings) }
+        .map { (suffix, items) ->
+            val totalCount = items.sumOf {
+                it.count.conversation3(it.suffix, settings)
+            }
+            DomainCountSuffix(
+                count = totalCount,
+                suffix = suffix
+            )
+        }
+}

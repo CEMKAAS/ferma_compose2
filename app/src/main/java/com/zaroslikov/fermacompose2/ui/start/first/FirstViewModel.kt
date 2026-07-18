@@ -1,8 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.start.first
 
-import android.app.Activity
-import android.content.Context
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.table.DomainProjectTable
@@ -13,31 +10,27 @@ import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
 import com.zaroslikov.fermacompose2.BuildConfig
-import com.zaroslikov.fermacompose2.Event
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
+import com.zaroslikov.fermacompose2.utils.QrCodeDecoder
+import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import ru.rustore.sdk.appupdate.listener.InstallStateUpdateListener
-import ru.rustore.sdk.appupdate.manager.RuStoreAppUpdateManager
-import ru.rustore.sdk.appupdate.manager.factory.RuStoreAppUpdateManagerFactory
-import ru.rustore.sdk.appupdate.model.AppUpdateOptions
-import ru.rustore.sdk.appupdate.model.AppUpdateType
-import ru.rustore.sdk.appupdate.model.InstallStatus
-import ru.rustore.sdk.appupdate.model.UpdateAvailability
 import javax.inject.Inject
+import androidx.core.net.toUri
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrPayload
 
 @HiltViewModel
 class FirstViewModel @Inject constructor(
+    private val qrNavigationManager: QrNavigationManager,
     private val projectRepository: ProjectRepository,
     private val bookmarkRepository: BookmarkRepository,
     private val workManagerRepository: WorkManagerRepository,
@@ -55,6 +48,15 @@ class FirstViewModel @Inject constructor(
     init {
         loadData()
         launchNotification()
+        loadTemplate()
+    }
+
+    private fun loadTemplate() {
+        viewModelScope.launch {
+            val template = qrNavigationManager.consume()
+            Log.i("template", "loadDataForTemplateBottomSheet-template: $template ")
+            if (template != null) findProject(template)
+        }
     }
 
     private fun launchNotification() {
@@ -129,8 +131,49 @@ class FirstViewModel @Inject constructor(
             is FirstIntent.ArchiveClicked -> archiveProject(intent.value)
             is FirstIntent.UnarchiveClicked -> unarchiveProject(intent.value)
             is FirstIntent.SkipTrainingClicked -> updateFirstLaunch()
+            is FirstIntent.QrCodeScanner -> qrScanner(intent.value)
+            is FirstIntent.ChoiceProjectForTemplateClick -> navigateToProject(intent.value)
+            is FirstIntent.OpenMultiProjectBottomSheetClick -> if (!intent.value) qrNavigationManager.clear() else Unit
             else -> Unit
         }
+    }
+
+    private fun qrScanner(uri: String) {
+        viewModelScope.launch {
+            val androidUri = uri.toUri()
+            val payload = QrCodeDecoder.decodeForUri(androidUri)
+
+            if (payload == null) {
+                sendIntent(FirstIntent.OpenWarningQrCodeClick(true))
+                sendIntent(FirstIntent.OpenQrCodeScanner(false))
+                return@launch
+            }
+            findProject(payload)
+        }
+    }
+
+    private suspend fun findProject(payload: QrPayload) {
+        if (payload.isMultiProjectTemplate) {
+            val projectList = projectRepository.getProjectListAct().first()
+            qrNavigationManager.put(payload)
+            sendIntent(FirstIntent.OpenMultiProjectBottomSheetClick(true, projectList))
+        } else {
+            val projectExists = projectRepository
+                .getIsProject(payload.idPT)
+                .first()
+
+            if (!projectExists) {
+                sendIntent(FirstIntent.OpenWarningQrCodeClick(true))
+                sendIntent(FirstIntent.OpenQrCodeScanner(false))
+                return
+            }
+            qrNavigationManager.put(payload)
+            navigateTo(UiEvent.Navigate(payload.idPT))
+        }
+    }
+
+    private fun navigateToProject(id: Long) {
+        navigateTo(UiEvent.Navigate(id))
     }
 
     private fun unarchiveProject(domainProjectTable: DomainProjectTable) {

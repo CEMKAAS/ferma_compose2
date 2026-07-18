@@ -81,7 +81,7 @@ data class ErrorEntryAnimal(
     val isErrorTitle: Boolean = false,
     val isErrorSlash: Boolean = false,
     val isErrorType: Boolean = false,
-    val isErrorCount: Boolean = false,
+    val isErrorCount: Boolean = false, override val hasAnyError: Boolean = false,
 ) : BaseError
 
 

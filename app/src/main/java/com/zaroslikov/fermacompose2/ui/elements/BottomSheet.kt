@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -54,10 +57,8 @@ fun CountBottomSheet2(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-
-        ) {
-        Column(modifier = Modifier.modifierBottomSheet(false)) {
+        sheetState = sheetState) {
+        Column(modifier = Modifier.modifierBottomSheet()) {
             IconAndText(
                 modifier = Modifier.fillMaxWidth(),
                 iconRes = version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
@@ -90,7 +91,12 @@ fun CountBottomSheet2(
 @Composable
 fun BaseBottomSheet(
     modifier: Modifier = Modifier,
-    title: String = "",
+    paddingValues: PaddingValues = PaddingValues(
+        start = dimensionResource(id = R.dimen.padding_medium),
+        end = dimensionResource(id = R.dimen.padding_medium),
+        top = dimensionResource(R.dimen.padding_small)
+    ),
+    title: String? = null,
     supText: String? = null,
     @DrawableRes iconRes: Int? = null,
     colors: List<Color> = listOf(white, white),
@@ -108,66 +114,64 @@ fun BaseBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState
     ) {
-        Box(
-            modifier = Modifier
-//                .fillMaxSize()
-//                .fillMaxHeight()
-        ) {
+        Box {
             Column(
                 modifier = Modifier
-                    .modifierBottomSheet(isScroll)
+                    .modifierBottomSheet(paddingValues = paddingValues)
                     .padding(bottom = bottomPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                if (title != null) {
+                    Column {
                         Row(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            iconRes?.let {
-                                IconIndicatorsAnimal(
-                                    icon = it,
-                                    colors = colors
-                                )
-                            }
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                TextLine(
-
-                                    valueString = title,
-                                    textStyle = textBold_20
-                                )
-                                supText?.let {
-                                    Text(it, style = text_12, color = gray_7)
+                                iconRes?.let {
+                                    IconIndicatorsAnimal(
+                                        icon = it,
+                                        colors = colors
+                                    )
+                                }
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    TextLine(
+                                        valueString = title,
+                                        textStyle = textBold_20
+                                    )
+                                    supText?.let {
+                                        Text(it, style = text_12, color = gray_7)
+                                    }
                                 }
                             }
-                        }
-                        IconButton(onClick = onSecondDismissRequest ?: onDismissRequest) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close"
-                            )
+                            IconButton(onClick = onSecondDismissRequest ?: onDismissRequest) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Close"
+                                )
+                            }
                         }
                     }
-                }
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = gray_6
-                )
-                Column(
-                    modifier = Modifier.then(
-                        if (isScroll)
-                            Modifier.verticalScroll(rememberScrollState())
-                        else Modifier
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = gray_6
                     )
+                }
+                Column(
+                    modifier = Modifier
+                        .then(
+                            if (isScroll)
+                                Modifier.verticalScroll(rememberScrollState())
+                            else Modifier.fillMaxSize()
+                        )
                 ) {
                     content()
                 }

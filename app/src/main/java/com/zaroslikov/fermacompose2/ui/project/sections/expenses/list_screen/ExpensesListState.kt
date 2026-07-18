@@ -166,7 +166,7 @@ data class ErrorExpenses(
     val isErrorTitle: Boolean = false,
     val isErrorSlash: Boolean = false,
     val isErrorCount: Boolean = false,
-    val isErrorPrice: Boolean = false
+    val isErrorPrice: Boolean = false, override val hasAnyError: Boolean = false
 ) : BaseError
 
 

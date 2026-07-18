@@ -386,14 +386,14 @@ private fun WriteOffEntryBottomSheet(
             onValueChoice = {
                 onIntent(WriteOffListIntent.TitleAndSuffix(it.title, it.suffix, it.productOrigin))
             },
+            productOrigin = state.writeOffProductOrigin,
             intResSup = R.string.support_text_price_write_product,
-            titleList = state.pickList.titleList,
-            isErrorTitle = state.error.isErrorTitle,
-            isErrorSlash = state.error.isErrorSlash,
             readOnly = state.isIndicatorsValue,
             enable = !state.isIndicatorsValue,
+            titleList = state.pickList.titleList,
             isMore = true,
-            productOrigin = state.writeOffProductOrigin
+            isErrorTitle = state.error.isErrorTitle,
+            isErrorSlash = state.error.isErrorSlash,
         )
         OutlinedTextCountNew(
             value = state.count,
@@ -416,10 +416,6 @@ private fun WriteOffEntryBottomSheet(
             onPriceChange = {
                 onIntent(WriteOffListIntent.PriceChanged(it))
             },
-            priceAll = state.priceAll,
-            supportTextRes = R.string.support_text_price_write_off_all,
-            supportTextResAutoCal = R.string.support_text_price_write_off_one,
-            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
             isAutoCalculate = state.isAutoPrice,
             onAutoCalculate = {
                 onIntent(WriteOffListIntent.AutoPriceClicked(it))
@@ -427,7 +423,11 @@ private fun WriteOffEntryBottomSheet(
             isManyCount = true,
             count = state.count,
             countSuffix = state.countSuffix,
+            priceAll = state.priceAll,
             priceSuffix = priceSuffix,
+            supportTextRes = R.string.support_text_price_write_off_all,
+            supportTextResAutoCal = R.string.support_text_price_write_off_one,
+            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,,
         )
         OutlinedTextCategoryNew(
             value = state.category,

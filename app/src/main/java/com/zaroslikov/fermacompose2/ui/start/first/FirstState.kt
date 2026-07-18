@@ -13,10 +13,14 @@ data class FirstState(
     override val navigate: UiEvent? = null,
     val isArchive: Boolean = false,
     val isOpenArchiveIncubatorBottomSheet: Boolean = false,
+    val isOpenQrScannerBottomSheet: Boolean = false,
     val isOpenDeleteBottomSheet: Boolean = false,
     val isOpenDownloadingUpdate: Boolean = false,
+    val isOpenWaringQrCode: Boolean = false,
+    val isOpenChoiceProjectBottomSheet: Boolean = false,
+    val projectListForTemplate: List<DomainProjectTable> = emptyList(),
     val currentProjectTable: DomainProjectTable? = null,
     val appSettings: DomainAppSettings = DomainAppSettings(),
-    val isFirstLaunch : Boolean = false,
+    val isFirstLaunch: Boolean = false,
     val isNotificationAsked: Boolean = false //todo
 ) : ListState()

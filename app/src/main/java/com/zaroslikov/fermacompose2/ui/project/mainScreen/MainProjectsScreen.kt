@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.mainScreen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import com.zaroslikov.fermacompose2.supportFun.toDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toNav
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BottomBarButton
+import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorDestination
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.ProjectNavHost
 
@@ -35,7 +37,8 @@ object MainProjectsDestination : NavigationDestination {
     override val route = "MainProject"
     override val titleRes = R.string.app_name
     const val itemIdArg = "itemId"
-    val routeWithArgs = "$route/{$itemIdArg}"
+    const val templateArg = "template"
+    val routeWithArgs = "$route/{$itemIdArg}?$templateArg={$templateArg}"
 }
 
 @Composable
@@ -45,6 +48,7 @@ fun MainProjectScreen(
     ioOpenTemplate: Boolean
 ) {
     val projectNavController = rememberNavController()
+
     val startDestination = if (ioOpenTemplate) Destination.MAGAZINE else Destination.WAREHOUSE
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 

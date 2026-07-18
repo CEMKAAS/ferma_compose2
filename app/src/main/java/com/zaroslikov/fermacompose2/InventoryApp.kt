@@ -50,12 +50,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogBase
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgressWitchText
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.EnterInPatternBottomSheet
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarning
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningBottomSheet
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddEntryState2
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import kotlinx.coroutines.launch
@@ -123,8 +118,7 @@ fun InventoryApp(
                 InventoryNavHost(
                     navController = navController,
                     modifier = Modifier.padding(it),
-                    startDestination = startDestination.first,
-                    isOpenTemplate = startDestination.second
+                    startDestination = startDestination,
                 )
 
         LaunchedEffect(adFinished) {
@@ -135,12 +129,14 @@ fun InventoryApp(
         if (state.isOpenDownloadingUpdate)
             LoadUpdate()
 
-        if (viewModel.isOpenQrCodeWarning)
+      /*  if (viewModel.isOpenQrCodeWarning)
             QrCodeWarningBottomSheet(
-                   qrCodeWarning = QrCodeWarning.GLOBAL
+                qrCodeWarning = QrCodeWarning.GLOBAL,
+                onDismissRequest = { viewModel.isOpenQrCodeWarning = false},
+                onScannerClick = {}
             ) {
-                viewModel.isOpenQrCodeWarning = false
-            }
+
+            }*/
     }
 }
 

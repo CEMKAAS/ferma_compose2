@@ -3,6 +3,7 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.annotation.SuppressLint
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -116,7 +117,7 @@ fun FloatButton(
 @Composable
 fun NeonGlowFab(
     modifier: Modifier = Modifier,
-    icon: ImageVector = Icons.Default.Add,
+    @DrawableRes iconRes: Int = R.drawable.icon_add,
     onLongClick: (() -> Unit)? = null,
     colors: List<Color>,
     onClick: () -> Unit,
@@ -154,7 +155,7 @@ fun NeonGlowFab(
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = icon,
+            painter = painterResource(iconRes),
             contentDescription = "Добавить",
             tint = Color.White,
             modifier = Modifier.size(32.dp)

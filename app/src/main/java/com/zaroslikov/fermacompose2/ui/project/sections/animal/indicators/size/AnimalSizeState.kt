@@ -47,6 +47,6 @@ data class AnimalSizeUi(
 )
 
 data class ErrorAnimalSize(
-    val isErrorSize: Boolean = false
+    val isErrorSize: Boolean = false, override val hasAnyError: Boolean =false
 ) : BaseError
 

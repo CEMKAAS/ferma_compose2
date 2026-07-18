@@ -70,20 +70,20 @@ fun BottomSheetSaleAnimal(
             onPriceChange = {
                 onIntent(AnimalCountIntent.PriceChanged(it))
             },
-            priceAll = state.priceAll,
             isAutoCalculate = state.isAutoCalculate,
             onAutoCalculate = {
                 onIntent(AnimalCountIntent.AutoPriceClicked(it))
             },
             isManyCount = true,
             isError = state.error.isErrorPrice,
-            supportTextRes = R.string.support_text_price_animals,
-            supportTextResAutoCal = R.string.support_text_price_one_animals,
-            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
             isNecessarily = true,
             count = state.count,
             countSuffix = state.suffix,
-            priceSuffix = currencyPrice
+            priceAll = state.priceAll,
+            priceSuffix = currencyPrice,
+            supportTextRes = R.string.support_text_price_animals,
+            supportTextResAutoCal = R.string.support_text_price_one_animals,
+            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
         )
         OutlinedTextDateNew(
             value = state.date,
@@ -94,7 +94,7 @@ fun BottomSheetSaleAnimal(
             onValueChange = {
                 onIntent(AnimalCountIntent.BuyerSaleChanged(it))
             },
-            list = state.buyerList,
+            list = state.buyerList,,
         )
         OutlinedTextNoteNew(
             value = state.note,

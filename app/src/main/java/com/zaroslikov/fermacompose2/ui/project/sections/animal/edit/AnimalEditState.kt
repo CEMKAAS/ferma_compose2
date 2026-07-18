@@ -66,5 +66,5 @@ data class PickAnimalEditList(
 data class Error(
     val isErrorTitle: Boolean = false,
     val isErrorSlash: Boolean = false,
-    val isErrorType: Boolean = false
+    val isErrorType: Boolean = false, override val hasAnyError: Boolean = false
 ) : BaseError

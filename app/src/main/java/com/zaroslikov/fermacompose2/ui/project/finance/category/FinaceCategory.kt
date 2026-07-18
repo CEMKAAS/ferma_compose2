@@ -373,10 +373,10 @@ fun WarningCard(
     colorBorder: Color,
     colorIcon: Color,
     colorIconBackground: Color? = null,
-    colorTitle: Color,
+    colorTitle: Color? = null,
     colorText: Color,
     @DrawableRes icon: Int,
-    @StringRes title: Int,
+    @StringRes title: Int? = null,
     @StringRes text: Int
 ) {
     Card(
@@ -413,7 +413,8 @@ fun WarningCard(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(stringResource(title), style = text_14, color = colorTitle)
+                if (title != null && colorTitle != null)
+                    Text(stringResource(title), style = text_14, color = colorTitle)
                 Text(
                     stringResource(text),
                     style = text_12,
@@ -544,7 +545,7 @@ private fun BottomSheet(
                 .fillMaxHeight()
         ) {
             Column(
-                modifier = Modifier.modifierBottomSheet(false),
+                modifier = Modifier.modifierBottomSheet(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
@@ -631,7 +632,7 @@ private fun BottomSheet(
                             priceSuffix = priceSuffix,
                             category = it.category,
                             statusWriteOff = it.status,
-                           /* animal = null,*/
+                            /* animal = null,*/
                             date = it.data,
                             buyer = it.buyer,
                             categoryFinance = it.categoryFinance
@@ -652,7 +653,7 @@ private fun TransitionGroupCard(
     priceSuffix: Suffix = Suffix.PIECES,
     category: String? = null,
     statusWriteOff: Boolean? = null,
-   /* animal: String? = null,*/
+    /* animal: String? = null,*/
     date: String,
     buyer: String? = null,
     categoryFinance: FinanceCategory
@@ -737,7 +738,7 @@ private fun BalanceStructureCard(
     expenses: Double,
     ownNeed: Double,
     scrap: Double,
-   /* price: Double,*/
+    /* price: Double,*/
     profit: Double,
     suffix: Suffix
 ) {

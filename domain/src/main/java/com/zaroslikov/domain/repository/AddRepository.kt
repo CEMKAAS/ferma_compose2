@@ -4,6 +4,7 @@ import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
@@ -18,10 +19,10 @@ interface AddRepository {
     fun getAllAddTableForExport(): Flow<List<DomainAddTable>>
 
     suspend fun clearAndInsertAddTableForImport(domainAddTable: List<DomainAddTable>)
-    fun getItem(id: Long): Flow<DomainAddTable>
-    fun getAllItems(id: Long): Flow<List<DomainAddItemDto>>
+    fun getItem(id: Long): Flow<DomainAddItemDto>
+    fun getAllItems(id: Long): Flow<List<DomainAddItemDto2>>
     fun getBrieflyItemAdd(id: Long): Flow<List<BrieflyAddDomain>>
-    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<DomainAddItemDto>>
+    fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<DomainAddItemDto2>>
     fun getItemsTitleAddList(id: Long): Flow<List<TitleAndSuffixDomain>>
     fun getItemsCategoryAddList(id: Long): Flow<List<String>>
     fun getAnimalById(id: Long): Flow<String>

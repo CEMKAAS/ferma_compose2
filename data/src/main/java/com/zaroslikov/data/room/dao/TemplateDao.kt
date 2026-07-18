@@ -1,4 +1,4 @@
-package com.zaroslikov.data.room.dao.template
+package com.zaroslikov.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -7,7 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import com.zaroslikov.data.room.dto.add.AddTemplateDto
+import com.zaroslikov.data.room.dto.template.AddTemplateDto
 import com.zaroslikov.data.room.table.ferma.templateOne.TemplateTable
 import kotlinx.coroutines.flow.Flow
 
@@ -32,6 +32,9 @@ interface TemplateDao {
     @Query("SELECT * FROM template_table WHERE _id = :id")
     fun getAddTemplateItem(id: Long): Flow<TemplateTable?>
 
+    @Query("UPDATE template_table SET is_pinned =:pin  WHERE _id = :id")
+    suspend fun setPinById(pin: Boolean, id: Long)
+
     @Query(
         "SELECT " +
                 " a._id," +
@@ -44,10 +47,13 @@ interface TemplateDao {
                 " a.animal_id," +
                 " at.name AS animal_name," +
                 " a.note," +
-                " a.idPT " +
+                " a.idPT, " +
+                " a.is_pinned, " +
+                " a.is_multi_project_template" +
                 " FROM template_table a" +
                 " LEFT JOIN animal_table at ON at.id = a.animal_id" +
-                " WHERE a.idPT = :id and a.template_type = 0"
+                " WHERE is_multi_project_template = 1 or a.idPT = :id and a.template_type = 0 " +
+                " ORDER BY a.is_pinned DESC, a._id DESC"
     )
     fun getAllAddTemplateItems(id: Long): Flow<List<AddTemplateDto>>
 

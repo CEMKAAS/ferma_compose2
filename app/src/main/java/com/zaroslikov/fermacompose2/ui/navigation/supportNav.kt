@@ -32,6 +32,7 @@ fun nav(route: String, itemOne: String, itemTwo: String, itemThree: String) =
 
 sealed class UiEvent {
     data object NavigateBack : UiEvent()
+    data class Navigate(val value: Long) : UiEvent()
 }
 
 sealed class UiNotification {

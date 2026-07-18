@@ -47,15 +47,21 @@ data class TemplateTable(
 
     @ColumnInfo(name = "price")
     val price: Double?,
-
+    @ColumnInfo(name = "price_all")
+    val priceAll: Double?,
     @ColumnInfo(name = "price_suffix")
     val priceSuffix: Suffix?,
+
     val category: String?,
 
     @ColumnInfo(name = "animal_id")
     val animalId: Long?,
-
+    val buyer: String?,
     val note: String?,
+    @ColumnInfo(name = "is_pinned")
+    val isPinned: Boolean,
+    @ColumnInfo(name = "is_multi_project_template")
+    val isMultiProjectTemplate: Boolean,
     @ColumnInfo(name = "idPT")
-    val idPT: Long
+    val idPT: Long,
 )

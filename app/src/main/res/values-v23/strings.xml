@@ -30,6 +30,7 @@
     <string name="write_off_screen_title2">Списания</string>
     <string name="animal_screen_title2">Животные</string>
     <string name="is_empty"></string>
+    <string name="is_empty_2">-</string>
 
     //Ads
     <string name="yandex_banner_ads">R-M-12224806-1</string>
@@ -58,6 +59,7 @@
     <string name="outlined_text_notification">Напоминание</string>
     <string name="outlined_text_animals">Животное</string>
     <string name="outlined_text_note">Примечание</string>
+    <string name="outlined_text_multi_project_template">Многопроектный шаблон</string>
     <string name="outlined_text_reason">Причина</string>
     <string name="outlined_text_price">Стоимость</string>
     <string name="outlined_text_buyer">Покупатель</string>
@@ -115,6 +117,9 @@
     //SupportText
     <string name="support_text_enter_when_applying">Вводить при применении</string>
 
+    //ChoiceProjectForTemplate
+    <string name="choice_project_for_template_bottom_sheet_title">Выберите проект</string>
+    <string name="choice_project_for_template_bottom_sheet_title_support">Шаблон — многопроектный. К какому проекту добавить запись?</string>
 
     //PatternsBottomSheet
     <string name="pattern_bottom_sheet_title">Шаблоны</string>
@@ -127,6 +132,7 @@
     <string name="template_qr_code_bottom_sheet_no_search_template">Шаблон не найдет</string>
     <string name="template_qr_code_bottom_sheet_no_search_template_support">Возможно шаблон удален или qr-код не из вашего проекта</string>
     <string name="template_qr_code_bottom_sheet_no_search_template_support_2">Загрузите бекаб</string>
+    <string name="template_qr_code_bottom_sheet_ads_support">При сохранении QR-кода будет показана небольшая реклама — благодаря ей проект развивается. Спасибо за поддержку!</string>
 
     //WarningQrCodeBottomSheet
     <string name="warning_qr_code_bottom_sheet_no_search_project">Проект не найдет</string>>
@@ -134,7 +140,16 @@
 
     //WarningQrCodeBottomSheet
     <string name="warning_qr_code_bottom_sheet_no_search_template">Шаблон удалён</string>>
-    <string name="warning_qr_code_bottom_sheet_no_search_template_support"> Этот шаблон больше не существует на этом устройстве. Вы можете восстановить его из QR-кода.</string>
+    <string name="warning_qr_code_bottom_sheet_no_search_template_support">Этот шаблон больше не существует на этом устройстве. Вы можете восстановить его из QR-кода.</string>
+    <string name="warning_qr_code_bottom_sheet_no_search_template_support_no_backup_data">Этот шаблон больше не существует на этом устройстве.</string>
+
+    //WarningQrCodeCard
+    <string name="warning_qr_code_card_title">Внимание</string>>
+    <string name="warning_qr_code_card_title_support">QR-код перепечатывать не нужно — он привязан к шаблону по ID и продолжит работать после редактирования.</string>
+
+    //QrCodeScanner
+    <string name="qr_code_scanner_bottom_no_camera">Нет доступа к камере. Разрешите использование камеры в настройках смартфона.</string>
+    <string name="qr_code_scanner_bottom_camera_qr">Наведите камеру\nна QR-код</string>>
 
 
     //QrType
@@ -142,8 +157,15 @@
     <string name="qr_code_type_standard">Стандарт</string>
     <string name="qr_code_type_full">Подробный</string>
 
+    //TitleLocation
+    <string name="title_location_under">Снизу</string>
+    <string name="title_location_left">Слева</string>
+    <string name="title_location_right">Справа</string>
+    <string name="title_location_no">Без</string>
+
     //Button
     <string name="button_add">Добавить</string>
+    <string name="button_add_and_scanner_again">Добавить и сканировать следующий</string>
     <string name="button_sale">Продать</string>
     <string name="button_insert">Внести</string>
     <string name="button_archive">В архив</string>
@@ -163,6 +185,7 @@
     <string name="button_recover">Восстановить</string>
     <string name="button_сomplete">Завершить</string>
     <string name="button_close">Закрыть</string>
+    <string name="button_request_permission">Запросить разрешение</string>
     <string name="button_try_again">Попробовать еще раз</string>
     <string name="button_add_message_no_data">Добавить Продукцию!</string>
     <string name="button_sale_message_no_data">Добавить Продажу!</string>
@@ -324,6 +347,7 @@
     <string name="support_text_notification">Выберите уведомление</string>
     <string name="support_text_animal">Выберите животное, которое дало вам продукцию</string>
     <string name="support_text_note">Здесь может содержаться важная информация</string>
+    <string name="support_text_multi_project_template">Шаблон будет доступен во всех ваших проектах. Также любой пользователь приложения «Мое Хозяйство» сможет отсканировать этот шаблон и быстро добавить запись в свое приложение. После сканирования QR-кода необходимо выбрать проект, в который будет добавлена запись.</string>
     <string name="support_text_buyer">Укажите или выберите имя покупателя.</string>
     <string name="support_text_choice_animal">Выберите животных для рассчета длительности корма:</string>
     <string name="support_text_no_animal">Нет животных</string>
@@ -1047,6 +1071,12 @@
     <string name="message_no_item_finance">Нет транкзаций</string>
 
     //MessageNoData2
+    <string name="message_no_data_title_template">Нет шаблонов</string>
+    <string name="message_no_data_message_template">Создайте шаблон, чтобы вносить повторяющиеся данные в один касание</string>
+
+    <string name="message_no_data_title_choice_project_for_template">Нет доступных проектов</string>
+    <string name="message_no_data_message_choice_project_for_template">Создайте первый проект, чтобы использовать многопроектные шаблоны.</string>
+
     <string name="message_no_data_title_add">Нет продукции</string>
     <string name="message_no_data_message_add">Начните вести учет вашей продукции</string>
 

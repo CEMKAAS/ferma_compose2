@@ -37,5 +37,5 @@ data class NoteEntryState2(
 ) : BaseProduct()
 
 data class ErrorNote(
-    val isErrorTitle: Boolean = false,
+    val isErrorTitle: Boolean = false, override val hasAnyError: Boolean  =false,
 ) : BaseError

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_1
 import com.zaroslikov.fermacompose2.ghostly_white
@@ -33,14 +33,17 @@ import com.zaroslikov.fermacompose2.ui.elements.icon.IconBorder
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 
-enum class QrCodeWarning {
+enum class QrCodeWarningType {
     GLOBAL, LOCAL
 }
 
 @Composable
 fun QrCodeWarningBottomSheet(
-    qrCodeWarning: QrCodeWarning,
-    onDismissRequest: () -> Unit
+    backupData: DomainTemplateTable? = null,
+    qrCodeWarningType: QrCodeWarningType,
+    onDismissRequest: () -> Unit,
+    onScannerClick: () -> Unit,
+    onRecoverClick: (DomainTemplateTable) -> Unit = {}
 ) {
     BaseBottomSheet(
         title = stringResource(R.string.base_section_warning),
@@ -53,20 +56,27 @@ fun QrCodeWarningBottomSheet(
             )
         }
     ) {
-        when (qrCodeWarning) {
-            QrCodeWarning.GLOBAL -> WarningCard(
+        when (qrCodeWarningType) {
+            QrCodeWarningType.GLOBAL -> WarningCard(
                 titleRes = R.string.warning_qr_code_bottom_sheet_no_search_project,
                 supportTitleRes = R.string.warning_qr_code_bottom_sheet_no_search_project_support
-            ) { }
+            ) { onScannerClick() }
 
-            QrCodeWarning.LOCAL -> WarningCard(
-                titleRes = R.string.warning_qr_code_bottom_sheet_no_search_template,
-                supportTitleRes = R.string.warning_qr_code_bottom_sheet_no_search_template_support,
-                onRecoverClick = {},
-                onScannerClick = {}
-            )
+            QrCodeWarningType.LOCAL -> {
+                val (supportTitleRes, onRecoverClick) = if (backupData == null)
+                    R.string.warning_qr_code_bottom_sheet_no_search_template_support_no_backup_data to
+                            null
+                else
+                    R.string.warning_qr_code_bottom_sheet_no_search_template_support to
+                            { onRecoverClick(backupData) }
+                WarningCard(
+                    titleRes = R.string.warning_qr_code_bottom_sheet_no_search_template,
+                    supportTitleRes = supportTitleRes,
+                    onRecoverClick = onRecoverClick,
+                    onScannerClick = onScannerClick
+                )
+            }
         }
-
     }
 }
 

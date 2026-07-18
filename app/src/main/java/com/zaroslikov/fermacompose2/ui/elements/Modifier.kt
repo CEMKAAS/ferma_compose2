@@ -81,21 +81,16 @@ fun Modifier.modifierDialogScreen(isScroll: Boolean): Modifier {
 }
 
 @Composable
-fun Modifier.modifierBottomSheet(isScroll: Boolean = false, paddingValues: PaddingValues = PaddingValues()): Modifier {
+fun Modifier.modifierBottomSheet(
+    paddingValues: PaddingValues = PaddingValues(
+        start = dimensionResource(id = R.dimen.padding_medium),
+        end = dimensionResource(id = R.dimen.padding_medium),
+        top = dimensionResource(R.dimen.padding_small)
+    )
+): Modifier {
     val focusManager = LocalFocusManager.current
-    return this.padding(paddingValues)
-        /*.then(
-            if (isScroll)
-                Modifier.verticalScroll(rememberScrollState())
-            else Modifier
-        )*/
-        .padding(
-            horizontal = dimensionResource(id = R.dimen.padding_medium)
-        )
-        .padding(
-            top = dimensionResource(R.dimen.padding_small),
-//            bottom = 100.dp
-        )
+    return this
+        .padding(paddingValues)
         .pointerInput(Unit) {
             detectTapGestures(onTap = {
                 focusManager.clearFocus() // Убираем фокус при тапе в любую область

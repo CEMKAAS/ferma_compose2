@@ -21,6 +21,10 @@ class FirstReducer : BaseReducer<FirstState, FirstIntent>() {
 
             is FirstIntent.SkipTrainingClicked -> state.updateSkipTraining()
             is FirstIntent.ShowDownloadingUpdate -> state.copy(isOpenDownloadingUpdate = intent.value)
+            is FirstIntent.OpenWarningQrCodeClick -> state.copy(isOpenWaringQrCode = intent.value)
+            is FirstIntent.OpenQrCodeScanner -> state.copy(isOpenQrScannerBottomSheet = intent.value)
+            is FirstIntent.OpenMultiProjectBottomSheetClick ->
+                state.updateOpenChoiceProjectForTemplate(intent.value, intent.projectList)
 
             else -> state
         }
@@ -43,5 +47,17 @@ class FirstReducer : BaseReducer<FirstState, FirstIntent>() {
             ),
             isNotificationAsked = true
         )
+    }
+
+    private fun FirstState.updateOpenChoiceProjectForTemplate(
+        value: Boolean,
+        projectList: List<DomainProjectTable>
+    ): FirstState {
+        return copy(
+            isOpenChoiceProjectBottomSheet = value,
+            projectListForTemplate = projectList,
+            isOpenQrScannerBottomSheet = false
+        )
+
     }
 }

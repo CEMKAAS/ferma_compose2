@@ -1,14 +1,31 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
-import android.graphics.Bitmap
-import androidx.compose.ui.graphics.ImageBitmap
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
+import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 
 sealed class AddListIntent : BaseIntent {
-    data class OpenBottomSheetGroup(val title: String? = null) : AddListIntent()
+
+    data class LoadData(
+        val itemIdPT: Long,
+        val addList: List<DomainAddItemDto2>,
+        val briefly: List<BrieflyItem>,
+        val settings: DomainSettings,
+        val isLoading: Boolean,
+        val isArchive: Boolean
+    ) : AddListIntent()
+
+    data class LoadDataForDetailNomenclatura(val title: String? = null) : AddListIntent()
+    data class OpenBottomSheetGroup(
+        val isOpen: Boolean,
+        val detail: BrieflyItem? = null,
+        val productItems: List<DomainAddItemDto2> = emptyList()
+    ) : AddListIntent()
 
     data class OpenBottomSheetEntry(
         val isOpen: Boolean,
@@ -19,7 +36,7 @@ sealed class AddListIntent : BaseIntent {
 
     data class RefreshEntryBottomSheetState(
         val isOpen: Boolean,
-        val state: AddEntryState2,
+        val state: AddProductState,
         val isSaveStateForBottomSheet: Boolean = false,
         val isTemplate: Boolean = false
     ) : AddListIntent()
@@ -31,7 +48,6 @@ sealed class AddListIntent : BaseIntent {
     ) : AddListIntent()
 
     data class OpenBottomSheetDelete(val value: Long? = null) : AddListIntent()
-    data class OpenTemplateDeleteBottomSheet(val value: Long? = null) : AddListIntent()
 
     data class GroupClicked(val value: Boolean) : AddListIntent()
     data class TitleChanged(val value: String) : AddListIntent()
@@ -49,9 +65,7 @@ sealed class AddListIntent : BaseIntent {
     data object Insert : AddListIntent()
     data object Update : AddListIntent()
     data object Delete : AddListIntent()
-    data object InsertTemplate : AddListIntent()
-    data object UpdateTemplate : AddListIntent()
-    data object DeleteTemplate : AddListIntent()
+
 
     //Template
     data class NameTemplateChanged(val value: String) : AddListIntent()
@@ -61,25 +75,37 @@ sealed class AddListIntent : BaseIntent {
     data class CategoryTemplateChanged(val value: Boolean) : AddListIntent()
     data class AnimalTemplateChanged(val value: Boolean) : AddListIntent()
     data class NoteTemplateChanged(val value: Boolean) : AddListIntent()
+    data class MultiProjectTemplateChanged(val value: Boolean) : AddListIntent()
 
+    data object InsertTemplate : AddListIntent()
+    data object UpdateTemplate : AddListIntent()
+    data object DeleteTemplate : AddListIntent()
+
+    data class OpenTemplateDeleteBottomSheet(val value: Long? = null) : AddListIntent()
     data class OpenPatternsBottomSheetClick(val value: Boolean) : AddListIntent()
     data class LoadDataForTemplate(val value: List<TemplateItem>) : AddListIntent()
     data class OpenQrCodeBottomSheetClick(
         val value: Boolean,
-        val bitmap: Triple<DomainTemplateTable, Bitmap, Bitmap>? = null
+        val qrCode: QrCodeData? = null
     ) :
         AddListIntent()
 
     data class CreateQrCodeClick(val value: Long) : AddListIntent()
-    data class CreateQrCodeImageClick(val value: ImageBitmap) : AddListIntent()
     data class OpenTemplateBottomSheetClick(
         val value: Boolean,
-        val toUiMap23: AddEntryState2 = AddEntryState2()
+        val toUiMap23: AddProductState = AddProductState()
     ) : AddListIntent()
 
     data class OpenWarningQrCodeBottomSheetClick(
         val value: Boolean,
+        val qrCodeWarningType: QrCodeWarningType = QrCodeWarningType.LOCAL,
+        val backupData: DomainTemplateTable? = null
     ) : AddListIntent()
 
     data class LoadDataForTemplateBottomSheetClick(val value: Long) : AddListIntent()
+
+    data class OpenScannerQrCodeBottomSheetClick(val value: Boolean) : AddListIntent()
+    data class RecoverClick(val value: DomainTemplateTable) : AddListIntent()
+    data class QrDetected(val value: String) : AddListIntent()
+    data class SetPinOfTemplateClick(val value: Pair<Boolean, Long>) : AddListIntent()
 }

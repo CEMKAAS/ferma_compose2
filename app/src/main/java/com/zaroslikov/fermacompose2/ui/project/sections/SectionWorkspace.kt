@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.grey_3
@@ -62,6 +61,8 @@ object HomeDestination : NavigationDestination {
 
 @Composable
 fun SectionWorkspaceScreen(
+    navigationToFirstScreen: () -> Unit,
+    navigateToItemProject: (Pair<Long, Boolean>) -> Unit,
     navigateToItemCard: (Pair<Long, Long>) -> Unit,
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
     viewModel: AddViewModel = hiltViewModel()
@@ -104,7 +105,8 @@ fun SectionWorkspaceScreen(
                     ), null
                 )
                 Card(
-                    modifier = Modifier.clip(RoundedCornerShape(16.dp))
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
                         .clickable {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(index)
@@ -157,7 +159,9 @@ fun SectionWorkspaceScreen(
         ) { pageIndex ->
             when (pages[pageIndex]) {
                 Page.ADD -> AddScreen(
-                    navigationToAnalysis = { navigationToAnalysis(it) }
+                    navigationToAnalysis = { navigationToAnalysis(it) },
+                    navigateToItemProject = { navigateToItemProject(it) },
+                    navigateToFirstScreen = { navigationToFirstScreen() }
                 )
 
                 Page.SALE -> SaleScreen()

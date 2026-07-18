@@ -15,6 +15,7 @@ import com.zaroslikov.data.room.mapper.toAddRoomMap
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
@@ -35,13 +36,14 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
         return addDao.clearAndInsertAddTableForImport(domainAddTable.map { it.toAddRoomMap() })
     }
 
-    override fun getItem(id: Long): Flow<DomainAddTable> {
-        return addDao.getItem(id).map { it.toAddDomainMap() }
+    override fun getItem(id: Long): Flow<DomainAddItemDto> {
+        return addDao.getItem(id).map { it.toDomainAddItemDto() }
     }
 
-    override fun getAllItems(id: Long): Flow<List<DomainAddItemDto>> {
+    override fun getAllItems(id: Long): Flow<List<DomainAddItemDto2>> {
         return addDao.getAllItems(id).map { it -> it.map { it.toDomainAddItemDto() } }
     }
+
     override fun getBrieflyItemAdd(id: Long): Flow<List<BrieflyAddDomain>> {
         return addDao.getBrieflyItemAdd(id).map { it -> it.map { it.toBrieflyAddDomain() } }
     }
@@ -49,7 +51,7 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
     override fun getBrieflyDetailsItemAdd(
         id: Long,
         name: String
-    ): Flow<List<DomainAddItemDto>> {
+    ): Flow<List<DomainAddItemDto2>> {
         return addDao.getBrieflyDetailsItemAdd(id, name)
             .map { it -> it.map { it.toDomainAddItemDto() } }
     }
@@ -96,13 +98,13 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
         return addDao.getAnalysisAddAverageValueAllTime(id, name).map { it?.toDomainCountSuffix() }
     }
 
-   /* override fun getAnalysisAddAnimalAllTime(
-        id: Long,
-        name: String
-    ): Flow<List<DomainAnimalCountSuffix>> {
-        return addDao.getAnalysisAddAnimalAllTime(id, name)
-            .map { it -> it.map { it.toDomainAnimalCountSuffix() } }
-    }*/
+    /* override fun getAnalysisAddAnimalAllTime(
+         id: Long,
+         name: String
+     ): Flow<List<DomainAnimalCountSuffix>> {
+         return addDao.getAnalysisAddAnimalAllTime(id, name)
+             .map { it -> it.map { it.toDomainAnimalCountSuffix() } }
+     }*/
 
     override fun getAnalysisAddRangeList(
         id: Long,

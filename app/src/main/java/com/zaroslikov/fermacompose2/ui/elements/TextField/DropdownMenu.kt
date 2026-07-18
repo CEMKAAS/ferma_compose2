@@ -40,6 +40,8 @@ import com.zaroslikov.fermacompose2.violet_1
 @Composable
 fun DropdownMenuEdit(
     color: Color = grey_3,
+    onPinnedClick:(() -> Unit)? = null,
+    onUnpinnedClick:(() -> Unit)? = null,
     onActiveClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     onArchiveClick: (() -> Unit)? = null,
@@ -68,6 +70,12 @@ fun DropdownMenuEdit(
                             it
                         )
                     )
+                }
+                onPinnedClick?.let {
+                    add(MenuItemData("Закрепить вверху", R.drawable.outline_keep_24, color, it))
+                }
+                onUnpinnedClick?.let {
+                    add(MenuItemData("Открепить", R.drawable.outline_keep_off_24, color, it))
                 }
                 onEditClick?.let {
                     add(MenuItemData("Редактировать", R.drawable.outline_edit_square_24, color, it))
@@ -330,11 +338,13 @@ fun ExposedDropdownMenuAnimals(
     selectedItemIndex: Long,
     setTitle: (Pair<Long, String>) -> Unit,
     animalList: List<AnimalForAddDomain>,
+    enableDropMenu: Boolean = true,
     content: @Composable (Pair<Modifier, Boolean>) -> Unit,
 ) {
     BaseExposedDropdownMenu(
         list = animalList,
-        content = content
+        content = content,
+        enabled = enableDropMenu
     ) { index, item, closeMenu ->
         val trailingIcon: @Composable (() -> Unit)? = if (item.first == selectedItemIndex) {
             { Icon(Icons.Default.Done, contentDescription = null) }

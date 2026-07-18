@@ -15,6 +15,7 @@ import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisD
 import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisProduct
 import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceCategoryScreen2
 import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceIncomeExpensesDestination
+import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.SectionWorkspaceScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardDestination
@@ -143,6 +144,7 @@ fun ProjectNavHost(
                 })
         ) {
             SectionWorkspaceScreen(
+                navigationToFirstScreen = { rootNavController.navigate(FirstDestination.route) },
                 navigateToItemCard = {
                     navController.navigate(
                         navNull(
@@ -161,7 +163,8 @@ fun ProjectNavHost(
                             it.third.toString()
                         )
                     )
-                }
+                },
+                navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it.first}?${MainProjectsDestination.templateArg}=${it.second}") },
             )
         }
 

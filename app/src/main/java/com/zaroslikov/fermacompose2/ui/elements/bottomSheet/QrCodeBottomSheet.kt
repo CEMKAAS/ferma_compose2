@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,12 +25,14 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,20 +70,31 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButtonWitchAnimate
 import kotlinx.coroutines.launch
 import androidx.core.graphics.createBitmap
+import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.grey_2
+import com.zaroslikov.fermacompose2.orang_16
+import com.zaroslikov.fermacompose2.orang_4
+import com.zaroslikov.fermacompose2.orang_5
+import com.zaroslikov.fermacompose2.orang_6
+import com.zaroslikov.fermacompose2.orang_8
+import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.card.InfoPatternCard
+import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
+import com.zaroslikov.fermacompose2.white
+import io.appmetrica.analytics.AppMetrica
 
 //TODO Сократить
 @Composable
 fun QrCodeBottomSheet(
     colors: List<Color>,
-    triple: Triple<DomainTemplateTable, Bitmap, Bitmap>?,
-    onCreateQrCodeClick: (ImageBitmap) -> Unit,
+    qrCodeData: QrCodeData?,
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
+    var currentTitleLocation by rememberSaveable { mutableStateOf(TitleLocation.NO) }
     var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     val miniGraphicsLayer = rememberGraphicsLayer()
     val standardGraphicsLayer = rememberGraphicsLayer()
@@ -112,15 +126,18 @@ fun QrCodeBottomSheet(
                 onDismissRequest = onDismissRequest,
                 onCreateQrCodeClick = {
                     coroutineScope.launch {
+                        val currentQrCodeType =
+                            QrCodeType.entries.first { it.ordinal == pagerState.currentPage }
                         bitmap =
-                            when (QrCodeType.entries.first { it.ordinal == pagerState.currentPage }) {
+                            when (currentQrCodeType) {
                                 QrCodeType.MINI -> miniGraphicsLayer.toImageBitmap()
                                 QrCodeType.STANDARD -> standardGraphicsLayer.toImageBitmap()
                                 QrCodeType.FULL -> fullGraphicsLayer.toImageBitmap()
                             }.addPadding(context, 20)
-                        launcher.launch("qr_code_${triple?.first?.nameTemplate}.png")
+                        launcher.launch("qr_code_${qrCodeData?.template?.nameTemplate}.png")
+                        yandexMetric(currentQrCodeType, currentTitleLocation)
                     }
-                },
+                }
             )
         }
     ) {
@@ -149,7 +166,12 @@ fun QrCodeBottomSheet(
                                 }
                                 drawLayer(miniGraphicsLayer)
                             },
-                            triple?.third
+                            title = qrCodeData?.template?.nameTemplate ?: "",
+                            isMultiProjectTemplate = qrCodeData?.template?.isMultiProjectTemplate
+                                ?: false,
+                            bitmap = qrCodeData?.qrCodeWithLogoBitmap,
+                            currentTitleLocation = currentTitleLocation,
+                            onClick = { currentTitleLocation = it }
                         )
 
                     QrCodeType.STANDARD -> StandardQrCodeCard(
@@ -158,7 +180,7 @@ fun QrCodeBottomSheet(
                                 this@drawWithContent.drawContent()
                             }
                             drawLayer(standardGraphicsLayer)
-                        }, triple?.second, triple?.first
+                        }, qrCodeData?.qrCodeBitmap, qrCodeData?.template
                     )
 
                     QrCodeType.FULL -> FullQrCodeCard(
@@ -167,10 +189,19 @@ fun QrCodeBottomSheet(
                                 this@drawWithContent.drawContent()
                             }
                             drawLayer(fullGraphicsLayer)
-                        }, triple?.second, triple?.first
+                        }, qrCodeData?.qrCodeBitmap, qrCodeData?.template
                     )
                 }
             }
+            WarningCard(
+                colorBackground = orang_4,
+                colorBorder = orang_8,
+                colorIcon = orang_6,
+                colorIconBackground = orang_5,
+                colorText = orang_16,
+                icon = R.drawable.baseline_favorite_24,
+                text = R.string.template_qr_code_bottom_sheet_ads_support
+            )
         }
     }
 }
@@ -238,23 +269,16 @@ private fun Sd(bitmap: Bitmap?, first: DomainTemplateTable?) {
         )
         HorizontalDivider(color = green_8, modifier = Modifier.fillMaxWidth(0.75f))
     }
-    if (bitmap != null)
-        Image(
-            bitmap = bitmap.asImageBitmap(),
-            contentDescription = null,
-            modifier = Modifier.size(190.dp)
-        )
+    QrCodeImage(bitmap = bitmap)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         HorizontalDivider(color = green_8, modifier = Modifier.fillMaxWidth(0.75f))
         if (first != null)
-            Text(
-                first.nameTemplate,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 24.sp,
-                style = text_16
+            NameTemplateText(
+                title = first.nameTemplate,
+                isMultiProjectTemplate = first.isMultiProjectTemplate
             )
     }
 }
@@ -262,19 +286,62 @@ private fun Sd(bitmap: Bitmap?, first: DomainTemplateTable?) {
 @Composable
 private fun MiniQrCodeCard(
     modifier: Modifier = Modifier,
-    bitmap: Bitmap?
+    title: String,
+    bitmap: Bitmap?,
+    currentTitleLocation: TitleLocation,
+    isMultiProjectTemplate: Boolean,
+    onClick: (TitleLocation) -> Unit
 ) {
-    BaseQrCodeCard(
-        modifier = modifier
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (bitmap != null)
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.size(190.dp)
-            )
+        GroupButton(
+            currentTitleLocation
+        ) { onClick(it) }
+        BaseQrCodeCard(
+            modifier = modifier
+        ) {
+            when (currentTitleLocation) {
+                TitleLocation.LEFT,
+                TitleLocation.RIGHT -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (currentTitleLocation == TitleLocation.LEFT)
+                            NameTemplateText(
+                                modifier = Modifier.weight(1f),
+                                title = title,
+                                isMultiProjectTemplate = isMultiProjectTemplate
+                            )
+                        QrCodeImage(
+                            modifier = Modifier.weight(1f),
+                            bitmap = bitmap
+                        )
+                        if (currentTitleLocation == TitleLocation.RIGHT)
+                            NameTemplateText(
+                                modifier = Modifier.weight(1f),
+                                title = title,
+                                isMultiProjectTemplate = isMultiProjectTemplate
+                            )
+                    }
+                }
+
+                TitleLocation.UNDER -> Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    QrCodeImage(bitmap = bitmap)
+                    NameTemplateText(title = title, isMultiProjectTemplate = isMultiProjectTemplate)
+                }
+
+                TitleLocation.NO -> QrCodeImage(bitmap = bitmap)
+            }
+        }
     }
 }
+
 
 @Composable
 private fun BaseQrCodeCard(
@@ -312,13 +379,17 @@ private fun ButtonPanel(
         CloseButton(
             text = R.string.button_cancel,
             onClick = onDismissRequest,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
         )
         GradientButton(
             text = stringResource(R.string.button_create_png),
             onClick = onCreateQrCodeClick,
             prefixIconRes = R.drawable.outline_download_24,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
             colors = colors
         )
     }
@@ -360,11 +431,108 @@ private fun TabsWhichSlider(
     }
 }
 
+
+@Composable
+private fun GroupButton(
+    currentTitleLocation: TitleLocation,
+    onClick: (TitleLocation) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        TitleLocation.entries.forEach { titleLocation ->
+            val (containerColor, borderColor, textButton) =
+                if (currentTitleLocation == titleLocation) Triple(price_green, price_green, white)
+                else Triple(white, grey_2, gray_7)
+
+            BorderCard(
+                modifier = Modifier.weight(1f),
+                containerColor = containerColor,
+                padding = PaddingValues(6.dp),
+                shape = RoundedCornerShape(14.dp),
+                borderColor = borderColor,
+                onClick = { onClick(titleLocation) }
+            ) {
+                Text(
+                    stringResource(titleLocation.toResId()),
+                    style = text_12,
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = 16.sp,
+                    color = textButton,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun QrCodeImage(
+    modifier: Modifier = Modifier,
+    bitmap: Bitmap?
+) {
+    if (bitmap != null)
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            modifier = modifier
+                .size(190.dp)
+        )
+}
+
+@Composable
+private fun NameTemplateText(
+    modifier: Modifier = Modifier,
+    title: String,
+    isMultiProjectTemplate: Boolean
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            title,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 24.sp,
+            style = text_16,
+            textAlign = TextAlign.Center
+        )
+        if (isMultiProjectTemplate)
+            Icon(
+                painterResource(R.drawable.outline_language_24),
+                contentDescription = null,
+                tint = grey,
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(start = 4.dp)
+            )
+    }
+}
+
 enum class QrCodeType {
     MINI, STANDARD, FULL
 }
 
-fun ImageBitmap.addPadding(
+enum class TitleLocation {
+    LEFT, RIGHT, UNDER, NO
+}
+
+private fun yandexMetric(
+    currentQrCodeType: QrCodeType,
+    currentTitleLocation: TitleLocation,
+) {
+    val eventParameters: MutableMap<String, Any> = HashMap()
+    eventParameters["QR-код"] = currentQrCodeType
+    if (currentQrCodeType == QrCodeType.MINI)
+        eventParameters["Расположение"] = currentTitleLocation
+    AppMetrica.reportEvent("Cоздание QR-кода", eventParameters)
+}
+
+private fun ImageBitmap.addPadding(
     context: Context,
     paddingDp: Int
 ): ImageBitmap {

@@ -28,6 +28,8 @@ fun InfoPatternCard(
     count: String?,
     countSuffix: Suffix?,
     category: String?,
+    buyer: String?,
+    animalName: String?,
     note: String?
 ) {
     CardFieldNew(
@@ -45,7 +47,7 @@ fun InfoPatternCard(
                 color = grey
             )
             Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 title?.let {
                     TitleWithValue(
@@ -56,13 +58,13 @@ fun InfoPatternCard(
                 FlowRow(
                     maxItemsInEachRow = 2,
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     itemVerticalAlignment = Alignment.CenterVertically
                 ) {
                     count?.let {
                         TitleWithValue(
                             modifier = Modifier.weight(1f),
-                            titleRes = R.string.outlined_text_count,
+                            titleRes = R.string.outlined_text_field_quantity,
                             value = it
                         )
                     }
@@ -77,6 +79,20 @@ fun InfoPatternCard(
                         TitleWithValue(
                             modifier = Modifier.weight(1f),
                             titleRes = R.string.outlined_text_field_category,
+                            value = it
+                        )
+                    }
+                    buyer?.let {
+                        TitleWithValue(
+                            modifier = Modifier.weight(1f),
+                            titleRes = R.string.outlined_text_buyer,
+                            value = it
+                        )
+                    }
+                    animalName?.let {
+                        TitleWithValue(
+                            modifier = Modifier.weight(1f),
+                            titleRes = R.string.outlined_text_animals,
                             value = it
                         )
                     }

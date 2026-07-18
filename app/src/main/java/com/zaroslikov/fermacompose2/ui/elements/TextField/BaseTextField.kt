@@ -42,6 +42,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
@@ -50,6 +52,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zaroslikov.domain.models.enums.Suffix
@@ -85,8 +89,10 @@ fun BaseOutlinedTextNew(
     singleLine: Boolean = true,
     minLines: Int = 1,
     maxLength: Int? = null,
+    fontSize: TextUnit = 16.sp,
     isNecessarily: Boolean = false,
     colorTextField: Color = gray_9,
+    focusRequester: FocusRequester? = null,
     focusManager: FocusManager = LocalFocusManager.current,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActionFocus = KeyboardActionFocus.DOWN
@@ -186,10 +192,14 @@ fun BaseOutlinedTextNew(
                             .weight(1f)           // <-- ключ: занимает свободное место
                             .padding(end = if (isMore == true) 8.dp else 0.dp) // отступ перед иконкой
                             .heightIn(min = (minLines * 26).dp)
-                            .align(Alignment.CenterVertically),
+                            .align(Alignment.CenterVertically)
+                            .then(
+                                if (focusRequester != null)
+                                    Modifier.focusRequester(focusRequester) else Modifier
+                            ),
                         textStyle = TextStyle(
                             color = if (isDisabled) Color(0xFF9E9E9E) else Color.Black,
-                            fontSize = 36.sp, //TODO
+                            fontSize = fontSize,
                             lineHeight = 26.sp
                         ),
                         cursorBrush = SolidColor(Color(0xFF007AFF)),
@@ -281,9 +291,6 @@ fun BaseOutlinedTextNew(
         }
     }
 }
-
-
-
 
 
 @Composable

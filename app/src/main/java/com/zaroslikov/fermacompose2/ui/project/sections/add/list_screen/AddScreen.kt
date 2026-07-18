@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,13 +18,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.alabaster
+import com.zaroslikov.fermacompose2.green_11
+import com.zaroslikov.fermacompose2.green_8
+import com.zaroslikov.fermacompose2.green_9
 import com.zaroslikov.fermacompose2.green_g_1
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.price_green
+import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
 import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
@@ -40,13 +45,16 @@ import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedSwitch
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTemplate
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.EnterInPatternBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplatesBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeBottomSheet
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarning
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrScannerScreen
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplateCard
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
@@ -59,20 +67,29 @@ import io.appmetrica.analytics.AppMetrica
 @Composable
 fun AddScreen(
     viewModel: AddViewModel = hiltViewModel(),
+    navigateToFirstScreen: () -> Unit,
+    navigateToItemProject: (Pair<Long, Boolean>) -> Unit,
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val colors = listOf(price_green, green_shamrock)
     val idProject = state.idPT
-    val iconRes = R.drawable.icon_add_product
+    val eventFlow = viewModel.navigation
+    LaunchedEffect(Unit) {
+        eventFlow.collect { event ->
+            when (event) {
+                is UiEvent.Navigate -> navigateToItemProject(event.value to true)
+                is UiEvent.NavigateBack -> navigateToFirstScreen()
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBarNavigationNew(
-                value = state.textSearch,
-                isGroup = state.isGroup,
+                value = state.searchState.searchQuery,
+                isGroup = state.mainList.isGroupMode,
                 onValueChange = { viewModel.onIntent(AddListIntent.SearchChanged(it)) },
                 onClick = { viewModel.onIntent(AddListIntent.GroupClicked(it)) },
                 scrollBehavior = scrollBehavior,
@@ -81,7 +98,7 @@ fun AddScreen(
         floatingActionButton = {
             if (!state.isArchive)
                 NeonGlowFab(
-                    colors = colors,
+                    colors = state.ui.colors,
                     onClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true)) },
                     onLongClick = {
                         viewModel.onIntent(
@@ -99,12 +116,12 @@ fun AddScreen(
             AddContainer2(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
-                iconRes = iconRes,
-                itemList = state.list,
-                searchList = state.searchList,
-                brieflyList = state.briefly,
-                details = state.isGroup,
-                searchBrieflyList = state.searchBrieflyList,
+                iconRes = state.ui.iconRes,
+                itemList = state.mainList.items,
+                searchList = state.searchState.searchResults,
+                brieflyList = state.mainList.brieflyItems,
+                details = state.mainList.isGroupMode,
+                searchBrieflyList = state.searchState.searchBrieflyResults,
                 isArchive = state.isArchive,
                 onDetailsCardClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDetail(it)) },
                 onEditClick = {
@@ -115,21 +132,21 @@ fun AddScreen(
                 onDeleteClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(it)) },
                 onDetailsClick = {
                     viewModel.onIntent(
-                        AddListIntent.OpenBottomSheetGroup(it)
+                        AddListIntent.LoadDataForDetailNomenclatura(it)
                     )
                 })
-        if (state.openBottomSheetEntry)
+        if (state.bottomSheetState.isOpenEntry)
             AddEntryBottomSheet(
                 state = state.currentProduct,
-                colors = colors,
+                colors = state.ui.colors,
                 onIntent = viewModel::onIntent
             )
-        if (state.openBottomSheetGroup)
+        if (state.bottomSheetState.isOpenGroup)
             BrieflyBottomSheetAdd(
-                iconRes = iconRes,
-                list = state.listBriefly,
-                state = state.currentBriefly,
-                onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(null)) },
+                iconRes = state.ui.iconRes,
+                list = state.detailNomenclatura.productItems,
+                state = state.detailNomenclatura.detail,
+                onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
                 onEditClick = {
                     viewModel.onIntent(
                         AddListIntent.OpenBottomSheetEntry(true, it)
@@ -142,37 +159,42 @@ fun AddScreen(
                     AppMetrica.reportEvent("Переход в полный анализ продукта")
                 }
             )
-        if (state.isOpenBottomSheetDetail)
+        if (state.bottomSheetState.isOpenDetail)
             AddDetailBottomSheet(
-                state = state.currentDetail,
-                colors = colors,
+                state = state.productDetail,
+                colors = state.ui.colors,
                 onIntent = viewModel::onIntent,
                 isArchive = state.isArchive
             )
-        if (state.isOpenProductDeleteBottomSheet)
+        if (state.bottomSheetState.isOpenProductDelete)
             WarningDeleteAddBottomSheet(
                 onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(null)) },
                 onDeleteClick = { viewModel.onIntent(AddListIntent.Delete) },
-                state = state.currentDetail,
+                state = state.productDetail,
             )
-        if (state.isOpenTemplateDeleteBottomSheet)
+
+
+        if (state.bottomSheetState.isOpenTemplateDelete)
             WarningDeleteTemplateBottomSheet(
-                iconRes = iconRes,
+                iconRes = state.ui.iconRes,
                 onDismissRequest = {
-                    viewModel.onIntent(
-                        AddListIntent.OpenTemplateDeleteBottomSheet(
-                            null
-                        )
-                    )
+                    viewModel.onIntent(AddListIntent.OpenTemplateDeleteBottomSheet(null))
                 },
                 onDeleteClick = { viewModel.onIntent(AddListIntent.DeleteTemplate) },
-                templateItem = state.templateDelete
+                templateItem = state.templatesState.templateToDelete,
+                iconColor = green_shamrock,
+                iconBorderColor = alabaster,
             )
-        if (state.isOpenTemplateBottomSheet)
+        if (state.bottomSheetState.isOpenTemplates)
             TemplatesBottomSheet(
-                list = state.templateList,
-                iconRes = iconRes,
-                colors = colors,
+                list = state.templatesState.templatesList,
+                iconRes = state.ui.iconRes,
+                colors = state.ui.colors,
+                iconColor = green_shamrock,
+                iconBorderColor = alabaster,
+                onSetPinnedClick = {
+                    viewModel.onIntent(AddListIntent.SetPinOfTemplateClick(it))
+                },
                 onDismissRequest = {
                     viewModel.onIntent(AddListIntent.OpenPatternsBottomSheetClick(value = false))
                 },
@@ -198,16 +220,16 @@ fun AddScreen(
                     viewModel.onIntent(AddListIntent.OpenTemplateDeleteBottomSheet(it))
                 }
             )
-        if (state.isOpenQrCodeBottomSheet)
+        if (state.bottomSheetState.isOpenCreateQrCode)
             QrCodeBottomSheet(
-                colors = colors,
-                triple = state.bitmap,
-                onCreateQrCodeClick = { viewModel.onIntent(AddListIntent.CreateQrCodeImageClick(it)) }
+                colors = state.ui.colors,
+                qrCodeData = state.qrCodeState,
             ) { viewModel.onIntent(AddListIntent.OpenQrCodeBottomSheetClick(false)) }
-        if (state.isOpenEntryInTemplateBottomSheet)
+
+        if (state.bottomSheetState.isOpenEntryInTemplate)
             EnterInPatternBottomSheet(
-                colors = colors,
-                addEntryState2 = state.currentProduct,
+                colors = state.ui.colors,
+                addProductState = state.currentProduct,
                 onDismissRequest = {
                     viewModel.onIntent(AddListIntent.OpenTemplateBottomSheetClick(false))
                 },
@@ -219,20 +241,39 @@ fun AddScreen(
                 onAnimalChange = { viewModel.onIntent(AddListIntent.Animal(it)) },
                 onAnimalClearChange = { viewModel.onIntent(AddListIntent.AnimalClear(it)) },
                 onNoteChange = { viewModel.onIntent(AddListIntent.NoteChanged(it)) },
-                onInsertClick = { viewModel.onIntent(AddListIntent.Insert) }
+                onInsertClick = { viewModel.onIntent(AddListIntent.Insert) },
+                onInsertAndScannerAgain = {
+                    viewModel.onIntent(AddListIntent.Insert)
+                    viewModel.onIntent(AddListIntent.OpenScannerQrCodeBottomSheetClick(true))
+                }
             )
-        if (state.isOpenWarningQrCodeBottomSheet)
+        if (state.bottomSheetState.isOpenWarningQrCode)
             QrCodeWarningBottomSheet(
-                qrCodeWarning = QrCodeWarning.LOCAL
-            ) {
-                viewModel.onIntent(AddListIntent.OpenWarningQrCodeBottomSheetClick(false))
-            }
+                backupData = state.qrCodeWarning.templateBackup,
+                qrCodeWarningType = state.qrCodeWarning.warningType,
+                onDismissRequest = {
+                    viewModel.onIntent(AddListIntent.OpenWarningQrCodeBottomSheetClick(false))
+                },
+                onScannerClick = {
+                    viewModel.onIntent(AddListIntent.OpenScannerQrCodeBottomSheetClick(true))
+                },
+                onRecoverClick = {
+                    viewModel.onIntent(AddListIntent.RecoverClick(it))
+                }
+            )
+        if (state.bottomSheetState.isOpenScannerQrCode)
+            QrScannerScreen(
+                onQrDetected = { viewModel.onIntent(AddListIntent.QrDetected(it)) },
+                onDismissRequest = {
+                    viewModel.onIntent(AddListIntent.OpenScannerQrCodeBottomSheetClick(false))
+                }
+            )
     }
 }
 
 @Composable
 private fun AddDetailBottomSheet(
-    state: DomainAddItemDto?,
+    state: DomainAddItemDto2?,
     colors: List<Color>,
     onIntent: (AddListIntent) -> Unit,
     isArchive: Boolean
@@ -264,7 +305,7 @@ private fun AddDetailBottomSheet(
 private fun WarningDeleteAddBottomSheet(
     onDismissRequest: () -> Unit,
     onDeleteClick: () -> Unit,
-    state: DomainAddItemDto?,
+    state: DomainAddItemDto2?,
 ) {
     WarningDeleteBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -290,8 +331,10 @@ private fun WarningDeleteAddBottomSheet(
 }
 
 @Composable
-private fun WarningDeleteTemplateBottomSheet(
+fun WarningDeleteTemplateBottomSheet(
     @DrawableRes iconRes: Int,
+    iconColor: Color,
+    iconBorderColor: Color,
     onDismissRequest: () -> Unit,
     onDeleteClick: () -> Unit,
     templateItem: TemplateItem?,
@@ -303,8 +346,12 @@ private fun WarningDeleteTemplateBottomSheet(
         templateItem?.let { template ->
             TemplateCard(
                 iconRes = iconRes,
-                title = template.nameTemplate,
+                title = template.name,
                 value = template.description.ifBlank { null },
+                pin = template.isPinned,
+                iconColor = iconColor,
+                iconBorderColor = iconBorderColor,
+                isMultiProject = template.isMultiProject
             )
         }
     }
@@ -316,8 +363,8 @@ fun AddContainer2(
     @DrawableRes iconRes: Int,
     details: Boolean,
     isArchive: Boolean,
-    itemList: List<DomainAddItemDto>,
-    searchList: List<DomainAddItemDto>,
+    itemList: List<DomainAddItemDto2>,
+    searchList: List<DomainAddItemDto2>,
     brieflyList: List<BrieflyItem>,
     searchBrieflyList: List<BrieflyItem>,
     onDetailsCardClick: (Long) -> Unit,
@@ -380,7 +427,7 @@ fun AddContainer2(
 @Composable
 fun BrieflyBottomSheetAdd(
     @DrawableRes iconRes: Int,
-    list: List<DomainAddItemDto>,
+    list: List<DomainAddItemDto2>,
     isArchive: Boolean,
     state: BrieflyItem?,
     onEditClick: (Long) -> Unit,
@@ -424,22 +471,26 @@ fun BrieflyBottomSheetAdd(
 
 @Composable
 fun AddEntryBottomSheet(
-    state: AddEntryState2,
+    state: AddProductState,
     colors: List<Color>,
     onIntent: (AddListIntent) -> Unit
 ) {
-    val template = state.templateEntryState
+    val template = state.template.activeField
+    val product = state.product
+    val errors = state.errors
+    val isTemplate = state.template.isTemplate
+
     EntryBottomSheet(
-        titleEntryRes = if (state.isTemplate) R.string.template_title_entry else R.string.add_screen_title_entry,
-        titleEditRes = if (state.isTemplate) R.string.template_title_edit else R.string.add_screen_title_edit,
-        isEntry = state.isEntry,
-        enabledButton = state.hasAnyError,
+        titleEntryRes = if (isTemplate) R.string.template_title_entry else R.string.add_screen_title_entry,
+        titleEditRes = if (isTemplate) R.string.template_title_edit else R.string.add_screen_title_edit,
+        isEntry = isTemplate,
+        enabledButton = errors.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
                 AddListIntent.OpenBottomSheetEntry(
                     isOpen = false,
-                    isSaveStateForBottomSheet = state.isEntry
+                    isSaveStateForBottomSheet = product.isEntry
                 )
             )
         },
@@ -447,92 +498,114 @@ fun AddEntryBottomSheet(
             onIntent(AddListIntent.OpenBottomSheetEntry(false))
         },
         onInsertClick = {
-            if (state.isTemplate) onIntent(AddListIntent.InsertTemplate)
+            if (isTemplate) onIntent(AddListIntent.InsertTemplate)
             else onIntent(AddListIntent.Insert)
         },
         onUpdateClick = {
-            if (state.isTemplate) onIntent(AddListIntent.UpdateTemplate)
+            if (isTemplate) onIntent(AddListIntent.UpdateTemplate)
             else onIntent(AddListIntent.Update)
         },
     ) {
-        if (state.isTemplate)
+        if (!product.isEntry && isTemplate)
+            WarningCard2()
+        if (isTemplate)
             OutlinedTextTemplate(
-                value = state.nameTemplate,
+                value = state.template.name,
                 onValueChange = { onIntent(AddListIntent.NameTemplateChanged(it)) },
-                isError = state.error.isErrorNameTemplate,
+                isError = errors.isErrorNameTemplate,
             )
         OutlinedTextTitleAddNew(
-            value = state.title,
+            value = product.title,
             onValueChange = { onIntent(AddListIntent.TitleChanged(it)) },
             onValueChangeSuffix = { onIntent(AddListIntent.TitleAndSuffix(it)) },
-            titleList = state.pickList.titleList,
-            isErrorTitle = state.error.isErrorTitle,
-            isErrorSlash = state.error.isErrorSlash,
+            titleList = state.pickList.titles,
+            isErrorTitle = errors.isErrorTitle,
+            isErrorSlash = errors.isErrorSlash,
             drawableRes = R.drawable.icon_add_product,
-            isShowSwitch = state.isTemplate,
+
+            isShowSwitch = isTemplate,
             checked = template.isTitle,
-            isNecessarily = !state.isTemplate || !template.isTitle,
+            isNecessarily = !isTemplate || !template.isTitle,
             onCheckedChange = { onIntent(AddListIntent.TitleTemplateChanged(it)) },
         )
         OutlinedTextCountNew(
-            value = state.count,
+            value = product.count,
             onValueChange = {
                 onIntent(AddListIntent.CountChanged(it))
             },
-            suffix = state.countSuffix,
+            suffix = product.countSuffix,
             onSuffixChange = { onIntent(AddListIntent.SuffixClicked(it)) },
-            isError = state.error.isErrorCount,
+            isError = errors.isErrorCount,
             intResSup = R.string.support_text_count_product,
-            isNecessarily = !state.isTemplate || !template.isCount,
+            isNecessarily = !isTemplate || !template.isCount,
 
-            isShowSwitchForValue = state.isTemplate,
+            isShowSwitchForValue = isTemplate,
             checkedForValue = template.isCount,
             onCheckedForValueChange = { onIntent(AddListIntent.CountTemplateChanged(it)) },
 
-            isShowSwitchForSuffix = state.isTemplate,
+            isShowSwitchForSuffix = isTemplate,
             checkedForSuffix = template.isSuffix,
             onCheckedForSuffixChange = { onIntent(AddListIntent.SuffixTemplateClicked(it)) },
 
             )
-        if (!state.isIndicatorsValue && !state.isTemplate)
+        if (!product.hasIndicators && !isTemplate)
             WarehouseCountCard(
-                title = state.title,
+                title = product.title,
                 warehouseList = state.pickList.warehouseList
             )
         OutlinedTextCategoryNew(
-            value = state.category,
+            value = product.category,
             onValueChange = { onIntent(AddListIntent.CategoryChanged(it)) },
-            titleList = state.pickList.categoryList,
-            isShowSwitch = state.isTemplate,
+            titleList = state.pickList.categories,
+            isShowSwitch = isTemplate,
             checked = template.isCategory,
             onCheckedChange = { onIntent(AddListIntent.CategoryTemplateChanged(it)) },
         )
-        if (!state.isIndicatorsValue && !state.isTemplate)
+        if (!product.hasIndicators && !isTemplate)
             OutlinedTextDateNew(
-                value = state.date,
+                value = product.date,
                 onValueChange = { onIntent(AddListIntent.Date(it)) }
             )
-        if (!state.isIndicatorsValue)
-            if (state.pickList.animalList.isNotEmpty())
-                OutlinedTextAnimalNew(
-                    value = state.animal,
-                    onValueChange = { onIntent(AddListIntent.Animal(it)) },
-                    selectedAnimalIndex = state.selectedAnimalIndex,
-                    onClickClear = { onIntent(AddListIntent.AnimalClear(it)) },
-                    animalList = state.pickList.animalList,
-
-                    isShowSwitch = state.isTemplate,
-                    checked = template.isAnimal,
-                    onCheckedChange = { onIntent(AddListIntent.AnimalTemplateChanged(it)) },
-                )
+        if (!product.hasIndicators && state.pickList.animals.isNotEmpty())
+            OutlinedTextAnimalNew(
+                value = product.animalName,
+                onValueChange = { onIntent(AddListIntent.Animal(it)) },
+                selectedAnimalIndex = product.selectedAnimalIndex,
+                onClickClear = { onIntent(AddListIntent.AnimalClear(it)) },
+                animalList = state.pickList.animals,
+                enabledChecked = !template.isMultiProjectTemplate,
+                isShowSwitch = isTemplate,
+                checked = template.isAnimal,
+                onCheckedChange = { onIntent(AddListIntent.AnimalTemplateChanged(it)) },
+            )
         OutlinedTextNoteNew(
-            value = state.note,
+            value = product.note,
             onValueChange = { onIntent(AddListIntent.NoteChanged(it)) },
-            isShowSwitch = state.isTemplate,
+            isShowSwitch = isTemplate,
             checked = template.isNote,
             onCheckedChange = { onIntent(AddListIntent.NoteTemplateChanged(it)) },
         )
+        if (isTemplate)
+            OutlinedSwitch(
+                checked = template.isMultiProjectTemplate,
+                onCheckedChange = { onIntent(AddListIntent.MultiProjectTemplateChanged(it)) }
+            )
     }
+}
+
+@Composable
+fun WarningCard2() {
+    WarningCard(
+        colorBackground = price_green_2,
+        colorBorder = green_11,
+        colorIcon = price_green,
+        colorIconBackground = green_8,
+        colorTitle = green_9,
+        colorText = green_9,
+        icon = R.drawable.outline_qr_code_24,
+        title = R.string.warning_qr_code_card_title,
+        text = R.string.warning_qr_code_card_title_support
+    )
 }
 
 enum class Page {

@@ -1,10 +1,10 @@
 package com.zaroslikov.data.room.repository
 
-import com.zaroslikov.data.room.dao.template.TemplateDao
-import com.zaroslikov.data.room.mapper.dto.add.toDomainAddTemplateDto
+import com.zaroslikov.data.room.dao.TemplateDao
+import com.zaroslikov.data.room.mapper.dto.template.toDomainAddTemplateDto
 import com.zaroslikov.data.room.mapper.table.template.toAddTemplateTable
 import com.zaroslikov.data.room.mapper.table.template.toDomainAddTemplateTable
-import com.zaroslikov.domain.models.dto.add.DomainAddTemplateDto
+import com.zaroslikov.domain.models.dto.template.DomainAddTemplateDto
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.domain.repository.template.AddTemplateRepository
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +28,10 @@ class AddTemplateRepositoryImpl @Inject constructor(private val templateDao: Tem
 
     override suspend fun clearAndInsertAddTemplateTableForImport(addTemplateTable: List<DomainTemplateTable>) {
         return templateDao.clearAndInsertAddTemplateTableForImport(addTemplateTable.map { it.toAddTemplateTable() })
+    }
+
+    override suspend fun setPinById(pin: Boolean, id: Long) {
+        return templateDao.setPinById(pin, id)
     }
 
     override fun getAddTemplateItem(id: Long): Flow<DomainTemplateTable?> {
