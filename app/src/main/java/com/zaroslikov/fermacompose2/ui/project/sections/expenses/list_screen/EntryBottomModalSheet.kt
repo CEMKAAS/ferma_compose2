@@ -183,7 +183,7 @@ fun ExpensesEntryBottomSheet(
             priceSuffix = priceSuffix,
             supportTextRes = R.string.support_text_price_expenses_all,
             supportTextResAutoCal = R.string.support_text_price_expenses_one,
-            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,,
+            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
         )
         OutlinedTextCategoryNew(
             value = state.category,

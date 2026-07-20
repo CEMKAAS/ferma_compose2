@@ -16,7 +16,7 @@ fun AddTemplateDto.toDomainAddTemplateDto(): DomainAddTemplateDto {
         nameAnimal = this.nameAnimal,
         note = this.note,
         idPT = this.idPT,
-        pin = this.pin,
+        pin = this.isPinned,
         isMultiProject = this.isMultiProject
     )
 }

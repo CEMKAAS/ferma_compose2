@@ -45,7 +45,7 @@ import com.zaroslikov.data.room.table.incubator.IncubatorParameters
 import com.zaroslikov.data.room.table.ferma.NoteTable
 import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
-import com.zaroslikov.data.room.table.ferma.templateOne.TemplateTable
+import com.zaroslikov.data.room.table.ferma.TemplateTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable

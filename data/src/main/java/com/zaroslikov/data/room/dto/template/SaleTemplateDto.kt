@@ -3,7 +3,7 @@ package com.zaroslikov.data.room.dto.template
 import androidx.room.ColumnInfo
 import com.zaroslikov.domain.models.enums.Suffix
 
-data class AddTemplateDto(
+data class SaleTemplateDto(
     @ColumnInfo(name = "_id")
     val id: Long = 0,
     @ColumnInfo(name = "name_template")
@@ -13,11 +13,10 @@ data class AddTemplateDto(
     @ColumnInfo(name = "count_suffix")
     val countSuffix: Suffix? = Suffix.KILOGRAM,
     val price: Double? = 0.0,
+    @ColumnInfo(name = "price_all")
+    val priceAll: Double? = null,
     val category: String?,
-    @ColumnInfo(name = "animal_id")
-    val animalId: Long? = null,
-    @ColumnInfo(name = "animal_name")
-    val nameAnimal: String? = null,
+    val buyer: String? = null,
     val note: String? = "",
     val idPT: Long = 0,
     @ColumnInfo(name = "is_pinned")

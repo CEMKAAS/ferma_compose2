@@ -1,4 +1,4 @@
-package com.zaroslikov.data.room.table.ferma.templateOne
+package com.zaroslikov.data.room.table.ferma
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

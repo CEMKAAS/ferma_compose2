@@ -8,7 +8,8 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.zaroslikov.data.room.dto.template.AddTemplateDto
-import com.zaroslikov.data.room.table.ferma.templateOne.TemplateTable
+import com.zaroslikov.data.room.dto.template.SaleTemplateDto
+import com.zaroslikov.data.room.table.ferma.TemplateTable
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -56,6 +57,27 @@ interface TemplateDao {
                 " ORDER BY a.is_pinned DESC, a._id DESC"
     )
     fun getAllAddTemplateItems(id: Long): Flow<List<AddTemplateDto>>
+
+    @Query(
+        "SELECT " +
+                " a._id," +
+                " a.name_template, " +
+                " a.title," +
+                " a.count," +
+                " a.count_suffix," +
+                " a.price," +
+                " a.price_all," +
+                " a.category," +
+                " a.buyer," +
+                " a.note," +
+                " a.idPT, " +
+                " a.is_pinned, " +
+                " a.is_multi_project_template" +
+                " FROM template_table a" +
+                " WHERE is_multi_project_template = 1 or a.idPT = :id and a.template_type = 1 " +
+                " ORDER BY a.is_pinned DESC, a._id DESC"
+    )
+    fun getAllSaleTemplateItems(id: Long): Flow<List<SaleTemplateDto>>
 
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)

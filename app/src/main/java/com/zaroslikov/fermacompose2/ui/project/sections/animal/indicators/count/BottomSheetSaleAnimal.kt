@@ -94,7 +94,7 @@ fun BottomSheetSaleAnimal(
             onValueChange = {
                 onIntent(AnimalCountIntent.BuyerSaleChanged(it))
             },
-            list = state.buyerList,,
+            list = state.buyerList,
         )
         OutlinedTextNoteNew(
             value = state.note,

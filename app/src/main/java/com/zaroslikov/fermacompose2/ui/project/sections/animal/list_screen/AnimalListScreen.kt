@@ -280,7 +280,7 @@ private fun AnimalEntryBottomSheet(
             priceSuffix = priceSuffix,
             supportTextRes = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_price_animal,
             supportTextResAutoCal = R.string.support_text_price_animal,
-            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,,
+            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
         )
         OutlinedTextDateNew(
             value = state.dateBorn,

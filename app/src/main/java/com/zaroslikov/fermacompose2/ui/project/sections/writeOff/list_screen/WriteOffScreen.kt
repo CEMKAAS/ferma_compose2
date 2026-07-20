@@ -389,7 +389,7 @@ private fun WriteOffEntryBottomSheet(
             productOrigin = state.writeOffProductOrigin,
             intResSup = R.string.support_text_price_write_product,
             readOnly = state.isIndicatorsValue,
-            enable = !state.isIndicatorsValue,
+            enabled = !state.isIndicatorsValue,
             titleList = state.pickList.titleList,
             isMore = true,
             isErrorTitle = state.error.isErrorTitle,
@@ -427,7 +427,7 @@ private fun WriteOffEntryBottomSheet(
             priceSuffix = priceSuffix,
             supportTextRes = R.string.support_text_price_write_off_all,
             supportTextResAutoCal = R.string.support_text_price_write_off_one,
-            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,,
+            tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
         )
         OutlinedTextCategoryNew(
             value = state.category,

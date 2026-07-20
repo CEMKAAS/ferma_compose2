@@ -145,7 +145,7 @@ private fun EntryValue(
                 supportTextRes = R.string.entry_bookmark_support_text_all_price,
                 supportTextResAutoCal = R.string.entry_bookmark_support_text_price,
                 tooltipTextResAutoCal = R.string.entry_bookmark_tooltip_auto_calculate_price,
-                isBorderCard = false,,
+                isBorderCard = false,
             )
             OutlinedTextDateNew(
                 value = state.startDate,

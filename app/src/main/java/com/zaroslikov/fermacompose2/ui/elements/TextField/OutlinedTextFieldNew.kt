@@ -1072,7 +1072,7 @@ fun OutlinedPriceInputNew(
                 value = price,
                 onValueChange = { onPriceChange(it) },
                 labelIntRes = R.string.outlined_text_price,
-                intResSup = supportText,
+                intResSup = if (checked) R.string.is_empty_2 else supportText,
                 intResError = R.string.error_no_count_sale,
                 isError = isError,
                 suffix = priceSuffix,
@@ -1082,27 +1082,28 @@ fun OutlinedPriceInputNew(
                 leadingIconRes = leadingIconRes,
                 keyboardOptions = keyboardOptionsNextNumber(), fontSize = fontSize
             )
+            if (!checked)
+                AnimatedVisibility(
+                    modifier = Modifier.fillMaxWidth(),
+                    visible = isManyCount
+                ) {
+                    AutoCalculateCheckbox(
+                        isChecked = isAutoCalculate,
+                        onCheckedChange = onAutoCalculate,
+                        tooltipTextResAutoCal = tooltipTextResAutoCal,
+                        price = price,
+                        count = count,
+                        countSuffix = countSuffix,
+                        priceSuffix = priceSuffix,
+                        priceAll = priceAll,
+                    )
+                }
             if (isShowSwitch)
                 SwitchWitchText(
                     checked = checked,
                     onCheckedChange = onCheckedChange,
                     intRes = switchTextRes
                 )
-            AnimatedVisibility(
-                modifier = Modifier.fillMaxWidth(),
-                visible = isManyCount
-            ) {
-                AutoCalculateCheckbox(
-                    isChecked = isAutoCalculate,
-                    onCheckedChange = onAutoCalculate,
-                    tooltipTextResAutoCal = tooltipTextResAutoCal,
-                    price = price,
-                    count = count,
-                    countSuffix = countSuffix,
-                    priceSuffix = priceSuffix,
-                    priceAll = priceAll,
-                )
-            }
         }
     }
     if (isBorderCard) BorderCard { textField() } else textField()
@@ -1366,14 +1367,15 @@ fun OutlinedTextTitleSaleNew(
     productOrigin: ProductOrigin?,
     @StringRes intResSup: Int = R.string.support_text_product,
     readOnly: Boolean = false,
-    enable: Boolean = true,
+    enabled: Boolean = true,
     titleList: List<DomainTitleSuffixCategory>,
     isMore: Boolean = value.isBlank(),
     isErrorTitle: Boolean = false,
     isErrorSlash: Boolean = false,
-    isShowSwitch: Boolean,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    isNecessarily: Boolean = true,
+    isShowSwitch: Boolean = false,
+    checked: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit = {},
     @StringRes switchTextRes: Int = R.string.support_text_enter_when_applying,
     fontSize: TextUnit = 16.sp,
 ) {
@@ -1393,7 +1395,7 @@ fun OutlinedTextTitleSaleNew(
             suffix = suffix,
             productOrigin = category,
             list = titleList,
-            enableDropMenu = enable,
+            enableDropMenu = enabled && !checked,
             content = {
                 BaseOutlinedTextNew(
                     value = value,
@@ -1406,14 +1408,14 @@ fun OutlinedTextTitleSaleNew(
                     leadingIconColor2 = category?.toColorList() ?: ProductOrigin.ADD.toColorList(),
                     labelIntRes = R.string.outlined_text_product,
                     isError = isErrorTitle, isErrorSlash = isErrorSlash,
-                    intResSup = intResSup,
+                    intResSup = if (checked) R.string.is_empty_2 else intResSup,
                     intResError = R.string.error_no_product,
                     readOnly = readOnly,
-                    enabled = enable,
+                    enabled = enabled && !checked,
                     singleLine = false,
                     modifier = it.first,
                     isMore = isMore,
-                    isNecessarily = true,
+                    isNecessarily = isNecessarily,
                     keyboardOptions = keyboardOptionsNext(), fontSize = fontSize
                 )
             },
@@ -1421,7 +1423,10 @@ fun OutlinedTextTitleSaleNew(
         if (isShowSwitch)
             SwitchWitchText(
                 checked = checked,
-                onCheckedChange = onCheckedChange,
+                onCheckedChange = {
+                    onCheckedChange(it)
+                    category = null
+                },
                 intRes = switchTextRes
             )
     }

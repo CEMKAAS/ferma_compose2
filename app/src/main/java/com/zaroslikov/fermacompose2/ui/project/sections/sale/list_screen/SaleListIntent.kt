@@ -1,15 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen
 
-import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
-import com.zaroslikov.fermacompose2.base.intent.BaseIntent2
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 
@@ -18,14 +14,16 @@ sealed class SaleListIntent : BaseIntent {
 
     data class OpenBottomSheetEntry(
         val isOpen: Boolean,
-        val item: DomainSaleTable? = null,
-        val isSaveStateForBottomSheet: Boolean = false
+        val id: Long? = null,
+        val isSaveStateForBottomSheet: Boolean = false,
+        val isTemplate: Boolean = false
     ) : SaleListIntent()
 
     data class RefreshEntryBottomSheetState(
         val isOpen: Boolean,
         val state: SaleProductState,
-        val isSaveStateForBottomSheet: Boolean = false
+        val isSaveStateForBottomSheet: Boolean = false,
+        val isTemplate: Boolean = false
     ) : SaleListIntent()
 
     data class OpenBottomSheetDetail(
@@ -81,7 +79,7 @@ sealed class SaleListIntent : BaseIntent {
     data class CreateQrCodeClick(val value: Long) : SaleListIntent()
     data class OpenTemplateBottomSheetClick(
         val value: Boolean,
-        val toUiMap23: AddProductState = AddProductState()
+        val toUiMap23: SaleProductState = SaleProductState()
     ) : SaleListIntent()
 
     data class OpenWarningQrCodeBottomSheetClick(

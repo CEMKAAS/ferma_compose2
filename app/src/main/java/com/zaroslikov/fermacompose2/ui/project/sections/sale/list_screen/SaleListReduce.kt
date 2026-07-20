@@ -13,8 +13,6 @@ import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListState
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -31,7 +29,8 @@ class SaleListReduce(
             is SaleListIntent.RefreshEntryBottomSheetState -> state.updateEntryBottomSheet(
                 isOpenEntryBottomSheet = intent.isOpen,
                 isSaveStateForEntry = intent.isSaveStateForBottomSheet,
-                entryState2 = intent.state
+                entryState2 = intent.state,
+                isTemplate = intent.isTemplate
             ).updateValid()
 
             is SaleListIntent.OpenBottomSheetDelete -> state.updateOpenBottomSheetDelete(intent.value)
@@ -68,6 +67,9 @@ class SaleListReduce(
                 .updateValid()
 
             is SaleListIntent.CountTemplateChanged -> state.updateCountTemplate(intent.value)
+                .updateValid()
+
+            is SaleListIntent.PriceTemplateClicked -> state.updatePriceTemplate(intent.value)
                 .updateValid()
 
             is SaleListIntent.SuffixTemplateClicked -> state.updateSuffixTemplate(intent.value)
@@ -148,9 +150,22 @@ class SaleListReduce(
 
     private fun SaleListState.updateValid(): SaleListState {
         val product = currentProduct.product
+        val template = currentProduct.template
+
         val baseValid =
-            product.title.isNotBlank() && product.count.isNotBlank()
-                    && product.price.isNotBlank() && !product.title.isSlash()
+            when {
+                template.isTemplate -> template.name.isNotBlank() &&
+                        (template.activeField.isTitle || product.title.isNotBlank()
+                                || !product.title.isSlash()) &&
+                        (template.activeField.isCount || product.count.isNotBlank()) &&
+                        (template.activeField.isPrice || product.price.isNotBlank())
+
+                else -> product.title.isNotBlank() &&
+                        !product.title.isSlash() &&
+                        product.count.isNotBlank() &&
+                        product.price.isNotBlank()
+            }
+
         return copy(
             currentProduct = currentProduct.copy(
                 errors = currentProduct.errors.copy(
@@ -350,14 +365,19 @@ class SaleListReduce(
     private fun SaleListState.updateEntryBottomSheet(
         isOpenEntryBottomSheet: Boolean,
         entryState2: SaleProductState,
-        isSaveStateForEntry: Boolean
+        isSaveStateForEntry: Boolean,
+        isTemplate: Boolean
     ): SaleListState {
         return copy(
             bottomSheetState = bottomSheetState.copy(
                 isOpenEntry = isOpenEntryBottomSheet,
                 isSaveStateForBottomSheet = isSaveStateForEntry
             ),
-            currentProduct = entryState2,
+            currentProduct = entryState2.copy(
+                template = entryState2.template.copy(
+                    isTemplate = isTemplate
+                )
+            )
         )
     }
 
@@ -400,6 +420,20 @@ class SaleListReduce(
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isCount = isCount
+                    )
+                )
+            )
+        )
+    }
+    private fun SaleListState.updatePriceTemplate(isPrice: Boolean): SaleListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                product = currentProduct.product.copy(
+                    price = if (isPrice) "" else currentProduct.product.price,
+                ),
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isPrice = isPrice
                     )
                 )
             )
@@ -479,10 +513,10 @@ class SaleListReduce(
         )
     }
 
-    private fun AddListState.updateOpenEntryInTemplate(
+    private fun SaleListState.updateOpenEntryInTemplate(
         isOpenEntryInTemplateBottomSheet: Boolean,
-        value: AddProductState,
-    ): AddListState {
+        value: SaleProductState,
+    ): SaleListState {
         return copy(
             bottomSheetState = bottomSheetState.copy(
                 isOpenEntryInTemplate = isOpenEntryInTemplateBottomSheet
@@ -491,11 +525,11 @@ class SaleListReduce(
         )
     }
 
-    private fun AddListState.updateOpenWarningQrCode(
+    private fun SaleListState.updateOpenWarningQrCode(
         bool: Boolean,
         warning: QrCodeWarningType,
         backupData: DomainTemplateTable?
-    ): AddListState {
+    ): SaleListState {
         return copy(
             bottomSheetState = bottomSheetState.copy(
                 isOpenWarningQrCode = bool,
@@ -508,9 +542,9 @@ class SaleListReduce(
         )
     }
 
-    private fun AddListState.updateOpenScannerQrCode(
+    private fun SaleListState.updateOpenScannerQrCode(
         bool: Boolean,
-    ): AddListState {
+    ): SaleListState {
         return copy(
             bottomSheetState = bottomSheetState.copy(
                 isOpenScannerQrCode = bool
@@ -518,7 +552,7 @@ class SaleListReduce(
         )
     }
 
-    private fun AddListState.updateOpenTemplateDeleteBottomSheet(id: Long?): AddListState {
+    private fun SaleListState.updateOpenTemplateDeleteBottomSheet(id: Long?): SaleListState {
         return if (id == null)
             copy(
                 bottomSheetState = bottomSheetState.copy(
@@ -538,7 +572,7 @@ class SaleListReduce(
         }
     }
 
-    private fun AddListState.updateOpenPatternBottomSheet(isOpenTemplates: Boolean): AddListState {
+    private fun SaleListState.updateOpenPatternBottomSheet(isOpenTemplates: Boolean): SaleListState {
         return copy(
             bottomSheetState = bottomSheetState.copy(
                 isOpenTemplates = isOpenTemplates
@@ -546,7 +580,7 @@ class SaleListReduce(
         )
     }
 
-    private fun AddListState.updateLoadDataForTemplate(templateItems: List<TemplateItem>): AddListState {
+    private fun SaleListState.updateLoadDataForTemplate(templateItems: List<TemplateItem>): SaleListState {
         return copy(
             templatesState = templatesState.copy(
                 templatesList = templateItems
@@ -554,10 +588,10 @@ class SaleListReduce(
         )
     }
 
-    private fun AddListState.updateOpenQrCodeBottomSheet(
+    private fun SaleListState.updateOpenQrCodeBottomSheet(
         isOpenCreateQrCode: Boolean,
         qrCodeState: QrCodeData?
-    ): AddListState {
+    ): SaleListState {
         return copy(
             bottomSheetState = bottomSheetState.copy(
                 isOpenCreateQrCode = isOpenCreateQrCode,

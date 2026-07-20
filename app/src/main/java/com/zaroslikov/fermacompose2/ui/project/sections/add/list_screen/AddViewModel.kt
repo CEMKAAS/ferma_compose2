@@ -257,7 +257,7 @@ class AddViewModel @Inject constructor(
     }
 
 
-    private fun loadDataForTemplatesBottomSheet(
+    override fun loadDataForTemplatesBottomSheet(
         isOpen: Boolean
     ) {
         viewModelScope.launch {
@@ -291,7 +291,7 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    private fun recover(domainTemplateTable: DomainTemplateTable) {
+    override fun recover(domainTemplateTable: DomainTemplateTable) {
         viewModelScope.launch {
             val baseState = loadDataForPickList()
             val currentProduct = baseState.toUiMap23(

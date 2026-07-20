@@ -1,6 +1,6 @@
 package com.zaroslikov.data.room.mapper.table.template
 
-import com.zaroslikov.data.room.table.ferma.templateOne.TemplateTable
+import com.zaroslikov.data.room.table.ferma.TemplateTable
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 
 fun DomainTemplateTable.toAddTemplateTable(): TemplateTable {

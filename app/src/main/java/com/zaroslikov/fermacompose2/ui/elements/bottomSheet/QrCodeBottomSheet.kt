@@ -221,7 +221,9 @@ private fun FullQrCodeCard(
                 count = first.count?.formatNumber(),
                 countSuffix = first.countSuffix,
                 category = first.category,
-                note = first.note
+                note = first.note,
+                buyer = first.buyer,
+                animalName = "Имя животного", //TODO нужно добавить имя животного
             )
     }
 }

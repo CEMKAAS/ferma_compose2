@@ -79,7 +79,7 @@ fun BottomSheetWriteOffAnimal(
             priceSuffix = currencyPrice,
             supportTextRes = R.string.support_text_price_animals,
             supportTextResAutoCal = R.string.support_text_price_one_animals,
-            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,,
+            tooltipTextResAutoCal = R.string.tooltip_auto_calculate_animal,
         )
         OutlinedTextDateNew(
             value = state.date,

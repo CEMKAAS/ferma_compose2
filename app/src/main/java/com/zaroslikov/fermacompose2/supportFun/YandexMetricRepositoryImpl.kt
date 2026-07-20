@@ -97,10 +97,10 @@ class YandexMetricRepositoryImpl @Inject constructor(
         domainSaleTable: SaleProductState
     ) {
         val eventParameters: MutableMap<String, Any> = HashMap()
-        eventParameters["Имя"] = domainSaleTable.title
-        eventParameters["Категория"] = domainSaleTable.category
-        eventParameters["Покупатель"] = domainSaleTable.buyer.ifBlank { "Покупатль не указан" }
-        eventParameters["Примечание"] = domainSaleTable.note.ifBlank { "Заметка не указана" }
+        eventParameters["Имя"] = domainSaleTable.product.title
+        eventParameters["Категория"] = domainSaleTable.product.category
+        eventParameters["Покупатель"] = domainSaleTable.product.buyer.ifBlank { "Покупатль не указан" }
+        eventParameters["Примечание"] = domainSaleTable.product.note.ifBlank { "Заметка не указана" }
         AppMetrica.reportEvent("Продажа продукции", eventParameters)
     }
 

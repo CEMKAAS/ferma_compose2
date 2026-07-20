@@ -148,7 +148,8 @@ fun ExposedDropdownMenuCategoryBuyer(
         title = title,
         labelSelector = { it },
         list = titleList,
-        content = content
+        content = content,
+        enableDropMenu = enableDropMenu
     ) { index, item, closeMenu ->
         val trailingIcon: @Composable (() -> Unit)? = if (item == title) {
             { Icon(Icons.Default.Done, contentDescription = null) }

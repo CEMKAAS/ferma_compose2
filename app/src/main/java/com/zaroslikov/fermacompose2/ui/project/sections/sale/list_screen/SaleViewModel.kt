@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
+import com.zaroslikov.domain.models.dto.template.DomainAddTemplateDto
+import com.zaroslikov.domain.models.dto.template.DomainSaleTemplateDto
 import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TemplateType
@@ -27,15 +29,20 @@ import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddPickList
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrPayload
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateFieldsState
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.QrGenerator
 import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -43,6 +50,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.text.contains
+import kotlin.text.isNotBlank
 import kotlin.text.trim
 
 @HiltViewModel
@@ -78,8 +87,9 @@ class SaleViewModel @Inject constructor(
         when (intent) {
             is SaleListIntent.OpenBottomSheetEntry -> loadDataForEntryOrEdit(
                 intent.isOpen,
-                intent.item,
-                intent.isSaveStateForBottomSheet
+                intent.id,
+                intent.isSaveStateForBottomSheet,
+                intent.isTemplate
             )
 
             is SaleListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(intent.value)
@@ -99,8 +109,8 @@ class SaleViewModel @Inject constructor(
             is SaleListIntent.CreateQrCodeClick -> generateQrCode(intent.value)
             is SaleListIntent.SetPinOfTemplateClick -> setPin(intent.value)
 
-            is AddListIntent.RecoverClick -> recover(intent.value)
-            is AddListIntent.OpenPatternsBottomSheetClick ->
+            is SaleListIntent.RecoverClick -> recover(intent.value)
+            is SaleListIntent.OpenPatternsBottomSheetClick ->
                 loadDataForTemplatesBottomSheet(intent.value)
 
             else -> Unit
@@ -195,54 +205,48 @@ class SaleViewModel @Inject constructor(
 
     private fun loadDataForEntryOrEdit(
         isOpen: Boolean,
-        domain: DomainSaleTable?,
-        isSaveStateForBottomSheet: Boolean = false
+        id: Long?,
+        isSaveStateForBottomSheet: Boolean = false,
+        isTemplate: Boolean = false
     ) {
         viewModelScope.launch {
             if (!isOpen) {
                 val state =
                     if (isSaveStateForBottomSheet) getState().currentProduct
                     else SaleProductState()
-                onIntent(
+                sendIntent(
                     SaleListIntent.RefreshEntryBottomSheetState(
-                        false, state, isSaveStateForBottomSheet
+                        false, state, isSaveStateForBottomSheet, false
                     )
                 )
                 return@launch
             }
             val newState =
-                if (!getState().bottomSheetState.isSaveStateForBottomSheet || domain != null) {
-                    val titleDeferred =
-                        async { saleRepository.getItemsTitleSaleList(_itemIdPT).first() }
-                    val categoryDeferred =
-                        async { saleRepository.getItemsCategorySaleList(_itemIdPT).first() }
-                    val buyerDeferred = async {
-                        saleRepository.getItemsBuyerSaleList(_itemIdPT).first()
-                    }
+                if (!getState().bottomSheetState.isSaveStateForBottomSheet || id != null) {
+                    val baseState = loadDataForPickList()
+                    when {
+                        isTemplate && id == null -> baseState
+                        isTemplate && id != null -> {
+                            val template = addTemplateRepository.getAddTemplateItem(id).first()
+                                ?: return@launch
+                            baseState.toUiMap23(template)
+                        }
 
-                    val baseState = SaleProductState(
-                        product = SaleProduct(
-                            projectId = _itemIdPT,
-                            category = resourceProvider.getString(R.string.support_text_no_category),
-                            buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
+                        id == null -> baseState
 
-                            ),
-                        pickList = PickSaleList(
-                            titles = titleDeferred.await(),
-                            categories = categoryDeferred.await(),
-                            buyers = buyerDeferred.await()
-                        )
-                    )
-                    if (domain == null) baseState
-                    else {
-                        /* val saleCategory = baseState.pickList.titleList
-                             .firstOrNull { it.title == domain.title }
-                             ?.category*/
-
-                        baseState.toUiMap22(domain)/*.copy(saleCategory = saleCategory)*/
+                        else -> {
+                            val addItem = saleRepository.getItemSale(id).first()
+                            baseState.toUiMap22(addItem)
+                        }
                     }
                 } else getState().currentProduct
-            onIntent(SaleListIntent.RefreshEntryBottomSheetState(true, newState))
+            sendIntent(
+                SaleListIntent.RefreshEntryBottomSheetState(
+                    true,
+                    newState,
+                    isTemplate = isTemplate
+                )
+            )
             newState.product.productOrigin?.let {
                 updateWarehouseUiStateSync(newState.product.title, it)
             }
@@ -259,9 +263,38 @@ class SaleViewModel @Inject constructor(
                 domainTemplateTable.isMultiProjectTemplate
             )
             sendIntent(
-                AddListIntent.OpenTemplateBottomSheetClick(true, currentProduct)
+                SaleListIntent.OpenTemplateBottomSheetClick(true, currentProduct)
             )
-            updateWarehouseUiStateSync(currentProduct.product.title)
+            updateWarehouseUiStateSync(
+                currentProduct.product.title,
+                currentProduct.product.productOrigin ?: ProductOrigin.SALE
+            ) //TODO
+        }
+    }
+
+
+    private suspend fun loadDataForPickList(): SaleProductState {
+        return coroutineScope {
+            val titleDeferred =
+                async { saleRepository.getItemsTitleSaleList(_itemIdPT).first() }
+            val categoryDeferred =
+                async { saleRepository.getItemsCategorySaleList(_itemIdPT).first() }
+            val buyerDeferred = async {
+                saleRepository.getItemsBuyerSaleList(_itemIdPT).first()
+            }
+
+            SaleProductState(
+                product = SaleProduct(
+                    projectId = _itemIdPT,
+                    category = resourceProvider.getString(R.string.support_text_no_category),
+                    buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer)
+                ),
+                pickList = PickSaleList(
+                    titles = titleDeferred.await(),
+                    categories = categoryDeferred.await(),
+                    buyers = buyerDeferred.await()
+                )
+            )
         }
     }
 
@@ -270,10 +303,36 @@ class SaleViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (!isOpen) return@launch
-            addTemplateRepository.getAllAddTemplateItems(_itemIdPT)
+            addTemplateRepository.getAllSaleTemplateItems(_itemIdPT)
                 .collectLatest { it ->
-                    sendIntent(AddListIntent.LoadDataForTemplate(it.map { it.toTemplateItemUi() }))
+                    sendIntent(SaleListIntent.LoadDataForTemplate(it.map { it.toTemplateItemUi() }))
                 }
+        }
+    }
+
+
+    private fun loadDataForTemplateBottomSheet(
+        id: Long,
+        qrPayload: QrPayload? = null
+    ) {
+        viewModelScope.launch {
+            val template =
+                addTemplateRepository.getAddTemplateItem(qrPayload?.itemId ?: id).first()
+                    ?: return@launch sendIntent(
+                        SaleListIntent.OpenWarningQrCodeBottomSheetClick(
+                            true,
+                            QrCodeWarningType.LOCAL,
+                            qrPayload?.backupData
+                        )
+                    )
+
+            val baseState = loadDataForPickList()
+            val currentProduct = baseState.toUiMap23(template, isTemplateEntry = true)
+            sendIntent(SaleListIntent.OpenTemplateBottomSheetClick(true, currentProduct))
+            updateWarehouseUiStateSync(
+                name = currentProduct.product.title,
+                productOrigin = currentProduct.product.productOrigin ?: ProductOrigin.SALE //TODO
+            )
         }
     }
 
@@ -334,7 +393,7 @@ class SaleViewModel @Inject constructor(
     override fun insertTemplate() {
         viewModelScope.launch {
             addTemplateRepository.insert(getState().currentProduct.toDomainTemplate())
-            yandexMetricRepository.metricalTemplate(getState().currentProduct)
+//            yandexMetricRepository.metricalTemplate(getState().currentProduct,) //TODO
             loadDataForEntryOrEdit(false, null)
         }
     }
@@ -501,16 +560,35 @@ class SaleViewModel @Inject constructor(
             title = if (activeField.isTitle) null else product.title.trim(),
             count = if (activeField.isCount) null else product.count.toConvertDbDouble(),
             countSuffix = if (activeField.isSuffix) null else product.countSuffix,
-            price = product.price.toConvertDbDouble(),
-            priceAll = if (product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
+            price = if (activeField.isPrice) null else product.price.toConvertDbDouble(),
+            priceAll = if (activeField.isPrice && product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
             priceSuffix = getState().settings.currencySuffix,
             category = if (activeField.isCategory) null else category,
-            animalId = if (activeField.isAnimal || activeField.isMultiProjectTemplate) null else product.animalId,
-            note = if (activeField.isNote) null else product.note.trim(),
             buyer = if (activeField.isBuyer) null else product.buyer.trim(),
+            note = if (activeField.isNote) null else product.note.trim(),
             idPT = _itemIdPT,
             isPinned = template.pin,
             isMultiProjectTemplate = activeField.isMultiProjectTemplate
+        )
+    }
+
+    private fun DomainSaleTemplateDto.toTemplateItemUi(): TemplateItem {
+        val description = listOfNotNull(
+            title?.takeIf { it.isNotBlank() },
+            count?.formatNumber(),
+            countSuffix?.let { resourceProvider.getString(it.toResId()) },
+            price?.formatNumber(),
+            priceAll?.formatNumber(),
+            category?.takeIf { !it.contains(resourceProvider.getString(R.string.support_text_no_category)) && it.isNotBlank() },
+            buyer?.takeIf { it.isNotBlank() },
+            note?.takeIf { it.isNotBlank() }
+        ).joinToString(" · ")
+        return TemplateItem(
+            id = id,
+            name = nameTemplate,
+            description = description,
+            isPinned = isPinned,
+            isMultiProject = isMultiProject
         )
     }
 }

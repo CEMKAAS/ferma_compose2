@@ -18,6 +18,8 @@ import com.zaroslikov.fermacompose2.base.state.Product
 import com.zaroslikov.fermacompose2.base.state.SearchState
 import com.zaroslikov.fermacompose2.base.state.SectionState
 import com.zaroslikov.fermacompose2.base.state.UiState
+import com.zaroslikov.fermacompose2.blue_1
+import com.zaroslikov.fermacompose2.blue_2
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.supportFun.dateToday
@@ -51,8 +53,8 @@ data class SaleListState(
 ) : SectionState
 
 data class SaleUiState(
-    override val colors: List<Color> = listOf(price_green, green_shamrock),
-    override val iconRes: Int = R.drawable.icon_add_product
+    override val colors: List<Color> = listOf(blue_1, blue_2),
+    override val iconRes: Int =R.drawable.icon_sale
 ) : UiState
 
 data class SaleSearchState(
@@ -89,7 +91,7 @@ data class SaleProduct(
     override val category: String = "",
     override val note: String = "",
     override val projectId: Long = 0,
-    override val isEntry: Boolean = false,
+    override val isEntry: Boolean = true,
     val productOrigin: ProductOrigin? = null,
     val price: String = "",
     val isAutoPrice: Boolean = false,
