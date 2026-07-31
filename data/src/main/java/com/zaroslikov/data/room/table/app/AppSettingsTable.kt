@@ -18,5 +18,5 @@ data class AppSettingsTable(
     @ColumnInfo(name = "is_first_launch")
     val isFirstLaunch: Boolean,
     @ColumnInfo(name = "device_id")
-    val deviceId: String = "" //TODO Добавить
+    val deviceId: String = ""
 )

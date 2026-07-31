@@ -78,7 +78,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         AppSettingsTable::class,
         ProfileTable::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 @TypeConverters(

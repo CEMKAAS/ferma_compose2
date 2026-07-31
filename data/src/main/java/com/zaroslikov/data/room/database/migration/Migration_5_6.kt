@@ -28,18 +28,21 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
                 product_origin INTEGER,
                 is_pinned INTEGER NOT NULL,
                 is_multi_project_template INTEGER NOT NULL,
-                idPT INTEGER NOT NULL
+                idPT INTEGER NOT NULL,
+                FOREIGN KEY(idPT) REFERENCES project_table(id) ON DELETE CASCADE,
+                FOREIGN KEY(animal_id) REFERENCES animal_table(id) ON DELETE SET NULL
             )
         """.trimIndent()
         )
 
         db.execSQL("CREATE INDEX IF NOT EXISTS index_template_table_idPT ON template_table(idPT)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_template_table_animal_id ON template_table(animal_id)")
 
         val deviceId = UUID.randomUUID().toString()
         db.execSQL(
             """
             ALTER TABLE app_settings_table
-            ADD COLUMN device_id INTEGER DEFAULT '$deviceId'
+            ADD COLUMN device_id TEXT NOT NULL DEFAULT '$deviceId'
     """.trimIndent()
         )
 
