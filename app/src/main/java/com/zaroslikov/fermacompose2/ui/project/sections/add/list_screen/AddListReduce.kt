@@ -512,6 +512,10 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
                     activeField = currentProduct.template.activeField.copy(
                         isTitle = isTitle
                     )
+                ),
+                errors = currentProduct.errors.copy(
+                    isErrorTitle = false,
+                    isErrorSlash = false,
                 )
             )
         )
@@ -524,6 +528,9 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
                     activeField = currentProduct.template.activeField.copy(
                         isCount = isCount
                     )
+                ),
+                errors = currentProduct.errors.copy(
+                    isErrorCount = false
                 )
             )
         )
