@@ -27,8 +27,10 @@ import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderButton
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData2
+import com.zaroslikov.fermacompose2.ui.elements.GradientButton
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.MessageNoData2
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.EmptyListNew
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 
 @Composable
@@ -53,12 +55,21 @@ fun TemplatesBottomSheet(
         colors = colors,
         onDismissRequest = onDismissRequest,
         contentBottom = {
-            BorderButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.pattern_bottom_sheet_create_pattern),
-                iconRes = R.drawable.icon_add,
-                onClick = onCreatePatternClick
-            )
+            if (list.isNotEmpty())
+                BorderButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.pattern_bottom_sheet_create_pattern),
+                    iconRes = R.drawable.icon_add,
+                    onClick = onCreatePatternClick
+                )
+            else
+                GradientButton(
+                    modifier = Modifier.fillMaxWidth(1f),
+                    text = stringResource(R.string.pattern_bottom_sheet_create_pattern),
+                    prefixIconRes = R.drawable.icon_add,
+                    onClick = onCreatePatternClick,
+                    colors = colors
+                )
         }
     ) {
         if (list.isNotEmpty())
@@ -83,14 +94,16 @@ fun TemplatesBottomSheet(
                     )
                 }
             }
-        else MessageNoData2(
-            modifier = Modifier,
-            titleRes = R.string.message_no_data_title_template,
-            messageRes = R.string.message_no_data_message_template,
+        else EmptyListNew(
             iconRes = R.drawable.outline_description_24,
-            iconColor = iconColor,
-            backgroundColor = iconBorderColor,
-            iconSize = 48.dp
+            title = R.string.message_no_data_title_template,
+            supportText = R.string.message_no_data_message_template,
+            list = listOf(
+                R.drawable.baseline_electric_bolt_24 to R.string.message_no_data_message_template_item_1,
+                R.drawable.outline_description_24 to R.string.message_no_data_message_template_item_2,
+                R.drawable.outline_qr_code_24 to R.string.message_no_data_message_template_item_3
+            ),
+            primeColor = iconColor
         )
     }
 }
@@ -112,7 +125,6 @@ fun TemplateCard(
     onDeleteClick: () -> Unit = {}
 ) {
     BorderCard(
-        containerColor = ghostly_white,
         elevation = 0.dp,
         onClick = onClick
     ) {

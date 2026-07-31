@@ -11,11 +11,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.provider.Settings
 import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -107,6 +111,7 @@ fun QrScannerScreen(
 ) {
     val context = LocalContext.current
     val activity = context as Activity
+    var torchEnabled by remember { mutableStateOf(false) }
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
@@ -131,12 +136,14 @@ fun QrScannerScreen(
                 ) { onDismissRequest() }
             }
         } else null,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = {
+            torchEnabled = false
+            onDismissRequest() }
     ) {
         AppMetrica.reportEvent("Открытие камеры для сканирование QR-кода")
         var detected by remember { mutableStateOf(false) }
 
-        var torchEnabled by remember { mutableStateOf(false) }
+
         var cameraControl by remember { mutableStateOf<CameraControl?>(null) }
 
 
@@ -174,7 +181,9 @@ fun QrScannerScreen(
                 CameraPreview(
                     onQrDetected = {
                         if (!detected) {
+                            torchEnabled = false
                             detected = true
+                            vibrateShort(context)
                             onQrDetected(it)
                         }
                     },
@@ -439,3 +448,31 @@ fun CameraPreview(
     }
 }
 
+
+fun vibrateShort(context: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibrator = context.getSystemService(VibratorManager::class.java)
+        vibrator.defaultVibrator.vibrate(
+            VibrationEffect.createOneShot(
+                40,
+                VibrationEffect.DEFAULT_AMPLITUDE
+            )
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        val vibrator =
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(
+                VibrationEffect.createOneShot(
+                    40,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(40)
+        }
+    }
+}

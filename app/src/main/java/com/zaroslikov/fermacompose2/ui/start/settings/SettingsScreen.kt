@@ -455,7 +455,6 @@ fun ImportWarning(
     BaseBottomSheet(
         title = stringResource(R.string.settings_screen_warning),
         supText = stringResource(R.string.settings_screen_confirm_action),
-        skipPartiallyExpanded = false,
         onDismissRequest = onDismissRequest,
     ) {
         Column(

@@ -1,25 +1,29 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
-import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
-import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 
 sealed class ExpensesListIntent : BaseIntent {
     data class OpenBottomSheetGroup(val title: String? = null) : ExpensesListIntent()
 
     data class OpenEntryBottomSheetByItem(
-        val value: Boolean,
-        val item: ExpensesTableUi? = null,
-        val isSaveStateForBottomSheet: Boolean = false
+        val isOpen: Boolean,
+        val id: Long? = null,
+        val isSaveStateForBottomSheet: Boolean = false,
+        val isTemplate: Boolean = false
     ) : ExpensesListIntent()
 
     data class RefreshEntryBottomSheetState(
         val isOpen: Boolean,
-        val state: ExpensesEntryState2,
-        val isSaveStateForBottomSheet: Boolean = false
+        val state: ExpensesProductState,
+        val isSaveStateForBottomSheet: Boolean = false,
+        val isTemplate: Boolean = false
     ) :
         ExpensesListIntent()
 
@@ -63,4 +67,21 @@ sealed class ExpensesListIntent : BaseIntent {
     data object Insert : ExpensesListIntent()
     data object Update : ExpensesListIntent()
     data object Delete : ExpensesListIntent()
+
+
+    //Template
+    data class NameTemplateChanged(val value: String) : ExpensesListIntent()
+    data class TitleTemplateChanged(val value: Boolean) : ExpensesListIntent()
+    data class CountTemplateChanged(val value: Boolean) : ExpensesListIntent()
+    data class SuffixTemplateClicked(val value: Boolean) : ExpensesListIntent()
+    data class DateTemplateChanged(val value: Boolean) : ExpensesListIntent()
+    data class PriceTemplateClicked(val value: Boolean) : ExpensesListIntent()
+    data class CategoryTemplateChanged(val value: Boolean) : ExpensesListIntent()
+    data class NoteTemplateChanged(val value: Boolean) : ExpensesListIntent()
+    data class MultiProjectTemplateChanged(val value: Boolean) : ExpensesListIntent()
+
+    data class OpenTemplateBottomSheetClick(
+        val value: Boolean,
+        val toUiMap23: ExpensesProductState = ExpensesProductState()
+    ) : ExpensesListIntent()
 }

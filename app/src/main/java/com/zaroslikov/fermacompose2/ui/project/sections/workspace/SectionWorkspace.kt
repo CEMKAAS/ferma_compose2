@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.project.sections
+package com.zaroslikov.fermacompose2.ui.project.sections.workspace
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -19,7 +20,7 @@ import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +32,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.grey_2
@@ -46,8 +46,11 @@ import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddViewM
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalListScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesViewModel
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleViewModel
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffViewModel
 import com.zaroslikov.fermacompose2.white
 import kotlinx.coroutines.launch
 
@@ -65,16 +68,20 @@ fun SectionWorkspaceScreen(
     navigateToItemProject: (Pair<Long, Boolean>) -> Unit,
     navigateToItemCard: (Pair<Long, Long>) -> Unit,
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
-    viewModel: AddViewModel = hiltViewModel()
+    viewModel: SectionWorkspaceViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val coroutineScope = rememberCoroutineScope()
     val pages = Page.entries
 
     val pagerState = rememberPagerState(
         pageCount = { pages.size },
         initialPage = 2
     )
+
+    LaunchedEffect(viewModel.initialPage) {
+        pagerState.animateScrollToPage(viewModel.initialPage)
+    }
+
+
     Column {
         PrimaryTabRow(
             selectedTabIndex = pagerState.currentPage,
@@ -90,68 +97,7 @@ fun SectionWorkspaceScreen(
             }
         ) {
             pages.forEachIndexed { index, page ->
-                val cardSetting = if (pagerState.currentPage == index)
-                    Triple(
-                        RoundedCornerShape(16.dp), CardDefaults.cardColors(
-                            containerColor = white
-                        ), BorderStroke(
-                            width = 1.dp,
-                            color = grey_2
-                        )
-                    ) else Triple(
-                    CardDefaults.shape, CardDefaults.cardColors(
-                        containerColor = Color.Transparent, // прозрачная карточка
-                        contentColor = Color.Unspecified    // не изменяем цвет текста
-                    ), null
-                )
-                Card(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                    shape = cardSetting.first,
-                    colors = cardSetting.second,
-                    border = cardSetting.third,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Card(
-                            modifier = Modifier.size(40.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (pagerState.currentPage == index) page.toColorList() else grey_2
-                            ),
-                            shape = RoundedCornerShape(14.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    painterResource(page.toDrawRes()),
-                                    modifier = Modifier.size(20.dp),
-                                    contentDescription = null,
-                                    tint = if (pagerState.currentPage == index) Color.White else grey_3
-                                )
-                            }
-                        }
-                        Spacer(Modifier.padding(3.dp))
-                        Text(
-                            text = stringResource(page.toResId()),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = text_10
-                        )
-                    }
-                }
+                CardSection(page, index, pagerState)
             }
         }
         HorizontalPager(
@@ -164,11 +110,95 @@ fun SectionWorkspaceScreen(
                     navigateToFirstScreen = { navigationToFirstScreen() }
                 )
 
-                Page.SALE -> SaleScreen()
-                Page.EXPENSES -> ExpensesScreen()
-                Page.WRITE_OFF -> WriteOffScreen()
+                Page.SALE -> SaleScreen(
+                    navigateToItemProject = { navigateToItemProject(it) },
+                    navigateToFirstScreen = { navigationToFirstScreen() }
+                )
+
+                Page.EXPENSES -> ExpensesScreen(
+                    navigateToItemProject = { navigateToItemProject(it) },
+                    navigateToFirstScreen = { navigationToFirstScreen() }
+                )
+
+                Page.WRITE_OFF -> WriteOffScreen(
+                    navigateToItemProject = { navigateToItemProject(it) },
+                    navigateToFirstScreen = { navigationToFirstScreen() }
+                )
+
                 Page.ANIMAL -> AnimalListScreen(navigateToItemCard = navigateToItemCard)
             }
+        }
+    }
+}
+
+
+@Composable
+private fun CardSection(
+    page: Page, index: Int, pagerState: PagerState,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val cardSetting = if (pagerState.currentPage == index)
+        Triple(
+            RoundedCornerShape(16.dp),
+            CardDefaults.cardColors(
+                containerColor = white
+            ),
+            BorderStroke(
+                width = 1.dp,
+                color = grey_2
+            )
+        ) else Triple(
+        CardDefaults.shape, CardDefaults.cardColors(
+            containerColor = Color.Transparent, // прозрачная карточка
+            contentColor = Color.Unspecified    // не изменяем цвет текста
+        ), null
+    )
+    Card(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(index)
+                }
+            },
+        shape = cardSetting.first,
+        colors = cardSetting.second,
+        border = cardSetting.third,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                modifier = Modifier.size(40.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (pagerState.currentPage == index) page.toColorList() else grey_2
+                ),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        painterResource(page.toDrawRes()),
+                        modifier = Modifier.size(20.dp),
+                        contentDescription = null,
+                        tint = if (pagerState.currentPage == index) Color.White else grey_3
+                    )
+                }
+            }
+            Spacer(Modifier.padding(3.dp))
+            Text(
+                text = stringResource(page.toResId()),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = text_10
+            )
         }
     }
 }

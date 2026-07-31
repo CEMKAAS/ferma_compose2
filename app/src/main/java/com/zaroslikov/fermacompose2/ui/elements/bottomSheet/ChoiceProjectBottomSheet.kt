@@ -22,9 +22,8 @@ import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderButton
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData2
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.MessageNoData2
 import com.zaroslikov.fermacompose2.ui.elements.text_14
-import com.zaroslikov.fermacompose2.white
 import kotlin.collections.forEach
 
 @Composable

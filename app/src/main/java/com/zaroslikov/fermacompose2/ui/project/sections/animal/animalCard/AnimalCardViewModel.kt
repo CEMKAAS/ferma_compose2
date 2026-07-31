@@ -18,8 +18,8 @@ import com.zaroslikov.domain.repository.AnimalWeightRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
-import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.mapperToBrieflyItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine

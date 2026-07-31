@@ -34,7 +34,8 @@
 
     //Ads
     <string name="yandex_banner_ads">R-M-12224806-1</string>
-    <string name="yandex_first_launch_ads">R-M-12224806-2</string>
+    <string name="yandex_first_launch_ads">R–M-12224806-2</string>
+    <string name="yandex_rewarded_ads">R-M-12224806-4</string>
     //AdsSupportText
     <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите, пожалуйста…</string>
 
@@ -56,6 +57,7 @@
     <string name="outlined_text_field_quantity">Количество</string>
     <string name="outlined_text_field_category">Категория</string>
     <string name="outlined_text_date">Дата</string>
+    <string name="outlined_text_current_date">Дата вводится вручную</string>
     <string name="outlined_text_notification">Напоминание</string>
     <string name="outlined_text_animals">Животное</string>
     <string name="outlined_text_note">Примечание</string>
@@ -75,6 +77,9 @@
     <string name="outlined_text_date_next">Следующая дата</string>
     <string name="outlined_text_out_of">%s из %s</string>
     <string name="outlined_text_suffix">Единица</string>
+    <string name="outlined_text_suffix_full">Единица измерения</string>
+    <string name="outlined_text_price_all">Общая стоимость</string>
+    <string name="outlined_text_price_suffix">Валюта</string>
     <string name="outlined_text_count">0</string>
     <string name="outlined_text_status_write_off">Тип списания</string>
 
@@ -136,7 +141,7 @@
 
     //WarningQrCodeBottomSheet
     <string name="warning_qr_code_bottom_sheet_no_search_project">Проект не найдет</string>>
-    <string name="warning_qr_code_bottom_sheet_no_search_project_support">Этот QR-код не относится к «Моему хозяйству» или в приложении нет этого проекта или он в архиве.</string>
+    <string name="warning_qr_code_bottom_sheet_no_search_project_support">Этот QR-код не относится к «Моему хозяйству» или был не создан на вашем устройстве или в приложении нет этого проекта или он в архиве.</string>
 
     //WarningQrCodeBottomSheet
     <string name="warning_qr_code_bottom_sheet_no_search_template">Шаблон удалён</string>>
@@ -347,7 +352,10 @@
     <string name="support_text_notification">Выберите уведомление</string>
     <string name="support_text_animal">Выберите животное, которое дало вам продукцию</string>
     <string name="support_text_note">Здесь может содержаться важная информация</string>
-    <string name="support_text_multi_project_template">Шаблон будет доступен во всех ваших проектах. Также любой пользователь приложения «Мое Хозяйство» сможет отсканировать этот шаблон и быстро добавить запись в свое приложение. После сканирования QR-кода необходимо выбрать проект, в который будет добавлена запись.</string>
+    <string name="support_text_multi_project_template">Шаблон будет доступен во всех ваших проектах. После сканирования QR-кода необходимо выбрать проект, в который будет добавлена запись.</string>
+    <string name="support_text_multi_project_template_add">Шаблон будет доступен во всех ваших проектах. Нельзя назначить животного. После сканирования QR-кода необходимо выбрать проект, в который будет добавлена запись.</string>
+    <string name="support_text_multi_project_template_write_off">Шаблон будет доступен во всех ваших проектах. Нельзя назначить товар. После сканирования QR-кода необходимо выбрать проект, в который будет добавлена запись.</string>
+    <string name="support_text_current_date">При активации шаблона нужно будет указать дату записи, иначе будет выбрана текущая дата</string>
     <string name="support_text_buyer">Укажите или выберите имя покупателя.</string>
     <string name="support_text_choice_animal">Выберите животных для рассчета длительности корма:</string>
     <string name="support_text_no_animal">Нет животных</string>
@@ -1072,7 +1080,11 @@
 
     //MessageNoData2
     <string name="message_no_data_title_template">Нет шаблонов</string>
-    <string name="message_no_data_message_template">Создайте шаблон, чтобы вносить повторяющиеся данные в один касание</string>
+    <string name="message_no_data_message_template">Создайте шаблон, чтобы вносить повторяющиеся данные в пару касаний</string>
+
+    <string name="message_no_data_message_template_item_1">Быстрый ввод без повторного заполнения</string>
+    <string name="message_no_data_message_template_item_2">Поля заполняются заранее или при применении</string>
+    <string name="message_no_data_message_template_item_3">QR-код для мгновенного доступа</string>
 
     <string name="message_no_data_title_choice_project_for_template">Нет доступных проектов</string>
     <string name="message_no_data_message_choice_project_for_template">Создайте первый проект, чтобы использовать многопроектные шаблоны.</string>

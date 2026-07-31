@@ -56,8 +56,11 @@ class AddRepositoryImpl @Inject constructor(private val addDao: AddDao) : AddRep
             .map { it -> it.map { it.toDomainAddItemDto() } }
     }
 
-    override fun getItemsTitleAddList(id: Long): Flow<List<TitleAndSuffixDomain>> {
-        return addDao.getItemsTitleAddList(id).map { it -> it.map { it.toTitleAndSuffixDomain() } }
+    override fun getItemsTitleAddList(
+        id: Long,
+        onlyWithoutAnimal: Boolean
+    ): Flow<List<TitleAndSuffixDomain>> {
+        return addDao.getItemsTitleAddList(id, onlyWithoutAnimal).map { it -> it.map { it.toTitleAndSuffixDomain() } }
     }
 
     override fun getItemsCategoryAddList(id: Long): Flow<List<String>> {

@@ -59,7 +59,7 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogArchiveAnimal
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogInfo
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorGradientCard
 import com.zaroslikov.fermacompose2.ui.elements.ProductKillInfoCard
 import com.zaroslikov.fermacompose2.ui.elements.SecondAnimalCard

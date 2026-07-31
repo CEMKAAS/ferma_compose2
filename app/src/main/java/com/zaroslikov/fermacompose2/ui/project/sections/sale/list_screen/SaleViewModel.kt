@@ -4,20 +4,23 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
-import com.zaroslikov.domain.models.dto.template.DomainAddTemplateDto
 import com.zaroslikov.domain.models.dto.template.DomainSaleTemplateDto
 import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TemplateType
 import com.zaroslikov.domain.models.enums.supportUi.ProductOperation
+import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
+import com.zaroslikov.domain.repository.AppSettingsRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
-import com.zaroslikov.domain.repository.template.AddTemplateRepository
+import com.zaroslikov.domain.repository.template.TemplateRepository
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.base.intent.QrCodeIntent
+import com.zaroslikov.fermacompose2.base.intent.TemplateIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel3
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.supportFun.build
@@ -27,16 +30,11 @@ import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddListIntent
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddPickList
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProduct
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProductState
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrPayload
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateFieldsState
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
-import com.zaroslikov.fermacompose2.ui.project.sections.mapperToBrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.mapperToBrieflyItem
 import com.zaroslikov.fermacompose2.utils.QrGenerator
 import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -59,13 +57,14 @@ class SaleViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val qrGenerator: QrGenerator,
     private val qrNavigationManager: QrNavigationManager,
-    private val addTemplateRepository: AddTemplateRepository,
+    private val templateRepository: TemplateRepository,
     private val saleRepository: SaleRepository,
     private val warehouseRepository: WarehouseRepository,
     private val settingsRepository: SettingsRepository,
     private val resourceProvider: ResourceProvider,
     private val projectRepository: ProjectRepository,
-    private val yandexMetricRepository: YandexMetricRepository
+    private val yandexMetricRepository: YandexMetricRepository,
+    private val appSettingsRepository: AppSettingsRepository
 ) : EntryNewViewModel3<SaleListState, SaleListIntent, SaleListReduce>(
     SaleListState(),
     SaleListReduce(resourceProvider),
@@ -73,26 +72,27 @@ class SaleViewModel @Inject constructor(
     resourceProvider = resourceProvider,
     projectRepository = projectRepository,
     qrNavigationManager = qrNavigationManager,
-    addTemplateRepository = addTemplateRepository
+    templateRepository = templateRepository,
+    appSettingsRepository = appSettingsRepository
 ) {
 
     private val _itemIdPT: Long = checkNotNull(savedStateHandle[SaleDestination.itemIdArg])
 
     init {
         loadData()
+        loadTemplate(TemplateType.SALE)
     }
 
     override fun onIntent(intent: SaleListIntent) {
         sendIntent(intent)
         when (intent) {
+            is SaleListIntent.OpenBottomSheetGroup -> loadDataForDetailNomenclatura(intent.value)
             is SaleListIntent.OpenBottomSheetEntry -> loadDataForEntryOrEdit(
                 intent.isOpen,
                 intent.id,
                 intent.isSaveStateForBottomSheet,
                 intent.isTemplate
             )
-
-            is SaleListIntent.OpenBottomSheetGroup -> openBottomSheetGroup(intent.value)
 
             is SaleListIntent.TitleAndSuffixClicked ->
                 updateWarehouseUiState(intent.title, intent.productOrigin)
@@ -101,32 +101,18 @@ class SaleViewModel @Inject constructor(
             SaleListIntent.Update -> update()
             SaleListIntent.Delete -> delete()
 
-            SaleListIntent.InsertTemplate -> insertTemplate()
-            SaleListIntent.UpdateTemplate -> updateTemplate()
-            SaleListIntent.DeleteTemplate -> deleteTemplate()
-
-            is SaleListIntent.QrDetected -> qrScanner(intent.value)
-            is SaleListIntent.CreateQrCodeClick -> generateQrCode(intent.value)
-            is SaleListIntent.SetPinOfTemplateClick -> setPin(intent.value)
-
-            is SaleListIntent.RecoverClick -> recover(intent.value)
-            is SaleListIntent.OpenPatternsBottomSheetClick ->
-                loadDataForTemplatesBottomSheet(intent.value)
-
             else -> Unit
         }
     }
 
-    override fun createOpenQrIntent(data: QrCodeData): SaleListIntent {
-        TODO("Not yet implemented")
-    }
-
-    override fun createOpenQrWarningIntent(warning: QrCodeWarningType): SaleListIntent {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun onQrPayloadReceived(payload: QrPayload) {
-        TODO("Not yet implemented")
+    override fun onQrCodeIntent(intent: QrCodeIntent) {
+        sendQrCodeIntent(intent)
+        when (intent) {
+            is QrCodeIntent.CreateQrCodeClick -> generateQrCode(intent.value)
+            is QrCodeIntent.RecoverClick -> recover(intent.value)
+            is QrCodeIntent.QrDetected -> qrScanner(intent.value, TemplateType.SALE, _itemIdPT)
+            else -> Unit
+        }
     }
 
     override fun loadData() {
@@ -170,7 +156,7 @@ class SaleViewModel @Inject constructor(
             }
     }
 
-    private fun openBottomSheetGroup(title: String?) {
+    private fun loadDataForDetailNomenclatura(title: String?) {
         viewModelScope.launch {
             if (title == null) {
                 updateState { state ->
@@ -203,11 +189,11 @@ class SaleViewModel @Inject constructor(
         return saleRepository.getBrieflyDetailsItemSale(_itemIdPT, name).first()
     }
 
-    private fun loadDataForEntryOrEdit(
+    override fun loadDataForEntryOrEdit(
         isOpen: Boolean,
         id: Long?,
-        isSaveStateForBottomSheet: Boolean = false,
-        isTemplate: Boolean = false
+        isSaveStateForBottomSheet: Boolean,
+        isTemplate: Boolean
     ) {
         viewModelScope.launch {
             if (!isOpen) {
@@ -227,7 +213,7 @@ class SaleViewModel @Inject constructor(
                     when {
                         isTemplate && id == null -> baseState
                         isTemplate && id != null -> {
-                            val template = addTemplateRepository.getAddTemplateItem(id).first()
+                            val template = templateRepository.getTemplateItem(id).first()
                                 ?: return@launch
                             baseState.toUiMap23(template)
                         }
@@ -273,7 +259,7 @@ class SaleViewModel @Inject constructor(
     }
 
 
-    private suspend fun loadDataForPickList(): SaleProductState {
+    override suspend fun loadDataForPickList(): SaleProductState {
         return coroutineScope {
             val titleDeferred =
                 async { saleRepository.getItemsTitleSaleList(_itemIdPT).first() }
@@ -287,7 +273,8 @@ class SaleViewModel @Inject constructor(
                 product = SaleProduct(
                     projectId = _itemIdPT,
                     category = resourceProvider.getString(R.string.support_text_no_category),
-                    buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer)
+                    buyer = resourceProvider.getString(R.string.animal_card_screen_sale_note_no_buyer),
+                    priceSuffix = getState().settings.currencySuffix
                 ),
                 pickList = PickSaleList(
                     titles = titleDeferred.await(),
@@ -303,23 +290,25 @@ class SaleViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             if (!isOpen) return@launch
-            addTemplateRepository.getAllSaleTemplateItems(_itemIdPT)
+            templateRepository.getAllSaleTemplateItems(_itemIdPT)
                 .collectLatest { it ->
-                    sendIntent(SaleListIntent.LoadDataForTemplate(it.map { it.toTemplateItemUi() }))
+                    sendTemplateIntent(TemplateIntent.LoadDataForTemplate(it.map {
+                        it.toTemplateItemUi()
+                    }))
                 }
         }
     }
 
 
-    private fun loadDataForTemplateBottomSheet(
+    override fun loadDataForTemplateBottomSheet(
         id: Long,
-        qrPayload: QrPayload? = null
+        qrPayload: QrPayload?
     ) {
         viewModelScope.launch {
             val template =
-                addTemplateRepository.getAddTemplateItem(qrPayload?.itemId ?: id).first()
-                    ?: return@launch sendIntent(
-                        SaleListIntent.OpenWarningQrCodeBottomSheetClick(
+                templateRepository.getTemplateItem(qrPayload?.itemId ?: id).first()
+                    ?: return@launch sendQrCodeIntent(
+                        QrCodeIntent.OpenWarningQrCodeBottomSheetClick(
                             true,
                             QrCodeWarningType.LOCAL,
                             qrPayload?.backupData
@@ -392,7 +381,7 @@ class SaleViewModel @Inject constructor(
 
     override fun insertTemplate() {
         viewModelScope.launch {
-            addTemplateRepository.insert(getState().currentProduct.toDomainTemplate())
+            templateRepository.insert(getState().currentProduct.toDomainTemplate())
 //            yandexMetricRepository.metricalTemplate(getState().currentProduct,) //TODO
             loadDataForEntryOrEdit(false, null)
         }
@@ -400,7 +389,7 @@ class SaleViewModel @Inject constructor(
 
     override fun updateTemplate() {
         viewModelScope.launch {
-            addTemplateRepository.update(getState().currentProduct.toDomainTemplate())
+            templateRepository.update(getState().currentProduct.toDomainTemplate())
             loadDataForEntryOrEdit(false, null)
         }
     }
@@ -408,8 +397,8 @@ class SaleViewModel @Inject constructor(
     override fun deleteTemplate() {
         viewModelScope.launch {
             getState().templatesState.templateToDelete?.let { template ->
-                addTemplateRepository.deleteAddTemplateItemById(template.id)
-                sendIntent(SaleListIntent.OpenTemplateDeleteBottomSheet(null))
+                templateRepository.deleteAddTemplateItemById(template.id)
+                sendTemplateIntent(TemplateIntent.OpenTemplateDeleteBottomSheet(null))
             }
         }
     }
@@ -460,14 +449,14 @@ class SaleViewModel @Inject constructor(
                 animalId = domain.animalId,
                 animalCountId = domain.animalCountId,
                 isEntry = false,
-                isIndicatorsValue = isIndicatorsValue,
+                hasIndicators = isIndicatorsValue,
                 projectId = domain.idPT,
                 productOrigin = domain.productOrigin
             ),
             pickList = pickList.copy(
                 suffixList = domain.countSuffix.toSuffixList()
             ),
-            errors = ErrorSale(),
+            errors = SaleError(),
         )
     }
 
@@ -494,15 +483,14 @@ class SaleViewModel @Inject constructor(
                 category = category,
                 buyer = buyer,
                 note = domain.note ?: "",
-                animalId = domain.animalId,
                 isEntry = false,
-                projectId = domain.idPT,
-//                productOrigin = domain.productOrigin TODO не совсем уверен, что это
+                projectId = if (isMultiProjectTemplate) _itemIdPT else domain.idPT,
+                productOrigin = domain.productOrigin
             ),
             //TODO не припоминаю, зачем тут лист единицы измерения
-            /* pickList = pickList.copy(
-                 suffixList = domain.countSuffix.toSuffixList()
-             ),*/
+            pickList = pickList.copy(
+                suffixList = domain.countSuffix?.toSuffixList() ?: suffixAllList
+            ),
             template = template.copy(
                 name = domain.nameTemplate,
                 isTemplate = false,
@@ -512,6 +500,7 @@ class SaleViewModel @Inject constructor(
                     isTitle = domain.title == null,
                     isCount = domain.count == null,
                     isPrice = domain.price == null,
+                    isPriceAll = domain.priceAll == null,
                     isSuffix = domain.countSuffix == null,
                     isCategory = domain.category == null,
                     isBuyer = domain.buyer == null,
@@ -519,7 +508,7 @@ class SaleViewModel @Inject constructor(
                     isMultiProjectTemplate = domain.isMultiProjectTemplate
                 )
             ),
-            errors = ErrorSale(),
+            errors = SaleError(),
         )
     }
 
@@ -534,7 +523,7 @@ class SaleViewModel @Inject constructor(
             countSuffix = product.countSuffix,
             price = product.price.toConvertDbDouble(),
             priceAll = if (product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
-            priceSuffix = getState().settings.currencySuffix,
+            priceSuffix = product.priceSuffix,
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
@@ -551,7 +540,6 @@ class SaleViewModel @Inject constructor(
     }
 
     private fun SaleProductState.toDomainTemplate(): DomainTemplateTable {
-        val category = product.category.trim()
         val activeField = template.activeField
         return DomainTemplateTable(
             id = product.itemId,
@@ -561,11 +549,13 @@ class SaleViewModel @Inject constructor(
             count = if (activeField.isCount) null else product.count.toConvertDbDouble(),
             countSuffix = if (activeField.isSuffix) null else product.countSuffix,
             price = if (activeField.isPrice) null else product.price.toConvertDbDouble(),
-            priceAll = if (activeField.isPrice && product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
-            priceSuffix = getState().settings.currencySuffix,
-            category = if (activeField.isCategory) null else category,
+            priceAll = if (!activeField.isPrice && product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
+            priceSuffix = product.priceSuffix,
+            category = if (activeField.isCategory) null else product.category.trim(),
+            isDate = activeField.isDate,
             buyer = if (activeField.isBuyer) null else product.buyer.trim(),
             note = if (activeField.isNote) null else product.note.trim(),
+            productOrigin = if (activeField.isTitle) null else product.productOrigin,
             idPT = _itemIdPT,
             isPinned = template.pin,
             isMultiProjectTemplate = activeField.isMultiProjectTemplate
@@ -573,12 +563,13 @@ class SaleViewModel @Inject constructor(
     }
 
     private fun DomainSaleTemplateDto.toTemplateItemUi(): TemplateItem {
+        val suffix = priceSuffix?.let { resourceProvider.getString(it.toResId()) }
         val description = listOfNotNull(
             title?.takeIf { it.isNotBlank() },
             count?.formatNumber(),
             countSuffix?.let { resourceProvider.getString(it.toResId()) },
-            price?.formatNumber(),
-            priceAll?.formatNumber(),
+            price?.let { "${it.formatNumber()} $suffix".trim() },
+            priceAll?.let { "${it.formatNumber()} $suffix".trim() },
             category?.takeIf { !it.contains(resourceProvider.getString(R.string.support_text_no_category)) && it.isNotBlank() },
             buyer?.takeIf { it.isNotBlank() },
             note?.takeIf { it.isNotBlank() }

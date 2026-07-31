@@ -26,7 +26,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.core.net.toUri
+import com.zaroslikov.domain.models.enums.TemplateType
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrPayload
+import java.util.UUID
 
 @HiltViewModel
 class FirstViewModel @Inject constructor(
@@ -153,27 +155,55 @@ class FirstViewModel @Inject constructor(
     }
 
     private suspend fun findProject(payload: QrPayload) {
-        if (payload.isMultiProjectTemplate) {
-            val projectList = projectRepository.getProjectListAct().first()
-            qrNavigationManager.put(payload)
-            sendIntent(FirstIntent.OpenMultiProjectBottomSheetClick(true, projectList))
-        } else {
-            val projectExists = projectRepository
-                .getIsProject(payload.idPT)
-                .first()
+        val deviceId = appSettingsRepository.getAppSettings().first().deviceId
 
-            if (!projectExists) {
-                sendIntent(FirstIntent.OpenWarningQrCodeClick(true))
-                sendIntent(FirstIntent.OpenQrCodeScanner(false))
-                return
+        when {
+            deviceId != payload.deviceId ->
+                when (payload.templateType) {
+                    TemplateType.ADD, TemplateType.WRITE_OFF -> {
+                        sendIntent(FirstIntent.OpenWarningQrCodeClick(true))
+                        sendIntent(FirstIntent.OpenQrCodeScanner(false))
+                    }
+
+                    TemplateType.SALE, TemplateType.EXPENSES -> {
+                        val projectList = projectRepository.getProjectListAct().first()
+                        val newPayload = payload.copy(
+                            templateType = TemplateType.EXPENSES,
+                            backupData = payload.backupData?.copy(
+                                note = if (payload.backupData.note != null) "" else null,
+                                isMultiProjectTemplate = false
+                            )
+                        )
+                        qrNavigationManager.put(newPayload)
+                        sendIntent(FirstIntent.OpenMultiProjectBottomSheetClick(true, projectList))
+                    }
+                }
+
+            payload.isMultiProjectTemplate -> {
+                val projectList = projectRepository.getProjectListAct().first()
+                qrNavigationManager.put(payload)
+                sendIntent(FirstIntent.OpenMultiProjectBottomSheetClick(true, projectList))
             }
-            qrNavigationManager.put(payload)
-            navigateTo(UiEvent.Navigate(payload.idPT))
+
+            else -> {
+                val projectExists = projectRepository
+                    .getIsProject(payload.idPT)
+                    .first()
+
+                if (!projectExists) {
+                    sendIntent(FirstIntent.OpenWarningQrCodeClick(true))
+                    sendIntent(FirstIntent.OpenQrCodeScanner(false))
+                    return
+                }
+                qrNavigationManager.put(payload)
+                navigateTo(UiEvent.Navigate(payload.idPT))
+            }
         }
     }
 
     private fun navigateToProject(id: Long) {
         navigateTo(UiEvent.Navigate(id))
+        sendIntent(FirstIntent.OpenMultiProjectBottomSheetClick(false))
     }
 
     private fun unarchiveProject(domainProjectTable: DomainProjectTable) {
@@ -266,12 +296,15 @@ class FirstViewModel @Inject constructor(
     private fun updateFirstLaunch() {
         viewModelScope.launch {
             Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
+
             updateSettings(
                 domainAppSettings = getState().appSettings.copy(
                     isFirstLaunch = false
                 )
             )
             updateState { state -> state.copy(isFirstLaunch = true) }
+
+
             Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
             _notification.emit(UiNotification.Notification)
         }

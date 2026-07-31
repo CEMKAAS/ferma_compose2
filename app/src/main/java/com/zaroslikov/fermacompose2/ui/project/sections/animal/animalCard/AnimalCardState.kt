@@ -1,7 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard
 
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
-import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
 
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
@@ -10,7 +9,7 @@ import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
 
 data class AnimalCardState(
     val isOpenArchiveDialog: Boolean = false,

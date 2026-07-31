@@ -60,7 +60,7 @@ import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.EmptyBookmark
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
 import com.zaroslikov.fermacompose2.ui.elements.NoteColorCard

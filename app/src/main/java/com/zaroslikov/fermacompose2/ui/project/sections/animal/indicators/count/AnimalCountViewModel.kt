@@ -189,7 +189,7 @@ class AnimalCountViewModel @Inject constructor(
             val newState =
                 if (!getState().isSaveStateForEntry || domain != null || version != getState().saveAnimalCountVersion) {
                     val titleDeferred =
-                        async { addRepository.getItemsTitleAddList(itemIdPT).first() }
+                        async { addRepository.getItemsTitleAddList(itemIdPT, false).first() }
                     val buyerDeferred =
                         async { saleRepository.getItemsBuyerSaleList(itemIdPT).first() }
 

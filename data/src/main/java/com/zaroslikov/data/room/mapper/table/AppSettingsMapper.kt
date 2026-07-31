@@ -10,6 +10,7 @@ fun DomainAppSettings.toAppSettingsTable(): AppSettingsTable {
         lastVersionApp = this.lastVersionApp,
         currentVersionApp = this.currentVersionApp,
         isFirstLaunch = this.isFirstLaunch,
+        deviceId = this.deviceId
     )
 }
 
@@ -19,5 +20,6 @@ fun AppSettingsTable.toDomainAppSettings(): DomainAppSettings {
         lastVersionApp = this.lastVersionApp,
         currentVersionApp = this.currentVersionApp,
         isFirstLaunch = this.isFirstLaunch,
+        deviceId = this.deviceId
     )
 }

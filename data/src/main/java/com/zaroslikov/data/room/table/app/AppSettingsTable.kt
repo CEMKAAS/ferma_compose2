@@ -16,5 +16,7 @@ data class AppSettingsTable(
     @ColumnInfo(name = "current_version_app")
     val currentVersionApp: String,
     @ColumnInfo(name = "is_first_launch")
-    val isFirstLaunch: Boolean
+    val isFirstLaunch: Boolean,
+    @ColumnInfo(name = "device_id")
+    val deviceId: String = "" //TODO Добавить
 )

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.zaroslikov.fermacompose2.ui.project.sections
+package com.zaroslikov.fermacompose2.ui.project.sections.baseComposable
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -77,7 +77,7 @@ import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
-import com.zaroslikov.fermacompose2.ui.elements.MessageNoData2
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.MessageNoData2
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16

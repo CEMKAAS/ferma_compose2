@@ -27,11 +27,16 @@ fun InfoPatternCard(
     title: String?,
     count: String?,
     countSuffix: Suffix?,
+    price: String? = null,
+    priceAll: String? = null,
+    priceSuffix: Suffix? = null,
     category: String?,
-    buyer: String?,
-    animalName: String?,
+    buyer: String? = null,
+    animalName: String? = null,
+    writeOffStatus: Boolean? = null,
     note: String?
 ) {
+    val priceSuffixString = priceSuffix?.let { stringResource(it.toResId()) } ?: ""
     CardFieldNew(
         elevation = 0.dp,
         containerColor = ghostly_white
@@ -59,7 +64,7 @@ fun InfoPatternCard(
                     maxItemsInEachRow = 2,
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    itemVerticalAlignment = Alignment.CenterVertically
+                    itemVerticalAlignment = Alignment.Top
                 ) {
                     count?.let {
                         TitleWithValue(
@@ -71,8 +76,32 @@ fun InfoPatternCard(
                     countSuffix?.let {
                         TitleWithValue(
                             modifier = Modifier.weight(1f),
-                            titleRes = R.string.outlined_text_suffix,
+                            titleRes = R.string.outlined_text_suffix_full,
                             value = stringResource(it.toResId())
+                        )
+                    }
+                    price?.let {
+                        TitleWithValue(
+                            modifier = Modifier.weight(1f),
+                            titleRes = R.string.outlined_text_price,
+                            value = "$it $priceSuffixString".trim()
+                        )
+                    }
+                    priceAll?.let {
+                        TitleWithValue(
+                            modifier = Modifier.weight(1f),
+                            titleRes = R.string.outlined_text_price_all,
+                            value = "$it $priceSuffixString".trim()
+                        )
+                    }
+                    writeOffStatus?.let {
+                        TitleWithValue(
+                            modifier = Modifier.weight(1f),
+                            titleRes = R.string.outlined_text_status_write_off,
+                            value = stringResource(
+                                if (it) R.string.ration_button_own_needs
+                                else R.string.ration_button_disposal
+                            )
                         )
                     }
                     category?.let {

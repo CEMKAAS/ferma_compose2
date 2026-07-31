@@ -52,7 +52,7 @@ import com.zaroslikov.fermacompose2.ui.elements.BigColorCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CardFinanceNew
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.IconFinance
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen

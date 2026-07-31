@@ -75,8 +75,8 @@ import com.zaroslikov.fermacompose2.ui.elements.BigColorCard
 import com.zaroslikov.fermacompose2.ui.elements.BorderButton
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.EmptyBookmark
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab

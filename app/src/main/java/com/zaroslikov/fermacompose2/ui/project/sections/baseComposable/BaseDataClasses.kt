@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.project.sections
+package com.zaroslikov.fermacompose2.ui.project.sections.baseComposable
 
 import android.util.Log
 import com.zaroslikov.domain.models.dto.BaseProductSection

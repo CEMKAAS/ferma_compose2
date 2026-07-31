@@ -70,7 +70,7 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.IconToggle
-import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EntryIndicationBottomSheet
 import com.zaroslikov.fermacompose2.white
 
 @Composable

@@ -3,17 +3,12 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,6 +17,8 @@ import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.fermacompose2.alabaster
+import com.zaroslikov.fermacompose2.base.intent.QrCodeIntent
+import com.zaroslikov.fermacompose2.base.intent.TemplateIntent
 import com.zaroslikov.fermacompose2.green_11
 import com.zaroslikov.fermacompose2.green_8
 import com.zaroslikov.fermacompose2.green_9
@@ -31,36 +28,29 @@ import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
-import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCategoryNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
-import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.WarehouseCountCard
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedSwitch
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTemplate
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.EnterInPatternBottomSheet
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplatesBottomSheet
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeBottomSheet
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningBottomSheet
-import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrScannerScreen
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.TemplateCard
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
-import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
-import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
-import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyBottomSheetUniversal
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.DetailSectionBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EmptyState
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BaseSectionScreen
 import io.appmetrica.analytics.AppMetrica
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,10 +61,10 @@ fun AddScreen(
     navigateToItemProject: (Pair<Long, Boolean>) -> Unit,
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val state by viewModel.state.collectAsStateWithLifecycle()
     val idProject = state.idPT
     val eventFlow = viewModel.navigation
+
     LaunchedEffect(Unit) {
         eventFlow.collect { event ->
             when (event) {
@@ -83,36 +73,14 @@ fun AddScreen(
             }
         }
     }
-
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBarNavigationNew(
-                value = state.searchState.searchQuery,
-                isGroup = state.mainList.isGroupMode,
-                onValueChange = { viewModel.onIntent(AddListIntent.SearchChanged(it)) },
-                onClick = { viewModel.onIntent(AddListIntent.GroupClicked(it)) },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        floatingActionButton = {
-            if (!state.isArchive)
-                NeonGlowFab(
-                    colors = state.ui.colors,
-                    onClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(true)) },
-                    onLongClick = {
-                        viewModel.onIntent(
-                            AddListIntent.OpenPatternsBottomSheetClick(true)
-                        )
-                    }
-                )
-        }
-    ) { innerPadding ->
-        if (state.isLoading)
-            CircularProgress(
-                modifier = Modifier.padding(innerPadding),
-            )
-        else
+    BaseSectionScreen(
+        state = state,
+        onGroupModeClick = { viewModel.onIntent(AddListIntent.GroupClicked(it)) },
+        onSearchChanged = { viewModel.onIntent(AddListIntent.SearchChanged(it)) },
+        onAddProductClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetEntry(it)) },
+        onQrCodeIntent = viewModel::onQrCodeIntent,
+        onTemplateIntent = viewModel::onTemplateIntent,
+        content = { innerPadding ->
             AddContainer2(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
@@ -135,140 +103,62 @@ fun AddScreen(
                         AddListIntent.LoadDataForDetailNomenclatura(it)
                     )
                 })
-        if (state.bottomSheetState.isOpenEntry)
-            AddEntryBottomSheet(
-                state = state.currentProduct,
-                colors = state.ui.colors,
-                onIntent = viewModel::onIntent
-            )
-        if (state.bottomSheetState.isOpenGroup)
-            BrieflyBottomSheetAdd(
-                iconRes = state.ui.iconRes,
-                list = state.detailNomenclatura.productItems,
-                state = state.detailNomenclatura.detail,
-                onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
-                onEditClick = {
-                    viewModel.onIntent(
-                        AddListIntent.OpenBottomSheetEntry(true, it)
-                    )
-                },
-                isArchive = state.isArchive,
-                onDeleteClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(it)) },
-                onAnalysisClick = {
-                    navigationToAnalysis(Triple(idProject, it.first, it.second))
-                    AppMetrica.reportEvent("Переход в полный анализ продукта")
-                }
-            )
-        if (state.bottomSheetState.isOpenDetail)
-            AddDetailBottomSheet(
-                state = state.productDetail,
-                colors = state.ui.colors,
-                onIntent = viewModel::onIntent,
-                isArchive = state.isArchive
-            )
-        if (state.bottomSheetState.isOpenProductDelete)
-            WarningDeleteAddBottomSheet(
-                onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(null)) },
-                onDeleteClick = { viewModel.onIntent(AddListIntent.Delete) },
-                state = state.productDetail,
-            )
-
-
-        if (state.bottomSheetState.isOpenTemplateDelete)
-            WarningDeleteTemplateBottomSheet(
-                iconRes = state.ui.iconRes,
-                onDismissRequest = {
-                    viewModel.onIntent(AddListIntent.OpenTemplateDeleteBottomSheet(null))
-                },
-                onDeleteClick = { viewModel.onIntent(AddListIntent.DeleteTemplate) },
-                templateItem = state.templatesState.templateToDelete,
-                iconColor = green_shamrock,
-                iconBorderColor = alabaster,
-            )
-        if (state.bottomSheetState.isOpenTemplates)
-            TemplatesBottomSheet(
-                list = state.templatesState.templatesList,
-                iconRes = state.ui.iconRes,
-                colors = state.ui.colors,
-                iconColor = green_shamrock,
-                iconBorderColor = alabaster,
-                onSetPinnedClick = {
-                    viewModel.onIntent(AddListIntent.SetPinOfTemplateClick(it))
-                },
-                onDismissRequest = {
-                    viewModel.onIntent(AddListIntent.OpenPatternsBottomSheetClick(value = false))
-                },
-                onCreatePatternClick = {
-                    viewModel.onIntent(
-                        AddListIntent.OpenBottomSheetEntry(isOpen = true, isTemplate = true)
-                    )
-                },
-                onChoicePatternClick = {
-                    viewModel.onIntent(AddListIntent.LoadDataForTemplateBottomSheetClick(it))
-                },
-                onEditTemplateClick = {
-                    viewModel.onIntent(
-                        AddListIntent.OpenBottomSheetEntry(
-                            isOpen = true,
-                            id = it,
-                            isTemplate = true
+            if (state.bottomSheetState.isOpenEntry)
+                AddEntryBottomSheet(
+                    state = state.currentProduct,
+                    colors = state.ui.colors,
+                    onIntent = viewModel::onIntent,
+                    onTemplateIntent = viewModel::onTemplateIntent
+                )
+            if (state.bottomSheetState.isOpenGroup)
+                BrieflyBottomSheetAdd(
+                    iconRes = state.ui.iconRes,
+                    list = state.detailNomenclatura.productItems,
+                    state = state.detailNomenclatura.detail,
+                    onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
+                    onEditClick = {
+                        viewModel.onIntent(
+                            AddListIntent.OpenBottomSheetEntry(true, it)
                         )
-                    )
-                },
-                onCreateQrCodeClick = { viewModel.onIntent(AddListIntent.CreateQrCodeClick(it)) },
-                onDeleteTemplateClick = {
-                    viewModel.onIntent(AddListIntent.OpenTemplateDeleteBottomSheet(it))
-                }
-            )
-        if (state.bottomSheetState.isOpenCreateQrCode)
-            QrCodeBottomSheet(
-                colors = state.ui.colors,
-                qrCodeData = state.qrCodeState,
-            ) { viewModel.onIntent(AddListIntent.OpenQrCodeBottomSheetClick(false)) }
-
-        if (state.bottomSheetState.isOpenEntryInTemplate)
-            EnterInPatternBottomSheet(
-                colors = state.ui.colors,
-                addProductState = state.currentProduct,
-                onDismissRequest = {
-                    viewModel.onIntent(AddListIntent.OpenTemplateBottomSheetClick(false))
-                },
-                onTitleChange = { viewModel.onIntent(AddListIntent.TitleChanged(it)) },
-                onTitleAndSuffix = { viewModel.onIntent(AddListIntent.TitleAndSuffix(it)) },
-                onCountChange = { viewModel.onIntent(AddListIntent.CountChanged(it)) },
-                onSuffixChange = { viewModel.onIntent(AddListIntent.SuffixClicked(it)) },
-                onCategoryChange = { viewModel.onIntent(AddListIntent.CategoryChanged(it)) },
-                onAnimalChange = { viewModel.onIntent(AddListIntent.Animal(it)) },
-                onAnimalClearChange = { viewModel.onIntent(AddListIntent.AnimalClear(it)) },
-                onNoteChange = { viewModel.onIntent(AddListIntent.NoteChanged(it)) },
-                onInsertClick = { viewModel.onIntent(AddListIntent.Insert) },
-                onInsertAndScannerAgain = {
-                    viewModel.onIntent(AddListIntent.Insert)
-                    viewModel.onIntent(AddListIntent.OpenScannerQrCodeBottomSheetClick(true))
-                }
-            )
-        if (state.bottomSheetState.isOpenWarningQrCode)
-            QrCodeWarningBottomSheet(
-                backupData = state.qrCodeWarning.templateBackup,
-                qrCodeWarningType = state.qrCodeWarning.warningType,
-                onDismissRequest = {
-                    viewModel.onIntent(AddListIntent.OpenWarningQrCodeBottomSheetClick(false))
-                },
-                onScannerClick = {
-                    viewModel.onIntent(AddListIntent.OpenScannerQrCodeBottomSheetClick(true))
-                },
-                onRecoverClick = {
-                    viewModel.onIntent(AddListIntent.RecoverClick(it))
-                }
-            )
-        if (state.bottomSheetState.isOpenScannerQrCode)
-            QrScannerScreen(
-                onQrDetected = { viewModel.onIntent(AddListIntent.QrDetected(it)) },
-                onDismissRequest = {
-                    viewModel.onIntent(AddListIntent.OpenScannerQrCodeBottomSheetClick(false))
-                }
-            )
-    }
+                    },
+                    isArchive = state.isArchive,
+                    onDeleteClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(it)) },
+                    onAnalysisClick = {
+                        navigationToAnalysis(Triple(idProject, it.first, it.second))
+                        AppMetrica.reportEvent("Переход в полный анализ продукта")
+                    }
+                )
+            if (state.bottomSheetState.isOpenDetail)
+                AddDetailBottomSheet(
+                    state = state.productDetail,
+                    colors = state.ui.colors,
+                    onIntent = viewModel::onIntent,
+                    isArchive = state.isArchive
+                )
+            if (state.bottomSheetState.isOpenProductDelete)
+                WarningDeleteAddBottomSheet(
+                    onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(null)) },
+                    onDeleteClick = { viewModel.onIntent(AddListIntent.Delete) },
+                    state = state.productDetail,
+                )
+            if (state.bottomSheetState.isOpenEntryInTemplate)
+                EnterInPatternBottomSheet(
+                    colors = state.ui.colors,
+                    state = state.currentProduct,
+                    onDismissRequest = {
+                        viewModel.onIntent(AddListIntent.OpenTemplateBottomSheetClick(false))
+                    },
+                    onIntent = viewModel::onIntent,
+                    onInsertClick = { viewModel.onIntent(AddListIntent.Insert) },
+                    onInsertAndScannerAgain = {
+                        viewModel.onIntent(AddListIntent.Insert)
+                        viewModel.onQrCodeIntent(
+                            QrCodeIntent.OpenScannerQrCodeBottomSheetClick(true)
+                        )
+                    }
+                )
+        }
+    )
 }
 
 @Composable
@@ -473,7 +363,8 @@ fun BrieflyBottomSheetAdd(
 fun AddEntryBottomSheet(
     state: AddProductState,
     colors: List<Color>,
-    onIntent: (AddListIntent) -> Unit
+    onIntent: (AddListIntent) -> Unit,
+    onTemplateIntent: (TemplateIntent) -> Unit
 ) {
     val template = state.template.activeField
     val product = state.product
@@ -483,7 +374,7 @@ fun AddEntryBottomSheet(
     EntryBottomSheet(
         titleEntryRes = if (isTemplate) R.string.template_title_entry else R.string.add_screen_title_entry,
         titleEditRes = if (isTemplate) R.string.template_title_edit else R.string.add_screen_title_edit,
-        isEntry = isTemplate,
+        isEntry = product.isEntry,
         enabledButton = errors.hasAnyError,
         colors = colors,
         onDismissRequest = {
@@ -498,11 +389,11 @@ fun AddEntryBottomSheet(
             onIntent(AddListIntent.OpenBottomSheetEntry(false))
         },
         onInsertClick = {
-            if (isTemplate) onIntent(AddListIntent.InsertTemplate)
+            if (isTemplate) onTemplateIntent(TemplateIntent.InsertTemplate)
             else onIntent(AddListIntent.Insert)
         },
         onUpdateClick = {
-            if (isTemplate) onIntent(AddListIntent.UpdateTemplate)
+            if (isTemplate) onTemplateIntent(TemplateIntent.UpdateTemplate)
             else onIntent(AddListIntent.Update)
         },
     ) {
@@ -566,6 +457,14 @@ fun AddEntryBottomSheet(
                 value = product.date,
                 onValueChange = { onIntent(AddListIntent.Date(it)) }
             )
+        if (isTemplate)
+            OutlinedSwitch(
+                checked = template.isDate,
+                onCheckedChange = { onIntent(AddListIntent.DateTemplateChanged(it)) },
+                leadingIconRes = R.drawable.baseline_calendar_month_24,
+                labelIntRes = R.string.outlined_text_current_date,
+                supportingText = R.string.support_text_current_date,
+            )
         if (!product.hasIndicators && state.pickList.animals.isNotEmpty())
             OutlinedTextAnimalNew(
                 value = product.animalName,
@@ -588,7 +487,8 @@ fun AddEntryBottomSheet(
         if (isTemplate)
             OutlinedSwitch(
                 checked = template.isMultiProjectTemplate,
-                onCheckedChange = { onIntent(AddListIntent.MultiProjectTemplateChanged(it)) }
+                onCheckedChange = { onIntent(AddListIntent.MultiProjectTemplateChanged(it)) },
+                supportingText = R.string.support_text_multi_project_template_add
             )
     }
 }

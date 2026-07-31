@@ -148,10 +148,9 @@ fun NeonGlowFab(
             }
             .clip(CircleShape)
             .combinedClickable(
-                onClick =  onClick,
+                onClick = onClick,
                 onLongClick = onLongClick
-            )
-        ,
+            ),
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -159,6 +158,38 @@ fun NeonGlowFab(
             contentDescription = "Добавить",
             tint = Color.White,
             modifier = Modifier.size(32.dp)
+        )
+    }
+}
+
+@Composable
+fun TemplateFab(
+    modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int = R.drawable.outline_description_24,
+    color: Color,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .size(44.dp)
+            .graphicsLayer {
+                // имитация неонового свечения
+                shadowElevation = 20f
+                shape = CircleShape
+                clip = false
+            }
+            .clip(CircleShape)
+            .background(Color.White)
+            .clickable(
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = "Добавить",
+            tint = color,
+            modifier = Modifier.size(20.dp)
         )
     }
 }

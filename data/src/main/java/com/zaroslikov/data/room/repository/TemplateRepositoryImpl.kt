@@ -2,19 +2,23 @@ package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.TemplateDao
 import com.zaroslikov.data.room.mapper.dto.template.toDomainAddTemplateDto
+import com.zaroslikov.data.room.mapper.dto.template.toDomainExpensesTemplateDto
 import com.zaroslikov.data.room.mapper.dto.template.toDomainSaleTemplateDto
+import com.zaroslikov.data.room.mapper.dto.template.toDomainWriteOffTemplateDto
 import com.zaroslikov.data.room.mapper.table.template.toAddTemplateTable
 import com.zaroslikov.data.room.mapper.table.template.toDomainAddTemplateTable
 import com.zaroslikov.domain.models.dto.template.DomainAddTemplateDto
+import com.zaroslikov.domain.models.dto.template.DomainExpensesTemplateDto
 import com.zaroslikov.domain.models.dto.template.DomainSaleTemplateDto
+import com.zaroslikov.domain.models.dto.template.DomainWriteOffTemplateDto
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
-import com.zaroslikov.domain.repository.template.AddTemplateRepository
+import com.zaroslikov.domain.repository.template.TemplateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class AddTemplateRepositoryImpl @Inject constructor(private val templateDao: TemplateDao) :
-    AddTemplateRepository {
+class TemplateRepositoryImpl @Inject constructor(private val templateDao: TemplateDao) :
+    TemplateRepository {
     override fun getAllAddTemplateTableForExport(): Flow<List<DomainTemplateTable>> {
         return templateDao.getAllAddTemplateTableForExport()
             .map { it -> it.map { it.toDomainAddTemplateTable() } }
@@ -36,7 +40,7 @@ class AddTemplateRepositoryImpl @Inject constructor(private val templateDao: Tem
         return templateDao.setPinById(pin, id)
     }
 
-    override fun getAddTemplateItem(id: Long): Flow<DomainTemplateTable?> {
+    override fun getTemplateItem(id: Long): Flow<DomainTemplateTable?> {
         return templateDao.getAddTemplateItem(id).map { it?.toDomainAddTemplateTable() }
     }
 
@@ -48,6 +52,17 @@ class AddTemplateRepositoryImpl @Inject constructor(private val templateDao: Tem
     override fun getAllSaleTemplateItems(id: Long): Flow<List<DomainSaleTemplateDto>> {
         return templateDao.getAllSaleTemplateItems(id)
             .map { it -> it.map { it.toDomainSaleTemplateDto() } }
+    }
+
+    override fun getAllWriteOffTemplateItems(id: Long): Flow<List<DomainWriteOffTemplateDto>> {
+        return templateDao.getAllWriteOffTemplateItems(id)
+            .map { it -> it.map { it.toDomainWriteOffTemplateDto() } }
+    }
+
+    override fun getAllExpensesTemplateItems(id: Long): Flow<List<DomainExpensesTemplateDto>> {
+        return templateDao.getAllExpensesTemplateItems(id).map { it ->
+            it.map { it.toDomainExpensesTemplateDto() }
+        }
     }
 
     override suspend fun insert(item: DomainTemplateTable) {

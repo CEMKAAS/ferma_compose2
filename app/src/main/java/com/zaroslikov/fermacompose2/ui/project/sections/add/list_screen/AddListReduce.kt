@@ -6,17 +6,20 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
+import com.zaroslikov.fermacompose2.base.intent.QrCodeIntent
+import com.zaroslikov.fermacompose2.base.intent.TemplateIntent
+
+import com.zaroslikov.fermacompose2.base.reduce.SectionReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import kotlin.text.lowercase
 
 class AddListReduce(private val resourceProvider: ResourceProvider) :
-    BaseReducer<AddListState, AddListIntent>() {
+    SectionReducer<AddListState, AddListIntent>() {
     override fun reducer(
         state: AddListState,
         intent: AddListIntent
@@ -67,6 +70,7 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
 
             is AddListIntent.SuffixTemplateClicked -> state.updateSuffixTemplate(intent.value)
             is AddListIntent.CategoryTemplateChanged -> state.updateCategoryTemplate(intent.value)
+            is AddListIntent.DateTemplateChanged -> state.updateDateTemplate(intent.value)
             is AddListIntent.AnimalTemplateChanged -> state.updateAnimalTemplate(intent.value)
             is AddListIntent.NoteTemplateChanged -> state.updateNoteTemplate(intent.value)
             is AddListIntent.MultiProjectTemplateChanged -> state.updateMultiProjectTemplate(intent.value)
@@ -75,23 +79,45 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.OpenTemplateBottomSheetClick ->
                 state.updateOpenEntryInTemplate(intent.value, intent.toUiMap23).updateValid()
 
-            is AddListIntent.OpenWarningQrCodeBottomSheetClick ->
-                state.updateOpenWarningQrCode(intent.value, intent.qrCodeWarningType, intent.backupData)
+            else -> state
+        }
+    }
 
-            is AddListIntent.OpenScannerQrCodeBottomSheetClick ->
+    override fun qrReducer(
+        state: AddListState,
+        intent: QrCodeIntent
+    ): AddListState {
+        return when (intent) {
+            is QrCodeIntent.OpenScannerQrCodeBottomSheetClick ->
                 state.updateOpenScannerQrCode(intent.value)
 
-            is AddListIntent.OpenTemplateDeleteBottomSheet ->
+            is QrCodeIntent.OpenWarningQrCodeBottomSheetClick ->
+                state.updateOpenWarningQrCode(
+                    intent.value,
+                    intent.qrCodeWarningType,
+                    intent.backupData
+                )
+
+            is QrCodeIntent.OpenQrCodeBottomSheetClick ->
+                state.updateOpenQrCodeBottomSheet(intent.value, intent.qrCode)
+
+            else -> state
+        }
+    }
+
+    override fun templateReducer(
+        state: AddListState,
+        intent: TemplateIntent
+    ): AddListState {
+        return when (intent) {
+            is TemplateIntent.OpenTemplateDeleteBottomSheet ->
                 state.updateOpenTemplateDeleteBottomSheet(intent.value)
 
-            is AddListIntent.OpenPatternsBottomSheetClick ->
+            is TemplateIntent.OpenPatternsBottomSheetClick ->
                 state.updateOpenPatternBottomSheet(intent.value)
 
-            is AddListIntent.LoadDataForTemplate ->
+            is TemplateIntent.LoadDataForTemplate ->
                 state.updateLoadDataForTemplate(intent.value)
-
-            is AddListIntent.OpenQrCodeBottomSheetClick ->
-                state.updateOpenQrCodeBottomSheet(intent.value, intent.qrCode)
 
             else -> state
         }
@@ -482,9 +508,6 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateTitleTemplate(isTitle: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    title = if (isTitle) "" else currentProduct.product.title,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isTitle = isTitle
@@ -497,9 +520,6 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateCountTemplate(isCount: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    title = if (isCount) "" else currentProduct.product.count,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isCount = isCount
@@ -512,9 +532,6 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateSuffixTemplate(isSuffix: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    countSuffix = if (isSuffix) Suffix.NO else currentProduct.product.countSuffix,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isSuffix = isSuffix
@@ -527,9 +544,6 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateCategoryTemplate(isCategory: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    category = if (isCategory) "" else currentProduct.product.category,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isCategory = isCategory
@@ -539,13 +553,21 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
         )
     }
 
+    private fun AddListState.updateDateTemplate(isDate: Boolean): AddListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isDate = isDate
+                    )
+                )
+            )
+        )
+    }
+
     private fun AddListState.updateAnimalTemplate(isAnimal: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    animalName = if (isAnimal) "" else currentProduct.product.animalName,
-                    animalId = null,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isAnimal = isAnimal
@@ -558,9 +580,6 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
     private fun AddListState.updateNoteTemplate(isNote: Boolean): AddListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    note = if (isNote) "" else currentProduct.product.note,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isNote = isNote

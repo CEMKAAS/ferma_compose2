@@ -20,6 +20,7 @@ import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.models.table.incubator.DomainTimeNotificationIncubator
 import com.zaroslikov.domain.models.table.profile.DomainProfileTable
 import com.zaroslikov.domain.models.table.project.DomainTimeNotificationProject
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import kotlinx.serialization.Serializable
@@ -46,6 +47,8 @@ data class BackupData(
     val writeOff: List<DomainWriteOffTable> = emptyList(),
     val expensesTable: List<DomainExpensesTable> = emptyList(),
     val noteTable: List<DomainNoteTable> = emptyList(),
+
+    val templateTable: List<DomainTemplateTable> = emptyList(),
 
     val expensesAnimal: List<DomainExpensesAnimal> = emptyList(),
 

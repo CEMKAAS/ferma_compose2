@@ -81,8 +81,8 @@ import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogStandard
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.BorderShowAllButton
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
-import com.zaroslikov.fermacompose2.ui.elements.EmptyBookmark
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.EmptyBookmark
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.TextMiniCard

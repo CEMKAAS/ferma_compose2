@@ -91,7 +91,7 @@ import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.supportFun.toCardDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toCardResId
-import com.zaroslikov.fermacompose2.ui.project.sections.ValueItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.ValueItem
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white

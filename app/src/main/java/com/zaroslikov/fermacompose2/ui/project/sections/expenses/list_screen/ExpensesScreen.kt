@@ -4,39 +4,36 @@ package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.base.intent.QrCodeIntent
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_3
 import com.zaroslikov.fermacompose2.supportFun.dateBuilder
 import com.zaroslikov.fermacompose2.ui.elements.BrieflyCountCardNew
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
-import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
-import com.zaroslikov.fermacompose2.ui.elements.TopAppBarNavigationNew
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyBottomSheetUniversal
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
-import com.zaroslikov.fermacompose2.ui.project.sections.DetailSectionBottomSheet
-import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
-import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
+import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyBottomSheetUniversal
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.DetailSectionBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EmptyState
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.InventoryBody
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BaseSectionScreen
 
 object ExpensesDestination : NavigationDestination {
     override val route = "expenses"
@@ -48,115 +45,116 @@ object ExpensesDestination : NavigationDestination {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreen(
+    navigateToFirstScreen: () -> Unit,
+    navigateToItemProject: (Pair<Long, Boolean>) -> Unit,
     viewModel: ExpensesViewModel = hiltViewModel()
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = listOf(orang_1, orang_2)
     val primeColor = orang_1
     val iconRes = R.drawable.icon_expenses
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBarNavigationNew(
-                value = state.textSearch,
-                isGroup = state.isGroup,
-                onValueChange = {
-                    viewModel.onIntent(ExpensesListIntent.SearchChanged(it))
-                },
-                onClick = { viewModel.onIntent(ExpensesListIntent.GroupClicked(it)) },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        floatingActionButton = {
-            if (!state.isArchive)
-                NeonGlowFab(colors = colors,) {
-                    viewModel.onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(true))
-                }
+    val eventFlow = viewModel.navigation
+    LaunchedEffect(Unit) {
+        eventFlow.collect { event ->
+            when (event) {
+                is UiEvent.Navigate -> navigateToItemProject(event.value to true)
+                is UiEvent.NavigateBack -> navigateToFirstScreen()
+            }
         }
-    ) { innerPadding ->
-        if (state.isLoading)
-            CircularProgress(
-                modifier = Modifier.padding(innerPadding),
-            )
-        else
+    }
+    BaseSectionScreen(
+        state = state,
+        onGroupModeClick = { viewModel.onIntent(ExpensesListIntent.GroupClicked(it)) },
+        onSearchChanged = { viewModel.onIntent(ExpensesListIntent.SearchChanged(it)) },
+        onAddProductClick = { viewModel.onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(it)) },
+        onQrCodeIntent = viewModel::onQrCodeIntent,
+        onTemplateIntent = viewModel::onTemplateIntent,
+        content = { innerPadding ->
             ExpensesContainer(
                 modifier = Modifier
                     .modifierScreenLazy(innerPadding),
                 color = primeColor,
                 iconRes = iconRes,
-                itemList = state.list,
-                searchList = state.searchList,
-                brieflyList = state.briefly,
-                searchBrieflyList = state.searchBrieflyList,
+                itemList = state.mainList.items,
+                searchList = state.searchState.searchResults,
+                brieflyList = state.mainList.brieflyItems,
+                searchBrieflyList = state.searchState.searchBrieflyResults,
                 priceSuffix = state.settings.currencySuffix,
-                details = state.isGroup,
+                details = state.mainList.isGroupMode,
                 isArchive = state.isArchive,
                 onDetailsCardClick = {
-                    viewModel.onIntent(
-                        ExpensesListIntent.OpenBottomSheetDetail(
-                            it
-                        )
-                    )
+                    viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDetail(it))
                 },
                 onEditClick = {
-                    viewModel.onIntent(
-                        ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
-                    )
+                    viewModel.onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(true, it))
                 },
                 onDeleteClick = { viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(it)) },
                 onDetailsClick = {
-                    viewModel.onIntent(
-                        ExpensesListIntent.OpenBottomSheetGroup(it)
-                    )
+                    viewModel.onIntent(ExpensesListIntent.OpenBottomSheetGroup(it))
                 }
             )
+            if (state.bottomSheetState.isOpenEntry)
+                ExpensesEntryBottomSheet(
+                    colors = colors,
+                    state = state.currentProduct,
+                    onIntent = viewModel::onIntent,
+                    onTemplateIntent = viewModel::onTemplateIntent
+                )
+            if (state.bottomSheetState.isOpenGroup)
+                BrieflyBottomSheetExpenses(
+                    color = primeColor,
+                    iconRes = iconRes,
+                    list = state.detailNomenclatura.productItems,
+                    state = state.detailNomenclatura.detail,
+                    priceSuffix = state.settings.currencySuffix,
+                    isArchive = state.isArchive,
+                    onDismissRequest = {
+                        viewModel.onIntent(
+                            ExpensesListIntent.OpenBottomSheetGroup(null)
+                        )
+                    },
+                    onEditClick = {
+                        viewModel.onIntent(
+                            ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
+                        )
+                    },
+                    onDeleteClick = { viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(it)) },
+                )
+            if (state.bottomSheetState.isOpenDetail)
+                ExpensesDetailBottomSheet(
+                    state = state.productDetail,
+                    priceSuffix = state.settings.currencySuffix,
+                    colors = colors,
+                    onIntent = viewModel::onIntent,
+                    isArchive = state.isArchive
+                )
+            if (state.bottomSheetState.isOpenProductDelete)
+                WarningDeleteExpensesBottomSheet(
+                    onDismissRequest = {
+                        viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(null))
+                    },
+                    onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete) },
+                    state = state.productDetail,
+                    color = colors.first(),
+                    priceSuffix = state.settings.currencySuffix
+                )
 
-        if (state.isOpenEntryBottomSheet)
-            ExpensesEntryBottomSheet(
-                colors = colors,
-                state = state.currentProduct,
-                priceSuffix = state.settings.currencySuffix,
-                onIntent = viewModel::onIntent
-            )
-        if (state.isOpenGroupBottomSheet)
-            BrieflyBottomSheetExpenses(
-                color = primeColor,
-                iconRes = iconRes,
-                list = state.brieflyList,
-                state = state.currentBriefly,
-                priceSuffix = state.settings.currencySuffix,
-                isArchive = state.isArchive,
-                onDismissRequest = {
-                    viewModel.onIntent(
-                        ExpensesListIntent.OpenBottomSheetGroup(null)
-                    )
-                },
-                onEditClick = {
-                    viewModel.onIntent(
-                        ExpensesListIntent.OpenEntryBottomSheetByItem(true, it)
-                    )
-                },
-                onDeleteClick = { viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(it)) },
-            )
-    }
-    if (state.isOpenBottomSheetDetail)
-        ExpensesDetailBottomSheet(
-            state = state.currentDetail,
-            priceSuffix = state.settings.currencySuffix,
-            colors = colors,
-            onIntent = viewModel::onIntent,
-            isArchive = state.isArchive
-        )
-    if (state.isOpenBottomSheetDelete)
-        WarningDeleteExpensesBottomSheet(
-            onDismissRequest = { viewModel.onIntent(ExpensesListIntent.OpenBottomSheetDelete(null)) },
-            onDeleteClick = { viewModel.onIntent(ExpensesListIntent.Delete) },
-            state = state.currentDetail,
-            color = colors.first(),
-            priceSuffix = state.settings.currencySuffix
-        )
+            if (state.bottomSheetState.isOpenEntryInTemplate)
+                ExpensesEnterInPatternBottomSheet(
+                    colors = state.ui.colors,
+                    state = state.currentProduct,
+                    onIntent = viewModel::onIntent,
+                    onDismissRequest = {
+                        viewModel.onIntent(ExpensesListIntent.OpenTemplateBottomSheetClick(false))
+                    },
+                    onInsertClick = { viewModel.onIntent(ExpensesListIntent.Insert) },
+                    onInsertAndScannerAgain = {
+                        viewModel.onIntent(ExpensesListIntent.Insert)
+                        viewModel.onQrCodeIntent(QrCodeIntent.OpenScannerQrCodeBottomSheetClick(true))
+                    }
+                )
+        })
 }
 
 
@@ -191,7 +189,7 @@ private fun ExpensesDetailBottomSheet(
                 onIntent(
                     ExpensesListIntent.OpenEntryBottomSheetByItem(
                         true,
-                        state
+                        state.id
                     )
                 )
             },
@@ -225,7 +223,8 @@ private fun WarningDeleteExpensesBottomSheet(
                 suffix = product.countSuffix,
                 price = product.priceAll ?: product.price,
                 priceSuffix = priceSuffix,
-                category = product.category ?: stringResource(R.string.support_text_no_category),
+                category = product.category
+                    ?: stringResource(R.string.support_text_no_category),
                 note = product.note,
                 color = color,
                 day = product.day,
@@ -254,7 +253,7 @@ fun ExpensesContainer(
     brieflyList: List<BrieflyItem>,
     searchBrieflyList: List<BrieflyItem>,
     onDetailsCardClick: (Long) -> Unit,
-    onEditClick: (ExpensesTableUi) -> Unit,
+    onEditClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (String) -> Unit,
     isArchive: Boolean
@@ -283,7 +282,7 @@ fun ExpensesContainer(
                 animalVaccinationId = item.animalVaccinationId,
                 isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
-                onEditClick = { onEditClick(item) },
+                onEditClick = { onEditClick(item.id) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
         },
@@ -322,7 +321,7 @@ fun BrieflyBottomSheetExpenses(
     state: BrieflyItem?,
     color: Color = blue_1,
     priceSuffix: Suffix,
-    onEditClick: (ExpensesTableUi) -> Unit,
+    onEditClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onDismissRequest: () -> Unit,
     isArchive: Boolean,
@@ -357,7 +356,7 @@ fun BrieflyBottomSheetExpenses(
                     animalCountId = product.animalCountId,
                     animalVaccinationId = product.animalVaccinationId,
                     onDeleteClick = { onDeleteClick(product.id) },
-                    onEditClick = { onEditClick(product) }
+                    onEditClick = { onEditClick(product.id) }
                 )
             }
         )

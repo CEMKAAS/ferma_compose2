@@ -9,25 +9,23 @@ import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BasePickList
 import com.zaroslikov.fermacompose2.base.state.BaseProductState
 import com.zaroslikov.fermacompose2.base.state.DetailNomenclatura
 import com.zaroslikov.fermacompose2.base.state.MainList
 import com.zaroslikov.fermacompose2.base.state.Product
+import com.zaroslikov.fermacompose2.base.state.ProductError
 import com.zaroslikov.fermacompose2.base.state.SearchState
 import com.zaroslikov.fermacompose2.base.state.SectionState
 import com.zaroslikov.fermacompose2.base.state.UiState
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_2
-import com.zaroslikov.fermacompose2.green_shamrock
-import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddBottomSheetState
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddTemplateState
-import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddTemplatesState
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.BottomSheetState
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateState
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplatesState
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeWarning
 
@@ -46,15 +44,15 @@ data class SaleListState(
     override val searchState: SaleSearchState = SaleSearchState(),
 
     override val settings: DomainSettings = DomainSettings(),
-    override val bottomSheetState: AddBottomSheetState = AddBottomSheetState(),
-    override val templatesState: AddTemplatesState = AddTemplatesState(),
+    override val bottomSheetState: BottomSheetState = BottomSheetState(),
+    override val templatesState: TemplatesState = TemplatesState(),
     override val qrCodeState: QrCodeData? = null,
     override val qrCodeWarning: QrCodeWarning = QrCodeWarning()
 ) : SectionState
 
 data class SaleUiState(
     override val colors: List<Color> = listOf(blue_1, blue_2),
-    override val iconRes: Int =R.drawable.icon_sale
+    override val iconRes: Int = R.drawable.icon_sale
 ) : UiState
 
 data class SaleSearchState(
@@ -64,7 +62,7 @@ data class SaleSearchState(
 ) : SearchState
 
 data class SaleMainListState(
-    val isGroupMode: Boolean = true,
+    override val isGroupMode: Boolean = true,
     val items: List<DomainSaleTable> = emptyList(),
     val brieflyItems: List<BrieflyItem> = emptyList()
 ) : MainList
@@ -77,9 +75,9 @@ data class SaleDetailNomenclaturaState(
 //Product State
 data class SaleProductState(
     override val product: SaleProduct = SaleProduct(),
-    override val errors: ErrorSale = ErrorSale(),
+    override val errors: SaleError = SaleError(),
     override val pickList: PickSaleList = PickSaleList(),
-    override val template: AddTemplateState = AddTemplateState()
+    override val template: TemplateState = TemplateState()
 ) : BaseProductState
 
 data class SaleProduct(
@@ -93,30 +91,31 @@ data class SaleProduct(
     override val projectId: Long = 0,
     override val isEntry: Boolean = true,
     val productOrigin: ProductOrigin? = null,
-    val price: String = "",
-    val isAutoPrice: Boolean = false,
-    val priceAll: String = "",
+    override val price: String = "",
+    override val priceAll: String = "",
+    val priceSuffix: Suffix = Suffix.RUBLE,
+    override val isAutoPrice: Boolean = false,
     val buyer: String = "",
     val selectedAnimalIndex: Long = 0,
     val animalCountId: Long? = null,
     val animalId: Long? = null,
     val animal: String = "",
-    val isIndicatorsValue: Boolean = false,
+    val hasIndicators: Boolean = false,
 ) : Product
 
 data class PickSaleList(
     val titles: List<DomainTitleSuffixCategory> = emptyList(),
-    val categories: List<String> = emptyList(),
+    override val categories: List<String> = emptyList(),
     val buyers: List<String> = emptyList(),
-    val warehouseList: List<DomainCountSuffix> = emptyList(),
+    override val warehouseList: List<DomainCountSuffix> = emptyList(),
     val suffixList: List<Suffix> = suffixAllList
 ) : BasePickList
 
-data class ErrorSale(
+data class SaleError(
     val isErrorNameTemplate: Boolean = false,
-    val isErrorTitle: Boolean = false,
-    val isErrorSlash: Boolean = false,
-    val isErrorCount: Boolean = false,
+    override val isErrorTitle: Boolean = false,
+    override val isErrorSlash: Boolean = false,
+    override val isErrorCount: Boolean = false,
     val isErrorPrice: Boolean = false,
     override val hasAnyError: Boolean = false
-) : BaseError
+) : ProductError

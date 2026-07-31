@@ -10,6 +10,7 @@ data class DomainSaleTemplateDto(
     val countSuffix: Suffix? = Suffix.KILOGRAM,
     val price: Double? = 0.0,
     val priceAll: Double? = null,
+    val priceSuffix: Suffix? = Suffix.RUBLE,
     val category: String?,
     val buyer: String? = null,
     val note: String? = "",

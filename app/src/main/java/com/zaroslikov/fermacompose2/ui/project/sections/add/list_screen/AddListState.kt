@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
+import android.health.connect.datatypes.Device
 import androidx.compose.ui.graphics.Color
 import coil3.Bitmap
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
@@ -12,26 +13,22 @@ import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.state.ActiveField
-import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProductState
-import com.zaroslikov.fermacompose2.base.state.BottomSheetState
 import com.zaroslikov.fermacompose2.base.state.BasePickList
 import com.zaroslikov.fermacompose2.base.state.DetailNomenclatura
 import com.zaroslikov.fermacompose2.base.state.MainList
 import com.zaroslikov.fermacompose2.base.state.Product
-import com.zaroslikov.fermacompose2.base.state.QrCodeState
-import com.zaroslikov.fermacompose2.base.state.QrCodeWarningState
+import com.zaroslikov.fermacompose2.base.state.ProductError
 import com.zaroslikov.fermacompose2.base.state.SearchState
 import com.zaroslikov.fermacompose2.base.state.SectionState
 import com.zaroslikov.fermacompose2.base.state.TemplateState
-import com.zaroslikov.fermacompose2.base.state.TemplatesState
 import com.zaroslikov.fermacompose2.base.state.UiState
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
 import kotlinx.serialization.Serializable
 
 data class AddListState(
@@ -49,8 +46,8 @@ data class AddListState(
     override val searchState: AddSearchState = AddSearchState(),
 
     override val settings: DomainSettings = DomainSettings(),
-    override val bottomSheetState: AddBottomSheetState = AddBottomSheetState(),
-    override val templatesState: AddTemplatesState = AddTemplatesState(),
+    override val bottomSheetState: BottomSheetState = BottomSheetState(),
+    override val templatesState: TemplatesState = TemplatesState(),
     override val qrCodeState: QrCodeData? = null,
     override val qrCodeWarning: QrCodeWarning = QrCodeWarning()
 ) : SectionState
@@ -60,25 +57,25 @@ data class AddUiState(
     override val iconRes: Int = R.drawable.icon_add_product
 ) : UiState
 
-data class AddTemplatesState(
-    override val templatesList: List<TemplateItem> = emptyList(),
-    override val templateToDelete: TemplateItem? = null
-) : TemplatesState
+data class TemplatesState(
+    val templatesList: List<TemplateItem> = emptyList(),
+    val templateToDelete: TemplateItem? = null
+)
 
 
-data class AddBottomSheetState(
-    override val isOpenGroup: Boolean = false,
-    override val isOpenEntry: Boolean = false,
-    override val isOpenDetail: Boolean = false,
-    override val isOpenProductDelete: Boolean = false,
-    override val isOpenTemplateDelete: Boolean = false,
-    override val isSaveStateForBottomSheet: Boolean = false,
-    override val isOpenTemplates: Boolean = false,
-    override val isOpenEntryInTemplate: Boolean = false,
-    override val isOpenWarningQrCode: Boolean = false,
-    override val isOpenScannerQrCode: Boolean = false,
-    override val isOpenCreateQrCode: Boolean = false
-) : BottomSheetState
+data class BottomSheetState(
+    val isOpenGroup: Boolean = false,
+    val isOpenEntry: Boolean = false,
+    val isOpenDetail: Boolean = false,
+    val isOpenProductDelete: Boolean = false,
+    val isOpenTemplateDelete: Boolean = false,
+    val isSaveStateForBottomSheet: Boolean = false,
+    val isOpenTemplates: Boolean = false,
+    val isOpenEntryInTemplate: Boolean = false,
+    val isOpenWarningQrCode: Boolean = false,
+    val isOpenScannerQrCode: Boolean = false,
+    val isOpenCreateQrCode: Boolean = false
+)
 
 data class AddSearchState(
     override val searchQuery: String = "",
@@ -87,7 +84,7 @@ data class AddSearchState(
 ) : SearchState
 
 data class AddMainListState(
-    val isGroupMode: Boolean = true,
+    override val isGroupMode: Boolean = true,
     val items: List<DomainAddItemDto2> = emptyList(),
     val brieflyItems: List<BrieflyItem> = emptyList()
 ) : MainList
@@ -103,7 +100,7 @@ data class AddProductState(
     override val product: AddProduct = AddProduct(),
     override val pickList: AddPickList = AddPickList(),
     override val errors: AddErrors = AddErrors(),
-    override val template: AddTemplateState = AddTemplateState()
+    override val template: com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateState = TemplateState()
 ) : BaseProductState
 
 data class AddProduct(
@@ -121,10 +118,13 @@ data class AddProduct(
     val animalName: String = "",
     val hasIndicators: Boolean = false,
     val animalCountId: Long? = null,
+    override val price: String = "", // Заглушка на будующе
+    override val priceAll: String = "",// Заглушка на будующе
+    override val isAutoPrice: Boolean = false,// Заглушка на будующе
 ) : Product
 
 
-data class AddTemplateState(
+data class TemplateState(
     override val name: String = "",
     override val isTemplate: Boolean = false,
     override val isTemplateEntry: Boolean = false,
@@ -137,7 +137,10 @@ data class TemplateFieldsState(
     override val isCount: Boolean = false,
     override val isSuffix: Boolean = false,
     override val isCategory: Boolean = false,
+    override val isDate: Boolean = false,
+    val isWriteOffStatus: Boolean = false,
     val isPrice: Boolean = false,
+    val isPriceAll: Boolean = false,
     val isAnimal: Boolean = false,
     override val isNote: Boolean = false,
     val isBuyer: Boolean = false,
@@ -146,18 +149,18 @@ data class TemplateFieldsState(
 
 data class AddPickList(
     val titles: List<TitleAndSuffixDomain> = emptyList(),
-    val categories: List<String> = emptyList(),
+    override val categories: List<String> = emptyList(),
     val animals: List<AnimalForAddDomain> = emptyList(),
-    val warehouseList: List<DomainCountSuffix> = emptyList(),
+    override val warehouseList: List<DomainCountSuffix> = emptyList(),
 ) : BasePickList
 
 data class AddErrors(
     val isErrorNameTemplate: Boolean = false,
-    val isErrorTitle: Boolean = false,
-    val isErrorSlash: Boolean = false,
-    val isErrorCount: Boolean = false,
+    override val isErrorTitle: Boolean = false,
+    override val isErrorSlash: Boolean = false,
+    override val isErrorCount: Boolean = false,
     override val hasAnyError: Boolean = false
-) : BaseError
+) : ProductError
 
 
 data class TemplateItem(
@@ -172,18 +175,19 @@ data class QrCodeData(
     val template: DomainTemplateTable,
     val qrCodeBitmap: Bitmap,
     val qrCodeWithLogoBitmap: Bitmap,
-) : QrCodeState
+)
 
 data class QrCodeWarning(
     val warningType: QrCodeWarningType = QrCodeWarningType.LOCAL,
     val templateBackup: DomainTemplateTable? = null
-) : QrCodeWarningState
+)
 
 
 @Serializable
 data class QrPayload(
     val templateType: TemplateType,
     val isMultiProjectTemplate: Boolean,
+    val deviceId: String?,
     val itemId: Long,
     val idPT: Long,
     val backupData: DomainTemplateTable? = null

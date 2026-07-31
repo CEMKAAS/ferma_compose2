@@ -49,7 +49,9 @@ fun <T> BaseExposedDropdownMenu(
     Box(modifier = modifier) {
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
+            onExpandedChange = {
+                if (!enabled) return@ExposedDropdownMenuBox
+                expanded = !expanded }
         ) {
             content(
                 Pair(
@@ -59,31 +61,30 @@ fun <T> BaseExposedDropdownMenu(
                     expanded
                 )
             )
-            if (enabled)
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    shape = RoundedCornerShape(14.dp),
-                    containerColor = white
-                ) {
-                    list.forEachIndexed { index, item ->
-                        dropdownMenuItem(index, item) {
-                            expanded = false
-                        }
-                        if (index != list.lastIndex)
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = gray_5
-                            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                shape = RoundedCornerShape(14.dp),
+                containerColor = white
+            ) {
+                list.forEachIndexed { index, item ->
+                    dropdownMenuItem(index, item) {
+                        expanded = false
                     }
+                    if (index != list.lastIndex)
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = gray_5
+                        )
                 }
+            }
         }
     }
 }
 
 @Composable
 fun <T> BaseExposedDropdownMenu2(
-        type: ExposedDropdownMenuAnchorType = PrimaryEditable,
+    type: ExposedDropdownMenuAnchorType = PrimaryEditable,
     title: String,
     labelSelector: (T) -> String,
     list: List<T>,

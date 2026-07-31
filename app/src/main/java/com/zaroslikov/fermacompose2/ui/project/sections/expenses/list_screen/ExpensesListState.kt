@@ -2,7 +2,6 @@ package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
 import androidx.compose.ui.graphics.Color
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
-import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDomain
 import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.Suffix
@@ -10,49 +9,88 @@ import com.zaroslikov.domain.models.enums.supportUi.TypeProduct
 import com.zaroslikov.domain.models.list.suffixAllList
 import com.zaroslikov.domain.models.list.suffixWeightList
 import com.zaroslikov.domain.models.table.DomainSettings
-import com.zaroslikov.fermacompose2.base.state.BaseError
-import com.zaroslikov.fermacompose2.base.state.BaseProduct
-import com.zaroslikov.fermacompose2.base.state.EntryNewState
+import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.base.state.BasePickList
+import com.zaroslikov.fermacompose2.base.state.BaseProductState
+import com.zaroslikov.fermacompose2.base.state.DetailNomenclatura
+import com.zaroslikov.fermacompose2.base.state.MainList
+import com.zaroslikov.fermacompose2.base.state.Product
+import com.zaroslikov.fermacompose2.base.state.ProductError
+import com.zaroslikov.fermacompose2.base.state.SearchState
+import com.zaroslikov.fermacompose2.base.state.SectionState
+import com.zaroslikov.fermacompose2.base.state.UiState
+import com.zaroslikov.fermacompose2.orang_1
+import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.project.sections.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.BottomSheetState
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateState
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplatesState
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeWarning
 
 
 data class ExpensesListState(
-    val textSearch: String = "",
-    val isGroup: Boolean = true,
     val idPT: Long = 0,
-    val isOpenGroupBottomSheet: Boolean = false,
-    val isOpenEntryBottomSheet: Boolean = false,
-    val isOpenBottomSheetDetail: Boolean = false,
-    val isOpenBottomSheetDelete: Boolean = false,
-    val isSaveStateForEntry: Boolean = false,
+    val productDetail: ExpensesTableUi? = null,
 
-    val currentDetail: ExpensesTableUi? = null,
-    val currentBriefly: BrieflyItem? = null,
-
-    val list: List<ExpensesTableUi> = emptyList(),
-    val briefly: List<BrieflyItem> = emptyList(),
-    val brieflyList: List<ExpensesTableUi> = emptyList(),
-    val searchList: List<ExpensesTableUi> = emptyList(),
-    val searchBrieflyList: List<BrieflyItem> = emptyList(),
-
-    val settings: DomainSettings = DomainSettings(),
-    override val isEntry: Boolean = false,
-    override val currentProduct: ExpensesEntryState2 = ExpensesEntryState2(),
-    override val isLoading: Boolean = true,
+    override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
-    val isArchive: Boolean = false
-) : EntryNewState()
+    override val isArchive: Boolean = false,
+    override val ui: ExpensesUiState = ExpensesUiState(),
+    override val mainList: ExpensesMainListState = ExpensesMainListState(),
+
+    override val detailNomenclatura: ExpensesDetailNomenclaturaState = ExpensesDetailNomenclaturaState(),
+    override val currentProduct: ExpensesProductState = ExpensesProductState(),
+    override val searchState: ExpensesSearchState = ExpensesSearchState(),
+
+    override val settings: DomainSettings = DomainSettings(),
+    override val bottomSheetState: BottomSheetState = BottomSheetState(),
+    override val templatesState: TemplatesState = TemplatesState(),
+    override val qrCodeState: QrCodeData? = null,
+    override val qrCodeWarning: QrCodeWarning = QrCodeWarning()
+) : SectionState
 
 
-data class ExpensesEntryState2(
+data class ExpensesUiState(
+    override val colors: List<Color> = listOf(orang_1, orang_2),
+    override val iconRes: Int = R.drawable.icon_expenses
+) : UiState
+
+data class ExpensesSearchState(
+    override val searchQuery: String = "",
+    val searchResults: List<ExpensesTableUi> = emptyList(),
+    val searchBrieflyResults: List<BrieflyItem> = emptyList(),
+) : SearchState
+
+data class ExpensesMainListState(
+    override val isGroupMode: Boolean = true,
+    val items: List<ExpensesTableUi> = emptyList(),
+    val brieflyItems: List<BrieflyItem> = emptyList()
+) : MainList
+
+data class ExpensesDetailNomenclaturaState(
+    val detail: BrieflyItem? = null,
+    val productItems: List<ExpensesTableUi> = emptyList(),
+) : DetailNomenclatura
+
+
+data class ExpensesProductState(
+    override val product: ExpensesProduct = ExpensesProduct(),
+    override val errors: ExpensesError = ExpensesError(),
+    override val pickList: ExpensesPickList = ExpensesPickList(),
+    override val template: TemplateState = TemplateState()
+) : BaseProductState
+
+
+data class ExpensesProduct(
     val isFood: Boolean = false,
-    val itemId: Long = 0,
-    val title: String = "",
+    override val itemId: Long = 0,
+    override val title: String = "",
 
-    val count: String = "",
-    val countSuffix: Suffix = Suffix.PIECES,
+    override val count: String = "",
+    override val countSuffix: Suffix = Suffix.PIECES,
     val suffixList: List<Suffix> = suffixAllList,
 
     val weight: String = "",
@@ -63,13 +101,14 @@ data class ExpensesEntryState2(
     val isAutoWeight: Boolean = false,
     val weightSuffixList: List<Suffix> = suffixWeightList,
 
-    val price: String = "",
-    val isAutoPrice: Boolean = false,
-    val priceAll: String = "",
+    override val price: String = "",
+    override val priceAll: String = "",
+    override val isAutoPrice: Boolean = false,
+    val priceSuffix: Suffix = Suffix.RUBLE,
 
-    val category: String = "",
-    val date: String = dateToday(),
-    val note: String = "",
+    override val category: String = "",
+    override val date: String = dateToday(),
+    override val note: String = "",
 
     val isShowFood: Boolean = false,
     val feedFood: String = "",
@@ -82,19 +121,17 @@ data class ExpensesEntryState2(
 
     val isPercent: Boolean = true,
 
-    val isEntry: Boolean = true,
-    val isIndicatorsValue: Boolean = false,
+    override val isEntry: Boolean = true,
+    val hasIndicators: Boolean = false,
 
-    val itemIdPT: Long = 0,
     val suffixSet: Set<Suffix> = setOf(Suffix.GRAM, Suffix.KILOGRAM, Suffix.TONS),
-    val pickList: PickExpensesList = PickExpensesList(),
-    val error: ErrorExpenses = ErrorExpenses(),
-
     val animalId: Long? = null,
+
     val animalVaccinationId: Long? = null,
     val animalCountId: Long? = null,
-    override val hasAnyError: Boolean = false
-) : BaseProduct()
+
+    override val projectId: Long = 0,
+) : Product
 
 
 data class ExpensesTableUi(
@@ -137,12 +174,12 @@ data class Food(
     val remainingFood: Double
 )
 
-data class PickExpensesList(
-    val titleList: List<TitleAndSuffixDomain> = emptyList(),
-    val categoryList: List<String> = emptyList(),
+data class ExpensesPickList(
+    val titles: List<TitleAndSuffixDomain> = emptyList(),
+    override val categories: List<String> = emptyList(),
     val animalList2: List<AnimalExpensesUi> = emptyList(),
-    val warehouseList: List<DomainCountSuffix> = emptyList(),
-)
+    override val warehouseList: List<DomainCountSuffix> = emptyList(),
+) : BasePickList
 
 data class AnimalExpensesUi(
     val id: Long,
@@ -162,11 +199,13 @@ data class ErrorAnimalExpenses(
     val isErrorPrice: Boolean = false
 )
 
-data class ErrorExpenses(
-    val isErrorTitle: Boolean = false,
-    val isErrorSlash: Boolean = false,
-    val isErrorCount: Boolean = false,
-    val isErrorPrice: Boolean = false, override val hasAnyError: Boolean = false
-) : BaseError
+data class ExpensesError(
+    val isErrorNameTemplate: Boolean = false,
+    override val isErrorTitle: Boolean = false,
+    override val isErrorSlash: Boolean = false,
+    override val isErrorCount: Boolean = false,
+    val isErrorPrice: Boolean = false,
+    override val hasAnyError: Boolean = false
+) : ProductError
 
 

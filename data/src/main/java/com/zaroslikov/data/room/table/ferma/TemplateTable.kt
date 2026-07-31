@@ -7,6 +7,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.project.ProjectTable
+import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TemplateType
 
@@ -17,13 +18,13 @@ import com.zaroslikov.domain.models.enums.TemplateType
             entity = ProjectTable::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("idPT"),
-            onDelete = ForeignKey.Companion.CASCADE
+            onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = AnimalTable::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("animal_id"),
-            onDelete = ForeignKey.Companion.SET_NULL
+            onDelete = ForeignKey.SET_NULL
         )],
     indices = [Index("idPT"), Index("animal_id")]
 )
@@ -53,11 +54,19 @@ data class TemplateTable(
     val priceSuffix: Suffix?,
 
     val category: String?,
+    @ColumnInfo(name = "is_date")
+    val isDate: Boolean,
 
     @ColumnInfo(name = "animal_id")
     val animalId: Long?,
+    @ColumnInfo(name = "animal_name")
+    val animalName: String?,
     val buyer: String?,
     val note: String?,
+    @ColumnInfo(name = "write_off_status")
+    val writeOffStatus: Boolean?,
+    @ColumnInfo(name = "product_origin")
+    val productOrigin: ProductOrigin?,
     @ColumnInfo(name = "is_pinned")
     val isPinned: Boolean,
     @ColumnInfo(name = "is_multi_project_template")

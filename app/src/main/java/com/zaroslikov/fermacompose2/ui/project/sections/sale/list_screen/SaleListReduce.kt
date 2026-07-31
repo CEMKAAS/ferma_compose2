@@ -5,7 +5,9 @@ import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.R
-import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
+import com.zaroslikov.fermacompose2.base.intent.QrCodeIntent
+import com.zaroslikov.fermacompose2.base.intent.TemplateIntent
+import com.zaroslikov.fermacompose2.base.reduce.SectionReducer
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
@@ -20,7 +22,7 @@ import kotlin.text.lowercase
 
 class SaleListReduce(
     private val resourceProvider: ResourceProvider
-) : BaseReducer<SaleListState, SaleListIntent>() {
+) : SectionReducer<SaleListState, SaleListIntent>() {
     override fun reducer(
         state: SaleListState,
         intent: SaleListIntent
@@ -74,6 +76,7 @@ class SaleListReduce(
 
             is SaleListIntent.SuffixTemplateClicked -> state.updateSuffixTemplate(intent.value)
             is SaleListIntent.CategoryTemplateChanged -> state.updateCategoryTemplate(intent.value)
+            is SaleListIntent.DateTemplateChanged -> state.updateDateTemplate(intent.value)
             is SaleListIntent.BuyerTemplateChanged -> state.updateBuyerTemplate(intent.value)
             is SaleListIntent.NoteTemplateChanged -> state.updateNoteTemplate(intent.value)
             is SaleListIntent.MultiProjectTemplateChanged -> state.updateMultiProjectTemplate(intent.value)
@@ -82,32 +85,50 @@ class SaleListReduce(
             is SaleListIntent.OpenTemplateBottomSheetClick ->
                 state.updateOpenEntryInTemplate(intent.value, intent.toUiMap23).updateValid()
 
-            is SaleListIntent.OpenWarningQrCodeBottomSheetClick ->
+            else -> state
+        }
+    }
+
+    override fun qrReducer(
+        state: SaleListState,
+        intent: QrCodeIntent
+    ): SaleListState {
+        return when (intent) {
+            is QrCodeIntent.OpenScannerQrCodeBottomSheetClick ->
+                state.updateOpenScannerQrCode(intent.value)
+
+            is QrCodeIntent.OpenWarningQrCodeBottomSheetClick ->
                 state.updateOpenWarningQrCode(
                     intent.value,
                     intent.qrCodeWarningType,
                     intent.backupData
                 )
 
-            is SaleListIntent.OpenScannerQrCodeBottomSheetClick ->
-                state.updateOpenScannerQrCode(intent.value)
-
-            is SaleListIntent.OpenTemplateDeleteBottomSheet ->
-                state.updateOpenTemplateDeleteBottomSheet(intent.value)
-
-            is SaleListIntent.OpenPatternsBottomSheetClick ->
-                state.updateOpenPatternBottomSheet(intent.value)
-
-            is SaleListIntent.LoadDataForTemplate ->
-                state.updateLoadDataForTemplate(intent.value)
-
-            is SaleListIntent.OpenQrCodeBottomSheetClick ->
+            is QrCodeIntent.OpenQrCodeBottomSheetClick ->
                 state.updateOpenQrCodeBottomSheet(intent.value, intent.qrCode)
-
 
             else -> state
         }
     }
+
+    override fun templateReducer(
+        state: SaleListState,
+        intent: TemplateIntent
+    ): SaleListState {
+        return when (intent) {
+            is TemplateIntent.OpenTemplateDeleteBottomSheet ->
+                state.updateOpenTemplateDeleteBottomSheet(intent.value)
+
+            is TemplateIntent.OpenPatternsBottomSheetClick ->
+                state.updateOpenPatternBottomSheet(intent.value)
+
+            is TemplateIntent.LoadDataForTemplate ->
+                state.updateLoadDataForTemplate(intent.value)
+
+            else -> state
+        }
+    }
+
 
     private fun SaleListState.updateOpenBottomSheetDetail(
         id: Long?
@@ -398,10 +419,6 @@ class SaleListReduce(
     private fun SaleListState.updateTitleTemplate(isTitle: Boolean): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    title = if (isTitle) "" else currentProduct.product.title,
-                    productOrigin = null
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isTitle = isTitle
@@ -414,9 +431,6 @@ class SaleListReduce(
     private fun SaleListState.updateCountTemplate(isCount: Boolean): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    title = if (isCount) "" else currentProduct.product.count,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isCount = isCount
@@ -425,12 +439,10 @@ class SaleListReduce(
             )
         )
     }
+
     private fun SaleListState.updatePriceTemplate(isPrice: Boolean): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    price = if (isPrice) "" else currentProduct.product.price,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isPrice = isPrice
@@ -443,9 +455,6 @@ class SaleListReduce(
     private fun SaleListState.updateSuffixTemplate(isSuffix: Boolean): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    countSuffix = if (isSuffix) Suffix.NO else currentProduct.product.countSuffix,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isSuffix = isSuffix
@@ -458,9 +467,6 @@ class SaleListReduce(
     private fun SaleListState.updateCategoryTemplate(isCategory: Boolean): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    category = if (isCategory) "" else currentProduct.product.category,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isCategory = isCategory
@@ -470,12 +476,21 @@ class SaleListReduce(
         )
     }
 
+    private fun SaleListState.updateDateTemplate(isDate: Boolean): SaleListState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                template = currentProduct.template.copy(
+                    activeField = currentProduct.template.activeField.copy(
+                        isDate = isDate
+                    )
+                )
+            )
+        )
+    }
+
     private fun SaleListState.updateBuyerTemplate(isBuyer: Boolean): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    buyer = if (isBuyer) "" else currentProduct.product.buyer,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isBuyer = isBuyer
@@ -488,9 +503,6 @@ class SaleListReduce(
     private fun SaleListState.updateNoteTemplate(isNote: Boolean): SaleListState {
         return copy(
             currentProduct = currentProduct.copy(
-                product = currentProduct.product.copy(
-                    note = if (isNote) "" else currentProduct.product.note,
-                ),
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
                         isNote = isNote
@@ -505,7 +517,6 @@ class SaleListReduce(
             currentProduct = currentProduct.copy(
                 template = currentProduct.template.copy(
                     activeField = currentProduct.template.activeField.copy(
-                        isAnimal = true,
                         isMultiProjectTemplate = isMultiProjectTemplate
                     )
                 )
@@ -599,6 +610,4 @@ class SaleListReduce(
             qrCodeState = qrCodeState,
         )
     }
-
-
 }

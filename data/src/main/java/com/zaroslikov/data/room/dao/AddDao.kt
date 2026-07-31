@@ -114,11 +114,12 @@ interface AddDao {
         "SELECT title," +
                 " count_suffix AS suffix" +
                 " FROM add_table" +
-                " WHERE idPT=:id" +
+                " WHERE idPT=:id and " +
+                " ((:onlyWithoutAnimal = 1 AND animal_count_id IS NULL) OR (:onlyWithoutAnimal = 0))" +
                 " GROUP BY title" +
                 " ORDER BY MAX(_id) DESC"
     )
-    fun getItemsTitleAddList(id: Long): Flow<List<TitleAndSuffixDto>>
+    fun getItemsTitleAddList(id: Long, onlyWithoutAnimal: Boolean): Flow<List<TitleAndSuffixDto>>
 
     @Query(
         "SELECT category FROM add_table" +

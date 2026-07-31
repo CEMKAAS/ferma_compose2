@@ -6,7 +6,7 @@ import com.zaroslikov.fermacompose2.ui.incubator_project.finance.FinanceIncubato
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.incubator_project.journal.JournalDestination
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
-import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.workspace.HomeDestination
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
 
 fun Destination.toNav(itemPT: Long): String {

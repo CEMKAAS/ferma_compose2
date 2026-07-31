@@ -16,8 +16,8 @@ import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisP
 import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceCategoryScreen2
 import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceIncomeExpensesDestination
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.HomeDestination
-import com.zaroslikov.fermacompose2.ui.project.sections.SectionWorkspaceScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.workspace.HomeDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.workspace.SectionWorkspaceScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalEditDestination
@@ -135,7 +135,7 @@ fun ProjectNavHost(
             FinanceAnalysisProduct(navigateBack = { navController.popBackStack() })
         }
 
-        // Add
+        // Section
         composable(
             route = HomeDestination.routeWithArgs,
             arguments = listOf(

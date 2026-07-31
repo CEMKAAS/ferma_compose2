@@ -1,7 +1,6 @@
 package com.zaroslikov.domain.repository
 
 import com.zaroslikov.domain.models.DomainAddTable
-import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.dto.add.BrieflyAddDomain
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto2
@@ -11,8 +10,6 @@ import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.finance.DomainAnimalWitchCountAndImage
 import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
-import com.zaroslikov.domain.models.dto.shared.DomainCountSuffixDate
-import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import kotlinx.coroutines.flow.Flow
 
 interface AddRepository {
@@ -23,7 +20,7 @@ interface AddRepository {
     fun getAllItems(id: Long): Flow<List<DomainAddItemDto2>>
     fun getBrieflyItemAdd(id: Long): Flow<List<BrieflyAddDomain>>
     fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<DomainAddItemDto2>>
-    fun getItemsTitleAddList(id: Long): Flow<List<TitleAndSuffixDomain>>
+    fun getItemsTitleAddList(id: Long, onlyWithoutAnimal: Boolean): Flow<List<TitleAndSuffixDomain>>
     fun getItemsCategoryAddList(id: Long): Flow<List<String>>
     fun getAnimalById(id: Long): Flow<String>
 

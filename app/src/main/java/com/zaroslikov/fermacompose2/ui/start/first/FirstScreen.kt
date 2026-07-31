@@ -80,7 +80,7 @@ import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.DrawerSheetNew
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
@@ -99,8 +99,8 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
-import com.zaroslikov.fermacompose2.ui.project.sections.EmptyState
-import com.zaroslikov.fermacompose2.ui.project.sections.InventoryBody
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EmptyState
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.InventoryBody
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 
@@ -249,6 +249,7 @@ fun FirstScreen(
                             },
                             onNavigationProject = { navigateToItemProject(it to false) },
                             onNavigationIncubator = { navigateToItemIncubator(it) })
+
                     if (showBottomSheet)
                         ChoiceProjectBottomSheet(
                             onDismissRequest = { showBottomSheet = false },

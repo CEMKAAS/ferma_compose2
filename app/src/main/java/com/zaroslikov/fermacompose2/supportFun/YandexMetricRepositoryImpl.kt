@@ -11,9 +11,9 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size.C
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vaccination.Vaccination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.CurrentAnimalWeight
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalEntryState2
-import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesEntryState2
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleProductState
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffEntryState2
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffProduct
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -105,7 +105,7 @@ class YandexMetricRepositoryImpl @Inject constructor(
     }
 
     override fun metricalExpenses(
-        domainExpensesTable: ExpensesEntryState2
+        domainExpensesTable: ExpensesProduct
     ) {
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["Имя"] = domainExpensesTable.title
@@ -115,7 +115,7 @@ class YandexMetricRepositoryImpl @Inject constructor(
         AppMetrica.reportEvent("Покупка продукции", eventParameters)
     }
 
-    override fun metricalWriteOff(currentProduct: WriteOffEntryState2) {
+    override fun metricalWriteOff(currentProduct: WriteOffProduct) {
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["Имя"] = currentProduct.title
         eventParameters["Статус"] =

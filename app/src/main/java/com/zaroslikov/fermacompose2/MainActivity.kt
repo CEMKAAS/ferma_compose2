@@ -28,11 +28,9 @@ import com.yandex.mobile.ads.common.AdError
 import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.compose.rememberAppOpenAdLoader
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgressWitchText
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgressWitchText
 import com.zaroslikov.fermacompose2.ui.theme.FermaCompose2Theme
-import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

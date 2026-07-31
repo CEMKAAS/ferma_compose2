@@ -40,8 +40,8 @@ import com.zaroslikov.fermacompose2.violet_1
 @Composable
 fun DropdownMenuEdit(
     color: Color = grey_3,
-    onPinnedClick:(() -> Unit)? = null,
-    onUnpinnedClick:(() -> Unit)? = null,
+    onPinnedClick: (() -> Unit)? = null,
+    onUnpinnedClick: (() -> Unit)? = null,
     onActiveClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     onArchiveClick: (() -> Unit)? = null,
@@ -281,7 +281,8 @@ fun ExposedDropdownMenuStatusWriteOff(
 ) {
     BaseExposedDropdownMenu(
         list = statusList,
-        content = content
+        content = content,
+        enabled = enableDropMenu
     ) { index, item, closeMenu ->
         val trailingIcon: @Composable (() -> Unit)? = if (item.third == status) {
             { IconDone() }

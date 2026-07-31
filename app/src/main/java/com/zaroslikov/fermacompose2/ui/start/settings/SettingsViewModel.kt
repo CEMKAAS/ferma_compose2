@@ -28,6 +28,7 @@ import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
+import com.zaroslikov.domain.repository.template.TemplateRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
@@ -43,6 +44,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,6 +60,8 @@ class SettingsViewModel @Inject constructor(
     private val writeOffRepository: WriteOffRepository,
     private val expensesRepository: ExpensesRepository,
     private val noteRepository: NoteRepository,
+
+    private val templateRepository: TemplateRepository,
 
     private val expensesAnimalRepository: ExpensesAnimalRepository,
 
@@ -111,7 +115,8 @@ class SettingsViewModel @Inject constructor(
                         domainAppSettings = DomainAppSettings(
                             lastVersionApp = BuildConfig.VERSION_NAME,
                             currentVersionApp = BuildConfig.VERSION_NAME,
-                            isFirstLaunch = false
+                            isFirstLaunch = false,
+                            deviceId = UUID.randomUUID().toString()
                         )
                     )
                     profileRepository.createProfile(
@@ -157,6 +162,8 @@ class SettingsViewModel @Inject constructor(
             val expensesTable = expensesRepository.getAllExpensesTableForExport().first()
             val noteTable = noteRepository.getAllNoteTableForExport().first()
 
+            val templateTable = templateRepository.getAllAddTemplateTableForExport().first()
+
             val expensesAnimalTable =
                 expensesAnimalRepository.getAllExpensesAnimalTableForExport().first()
 
@@ -199,6 +206,7 @@ class SettingsViewModel @Inject constructor(
                 expensesTable = expensesTable,
                 expensesAnimal = expensesAnimalTable,
                 noteTable = noteTable,
+                templateTable = templateTable,
                 animalTable = animalTable.map { project ->
                     val base64 = project.imagePath?.let { path ->
                         val file = File(path)
@@ -273,6 +281,7 @@ class SettingsViewModel @Inject constructor(
                 noteRepository.clearAndInsertNoteTableForImport(backup.noteTable)
                 expensesAnimalRepository.clearAndInsertExpensesAnimalTableForImport(backup.expensesAnimal)
 
+                templateRepository.clearAndInsertAddTemplateTableForImport(backup.templateTable)
 
                 animalCountRepository.clearAndInsertAnimalCountTableForImport(backup.animalCountTable)
                 animalWeightRepository.clearAndInsertAnimalWeightTableForImport(backup.animalWeightTable)
@@ -292,7 +301,7 @@ class SettingsViewModel @Inject constructor(
                 appSettingsRepository.clearAndInsertAppSettingsTableForImport(backup.appSettingsTable)
                 launchNotification()
                 showMessage("Импорт прошел успешно")
-                AppMetrica.reportEvent("Ипорт базы данных")
+                AppMetrica.reportEvent("Импорт базы данных")
                 return@launch
             } catch (e: Exception) {
                 showMessage("Ошибка при импорте базы данных")

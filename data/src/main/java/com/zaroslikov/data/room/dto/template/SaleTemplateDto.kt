@@ -15,6 +15,8 @@ data class SaleTemplateDto(
     val price: Double? = 0.0,
     @ColumnInfo(name = "price_all")
     val priceAll: Double? = null,
+    @ColumnInfo(name = "price_suffix")
+    val priceSuffix: Suffix? = null,
     val category: String?,
     val buyer: String? = null,
     val note: String? = "",

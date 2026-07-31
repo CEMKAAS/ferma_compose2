@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.elements.bottomSheet
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Canvas
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -28,6 +29,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +72,15 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButtonWitchAnimate
 import kotlinx.coroutines.launch
 import androidx.core.graphics.createBitmap
+import com.yandex.mobile.ads.common.AdError
+import com.yandex.mobile.ads.common.AdRequest
+import com.yandex.mobile.ads.common.ImpressionData
+import com.yandex.mobile.ads.compose.RewardedAdLoaderState
+import com.yandex.mobile.ads.compose.rememberRewardedAdLoader
+import com.yandex.mobile.ads.rewarded.Reward
+import com.yandex.mobile.ads.rewarded.RewardedAd
+import com.yandex.mobile.ads.rewarded.RewardedAdEventListener
+import com.yandex.mobile.ads.rewarded.RewardedAdLoadResult
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.orang_16
@@ -77,28 +88,39 @@ import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.orang_8
-import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.toastShort
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.card.InfoPatternCard
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
 import com.zaroslikov.fermacompose2.white
 import io.appmetrica.analytics.AppMetrica
 
+
 //TODO Сократить
 @Composable
-fun QrCodeBottomSheet(
+fun QrCodeCreateBottomSheet(
     colors: List<Color>,
     qrCodeData: QrCodeData?,
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
+    val activity = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var currentTitleLocation by rememberSaveable { mutableStateOf(TitleLocation.NO) }
     var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     val miniGraphicsLayer = rememberGraphicsLayer()
     val standardGraphicsLayer = rememberGraphicsLayer()
     val fullGraphicsLayer = rememberGraphicsLayer()
+    val text = stringResource(R.string.yandex_rewarded_ads)
+
+    // Состояния для рекламы
+    var rewardedAd by remember { mutableStateOf<RewardedAd?>(null) }
+    var isAdReady by remember { mutableStateOf(false) }
+    var isAdLoading by remember { mutableStateOf(false) }
+    var showAdTrigger by remember { mutableStateOf(false) } // Триггер для показа рекламы
+
+    val loader = rememberRewardedAdLoader()
 
     val pages = QrCodeType.entries
     val pagerState = rememberPagerState(
@@ -117,6 +139,83 @@ fun QrCodeBottomSheet(
         }
     }
 
+    // Загрузка рекламы при старте
+    LaunchedEffect(Unit) {
+        isAdLoading = true
+        loadNewAd(
+            text, loader
+        ) { ad ->
+            rewardedAd = ad
+            isAdReady = true
+            isAdLoading = false
+        }
+    }
+
+    // Показ рекламы при активации триггера
+    LaunchedEffect(showAdTrigger) {
+        if (showAdTrigger && rewardedAd != null && isAdReady) {
+            rewardedAd?.apply {
+                setAdEventListener(object : RewardedAdEventListener {
+                    override fun onAdShown() {
+                        // Реклама показана
+                    }
+
+                    override fun onAdFailedToShow(adError: AdError) {
+                        coroutineScope.launch {
+                            loadNewAd(text, loader) { ad ->
+                                rewardedAd = ad
+                                isAdReady = true
+                                isAdLoading = false
+                            }
+                        }
+
+                    }
+
+                    override fun onAdDismissed() {
+                        // Реклама закрыта - загружаем новую для следующих показов
+                        isAdReady = false
+                        isAdLoading = true
+                        coroutineScope.launch {
+                            loadNewAd(text, loader) { ad ->
+                                rewardedAd = ad
+                                isAdReady = true
+                                isAdLoading = false
+                            }
+                        }
+                        // Сбрасываем триггер
+                        showAdTrigger = false
+                    }
+
+                    override fun onAdClicked() {
+                        // Клик по рекламе
+                    }
+
+                    override fun onAdImpression(impressionData: ImpressionData?) {
+                        // Импрессия зафиксирована
+                    }
+
+                    override fun onRewarded(reward: Reward) {
+                        // Награда получена - создаем QR код
+                        coroutineScope.launch {
+                            val currentQrCodeType =
+                                QrCodeType.entries.first { it.ordinal == pagerState.currentPage }
+                            bitmap =
+                                when (currentQrCodeType) {
+                                    QrCodeType.MINI -> miniGraphicsLayer.toImageBitmap()
+                                    QrCodeType.STANDARD -> standardGraphicsLayer.toImageBitmap()
+                                    QrCodeType.FULL -> fullGraphicsLayer.toImageBitmap()
+                                }.addPadding(context, 20)
+                            launcher.launch("qr_code_${qrCodeData?.template?.nameTemplate}.png")
+                            yandexMetric(currentQrCodeType, currentTitleLocation)
+                        }
+                    }
+                })
+                // Показываем рекламу
+                show(activity as Activity)
+            }
+        }
+    }
+
     BaseBottomSheet(
         title = stringResource(R.string.template_qr_code_bottom_sheet_title),
         onDismissRequest = onDismissRequest,
@@ -125,17 +224,14 @@ fun QrCodeBottomSheet(
                 colors = colors,
                 onDismissRequest = onDismissRequest,
                 onCreateQrCodeClick = {
-                    coroutineScope.launch {
-                        val currentQrCodeType =
-                            QrCodeType.entries.first { it.ordinal == pagerState.currentPage }
-                        bitmap =
-                            when (currentQrCodeType) {
-                                QrCodeType.MINI -> miniGraphicsLayer.toImageBitmap()
-                                QrCodeType.STANDARD -> standardGraphicsLayer.toImageBitmap()
-                                QrCodeType.FULL -> fullGraphicsLayer.toImageBitmap()
-                            }.addPadding(context, 20)
-                        launcher.launch("qr_code_${qrCodeData?.template?.nameTemplate}.png")
-                        yandexMetric(currentQrCodeType, currentTitleLocation)
+                    // Показываем рекламу перед созданием QR кода
+                    if (isAdReady && rewardedAd != null) {
+                        // Реклама готова - показываем
+                        showAdTrigger = true
+                    } else if (isAdLoading) {
+                        toastShort(context, "Загрузка")
+                    } else {
+                        toastShort(context, "Отсутсвует подключение к интернету")
                     }
                 }
             )
@@ -166,12 +262,13 @@ fun QrCodeBottomSheet(
                                 }
                                 drawLayer(miniGraphicsLayer)
                             },
+                            color = colors.first(),
                             title = qrCodeData?.template?.nameTemplate ?: "",
-                            isMultiProjectTemplate = qrCodeData?.template?.isMultiProjectTemplate
-                                ?: false,
                             bitmap = qrCodeData?.qrCodeWithLogoBitmap,
                             currentTitleLocation = currentTitleLocation,
-                            onClick = { currentTitleLocation = it }
+                            isMultiProjectTemplate = qrCodeData?.template?.isMultiProjectTemplate
+                                ?: false,
+                            onClick = { currentTitleLocation = it },
                         )
 
                     QrCodeType.STANDARD -> StandardQrCodeCard(
@@ -221,9 +318,13 @@ private fun FullQrCodeCard(
                 count = first.count?.formatNumber(),
                 countSuffix = first.countSuffix,
                 category = first.category,
-                note = first.note,
+                note = first.note?.ifBlank { null },
                 buyer = first.buyer,
-                animalName = "Имя животного", //TODO нужно добавить имя животного
+                animalName = first.animalName?.ifBlank { null },
+                price = first.price?.takeIf { it != 0.0 }?.formatNumber(),
+                priceAll = first.priceAll?.takeIf { it != 0.0 }?.formatNumber(),
+                priceSuffix = first.priceSuffix,
+                writeOffStatus = first.writeOffStatus
             )
     }
 }
@@ -290,6 +391,7 @@ private fun MiniQrCodeCard(
     modifier: Modifier = Modifier,
     title: String,
     bitmap: Bitmap?,
+    color: Color,
     currentTitleLocation: TitleLocation,
     isMultiProjectTemplate: Boolean,
     onClick: (TitleLocation) -> Unit
@@ -299,6 +401,7 @@ private fun MiniQrCodeCard(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         GroupButton(
+            color = color,
             currentTitleLocation
         ) { onClick(it) }
         BaseQrCodeCard(
@@ -436,6 +539,7 @@ private fun TabsWhichSlider(
 
 @Composable
 private fun GroupButton(
+    color: Color,
     currentTitleLocation: TitleLocation,
     onClick: (TitleLocation) -> Unit
 ) {
@@ -446,7 +550,7 @@ private fun GroupButton(
     ) {
         TitleLocation.entries.forEach { titleLocation ->
             val (containerColor, borderColor, textButton) =
-                if (currentTitleLocation == titleLocation) Triple(price_green, price_green, white)
+                if (currentTitleLocation == titleLocation) Triple(color, color, white)
                 else Triple(white, grey_2, gray_7)
 
             BorderCard(
@@ -512,6 +616,18 @@ private fun NameTemplateText(
                     .size(24.dp)
                     .padding(start = 4.dp)
             )
+    }
+}
+
+private suspend fun loadNewAd(
+    text: String,
+    loader: RewardedAdLoaderState,
+    onResult: (RewardedAd?) -> Unit
+) {
+    val adRequest = AdRequest.Builder(text).build()
+    when (val result = loader.loadAd(adRequest)) {
+        is RewardedAdLoadResult.Success -> onResult(result.ad)
+        is RewardedAdLoadResult.Failure -> onResult(null)
     }
 }
 

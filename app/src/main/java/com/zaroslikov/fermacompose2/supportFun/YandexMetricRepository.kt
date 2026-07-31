@@ -9,9 +9,9 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size.C
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vaccination.Vaccination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.CurrentAnimalWeight
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalEntryState2
-import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesEntryState2
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleProductState
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffEntryState2
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffProduct
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
 
@@ -23,8 +23,8 @@ interface YandexMetricRepository {
     fun metricalWriteOffFood(state: FoodListUi)
     fun metricAdd(domainAddTable: AddProductState)
     fun metricSale(domainSaleTable: SaleProductState)
-    fun metricalExpenses(domainExpensesTable: ExpensesEntryState2)
-    fun metricalWriteOff(currentProduct: WriteOffEntryState2)
+    fun metricalExpenses(domainExpensesTable: ExpensesProduct)
+    fun metricalWriteOff(currentProduct: WriteOffProduct)
     fun metricalTemplate(currentProduct: AddProductState)
     fun metricalAnimalVaccination(state: Vaccination)
     fun metricalNote(title: String)

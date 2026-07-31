@@ -12,6 +12,7 @@ fun SaleTemplateDto.toDomainSaleTemplateDto(): DomainSaleTemplateDto {
         countSuffix = countSuffix,
         price = price,
         priceAll = priceAll,
+        priceSuffix = priceSuffix,
         category = category,
         buyer = buyer,
         note = note,

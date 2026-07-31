@@ -2,6 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.elements.TextField
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -169,7 +170,7 @@ fun OutlinedTextNoteNew(
     val textField: @Composable () -> Unit = {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             BaseOutlinedTextNew(
-                value = value,
+                value = if (checked) stringResource(R.string.is_empty_2) else value,
                 onValueChange = { onValueChange(it) },
                 leadingIconRes = leadingIconRes,
                 labelIntRes = labelIntRes,
@@ -411,7 +412,7 @@ fun OutlinedTextAnimalNew(
             ) {
                 BaseOutlinedTextNew(
                     modifier = it.first,
-                    value = value,
+                    value = if (checked) stringResource(R.string.is_empty_2) else value,
                     onValueChange = {},
                     onClear = {
                         onClickClear("")
@@ -478,7 +479,7 @@ fun OutlinedTextTitleAddNew(
                 BaseOutlinedTextNew(
                     modifier = it.first,
                     isNecessarily = isNecessarily,
-                    value = value,
+                    value = if (checked) stringResource(R.string.is_empty_2) else value,
                     onValueChange = { onValueChange(it) },
                     onClear = { onValueChange("") },
                     leadingIconRes = drawableRes,
@@ -520,7 +521,9 @@ fun OutlinedTextDateNew(
     isLimit: Boolean = true,
     isNecessarily: Boolean = false,
     isBorderCard: Boolean = true,
-    minDate: String? = null
+    minDate: String? = null,
+    focusRequester: FocusRequester? = null,
+    fontSize: TextUnit = 16.sp,
 ) {
     val dateList = value.split(".")
     val date =
@@ -555,6 +558,8 @@ fun OutlinedTextDateNew(
             labelIntRes = intRes,
             intResSup = intResSup,
             leadingIconRes = drawableRes,
+            fontSize = fontSize,
+            focusRequester = focusRequester
         )
     }
     if (isBorderCard) BorderCard(
@@ -629,7 +634,7 @@ fun OutlinedTextCategoryNew(
             ) {
                 BaseOutlinedTextNew(
                     modifier = it.first,
-                    value = value,
+                    value = if (checked) stringResource(R.string.is_empty_2) else value,
                     onValueChange = { onValueChange(it) },
                     onClear = { onValueChange("") },
                     leadingIconRes = R.drawable.baseline_format_list_bulleted_24,
@@ -810,7 +815,9 @@ fun OutlinedTextCountNew(
     isShowSwitchForSuffix: Boolean = false,
     checkedForValue: Boolean = false,
     onCheckedForValueChange: (Boolean) -> Unit = {},
+
     checkedForSuffix: Boolean = false,
+    enabledCheckedForSuffix: Boolean = true,
     onCheckedForSuffixChange: (Boolean) -> Unit = {},
     @StringRes switchTextRes: Int = R.string.support_text_enter_when_applying,
     focusRequester: FocusRequester? = null,
@@ -828,7 +835,7 @@ fun OutlinedTextCountNew(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     BaseOutlinedTextNew(
-                        value = value,
+                        value = if (checkedForValue) stringResource(R.string.is_empty_2) else value,
                         onValueChange = onValueChange,
                         isError = isError,
                         leadingIconRes = drawableRes,
@@ -864,11 +871,12 @@ fun OutlinedTextCountNew(
                             }
                         },
                         suffixList = suffixList,
-                        enableDropMenu = enabled,
+                        enableDropMenu = enabled && !checkedForSuffix,
                         content = {
                             BaseOutlinedTextNew(
                                 modifier = it.first,
-                                value = stringResource(suffix.toResId()),
+                                value = if (checkedForSuffix) stringResource(R.string.is_empty_2)
+                                else stringResource(suffix.toResId()),
                                 onValueChange = {},
                                 leadingIconRes = R.drawable.baseline_edit_document_24,
                                 labelIntRes = R.string.outlined_text_suffix,
@@ -886,6 +894,7 @@ fun OutlinedTextCountNew(
                         SwitchWitchText(
                             checked = checkedForSuffix,
                             onCheckedChange = onCheckedForSuffixChange,
+                            enabled = enabledCheckedForSuffix,
                             intRes = switchTextRes
                         )
                 }
@@ -1052,6 +1061,7 @@ fun OutlinedPriceInputNew(
     onCheckedChange: (Boolean) -> Unit = {},
     @StringRes switchTextRes: Int = R.string.support_text_enter_when_applying,
     fontSize: TextUnit = 16.sp,
+    focusRequester: FocusRequester? = null,
 ) {
     val target = when {
         isAutoCalculate -> 4.dp
@@ -1069,7 +1079,7 @@ fun OutlinedPriceInputNew(
     val textField: @Composable () -> Unit = {
         Column {
             BaseOutlinedTextNew(
-                value = price,
+                value = if (checked) stringResource(R.string.is_empty_2) else price,
                 onValueChange = { onPriceChange(it) },
                 labelIntRes = R.string.outlined_text_price,
                 intResSup = if (checked) R.string.is_empty_2 else supportText,
@@ -1077,10 +1087,12 @@ fun OutlinedPriceInputNew(
                 isError = isError,
                 suffix = priceSuffix,
                 isNecessarily = isNecessarily,
+                enabled = !checked,
                 modifier = Modifier
                     .padding(bottom = animatedPadding.coerceAtLeast(0.dp)),
                 leadingIconRes = leadingIconRes,
-                keyboardOptions = keyboardOptionsNextNumber(), fontSize = fontSize
+                keyboardOptions = keyboardOptionsNextNumber(), fontSize = fontSize,
+                focusRequester = focusRequester
             )
             if (!checked)
                 AnimatedVisibility(
@@ -1128,7 +1140,15 @@ fun OutlinedCountInputNew(
     weightAll: String,
     weightAllSuffix: Suffix,
     enabledWeightSuffix: Boolean = true,
-    isBorderCard: Boolean = true
+    isBorderCard: Boolean = true,
+
+    isShowSwitchForValue: Boolean = false,
+    isShowSwitchForSuffix: Boolean = false,
+    checkedForValue: Boolean = false,
+    onCheckedForValueChange: (Boolean) -> Unit = {},
+    checkedForSuffix: Boolean = false,
+    onCheckedForSuffixChange: (Boolean) -> Unit = {},
+    @StringRes switchTextRes: Int = R.string.support_text_enter_when_applying,
 ) {
     val target = when {
         isAutoCalculate -> 4.dp
@@ -1153,6 +1173,14 @@ fun OutlinedCountInputNew(
                 isError = isError,
                 enabled = enabled,
                 isBorderCard = false,
+                isNecessarily = !checkedForValue,
+                isShowSwitchForValue = isShowSwitchForValue,
+                isShowSwitchForSuffix = isShowSwitchForSuffix,
+                checkedForValue = checkedForValue,
+                onCheckedForValueChange = onCheckedForValueChange,
+                checkedForSuffix = checkedForSuffix,
+                onCheckedForSuffixChange = onCheckedForSuffixChange,
+                switchTextRes = switchTextRes
             )
             AnimatedVisibility(
                 modifier = Modifier.fillMaxWidth(),
@@ -1375,9 +1403,10 @@ fun OutlinedTextTitleSaleNew(
     isNecessarily: Boolean = true,
     isShowSwitch: Boolean = false,
     checked: Boolean = false,
+    enabledChecked: Boolean = true,
     onCheckedChange: (Boolean) -> Unit = {},
     @StringRes switchTextRes: Int = R.string.support_text_enter_when_applying,
-    fontSize: TextUnit = 16.sp,
+    fontSize: TextUnit = 16.sp, focusRequester: FocusRequester? = null,
 ) {
     val focusManager = LocalFocusManager.current
     var category by rememberSaveable { mutableStateOf(productOrigin) }
@@ -1398,13 +1427,13 @@ fun OutlinedTextTitleSaleNew(
             enableDropMenu = enabled && !checked,
             content = {
                 BaseOutlinedTextNew(
-                    value = value,
+                    value = if (checked) stringResource(R.string.is_empty_2) else value,
                     onValueChange = { text -> onValueChange(text) },
                     onClear = {
                         onValueChange("")
                         category = null
                     },
-                    leadingIconRes2 = category?.toDrawRes(),
+                    leadingIconRes2 = if (checked) null else category?.toDrawRes(),
                     leadingIconColor2 = category?.toColorList() ?: ProductOrigin.ADD.toColorList(),
                     labelIntRes = R.string.outlined_text_product,
                     isError = isErrorTitle, isErrorSlash = isErrorSlash,
@@ -1416,6 +1445,7 @@ fun OutlinedTextTitleSaleNew(
                     modifier = it.first,
                     isMore = isMore,
                     isNecessarily = isNecessarily,
+                    focusRequester = focusRequester,
                     keyboardOptions = keyboardOptionsNext(), fontSize = fontSize
                 )
             },
@@ -1425,8 +1455,8 @@ fun OutlinedTextTitleSaleNew(
                 checked = checked,
                 onCheckedChange = {
                     onCheckedChange(it)
-                    category = null
                 },
+                enabled = enabledChecked,
                 intRes = switchTextRes
             )
     }
@@ -1435,7 +1465,12 @@ fun OutlinedTextTitleSaleNew(
 @Composable
 fun OutlinedWriteOffStatus(
     value: Boolean,
-    onValueChange: (Boolean) -> Unit = {}
+    onValueChange: (Boolean) -> Unit = {},
+    isShowSwitch: Boolean = false,
+    checked: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit = {},
+    focusRequester: FocusRequester? = null,
+    fontSize: TextUnit = 16.sp,
 ) {
     val focusManager = LocalFocusManager.current
     var selectedItemIndex by remember { mutableIntStateOf(if (value) 0 else 1) }
@@ -1451,21 +1486,32 @@ fun OutlinedWriteOffStatus(
                 selectedItemIndex = it.second
                 focusManager.moveFocus(FocusDirection.Down)
             },
+            enableDropMenu = !checked,
             statusList = statusList
         ) {
             BaseOutlinedTextNew(
-                value = stringResource(statusList[selectedItemIndex].second),
+                value = if (checked) stringResource(R.string.is_empty_2) else stringResource(
+                    statusList[selectedItemIndex].second
+                ),
                 onValueChange = { },
-                leadingIconRes2 = statusList[selectedItemIndex].first,
+                leadingIconRes2 = if (checked) null else statusList[selectedItemIndex].first,
                 leadingIconColor2 = if (selectedItemIndex == 0) violet_1 else error_base,
                 labelIntRes = R.string.outlined_text_status_write_off,
-                intResSup = R.string.support_text_product,
+                intResSup = if (checked) R.string.is_empty_2 else R.string.support_text_product,
                 readOnly = true,
                 modifier = it.first,
                 isMore = true,
-                keyboardOptions = keyboardOptionsNext()
+                keyboardOptions = keyboardOptionsNext(),
+                fontSize = fontSize,
+                enabled = !checked,
+                focusRequester = focusRequester
             )
         }
+        if (isShowSwitch)
+            SwitchWitchText(
+                checked = checked,
+                onCheckedChange = onCheckedChange
+            )
     }
 }
 
@@ -1527,7 +1573,7 @@ fun OutlinedTextBuyerNew(
             enableDropMenu = !checked,
         ) {
             BaseOutlinedTextNew(
-                value = value,
+                value = if (checked) stringResource(R.string.is_empty_2) else value,
                 onValueChange = { onValueChange(it) },
                 onClear = { onValueChange("") },
                 labelIntRes = R.string.outlined_text_buyer,

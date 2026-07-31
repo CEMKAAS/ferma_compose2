@@ -49,7 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogBase
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgressWitchText
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgressWitchText
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
 import com.zaroslikov.fermacompose2.utils.SnackbarController

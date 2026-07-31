@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.base.intent.TemplateIntent
 import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.blue_1
@@ -80,7 +82,10 @@ import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_18
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedSwitch
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTemplate
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.WarningCard2
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.GroupCard
 import com.zaroslikov.fermacompose2.violet_1
@@ -89,131 +94,179 @@ import com.zaroslikov.fermacompose2.white
 @Composable
 fun ExpensesEntryBottomSheet(
     colors: List<Color>,
-    priceSuffix: Suffix,
-    state: ExpensesEntryState2,
-    onIntent: (ExpensesListIntent) -> Unit
+    state: ExpensesProductState,
+    onIntent: (ExpensesListIntent) -> Unit,
+    onTemplateIntent: (TemplateIntent) -> Unit
 ) {
+    val product = state.product
+    val errors = state.errors
+    val isTemplate = state.template.isTemplate
+    val template = state.template.activeField
+
     val titleEdit =
-        if (state.isIndicatorsValue) R.string.expenses_screen_title_edit_animal else R.string.expenses_screen_title_edit
+        if (state.product.hasIndicators) R.string.expenses_screen_title_edit_animal else R.string.expenses_screen_title_edit
     EntryBottomSheet(
-        titleEntryRes = R.string.expenses_screen_title_entry,
-        titleEditRes = titleEdit,
-        isEntry = state.isEntry,
-        enabledButton = state.hasAnyError,
+        titleEntryRes = if (isTemplate) R.string.template_title_entry else R.string.expenses_screen_title_entry,
+        titleEditRes = if (isTemplate) R.string.template_title_edit else titleEdit,
+        isEntry = product.isEntry,
+        enabledButton = state.errors.hasAnyError,
         colors = colors,
         onDismissRequest = {
             onIntent(
                 ExpensesListIntent.OpenEntryBottomSheetByItem(
-                    value = false,
-                    isSaveStateForBottomSheet = state.isEntry
+                    isOpen = false,
+                    isSaveStateForBottomSheet = product.isEntry
                 )
             )
         },
         onSecondDismissRequest = {
             onIntent(ExpensesListIntent.OpenEntryBottomSheetByItem(false))
         },
-        onInsertClick = { onIntent(ExpensesListIntent.Insert) },
-        onUpdateClick = { onIntent(ExpensesListIntent.Update) }
+        onInsertClick = {
+            Log.i("expenses_template", "insert-isTemplate $isTemplate ")
+            if (isTemplate) onTemplateIntent(TemplateIntent.InsertTemplate)
+            else onIntent(ExpensesListIntent.Insert)
+        },
+        onUpdateClick = {
+            if (isTemplate) onTemplateIntent(TemplateIntent.UpdateTemplate)
+            else onIntent(ExpensesListIntent.Update)
+        }
     ) {
-        if (state.pickList.animalList2.isNotEmpty() && !state.isIndicatorsValue)
+        if (!product.isEntry && isTemplate)
+            WarningCard2()
+        if (isTemplate)
+            OutlinedTextTemplate(
+                value = state.template.name,
+                onValueChange = { onIntent(ExpensesListIntent.NameTemplateChanged(it)) },
+                isError = errors.isErrorNameTemplate,
+            )
+        if (state.pickList.animalList2.isNotEmpty() && !product.hasIndicators && isTemplate)
             GroupCard(
                 titleRes = R.string.expenses_screen_type_expenses,
                 iconOneRes = R.drawable.icon_expenses,
                 iconTwoRes = R.drawable.wheat_24dp_000000_fill0_wght400_grad0_opsz24,
                 textOneRes = R.string.expenses_screen_common_expenses,
                 textTwoRes = R.string.expenses_screen_button_food,
-                isSecondValue = state.isFood,
+                isSecondValue = product.isFood,
                 onClick = { onIntent(ExpensesListIntent.FoodClicked(it)) }
             )
         OutlinedTextTitleAddNew(
-            value = state.title,
+            value = product.title,
             onValueChange = {
                 onIntent(ExpensesListIntent.TitleChanged(it))
             },
             onValueChangeSuffix = {
                 onIntent(ExpensesListIntent.TitleAndSuffixClicked(it.first, it.second))
             },
-            titleList = state.pickList.titleList,
-            isErrorTitle = state.error.isErrorTitle,
-            isErrorSlash = state.error.isErrorSlash,
-            readOnly = state.isIndicatorsValue,
-            enable = !state.isIndicatorsValue,
-            isBorderCard = true
+            titleList = state.pickList.titles,
+            isErrorTitle = errors.isErrorTitle,
+            isErrorSlash = errors.isErrorSlash,
+            readOnly = product.hasIndicators,
+            enable = !product.hasIndicators,
+            isBorderCard = true,
+            isNecessarily = !template.isTitle,
+            isShowSwitch = isTemplate,
+            checked = template.isTitle,
+            onCheckedChange = { onIntent(ExpensesListIntent.TitleTemplateChanged(it)) },
         )
         OutlinedCountInputNew(
-            count = state.count,
-            countSuffixList = state.suffixList,
+            count = product.count,
+            countSuffixList = product.suffixList,
             onCountChange = { onIntent(ExpensesListIntent.CountChanged(it)) },
-            countSuffix = state.countSuffix,
+            countSuffix = product.countSuffix,
             onSuffixChange = { onIntent(ExpensesListIntent.SuffixClicked(it)) },
-            enabled = !state.isIndicatorsValue,
-            isAutoCalculate = state.isAutoWeight,
+            enabled = !product.hasIndicators,
+            isAutoCalculate = product.isAutoWeight,
             onAutoCalculate = { onIntent(ExpensesListIntent.AutoWeightClicked(it)) },
-            weight = state.weight,
+            weight = product.weight,
             onWeightChange = { onIntent(ExpensesListIntent.WeightChanged(it)) },
-            weightSuffix = state.weightSuffix,
+            weightSuffix = product.weightSuffix,
             onWeightSuffixChance = { onIntent(ExpensesListIntent.WeightSuffixChanged(it)) },
-            isError = state.error.isErrorCount,
-            isShowCheckbox = state.isFood && !state.isIndicatorsValue && state.isShowAutoWeightCheckbox,
-            weightAll = state.weightAll,
-            weightAllSuffix = state.weightAllSuffix,
-            enabledWeightSuffix = !(state.weightSuffix == Suffix.KILOGRAM_TO_CUBIC_METERS ||
-                    state.weightSuffix == Suffix.KILOGRAM_TO_LITERS)
+            isError = errors.isErrorCount,
+            isShowCheckbox = product.isFood && !product.hasIndicators && product.isShowAutoWeightCheckbox,
+            weightAll = product.weightAll,
+            weightAllSuffix = product.weightAllSuffix,
+            enabledWeightSuffix = !(product.weightSuffix == Suffix.KILOGRAM_TO_CUBIC_METERS ||
+                    product.weightSuffix == Suffix.KILOGRAM_TO_LITERS),
+
+            isShowSwitchForValue = isTemplate,
+            checkedForValue = template.isCount,
+            onCheckedForValueChange = { onIntent(ExpensesListIntent.CountTemplateChanged(it)) },
+
+            isShowSwitchForSuffix = isTemplate,
+            checkedForSuffix = template.isSuffix,
+            onCheckedForSuffixChange = { onIntent(ExpensesListIntent.SuffixTemplateClicked(it)) },
         )
-        if (!state.isIndicatorsValue)
+        if (!product.hasIndicators && !isTemplate)
             WarehouseCountCard(
-                title = state.title,
+                title = product.title,
                 warehouseList = state.pickList.warehouseList
             )
         OutlinedPriceInputNew(
-            price = state.price,
+            price = product.price,
             onPriceChange = {
                 onIntent(ExpensesListIntent.PriceChanged(it))
             },
-            isAutoCalculate = state.isAutoPrice,
+            isAutoCalculate = product.isAutoPrice,
             onAutoCalculate = {
                 onIntent(ExpensesListIntent.AutoPriceClicked(it))
             },
             isManyCount = true,
-            isError = state.error.isErrorPrice,
-            isNecessarily = true,
-            count = state.count,
-            countSuffix = state.countSuffix,
-            priceAll = state.priceAll,
-            priceSuffix = priceSuffix,
+            isError = errors.isErrorPrice,
+            isNecessarily = !template.isPrice,
+            count = if (template.isCount) "" else product.count,
+            countSuffix = if (template.isSuffix) Suffix.NO else product.countSuffix,
+            priceAll = product.priceAll,
+            priceSuffix = product.priceSuffix,
             supportTextRes = R.string.support_text_price_expenses_all,
             supportTextResAutoCal = R.string.support_text_price_expenses_one,
             tooltipTextResAutoCal = R.string.expenses_entry_screen_auto_calculate,
+
+            isShowSwitch = isTemplate,
+            checked = template.isPrice,
+            onCheckedChange = { onIntent(ExpensesListIntent.PriceTemplateClicked(it)) },
         )
         OutlinedTextCategoryNew(
-            value = state.category,
+            value = product.category,
             onValueChange = {
                 onIntent(ExpensesListIntent.CategoryChanged(it))
             },
-            titleList = state.pickList.categoryList
+            titleList = state.pickList.categories,
+
+            isShowSwitch = isTemplate,
+            checked = template.isCategory,
+            onCheckedChange = { onIntent(ExpensesListIntent.CategoryTemplateChanged(it)) },
         )
-        if (!state.isIndicatorsValue)
+        if (!product.hasIndicators && !isTemplate)
             OutlinedTextDateNew(
-                value = state.date,
+                value = product.date,
                 onValueChange = {
                     onIntent(ExpensesListIntent.DateClicked(it))
-                },
+                }
             )
-        if (!state.isIndicatorsValue && state.isFood && (!state.isShowAutoWeightCheckbox || state.isAutoWeight))
+        if (isTemplate)
+            OutlinedSwitch(
+                checked = template.isDate,
+                onCheckedChange = { onIntent(ExpensesListIntent.DateTemplateChanged(it)) },
+                leadingIconRes = R.drawable.baseline_calendar_month_24,
+                labelIntRes = R.string.outlined_text_current_date,
+                supportingText = R.string.support_text_current_date,
+            )
+        if (!product.hasIndicators && product.isFood && (!product.isShowAutoWeightCheckbox || product.isAutoWeight) && !isTemplate)
             AdditionalFunctionFood(
                 animalList = state.pickList.animalList2,
                 onAnimalClick = { onIntent(ExpensesListIntent.AnimalChipByIdFoodClicked(it)) },
-                countAnimal = state.countAnimalFood,
-                feedFood = "${state.feedFood} ${stringResource(state.feedFoodSuffix.toResId())}",
-                day = "${state.daysFood.formatNumber()} ${stringResource(R.string.expenses_screen_days)}",
-                dateEnd = state.dateEndFood,
-                isEntry = state.isEntry
+                countAnimal = product.countAnimalFood,
+                feedFood = "${product.feedFood} ${stringResource(product.feedFoodSuffix.toResId())}",
+                day = "${product.daysFood.formatNumber()} ${stringResource(R.string.expenses_screen_days)}",
+                dateEnd = product.dateEndFood,
+                isEntry = product.isEntry
             )
-        if (!state.isIndicatorsValue && !state.isFood && state.pickList.animalList2.isNotEmpty())
+        if (!product.hasIndicators && !product.isFood && state.pickList.animalList2.isNotEmpty() && !isTemplate)
             AdditionalFunction(
                 animalList = state.pickList.animalList2,
-                isPercent = state.isPercent,
-                priceSuffix = priceSuffix,
+                isPercent = product.isPercent,
+                priceSuffix = product.priceSuffix,
                 onAnimalChipClicked = { onIntent(ExpensesListIntent.AnimalChipByIdClicked(it)) },
                 onPercentClicked = { onIntent(ExpensesListIntent.PercentClicked(it)) },
                 onEquallyClick = { onIntent(ExpensesListIntent.EquallyClicked) },
@@ -234,15 +287,19 @@ fun ExpensesEntryBottomSheet(
                 }
             )
         OutlinedTextNoteNew(
-            value = state.note,
+            value = product.note,
             onValueChange = {
                 onIntent(ExpensesListIntent.NoteChanged(it))
-            }
+            },
+            isShowSwitch = isTemplate,
+            checked = template.isNote,
+            onCheckedChange = { onIntent(ExpensesListIntent.NoteTemplateChanged(it)) },
         )
-        /*AdditionalSettings2(
-            state = state,
-            onIntent = onIntent
-        )*/
+        /* if (isTemplate)
+             OutlinedSwitch(
+                 checked = template.isMultiProjectTemplate,
+                 onCheckedChange = { onIntent(ExpensesListIntent.MultiProjectTemplateChanged(it)) }
+             )*/
     }
 }
 

@@ -1,4 +1,4 @@
-package com.zaroslikov.fermacompose2.ui.elements
+package com.zaroslikov.fermacompose2.ui.elements.empty_list
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -32,9 +32,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.black_2
-import com.zaroslikov.fermacompose2.ghostly_white
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.ui.elements.BorderCard
+import com.zaroslikov.fermacompose2.ui.elements.ButtonStandart
+import com.zaroslikov.fermacompose2.ui.elements.text_14
+import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.text_20_center
+import com.zaroslikov.fermacompose2.ui.elements.text_20_justify
+import com.zaroslikov.fermacompose2.ui.elements.text_24
+import com.zaroslikov.fermacompose2.ui.elements.toOutlinedText
 import com.zaroslikov.fermacompose2.white
 
 
@@ -95,7 +102,7 @@ fun MessageNoData(
         Text(
             text = stringResource(titleRes),
             style = text_20_center,
-            modifier = Modifier.toOutlinedText()
+            modifier = Modifier.Companion.toOutlinedText()
         )
         Text(
             text = stringResource(messageRes),

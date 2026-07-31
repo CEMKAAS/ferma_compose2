@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.enums.TemplateType
 import com.zaroslikov.domain.repository.AppSettingsRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
@@ -87,18 +88,21 @@ class InventoryAppViewModel @Inject constructor(
 
             uri != null -> {
                 val payload = QrCodeDecoder.decodeForBase64(uri)
+                val deviceId = appSettingsRepository.getAppSettings().first().deviceId
 
                 qrNavigationManager.put(payload)
+                when {
+                    payload.deviceId != deviceId -> FirstDestination.route
+                    payload.isMultiProjectTemplate -> FirstDestination.route
+                    else -> {
+                        val projectExists = projectRepository
+                            .getIsProject(payload.idPT)
+                            .first()
 
-                if (payload.isMultiProjectTemplate) FirstDestination.route
-                 else {
-                    val projectExists = projectRepository
-                        .getIsProject(payload.idPT)
-                        .first()
-
-                    if (!projectExists) FirstDestination.route
-                    else
-                        "${MainProjectsDestination.route}/${payload.idPT}?${MainProjectsDestination.templateArg}=true"
+                        if (!projectExists) FirstDestination.route
+                        else
+                            "${MainProjectsDestination.route}/${payload.idPT}?${MainProjectsDestination.templateArg}=true"
+                    }
                 }
             }
 

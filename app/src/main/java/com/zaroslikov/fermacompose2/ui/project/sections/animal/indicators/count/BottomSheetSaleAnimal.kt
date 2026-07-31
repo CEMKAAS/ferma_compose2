@@ -18,7 +18,7 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextBuyerNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountAnimalNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
-import com.zaroslikov.fermacompose2.ui.project.sections.EntryIndicationBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EntryIndicationBottomSheet
 
 @Composable
 fun BottomSheetSaleAnimal(

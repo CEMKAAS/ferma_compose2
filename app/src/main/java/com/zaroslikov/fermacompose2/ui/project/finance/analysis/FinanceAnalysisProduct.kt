@@ -66,7 +66,7 @@ import com.zaroslikov.fermacompose2.ui.elements.ButtonForGroupButtons
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CardNewWithTitle
 import com.zaroslikov.fermacompose2.ui.elements.CategoryBorderCard
-import com.zaroslikov.fermacompose2.ui.elements.CircularProgress
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
 import com.zaroslikov.fermacompose2.ui.elements.IconCircle

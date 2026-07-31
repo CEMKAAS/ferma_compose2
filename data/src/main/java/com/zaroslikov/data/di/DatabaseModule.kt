@@ -33,11 +33,13 @@ import com.zaroslikov.data.room.database.migration.MIGRATION_1_2
 import com.zaroslikov.data.room.database.migration.MIGRATION_2_3
 import com.zaroslikov.data.room.database.migration.MIGRATION_3_4
 import com.zaroslikov.data.room.database.migration.MIGRATION_4_5
+import com.zaroslikov.data.room.database.migration.MIGRATION_5_6
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.util.UUID
 import javax.inject.Singleton
 
 @Module
@@ -55,16 +57,17 @@ object DatabaseModule {
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
+            .addMigrations(MIGRATION_5_6)
             .addCallback(object : RoomDatabase.Callback() {
 
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-
+                    val deviceId = UUID.randomUUID().toString()
                     db.execSQL(
                         """
                     INSERT INTO app_settings_table 
-                    (id, last_version_app, current_version_app, is_first_launch) 
-                    VALUES (1, NULL, '3.0.0', 1)
+                    (id, last_version_app, current_version_app, is_first_launch, device_id) 
+                    VALUES (1, NULL, '3.0.0', 1, '$deviceId' )
                 """.trimIndent()
                     )
                 }
