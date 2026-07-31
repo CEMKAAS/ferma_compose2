@@ -401,6 +401,10 @@ class WriteOffListReduce(
                         isTitle = isTitle,
                         isSuffix = isTitle
                     )
+                ),
+                errors = currentProduct.errors.copy(
+                    isErrorTitle = false,
+                    isErrorSlash = false,
                 )
             )
         )
@@ -413,6 +417,9 @@ class WriteOffListReduce(
                     activeField = currentProduct.template.activeField.copy(
                         isCount = isCount
                     )
+                ),
+                errors = currentProduct.errors.copy(
+                    isErrorCount = false,
                 )
             )
         )

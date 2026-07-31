@@ -83,7 +83,7 @@ class ExpensesViewModel @Inject constructor(
     appSettingsRepository = appSettingsRepository
 ) {
 
-    val _itemIdPT: Long = checkNotNull(savedStateHandle[ExpensesDestination.itemIdArg])
+    private val _itemIdPT: Long = checkNotNull(savedStateHandle[ExpensesDestination.itemIdArg])
 
     init {
         loadData()
@@ -122,17 +122,17 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    override suspend fun loadDataForPickList(): ExpensesProductState {
+    override suspend fun loadDataForPickList(id: Long?): ExpensesProductState {
         return coroutineScope {
             val titleDeferred =
                 async { expensesRepository.getItemsTitleExpensesList(_itemIdPT).first() }
             val categoryDeferred =
                 async { expensesRepository.getItemsCategoryExpensesList(_itemIdPT).first() }
             //TODO что-то пошло не поплану, нужно подумать как это сделать красиво
-            /*  val animalDeferred = async {
-                  updateAnimalList(domain?.id)
-              }
-              val animalList = animalDeferred.await().map { it.toUi() }*/
+            val animalDeferred = async {
+                updateAnimalList(id)
+            }
+            val animalList = animalDeferred.await().map { it.toUi() }
             ExpensesProductState(
                 product = ExpensesProduct(
                     projectId = _itemIdPT,
@@ -142,7 +142,7 @@ class ExpensesViewModel @Inject constructor(
                 pickList = ExpensesPickList(
                     titles = titleDeferred.await(),
                     categories = categoryDeferred.await(),
-//                    animalList2 = animalList
+                    animalList2 = animalList
                 )
             )
         }
@@ -150,7 +150,7 @@ class ExpensesViewModel @Inject constructor(
 
     override fun recover(domainTemplateTable: DomainTemplateTable) {
         viewModelScope.launch {
-            val baseState = loadDataForPickList()
+            val baseState = loadDataForPickList(null)
             val currentProduct = baseState.toUiMap23(
                 domainTemplateTable,
                 isTemplateEntry = true,
@@ -190,7 +190,7 @@ class ExpensesViewModel @Inject constructor(
                         )
                     )
 
-            val baseState = loadDataForPickList()
+            val baseState = loadDataForPickList(qrPayload?.itemId ?: id)
             val currentProduct = baseState.toUiMap23(template, isTemplateEntry = true)
             sendIntent(ExpensesListIntent.OpenTemplateBottomSheetClick(true, currentProduct))
             updateWarehouseUiStateSync(currentProduct.product.title)
@@ -297,8 +297,7 @@ class ExpensesViewModel @Inject constructor(
             }
             val newState =
                 if (!getState().bottomSheetState.isSaveStateForBottomSheet || id != null) {
-                    val baseState = loadDataForPickList()
-
+                    val baseState = loadDataForPickList(id)
                     when {
                         isTemplate && id == null -> baseState
                         isTemplate && id != null -> {

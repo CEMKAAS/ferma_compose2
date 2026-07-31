@@ -259,7 +259,7 @@ class SaleViewModel @Inject constructor(
     }
 
 
-    override suspend fun loadDataForPickList(): SaleProductState {
+    override suspend fun loadDataForPickList(id: Long?): SaleProductState {
         return coroutineScope {
             val titleDeferred =
                 async { saleRepository.getItemsTitleSaleList(_itemIdPT).first() }

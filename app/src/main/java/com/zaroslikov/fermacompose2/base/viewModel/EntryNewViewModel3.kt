@@ -98,7 +98,7 @@ abstract class EntryNewViewModel3<STATE : SectionState, INTENT : BaseIntent, RED
         isTemplate: Boolean = false
     )
 
-    protected abstract suspend fun loadDataForPickList(): BaseProductState
+    protected abstract suspend fun loadDataForPickList(id: Long? = null): BaseProductState
 
 
     protected abstract fun recover(domainTemplateTable: DomainTemplateTable)

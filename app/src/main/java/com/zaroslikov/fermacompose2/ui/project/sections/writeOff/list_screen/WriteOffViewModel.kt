@@ -383,7 +383,7 @@ class WriteOffViewModel @Inject constructor(
         }
     }
 
-    override suspend fun loadDataForPickList(): WriteOffProductState {
+    override suspend fun loadDataForPickList(id: Long?): WriteOffProductState {
         return coroutineScope {
             val titleDeferred =
                 async { writeOffRepository.getItemsWriteOffList(_itemIdPT).first() }

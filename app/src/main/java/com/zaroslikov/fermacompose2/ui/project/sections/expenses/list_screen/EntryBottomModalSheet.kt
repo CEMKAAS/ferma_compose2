@@ -140,7 +140,7 @@ fun ExpensesEntryBottomSheet(
                 onValueChange = { onIntent(ExpensesListIntent.NameTemplateChanged(it)) },
                 isError = errors.isErrorNameTemplate,
             )
-        if (state.pickList.animalList2.isNotEmpty() && !product.hasIndicators && isTemplate)
+        if (state.pickList.animalList2.isNotEmpty() && !product.hasIndicators && !isTemplate)
             GroupCard(
                 titleRes = R.string.expenses_screen_type_expenses,
                 iconOneRes = R.drawable.icon_expenses,

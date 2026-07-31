@@ -423,6 +423,10 @@ class SaleListReduce(
                     activeField = currentProduct.template.activeField.copy(
                         isTitle = isTitle
                     )
+                ),
+                errors = currentProduct.errors.copy(
+                    isErrorTitle = false,
+                    isErrorSlash = false,
                 )
             )
         )
@@ -435,6 +439,9 @@ class SaleListReduce(
                     activeField = currentProduct.template.activeField.copy(
                         isCount = isCount
                     )
+                ),
+                errors = currentProduct.errors.copy(
+                    isErrorCount = false
                 )
             )
         )
@@ -447,6 +454,9 @@ class SaleListReduce(
                     activeField = currentProduct.template.activeField.copy(
                         isPrice = isPrice
                     )
+                ),
+                errors = currentProduct.errors.copy(
+                    isErrorPrice = false
                 )
             )
         )

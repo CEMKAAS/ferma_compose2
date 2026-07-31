@@ -214,7 +214,7 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    override suspend fun loadDataForPickList(): AddProductState {
+    override suspend fun loadDataForPickList(id: Long?): AddProductState {
         return coroutineScope {
             val titleDeferred =
                 async { addRepository.getItemsTitleAddList(_itemIdPT, true).first() }

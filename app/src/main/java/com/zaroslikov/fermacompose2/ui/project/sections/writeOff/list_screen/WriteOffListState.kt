@@ -116,8 +116,7 @@ data class WriteOffError(
     override val isErrorTitle: Boolean = false,
     override val isErrorSlash: Boolean = false,
     override val isErrorCount: Boolean = false,
-    override val hasAnyError: Boolean = false,
-    val isErrorPrice: Boolean = false,
+    override val hasAnyError: Boolean = false
 ) : ProductError
 
 data class LoadDataWriteOffList(
