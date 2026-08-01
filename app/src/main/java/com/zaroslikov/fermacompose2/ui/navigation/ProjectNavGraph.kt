@@ -62,7 +62,14 @@ fun ProjectNavHost(
             })
         ) {
             WarehouseScreen(
-                navigateToStart = { rootNavController.navigate(FirstDestination.route) },
+                navigateToStart = {
+                    rootNavController.navigate(FirstDestination.route) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
                 navigateToEdit = { rootNavController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
                 navigationToAnalysis = {

@@ -8,5 +8,5 @@ data class DomainAppSettings(
     val lastVersionApp: String? = null,
     val currentVersionApp: String = "3.0.0",
     val isFirstLaunch: Boolean = false,
-    val deviceId: String = "" //TODO Добавить
+    val deviceId: String = ""
 )

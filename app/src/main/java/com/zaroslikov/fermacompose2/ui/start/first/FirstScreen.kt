@@ -101,6 +101,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.InventoryBody
+import com.zaroslikov.fermacompose2.ui.start.update.TrainingScreen
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 

@@ -62,7 +62,14 @@ fun IncubatorNavHost(
                         )
                     )
                 },
-                navigateToBack = { rootNavController.navigate(FirstDestination.route) }
+                navigateToBack = {
+                    rootNavController.navigate(FirstDestination.route) {
+                        popUpTo(0) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
         composable(

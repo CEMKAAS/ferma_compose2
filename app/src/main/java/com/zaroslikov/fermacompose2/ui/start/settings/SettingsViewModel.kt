@@ -85,13 +85,7 @@ class SettingsViewModel @Inject constructor(
         SettingsState(),
         SettingsReduce()
     ) {
-    init {
-        loadData()
-    }
 
-    private fun loadData() {
-
-    }
 
     fun onIntent(intent: SettingsIntent) {
         sendIntent(intent)
