@@ -34,7 +34,7 @@
 
     //Ads
     <string name="yandex_banner_ads">R-M-12224806-1</string>
-    <string name="yandex_first_launch_ads">R–M-12224806-2</string>
+    <string name="yandex_first_launch_ads">R-M-12224806-2</string>
     <string name="yandex_rewarded_ads">R-M-12224806-4</string>
     //AdsSupportText
     <string name="ads_support_text_load_ads">Загружаем рекламу… Благодаря ей проект развивается.\nПожалуйста, подождите несколько секунд.\nСпасибо большое за вашу поддержку!❤️</string>

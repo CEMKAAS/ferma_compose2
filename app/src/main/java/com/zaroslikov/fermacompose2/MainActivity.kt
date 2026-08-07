@@ -63,10 +63,10 @@ fun SplashScreen(
     var isLoading by remember { mutableStateOf(true) }
 
     val loader = rememberAppOpenAdLoader()
-    val adUnitId = stringResource(R.string.yandex_first_launch_ads)
+    val adUnitId = stringResource(R.string.yandex_first_launch_ads)// TODO
 
     LaunchedEffect(Unit) {
-        val adRequest = AdRequest.Builder(adUnitId).build()
+        val adRequest = AdRequest.Builder("R-M-12224806-2").build()
 
         when (val result = loader.loadAd(adRequest)) {
             is AppOpenAdLoadResult.Success -> {
