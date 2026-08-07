@@ -102,7 +102,7 @@ class FirstViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
-                projectRepository.getAllProject().collectLatest { baseList ->
+            projectRepository.getAllProject().collectLatest { baseList ->
                 val list = baseList.filter { !it.archive }
                 val archiveList = baseList.filter { it.archive }
                 updateState {
@@ -179,11 +179,10 @@ class FirstViewModel @Inject constructor(
                     .getIsProject(payload.idPT)
                     .first()
 
-                if (!projectExists) {
-                    sendIntent(FirstIntent.OpenWarningQrCodeClick(true))
-                    sendIntent(FirstIntent.OpenQrCodeScanner(false))
-                    return
-                }
+                sendIntent(FirstIntent.OpenQrCodeScanner(false))
+
+                if (!projectExists) return sendIntent(FirstIntent.OpenWarningQrCodeClick(true))
+
                 qrNavigationManager.put(payload)
                 navigateTo(UiEvent.Navigate(payload.idPT))
             }

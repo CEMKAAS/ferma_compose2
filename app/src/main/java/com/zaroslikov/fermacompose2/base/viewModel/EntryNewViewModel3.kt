@@ -161,6 +161,7 @@ abstract class EntryNewViewModel3<STATE : SectionState, INTENT : BaseIntent, RED
                 qrNavigationManager.put(payload)
                 navigateTo(UiEvent.Navigate(payload.idPT))
             }
+            sendQrCodeIntent(QrCodeIntent.OpenScannerQrCodeBottomSheetClick(false))
         }
     }
 

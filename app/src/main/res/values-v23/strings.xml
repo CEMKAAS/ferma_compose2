@@ -176,6 +176,9 @@
     <string name="template_qr_code_bottom_sheet_no_search_template_support">Возможно шаблон удален или qr-код не из вашего проекта</string>
     <string name="template_qr_code_bottom_sheet_no_search_template_support_2">Загрузите бекаб</string>
     <string name="template_qr_code_bottom_sheet_ads_support">При сохранении QR-кода будет показана небольшая реклама — благодаря ей проект развивается. Спасибо за поддержку!</string>
+    <string name="template_qr_code_bottom_sheet_security_support">Все данные зашифрованы. QR-код привязан к этому устройству и будет работать только здесь.</string>
+    <string name="template_qr_code_bottom_sheet_security_support_sale">Все данные зашифрованы. QR-код привязан к этому устройству и будет работать только здесь. При сканировании другим устройством пользователь будет перенаправлен в режим покупки</string>
+    <string name="template_qr_code_bottom_sheet_security_support_expenses">Все данные зашифрованы. QR-код доступен всем пользователям "\Мое Хозяйство"\</string>
 
     //WarningQrCodeBottomSheet
     <string name="warning_qr_code_bottom_sheet_no_search_project">Проект не найдет</string>>

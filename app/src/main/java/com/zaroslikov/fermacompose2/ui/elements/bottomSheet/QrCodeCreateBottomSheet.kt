@@ -81,8 +81,12 @@ import com.yandex.mobile.ads.rewarded.Reward
 import com.yandex.mobile.ads.rewarded.RewardedAd
 import com.yandex.mobile.ads.rewarded.RewardedAdEventListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoadResult
+import com.zaroslikov.domain.models.enums.TemplateType
+import com.zaroslikov.fermacompose2.dark
+import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_16
 import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_5
@@ -289,6 +293,21 @@ fun QrCodeCreateBottomSheet(
                         }, qrCodeData?.qrCodeBitmap, qrCodeData?.template
                     )
                 }
+            }
+            qrCodeData?.template?.templateType?.let {
+                WarningCard(
+                    colorBackground = ghostly_white,
+                    colorBorder = grey_2,
+                    colorIcon = dark,
+                    colorIconBackground = gray_6,
+                    colorText = marengo,
+                    icon = R.drawable.outline_lock_24,
+                    text = when (it) {
+                        TemplateType.SALE -> R.string.template_qr_code_bottom_sheet_security_support_sale
+                        TemplateType.EXPENSES -> R.string.template_qr_code_bottom_sheet_security_support_expenses
+                        else -> R.string.template_qr_code_bottom_sheet_security_support
+                    }
+                )
             }
             WarningCard(
                 colorBackground = orang_4,
