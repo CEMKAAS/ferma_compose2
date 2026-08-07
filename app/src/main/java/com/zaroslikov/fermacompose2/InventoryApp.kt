@@ -138,7 +138,7 @@ fun InventoryApp(
                 },
                 snackbarHost = { SnackbarHost(snackbarHostState) },
             ) {
-                if (activity != null && (!state.appSettings.isFirstLaunch && showSplash)
+                if (activity != null && (state.isShowAds && showSplash)
                     && !BuildConfig.BUILD_TYPE.contentEquals("debug")
                 )
                     SplashScreen(

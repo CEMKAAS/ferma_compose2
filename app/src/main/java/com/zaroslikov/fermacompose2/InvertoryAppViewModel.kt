@@ -92,7 +92,7 @@ class InventoryAppViewModel @Inject constructor(
                 lastVersionApp = appSettings.currentVersionApp,
                 currentVersionApp = currentVersionApp
             )
-            updateState { it.copy(isFirstLaunchUpdate = true) }
+            updateState { it.copy(isFirstLaunchUpdate = true, isShowAds = false) }
             updateSettings(newAppSettings)
             newAppSettings
         } else appSettings
@@ -104,7 +104,7 @@ class InventoryAppViewModel @Inject constructor(
 
             updateSettings(
                 domainAppSettings = getState().appSettings.copy(
-                    isFirstLaunch = false
+                    isFirstLaunch = false,
                 )
             )
             Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
@@ -237,6 +237,7 @@ sealed class Event : BaseIntent {
 data class InvertoryAppState(
     val isOpenDownloadingUpdate: Boolean = false,
     val isFirstLaunchUpdate: Boolean = false,
+    val isShowAds: Boolean = true,
     val appSettings: DomainAppSettings = DomainAppSettings(),
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
@@ -261,7 +262,8 @@ class InvertoryAppReduce : BaseReducer<InvertoryAppState, Event>() {
                 isFirstLaunch = false
             ),
             isFirstLaunchUpdate = false,
-            isNotificationAsked = true
+            isNotificationAsked = true,
+            isShowAds = false
         )
     }
 }
