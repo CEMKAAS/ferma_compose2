@@ -1,11 +1,14 @@
 package com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen
 
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -33,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -59,6 +64,7 @@ import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_1
 import com.zaroslikov.fermacompose2.green_2
@@ -67,12 +73,15 @@ import com.zaroslikov.fermacompose2.green_g_1
 import com.zaroslikov.fermacompose2.green_g_3
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.grey
+import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_2
 import com.zaroslikov.fermacompose2.orang_4
 import com.zaroslikov.fermacompose2.orang_5
 import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.orang_9
+import com.zaroslikov.fermacompose2.red_11
+import com.zaroslikov.fermacompose2.red_12
 import com.zaroslikov.fermacompose2.red_3
 import com.zaroslikov.fermacompose2.red_4
 import com.zaroslikov.fermacompose2.red_5
@@ -154,6 +163,14 @@ fun WarehouseScreen(
                     modifier = Modifier.modifierScreen(innerPadding),
                     state = state,
                     onFastAddClick = { viewModel.onIntent(WarehouseIntent.FastAddClicked(it)) },
+                    onShowAllProduct = { viewModel.onIntent(WarehouseIntent.ShowAllProductClicked(it)) },
+                    onShowAllExpenses = {
+                        viewModel.onIntent(
+                            WarehouseIntent.ShowAllExpensesClicked(
+                                it
+                            )
+                        )
+                    },
                     onShowFastAddClick = { viewModel.onIntent(WarehouseIntent.ShowFastAddClicked(it)) },
                     onAnalysisNavClick = {
                         navigationToAnalysis(Triple(state.idPT, it.first, it.second))
@@ -184,6 +201,8 @@ fun WarehouseScreen(
 private fun WarehouseContainer(
     modifier: Modifier = Modifier,
     state: WarehouseState,
+    onShowAllProduct: (Boolean) -> Unit,
+    onShowAllExpenses: (Boolean) -> Unit,
     onAnalysisNavClick: (Pair<String, Suffix>) -> Unit,
     onShowFastAddClick: (Boolean) -> Unit,
     onFastAddClick: (DomainFastAddProduct) -> Unit,
@@ -217,25 +236,36 @@ private fun WarehouseContainer(
                 )
             }
         else {
-            if (state.productList.isNotEmpty())
+            if (state.productList.isNotEmpty()) {
+                val hasZeroOrMinus =
+                    state.productList.any { it.countOfWarehouse == CountOfWarehouse.Zero || it.countOfWarehouse == CountOfWarehouse.Minus }
+                val productList = state.productList.let { list ->
+                    if (!state.isShowAllProduct && hasZeroOrMinus)
+                        list.filter { it.countOfWarehouse == CountOfWarehouse.Have }
+                    else list
+                }
                 WarehouseSection(
                     titleRes = R.string.add_screen_title2,
                     iconRes = R.drawable.icon_add_product,
-                    list = state.productList,
+                    list = productList,
                     textColor = green_2,
                     borderColor = green_1,
                     iconColor = green_shamrock,
                     backgroundMiniColor = green_g_1,
-                ) { item ->
+                    isShowAllProduct = state.isShowAllProduct,
+                    onClick = if (hasZeroOrMinus) onShowAllProduct else null
+                ) { product ->
                     ProductCard(
-                        title = item.title,
-                        value = item.count,
-                        suffix = item.suffix
+                        title = product.title,
+                        value = product.count,
+                        suffix = product.suffix,
+                        countOfWarehouse = product.countOfWarehouse
                     ) {
-                        onAnalysisNavClick(item.title to item.suffix)
+                        onAnalysisNavClick(product.title to product.suffix)
                         AppMetrica.reportEvent("Переход в полный анализ продукта со склада")
                     }
                 }
+            }
             AdsCard()
             if (state.foodList.isNotEmpty())
                 WarehouseSection(
@@ -258,72 +288,74 @@ private fun WarehouseContainer(
                         }
                     )
                 }
-            if (state.expensesList.isNotEmpty())
+            if (state.expensesList.isNotEmpty()) {
+                val hasZeroOrMinus =
+                    state.expensesList.any { it.countOfWarehouse == CountOfWarehouse.Zero || it.countOfWarehouse == CountOfWarehouse.Minus }
+                val expensesList = state.expensesList.let { list ->
+                    if (!state.isShowAllExpenses && hasZeroOrMinus)
+                        list.filter { it.countOfWarehouse == CountOfWarehouse.Have }
+                    else list
+                }
                 WarehouseSection(
                     titleRes = R.string.warehouse_screen_products,
                     iconRes = R.drawable.icon_expenses,
-                    list = state.expensesList,
+                    list = expensesList,
                     textColor = blue_8,
                     borderColor = blue_16,
                     iconColor = blue_1,
                     backgroundMiniColor = blue_3,
+                    isShowAllProduct = state.isShowAllExpenses,
+                    onClick = if (hasZeroOrMinus) onShowAllExpenses else null
                 ) { item ->
                     ProductCard(
                         title = item.title,
                         value = item.count,
-                        suffix = item.suffix
+                        suffix = item.suffix,
+                        countOfWarehouse = item.countOfWarehouse
                     )
                 }
+            }
         }
     }
 }
 
 @Composable
-private fun ProductCard(
+fun ProductCard(
     modifier: Modifier = Modifier,
     title: String,
     value: Double,
     suffix: Suffix,
+    countOfWarehouse: CountOfWarehouse,
     onClick: (() -> Unit)? = null
 ) {
-    val row: @Composable () -> Unit = {
+    val (colorText, containerColor, borderColor) = when (countOfWarehouse) {
+        CountOfWarehouse.Have -> Triple(black_2, ghostly_white, ghostly_white)
+        CountOfWarehouse.Zero -> Triple(grey, gray_6, grey_2)
+        CountOfWarehouse.Minus -> Triple(error_base, red_11, red_12)
+    }
+    CardFieldNew(
+        modifier = modifier,
+        padding = PaddingValues(12.dp),
+        shape = RoundedCornerShape(8.dp),
+        containerColor = containerColor,
+        elevation = 2.dp,
+        onClick = onClick
+    ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(title, style = text_14, color = black_2, modifier = Modifier.weight(1f))
+            Text(title, style = text_14, color = colorText, modifier = Modifier.weight(1f))
             Text(
                 "${value.formatNumber()} " + stringResource(suffix.toResId()),
-                style = text_14,
-                color = black_2
+                style = text_16,
+                color = colorText,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
-
-    if (onClick != null)
-        CardFieldNew(
-            modifier = modifier,
-            padding = PaddingValues(),
-            shape = RoundedCornerShape(8.dp),
-            containerColor = ghostly_white,
-            elevation = 2.dp,
-            onClick = onClick
-        ) {
-            row()
-        }
-    else
-        CardFieldNew(
-            modifier = modifier,
-            padding = PaddingValues(),
-            shape = RoundedCornerShape(8.dp),
-            containerColor = ghostly_white,
-            elevation = 2.dp,
-        ) {
-            row()
-        }
 }
 
 
@@ -408,7 +440,7 @@ private fun SliderFood(
 
 
 @Composable
-private fun <T> WarehouseSection(
+fun <T> WarehouseSection(
     @StringRes titleRes: Int,
     @DrawableRes iconRes: Int,
     list: List<T>,
@@ -416,6 +448,8 @@ private fun <T> WarehouseSection(
     backgroundMiniColor: Color,
     textColor: Color,
     borderColor: Color,
+    isShowAllProduct: Boolean = false,
+    onClick: ((Boolean) -> Unit)? = null,
     itemCard: @Composable (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -433,31 +467,100 @@ private fun <T> WarehouseSection(
                     Icon(painterResource(iconRes), contentDescription = null, tint = iconColor)
                     Text(stringResource(titleRes), style = text_16, color = black_2)
                 }
-                TextMiniCard(
-                    "${list.size} " +
-                            stringResource(R.string.warehouse_screen_positions),
-                    textColor = textColor,
-                    backgroundColor = backgroundMiniColor
-                )
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (list.isNotEmpty()) {
-                    for (i in list.indices) {
-                        itemCard(list[i])
-                        if (i == 4 && !expanded)
-                            break
-                    }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextMiniCard(
+                        "${list.size} " +
+                                stringResource(R.string.warehouse_screen_positions),
+                        textColor = textColor,
+                        backgroundColor = backgroundMiniColor
+                    )
+                    if (onClick != null)
+                        Box(
+                            Modifier
+                                .background(color = gray_6, shape = RoundedCornerShape(10.dp))
+                                .clip(RoundedCornerShape(10.dp))
+                                .clickable(onClick = { onClick(!isShowAllProduct) })
+                                .padding(8.dp),
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(14.dp),
+                                painter = painterResource(
+                                    if (isShowAllProduct) R.drawable.ic_visibility_off
+                                    else R.drawable.ic_visibility
+                                ),
+                                contentDescription = null,
+                                tint = grey
+                            )
+                        }
                 }
             }
-            if (list.size > 4)
+            Column(
+                modifier = Modifier
+                    .animateContentSize()
+                    .padding(4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (list.isNotEmpty())
+                    for (i in list.indices) {
+                        itemCard(list[i])
+                        if (i == 3 && !expanded)
+                            break
+                    }
+                else
+                    if (onClick != null)
+                        EmptyList(onClick = { onClick(true) })
+            }
+        }
+        AnimatedVisibility(
+            visible = list.size > 4
+        ) {
+            Column {
+                Spacer(Modifier.padding(vertical = 8.dp))
                 BorderShowAllButton(
                     listSize = list.size,
                     textColor = textColor,
                     borderColor = borderColor,
                     isShowMore = expanded
                 ) { expanded = !expanded }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyList(onClick: () -> Unit) {
+    BorderCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        padding = PaddingValues(16.dp),
+        onClick = onClick
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                stringResource(R.string.warehouse_screen_warehouse_item_empty_list),
+                style = text_14,
+                fontWeight = FontWeight.SemiBold,
+                lineHeight = 20.sp,
+                color = gray_7,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                stringResource(R.string.warehouse_screen_warehouse_item_empty_list_text),
+                style = text_12,
+                fontWeight = FontWeight.Medium,
+                lineHeight = 16.sp,
+                color = grey,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

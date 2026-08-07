@@ -88,6 +88,7 @@ import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.toCardDrawRes
 import com.zaroslikov.fermacompose2.supportFun.toCardResId
 import com.zaroslikov.fermacompose2.ui.elements.AdsCard
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.EmptyListNew
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.DetailBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
@@ -151,7 +152,6 @@ fun <T, B> InventoryBody(
 
         val supportSecondTextArchive =
             if (isArchive) R.string.message_no_data_message_archive_project else support
-
         MessageNoData2(
             modifier = modifier.padding(bottom = 16.dp),
             titleRes = titleRes,
@@ -224,8 +224,7 @@ private fun <T, B> InventoryList(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         detailCard(index, item)
-                        if ((index + 1) % 5 == 0 && index != itemList.lastIndex)
-                            AdsCard()
+                        if (shouldShowAd(index = index, lastIndex = itemList.lastIndex)) AdsCard()
                     }
 
                 }
@@ -235,13 +234,30 @@ private fun <T, B> InventoryList(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         brieflyCard(item)
-                        if ((index + 1) % 5 == 0 && index != itemList.lastIndex)
-                            AdsCard()
+                        if (shouldShowAd(index = index, lastIndex = itemList.lastIndex)) AdsCard()
                     }
                 }
             }
         }
     }
+}
+
+fun shouldShowAd(
+    index: Int,
+    lastIndex: Int,
+    firstAdAfter: Int = 3,
+    adInterval: Int = 5
+): Boolean {
+    if (index == lastIndex) return false
+
+    val itemNumber = index + 1
+
+    // Первая реклама после firstAdAfter-го элемента
+    if (itemNumber == firstAdAfter) return true
+
+    // Затем каждые adInterval элементов
+    return itemNumber > firstAdAfter &&
+            (itemNumber - firstAdAfter) % adInterval == 0
 }
 
 @Composable

@@ -2,38 +2,24 @@ package com.zaroslikov.fermacompose2.ui.start.update
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,36 +27,28 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.animal_3
-import com.zaroslikov.fermacompose2.black_1
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_13
-import com.zaroslikov.fermacompose2.gray_8
 import com.zaroslikov.fermacompose2.green_10
-import com.zaroslikov.fermacompose2.green_6
 import com.zaroslikov.fermacompose2.green_8
-import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_1
 import com.zaroslikov.fermacompose2.orang_20
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
-import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
-import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.textBold_18
 import com.zaroslikov.fermacompose2.ui.elements.text_14
-import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.elements.text_18
-import kotlinx.coroutines.launch
 
 @Composable
 fun TrainingScreen(
     onSkipClick: () -> Unit
 ) {
     BaseUpdateScreen(
-        countPage = 5,
+        pagerState = rememberPagerState(pageCount = { 5 }),
         onSkipClick = onSkipClick
     ) { (page, innerPadding) ->
         when (page) {
@@ -90,7 +68,8 @@ private fun TrainingScreen1(
     val listRow = listOf(
         R.drawable.baseline_favorite_24 to R.string.training_screen_main_welcome_row_1,
         R.drawable.icon_add_product to R.string.training_screen_main_welcome_row_2,
-        R.drawable.outline_analytics_24 to R.string.training_screen_main_welcome_row_3
+        R.drawable.outline_analytics_24 to R.string.training_screen_main_welcome_row_3,
+        R.drawable.outline_qr_code_24 to R.string.training_screen_main_welcome_row_4
     )
     Base(
         innerPadding = innerPadding,

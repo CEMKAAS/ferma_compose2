@@ -173,7 +173,7 @@ class WriteOffViewModel @Inject constructor(
         viewModelScope.launch {
             val currentProduct = getState().currentProduct
             writeOffRepository.insertWriteOff(currentProduct.product.updateForSave())
-            yandexMetricRepository.metricalWriteOff(currentProduct.product)
+            yandexMetricRepository.metricalWriteOff(currentProduct)
             if (currentProduct.template.isTemplateEntry)
                 sendIntent(WriteOffListIntent.OpenTemplateBottomSheetClick(false))
             else {
@@ -205,8 +205,9 @@ class WriteOffViewModel @Inject constructor(
 
     override fun insertTemplate() {
         viewModelScope.launch {
-            templateRepository.insert(getState().currentProduct.toDomainTemplate())
-//            yandexMetricRepository.metricalTemplate(getState().currentProduct)
+            val domainTemplate = getState().currentProduct.toDomainTemplate()
+            templateRepository.insert(domainTemplate)
+            yandexMetricRepository.metricalTemplate(domainTemplate)
             loadDataForEntryOrEdit(false, null)
 
         }
@@ -543,8 +544,12 @@ class WriteOffViewModel @Inject constructor(
             count = if (activeField.isCount) null else product.count.toConvertDbDouble(),
             countSuffix = if (activeField.isSuffix) null else product.countSuffix,
             price = if (activeField.isPrice) null else product.price.toConvertZeroDouble(),
-            priceAll = if (!activeField.isPrice && product.isAutoPrice && product.price.isNotBlank())
-                product.priceAll.toConvertDbDouble() else null,
+            priceAll = when {
+                !activeField.isPrice && product.isAutoPrice && product.price.isNotBlank() ->
+                    if (activeField.isCount) 0.0 else product.priceAll.toConvertDbDouble()
+
+                else -> null
+            },
             priceSuffix = product.priceSuffix,
             category = if (activeField.isCategory) null else product.category.trim(),
             isDate = activeField.isDate,
@@ -563,8 +568,8 @@ class WriteOffViewModel @Inject constructor(
             title?.takeIf { it.isNotBlank() },
             count?.formatNumber(),
             countSuffix?.let { resourceProvider.getString(it.toResId()) },
-            price?.let { if (it != 0.0) "${it.formatNumber()} $suffix".trim() else null },
-            priceAll?.let { "${it.formatNumber()} $suffix".trim() },
+            price?.let { "${it.formatNumber()} $suffix".trim() },
+            priceAll?.let { if (it != 0.0) "${it.formatNumber()} $suffix".trim() else null },
             category?.takeIf { !it.contains(resourceProvider.getString(R.string.support_text_no_category)) && it.isNotBlank() },
             writeOffStatus?.let {
                 resourceProvider.getString(

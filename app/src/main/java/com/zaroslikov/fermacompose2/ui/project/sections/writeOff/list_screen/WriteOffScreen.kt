@@ -501,7 +501,7 @@ private fun WriteOffEntryBottomSheet(
             isManyCount = true,
             count = if (template.isCount) "" else product.count,
             countSuffix = if (template.isSuffix) Suffix.NO else product.countSuffix,
-            priceAll = product.priceAll,
+            priceAll = if (template.isCount) "-" else product.priceAll,
             priceSuffix = product.priceSuffix,
             supportTextRes = R.string.support_text_price_write_off_all,
             supportTextResAutoCal = R.string.support_text_price_write_off_one,

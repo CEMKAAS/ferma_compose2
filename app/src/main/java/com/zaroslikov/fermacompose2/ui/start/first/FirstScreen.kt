@@ -2,11 +2,7 @@
 
 package com.zaroslikov.fermacompose2.ui.start.first
 
-import android.Manifest
-import android.os.Build
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -97,11 +93,9 @@ import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
-import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.InventoryBody
-import com.zaroslikov.fermacompose2.ui.start.update.TrainingScreen
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.launch
 
@@ -124,7 +118,7 @@ fun FirstScreen(
     viewModel: FirstViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val notificationFlow = viewModel.notification
+
     val eventFlow = viewModel.navigation
     val colors = listOf(price_green, green_9)
     val scope = rememberCoroutineScope()
@@ -134,19 +128,6 @@ fun FirstScreen(
         scope.launch {
             drawerState.apply {
                 if (isClosed) open() else close()
-            }
-        }
-    }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {}
-
-    LaunchedEffect(Unit) {
-        notificationFlow.collect { event ->
-            when (event) {
-                UiNotification.Notification ->
-                    if (Build.VERSION.SDK_INT >= 33 && state.isNotificationAsked)
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
@@ -160,157 +141,157 @@ fun FirstScreen(
         }
     }
 
-    if (state.isLoading)
-        CircularProgress(
-            modifier = Modifier,
-        )
+    if (state.isLoading) CircularProgress()
     else
-        if (state.appSettings.isFirstLaunch)
-            TrainingScreen { viewModel.onIntent(FirstIntent.SkipTrainingClicked) }
-        else
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    DrawerSheetNew(
-                        onProfileClick = {
-                            navigateToProfile()
-                            AppMetrica.reportEvent("Переход в профиль")
-                        },
-                        onSettingsClick = {
-                            navigateToSettings()
-                            AppMetrica.reportEvent("Переход в настройки")
-                        },
-                        onAboutAppClick = {
-                            navigateToAboutApp()
-                            AppMetrica.reportEvent("Переход в о приложении")
-                        },
-                        onCloseClick = { drawerClose() }
-                    )
-                }
-            ) {
-                Scaffold(
-                    topBar = {
-                        TopAppBarStart2(
-                            title = R.string.start_screen_title,
-                            isArchive = state.isArchive,
-                            infoBottomSheet = { drawerClose() },
-                            onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveModeClicked) }
-                        )
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerSheetNew(
+                    onProfileClick = {
+                        navigateToProfile()
+                        AppMetrica.reportEvent("Переход в профиль")
                     },
-                    floatingActionButtonPosition = FabPosition.Center,
-                    floatingActionButton = {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
+                    onSettingsClick = {
+                        navigateToSettings()
+                        AppMetrica.reportEvent("Переход в настройки")
+                    },
+                    onAboutAppClick = {
+                        navigateToAboutApp()
+                        AppMetrica.reportEvent("Переход в о приложении")
+                    },
+                    onCloseClick = { drawerClose() }
+                )
+            }
+        ) {
+            Scaffold(
+                topBar = {
+                    TopAppBarStart2(
+                        title = R.string.start_screen_title,
+                        isArchive = state.isArchive,
+                        infoBottomSheet = { drawerClose() },
+                        onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveModeClicked) }
+                    )
+                },
+                floatingActionButtonPosition = FabPosition.Center,
+                floatingActionButton = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
+                        horizontalArrangement = if (state.list.isNotEmpty()) Arrangement.SpaceBetween else Arrangement.End
+                    ) {
+                        if (state.list.isNotEmpty())
                             NeonGlowFab(
                                 iconRes = R.drawable.outline_qr_code_scanner_24,
                                 colors = colors,
                             ) { viewModel.onIntent(FirstIntent.OpenQrCodeScanner(true)) }
-                            NeonGlowFab(
-                                colors = colors,
-                            ) { showBottomSheet = true }
-
-                        }
+                        NeonGlowFab(
+                            colors = colors,
+                        ) { showBottomSheet = true }
                     }
-                ) { innerPadding ->
-                    if (state.isLoading)
-                        CircularProgress(
-                            modifier = Modifier.padding(innerPadding),
-                        )
-                    else
-                        StartScreenContainer2(
-                            modifier = Modifier.modifierScreenLazy(innerPadding),
-                            itemList = state.list,
-                            brieflyList = state.archiveList,
-                            isArchiveMode = state.isArchive,
-                            onEditProjectClick = { navigateToProject(it) },
-                            onEditIncubatorClick = { navigateToIncubator(it) },
-                            onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveClicked(it)) },
-                            onArchiveIncubatorClick = {
-                                viewModel.onIntent(
-                                    FirstIntent.OpenArchiveIncubatorBottomSheetClicked(
-                                        true,
-                                        it
-                                    )
-                                )
-                            },
-                            onUnarchiveClick = {
-                                viewModel.onIntent(FirstIntent.UnarchiveClicked(it))
-                            },
-                            onDeleteClick = {
-                                viewModel.onIntent(
-                                    FirstIntent.OpenDeleteBottomSheetClicked(
-                                        true,
-                                        it
-                                    )
-                                )
-                            },
-                            onNavigationProject = { navigateToItemProject(it to false) },
-                            onNavigationIncubator = { navigateToItemIncubator(it) })
-
-                    if (showBottomSheet)
-                        ChoiceProjectBottomSheet(
-                            onDismissRequest = { showBottomSheet = false },
-                            onIncubatorProject = { navigateToIncubator(-1) },
-                            onAddProject = { navigateToProject(-1) }
-                        )
-
-                    if (state.isOpenQrScannerBottomSheet)
-                        QrScannerScreen(
-                            onQrDetected = { viewModel.onIntent(FirstIntent.QrCodeScanner(it)) },
-                            onDismissRequest = {
-                                viewModel.onIntent(FirstIntent.OpenQrCodeScanner(false))
-                            }
-                        )
-
-                    if (state.isOpenArchiveIncubatorBottomSheet)
-                        WarningArchiveBottomSheet(
-                            onDismissRequest = {
-                                viewModel.onIntent(
-                                    FirstIntent.OpenArchiveIncubatorBottomSheetClicked(
-                                        false
-                                    )
-                                )
-                            },
-                            onArchiveIncubatorClick = {
-                                viewModel.onIntent(FirstIntent.ArchiveClicked(null))
-                            }
-                        )
-
-                    if (state.isOpenDeleteBottomSheet)
-                        WarningDeleteBottomSheet(
-                            isProject = state.currentProjectTable?.mode ?: true,
-                            onDismissRequest = {
-                                viewModel.onIntent(
-                                    FirstIntent.OpenDeleteBottomSheetClicked(
-                                        false
-                                    )
-                                )
-                            },
-                            onDeleteDatabaseClick = { viewModel.onIntent(FirstIntent.DeleteClicked) }
-                        )
-                    if (state.isOpenWaringQrCode)
-                        QrCodeWarningBottomSheet(
-                            qrCodeWarningType = QrCodeWarningType.GLOBAL,
-                            onDismissRequest = {
-                                viewModel.onIntent(FirstIntent.OpenWarningQrCodeClick(false))
-                            },
-                            onScannerClick = { viewModel.onIntent(FirstIntent.OpenQrCodeScanner(true)) },
-                        )
-                    if (state.isOpenChoiceProjectBottomSheet)
-                        ChoiceProjectBottomSheet(
-                            list = state.projectListForTemplate,
-                            onDismissRequest = {
-                                viewModel.onIntent(
-                                    FirstIntent.OpenMultiProjectBottomSheetClick(false)
-                                )
-                            }
-                        ) { viewModel.onIntent(FirstIntent.ChoiceProjectForTemplateClick(it)) }
                 }
+            ) { innerPadding ->
+                if (state.isLoading)
+                    CircularProgress(
+                        modifier = Modifier.padding(innerPadding),
+                    )
+                else
+                    StartScreenContainer2(
+                        modifier = Modifier.modifierScreenLazy(innerPadding),
+                        itemList = state.list,
+                        brieflyList = state.archiveList,
+                        isArchiveMode = state.isArchive,
+                        onEditProjectClick = { navigateToProject(it) },
+                        onEditIncubatorClick = { navigateToIncubator(it) },
+                        onArchiveClick = { viewModel.onIntent(FirstIntent.ArchiveClicked(it)) },
+                        onArchiveIncubatorClick = {
+                            viewModel.onIntent(
+                                FirstIntent.OpenArchiveIncubatorBottomSheetClicked(
+                                    true,
+                                    it
+                                )
+                            )
+                        },
+                        onUnarchiveClick = {
+                            viewModel.onIntent(FirstIntent.UnarchiveClicked(it))
+                        },
+                        onDeleteClick = {
+                            viewModel.onIntent(
+                                FirstIntent.OpenDeleteBottomSheetClicked(
+                                    true,
+                                    it
+                                )
+                            )
+                        },
+                        onNavigationProject = { navigateToItemProject(it to false) },
+                        onNavigationIncubator = { navigateToItemIncubator(it) })
+
+                if (showBottomSheet)
+                    ChoiceProjectBottomSheet(
+                        onDismissRequest = { showBottomSheet = false },
+                        onIncubatorProject = { navigateToIncubator(-1) },
+                        onAddProject = { navigateToProject(-1) }
+                    )
+
+                if (state.isOpenQrScannerBottomSheet)
+                    QrScannerScreen(
+                        onQrDetected = { viewModel.onIntent(FirstIntent.QrCodeScanner(it)) },
+                        onDismissRequest = {
+                            viewModel.onIntent(FirstIntent.OpenQrCodeScanner(false))
+                        }
+                    )
+
+                if (state.isOpenArchiveIncubatorBottomSheet)
+                    WarningArchiveBottomSheet(
+                        onDismissRequest = {
+                            viewModel.onIntent(
+                                FirstIntent.OpenArchiveIncubatorBottomSheetClicked(
+                                    false
+                                )
+                            )
+                        },
+                        onArchiveIncubatorClick = {
+                            viewModel.onIntent(FirstIntent.ArchiveClicked(null))
+                        }
+                    )
+
+                if (state.isOpenDeleteBottomSheet)
+                    WarningDeleteBottomSheet(
+                        isProject = state.currentProjectTable?.mode ?: true,
+                        onDismissRequest = {
+                            viewModel.onIntent(
+                                FirstIntent.OpenDeleteBottomSheetClicked(
+                                    false
+                                )
+                            )
+                        },
+                        onDeleteDatabaseClick = { viewModel.onIntent(FirstIntent.DeleteClicked) }
+                    )
+                if (state.isOpenWaringQrCode)
+                    QrCodeWarningBottomSheet(
+                        qrCodeWarningType = QrCodeWarningType.GLOBAL,
+                        onDismissRequest = {
+                            viewModel.onIntent(FirstIntent.OpenWarningQrCodeClick(false))
+                        },
+                        onScannerClick = {
+                            viewModel.onIntent(
+                                FirstIntent.OpenQrCodeScanner(
+                                    true
+                                )
+                            )
+                        },
+                    )
+                if (state.isOpenChoiceProjectBottomSheet)
+                    ChoiceProjectBottomSheet(
+                        list = state.projectListForTemplate,
+                        onDismissRequest = {
+                            viewModel.onIntent(
+                                FirstIntent.OpenMultiProjectBottomSheetClick(false)
+                            )
+                        }
+                    ) { viewModel.onIntent(FirstIntent.ChoiceProjectForTemplateClick(it)) }
             }
+        }
 }
 
 @Composable
@@ -369,7 +350,7 @@ private fun StartScreenContainer2(
             title = R.string.start_screen_no_data_title,
             message = R.string.start_screen_no_data_message,
             icon = R.drawable.ic_new_logo_2,
-            iconSize = 64.dp
+            iconSize = 164.dp
         ),
         brieflyEmptyState = EmptyState(
             title = R.string.start_screen_no_data_archive_title,

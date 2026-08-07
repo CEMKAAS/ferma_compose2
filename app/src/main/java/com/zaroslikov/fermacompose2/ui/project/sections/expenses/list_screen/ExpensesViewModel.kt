@@ -358,7 +358,7 @@ class ExpensesViewModel @Inject constructor(
             val id =
                 expensesRepository.insertExpenses(currentProduct.product.toDomainMap(true))
             setExpensesAnimal(id)
-            yandexMetricRepository.metricalExpenses(currentProduct.product)
+            yandexMetricRepository.metricalExpenses(currentProduct)
             if (currentProduct.template.isTemplateEntry)
                 sendIntent(ExpensesListIntent.OpenTemplateBottomSheetClick(false))
             else {
@@ -390,8 +390,9 @@ class ExpensesViewModel @Inject constructor(
 
     override fun insertTemplate() {
         viewModelScope.launch {
-            templateRepository.insert(getState().currentProduct.toDomainTemplate())
-//            yandexMetricRepository.metricalTemplate(getState().currentProduct,) //TODO
+            val domainTemplate = getState().currentProduct.toDomainTemplate()
+            templateRepository.insert(domainTemplate)
+            yandexMetricRepository.metricalTemplate(domainTemplate)
             loadDataForEntryOrEdit(false, null)
         }
     }
@@ -569,7 +570,7 @@ class ExpensesViewModel @Inject constructor(
             lastDayFood = if (isFood) dateEndFood else null,
             weight = weight,
             weightSuffix = weightSuffix,
-            idPT = projectId,
+            idPT = _itemIdPT,
             animalId = animalId,
             animalVaccinationId = animalVaccinationId,
             animalCountId = animalCountId,
@@ -612,7 +613,7 @@ class ExpensesViewModel @Inject constructor(
                     isCategory = domain.category == null,
                     isDate = domain.isDate,
                     isNote = domain.note == null,
-//                    isMultiProjectTemplate = domain.isMultiProjectTemplate
+                    isMultiProjectTemplate = domain.isMultiProjectTemplate
                 )
             ),
             errors = ExpensesError(),
@@ -711,14 +712,19 @@ class ExpensesViewModel @Inject constructor(
             count = if (activeField.isCount) null else product.count.toConvertDbDouble(),
             countSuffix = if (activeField.isSuffix) null else product.countSuffix,
             price = if (activeField.isPrice) null else product.price.toConvertDbDouble(),
-            priceAll = if (!activeField.isPrice && product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
+            priceAll = when {
+                !activeField.isPrice && product.isAutoPrice ->
+                    if (activeField.isCount) 0.0 else product.priceAll.toConvertDbDouble()
+
+                else -> null
+            },
             priceSuffix = product.priceSuffix,
             category = if (activeField.isCategory) null else product.category.trim(),
             isDate = activeField.isDate,
             note = if (activeField.isNote) null else product.note.trim(),
             idPT = _itemIdPT,
             isPinned = template.pin,
-            isMultiProjectTemplate = /*activeField.isMultiProjectTemplate*/false
+            isMultiProjectTemplate = activeField.isMultiProjectTemplate
         )
     }
 
@@ -729,7 +735,7 @@ class ExpensesViewModel @Inject constructor(
             count?.formatNumber(),
             countSuffix?.let { resourceProvider.getString(it.toResId()) },
             price?.let { "${it.formatNumber()} $suffix".trim() },
-            priceAll?.let { "${it.formatNumber()} $suffix".trim() },
+            priceAll?.let { if (it != 0.0) "${it.formatNumber()} $suffix".trim() else null },
             category?.takeIf { !it.contains(resourceProvider.getString(R.string.support_text_no_category)) && it.isNotBlank() },
             note?.takeIf { it.isNotBlank() }
         ).joinToString(" · ")

@@ -173,7 +173,8 @@ fun EmptyBookmark(
             modifier = Modifier
                 .shadow(6.dp, shape = CircleShape)
                 .background(color = backgroundColor, shape = CircleShape)
-                .size(iconSize * 2)
+                .size(128.dp)
+//                .size(iconSize * 2)
         ) {
             Icon(
                 painter = painterResource(iconRes),

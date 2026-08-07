@@ -8,7 +8,6 @@ sealed class FirstIntent() : BaseIntent {
     data class ArchiveClicked(val value: DomainProjectTable?) : FirstIntent()
     data class UnarchiveClicked(val value: DomainProjectTable) : FirstIntent()
 
-    data object SkipTrainingClicked : FirstIntent()
     data class OpenArchiveIncubatorBottomSheetClicked(
         val value: Boolean,
         val domainProjectTable: DomainProjectTable? = null

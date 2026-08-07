@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.elements
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
@@ -32,6 +33,13 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +61,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.compose.Banner
+import com.yandex.mobile.ads.compose.BannerEvents
 import com.yandex.mobile.ads.compose.BannerSize
 import com.yandex.mobile.ads.compose.rememberBannerAdState
 import com.zaroslikov.data.room.dto.animal.AnimalExpensesDomain
@@ -95,6 +104,8 @@ import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.ValueItem
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.Food
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Deprecated(
@@ -1392,14 +1403,33 @@ fun AdsCard(
     val horizontalPadding = dimensionResource(id = R.dimen.padding_medium)
     val availableWidth = screenWidthDp - (horizontalPadding * 2 + 20.dp)
     val adUnitId = stringResource(R.string.yandex_banner_ads)
+    // Счетчик попыток перезагрузки
+    val coroutineScope = rememberCoroutineScope()
+    var retryCount by rememberSaveable { mutableIntStateOf(0) }
+    val maxRetries = 3
+
     val bannerState = rememberBannerAdState(
         adSize = BannerSize.Inline(width = availableWidth, maxHeight = maxHeight),
+        events = BannerEvents(
+            onAdLoaded = { retryCount = 0 },
+            onAdFailedToLoad = { error ->
+                if (retryCount < maxRetries) {
+                    retryCount++
+                    coroutineScope.launch {
+                        delay(3000L)
+                    }
+                }
+            },
+            onAdClicked = { },
+            onImpression = { },
+        )
     )
     LaunchedEffect(Unit) {
         bannerState.loadAd(AdRequest.Builder(adUnitId).build())
     }
 
-    if (!BuildConfig.BUILD_TYPE.contentEquals("debug"))
+    Log.i("yandex_ads", "AdsCard: $retryCount")
+    if (!BuildConfig.BUILD_TYPE.contentEquals("debug") && retryCount == 0)
         Banner(
             state = bannerState,
             modifier = Modifier
@@ -1415,5 +1445,4 @@ fun AdsCard(
                 )
 //            .padding(vertical = 15.dp, horizontal = 20.dp) // внешний отступ карточки
         )
-
 }

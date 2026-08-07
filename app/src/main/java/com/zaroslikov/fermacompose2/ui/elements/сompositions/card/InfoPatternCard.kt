@@ -88,10 +88,13 @@ fun InfoPatternCard(
                         )
                     }
                     priceAll?.let {
+                        val value =
+                            if (it != "0") "$it $priceSuffixString".trim()
+                            else stringResource(R.string.word_calculated)
                         TitleWithValue(
                             modifier = Modifier.weight(1f),
                             titleRes = R.string.outlined_text_price_all,
-                            value = "$it $priceSuffixString".trim()
+                            value = value
                         )
                     }
                     writeOffStatus?.let {

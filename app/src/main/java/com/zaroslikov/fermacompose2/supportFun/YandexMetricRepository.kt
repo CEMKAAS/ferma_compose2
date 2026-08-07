@@ -1,7 +1,9 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import com.zaroslikov.data.room.table.ferma.TemplateTable
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.table.DomainAnimalCount
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.AddIncubator
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.EntryBookmark
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProductState
@@ -10,8 +12,10 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vaccin
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.CurrentAnimalWeight
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalEntryState2
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffProductState
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
 
@@ -23,9 +27,9 @@ interface YandexMetricRepository {
     fun metricalWriteOffFood(state: FoodListUi)
     fun metricAdd(domainAddTable: AddProductState)
     fun metricSale(domainSaleTable: SaleProductState)
-    fun metricalExpenses(domainExpensesTable: ExpensesProduct)
-    fun metricalWriteOff(currentProduct: WriteOffProduct)
-    fun metricalTemplate(currentProduct: AddProductState)
+    fun metricalExpenses(domainExpensesTable: ExpensesProductState)
+    fun metricalWriteOff(currentProduct: WriteOffProductState)
+    fun metricalTemplate(currentProduct: DomainTemplateTable)
     fun metricalAnimalVaccination(state: Vaccination)
     fun metricalNote(title: String)
     fun metricalAnimal(state: AnimalEntryState2)

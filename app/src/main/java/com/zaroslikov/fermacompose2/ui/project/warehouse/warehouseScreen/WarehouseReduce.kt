@@ -11,6 +11,12 @@ class WarehouseReduce : BaseReducer<WarehouseState, WarehouseIntent>() {
             is WarehouseIntent.OpenWarningWriteOffAlterDialogClicked ->
                 state.updateOpenWarningWriteOffAlterDialog(intent.id)
 
+            is WarehouseIntent.ShowAllProductClicked ->
+                state.updateShowAllProduct(intent.value)
+
+            is WarehouseIntent.ShowAllExpensesClicked ->
+                state.updateShowAllExpenses(intent.value)
+
             is WarehouseIntent.ShowFastAddClicked ->
                 state.updateShowFastAdd(intent.value)
 
@@ -39,5 +45,20 @@ class WarehouseReduce : BaseReducer<WarehouseState, WarehouseIntent>() {
                 isOpenWarningWriteOffAlterDialog = currentFoodOnWriteOff?.let { true } ?: false
             )
         }
+    }
+
+    private fun WarehouseState.updateShowAllProduct(
+       isShowAllProduct: Boolean
+    ): WarehouseState {
+            return copy(
+                isShowAllProduct = isShowAllProduct
+            )
+    }
+    private fun WarehouseState.updateShowAllExpenses(
+       isShowAllExpenses: Boolean
+    ): WarehouseState {
+            return copy(
+                isShowAllExpenses = isShowAllExpenses
+            )
     }
 }

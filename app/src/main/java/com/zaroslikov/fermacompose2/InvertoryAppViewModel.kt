@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import com.zaroslikov.domain.models.enums.TemplateType
+import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.repository.AppSettingsRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
@@ -17,14 +17,16 @@ import com.zaroslikov.fermacompose2.base.state.BaseState
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.MainIncubatorDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
 import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
 import com.zaroslikov.fermacompose2.utils.QrCodeDecoder
 import com.zaroslikov.fermacompose2.utils.QrNavigationManager
-import com.zaroslikov.fermacompose2.utils.SnackbarController
-import com.zaroslikov.fermacompose2.utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.rustore.sdk.appupdate.listener.InstallStateUpdateListener
@@ -45,11 +47,11 @@ class InventoryAppViewModel @Inject constructor(
     InvertoryAppState(),
     InvertoryAppReduce()
 ) {
-    var isFirstLaunch by mutableStateOf(false)
+    private val _notification = MutableSharedFlow<UiNotification>()
+    val notification = _notification.asSharedFlow()
+
     var startDestination by mutableStateOf<String?>(null)
         private set
-
-    var isOpenQrCodeWarning by mutableStateOf(false)
 
     private var initialized = false
 
@@ -58,10 +60,60 @@ class InventoryAppViewModel @Inject constructor(
 
 
     init {
-        viewModelScope.launch {
-            val appSettings = appSettingsRepository.getAppSettings().first()
-            isFirstLaunch = appSettings.isFirstLaunch
+        loadData()
+    }
+
+    fun onIntent(intent: Event) {
+        sendIntent(intent)
+        when (intent) {
+            is Event.SkipTrainingClicked -> updateFirstLaunch()
+            else -> Unit
         }
+    }
+
+    private fun loadData() {
+        viewModelScope.launch {
+            updateState { it.copy(isLoading = true) }
+            val appSettings = appSettingsRepository.getAppSettings().first()
+            val newAppSetting = updateLastVersion(appSettings)
+            updateState {
+                it.copy(
+                    appSettings = newAppSetting,
+                    isLoading = false
+                )
+            }
+        }
+    }
+
+    private suspend fun updateLastVersion(appSettings: DomainAppSettings): DomainAppSettings {
+        val currentVersionApp = BuildConfig.VERSION_NAME
+        return if (currentVersionApp != appSettings.currentVersionApp) {
+            val newAppSettings = appSettings.copy(
+                lastVersionApp = appSettings.currentVersionApp,
+                currentVersionApp = currentVersionApp
+            )
+            updateState { it.copy(isFirstLaunchUpdate = true) }
+            updateSettings(newAppSettings)
+            newAppSettings
+        } else appSettings
+    }
+
+    private fun updateFirstLaunch() {
+        viewModelScope.launch {
+            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
+
+            updateSettings(
+                domainAppSettings = getState().appSettings.copy(
+                    isFirstLaunch = false
+                )
+            )
+            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
+            _notification.emit(UiNotification.Notification)
+        }
+    }
+
+    private suspend fun updateSettings(domainAppSettings: DomainAppSettings? = null) {
+        appSettingsRepository.updateAppSettings(domainAppSettings ?: getState().appSettings)
     }
 
     fun resolveStartDestination(intent: Intent?) {
@@ -178,14 +230,17 @@ class InventoryAppViewModel @Inject constructor(
 }
 
 sealed class Event : BaseIntent {
-    data object UpdateCompleted : Event()
     data class ShowDownloadingUpdate(val value: Boolean) : Event()
+    data object SkipTrainingClicked : Event()
 }
 
 data class InvertoryAppState(
     val isOpenDownloadingUpdate: Boolean = false,
+    val isFirstLaunchUpdate: Boolean = false,
+    val appSettings: DomainAppSettings = DomainAppSettings(),
     override val isLoading: Boolean = false,
-    override val navigate: UiEvent? = null
+    override val navigate: UiEvent? = null,
+    val isNotificationAsked: Boolean = false
 ) : BaseState
 
 class InvertoryAppReduce : BaseReducer<InvertoryAppState, Event>() {
@@ -195,7 +250,18 @@ class InvertoryAppReduce : BaseReducer<InvertoryAppState, Event>() {
     ): InvertoryAppState {
         return when (intent) {
             is Event.ShowDownloadingUpdate -> state.copy(isOpenDownloadingUpdate = intent.value)
-            Event.UpdateCompleted -> state
+            is Event.SkipTrainingClicked -> state.updateSkipTraining()
+            else -> state
         }
+    }
+
+    private fun InvertoryAppState.updateSkipTraining(): InvertoryAppState {
+        return copy(
+            appSettings = appSettings.copy(
+                isFirstLaunch = false
+            ),
+            isFirstLaunchUpdate = false,
+            isNotificationAsked = true
+        )
     }
 }

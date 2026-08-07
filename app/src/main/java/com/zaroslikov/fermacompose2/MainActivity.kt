@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -36,16 +37,12 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
+
         super.onCreate(savedInstanceState)
+        // Принудительно устанавливаем прозрачные бары
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                scrim = android.graphics.Color.WHITE,
-                darkScrim = android.graphics.Color.WHITE
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                scrim = android.graphics.Color.WHITE,
-                darkScrim = android.graphics.Color.WHITE
-            )
+            statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT, ),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
         )
         setContent {
             FermaCompose2Theme {

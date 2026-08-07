@@ -1,9 +1,14 @@
 package com.zaroslikov.fermacompose2
 
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -49,8 +54,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogBase
+import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgressWitchText
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
+import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
+import com.zaroslikov.fermacompose2.ui.start.first.FirstIntent
+import com.zaroslikov.fermacompose2.ui.start.update.TrainingScreen
+import com.zaroslikov.fermacompose2.ui.start.update.UpdateScreen
 import com.zaroslikov.fermacompose2.utils.ObserveAsEvents
 import com.zaroslikov.fermacompose2.utils.SnackbarController
 import kotlinx.coroutines.launch
@@ -62,6 +72,7 @@ fun InventoryApp(
     viewModel: InventoryAppViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current
+    val notificationFlow = viewModel.notification
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -74,6 +85,20 @@ fun InventoryApp(
 
     LaunchedEffect(intent) {
         viewModel.resolveStartDestination(intent)
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {}
+
+    LaunchedEffect(Unit) {
+        notificationFlow.collect { event ->
+            when (event) {
+                UiNotification.Notification ->
+                    if (Build.VERSION.SDK_INT >= 33 && state.isNotificationAsked)
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     ObserveAsEvents(
@@ -94,50 +119,53 @@ fun InventoryApp(
             }
         }
     }
-    Scaffold(
-        modifier = Modifier.pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                focusManager.clearFocus()
-            })
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        if (activity != null && (!viewModel.isFirstLaunch && showSplash)
-            && !BuildConfig.BUILD_TYPE.contentEquals("debug")
-        )
-            SplashScreen(
-                innerPadding = it,
-                activity = activity,
-                onFinished = {
-                    showSplash = false
-                    adFinished = true
-                }
-            )
-        else
-            if (startDestination != null)
-                InventoryNavHost(
-                    navController = navController,
-                    modifier = Modifier.padding(it),
-                    startDestination = startDestination,
-                )
 
-        LaunchedEffect(adFinished) {
-            if (adFinished) {
-                viewModel.update()
+    if (state.isLoading)
+        CircularProgress(modifier = Modifier.background(white))
+    else
+        when {
+            state.appSettings.isFirstLaunch ->
+                TrainingScreen { viewModel.onIntent(Event.SkipTrainingClicked) }
+
+            state.isFirstLaunchUpdate ->
+                UpdateScreen { viewModel.onIntent(Event.SkipTrainingClicked) }
+
+            else -> Scaffold(
+                modifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                },
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+            ) {
+                if (activity != null && (!state.appSettings.isFirstLaunch && showSplash)
+                    && !BuildConfig.BUILD_TYPE.contentEquals("debug")
+                )
+                    SplashScreen(
+                        innerPadding = it,
+                        activity = activity,
+                        onFinished = {
+                            showSplash = false
+                            adFinished = true
+                        }
+                    )
+                else
+                    if (startDestination != null)
+                        InventoryNavHost(
+                            navController = navController,
+                            modifier = Modifier.padding(it),
+                            startDestination = startDestination,
+                        )
+
+                LaunchedEffect(adFinished) {
+                    if (adFinished) {
+                        viewModel.update()
+                    }
+                }
+                if (state.isOpenDownloadingUpdate)
+                    LoadUpdate()
             }
         }
-        if (state.isOpenDownloadingUpdate)
-            LoadUpdate()
-
-      /*  if (viewModel.isOpenQrCodeWarning)
-            QrCodeWarningBottomSheet(
-                qrCodeWarning = QrCodeWarning.GLOBAL,
-                onDismissRequest = { viewModel.isOpenQrCodeWarning = false},
-                onScannerClick = {}
-            ) {
-
-            }*/
-    }
 }
 
 @Composable

@@ -29,6 +29,7 @@ import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.domain.repository.template.TemplateRepository
+import com.zaroslikov.fermacompose2.BuildConfig
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
@@ -36,7 +37,6 @@ import com.zaroslikov.fermacompose2.ui.navigation.EventFile
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appmetrica.analytics.AppMetrica
-import io.appmetrica.analytics.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -292,13 +292,18 @@ class SettingsViewModel @Inject constructor(
                 )
 
                 profileRepository.clearAndInsertProfileTableForImport(backup.profileTable)
-                appSettingsRepository.clearAndInsertAppSettingsTableForImport(backup.appSettingsTable)
+                appSettingsRepository.clearAndInsertAppSettingsTableForImport(backup.appSettingsTable.map {
+                    it.copy(
+                        currentVersionApp = BuildConfig.VERSION_NAME,
+                        deviceId = it.deviceId.ifBlank { UUID.randomUUID().toString() }
+                    )
+                })
                 launchNotification()
                 showMessage("Импорт прошел успешно")
                 AppMetrica.reportEvent("Импорт базы данных")
                 return@launch
             } catch (e: Exception) {
-                showMessage("Ошибка при импорте базы данных")
+                showMessage("Ошибка при импорте базы данных!\nОбратитесь в службу поддержки.")
                 Log.i("error", "setAllData: $e")
             }
         }

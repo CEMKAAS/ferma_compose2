@@ -37,7 +37,8 @@
     <string name="yandex_first_launch_ads">R–M-12224806-2</string>
     <string name="yandex_rewarded_ads">R-M-12224806-4</string>
     //AdsSupportText
-    <string name="ads_support_text_load_ads">Идет загрузка рекламы, подождите, пожалуйста…</string>
+    <string name="ads_support_text_load_ads">Загружаем рекламу… Благодаря ей проект развивается.\nПожалуйста, подождите несколько секунд.\nСпасибо большое за вашу поддержку!❤️</string>
+
 
     //Update App
     <string name="update_app_load_update">Идет загрузка обновления, подождите, пожалуйста…</string>
@@ -50,6 +51,43 @@
     // BottomBarIncubator
     <string name="bottom_bar_incubator">Инкубатор</string>
     <string name="bottom_bar_bookmark">Закладка</string>
+
+    //Update 3.1.0
+    <string name="update_screen_first_title">Большое обновление! Шаблоны и QR-коды</string>
+    <string name="update_screen_first_support_title">Новые инструменты для быстрой работы — шаблоны и QR-коды</string>
+    <string name="update_screen_first_list_1">Шаблоны для всех разделов</string>
+    <string name="update_screen_first_list_2">QR-коды для шаблонов</string>
+    <string name="update_screen_first_list_3">Нулевые остатки на складе</string>
+    <string name="update_screen_first_list_4">Устранение ошибок</string>
+
+    <string name="update_screen_second_title">Сканируй — и готово</string>
+    <string name="update_screen_second_support_title">Распечатай QR-код шаблона и прикрепи на видное место. Сканируй — и запись создаётся мгновенно.</string>
+    <string name="update_screen_second_list_1">Три режима QR-кода</string>
+    <string name="update_screen_second_list_support_1">Мини, стандартный, подробный</string>
+    <string name="update_screen_second_list_2">Удобный формат для печати</string>
+    <string name="update_screen_second_list_support_2">Скачать QR-код в формате PNG в одно нажатие</string>
+    <string name="update_screen_second_list_3">Сканируй QR-код как удобно</string>
+    <string name="update_screen_second_list_support_3">Через камеру своего сматфона или через приложение</string>
+
+    <string name="update_screen_third_title">Шаблоны для всех разделов</string>
+    <string name="update_screen_third_support_title">Для каждорого раздела можно создать свой шаблон. Мультипроектный шаблон работает сразу во всех проектах. При применении выбираешь нужный.</string>
+    <string name="update_screen_third_list_1">Многопроектный режим</string>
+    <string name="update_screen_third_list_support_1">Универальный шаблон для всех проектов</string>
+    <string name="update_screen_third_list_2">Закрепление сверху</string>
+    <string name="update_screen_third_list_support_2">Важные шаблоны всегда первые</string>
+
+    <string name="update_screen_found_title">Учёт остатков</string>
+    <string name="update_screen_found_support_title">На складе теперь видны позиции с нулём и минусом.</string>
+    <string name="update_screen_found_list_1">Нулевые остатки</string>
+    <string name="update_screen_found_list_support_1">Нажмите на иконку глаза в разделе</string>
+    <string name="update_screen_found_list_2">Четкое разделение</string>
+    <string name="update_screen_found_list_support_2">Разделение кол-во товара по цветам</string>
+    <string name="update_screen_found_list_3">Что-то еще</string>
+    <string name="update_screen_found_list_support_3">Что-то еще</string>
+
+
+    //words
+    <string name="word_calculated">Рассчитывается…</string>
 
 
     //OutlinedTextField
@@ -390,6 +428,7 @@
     <string name="training_screen_main_welcome_row_1">Простой и понятный интерфейс</string>
     <string name="training_screen_main_welcome_row_2">Полный контроль над хозяйством</string>
     <string name="training_screen_main_welcome_row_3">Автоматические расчеты и аналитика</string>
+    <string name="training_screen_main_welcome_row_4">Внос данных через QR-код</string>
 
     <string name="training_screen_main_ferma_title">Хозяйство</string>
     <string name="training_screen_main_ferma_title_sup">Контролируйте доходы и расходы</string>
@@ -760,6 +799,9 @@
     <string name="warehouse_screen_warehouse_write_off_food">Списать корм?</string>
     <string name="warehouse_screen_warehouse_write_off_food_text">Вы собираетесь списать весь оставшийся корм:</string>
     <string name="warehouse_screen_warehouse_food_write_off">Списание корма</string>
+    <string name="warehouse_screen_warehouse_item_empty_list">Вся продукция на нуле или в минусе</string>
+    <string name="warehouse_screen_warehouse_item_empty_list_text">Позиций скрыты — нажмите чтобы показать</string>
+
 
     //WarehouseEdit
     <string name="warehouse_edit_screen_title_add">Создание проекта</string>

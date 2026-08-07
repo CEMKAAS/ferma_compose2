@@ -333,8 +333,9 @@ class AddViewModel @Inject constructor(
 
     override fun insertTemplate() {
         viewModelScope.launch {
-            templateRepository.insert(getState().currentProduct.toDomainTemplate())
-            yandexMetricRepository.metricalTemplate(getState().currentProduct)
+            val domainTemplate = getState().currentProduct.toDomainTemplate()
+            templateRepository.insert(domainTemplate)
+            yandexMetricRepository.metricalTemplate(domainTemplate)
             loadDataForEntryOrEdit(false, null)
         }
     }
@@ -469,7 +470,7 @@ class AddViewModel @Inject constructor(
             animalId = product.animalId,
             note = product.note.trim(),
             price = 0.0,
-            idPT = product.projectId,
+            idPT = _itemIdPT,
             animalCountId = product.animalCountId
         )
     }

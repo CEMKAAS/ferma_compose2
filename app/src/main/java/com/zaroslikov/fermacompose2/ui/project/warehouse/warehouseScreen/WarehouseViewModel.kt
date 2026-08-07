@@ -26,10 +26,12 @@ import com.zaroslikov.fermacompose2.supportFun.dateTodayArray
 import com.zaroslikov.fermacompose2.supportFun.formatDateToString
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.CountOfWarehouse
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.LoadDataWarehouse
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseIntent
+import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseItem
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseReduce
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseState
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -167,20 +169,27 @@ class WarehouseViewModel @Inject constructor(
     private fun build(
         productList: List<DomainTitleCountSuffix>,
         settings: DomainSettings
-    ): List<DomainTitleCountSuffix> {
+    ): List<WarehouseItem> {
         return productList
             .groupBy { it.title to it.suffix.conversation4(settings) }
             .map { (title, items) ->
                 val totalCount = items.sumOf {
                     it.count.conversation3(it.suffix, settings)
                 }
-                DomainTitleCountSuffix(
+                val countOfWarehouse = when {
+                    totalCount > 0 -> CountOfWarehouse.Have
+                    totalCount == 0.0 -> CountOfWarehouse.Zero
+                    else -> CountOfWarehouse.Minus
+                }
+                WarehouseItem(
                     title = title.first,
                     count = totalCount,
-                    suffix = title.second
+                    suffix = title.second,
+                    countOfWarehouse = countOfWarehouse
                 )
-            }.filter { it.count > 0 }
+            }.sortedByDescending { it.count }
     }
+
 
     private fun FoodListUi.toUi(): DomainWriteOffTable {
         val date = dateTodayArray()

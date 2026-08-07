@@ -11,11 +11,13 @@ data class WarehouseState(
     val isOpenWarningWriteOffAlterDialog: Boolean = false,
     val currentFoodOnWriteOff: FoodListUi? = null,
     val isShowFastAddProduct: Boolean = false,
-    val productList: List<DomainTitleCountSuffix> = emptyList(),
+    val productList: List<WarehouseItem> = emptyList(),
     val foodList: List<FoodListUi> = emptyList(),
-    val expensesList: List<DomainTitleCountSuffix> = emptyList(),
+    val expensesList: List<WarehouseItem> = emptyList(),
     val fastAddList: List<DomainFastAddProduct> = emptyList(),
     val settings: DomainSettings = DomainSettings(),
+    val isShowAllProduct: Boolean = false,
+    val isShowAllExpenses: Boolean = false,
     override val idPT: Long = 0,
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
@@ -33,9 +35,20 @@ data class FoodListUi(
 )
 
 data class LoadDataWarehouse(
-    val productList: List<DomainTitleCountSuffix>,
+    val productList: List<WarehouseItem>,
     val foodList: List<FoodListUi>,
-    val expensesList: List<DomainTitleCountSuffix>,
+    val expensesList: List<WarehouseItem>,
     val fastAddList: List<DomainFastAddProduct>,
     val settings: DomainSettings
 )
+
+data class WarehouseItem(
+    val title: String,
+    val count: Double,
+    val suffix: Suffix,
+    val countOfWarehouse: CountOfWarehouse
+)
+
+enum class CountOfWarehouse {
+    Have, Zero, Minus
+}

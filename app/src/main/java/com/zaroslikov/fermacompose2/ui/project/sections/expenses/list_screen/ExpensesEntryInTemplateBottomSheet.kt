@@ -69,7 +69,8 @@ fun ExpensesEnterInPatternBottomSheet(
             InfoPatternCard(
                 title = if (template.isTitle) null else product.title,
                 count = if (template.isCount) null else product.count,
-                countSuffix = if (template.isSuffix) null else product.countSuffix,                 price = if (template.isPrice) null else product.price,
+                countSuffix = if (template.isSuffix) null else product.countSuffix,
+                price = if (template.isPrice) null else product.price,
                 priceAll = if (template.isPriceAll) null else product.priceAll,
                 priceSuffix = product.priceSuffix,
                 category = if (template.isCategory) null else product.category,

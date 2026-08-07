@@ -464,7 +464,7 @@ private fun SaleEntryBottomSheet(
             isNecessarily = true,
             count = if (template.isCount) "" else product.count,
             countSuffix = if (template.isSuffix) Suffix.NO else product.countSuffix,
-            priceAll = product.priceAll,
+            priceAll = if (template.isCount) "-" else product.priceAll,
             priceSuffix = product.priceSuffix,
 
             isShowSwitch = isTemplate,

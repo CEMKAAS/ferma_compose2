@@ -381,8 +381,9 @@ class SaleViewModel @Inject constructor(
 
     override fun insertTemplate() {
         viewModelScope.launch {
-            templateRepository.insert(getState().currentProduct.toDomainTemplate())
-//            yandexMetricRepository.metricalTemplate(getState().currentProduct,) //TODO
+            val domainTemplate = getState().currentProduct.toDomainTemplate()
+            templateRepository.insert(domainTemplate)
+            yandexMetricRepository.metricalTemplate(domainTemplate)
             loadDataForEntryOrEdit(false, null)
         }
     }
@@ -549,7 +550,12 @@ class SaleViewModel @Inject constructor(
             count = if (activeField.isCount) null else product.count.toConvertDbDouble(),
             countSuffix = if (activeField.isSuffix) null else product.countSuffix,
             price = if (activeField.isPrice) null else product.price.toConvertDbDouble(),
-            priceAll = if (!activeField.isPrice && product.isAutoPrice) product.priceAll.toConvertDbDouble() else null,
+            priceAll = when {
+                !activeField.isPrice && product.isAutoPrice -> if (activeField.isCount) 0.0 else
+                    product.priceAll.toConvertDbDouble()
+
+                else -> null
+            },
             priceSuffix = product.priceSuffix,
             category = if (activeField.isCategory) null else product.category.trim(),
             isDate = activeField.isDate,
@@ -569,7 +575,7 @@ class SaleViewModel @Inject constructor(
             count?.formatNumber(),
             countSuffix?.let { resourceProvider.getString(it.toResId()) },
             price?.let { "${it.formatNumber()} $suffix".trim() },
-            priceAll?.let { "${it.formatNumber()} $suffix".trim() },
+            priceAll?.let { if (it != 0.0) "${it.formatNumber()} $suffix".trim() else null },
             category?.takeIf { !it.contains(resourceProvider.getString(R.string.support_text_no_category)) && it.isNotBlank() },
             buyer?.takeIf { it.isNotBlank() },
             note?.takeIf { it.isNotBlank() }

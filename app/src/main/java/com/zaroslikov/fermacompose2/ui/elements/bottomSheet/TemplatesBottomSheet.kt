@@ -116,7 +116,7 @@ fun TemplateCard(
     pin: Boolean,
     isMultiProject: Boolean,
     iconColor: Color,
-    iconBorderColor: Color,
+    iconBorderColor: Color = ghostly_white,
     onClick: (() -> Unit)? = null,
     onPinnedClick: () -> Unit = {},
     onUnpinnedClick: () -> Unit = {},

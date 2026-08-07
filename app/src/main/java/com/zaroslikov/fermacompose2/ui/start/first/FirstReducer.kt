@@ -19,7 +19,6 @@ class FirstReducer : BaseReducer<FirstState, FirstIntent>() {
                 currentProjectTable = intent.domainProjectTable
             )
 
-            is FirstIntent.SkipTrainingClicked -> state.updateSkipTraining()
             is FirstIntent.ShowDownloadingUpdate -> state.copy(isOpenDownloadingUpdate = intent.value)
             is FirstIntent.OpenWarningQrCodeClick -> state.copy(isOpenWaringQrCode = intent.value)
             is FirstIntent.OpenQrCodeScanner -> state.copy(isOpenQrScannerBottomSheet = intent.value)
@@ -39,16 +38,6 @@ class FirstReducer : BaseReducer<FirstState, FirstIntent>() {
             currentProjectTable = if (isOpenArchiveIncubatorBottomSheet) domainProjectTable else null
         )
     }
-
-    private fun FirstState.updateSkipTraining(): FirstState {
-        return copy(
-            appSettings = appSettings.copy(
-                isFirstLaunch = false
-            ),
-            isNotificationAsked = true
-        )
-    }
-
     private fun FirstState.updateOpenChoiceProjectForTemplate(
         value: Boolean,
         projectList: List<DomainProjectTable>

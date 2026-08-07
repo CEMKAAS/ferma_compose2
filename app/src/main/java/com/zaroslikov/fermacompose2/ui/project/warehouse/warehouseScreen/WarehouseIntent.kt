@@ -5,6 +5,8 @@ import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 
 sealed class WarehouseIntent() : BaseIntent {
     data class FastAddClicked(val value: DomainFastAddProduct) : WarehouseIntent()
+    data class ShowAllProductClicked(val value: Boolean) : WarehouseIntent()
+    data class ShowAllExpensesClicked(val value: Boolean) : WarehouseIntent()
     data class ShowFastAddClicked(val value: Boolean) : WarehouseIntent()
     data class OpenWarningWriteOffAlterDialogClicked(val id: Long?) : WarehouseIntent()
     data object FoodOnWriteOffChange : WarehouseIntent()

@@ -88,6 +88,7 @@ import com.zaroslikov.fermacompose2.ui.project.finance.category.WarningCard
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.WarningCard2
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.GroupCard
+import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleListIntent
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.white
 
@@ -216,7 +217,7 @@ fun ExpensesEntryBottomSheet(
             isNecessarily = !template.isPrice,
             count = if (template.isCount) "" else product.count,
             countSuffix = if (template.isSuffix) Suffix.NO else product.countSuffix,
-            priceAll = product.priceAll,
+            priceAll =  if (template.isCount) "-" else product.priceAll,
             priceSuffix = product.priceSuffix,
             supportTextRes = R.string.support_text_price_expenses_all,
             supportTextResAutoCal = R.string.support_text_price_expenses_one,
@@ -244,6 +245,7 @@ fun ExpensesEntryBottomSheet(
                     onIntent(ExpensesListIntent.DateClicked(it))
                 }
             )
+
         if (isTemplate)
             OutlinedSwitch(
                 checked = template.isDate,
@@ -295,11 +297,11 @@ fun ExpensesEntryBottomSheet(
             checked = template.isNote,
             onCheckedChange = { onIntent(ExpensesListIntent.NoteTemplateChanged(it)) },
         )
-        /* if (isTemplate)
-             OutlinedSwitch(
-                 checked = template.isMultiProjectTemplate,
-                 onCheckedChange = { onIntent(ExpensesListIntent.MultiProjectTemplateChanged(it)) }
-             )*/
+        if (isTemplate)
+            OutlinedSwitch(
+                checked = template.isMultiProjectTemplate,
+                onCheckedChange = { onIntent(ExpensesListIntent.MultiProjectTemplateChanged(it)) }
+            )
     }
 }
 

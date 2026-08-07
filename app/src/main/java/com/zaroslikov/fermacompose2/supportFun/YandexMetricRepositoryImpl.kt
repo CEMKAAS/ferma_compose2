@@ -1,9 +1,11 @@
 package com.zaroslikov.fermacompose2.supportFun
 
+import com.zaroslikov.data.room.table.ferma.TemplateTable
 import com.zaroslikov.domain.models.dto.add.DomainFastAddProduct
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainAnimalCount
+import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator.AddIncubator
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.EntryBookmark
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProductState
@@ -12,8 +14,10 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.vaccin
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.weight.CurrentAnimalWeight
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalEntryState2
 import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.expenses.list_screen.ExpensesProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleProductState
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffProductState
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen.WarehouseEditState
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.FoodListUi
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -88,8 +92,10 @@ class YandexMetricRepositoryImpl @Inject constructor(
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["Имя"] = domainAddTable.product.title
         eventParameters["Категория"] = domainAddTable.product.category
-        eventParameters["Животное"] = domainAddTable.product.animalName.ifBlank { "Животное не указано" }
+        eventParameters["Животное"] =
+            domainAddTable.product.animalName.ifBlank { "Животное не указано" }
         eventParameters["Примечание"] = domainAddTable.product.note.ifBlank { "Заметка не указана" }
+        eventParameters["Через шаблон"] = domainAddTable.template.isTemplateEntry
         AppMetrica.reportEvent("Добавление продукции", eventParameters)
     }
 
@@ -99,39 +105,56 @@ class YandexMetricRepositoryImpl @Inject constructor(
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["Имя"] = domainSaleTable.product.title
         eventParameters["Категория"] = domainSaleTable.product.category
-        eventParameters["Покупатель"] = domainSaleTable.product.buyer.ifBlank { "Покупатль не указан" }
-        eventParameters["Примечание"] = domainSaleTable.product.note.ifBlank { "Заметка не указана" }
+        eventParameters["Покупатель"] =
+            domainSaleTable.product.buyer.ifBlank { "Покупатль не указан" }
+        eventParameters["Примечание"] =
+            domainSaleTable.product.note.ifBlank { "Заметка не указана" }
+        eventParameters["Через шаблон"] = domainSaleTable.template.isTemplateEntry
         AppMetrica.reportEvent("Продажа продукции", eventParameters)
     }
 
     override fun metricalExpenses(
-        domainExpensesTable: ExpensesProduct
+        domainExpensesTable: ExpensesProductState
     ) {
         val eventParameters: MutableMap<String, Any> = HashMap()
-        eventParameters["Имя"] = domainExpensesTable.title
-        eventParameters["Категория"] = domainExpensesTable.category
-        eventParameters["Корм"] = if (domainExpensesTable.isShowFood) "Корм" else "Обычная покупка"
-        eventParameters["Примечание"] = domainExpensesTable.note.ifBlank { "Заметка не указана" }
+        eventParameters["Имя"] = domainExpensesTable.product.title
+        eventParameters["Категория"] = domainExpensesTable.product.category
+        eventParameters["Корм"] =
+            if (domainExpensesTable.product.isShowFood) "Корм" else "Обычная покупка"
+        eventParameters["Примечание"] =
+            domainExpensesTable.product.note.ifBlank { "Заметка не указана" }
+        eventParameters["Через шаблон"] = domainExpensesTable.template.isTemplateEntry
         AppMetrica.reportEvent("Покупка продукции", eventParameters)
     }
 
-    override fun metricalWriteOff(currentProduct: WriteOffProduct) {
+    override fun metricalWriteOff(currentProduct: WriteOffProductState) {
         val eventParameters: MutableMap<String, Any> = HashMap()
-        eventParameters["Имя"] = currentProduct.title
+        eventParameters["Имя"] = currentProduct.product.title
         eventParameters["Статус"] =
-            if (currentProduct.status) "На утилизацию" else "На собсвенные нужды"
-        eventParameters["Примечание"] = currentProduct.note.ifBlank { "Заметка не указана" }
+            if (currentProduct.product.status) "На утилизацию" else "На собсвенные нужды"
+        eventParameters["Примечание"] = currentProduct.product.note.ifBlank { "Заметка не указана" }
+        eventParameters["Через шаблон"] = currentProduct.template.isTemplateEntry
         AppMetrica.reportEvent("Списание продукции", eventParameters)
     }
 
-    override fun metricalTemplate(currentProduct: AddProductState) {
+    override fun metricalTemplate(currentProduct: DomainTemplateTable) {
         val eventParameters: MutableMap<String, Any> = HashMap()
-        eventParameters["Имя шаблона"] = currentProduct.template.name
-        eventParameters["Имя"] = currentProduct.product.title
-        eventParameters["Категория"] = currentProduct.product.category
-        eventParameters["Животное"] =
-            currentProduct.product.animalName.ifBlank { "Животное не указано" }
-        eventParameters["Примечание"] = currentProduct.product.note.ifBlank { "Заметка не указана" }
+        eventParameters["Тип шаблона"] = currentProduct.templateType.name
+        eventParameters["Имя шаблона"] = currentProduct.nameTemplate
+        eventParameters["Имя"] = currentProduct.title ?: "Пользователь указывает сам"
+        eventParameters["Кол-во"] = currentProduct.count ?: "Пользователь указывает сам"
+        eventParameters["Единица измерения"] =
+            currentProduct.countSuffix ?: "Пользователь указывает сам"
+        eventParameters["Категория"] = currentProduct.category ?: "Пользователь указывает сам"
+        eventParameters["Многопроектный шаблон"] = currentProduct.isMultiProjectTemplate
+        eventParameters["Текущая дата"] = currentProduct.isDate
+        eventParameters["Тип списания"] =
+            currentProduct.writeOffStatus ?: "Пользователь указывает сам"
+        eventParameters["Цена"] = currentProduct.price ?: "Пользователь указывает сам"
+        eventParameters["Общая стоимость"] = currentProduct.priceAll ?: "Пользователь указывает сам"
+        eventParameters["Покупатель"] = currentProduct.buyer ?: "Пользователь указывает сам"
+        eventParameters["Животное"] = currentProduct.animalName ?: "Пользователь указывает сам "
+        eventParameters["Примечание"] = currentProduct.note ?: "Пользователь указывает сам"
         AppMetrica.reportEvent("Добавление шаблона", eventParameters)
     }
 

@@ -44,9 +44,6 @@ class FirstViewModel @Inject constructor(
     FirstReducer()
 ) {
 
-    private val _notification = MutableSharedFlow<UiNotification>()
-    val notification = _notification.asSharedFlow()
-
     init {
         loadData()
         launchNotification()
@@ -56,7 +53,6 @@ class FirstViewModel @Inject constructor(
     private fun loadTemplate() {
         viewModelScope.launch {
             val template = qrNavigationManager.consume()
-            Log.i("template", "loadDataForTemplateBottomSheet-template: $template ")
             if (template != null) findProject(template)
         }
     }
@@ -106,18 +102,12 @@ class FirstViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             updateState { it.copy(isLoading = true) }
-            combine(
-                appSettingsRepository.getAppSettings(),
-                projectRepository.getAllProject()
-            ) { appSettings, projects ->
-                updateLastVersion(appSettings) to projects
-            }.collectLatest { (appSettings, baseList) ->
+                projectRepository.getAllProject().collectLatest { baseList ->
                 val list = baseList.filter { !it.archive }
                 val archiveList = baseList.filter { it.archive }
                 updateState {
                     it.copy(
                         isLoading = false,
-                        appSettings = appSettings,
                         list = list,
                         archiveList = archiveList
                     )
@@ -132,7 +122,6 @@ class FirstViewModel @Inject constructor(
             is FirstIntent.DeleteClicked -> deleteProject()
             is FirstIntent.ArchiveClicked -> archiveProject(intent.value)
             is FirstIntent.UnarchiveClicked -> unarchiveProject(intent.value)
-            is FirstIntent.SkipTrainingClicked -> updateFirstLaunch()
             is FirstIntent.QrCodeScanner -> qrScanner(intent.value)
             is FirstIntent.ChoiceProjectForTemplateClick -> navigateToProject(intent.value)
             is FirstIntent.OpenMultiProjectBottomSheetClick -> if (!intent.value) qrNavigationManager.clear() else Unit
@@ -278,40 +267,4 @@ class FirstViewModel @Inject constructor(
                 }
             }
     }
-
-
-    private suspend fun updateLastVersion(appSettings: DomainAppSettings): DomainAppSettings {
-        val currentVersionApp = BuildConfig.VERSION_NAME
-
-        return if (currentVersionApp != appSettings.currentVersionApp) {
-            val newAppSettings = appSettings.copy(
-                lastVersionApp = appSettings.currentVersionApp,
-                currentVersionApp = currentVersionApp
-            )
-            updateSettings(newAppSettings)
-            newAppSettings
-        } else appSettings
-    }
-
-    private fun updateFirstLaunch() {
-        viewModelScope.launch {
-            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
-
-            updateSettings(
-                domainAppSettings = getState().appSettings.copy(
-                    isFirstLaunch = false
-                )
-            )
-            updateState { state -> state.copy(isFirstLaunch = true) }
-
-
-            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
-            _notification.emit(UiNotification.Notification)
-        }
-    }
-
-    private suspend fun updateSettings(domainAppSettings: DomainAppSettings? = null) {
-        appSettingsRepository.updateAppSettings(domainAppSettings ?: getState().appSettings)
-    }
-
 }
