@@ -26,7 +26,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.rustore.sdk.appupdate.listener.InstallStateUpdateListener
@@ -208,10 +207,7 @@ class InventoryAppViewModel @Inject constructor(
     }
 
     private val installStateUpdateListener = InstallStateUpdateListener { installState ->
-        Log.i(
-            "update_app",
-            "status = ${installState.installStatus}"
-        )
+
         when (installState.installStatus) {
             InstallStatus.DOWNLOADED -> {
                 sendIntent(Event.ShowDownloadingUpdate(false))
@@ -221,16 +217,23 @@ class InventoryAppViewModel @Inject constructor(
             InstallStatus.DOWNLOADING -> {
                 val totalBytes = installState.totalBytesToDownload
                 val bytesDownloaded = installState.bytesDownloaded
+                sendIntent(
+                    Event.PercentUpdateDownload((bytesDownloaded / totalBytes).toFloat())
+                )
                 sendIntent(Event.ShowDownloadingUpdate(true))
             }
 
-            InstallStatus.FAILED -> {}
+            InstallStatus.FAILED -> {
+                sendIntent(Event.ShowDownloadingUpdate(false))
+                showMessage("Ошибка!")
+            }
         }
     }
 }
 
 sealed class Event : BaseIntent {
     data class ShowDownloadingUpdate(val value: Boolean) : Event()
+    data class PercentUpdateDownload(val value: Float) : Event()
     data object SkipTrainingClicked : Event()
 }
 
@@ -239,6 +242,7 @@ data class InvertoryAppState(
     val isFirstLaunchUpdate: Boolean = false,
     val isShowAds: Boolean = true,
     val appSettings: DomainAppSettings = DomainAppSettings(),
+    val percentUpdateDownload: Float = 0f,
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
     val isNotificationAsked: Boolean = false
@@ -252,6 +256,7 @@ class InvertoryAppReduce : BaseReducer<InvertoryAppState, Event>() {
         return when (intent) {
             is Event.ShowDownloadingUpdate -> state.copy(isOpenDownloadingUpdate = intent.value)
             is Event.SkipTrainingClicked -> state.updateSkipTraining()
+            is Event.PercentUpdateDownload -> state.updatePercentDownload(intent.value)
             else -> state
         }
     }
@@ -266,4 +271,11 @@ class InvertoryAppReduce : BaseReducer<InvertoryAppState, Event>() {
             isShowAds = false
         )
     }
+
+    private fun InvertoryAppState.updatePercentDownload(percentUpdateDownload: Float): InvertoryAppState {
+        return copy(
+            percentUpdateDownload = percentUpdateDownload
+        )
+    }
 }
+

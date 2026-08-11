@@ -16,14 +16,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -56,6 +60,7 @@ import androidx.navigation.compose.rememberNavController
 import com.zaroslikov.fermacompose2.ui.elements.AlertDialog.AlertDialogBase
 import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
 import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgressWitchText
+import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.navigation.InventoryNavHost
 import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.ui.start.first.FirstIntent
@@ -163,19 +168,39 @@ fun InventoryApp(
                     }
                 }
                 if (state.isOpenDownloadingUpdate)
-                    LoadUpdate()
+                    LoadUpdate(state.percentUpdateDownload)
             }
         }
 }
 
 @Composable
-fun LoadUpdate() {
+fun LoadUpdate(
+    progress: Float
+) {
     AlertDialogBase(
         onDismissRequest = { }
     ) {
-        CircularProgressWitchText(
-            intRes = R.string.update_app_load_update
-        )
+        Box(
+            modifier = Modifier.padding(vertical = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    stringResource(R.string.update_app_load_update),
+                    style = text_14,
+                    color = black_2,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }
 
