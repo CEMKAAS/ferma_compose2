@@ -79,15 +79,15 @@ abstract class EntryNewViewModel3<STATE : SectionState, INTENT : BaseIntent, RED
     }
 
     protected fun sendIntent(intent: INTENT) {
-        _state.value = reducer.reducer(_state.value, intent)
+        updateState { reducer.reducer(it, intent) }
     }
 
     protected fun sendQrCodeIntent(intent: QrCodeIntent) {
-        _state.value = reducer.qrReducer(_state.value, intent)
+        updateState { reducer.qrReducer(it, intent) }
     }
 
     protected fun sendTemplateIntent(intent: TemplateIntent) {
-        _state.value = reducer.templateReducer(_state.value, intent)
+        updateState { reducer.templateReducer(it, intent) }
     }
 
 

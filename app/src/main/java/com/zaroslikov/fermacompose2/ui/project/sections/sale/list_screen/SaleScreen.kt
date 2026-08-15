@@ -416,8 +416,8 @@ private fun SaleEntryBottomSheet(
             titleList = state.pickList.titles,
             isErrorTitle = errors.isErrorTitle,
             isErrorSlash = errors.isErrorSlash,
-            readOnly = product.hasIndicators || template.isTitle,
-            enabled = !product.hasIndicators || !template.isTitle,
+            readOnly = product.hasIndicators,
+            enabled = !product.hasIndicators,
             isNecessarily = !template.isTitle,
 
             isShowSwitch = isTemplate,

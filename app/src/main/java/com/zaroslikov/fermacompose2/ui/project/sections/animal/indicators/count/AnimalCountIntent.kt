@@ -50,6 +50,7 @@ sealed class AnimalCountIntent : BaseIntent {
     data object UpdateSalePressed : AnimalCountIntent()
 
     // WriteOff Count Animal
+    data class StatusClicked(val value: Boolean) : AnimalCountIntent()
     data object InsertWriteOffPressed : AnimalCountIntent()
     data object UpdateWriteOffPressed : AnimalCountIntent()
 

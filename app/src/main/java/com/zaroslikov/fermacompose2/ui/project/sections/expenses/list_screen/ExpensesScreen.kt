@@ -278,6 +278,7 @@ fun ExpensesContainer(
                 year = item.year,
                 food = item.food,
                 typeProduct = item.typeProduct,
+                animalId = item.animalId,
                 animalCountId = item.animalCountId,
                 animalVaccinationId = item.animalVaccinationId,
                 isArchive = isArchive,

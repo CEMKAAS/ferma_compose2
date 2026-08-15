@@ -456,10 +456,10 @@ class ExpensesViewModel @Inject constructor(
         val (title, count) =
             if (productOperation == ProductOperation.DELETE) {
                 val product = getState().productDetail ?: ExpensesTableUi()
-                product.title to product.count.formatNumber()
+                product.title to (product.priceAll ?: product.price).formatNumber()
             } else {
                 val product = getState().currentProduct.product
-                product.title to product.count
+                product.title to (product.priceAll.ifBlank { null } ?: product.price)
             }
         val suffix = resourceProvider.getString(getState().settings.currencySuffix.toResId())
         showMessage(

@@ -613,6 +613,7 @@ class AnimalCountViewModel @Inject constructor(
             buyer = domain.buyer ?: "",
             tableId = domain.tableId ?: 0,
             itemIdPT = domain.idPT ?: 0,
+            writeOffStatus = domain.writeOffStatus ?: false,
             isEntry = false,
             productKillList = domain.productKill,
             buyerList = buyerList,
@@ -673,7 +674,7 @@ class AnimalCountViewModel @Inject constructor(
             day = dateList[0].toInt(),
             month = dateList[1].toInt(),
             year = dateList[2].toInt(),
-            status = true,
+            status = state.writeOffStatus,
             note = note?.trim()
                 ?: resourceProvider.getString(R.string.animal_card_screen_note_write_off),
             idPT = itemIdPT,
@@ -742,10 +743,10 @@ class AnimalCountViewModel @Inject constructor(
             price = price,
             priceAll = priceAll,
             buyer = buyer,
+            writeOffStatus = writeOffStatus,
             tableId = tableId,
             idPT = idPT,
             productKill = productKill
         )
     }
 }
-//1157

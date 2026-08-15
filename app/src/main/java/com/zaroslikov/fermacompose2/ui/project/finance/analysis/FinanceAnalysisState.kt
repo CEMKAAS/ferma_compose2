@@ -54,7 +54,9 @@ data class FinanceAnalysisState(
     val animalProducer: List<AnimalProducer> = emptyList(),
     val financeAnalysis: List<FinanceAnalysis> = emptyList(),
     val dateFilter: DateFilterAnalysis = DateFilterAnalysis(),
-    override val isLoading: Boolean = false,
+    // true по умолчанию: экран открывается сразу и с первого кадра показывает
+    // индикатор, пока данные считаются в фоне
+    override val isLoading: Boolean = true,
     override val idPT: Long = 0,
     override val navigate: UiEvent? = null
 ) : ListState()

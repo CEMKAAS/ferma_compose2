@@ -117,7 +117,11 @@ fun <T, B> InventoryBody(
     brieflyEmptyState: EmptyState? = null,
     iconColor: Color,
     backgroundColor: Color,
-    isBorderCard: Boolean = true
+    isBorderCard: Boolean = true,
+    // Запас снизу, чтобы FAB не перекрывал последнюю карточку.
+    // Значение зависит от высоты FAB конкретного экрана, поэтому задаётся вызывающим;
+    // дефолт сохраняет прежнее поведение.
+    bottomContentPadding: Dp = 8.dp
 ) {
     val currentListIsNotEmpty = if (details) {
         itemList.isNotEmpty()
@@ -136,6 +140,7 @@ fun <T, B> InventoryBody(
                 brieflyList = searchBrieflyList,
                 detailCard = detailCard,
                 brieflyCard = brieflyCard,
+                bottomContentPadding = bottomContentPadding,
             )
         else MessageNoData2(
             modifier = modifier.padding(bottom = 16.dp),
@@ -182,6 +187,7 @@ private fun <T, B> InventoryList(
     brieflyList: List<B>,
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
+    bottomContentPadding: Dp = 8.dp,
 ) {
     AnimatedContent(
         targetState = details,
@@ -215,7 +221,7 @@ private fun <T, B> InventoryList(
 
         LazyColumn(
             modifier = modifier,
-            contentPadding = PaddingValues(vertical = 8.dp),
+            contentPadding = PaddingValues(top = 8.dp, bottom = bottomContentPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (targetDetails) {

@@ -68,6 +68,7 @@ data class CountItem(
     val priceAll: String = "",
     val isAutoCalculate: Boolean = false,
     val buyer: String = "",
+    val writeOffStatus: Boolean = false,
     val tableId: Long? = null,
     val itemIdPT: Long = 0,
     val isEntry: Boolean = true,
@@ -108,7 +109,7 @@ data class ErrorKill(
 data class ErrorCount(
     val isErrorPrice: Boolean = false,
     val isErrorCount: Boolean = false,
-    val isErrorCountZero: Boolean = false, override val hasAnyError: Boolean =false,
+    val isErrorCountZero: Boolean = false, override val hasAnyError: Boolean = false,
 ) : BaseError
 
 data class DomainAnimalCountPriceUi(
@@ -119,6 +120,7 @@ data class DomainAnimalCountPriceUi(
     val animalId: Long = 0,
     val note: String = "",
     val version: AnimalCountVersion? = AnimalCountVersion.ADD, //TODO
+    val writeOffStatus: Boolean? = null,
     val price: Double? = null,
     val priceAll: Double? = null,
     val buyer: String? = null,

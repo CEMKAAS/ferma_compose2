@@ -16,7 +16,9 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountAnimalNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextNoteNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedWriteOffStatus
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EntryIndicationBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffListIntent
 
 @Composable
 fun BottomSheetWriteOffAnimal(
@@ -42,7 +44,7 @@ fun BottomSheetWriteOffAnimal(
             onIntent(
                 AnimalCountIntent.DialogClicked(
                     false,
-                    isSaveStateForBottomSheet =  state.isEntry,
+                    isSaveStateForBottomSheet = state.isEntry,
                     version = state.version
                 )
             )
@@ -53,6 +55,10 @@ fun BottomSheetWriteOffAnimal(
         onInsertClick = { onIntent(AnimalCountIntent.InsertWriteOffPressed) },
         onUpdateClick = { onIntent(AnimalCountIntent.UpdateWriteOffPressed) }
     ) {
+        OutlinedWriteOffStatus(
+            value = state.writeOffStatus,
+            onValueChange = { onIntent(AnimalCountIntent.StatusClicked(it)) },
+        )
         OutlinedTextCountAnimalNew(
             value = state.count,
             onValueChange = {

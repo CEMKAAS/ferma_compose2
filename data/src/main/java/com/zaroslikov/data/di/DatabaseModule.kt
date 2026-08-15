@@ -51,8 +51,9 @@ object DatabaseModule {
     fun provideDatabase(
         @ApplicationContext context: Context,
     ): AppDatabase {
+        // Без fallbackToDestructiveMigration: отсутствующая миграция должна падать,
+        // а не молча стирать базу хозяйства — данные пользователя нигде не дублируются.
         return Room.databaseBuilder(context, AppDatabase::class.java, "item_database")
-            .fallbackToDestructiveMigration()
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)

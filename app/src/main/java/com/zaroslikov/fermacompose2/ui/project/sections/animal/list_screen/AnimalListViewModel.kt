@@ -33,7 +33,7 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class AnimalListViewModel @Inject constructor(
+class       AnimalListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val animalRepository: AnimalRepository,
     private val animalCountRepository: AnimalCountRepository,
@@ -140,10 +140,10 @@ class AnimalListViewModel @Inject constructor(
 
             val pair = getState().currentProduct.updateForSave(idAnimal, itemIdPT)
 
-            animalCountRepository.insertAnimalCountTable(pair.first)
+            val id = animalCountRepository.insertAnimalCountTable(pair.first)
 
             pair.second?.let {
-                expensesRepository.insertExpenses(it)
+                expensesRepository.insertExpenses(it.copy(animalCountId = id))
             }
             yandexMetricRepository.metricalAnimal(getState().currentProduct)
             showSnackbar(ProductOperation.ADD)

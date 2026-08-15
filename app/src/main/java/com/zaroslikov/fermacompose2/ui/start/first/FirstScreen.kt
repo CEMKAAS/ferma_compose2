@@ -312,6 +312,9 @@ private fun StartScreenContainer2(
     InventoryBody(
         modifier = modifier,
         details = !isArchiveMode,
+        // NeonGlowFab 64dp + отступ FAB от низа Scaffold 16dp + 8dp запаса,
+        // иначе FAB перекрывает кнопки последней карточки
+        bottomContentPadding = 88.dp,
         itemList = itemList,
         searchList = itemList,
         brieflyList = brieflyList,

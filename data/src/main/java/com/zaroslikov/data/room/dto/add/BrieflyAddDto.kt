@@ -1,6 +1,5 @@
 package com.zaroslikov.data.room.dto.add
 
-import androidx.compose.runtime.Composable
 import androidx.room.ColumnInfo
 import com.zaroslikov.domain.models.enums.Suffix
 

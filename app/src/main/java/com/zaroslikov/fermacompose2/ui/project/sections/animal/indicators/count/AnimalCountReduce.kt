@@ -12,6 +12,7 @@ import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble2
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.WriteOffListIntent
 
 
 class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
@@ -52,6 +53,8 @@ class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
 
             // Sale Count Animal
             is AnimalCountIntent.BuyerSaleChanged -> state.updateBuyerSale(intent.value)
+            // WriteOff Count Animal
+            is AnimalCountIntent.StatusClicked -> state.updateWriteOffStatus(intent.value)
 
             // Kill Count Animal
             is AnimalCountIntent.OpenWeightAlertDialogClicked ->
@@ -92,7 +95,7 @@ class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
             AnimalCountVersion.SALE, AnimalCountVersion.EXPENSES ->
                 count.isNotBlank() && price.isNotBlank() && !isAnimalCountZero(count)/* isErrorCountZero*/
 
-            AnimalCountVersion.KILL, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.ADD, AnimalCountVersion.INCUBATOR  ->
+            AnimalCountVersion.KILL, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.ADD, AnimalCountVersion.INCUBATOR ->
                 count.isNotBlank() && !isAnimalCountZero(count)
         }
 
@@ -189,6 +192,15 @@ class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
         return copy(
             currentProduct = currentProduct.copy(
                 buyer = buyer
+            )
+        )
+    }
+
+    // WriteOff Count Animal
+    private fun AnimalCountState.updateWriteOffStatus(writeOffStatusClicked: Boolean): AnimalCountState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                writeOffStatus = writeOffStatusClicked
             )
         )
     }

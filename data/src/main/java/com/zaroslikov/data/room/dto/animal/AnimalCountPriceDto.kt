@@ -17,6 +17,8 @@ data class AnimalCountPriceDto(
     val price: Double?,
     @ColumnInfo(name = "price_all")
     val priceAll: Double?,
+    @ColumnInfo(name = "status")
+    val writeOffStatus: Boolean?,
     val buyer: String?,
     @ColumnInfo(name = "table_id")
     val tableId: Long?,

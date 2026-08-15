@@ -21,7 +21,7 @@ abstract class BaseViewModel<STATE : BaseState, INTENT : BaseIntent>(
     initialState: STATE,
 ) : ViewModel() {
 
-     val _state = MutableStateFlow(initialState)
+    private val _state = MutableStateFlow(initialState)
     val state: StateFlow<STATE> = _state.asStateFlow()
 
     protected fun updateState(update: (STATE) -> STATE) {

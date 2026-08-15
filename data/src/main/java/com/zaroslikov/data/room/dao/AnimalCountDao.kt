@@ -102,7 +102,11 @@ interface AnimalCountDao {
                 "        WHEN version IN (1, 5) THEN (SELECT idPT FROM expenses_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (2, 3) THEN (SELECT idPT FROM write_off_table WHERE animal_count_id = id)" +
                 "        ELSE NULL" +
-                "    END AS idPT" +
+                "    END AS idPT," +
+                "  CASE" +
+                "        WHEN version IN (2, 3) THEN (SELECT status FROM write_off_table WHERE animal_count_id = id)" +
+                "        ELSE NULL" +
+                "    END AS status" +
                 " FROM animal_count_table" +
                 " WHERE animal_id=:id" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"

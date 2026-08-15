@@ -24,6 +24,6 @@ abstract class EntryNewViewModel2<STATE : EntryNewState, INTENT : BaseIntent, RE
     abstract fun onIntent(intent: INTENT)
 
     protected fun sendIntent(intent: INTENT) {
-        _state.value = reducer.reducer(_state.value, intent)
+        updateState { reducer.reducer(it, intent) }
     }
 }

@@ -489,6 +489,7 @@ fun DetailProductCardNew(
     typeProduct: TypeProduct? = null,
     animalVaccinationId: Long? = null,
     animalCountId: Long? = null,
+    animalId: Long? = null,
     isArchive: Boolean,
     onClick: () -> Unit = {},
     onEditClick: (() -> Unit)? = null,
@@ -499,7 +500,7 @@ fun DetailProductCardNew(
     val date = dateBuilder(day, monthText, year)
 
     val onDeleteProductClick =
-        if (animalVaccinationId != null || animalCountId != null) null else onDeleteClick
+        if (animalVaccinationId != null || animalCountId != null || animalId != null) null else onDeleteClick
 
     val cardField: @Composable () -> Unit = {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -91,7 +91,8 @@ class InventoryAppViewModel @Inject constructor(
                 lastVersionApp = appSettings.currentVersionApp,
                 currentVersionApp = currentVersionApp
             )
-            updateState { it.copy(isFirstLaunchUpdate = true, isShowAds = false) }
+            if (!(appSettings.currentVersionApp == "v3.1.0v" || appSettings.currentVersionApp == "v3.1.0g"))
+                updateState { it.copy(isFirstLaunchUpdate = true, isShowAds = false) }
             updateSettings(newAppSettings)
             newAppSettings
         } else appSettings
@@ -106,7 +107,7 @@ class InventoryAppViewModel @Inject constructor(
                     isFirstLaunch = false,
                 )
             )
-            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
+             Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
             _notification.emit(UiNotification.Notification)
         }
     }
@@ -257,7 +258,6 @@ class InvertoryAppReduce : BaseReducer<InvertoryAppState, Event>() {
             is Event.ShowDownloadingUpdate -> state.copy(isOpenDownloadingUpdate = intent.value)
             is Event.SkipTrainingClicked -> state.updateSkipTraining()
             is Event.PercentUpdateDownload -> state.updatePercentDownload(intent.value)
-            else -> state
         }
     }
 

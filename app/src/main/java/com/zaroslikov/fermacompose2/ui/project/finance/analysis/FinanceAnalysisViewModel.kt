@@ -30,7 +30,10 @@ import com.zaroslikov.fermacompose2.supportFun.dateLongToStringSQLPair
 import com.zaroslikov.fermacompose2.supportFun.datePeriod
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.List
@@ -68,9 +71,22 @@ class FinanceAnalysisViewModel @Inject constructor(
         }
     }
 
+    private var loadJob: Job? = null
+
     private fun loadData() {
-        viewModelScope.launch {
-            updateState { it.copy(isLoading = true) }
+        // Флоу из Room бесконечные: без отмены каждая смена фильтра добавляла бы
+        // ещё один коллектор, и устаревший мог бы затереть актуальное состояние
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            // titleProduct и baseSuffix известны из аргументов навигации,
+            // поэтому шапка экрана заполнена ещё до окончания расчёта
+            updateState {
+                it.copy(
+                    isLoading = true,
+                    titleProduct = titleProduct,
+                    baseSuffix = baseSuffix
+                )
+            }
             val state = getState()
             val (start, end) = datePeriod(
                 state.dateFilter.filterDate,
@@ -111,28 +127,33 @@ class FinanceAnalysisViewModel @Inject constructor(
                     start = start,
                     end = end,
                 )
-            }.collect { newState ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        titleProduct = titleProduct,
-                        buyers = newState.buyers,
-                        animalProducer = newState.animalProducer,
-                        totalPrice = newState.totalPrice,
-                        countProduct = newState.countProduct,
-                        financeAnalysis = newState.financeAnalysis,
-                        stock = newState.stock,
-                        averagePrice = newState.averagePrice,
-                        realizedPrice = newState.realizedPrice,
-                        potentialBalance = newState.potentialBalance,
-                        soldLost = newState.soldLost,
-                        transactionList = newState.transactionList,
-                        charFilter = newState.charFilter,
-                        baseSuffix = baseSuffix,
-                        settings = newState.settings
-                    )
-                }
             }
+                // buildUiState тяжёлый: без flowOn он считался бы в главном потоке
+                // (viewModelScope = Dispatchers.Main.immediate) и блокировал отрисовку
+                // экрана вместе с индикатором загрузки
+                .flowOn(Dispatchers.Default)
+                .collect { newState ->
+                    updateState {
+                        it.copy(
+                            isLoading = false,
+                            titleProduct = titleProduct,
+                            buyers = newState.buyers,
+                            animalProducer = newState.animalProducer,
+                            totalPrice = newState.totalPrice,
+                            countProduct = newState.countProduct,
+                            financeAnalysis = newState.financeAnalysis,
+                            stock = newState.stock,
+                            averagePrice = newState.averagePrice,
+                            realizedPrice = newState.realizedPrice,
+                            potentialBalance = newState.potentialBalance,
+                            soldLost = newState.soldLost,
+                            transactionList = newState.transactionList,
+                            charFilter = newState.charFilter,
+                            baseSuffix = baseSuffix,
+                            settings = newState.settings
+                        )
+                    }
+                }
 
         }
     }

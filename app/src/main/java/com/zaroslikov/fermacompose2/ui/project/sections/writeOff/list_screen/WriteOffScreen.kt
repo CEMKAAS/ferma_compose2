@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen
 
 import android.app.Activity
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -443,6 +444,8 @@ private fun WriteOffEntryBottomSheet(
             checked = template.isWriteOffStatus,
             onCheckedChange = { onIntent(WriteOffListIntent.WriteOffStatusClicked(it)) },
         )
+        Log.i("write_off", "hasIndicator = ${!product.hasIndicators} ")
+        Log.i("write_off", "isTitle = ${!template.isTitle} ")
         OutlinedTextTitleSaleNew(
             value = product.title,
             onValueChoice = {
@@ -455,7 +458,7 @@ private fun WriteOffEntryBottomSheet(
             intResSup = R.string.support_text_price_write_product,
             isMore = true,
             readOnly = true,
-            enabled = !product.hasIndicators || !template.isTitle,
+            enabled = !product.hasIndicators,
             isNecessarily = !template.isTitle,
             isShowSwitch = isTemplate,
             checked = template.isTitle,
