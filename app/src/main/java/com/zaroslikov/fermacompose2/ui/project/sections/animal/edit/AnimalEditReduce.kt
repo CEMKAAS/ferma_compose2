@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.edit
 
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 
@@ -25,7 +26,7 @@ class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
         }
     }
 
-    private fun AnimalEditState.updateIcon(currentIcon: Int): AnimalEditState {
+    private fun AnimalEditState.updateIcon(currentIcon: AppIcon): AnimalEditState {
         return copy(
             currentProduct = currentProduct.copy(
                 currentIcon = currentIcon

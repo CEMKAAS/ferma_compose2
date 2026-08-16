@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 
 import android.provider.Settings
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.fermacompose2.base.state.BaseError
@@ -73,7 +74,7 @@ data class AnimalListUi(
     val foodDaySuffix: Suffix = Suffix.KILOGRAM_DAY,
     val isArchive: Boolean = false,
     val imagePath: String? = null,
-    val currentIcon: Int = 0
+    val currentIcon: AppIcon = AppIcon.PETS
 )
 
 

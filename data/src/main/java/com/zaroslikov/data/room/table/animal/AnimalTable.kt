@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.zaroslikov.data.room.table.project.ProjectTable
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 
 
@@ -34,7 +35,7 @@ data class AnimalTable(
     @ColumnInfo(name = "image_path")
     val imagePath: String? = null,
     @ColumnInfo(name = "icon")
-    val currentIcon: Int? = null,
+    val currentIcon: AppIcon? = null,
     val archive: Boolean,
     @ColumnInfo(name = "food_day")
     val foodDay:Double,

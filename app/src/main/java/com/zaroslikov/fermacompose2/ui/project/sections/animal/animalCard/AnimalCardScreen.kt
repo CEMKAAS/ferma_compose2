@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
@@ -226,7 +227,7 @@ private fun DataCardOne(
             ) {
                 IconAnimal(
                     sex = if (animal.group) null else animal.sex,
-                    currentIcon = animal.currentIcon ?: R.drawable.baseline_pets_24,
+                    currentIcon = animal.currentIcon ?: AppIcon.PETS,
                     imagePath = animal.imagePath
                 )
                 Column(

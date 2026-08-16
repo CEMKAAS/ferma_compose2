@@ -2,13 +2,13 @@ package com.zaroslikov.fermacompose2.ui.warehouse
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.project.DomainTimeNotificationProject
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
-import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
@@ -62,7 +62,7 @@ class WarehouseEditViewModel @Inject constructor(
                     isLoading = false,
                     nameProject = project.title,
                     dateProject = project.date,
-                    currentIcon = project.currentIcon ?: R.drawable.livestock,
+                    currentIcon = project.currentIcon ?: AppIcon.LIVESTOCK,
                     imagePath = project.imagePath,
                     isShowNotification = timeNotification.isNotEmpty(),
                     currentProject = project,

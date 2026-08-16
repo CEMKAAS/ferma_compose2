@@ -1,12 +1,13 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.edit
 
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.state.BaseError
 import com.zaroslikov.fermacompose2.base.state.BaseProduct
 import com.zaroslikov.fermacompose2.base.state.EntryNewState
 import com.zaroslikov.fermacompose2.base.state.EntryState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.ui.elements.icon.ANIMAL_ICONS
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 
@@ -37,23 +38,8 @@ data class AnimalUi(
     val foodDaySuffix: Suffix = Suffix.GRAM,
     val idPT: Long = 0,
     val imagePath: String? = null,
-    val currentIcon: Int = R.drawable.baseline_pets_24,
-    val iconList: List<Int> = listOf(
-        R.drawable.baseline_pets_24,
-        R.drawable.chicken,
-        R.drawable.duck,
-        R.drawable.external_goose_birds_icongeek26_outline_icongeek26,
-        R.drawable.quail,
-        R.drawable.turkeycock,
-        R.drawable.baseline_cruelty_free_24,
-        R.drawable.cow,
-        R.drawable.hourse,
-        R.drawable.goat,
-        R.drawable.icons_rabbit,
-        R.drawable.sheep,
-        R.drawable.pig,
-        R.drawable.baseline_add_photo_alternate_24,
-    ),
+    val currentIcon: AppIcon = AppIcon.PETS,
+    val iconList: List<AppIcon> = ANIMAL_ICONS,
     val error: Error = Error(),
     val pickList: PickAnimalEditList = PickAnimalEditList(),
     override val hasAnyError: Boolean = false

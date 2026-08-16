@@ -1,16 +1,17 @@
 package com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen
 
 import androidx.compose.ui.graphics.ImageBitmap
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.DomainSettings
-import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.state.ListState
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.ui.elements.icon.PROJECT_ICONS
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.NotificationParameters
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 
 data class WarehouseEditState(
-    val currentIcon: Int = R.drawable.livestock,
+    val currentIcon: AppIcon = AppIcon.LIVESTOCK,
     val imagePath: String? = null,
     val nameProject: String = "",
     val dateProject: String = dateToday(),
@@ -28,20 +29,5 @@ data class WarehouseEditState(
     override val idPT: Long = 0,
     override val isLoading: Boolean = false,
     val hasAnyError: Boolean = false,
-    val iconList: List<Int> = listOf(
-        R.drawable.livestock,
-        R.drawable.icons_chicken_s,
-        R.drawable.icons_goat,
-        R.drawable.icons_cow,
-        R.drawable.icons_pig,
-        R.drawable.icons_sheep,
-        R.drawable.icons_hourse,
-        R.drawable.icons_rabbit,
-        R.drawable.icons_farming_pets,
-        R.drawable.icons_pets,
-        R.drawable.icons_plant,
-        R.drawable.icons_farming_1,
-        R.drawable.icons_farming_2,
-        R.drawable.baseline_add_photo_alternate_24
-    )
+    val iconList: List<AppIcon> = PROJECT_ICONS
 ) : ListState()

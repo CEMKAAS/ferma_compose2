@@ -3,12 +3,12 @@ package com.zaroslikov.fermacompose2.ui.incubator_project.AddIncubator
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainIncubatorTable
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.repository.IncubatorTableRepository
 import com.zaroslikov.domain.repository.ProjectRepository
-import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
@@ -156,7 +156,7 @@ class AddIncubatorViewModel @Inject constructor(
         }
     }
 
-    private fun updateIcon(currentIcon: Int) {
+    private fun updateIcon(currentIcon: AppIcon) {
         updateState { state -> state.copy(currentProduct = state.currentProduct.copy(currentIcon = currentIcon)) }
     }
 
@@ -286,7 +286,7 @@ class AddIncubatorViewModel @Inject constructor(
             brandList = brandList,
             modelList = modelList,
             imagePath = domainProjectTable.imagePath,
-            currentIcon = domainProjectTable.currentIcon ?: R.drawable.outline_egg_24
+            currentIcon = domainProjectTable.currentIcon ?: AppIcon.EGG
         )
     }
 
@@ -308,7 +308,7 @@ class AddIncubatorViewModel @Inject constructor(
 }
 
 sealed class AddIncubatorIntent() : BaseIntent {
-    data class IconClicked(val value: Int) : AddIncubatorIntent()
+    data class IconClicked(val value: AppIcon) : AddIncubatorIntent()
     data class ImagePathClicked(val value: String?) : AddIncubatorIntent()
     data class TitleChanged(val value: String) : AddIncubatorIntent()
     data class BrandChanged(val value: String) : AddIncubatorIntent()

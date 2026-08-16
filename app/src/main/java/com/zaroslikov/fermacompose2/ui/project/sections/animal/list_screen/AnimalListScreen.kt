@@ -49,7 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.fermacompose2.ui.elements.icon.drawableRes
 import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.fermacompose2.R
@@ -592,7 +594,7 @@ fun IconAnimal(
     sizeIcon: Dp = 64.dp,
     sex: Boolean?,
     imagePath: String?,
-    currentIcon: Int,
+    currentIcon: AppIcon,
     isArchive: Boolean = false
 ) {
     val colors = when {
@@ -611,7 +613,7 @@ fun IconAnimal(
     )
     val painter = when {
         imagePath != null -> rememberAsyncImagePainter(File(imagePath))
-        else -> painterResource(currentIcon)
+        else -> painterResource(currentIcon.drawableRes)
     }
     val colorFilter = when {
         isArchive && imagePath != null -> ColorFilter.tint(Color.Gray, BlendMode.Saturation)

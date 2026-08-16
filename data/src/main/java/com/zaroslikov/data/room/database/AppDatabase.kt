@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zaroslikov.data.room.converter.AnimalCountVersionConverter
+import com.zaroslikov.data.room.converter.AppIconConverter
 import com.zaroslikov.data.room.converter.ProductOriginConverter
 import com.zaroslikov.data.room.converter.FinanceCategoryConverter
 import com.zaroslikov.data.room.converter.SuffixConverter
@@ -78,7 +79,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         AppSettingsTable::class,
         ProfileTable::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = false,
 )
 @TypeConverters(
@@ -87,7 +88,8 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
     SuffixConverter::class,
     AnimalCountVersionConverter::class,
     TypeEggConvert::class,
-    TemplateTypeConvert::class
+    TemplateTypeConvert::class,
+    AppIconConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun addDao(): AddDao

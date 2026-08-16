@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.dto.finance.DomainTransaction
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
@@ -86,7 +87,7 @@ data class AnimalProducer(
     val percentDouble: Double,
     val percentFloat: Float,
     val imagePath: String?,
-    val currentIcon: Int,
+    val currentIcon: AppIcon,
 )
 
 data class FinanceAnalysis(

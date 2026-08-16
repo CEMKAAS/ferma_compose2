@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.dto.finance.DomainTransaction
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
@@ -537,7 +538,7 @@ private fun AnimalProducerSlider(
     suffix: Suffix,
     percentDouble: Double,
     percentFloat: Float,
-    currentIcon: Int,
+    currentIcon: AppIcon,
     imagePath: String?,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -1,5 +1,7 @@
 package com.zaroslikov.domain.models.table
 
+import com.zaroslikov.domain.models.enums.AppIcon
+import com.zaroslikov.domain.models.enums.AppIconAsCodeSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,5 +13,6 @@ data class DomainProjectTable(
     val mode: Boolean = true, //Инкубатор = 0, Хозяйство = 1
     val archive: Boolean = false,  //не архив = 0, Архив = 1
     val imagePath: String? = null,
-    val currentIcon: Int? = null
+    @Serializable(with = AppIconAsCodeSerializer::class)
+    val currentIcon: AppIcon? = null
 )

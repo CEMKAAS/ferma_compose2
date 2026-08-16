@@ -4,6 +4,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.fermacompose2.base.viewModel.EntryNewViewModel2
@@ -79,7 +80,7 @@ class AnimalEditViewModel @Inject constructor(
             archive = archive,
             idPT = idPT,
             imagePath = imagePath,
-            currentIcon = currentIcon ?: R.drawable.baseline_pets_24,
+            currentIcon = currentIcon ?: AppIcon.PETS,
             pickList = PickAnimalEditList(
                 typeList = typeList
             )

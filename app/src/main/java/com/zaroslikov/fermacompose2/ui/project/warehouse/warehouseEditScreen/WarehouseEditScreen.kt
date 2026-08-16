@@ -55,12 +55,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.list.suffixCurrencyList
 import com.zaroslikov.domain.models.list.suffixHeightList
 import com.zaroslikov.domain.models.list.suffixVolumeList
 import com.zaroslikov.domain.models.list.suffixWeightList
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.elements.icon.drawableRes
 import com.zaroslikov.fermacompose2.black
 import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.blue_17
@@ -233,14 +235,14 @@ private fun WarehouseEditBody(
 
 @Composable
 fun MainSettingsCard(
-    iconList: List<Int>,
+    iconList: List<AppIcon>,
     nameProject: String? = null,
     imagePath: String?,
-    currentIcon: Int,
+    currentIcon: AppIcon,
     iconBoxColor: Color,
     onValueChange: (String) -> Unit = {},
     onImageSelected: (String?) -> Unit,
-    onIconSelected: (Int) -> Unit,
+    onIconSelected: (AppIcon) -> Unit,
 ) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
@@ -252,7 +254,6 @@ fun MainSettingsCard(
             saveImageToInternalStorage(context, it)
         }
         onImageSelected(path)
-        onIconSelected(0)
     }
     var expanded by remember { mutableStateOf(false) }
 
@@ -299,17 +300,20 @@ fun MainSettingsCard(
                             maxItemsInEachRow = 4,
                             itemVerticalAlignment = Alignment.CenterVertically
                         ) {
-                            iconList.forEachIndexed { index, icon ->
+                            iconList.forEach { icon ->
                                 ImageCard(
-                                    painterResource(icon),
-                                    isSelected = icon == currentIcon
+                                    painterResource(icon.drawableRes),
+                                    isSelected = imagePath == null && icon == currentIcon
                                 ) {
-                                    if (index == iconList.lastIndex) launcher.launch("image/*")
-                                    else {
-                                        onIconSelected(icon)
-                                        onImageSelected(null)
-                                    }
+                                    onIconSelected(icon)
+                                    onImageSelected(null)
                                 }
+                            }
+                            ImageCard(
+                                painterResource(R.drawable.baseline_add_photo_alternate_24),
+                                isSelected = false
+                            ) {
+                                launcher.launch("image/*")
                             }
                         }
                     }

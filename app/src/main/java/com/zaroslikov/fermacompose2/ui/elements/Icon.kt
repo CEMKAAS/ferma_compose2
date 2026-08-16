@@ -30,7 +30,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.fermacompose2.ghostly_white
+import com.zaroslikov.fermacompose2.ui.elements.icon.drawableRes
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.white
@@ -144,13 +146,13 @@ fun IconTransaction2(
     modifier: Modifier = Modifier,
     sizeCard: Dp = 40.dp,
     imagePath: String?,
-    currentIcon: Int,
+    currentIcon: AppIcon,
     color: Color,
     isArchive: Boolean = false
 ) {
     val painter = when {
         imagePath != null -> rememberAsyncImagePainter(File(imagePath))
-        else -> painterResource(currentIcon)
+        else -> painterResource(currentIcon.drawableRes)
     }
 
     val colorFilter = when {

@@ -1,6 +1,7 @@
 package com.zaroslikov.domain.models.dto.finance
 
 import com.zaroslikov.domain.models.dto.BaseProductSection
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 
 data class DomainAnimalWitchCountAndImage(
@@ -12,6 +13,6 @@ data class DomainAnimalWitchCountAndImage(
 
     override val price: Double?,
     override val priceAll: Double?,
-    val currentIcon: Int?,
+    val currentIcon: AppIcon?,
     val imagePath: String?
 ) : BaseProductSection

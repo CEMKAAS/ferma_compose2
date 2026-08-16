@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.TopAppBarStart2
@@ -377,7 +378,7 @@ private fun ProjectCard(
     onUnarchiveClick: (() -> Unit)? = null,
     onNavigationProject: () -> Unit
 ) {
-    val (iconProject, iconColor) = if (projectTable.mode) R.drawable.livestock to price_green_2 else R.drawable.outline_egg_24 to orang_8
+    val (iconProject, iconColor) = if (projectTable.mode) AppIcon.LIVESTOCK to price_green_2 else AppIcon.EGG to orang_8
 
     val colors = if (projectTable.archive) listOf(grey, gray_7) else
         if (projectTable.mode) listOf(green_6, green_shamrock)

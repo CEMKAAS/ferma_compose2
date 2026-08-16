@@ -1,6 +1,7 @@
 package com.zaroslikov.data.room.dto
 
 import androidx.room.ColumnInfo
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 
 
@@ -24,5 +25,5 @@ data class AnimalWithCountDto(
     @ColumnInfo(name = "image_path")
     val imagePath: String?,
     @ColumnInfo(name = "icon")
-    val currentIcon: Int?
+    val currentIcon: AppIcon?
 )

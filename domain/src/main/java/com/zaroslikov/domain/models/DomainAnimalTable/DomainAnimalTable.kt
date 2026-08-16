@@ -1,5 +1,7 @@
 package com.zaroslikov.domain.models.DomainAnimalTable
 
+import com.zaroslikov.domain.models.enums.AppIcon
+import com.zaroslikov.domain.models.enums.AppIconAsCodeSerializer
 import com.zaroslikov.domain.models.enums.Suffix
 import kotlinx.serialization.Serializable
 
@@ -17,6 +19,7 @@ data class DomainAnimalTable(
     val foodDay: Double = 0.0,
     val foodDaySuffix: Suffix = Suffix.GRAM,
     val imagePath: String? = null,
-    val currentIcon: Int? = null,
+    @Serializable(with = AppIconAsCodeSerializer::class)
+    val currentIcon: AppIcon? = null,
     val idPT: Long = 0
 )

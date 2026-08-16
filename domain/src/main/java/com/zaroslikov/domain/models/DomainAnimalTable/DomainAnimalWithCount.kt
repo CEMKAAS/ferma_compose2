@@ -1,5 +1,6 @@
 package com.zaroslikov.domain.models.DomainAnimalTable
 
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 
 data class DomainAnimalWithCount(
@@ -16,5 +17,5 @@ data class DomainAnimalWithCount(
     val foodDaySuffix: Suffix,
     val isArchive: Boolean,
     val imagePath: String?,
-    val currentIcon: Int?
+    val currentIcon: AppIcon?
 )

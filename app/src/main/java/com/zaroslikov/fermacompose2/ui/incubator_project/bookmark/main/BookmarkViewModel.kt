@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
@@ -849,13 +850,13 @@ class BookmarkViewModel @Inject constructor(
         )
     }
 
-    private fun iconByTypeEgg(typeEgg: TypeEgg): Int {
+    private fun iconByTypeEgg(typeEgg: TypeEgg): AppIcon {
         return when (typeEgg) {
-            TypeEgg.CHICKENS -> R.drawable.chiken
-            TypeEgg.GEESE -> R.drawable.external_goose_birds_icongeek26_outline_icongeek26
-            TypeEgg.QUAILS -> R.drawable.quail
-            TypeEgg.TURKEYS -> R.drawable.turkeycock
-            TypeEgg.DUCKS -> R.drawable.duck
+            TypeEgg.CHICKENS -> AppIcon.CHICK
+            TypeEgg.GEESE -> AppIcon.GOOSE
+            TypeEgg.QUAILS -> AppIcon.QUAIL
+            TypeEgg.TURKEYS -> AppIcon.TURKEY
+            TypeEgg.DUCKS -> AppIcon.DUCK
         }
     }
 }

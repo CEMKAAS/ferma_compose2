@@ -240,7 +240,7 @@ class SettingsViewModel @Inject constructor(
             }
 
             val backup = try {
-                Json.decodeFromString<BackupData>(value)
+                BackupParser.parse(value)
             } catch (e: Exception) {
                 showMessage("Ошибка чтения файла")
                 return@launch

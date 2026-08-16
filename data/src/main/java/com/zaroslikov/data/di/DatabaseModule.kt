@@ -34,6 +34,7 @@ import com.zaroslikov.data.room.database.migration.MIGRATION_2_3
 import com.zaroslikov.data.room.database.migration.MIGRATION_3_4
 import com.zaroslikov.data.room.database.migration.MIGRATION_4_5
 import com.zaroslikov.data.room.database.migration.MIGRATION_5_6
+import com.zaroslikov.data.room.database.migration.MIGRATION_6_7
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,6 +60,7 @@ object DatabaseModule {
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
             .addMigrations(MIGRATION_5_6)
+            .addMigrations(MIGRATION_6_7)
             .addCallback(object : RoomDatabase.Callback() {
 
                 override fun onCreate(db: SupportSQLiteDatabase) {

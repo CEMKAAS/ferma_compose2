@@ -3,6 +3,7 @@ package com.zaroslikov.data.room.table.project
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zaroslikov.domain.models.enums.AppIcon
 
 @Entity(tableName = "project_table")
 data class ProjectTable(
@@ -16,5 +17,5 @@ data class ProjectTable(
     val mode: Boolean, //Инкубатор = 0, Хозяйство = 1
     val archive: Boolean,  //не архив = 0, Архив = 1
     val imagePath: String?,
-    val currentIcon: Int?
+    val currentIcon: AppIcon?
 )

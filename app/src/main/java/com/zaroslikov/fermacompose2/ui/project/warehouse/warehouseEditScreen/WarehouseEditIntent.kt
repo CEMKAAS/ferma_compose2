@@ -1,11 +1,12 @@
 package com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen
 
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 
 sealed class WarehouseEditIntent() : BaseIntent {
     data class NameProjectChanged(val value: String) : WarehouseEditIntent()
-    data class IconClicked(val value: Int) : WarehouseEditIntent()
+    data class IconClicked(val value: AppIcon) : WarehouseEditIntent()
     data class ImagePathClicked(val value: String?) : WarehouseEditIntent()
     data class DateClicked(val value: String) : WarehouseEditIntent()
     data class CurrencyClicked(val value: Suffix) : WarehouseEditIntent()

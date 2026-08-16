@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
@@ -251,7 +252,7 @@ class       AnimalListViewModel @Inject constructor(
             foodDaySuffix = foodDaySuffix,
             isArchive = isArchive,
             imagePath = imagePath,
-            currentIcon = currentIcon ?: R.drawable.baseline_pets_24
+            currentIcon = currentIcon ?: AppIcon.PETS
         )
     }
 

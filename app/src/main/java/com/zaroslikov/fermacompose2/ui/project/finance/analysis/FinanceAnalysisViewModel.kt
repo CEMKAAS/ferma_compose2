@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.add.DomainAnimalCountSuffix
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.dto.finance.DomainAnimalWitchCountAndImage
 import com.zaroslikov.domain.models.dto.finance.DomainTransaction
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
@@ -286,7 +287,7 @@ class FinanceAnalysisViewModel @Inject constructor(
                     percentDouble = 0.0, // временно, заполним позже
                     percentFloat = 0f,
                     imagePath = items.first().imagePath,
-                    currentIcon = items.first().currentIcon ?: R.drawable.baseline_pets_24,
+                    currentIcon = items.first().currentIcon ?: AppIcon.PETS,
                 )
             }
         val totalAllAnimals = groupedAnimalProducerList.sumOf { it.count }

@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseEditScreen
 
 import android.util.Log
+import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
 import com.zaroslikov.fermacompose2.ui.incubator_project.bookmark.entry.NotificationParameters
@@ -49,7 +50,7 @@ class WarehouseEditReduce : BaseReducer<WarehouseEditState, WarehouseEditIntent>
         return copy(currentProject = currentProject.copy(title = nameProject))
     }
 
-    private fun WarehouseEditState.updateIcon(currentIcon: Int): WarehouseEditState {
+    private fun WarehouseEditState.updateIcon(currentIcon: AppIcon): WarehouseEditState {
         return copy(currentIcon = currentIcon)
     }
 
