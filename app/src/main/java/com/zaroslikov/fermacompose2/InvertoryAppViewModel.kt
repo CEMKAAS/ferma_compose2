@@ -20,6 +20,10 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
 import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
+import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.utils.IncubatorChicks
+import com.zaroslikov.fermacompose2.utils.IncubatorChicksLink
+import com.zaroslikov.fermacompose2.utils.IncubatorChicksManager
 import com.zaroslikov.fermacompose2.utils.QrCodeDecoder
 import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,8 +45,9 @@ class InventoryAppViewModel @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
     @ApplicationContext private val context: Context,
     val qrNavigationManager: QrNavigationManager,
-    val projectRepository: ProjectRepository
-) : BaseViewModel2<InvertoryAppState, Event, InvertoryAppReduce>(
+    val projectRepository: ProjectRepository,
+    private val incubatorChicksManager: IncubatorChicksManager,
+): BaseViewModel2<InvertoryAppState, Event, InvertoryAppReduce>(
     InvertoryAppState(),
     InvertoryAppReduce()
 ) {
@@ -91,7 +96,8 @@ class InventoryAppViewModel @Inject constructor(
                 lastVersionApp = appSettings.currentVersionApp,
                 currentVersionApp = currentVersionApp
             )
-            if (!(appSettings.currentVersionApp == "v3.1.0v" || appSettings.currentVersionApp == "v3.1.0g"))
+            // Для этих версий заставку об обновлении не показываем
+            if (currentVersionApp !in VERSIONS_WITHOUT_UPDATE_SCREEN)
                 updateState { it.copy(isFirstLaunchUpdate = true, isShowAds = false) }
             updateSettings(newAppSettings)
             newAppSettings
@@ -107,7 +113,7 @@ class InventoryAppViewModel @Inject constructor(
                     isFirstLaunch = false,
                 )
             )
-             Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
+            Log.i("app_settings", "updateFirstLaunch_1:${getState().appSettings} ")
             _notification.emit(UiNotification.Notification)
         }
     }
@@ -125,11 +131,30 @@ class InventoryAppViewModel @Inject constructor(
         }
     }
 
+    /**
+     * С птенцами из «Инкубатора» — всегда на первый экран: там `FirstViewModel` спросит,
+     * в новый проект их или в имеющийся, даже если проект один, — новый проект под
+     * партию выбирают не реже, чем единственный имеющийся.
+     */
+    private fun startDestinationForChicks(chicks: IncubatorChicks): String {
+        incubatorChicksManager.put(chicks)
+        return FirstDestination.route
+    }
+
     private suspend fun calculateStartDestination(intent: Intent?): String {
 
         val action = intent?.action
         val projectId = intent?.getLongExtra("itemIdPT", -1L) ?: -1L
         val uri = intent?.data?.getQueryParameter("data")
+        val chicks = intent?.data?.let { data ->
+            IncubatorChicksLink.parse(data.scheme, data.host, data.path, dateToday()) {
+                data.getQueryParameter(it)
+            }
+        }
+
+        // Птенцы из «Инкубатора» проверяются до шаблонов: ветка шаблона берёт любую
+        // ссылку с параметром `data`, не глядя на хост.
+        if (chicks != null) return startDestinationForChicks(chicks)
 
         return when {
             action == "OPEN_BOOKMARK_DETAIL" && projectId != -1L ->
@@ -229,6 +254,15 @@ class InventoryAppViewModel @Inject constructor(
                 showMessage("Ошибка!")
             }
         }
+    }
+
+    private companion object {
+        /** Версии, для которых экран «что нового» после обновления не показывается */
+        val VERSIONS_WITHOUT_UPDATE_SCREEN = setOf(
+            "v3.1.0v", "v3.1.0g",
+            "v3.1.1v", "v3.1.1g",
+            "v3.1.1av", "v3.1.1ag"
+        )
     }
 }
 

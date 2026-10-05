@@ -182,6 +182,18 @@ class YandexMetricRepositoryImpl @Inject constructor(
         AppMetrica.reportEvent("Добавление животного", eventParameters);
     }
 
+    /**
+     * Птенцы из приложения «Инкубатор» записаны — вторая половина его события
+     * «Птенцы в «Моё хозяйство»»: там нажали кнопку, здесь выбрали проект.
+     */
+    override fun metricalIncubatorChicks(newProject: Boolean, count: Int, type: String) {
+        val eventParameters: MutableMap<String, Any> = HashMap()
+        eventParameters["Проект"] = if (newProject) "Новый" else "Имеющийся"
+        eventParameters["Количество"] = count
+        eventParameters["Тип"] = type
+        AppMetrica.reportEvent("Птенцы из «Инкубатора»", eventParameters)
+    }
+
     override fun metricalAnimalSize(
         state: CurrentAnimalSize,
     ) {

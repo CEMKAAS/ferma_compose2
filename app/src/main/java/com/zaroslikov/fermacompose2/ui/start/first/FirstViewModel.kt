@@ -17,6 +17,11 @@ import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.navigation.UiNotification
 import com.zaroslikov.fermacompose2.utils.QrCodeDecoder
 import com.zaroslikov.fermacompose2.utils.QrNavigationManager
+import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
+import com.zaroslikov.fermacompose2.utils.IncubatorChicksImporter
+import com.zaroslikov.fermacompose2.utils.IncubatorChicksManager
+import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -39,6 +44,10 @@ class FirstViewModel @Inject constructor(
     private val timeNotificationIncubatorRepository: TimeNotificationIncubatorRepository,
     private val timeNotificationProjectRepository: TimeNotificationProjectRepository,
     private val appSettingsRepository: AppSettingsRepository,
+    private val incubatorChicksManager: IncubatorChicksManager,
+    private val incubatorChicksImporter: IncubatorChicksImporter,
+    private val resourceProvider: ResourceProvider,
+    private val yandexMetricRepository: YandexMetricRepository,
 ) : BaseViewModel2<FirstState, FirstIntent, FirstReducer>(
     FirstState(),
     FirstReducer()
@@ -48,6 +57,46 @@ class FirstViewModel @Inject constructor(
         loadData()
         launchNotification()
         loadTemplate()
+        loadIncubatorChicks()
+    }
+
+    /**
+     * Приложение открыли ссылкой из «Инкубатора»: спрашиваем, куда добавить птенцов, —
+     * в новый проект или в один из активных (архивные и инкубаторы не предлагаются).
+     * Шторка держится в состоянии, а не событием: она открывается из `init`, когда экран
+     * может ещё не слушать.
+     */
+    private fun loadIncubatorChicks() {
+        viewModelScope.launch {
+            val chicks = incubatorChicksManager.peek() ?: return@launch
+            val projects = projectRepository.getProjectListAct().first()
+            sendIntent(FirstIntent.IncubatorChicksLoaded(chicks, projects))
+        }
+    }
+
+    /**
+     * Записывает птенцов и уводит в проект, на страницу «Животные». Птенцы забираются из
+     * менеджера до записи: второе нажатие (или пересоздание экрана) их уже не найдёт, и
+     * дубля группы не будет.
+     */
+    private fun importIncubatorChicks(projectId: Long?) {
+        val chicks = incubatorChicksManager.consume() ?: return
+        val projectTitle = getState().chicksProjects.firstOrNull { it.id == projectId }?.title
+        viewModelScope.launch {
+            val idPT = if (projectId == null) incubatorChicksImporter.toNewProject(chicks)
+            else projectId.also { incubatorChicksImporter.toProject(chicks, it) }
+            yandexMetricRepository.metricalIncubatorChicks(
+                newProject = projectId == null,
+                count = chicks.count,
+                type = chicks.type,
+            )
+            showMessage(
+                resourceProvider.getString(R.string.incubator_chicks_added)
+                    .format(chicks.name, projectTitle ?: chicks.name)
+            )
+            incubatorChicksManager.requestAnimalsPage()
+            navigateTo(UiEvent.Navigate(idPT))
+        }
     }
 
     private fun loadTemplate() {
@@ -125,6 +174,9 @@ class FirstViewModel @Inject constructor(
             is FirstIntent.QrCodeScanner -> qrScanner(intent.value)
             is FirstIntent.ChoiceProjectForTemplateClick -> navigateToProject(intent.value)
             is FirstIntent.OpenMultiProjectBottomSheetClick -> if (!intent.value) qrNavigationManager.clear() else Unit
+            FirstIntent.IncubatorChicksDismiss -> incubatorChicksManager.clear()
+            FirstIntent.IncubatorChicksToNewProject -> importIncubatorChicks(projectId = null)
+            is FirstIntent.IncubatorChicksToProject -> importIncubatorChicks(projectId = intent.id)
             else -> Unit
         }
     }

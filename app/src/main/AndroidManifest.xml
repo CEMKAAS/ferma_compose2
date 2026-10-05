@@ -46,6 +46,23 @@
                     android:host="template"
                     android:scheme="myferma" />
             </intent-filter>
+            <!--
+                Птенцы из приложения «Инкубатор» после вывода (utils/IncubatorChicksLink).
+                Отдельный фильтр, а не ещё один <data> в фильтре шаблонов: <data> одного
+                фильтра перемножаются, и путь /add достался бы шаблонам. Схема, хост и путь
+                повторяют FarmLink «Инкубатора» дословно — по ним он решает, показывать ли
+                кнопку.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="animal"
+                    android:path="/add"
+                    android:scheme="myferma" />
+            </intent-filter>
         </activity>
         <provider
             android:name="androidx.startup.InitializationProvider"

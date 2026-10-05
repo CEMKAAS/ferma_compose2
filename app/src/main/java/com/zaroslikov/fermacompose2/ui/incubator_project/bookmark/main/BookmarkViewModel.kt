@@ -34,6 +34,7 @@ import com.zaroslikov.fermacompose2.supportFun.toConvertDbInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDbInt
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.supportFun.toAnimalIcon
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -850,15 +851,7 @@ class BookmarkViewModel @Inject constructor(
         )
     }
 
-    private fun iconByTypeEgg(typeEgg: TypeEgg): AppIcon {
-        return when (typeEgg) {
-            TypeEgg.CHICKENS -> AppIcon.CHICK
-            TypeEgg.GEESE -> AppIcon.GOOSE
-            TypeEgg.QUAILS -> AppIcon.QUAIL
-            TypeEgg.TURKEYS -> AppIcon.TURKEY
-            TypeEgg.DUCKS -> AppIcon.DUCK
-        }
-    }
+    private fun iconByTypeEgg(typeEgg: TypeEgg): AppIcon = typeEgg.toAnimalIcon()
 }
 
 sealed class BookmarkIntent() : BaseIntent {

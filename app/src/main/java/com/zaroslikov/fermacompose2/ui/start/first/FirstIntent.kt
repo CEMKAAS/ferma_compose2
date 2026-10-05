@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.start.first
 
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
+import com.zaroslikov.fermacompose2.utils.IncubatorChicks
 
 sealed class FirstIntent() : BaseIntent {
     data object DeleteClicked : FirstIntent()
@@ -33,4 +34,13 @@ sealed class FirstIntent() : BaseIntent {
     data class ChoiceProjectForTemplateClick(
         val value: Long,
     ) : FirstIntent()
+
+    // Птенцы из «Инкубатора»: шторка «куда добавить» и два ответа на неё.
+    data class IncubatorChicksLoaded(
+        val chicks: IncubatorChicks,
+        val projects: List<DomainProjectTable>,
+    ) : FirstIntent()
+    data object IncubatorChicksDismiss : FirstIntent()
+    data object IncubatorChicksToNewProject : FirstIntent()
+    data class IncubatorChicksToProject(val id: Long) : FirstIntent()
 }

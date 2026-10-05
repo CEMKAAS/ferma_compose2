@@ -85,6 +85,7 @@ import com.zaroslikov.fermacompose2.ui.elements.IconTransaction2
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.ChoiceProjectBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.IncubatorChicksBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrScannerScreen
@@ -291,6 +292,15 @@ fun FirstScreen(
                             )
                         }
                     ) { viewModel.onIntent(FirstIntent.ChoiceProjectForTemplateClick(it)) }
+                state.incubatorChicks?.let { chicks ->
+                    IncubatorChicksBottomSheet(
+                        chicks = chicks,
+                        projects = state.chicksProjects,
+                        onDismissRequest = { viewModel.onIntent(FirstIntent.IncubatorChicksDismiss) },
+                        onNewProjectClick = { viewModel.onIntent(FirstIntent.IncubatorChicksToNewProject) },
+                        onProjectClick = { viewModel.onIntent(FirstIntent.IncubatorChicksToProject(it)) },
+                    )
+                }
             }
         }
 }

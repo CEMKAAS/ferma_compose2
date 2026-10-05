@@ -40,8 +40,8 @@ android {
         applicationId = "com.zaroslikov.fermacompose2"
         minSdk = 26
         targetSdk = 37
-        versionCode = 22 //12
-        versionName = "v3.1.1v"
+        versionCode = 24 //12
+        versionName = "v3.1.1ag"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

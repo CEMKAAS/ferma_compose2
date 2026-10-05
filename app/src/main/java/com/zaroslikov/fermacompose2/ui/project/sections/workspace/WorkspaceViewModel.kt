@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.enums.TemplateType
 import com.zaroslikov.domain.repository.AppSettingsRepository
+import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
+import com.zaroslikov.fermacompose2.utils.IncubatorChicksManager
 import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
@@ -17,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SectionWorkspaceViewModel @Inject constructor(
-    private val qrNavigationManager: QrNavigationManager
+    private val qrNavigationManager: QrNavigationManager,
+    private val incubatorChicksManager: IncubatorChicksManager,
 ) : ViewModel() {
 
     var initialPage by mutableIntStateOf(2)
@@ -29,6 +32,13 @@ class SectionWorkspaceViewModel @Inject constructor(
 
     private fun checkQrPayload() {
         viewModelScope.launch {
+            // Только что записали птенцов из «Инкубатора» — открываем проект там, где их
+            // видно: на странице «Животные».
+            if (incubatorChicksManager.consumeAnimalsPage()) {
+                initialPage = Page.ANIMAL.ordinal
+                return@launch
+            }
+
             val payload = qrNavigationManager.peek() ?: return@launch
 
             Log.i("payload", "checkQrPayload: $payload")

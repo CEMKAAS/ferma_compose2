@@ -33,6 +33,7 @@ interface YandexMetricRepository {
     fun metricalAnimalVaccination(state: Vaccination)
     fun metricalNote(title: String)
     fun metricalAnimal(state: AnimalEntryState2)
+    fun metricalIncubatorChicks(newProject: Boolean, count: Int, type: String)
     fun metricalAnimalSize(state: CurrentAnimalSize)
     fun metricalAnimalWeight(state: CurrentAnimalWeight)
     fun metricalAnimalCount(state: DomainAnimalCount)

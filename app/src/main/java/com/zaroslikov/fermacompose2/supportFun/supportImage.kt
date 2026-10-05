@@ -7,6 +7,23 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.ui.incubator_project.main_screen.DestinationIncubator
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.Destination
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Page
+import com.zaroslikov.domain.models.enums.TypeEgg
+import com.zaroslikov.domain.models.enums.AppIcon
+
+/**
+ * Иконка группы птицы этого вида — её ставит и завершение закладки своего инкубатора,
+ * и птенцы, пришедшие из приложения «Инкубатор». [AppIcon], а не `R.drawable`: в базу
+ * уходит стабильный код, см. комментарий у [AppIcon].
+ */
+fun TypeEgg.toAnimalIcon(): AppIcon {
+    return when (this) {
+        TypeEgg.CHICKENS -> AppIcon.CHICK
+        TypeEgg.GEESE -> AppIcon.GOOSE
+        TypeEgg.QUAILS -> AppIcon.QUAIL
+        TypeEgg.TURKEYS -> AppIcon.TURKEY
+        TypeEgg.DUCKS -> AppIcon.DUCK
+    }
+}
 
 
 fun ProductOrigin.toDrawRes(): Int {

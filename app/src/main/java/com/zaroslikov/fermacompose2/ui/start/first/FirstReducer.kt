@@ -25,6 +25,15 @@ class FirstReducer : BaseReducer<FirstState, FirstIntent>() {
             is FirstIntent.OpenMultiProjectBottomSheetClick ->
                 state.updateOpenChoiceProjectForTemplate(intent.value, intent.projectList)
 
+            is FirstIntent.IncubatorChicksLoaded ->
+                state.copy(incubatorChicks = intent.chicks, chicksProjects = intent.projects)
+
+            // Любой ответ закрывает шторку сразу: запись идёт в фоне, а второе нажатие
+            // по уже закрытой шторке не запишет птенцов дважды.
+            FirstIntent.IncubatorChicksDismiss,
+            FirstIntent.IncubatorChicksToNewProject,
+            is FirstIntent.IncubatorChicksToProject -> state.copy(incubatorChicks = null)
+
             else -> state
         }
     }
