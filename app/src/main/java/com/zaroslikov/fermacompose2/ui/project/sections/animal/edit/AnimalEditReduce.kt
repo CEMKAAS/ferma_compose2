@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.edit
 import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
+import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 
 class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
     override fun reducer(
@@ -125,7 +126,11 @@ class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
         return copy(
             currentProduct = currentProduct.copy(
                 dateBorn = date,
-                dateFactory = if (currentProduct.isDateFactory) date else ""
+                // Дата завода не может быть раньше рождения; пустую строку сюда класть нельзя —
+                // OutlinedTextDateNew парсит её как dd.MM.yyyy и падает
+                dateFactory = if (currentProduct.isDateFactory ||
+                    formatDateToLong(currentProduct.dateFactory) < formatDateToLong(date)
+                ) date else currentProduct.dateFactory
             )
         )
     }

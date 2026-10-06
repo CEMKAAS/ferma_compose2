@@ -58,7 +58,7 @@ fun DatePickerDialogSample(
             Buttons(onDismissRequest = { onDateSelected(dateToday) }) {
                 val format = SimpleDateFormat("dd.MM.yyyy")
                 val formattedDate: String =
-                    format.format(datePickerState.selectedDateMillis)
+                    datePickerState.selectedDateMillis?.let { format.format(it) } ?: dateToday
                 onDateSelected(formattedDate)
             }
         }

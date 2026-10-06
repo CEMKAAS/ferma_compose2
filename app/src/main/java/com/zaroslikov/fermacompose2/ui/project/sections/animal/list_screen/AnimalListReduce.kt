@@ -3,7 +3,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 import android.util.Log
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
-import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
@@ -214,7 +214,10 @@ class AnimalListReduce(private val resourceProvider: ResourceProvider) :
         return copy(
             currentProduct = currentProduct.copy(
                 dateBorn = date,
-                dateFactory = if (currentProduct.isDateFactory) date else dateToday()
+                // Дата завода не может быть раньше рождения, иначе сохраняем выбранную пользователем
+                dateFactory = if (currentProduct.isDateFactory ||
+                    formatDateToLong(currentProduct.dateFactory) < formatDateToLong(date)
+                ) date else currentProduct.dateFactory
             )
         )
     }
