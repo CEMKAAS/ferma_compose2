@@ -5,6 +5,8 @@ import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
+import com.zaroslikov.crm.domain.model.DomainCrmBackup
+import com.zaroslikov.crm.domain.repository.CrmBackupRepository
 import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.models.table.profile.DomainProfileTable
@@ -43,6 +45,7 @@ import com.zaroslikov.fermacompose2.utils.PregnancyReminderScheduler
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appmetrica.analytics.AppMetrica
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -87,7 +90,8 @@ class SettingsViewModel @Inject constructor(
 
     private val profileRepository: ProfileRepository,
     private val appSettingsRepository: AppSettingsRepository,
-    private val workManagerRepository: WorkManagerRepository
+    private val workManagerRepository: WorkManagerRepository,
+    private val crmBackupRepository: CrmBackupRepository
 
 ) :
     BaseViewModel2<SettingsState, SettingsIntent, SettingsReduce>(
@@ -128,6 +132,8 @@ class SettingsViewModel @Inject constructor(
                         )
                     )
                 }
+                // CRM хранится в отдельной базе — чистим её тоже
+                crmBackupRepository.clearAll()
 
                 withContext(Dispatchers.Main) {
                     sendIntent(SettingsIntent.OpenDeleteBottomSheetClick(false))
@@ -189,6 +195,7 @@ class SettingsViewModel @Inject constructor(
                 incubatorParametersRepository.getAllIncubatorParameterTableForExport().first()
             val profileTable = profileRepository.getAllProfileTableForExport().first()
             val appSettingsTable = appSettingsRepository.getAllAppSettingsTableForExport().first()
+            val crm = crmBackupRepository.export()
 
             val backupData = BackupData(
                 version = 1,
@@ -239,7 +246,8 @@ class SettingsViewModel @Inject constructor(
                 incubatorParameters = incubatorParameters,
                 timeNotificationIncubatorTable = timeNotificationIncubatorTable,
                 profileTable = profileTable,
-                appSettingsTable = appSettingsTable
+                appSettingsTable = appSettingsTable,
+                crm = crm
             )
             val json = Json.encodeToString(backupData)
             updateState { state -> state.copy(backupDataText = json) }
@@ -342,6 +350,12 @@ class SettingsViewModel @Inject constructor(
                         deviceId = it.deviceId.ifBlank { UUID.randomUUID().toString() }
                     )
                 })
+                // CRM всегда перезаписывается: иначе старые клиенты прилипнут к чужим idPT.
+                // Берутся только строки проектов этого же бэкапа
+                crmBackupRepository.import(
+                    backup.crm ?: DomainCrmBackup(),
+                    projectIds = backup.projectTable.map { it.id }.toSet()
+                )
                 // Напоминания старых беременностей сняты, новые — по импортированным данным
                 pregnancyReminderScheduler.resetAfterImport()
                 launchNotification()
@@ -349,6 +363,14 @@ class SettingsViewModel @Inject constructor(
                 AppMetrica.reportEvent("Импорт базы данных")
                 return@launch
             } catch (e: Exception) {
+                // Импорт оборвался — старые клиенты CRM не должны остаться при чужих idPT
+                try {
+                    crmBackupRepository.clearAll()
+                } catch (clearError: CancellationException) {
+                    throw clearError
+                } catch (clearError: Exception) {
+                    Log.i("error", "setAllData: clear CRM $clearError")
+                }
                 showMessage("Ошибка при импорте базы данных!\nОбратитесь в службу поддержки.")
                 Log.i("error", "setAllData: $e")
             }

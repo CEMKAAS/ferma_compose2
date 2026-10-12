@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.start.first
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.crm.domain.repository.CrmBackupRepository
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.repository.AppSettingsRepository
@@ -24,6 +25,7 @@ import com.zaroslikov.fermacompose2.utils.IncubatorChicksManager
 import com.zaroslikov.fermacompose2.utils.PregnancyReminderScheduler
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -50,6 +52,7 @@ class FirstViewModel @Inject constructor(
     private val resourceProvider: ResourceProvider,
     private val yandexMetricRepository: YandexMetricRepository,
     private val pregnancyReminderScheduler: PregnancyReminderScheduler,
+    private val crmBackupRepository: CrmBackupRepository,
 ) : BaseViewModel2<FirstState, FirstIntent, FirstReducer>(
     FirstState(),
     FirstReducer()
@@ -284,6 +287,15 @@ class FirstViewModel @Inject constructor(
             getState().currentProjectTable?.let {
                 pregnancyReminderScheduler.cancelForProject(it.id)
                 projectRepository.deleteProject(it)
+                // CRM в отдельной базе без FK на проект — клиенты и задачи удаляются явно.
+                // Сбой CRM не должен мешать удалению проекта
+                try {
+                    crmBackupRepository.deleteForProject(it.id)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.i("error", "deleteProject: CRM $e")
+                }
                 if (it.mode) updateProjectNotifications() else updateIncubatorNotifications()
                 sendIntent(
                     FirstIntent.OpenDeleteBottomSheetClicked(false, null)

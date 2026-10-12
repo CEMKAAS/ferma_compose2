@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Общие -->
+    <string name="crm_title">CRM</string>
+    <string name="crm_back">Назад</string>
+    <string name="crm_all">Все</string>
+    <string name="crm_save">Сохранить</string>
+    <string name="crm_cancel">Отмена</string>
+    <string name="crm_ok">ОК</string>
+    <string name="crm_add">Добавить</string>
+    <string name="crm_edit">Редактировать</string>
+    <string name="crm_edit_short">Изменить</string>
+    <string name="crm_delete">Удалить</string>
+    <string name="crm_restore">Восстановить</string>
+    <string name="crm_delete_forever">Удалить навсегда</string>
+    <string name="crm_search">Поиск</string>
+    <string name="crm_clear">Очистить</string>
+    <string name="crm_copy">Копировать</string>
+    <string name="crm_select_date">Выбрать дату</string>
+    <string name="crm_dash">—</string>
+
+    <!-- Дашборд -->
+    <string name="crm_revenue_month">Выручка за месяц</string>
+    <string name="crm_revenue_dynamics">%1$s к прошлому месяцу</string>
+    <string name="crm_revenue_dynamics_none">Нет данных за прошлый месяц</string>
+    <string name="crm_clients_count">Клиентов</string>
+    <string name="crm_active_90">Активны за 90 дней</string>
+    <string name="crm_kpi_clients_total">Клиентов всего</string>
+    <string name="crm_kpi_new_month">Новых за месяц</string>
+    <string name="crm_kpi_avg_check">Средний чек</string>
+    <string name="crm_kpi_orders_month">Заказов за месяц</string>
+    <string name="crm_revenue_by_month">Выручка по месяцам</string>
+    <string name="crm_revenue_by_month_sup">За последние 12 месяцев</string>
+    <string name="crm_chart_empty">Нет продаж за период</string>
+    <string name="crm_top_clients">Топ клиентов</string>
+    <string name="crm_top_clients_empty">Продаж с указанным покупателем пока нет</string>
+    <string name="crm_upcoming_tasks">Ближайшие задачи</string>
+    <string name="crm_all_tasks">Все задачи</string>
+    <string name="crm_recent_interactions">Последние взаимодействия</string>
+    <string name="crm_quick_actions">Быстрые действия</string>
+    <string name="crm_action_clients">Клиенты</string>
+    <string name="crm_action_add_client">Добавить клиента</string>
+    <string name="crm_action_new_task">Новая задача</string>
+    <string name="crm_banner_sales_without_buyer">Продаж без покупателя: %1$d. Укажите покупателя в продаже — клиент появится в CRM автоматически.</string>
+
+    <!-- Список клиентов -->
+    <string name="crm_clients_title">Клиенты</string>
+    <string name="crm_search_hint">Имя, телефон, email</string>
+    <string name="crm_filter_all">Все</string>
+    <string name="crm_filter_favorite">Избранные</string>
+    <string name="crm_filter_vip">VIP</string>
+    <string name="crm_filter_new">Новые</string>
+    <string name="crm_filter_inactive">Неактивные</string>
+    <string name="crm_filter_archive">Архив</string>
+    <string name="crm_sort_title">Сортировка</string>
+    <string name="crm_sort_revenue">По выручке</string>
+    <string name="crm_sort_name">По имени</string>
+    <string name="crm_sort_last_purchase">По последней покупке</string>
+    <string name="crm_orders_value">Заказов: %1$s</string>
+    <string name="crm_clients_empty_title">Клиентов пока нет</string>
+    <string name="crm_clients_empty_text">Укажите покупателя при продаже или добавьте клиента вручную</string>
+    <string name="crm_clients_not_found_title">Ничего не найдено</string>
+    <string name="crm_clients_not_found_text">Попробуйте изменить запрос или фильтр</string>
+    <string name="crm_archive_empty_title">Архив пуст</string>
+    <string name="crm_archive_empty_text">Удалённые клиенты появятся здесь, их можно будет восстановить</string>
+
+    <!-- Карточка клиента -->
+    <string name="crm_client_card_title">Клиент</string>
+    <string name="crm_client_since">Клиент с %1$s</string>
+    <string name="crm_source_sales">Из продаж</string>
+    <string name="crm_source_manual">Добавлен вручную</string>
+    <string name="crm_vip">VIP</string>
+    <string name="crm_archived">В архиве</string>
+    <string name="crm_add_favorite">В избранное</string>
+    <string name="crm_remove_favorite">Убрать из избранного</string>
+    <string name="crm_contacts">Контакты</string>
+    <string name="crm_no_contacts">Контакты не указаны</string>
+    <string name="crm_kpi_revenue">Выручка</string>
+    <string name="crm_kpi_orders">Заказов</string>
+    <string name="crm_first_purchase">Первая покупка</string>
+    <string name="crm_last_purchase">Последняя покупка</string>
+    <string name="crm_client_revenue_chart">Выручка клиента по месяцам</string>
+    <string name="crm_purchases">Покупки</string>
+    <string name="crm_col_product">Товар</string>
+    <string name="crm_col_count">Кол-во</string>
+    <string name="crm_col_sum">Сумма</string>
+    <string name="crm_col_date">Дата</string>
+    <string name="crm_no_purchases">Покупок пока нет</string>
+    <string name="crm_top_products">Топ-товары</string>
+    <string name="crm_interactions">Взаимодействия</string>
+    <string name="crm_no_interactions">Взаимодействий пока нет</string>
+    <string name="crm_client_tasks">Задачи</string>
+    <string name="crm_note">Заметка</string>
+    <string name="crm_no_note">Заметки нет</string>
+    <string name="crm_archive_confirm_title">Удалить клиента?</string>
+    <string name="crm_archive_confirm_text">Клиент будет перемещён в архив. Восстановить его можно в списке клиентов, фильтр «Архив».</string>
+    <string name="crm_to_archive">В архив</string>
+    <string name="crm_show_all">Показать все (%1$d)</string>
+    <string name="crm_show_less">Свернуть</string>
+    <string name="crm_no_tasks">Задач по клиенту нет</string>
+    <string name="crm_delete_interaction_title">Удалить взаимодействие?</string>
+    <string name="crm_delete_interaction_text">Запись будет удалена без возможности восстановления.</string>
+    <string name="crm_delete_forever_title">Удалить навсегда?</string>
+    <string name="crm_delete_forever_text">Клиент, его контакты и взаимодействия будут удалены без возможности восстановления.</string>
+
+    <!-- Редактор клиента -->
+    <string name="crm_new_client">Новый клиент</string>
+    <string name="crm_edit_client">Редактирование клиента</string>
+    <string name="crm_field_name">Имя клиента</string>
+    <string name="crm_field_note">Заметка</string>
+    <string name="crm_field_status">Статус</string>
+    <string name="crm_status_regular">Обычный</string>
+    <string name="crm_status_vip">VIP</string>
+    <string name="crm_field_favorite">Избранный клиент</string>
+    <string name="crm_field_contact_type">Тип контакта</string>
+    <string name="crm_field_contact_value">Значение</string>
+    <string name="crm_add_contact">Добавить контакт</string>
+    <string name="crm_remove_contact">Удалить контакт</string>
+    <string name="crm_primary_contact">Основной</string>
+    <string name="crm_sales_key_hint">Продажи привязаны к покупателю «%1$s»</string>
+    <string name="crm_error_name_empty">Введите имя клиента</string>
+    <string name="crm_error_name_exists">Клиент с таким именем уже есть</string>
+    <string name="crm_error_contact_empty">Заполните значение контакта</string>
+    <string name="crm_error_email_invalid">Некорректный email</string>
+    <string name="crm_error_note_empty">Введите текст</string>
+    <string name="crm_error_title_empty">Введите название</string>
+    <string name="crm_error_date_empty">Выберите дату</string>
+
+    <!-- Задачи -->
+    <string name="crm_tasks_title">Задачи</string>
+    <string name="crm_tasks_active">Активные</string>
+    <string name="crm_tasks_done">Выполненные</string>
+    <string name="crm_tasks_overdue">Просрочено</string>
+    <string name="crm_tasks_today">Сегодня</string>
+    <string name="crm_tasks_tomorrow">Завтра</string>
+    <string name="crm_new_task">Новая задача</string>
+    <string name="crm_field_task_title">Название</string>
+    <string name="crm_field_due_date">Срок</string>
+    <string name="crm_field_client">Клиент</string>
+    <string name="crm_no_client">Без клиента</string>
+    <string name="crm_tasks_empty_title">Задач нет</string>
+    <string name="crm_tasks_empty_text">Создайте задачу, чтобы не забыть позвонить клиенту или отправить заказ</string>
+    <string name="crm_tasks_done_empty_title">Выполненных задач пока нет</string>
+    <string name="crm_tasks_done_empty_text">Отмеченные задачи появятся здесь</string>
+    <string name="crm_delete_task_title">Удалить задачу?</string>
+    <string name="crm_delete_task_text">Задача «%1$s» будет удалена без возможности восстановления.</string>
+
+    <!-- Взаимодействия -->
+    <string name="crm_new_interaction">Новое взаимодействие</string>
+    <string name="crm_field_interaction_type">Тип</string>
+    <string name="crm_field_date">Дата</string>
+
+    <!-- Типы контактов -->
+    <string name="crm_contact_phone">Телефон</string>
+    <string name="crm_contact_email">Email</string>
+    <string name="crm_contact_telegram">Telegram</string>
+    <string name="crm_contact_whatsapp">WhatsApp</string>
+    <string name="crm_contact_vk">ВКонтакте</string>
+    <string name="crm_contact_address">Адрес</string>
+    <string name="crm_contact_other">Другое</string>
+
+    <!-- Типы взаимодействий -->
+    <string name="crm_interaction_call">Звонок</string>
+    <string name="crm_interaction_meeting">Встреча</string>
+    <string name="crm_interaction_message">Сообщение</string>
+    <string name="crm_interaction_note">Заметка</string>
+
+    <!-- Активность клиента -->
+    <string name="crm_activity_new">Новый</string>
+    <string name="crm_activity_active">Активный</string>
+    <string name="crm_activity_inactive">Неактивный</string>
+    <string name="crm_activity_no_sales">Нет покупок</string>
+
+    <!-- Сообщения -->
+    <string name="crm_msg_client_restored">Клиент восстановлен</string>
+    <string name="crm_msg_client_deleted">Клиент удалён</string>
+    <string name="crm_msg_task_saved">Задача сохранена</string>
+    <string name="crm_msg_task_deleted">Задача удалена</string>
+    <string name="crm_msg_interaction_saved">Взаимодействие добавлено</string>
+    <string name="crm_msg_interaction_deleted">Взаимодействие удалено</string>
+    <string name="crm_msg_copied">Скопировано в буфер обмена</string>
+    <string name="crm_msg_no_app">Нет приложения, чтобы открыть контакт — значение скопировано</string>
+    <string name="crm_msg_error">Не удалось сохранить</string>
+    <string name="crm_msg_load_error">Не удалось загрузить данные</string>
+
+    <!-- Единицы и валюты (копия suffix-строк :app) -->
+    <string name="crm_suffix_pieces">шт.</string>
+    <string name="crm_suffix_units">ед.</string>
+    <string name="crm_suffix_heads">голов</string>
+    <string name="crm_suffix_gram">г.</string>
+    <string name="crm_suffix_kilogram">кг.</string>
+    <string name="crm_suffix_tons">тн.</string>
+    <string name="crm_suffix_millilitres">мл.</string>
+    <string name="crm_suffix_liters">л.</string>
+    <string name="crm_suffix_cubic_meters">м3.</string>
+    <string name="crm_suffix_millimeters">мм.</string>
+    <string name="crm_suffix_centimeters">см.</string>
+    <string name="crm_suffix_meters">м.</string>
+    <string name="crm_suffix_ruble">₽</string>
+    <string name="crm_suffix_tenge">₸</string>
+    <string name="crm_suffix_dollar">$</string>
+    <string name="crm_suffix_euro">€</string>
+    <string name="crm_suffix_gram_day">г./день</string>
+    <string name="crm_suffix_kilogram_day">кг./день</string>
+    <string name="crm_suffix_tons_day">тн./день</string>
+    <string name="crm_suffix_kilogram_to_cubic_meters">кг/м3.</string>
+    <string name="crm_suffix_kilogram_to_liters">кг/л</string>
+    <string name="crm_suffix_no" />
+    <string name="crm_error_name_exists_archived">Клиент с таким именем есть в архиве — восстановите его в списке клиентов, фильтр «Архив»</string>
+</resources>

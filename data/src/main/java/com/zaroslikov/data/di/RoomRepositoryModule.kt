@@ -19,6 +19,7 @@ import com.zaroslikov.data.room.repository.IncubatorTableRepositoryImpl
 import com.zaroslikov.data.room.repository.NoteRepositoryImpl
 import com.zaroslikov.data.room.repository.ProfileTableRepositoryImpl
 import com.zaroslikov.data.room.repository.ProjectRepositoryImpl
+import com.zaroslikov.data.room.repository.CrmSalesRepositoryImpl
 import com.zaroslikov.data.room.repository.SaleRepositoryImpl
 import com.zaroslikov.data.room.repository.SettingsRepositoryImpl
 import com.zaroslikov.data.room.repository.TimeNotificationIncubatorRepositoryImpl
@@ -44,6 +45,7 @@ import com.zaroslikov.domain.repository.NoteRepository
 import com.zaroslikov.domain.repository.ProfileRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.repository.crm.CrmSalesRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
@@ -125,6 +127,10 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSaleRepository(saleRepositoryImpl: SaleRepositoryImpl): SaleRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCrmSalesRepository(crmSalesRepositoryImpl: CrmSalesRepositoryImpl): CrmSalesRepository
 
     @Binds
     @Singleton

@@ -24,6 +24,7 @@ import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.data.room.dao.NoteDao
 import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
+import com.zaroslikov.data.room.dao.CrmSaleDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
 import com.zaroslikov.data.room.dao.TimeNotificationIncubatorDao
@@ -191,6 +192,12 @@ object DatabaseModule {
     @Singleton
     fun provideSaleDao(database: AppDatabase): SaleDao {
         return database.saleDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCrmSaleDao(database: AppDatabase): CrmSaleDao {
+        return database.crmSaleDao()
     }
 
     @Provides

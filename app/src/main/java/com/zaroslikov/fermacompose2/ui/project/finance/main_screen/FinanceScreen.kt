@@ -38,6 +38,7 @@ import com.zaroslikov.fermacompose2.black_2
 import com.zaroslikov.fermacompose2.blue_10
 import com.zaroslikov.fermacompose2.blue_11
 import com.zaroslikov.fermacompose2.blue_12
+import com.zaroslikov.fermacompose2.blue_16
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_7
 import com.zaroslikov.fermacompose2.green_6
@@ -82,6 +83,7 @@ object FinanceDestination : NavigationDestination {
 @Composable
 fun FinanceScreen(
     navigateToIncomeExpenses: (Pair<Long, FinanceCategory>) -> Unit,
+    navigateToCrm: () -> Unit,
     viewModel: FinanceViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -116,6 +118,7 @@ fun FinanceScreen(
                 incomeExpensesList = state.domainIncomeExpenseList,
                 suffix = state.currencySuffix,
                 navigate = { navigateToIncomeExpenses(idProject to it) },
+                navigateToCrm = navigateToCrm,
             )
     }
 }
@@ -133,7 +136,8 @@ private fun FinanceBody(
     expensesMount: Double,
     incomeExpensesList: List<DomainIncomeExpenses>,
     suffix: Suffix,
-    navigate: (FinanceCategory) -> Unit
+    navigate: (FinanceCategory) -> Unit,
+    navigateToCrm: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -164,8 +168,55 @@ private fun FinanceBody(
             ) { navigate(it) }
         }
         AdsCard()
+        CrmCard(
+            onClick = {
+                navigateToCrm()
+                AppMetrica.reportEvent("Переход в CRM")
+            }
+        )
         TransactionList(incomeExpensesList, suffix)
     }
+}
+
+/** Кнопка-карточка перехода в раздел CRM (клиенты, контакты, история покупок). */
+@Composable
+private fun CrmCard(onClick: () -> Unit) {
+    CardFieldNew(
+        padding = PaddingValues(16.dp),
+        onClick = onClick,
+        contentColumn = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                IconFinance(
+                    icon = R.drawable.baseline_groups_24,
+                    color = blue_16
+                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.finance_crm_button),
+                        style = textBold_16,
+                        color = black_2
+                    )
+                    Text(
+                        text = stringResource(R.string.finance_crm_button_sup),
+                        style = text_14,
+                        color = gray_7
+                    )
+                }
+                Icon(
+                    painterResource(R.drawable.baseline_chevron_right_24),
+                    contentDescription = null,
+                    tint = gray_7
+                )
+            }
+        }
+    )
 }
 
 @Composable

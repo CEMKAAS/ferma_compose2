@@ -93,6 +93,7 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":crm"))
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))

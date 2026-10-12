@@ -9,6 +9,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.zaroslikov.crm.ui.navigation.CrmDestination
+import com.zaroslikov.crm.ui.navigation.crmNavGraph
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
 import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisDestination
@@ -121,9 +123,15 @@ fun ProjectNavHost(
                             it.second.toString()
                         )
                     )
+                },
+                navigateToCrm = {
+                    navController.navigate("${CrmDestination.route}/$itemPT")
                 }
             )
         }
+
+        // Раздел CRM живёт в модуле :crm, граф экранов подключается целиком
+        crmNavGraph(navController)
 
         composable(
             route = FinanceIncomeExpensesDestination.routeWithArgs,

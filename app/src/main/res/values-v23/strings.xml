@@ -409,6 +409,8 @@
     <string name="support_text_food">Корма</string>
     <string name="support_text_more">более </string>
     <string name="support_text_transactions_now_month">Транзакции в текущем месяце</string>
+    <string name="finance_crm_button">Клиенты и CRM</string>
+    <string name="finance_crm_button_sup">Контакты, история покупок и задачи</string>
     <string name="support_text_current_balance">Текущий баланс</string>
     <string name="support_text_current_balance_">Доступно средств</string>
     <string name="support_text_now_month">Текущий месяц</string>

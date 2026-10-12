@@ -28,9 +28,12 @@ object BackupParser {
     private const val ICON_FIELD = "currentIcon"
     private val ICON_TABLES = listOf("projectTable", "animalTable")
 
+    /** Неизвестные поля пропускаем: бэкап из более новой версии не должен ломать импорт. */
+    private val json = Json { ignoreUnknownKeys = true }
+
     fun parse(value: String): BackupData {
-        val root = Json.parseToJsonElement(value)
-        return Json.decodeFromJsonElement(normalizeIcons(root))
+        val root = json.parseToJsonElement(value)
+        return json.decodeFromJsonElement(normalizeIcons(root))
     }
 
     /** Заменяет идентификаторы ресурсов старых сборок на коды [AppIcon]. */

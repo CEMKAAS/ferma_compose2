@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.start.settings
 
+import com.zaroslikov.crm.domain.model.DomainCrmBackup
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.table.DomainAnimalHerd
@@ -73,4 +74,6 @@ data class BackupData(
     val timeNotificationIncubatorTable: List<DomainTimeNotificationIncubator> = emptyList(),
     val profileTable: List<DomainProfileTable> = emptyList(),
     val appSettingsTable: List<DomainAppSettings> = emptyList(),
+    /** CRM (отдельная база `crm_database`); в старых бэкапах поля нет. */
+    val crm: DomainCrmBackup? = null,
 )

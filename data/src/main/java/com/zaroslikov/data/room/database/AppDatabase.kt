@@ -31,6 +31,7 @@ import com.zaroslikov.data.room.dao.IncubatorTableDao
 import com.zaroslikov.data.room.dao.NoteDao
 import com.zaroslikov.data.room.dao.ProfileDao
 import com.zaroslikov.data.room.dao.ProjectDao
+import com.zaroslikov.data.room.dao.CrmSaleDao
 import com.zaroslikov.data.room.dao.SaleDao
 import com.zaroslikov.data.room.dao.SettingsDao
 import com.zaroslikov.data.room.dao.TimeNotificationIncubatorDao
@@ -122,6 +123,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun projectDao(): ProjectDao
     abstract fun timeNotificationProjectDao(): TimeNotificationProjectDao
     abstract fun saleDao(): SaleDao
+    abstract fun crmSaleDao(): CrmSaleDao
     abstract fun warehouseDao(): WarehouseDao
     abstract fun writeOffDao(): WriteOffDao
     abstract fun settingsDao(): SettingsDao
