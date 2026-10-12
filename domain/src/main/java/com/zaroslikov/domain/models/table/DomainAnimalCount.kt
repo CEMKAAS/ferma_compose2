@@ -12,5 +12,10 @@ data class DomainAnimalCount(
     val date: String = "",
     val note: String = "",
     val version: AnimalCountVersion? = null,
-    val idAnimal: Long = 0
+    val idAnimal: Long = 0,
+    /** Сборная группа, в составе которой сделана запись; null — вне группы. */
+    val herdId: Long? = null,
+    /** Обезличенная группа: сколько из [count] самок и самцов; остальное — пол не известен. */
+    val femalesCount: Int = 0,
+    val malesCount: Int = 0
 )

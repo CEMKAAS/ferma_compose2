@@ -19,10 +19,18 @@ import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestinatio
 import com.zaroslikov.fermacompose2.ui.project.sections.workspace.HomeDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.workspace.SectionWorkspaceScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.card.AnimalHerdCardDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.card.AnimalHerdCardScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.count.AnimalHerdCountDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.count.AnimalHerdCountScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.edit.AnimalHerdEditDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.edit.AnimalHerdEditScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.AnimalCardProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalEditDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.edit.AnimalEditProduct
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.AnimalCountDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.pregnancy.AnimalPregnancyDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.pregnancy.AnimalPregnancyScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count.AnimalCountScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size.AnimalSizeDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.size.AnimalSizeScreen
@@ -161,6 +169,15 @@ fun ProjectNavHost(
                         )
                     )
                 },
+                navigateToHerdCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalHerdCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString(),
+                        )
+                    )
+                },
                 navigationToAnalysis = {
                     navController.navigate(
                         nav(
@@ -208,6 +225,80 @@ fun ProjectNavHost(
         ) {
             AnimalEditProduct(
                 navigateBack = { navController.popBackStack() })
+        }
+
+        // Сборная группа
+        composable(
+            route = AnimalHerdCountDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalHerdCountDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalHerdCountDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalHerdCountScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateAnimalCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = AnimalHerdCardDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalHerdCardDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalHerdCardDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalHerdCardScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateEdit = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalHerdEditDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
+                onNavigateCount = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalHerdCountDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
+                onNavigateAnimalCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = AnimalHerdEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalHerdEditDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalHerdEditDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalHerdEditScreen(navigateBack = { navController.popBackStack() })
         }
 
         composable(
@@ -264,6 +355,35 @@ fun ProjectNavHost(
                             itemTwo = it.second.toString()
                         )
                     )
+                },
+                onNavigateAnimalCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
+                onNavigateHerdCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalHerdCardDestination.route,
+                            itemOne = it.first.toString(),
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                },
+                onNavigatePregnancy = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalPregnancyDestination.route,
+                            itemOneRoute = AnimalPregnancyDestination.itemIdPT,
+                            itemOne = it.first.toString(),
+                            itemTwoRoute = AnimalPregnancyDestination.itemId,
+                            itemTwo = it.second.toString()
+                        )
+                    )
                 }
             )
         }
@@ -314,6 +434,29 @@ fun ProjectNavHost(
         ) {
             AnimalCountScreen(
                 navigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = AnimalPregnancyDestination.routeWithArgs,
+            arguments = listOf(navArgument(AnimalPregnancyDestination.itemIdPT) {
+                type = NavType.LongType
+            }, navArgument(AnimalPregnancyDestination.itemId) {
+                type = NavType.LongType
+            })
+        ) {
+            AnimalPregnancyScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateAnimalCard = {
+                    navController.navigate(
+                        navNull(
+                            route = AnimalCardDestination.route,
+                            itemOneRoute = AnimalCardDestination.itemIdPT,
+                            itemOne = it.first.toString(),
+                            itemTwoRoute = AnimalCardDestination.itemId,
+                            itemTwo = it.second.toString()
+                        )
+                    )
+                }
             )
         }
     }

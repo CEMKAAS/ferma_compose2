@@ -20,6 +20,10 @@ import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EntryIndi
 
 @Composable
 fun BottomSheetExpensesAnimal(
+    // Вместо поля количества (сборная группа: количество — по выбранным членам)
+    countContent: (@Composable () -> Unit)? = null,
+    // Под количеством: самки и самцы обезличенной группы
+    sexContent: (@Composable () -> Unit)? = null,
     state: CountItem,
     countAllAnimal: String?,
     countSuffix: Suffix,
@@ -53,7 +57,7 @@ fun BottomSheetExpensesAnimal(
         onInsertClick = { onIntent(AnimalCountIntent.InsertExpensesPressed) },
         onUpdateClick = { onIntent(AnimalCountIntent.UpdateExpensesPressed) }
     ) {
-        OutlinedTextCountAnimalNew(
+        if (countContent != null) countContent() else OutlinedTextCountAnimalNew(
             value = state.count,
             onValueChange = {
                 onIntent(AnimalCountIntent.CountChanged(it))
@@ -63,6 +67,7 @@ fun BottomSheetExpensesAnimal(
             suffix = countSuffix,
             countAnimal = countAllAnimal,
         )
+        sexContent?.invoke()
         OutlinedPriceInputNew(
             price = state.price,
             onPriceChange = {

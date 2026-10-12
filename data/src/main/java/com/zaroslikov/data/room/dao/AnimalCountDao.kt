@@ -33,6 +33,43 @@ interface AnimalCountDao {
     @Update
     suspend fun updateAnimalCountTable(animalCountTable: AnimalCountTable)
 
+    @Query("SELECT * FROM animal_count_table WHERE id = :id")
+    suspend fun getCountRow(id: Long): AnimalCountTable?
+
+    /** Самки и самцы обезличенной группы: прибавить (отрицательное — убавить, не ниже 0). */
+    @Query(
+        "UPDATE animal_table SET females_count = MAX(females_count + :females, 0), " +
+                "males_count = MAX(males_count + :males, 0) WHERE id = :animalId AND is_group = 1"
+    )
+    suspend fun addGroupSexCounts(animalId: Long, females: Int, males: Int)
+
+    /** Запись и пол группы — вместе: продажа самок убавляет самок группы. */
+    @Transaction
+    suspend fun insertCountWithSex(row: AnimalCountTable): Long {
+        val id = insertAnimalCountTable(row)
+        applyGroupSex(row, direction = 1)
+        return id
+    }
+
+    /** Правка записи: пол старой версии возвращается в группу, новой — применяется. */
+    @Transaction
+    suspend fun updateCountWithSex(row: AnimalCountTable) {
+        getCountRow(row.id)?.let { applyGroupSex(it, direction = -1) }
+        updateAnimalCountTable(row)
+        applyGroupSex(row, direction = 1)
+    }
+
+    /** Удаление записи: её пол возвращается в группу. */
+    @Transaction
+    suspend fun deleteCountWithSex(id: Long) {
+        val old = getCountRow(id)
+        deleteAnimalCountTable(id)
+        old?.let { applyGroupSex(it, direction = -1) }
+    }
+
+    @Query("SELECT herd_id FROM animal_count_table WHERE id = :id")
+    suspend fun getCountHerdId(id: Long): Long?
+
     @Query("DELETE FROM animal_count_table WHERE id =:id")
     suspend fun deleteAnimalCountTable(id: Long)
 
@@ -53,8 +90,8 @@ interface AnimalCountDao {
                 ELSE
                    COALESCE((SELECT SUM(
                         CASE
-                            WHEN version IN (1, 4, 5) THEN count
-                            WHEN version IN (0, 2, 3) THEN -count
+                            WHEN version IN ($ANIMAL_COUNT_PLUS) THEN count
+                            WHEN version IN ($ANIMAL_COUNT_MINUS) THEN -count
                             ELSE 0
                         END
                     ) FROM animal_count_table WHERE animal_id = :id), 0)
@@ -67,14 +104,16 @@ interface AnimalCountDao {
         date,
         animal_id,
         note,
-        version
+        version,
+        females_count,
+        males_count
     FROM FirstRow
 """
     )
     fun getCountAnimalLimit(id: Long): Flow<AnimalCountTable?>
 
     @Query(
-        "SELECT id, count, suffix, date, animal_id, note, version," +
+        "SELECT id, count, suffix, date, animal_id, note, version, females_count, males_count," +
                 "  CASE" +
                 "        WHEN version = 0 THEN (SELECT PRICE FROM sale_table WHERE animal_count_id = id)" +
                 "        WHEN version IN (1, 5) THEN (SELECT price FROM expenses_table WHERE animal_count_id = id)" +
@@ -112,4 +151,13 @@ interface AnimalCountDao {
                 " ORDER BY DATE(printf('%04d-%02d-%02d', substr(date, 7, 4), substr(date, 4, 2), substr(date, 1, 2))) DESC, id DESC"
     )
     fun getCountAnimal(id: Long): Flow<List<AnimalCountPriceDto>>
+}
+/**
+ * Пол записи [row] в счётчики самок и самцов группы: со знаком версии (продажа убавляет,
+ * приход прибавляет); [direction] = -1 — отменить запись.
+ */
+private suspend fun AnimalCountDao.applyGroupSex(row: AnimalCountTable, direction: Int) {
+    val sign = (row.version?.sign ?: 0) * direction
+    if (sign == 0 || (row.femalesCount == 0 && row.malesCount == 0)) return
+    addGroupSexCounts(row.animalId, sign * row.femalesCount, sign * row.malesCount)
 }

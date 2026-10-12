@@ -86,6 +86,10 @@ fun AnimalCountVersion.toColorList(): List<Color> {
         AnimalCountVersion.WRITE_OFF -> listOf(violet_1, violet_2)
         AnimalCountVersion.ADD -> listOf(Color(0xFF00A63E), Color(0xFF009966))
         AnimalCountVersion.INCUBATOR -> listOf(orang_2, orang_1)
+        AnimalCountVersion.TRANSFER_IN -> listOf(Color(0xFF00A63E), Color(0xFF009966))
+        AnimalCountVersion.TRANSFER_OUT -> listOf(violet_1, violet_2)
+        AnimalCountVersion.HERD_JOIN -> listOf(Color(0xFF00A63E), Color(0xFF009966))
+        AnimalCountVersion.HERD_LEAVE -> listOf(violet_1, violet_2)
     }
 }
 

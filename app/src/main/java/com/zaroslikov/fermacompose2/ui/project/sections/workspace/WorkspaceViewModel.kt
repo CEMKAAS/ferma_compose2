@@ -2,7 +2,7 @@ package com.zaroslikov.fermacompose2.ui.project.sections.workspace
 
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,8 +23,17 @@ class SectionWorkspaceViewModel @Inject constructor(
     private val incubatorChicksManager: IncubatorChicksManager,
 ) : ViewModel() {
 
-    var initialPage by mutableIntStateOf(2)
+    /**
+     * Разовый запрос на переключение вкладки (QR-шаблон, птенцы из «Инкубатора»).
+     * После выполнения сбрасывается в null, иначе при возврате с вложенного экрана
+     * (например, с карточки животного) пейджер снова уезжал бы на эту вкладку.
+     */
+    var pageRequest by mutableStateOf<Int?>(null)
         private set
+
+    fun onPageRequestHandled() {
+        pageRequest = null
+    }
 
     init {
         checkQrPayload()
@@ -35,14 +44,14 @@ class SectionWorkspaceViewModel @Inject constructor(
             // Только что записали птенцов из «Инкубатора» — открываем проект там, где их
             // видно: на странице «Животные».
             if (incubatorChicksManager.consumeAnimalsPage()) {
-                initialPage = Page.ANIMAL.ordinal
+                pageRequest = Page.ANIMAL.ordinal
                 return@launch
             }
 
             val payload = qrNavigationManager.peek() ?: return@launch
 
             Log.i("payload", "checkQrPayload: $payload")
-            initialPage = when (payload.templateType) {
+            pageRequest = when (payload.templateType) {
                 TemplateType.WRITE_OFF -> 0
                 TemplateType.SALE -> 1
                 TemplateType.ADD -> 2

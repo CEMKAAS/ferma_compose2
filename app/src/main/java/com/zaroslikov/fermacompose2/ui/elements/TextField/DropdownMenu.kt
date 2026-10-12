@@ -25,7 +25,10 @@ import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.ProductOrigin
+import com.zaroslikov.domain.models.enums.AnimalTypeSuggestion
 import com.zaroslikov.domain.models.enums.FilterDate
+import com.zaroslikov.fermacompose2.supportFun.toAnimalIcon
+import com.zaroslikov.fermacompose2.ui.elements.icon.drawableRes
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.grey_3
@@ -48,8 +51,10 @@ fun DropdownMenuEdit(
     onUnarchiveClick: (() -> Unit)? = null,
     onCreateQrCodeClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
+    onGroupClick: (() -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val groupTitle = stringResource(R.string.animal_group_menu_add)
 
     IconButton(onClick = { expanded = !expanded }, modifier = Modifier.size(18.dp)) {
         Icon(
@@ -79,6 +84,9 @@ fun DropdownMenuEdit(
                 }
                 onEditClick?.let {
                     add(MenuItemData("Редактировать", R.drawable.outline_edit_square_24, color, it))
+                }
+                onGroupClick?.let {
+                    add(MenuItemData(groupTitle, R.drawable.icon_group, color, it))
                 }
                 onArchiveClick?.let {
                     add(MenuItemData("Архивировать", R.drawable.baseline_archive_24, color, it))
@@ -165,6 +173,45 @@ fun ExposedDropdownMenuCategoryBuyer(
     }
 }
 
+
+/** Подсказки типа животного: у системных видов — иконка вида, у введённых пользователем — без иконки. */
+@Composable
+fun ExposedDropdownMenuAnimalType(
+    title: String,
+    setTitle: (String) -> Unit,
+    titleList: List<AnimalTypeSuggestion>,
+    content: @Composable (Pair<Modifier, Boolean>) -> Unit,
+) {
+    BaseExposedDropdownMenu2(
+        title = title,
+        labelSelector = { it.name },
+        list = titleList,
+        content = content,
+    ) { _, item, closeMenu ->
+        val trailingIcon: @Composable (() -> Unit)? = if (item.name == title) {
+            { Icon(Icons.Default.Done, contentDescription = null) }
+        } else null
+        val leadingIcon: @Composable (() -> Unit)? = item.species.toAnimalIcon()?.let { icon ->
+            {
+                Icon(
+                    painter = painterResource(icon.drawableRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = Color(0xFF6A7282)
+                )
+            }
+        }
+        DropdownMenuItem(
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            text = { Text(text = item.name) },
+            onClick = {
+                setTitle(item.name)
+                closeMenu()
+            }
+        )
+    }
+}
 
 @Composable
 fun ExposedDropdownMenuFilterDate(

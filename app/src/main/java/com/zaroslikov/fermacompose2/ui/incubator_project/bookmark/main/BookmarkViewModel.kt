@@ -7,6 +7,7 @@ import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.AnimalSpecies
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainAnimalCount
@@ -741,7 +742,7 @@ class BookmarkViewModel @Inject constructor(
         timeNotificationIncubatorRepository.getTimeNotificationInAllActiveBookmark()
             .first()
             .let { list ->
-                workManagerRepository.cancelAllNotifications()
+                workManagerRepository.cancelIncubatorNotification()
                 list.forEach { item ->
                     workManagerRepository.scheduleReminderIncubator(
                         name = item.nameBookmark,
@@ -802,6 +803,11 @@ class BookmarkViewModel @Inject constructor(
         return DomainAnimalTable(
             name = title,
             type = resourceProvider.getString(type.toResId()),
+            species = AnimalSpecies.fromTypeEgg(type),
+            // «Не указано» — заглушка формы закладки, а не порода
+            breed = breed?.trim()?.takeIf {
+                it.isNotEmpty() && it != resourceProvider.getString(R.string.entry_bookmark_not_specified)
+            },
             date = dateToday(),
             dateFactory = null,
             group = true,

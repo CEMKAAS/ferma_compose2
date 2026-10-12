@@ -11,7 +11,10 @@ fun AnimalCountTable.toDomainMap(): DomainAnimalCount = DomainAnimalCount(
     date = date,
     note = note,
     version = version,
-    idAnimal = animalId
+    idAnimal = animalId,
+    herdId = herdId,
+    femalesCount = femalesCount,
+    malesCount = malesCount
 )
 
 fun DomainAnimalCount.toRoomMap(): AnimalCountTable = AnimalCountTable(
@@ -21,5 +24,8 @@ fun DomainAnimalCount.toRoomMap(): AnimalCountTable = AnimalCountTable(
     date = date,
     note = note,
     version = version,
-    animalId = idAnimal
+    animalId = idAnimal,
+    herdId = herdId,
+    femalesCount = femalesCount,
+    malesCount = malesCount
 )

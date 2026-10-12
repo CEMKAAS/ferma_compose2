@@ -236,6 +236,8 @@ class YandexMetricRepositoryImpl @Inject constructor(
             AnimalCountVersion.WRITE_OFF -> "Списание животных"
             AnimalCountVersion.ADD -> "Добавление животных"
             AnimalCountVersion.INCUBATOR -> "Добавление животных через инкубатор"
+            AnimalCountVersion.TRANSFER_IN, AnimalCountVersion.TRANSFER_OUT -> "Перегруппировка (приход/расход)"
+            AnimalCountVersion.HERD_JOIN, AnimalCountVersion.HERD_LEAVE -> "Состав сборной группы (вход/выход)"
             null -> "Неизвестная ошибка "
         }
         eventParameters["Примечание"] = state.note.ifBlank { "Заметка не указана" }

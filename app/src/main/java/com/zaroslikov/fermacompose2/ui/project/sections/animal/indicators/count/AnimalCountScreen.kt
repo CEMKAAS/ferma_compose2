@@ -3,7 +3,12 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.count
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
@@ -17,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.group.GroupSexCountFields
 import com.zaroslikov.fermacompose2.animal_1
 import com.zaroslikov.fermacompose2.green_15
 import com.zaroslikov.fermacompose2.supportFun.toColorList
@@ -62,6 +68,7 @@ fun AnimalCountScreen(
             if (!state.isArchive)
                 FabMenu2(
                     isListEmpty = state.countList.isNotEmpty(),
+                    items = ANIMAL_COUNT_ACTIONS,
                     onClick = { viewModel.onIntent(AnimalCountIntent.DialogClicked(true, it)) }
                 )
         }
@@ -88,9 +95,24 @@ fun AnimalCountScreen(
             )
 
         if (state.isOpenEntryBottomSheet) {
+            // Обезличенная группа: сколько из уходящих или пришедших самок и самцов
+            val sexContent: (@Composable () -> Unit)? = if (state.animal.group) {
+                {
+                    GroupSexCountFields(
+                        females = state.currentProduct.femalesCount,
+                        males = state.currentProduct.malesCount,
+                        onFemalesChange = { viewModel.onIntent(AnimalCountIntent.FemalesCountChanged(it)) },
+                        onMalesChange = { viewModel.onIntent(AnimalCountIntent.MalesCountChanged(it)) },
+                        isError = state.currentProduct.error.isErrorSexCount,
+                        infoRes = R.string.animal_group_sex_op_info,
+                        errorRes = R.string.animal_group_sex_op_error
+                    )
+                }
+            } else null
             when (state.currentProduct.version) {
                 AnimalCountVersion.SALE ->
                     BottomSheetSaleAnimal(
+                        sexContent = sexContent,
                         state = state.currentProduct,
                         onIntent = viewModel::onIntent,
                         countAllAnimal = state.countAnimal,
@@ -99,6 +121,7 @@ fun AnimalCountScreen(
 
                 AnimalCountVersion.EXPENSES ->
                     BottomSheetExpensesAnimal(
+                        sexContent = sexContent,
                         state = state.currentProduct,
                         countAllAnimal = state.countAnimal,
                         countSuffix = state.countAnimalSuffix,
@@ -108,6 +131,7 @@ fun AnimalCountScreen(
 
                 AnimalCountVersion.KILL ->
                     BottomSheetKillAnimal(
+                        sexContent = sexContent,
                         state = state.currentProduct,
                         onIntent = viewModel::onIntent,
                         countAnimalAll = state.countAnimal,
@@ -116,6 +140,7 @@ fun AnimalCountScreen(
 
                 AnimalCountVersion.WRITE_OFF ->
                     BottomSheetWriteOffAnimal(
+                        sexContent = sexContent,
                         state = state.currentProduct,
                         countAllAnimal = state.countAnimal,
                         countSuffix = state.countAnimalSuffix,
@@ -125,6 +150,7 @@ fun AnimalCountScreen(
 
                 AnimalCountVersion.ADD ->
                     BottomSheetAddAnimal(
+                        sexContent = sexContent,
                         state = state.currentProduct,
                         countAllAnimal = state.countAnimal,
                         onIntent = viewModel::onIntent
@@ -138,6 +164,9 @@ fun AnimalCountScreen(
                         currencyPrice = state.settings.currencySuffix,
                         onIntent = viewModel::onIntent,
                     )
+
+                AnimalCountVersion.TRANSFER_IN, AnimalCountVersion.TRANSFER_OUT,
+                AnimalCountVersion.HERD_JOIN, AnimalCountVersion.HERD_LEAVE -> Unit
             }
         }
         if (state.openSoloDialog)
@@ -199,35 +228,40 @@ private fun AnimalCountContainer2(
     isArchive: Boolean,
     currencyPriceSuffix: Suffix,
 ) {
-    InventoryAnimalBody(
-        modifier = modifier,
-        itemList = itemList,
-        titleRes2 = titleRes,
-        titleRes = R.string.message_no_date_title_count,
-        messageRes = R.string.message_no_date_message_count,
-        iconRes = R.drawable.baseline_spoke_24,
-        iconColor = animal_1,
-        backgroundColor = green_15,
-        isArchive = isArchive,
-        detailCard = { item ->
-            AnimalCountCardNew(
-                icon = item.version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
-                colors = item.version?.toColorList() ?: AnimalCountVersion.ADD.toColorList(),
-                value = item.count,
-                suffix = item.suffix,
-                price = item.priceAll ?: item.price,
-                currencyPriceSuffix = currencyPriceSuffix,
-                date = item.date,
-                note = item.note,
-                isArchive = isArchive,
-                onEditClick = { onEditClick(item) },
-                onDeleteClick = { onDeleteClick(item.id) },
-                indicationStatus = item.version?.toIndicationStatus()
-                    ?: AnimalCountVersion.ADD.toIndicationStatus(),
-                productKill = item.productKill
-            )
-        }
-    )
+    Column(modifier = modifier) {
+        InventoryAnimalBody(
+            modifier = Modifier,
+            itemList = itemList,
+            titleRes2 = titleRes,
+            titleRes = R.string.message_no_date_title_count,
+            messageRes = R.string.message_no_date_message_count,
+            iconRes = R.drawable.baseline_spoke_24,
+            iconColor = animal_1,
+            backgroundColor = green_15,
+            isArchive = isArchive,
+            detailCard = { item ->
+                AnimalCountCardNew(
+                    icon = item.version?.toDrawRes() ?: AnimalCountVersion.ADD.toDrawRes(),
+                    colors = item.version?.toColorList() ?: AnimalCountVersion.ADD.toColorList(),
+                    value = item.count,
+                    suffix = item.suffix,
+                    price = item.priceAll ?: item.price,
+                    currencyPriceSuffix = currencyPriceSuffix,
+                    date = item.date,
+                    note = item.note,
+                    // Transfer-записи только для чтения: их меняют операции группы
+                    isArchive = isArchive || item.version?.isTransfer == true,
+                    onEditClick = { onEditClick(item) },
+                    onDeleteClick = { onDeleteClick(item.id) },
+                    indicationStatus = item.version?.toIndicationStatus()
+                        ?: AnimalCountVersion.ADD.toIndicationStatus(),
+                    productKill = item.productKill,
+                    femalesCount = item.femalesCount,
+                    malesCount = item.malesCount
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -261,3 +295,11 @@ private fun WarningDeleteCountBottomSheet(
     ) {
     }
 }
+/** Действия со счётчиком животного или обезличенной группы. */
+private val ANIMAL_COUNT_ACTIONS = listOf(
+    AnimalCountVersion.KILL,
+    AnimalCountVersion.EXPENSES,
+    AnimalCountVersion.WRITE_OFF,
+    AnimalCountVersion.SALE,
+    AnimalCountVersion.ADD
+)

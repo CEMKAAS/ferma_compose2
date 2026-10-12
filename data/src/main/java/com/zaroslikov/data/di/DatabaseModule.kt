@@ -7,6 +7,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.dao.AnimalCountDao
 import com.zaroslikov.data.room.dao.AnimalDao
+import com.zaroslikov.data.room.dao.AnimalHerdDao
+import com.zaroslikov.data.room.dao.AnimalPregnancyDao
 import com.zaroslikov.data.room.dao.AnimalSizeDao
 import com.zaroslikov.data.room.dao.AnimalVaccinationDao
 import com.zaroslikov.data.room.dao.AnimalWeightDao
@@ -35,6 +37,14 @@ import com.zaroslikov.data.room.database.migration.MIGRATION_3_4
 import com.zaroslikov.data.room.database.migration.MIGRATION_4_5
 import com.zaroslikov.data.room.database.migration.MIGRATION_5_6
 import com.zaroslikov.data.room.database.migration.MIGRATION_6_7
+import com.zaroslikov.data.room.database.migration.MIGRATION_7_8
+import com.zaroslikov.data.room.database.migration.MIGRATION_8_9
+import com.zaroslikov.data.room.database.migration.MIGRATION_9_10
+import com.zaroslikov.data.room.database.migration.MIGRATION_10_11
+import com.zaroslikov.data.room.database.migration.MIGRATION_11_12
+import com.zaroslikov.data.room.database.migration.MIGRATION_12_13
+import com.zaroslikov.data.room.database.migration.MIGRATION_13_14
+import com.zaroslikov.data.room.database.migration.MIGRATION_14_15
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,6 +71,14 @@ object DatabaseModule {
             .addMigrations(MIGRATION_4_5)
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
+            .addMigrations(MIGRATION_7_8)
+            .addMigrations(MIGRATION_8_9)
+            .addMigrations(MIGRATION_9_10)
+            .addMigrations(MIGRATION_10_11)
+            .addMigrations(MIGRATION_11_12)
+            .addMigrations(MIGRATION_12_13)
+            .addMigrations(MIGRATION_13_14)
+            .addMigrations(MIGRATION_14_15)
             .addCallback(object : RoomDatabase.Callback() {
 
                 override fun onCreate(db: SupportSQLiteDatabase) {
@@ -101,6 +119,18 @@ object DatabaseModule {
     @Singleton
     fun provideAnimalDao(database: AppDatabase): AnimalDao {
         return database.animalDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnimalHerdDao(database: AppDatabase): AnimalHerdDao {
+        return database.animalHerdDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAnimalPregnancyDao(database: AppDatabase): AnimalPregnancyDao {
+        return database.animalPregnancyDao()
     }
 
     @Provides

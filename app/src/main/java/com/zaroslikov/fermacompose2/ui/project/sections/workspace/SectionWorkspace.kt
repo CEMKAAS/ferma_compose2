@@ -67,6 +67,7 @@ fun SectionWorkspaceScreen(
     navigationToFirstScreen: () -> Unit,
     navigateToItemProject: (Pair<Long, Boolean>) -> Unit,
     navigateToItemCard: (Pair<Long, Long>) -> Unit,
+    navigateToHerdCard: (Pair<Long, Long>) -> Unit,
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
     viewModel: SectionWorkspaceViewModel = hiltViewModel()
 ) {
@@ -74,11 +75,15 @@ fun SectionWorkspaceScreen(
 
     val pagerState = rememberPagerState(
         pageCount = { pages.size },
-        initialPage = 2
+        initialPage = Page.ADD.ordinal
     )
 
-    LaunchedEffect(viewModel.initialPage) {
-        pagerState.animateScrollToPage(viewModel.initialPage)
+    val pageRequest = viewModel.pageRequest
+    LaunchedEffect(pageRequest) {
+        if (pageRequest != null) {
+            pagerState.animateScrollToPage(pageRequest)
+            viewModel.onPageRequestHandled()
+        }
     }
 
 
@@ -125,7 +130,10 @@ fun SectionWorkspaceScreen(
                     navigateToFirstScreen = { navigationToFirstScreen() }
                 )
 
-                Page.ANIMAL -> AnimalListScreen(navigateToItemCard = navigateToItemCard)
+                Page.ANIMAL -> AnimalListScreen(
+                    navigateToItemCard = navigateToItemCard,
+                    navigateToHerdCard = navigateToHerdCard
+                )
             }
         }
     }

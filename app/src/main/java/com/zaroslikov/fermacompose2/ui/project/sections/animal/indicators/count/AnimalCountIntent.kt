@@ -32,6 +32,8 @@ sealed class AnimalCountIntent : BaseIntent {
 
     // Update Action Animal
     data class CountChanged(val value: String) : AnimalCountIntent()
+    data class FemalesCountChanged(val value: String) : AnimalCountIntent()
+    data class MalesCountChanged(val value: String) : AnimalCountIntent()
     data class DateClicked(val value: String) : AnimalCountIntent()
     data class NoteChanged(val value: String) : AnimalCountIntent()
     data class PriceChanged(val value: String) : AnimalCountIntent()

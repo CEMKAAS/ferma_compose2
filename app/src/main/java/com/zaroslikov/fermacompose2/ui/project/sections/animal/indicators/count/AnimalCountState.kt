@@ -83,6 +83,12 @@ data class CountItem(
     val totalWeight: Double? = null,
     val finalWeight: Double = 0.0,
     val weightSuffix: Suffix = Suffix.KILOGRAM,
+    /** Обезличенная группа: сколько из количества самок и самцов (продажа, списание, забой). */
+    val femalesCount: String = "",
+    val malesCount: String = "",
+    /** Пол правимой записи — он уже вычтен из группы и при проверке возвращается. */
+    val oldFemalesCount: Int = 0,
+    val oldMalesCount: Int = 0,
     override val hasAnyError: Boolean = false
 ) : BaseProduct()
 
@@ -109,7 +115,10 @@ data class ErrorKill(
 data class ErrorCount(
     val isErrorPrice: Boolean = false,
     val isErrorCount: Boolean = false,
-    val isErrorCountZero: Boolean = false, override val hasAnyError: Boolean = false,
+    val isErrorCountZero: Boolean = false,
+    /** Самок или самцов больше, чем в группе, или вместе больше количества. */
+    val isErrorSexCount: Boolean = false,
+    override val hasAnyError: Boolean = false,
 ) : BaseError
 
 data class DomainAnimalCountPriceUi(
@@ -126,7 +135,9 @@ data class DomainAnimalCountPriceUi(
     val buyer: String? = null,
     val tableId: Long? = null,
     val idPT: Long? = null,
-    val productKill: List<ProductKill> = emptyList()
+    val productKill: List<ProductKill> = emptyList(),
+    val femalesCount: Int = 0,
+    val malesCount: Int = 0
 )
 
 data class LoadDataAnimalCount(

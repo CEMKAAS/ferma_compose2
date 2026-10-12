@@ -3,6 +3,8 @@ package com.zaroslikov.data.di
 import com.zaroslikov.data.room.repository.AddRepositoryImpl
 import com.zaroslikov.data.room.repository.TemplateRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalCountRepositoryImpl
+import com.zaroslikov.data.room.repository.AnimalHerdRepositoryImpl
+import com.zaroslikov.data.room.repository.AnimalPregnancyRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalSizeRepositoryImpl
 import com.zaroslikov.data.room.repository.AnimalVaccinationRepositoryImpl
@@ -25,6 +27,8 @@ import com.zaroslikov.data.room.repository.WarehouseRepositoryImpl
 import com.zaroslikov.data.room.repository.WriteOffRepositoryImpl
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalCountRepository
+import com.zaroslikov.domain.repository.AnimalHerdRepository
+import com.zaroslikov.domain.repository.AnimalPregnancyRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
@@ -71,6 +75,16 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAnimalRepository(animalRepositoryImpl: AnimalRepositoryImpl): AnimalRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAnimalHerdRepository(animalHerdRepositoryImpl: AnimalHerdRepositoryImpl): AnimalHerdRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAnimalPregnancyRepository(
+        animalPregnancyRepositoryImpl: AnimalPregnancyRepositoryImpl
+    ): AnimalPregnancyRepository
 
     @Binds
     @Singleton

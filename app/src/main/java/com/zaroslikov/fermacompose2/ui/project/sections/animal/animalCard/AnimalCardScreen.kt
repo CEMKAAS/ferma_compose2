@@ -47,6 +47,7 @@ import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
 import com.zaroslikov.fermacompose2.animal_1
+import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.gray_4
@@ -69,11 +70,15 @@ import com.zaroslikov.fermacompose2.ui.elements.TopAppBarBack
 import com.zaroslikov.fermacompose2.ui.elements.modifierScreen
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalBreedText
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalParameter
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.IconAnimal
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.pregnancy.PregnancyStartSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.pregnancy.ParentInfoSheet
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_3
 
@@ -94,6 +99,9 @@ fun AnimalCardProduct(
     onNavigateCount: (Pair<Long, Long>) -> Unit,
     onNavigateWeight: (Pair<Long, Long>) -> Unit,
     onNavigateVaccination: (Pair<Long, Long>) -> Unit,
+    onNavigateAnimalCard: (Pair<Long, Long>) -> Unit,
+    onNavigateHerdCard: (Pair<Long, Long>) -> Unit,
+    onNavigatePregnancy: (Pair<Long, Long>) -> Unit,
     viewModel: AnimalCardViewModel = hiltViewModel()
 ) {
     val eventFlow = viewModel.navigation
@@ -134,7 +142,10 @@ fun AnimalCardProduct(
                 onNavigateSize = { onNavigateSize(state.itemIdPT to state.itemId) },
                 onNavigateCount = { onNavigateCount(state.itemIdPT to state.itemId) },
                 onNavigateWeight = { onNavigateWeight(state.itemIdPT to state.itemId) },
-                onNavigateVaccination = { onNavigateVaccination(state.itemIdPT to state.itemId) }
+                onNavigateVaccination = { onNavigateVaccination(state.itemIdPT to state.itemId) },
+                onNavigateAnimalCard = { onNavigateAnimalCard(state.itemIdPT to it) },
+                onNavigateHerdCard = { onNavigateHerdCard(state.itemIdPT to it) },
+                onNavigatePregnancy = { onNavigatePregnancy(state.itemIdPT to state.itemId) }
             )
     }
 }
@@ -148,23 +159,53 @@ fun AnimalCardContainer(
     onNavigateCount: () -> Unit,
     onNavigateWeight: () -> Unit,
     onNavigateVaccination: () -> Unit,
+    onNavigateAnimalCard: (Long) -> Unit,
+    onNavigateHerdCard: (Long) -> Unit,
+    onNavigatePregnancy: () -> Unit,
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        DataCardOne(state.animal, state.price)
+        DataCardOne(
+            animal = state.animal,
+            price = state.price,
+            herdName = state.summary?.herdName?.takeIf { state.isMember },
+            isLeaveVisible = !state.isArchive,
+            isLeaveEnabled = !state.isGroupOperationRunning,
+            onHerdClick = state.animal.herdId?.let { id -> { onNavigateHerdCard(id) } },
+            onLeaveClick = { onIntent(AnimalCardIntent.OpenLeaveDialog(true)) }
+        )
         DataCardTwo(
             size = state.size,
             weight = state.weight,
             vaccination = state.vaccination,
             count = state.countAnimal,
+            // Особь в сборной группе своего количества не ведёт
+            isCountVisible = state.isGroup || !state.isMember,
+            // Для группы — поголовье счётчика (не меньше 0)
+            groupTotal = if (state.isGroup) state.summary?.let {
+                "${it.totalCount.formatNumber(isGroupingUsed = false)} ${stringResource(it.suffix.toResId())}"
+            } else null,
             onNavigateSize = onNavigateSize,
             onNavigateCount = onNavigateCount,
             onNavigateWeight = onNavigateWeight,
             onNavigateVaccination = onNavigateVaccination
         )
+        if (state.isGroup)
+            GroupSection(state = state, onIntent = onIntent)
+        if (state.isPregnancySectionVisible)
+            PregnancySection(
+                state = state,
+                onClick = onNavigatePregnancy,
+                onStartClick = { onIntent(AnimalCardIntent.OpenPregnancyStart) }
+            )
+        if (state.hasPedigree)
+            PedigreeSection(
+                state = state,
+                onRelativeClick = { onIntent(AnimalCardIntent.OpenPedigreeSheet(it)) }
+            )
         if (!state.animal.archive || state.animal.note.isNotEmpty())
             NoteWidget(note = state.animal.note, isArchive = state.isArchive)
             { onIntent(AnimalCardIntent.NoteChanged(it)) }
@@ -208,13 +249,64 @@ fun AnimalCardContainer(
                 onConfirmation = { onIntent(AnimalCardIntent.OpenArchiveDialogClicked(false)) },
                 onArchiveClick = { onIntent(AnimalCardIntent.ArchiveAnimalPressed) }
             )
+        if (state.isOpenArchivePregnancyDialog)
+            ArchivePregnancyDialog(
+                onDismissRequest = { onIntent(AnimalCardIntent.OpenArchivePregnancyDialog(false)) },
+                onConfirm = { onIntent(AnimalCardIntent.ArchivePregnancyConfirmed(it)) }
+            )
+        if (state.pregnancyStart.isOpen)
+            PregnancyStartSheet(
+                form = state.pregnancyStart,
+                animalName = state.animal.name,
+                sireCandidates = state.sireCandidates,
+                matingDateError = state.matingDateError,
+                isSireError = state.isSireError,
+                canConfirm = state.canConfirmPregnancyStart,
+                isSaving = state.isPregnancySaving
+            ) { onIntent(AnimalCardIntent.PregnancyStartEvent(it)) }
+        state.pedigreeSheet?.let { sheet ->
+            val child = (sheet as? PedigreeSheet.Child)?.let { c -> state.children.firstOrNull { it.id == c.id } }
+            ParentInfoSheet(
+                supText = state.animal.name,
+                isFemale = when (sheet) {
+                    PedigreeSheet.Mother -> true
+                    PedigreeSheet.Father -> false
+                    is PedigreeSheet.Child -> child?.sex == false
+                },
+                title = if (sheet is PedigreeSheet.Child) stringResource(R.string.pedigree_child) else null,
+                // Группа-помёт — без значка пола
+                icon = if (child?.group == true) R.drawable.baseline_pets_24 else null,
+                sire = state.pedigreeSheetAnimal,
+                isLoaded = state.isPedigreeSheetLoaded,
+                externalName = if (sheet == PedigreeSheet.Father) state.externalFatherName else null,
+                snapshotName = when (sheet) {
+                    PedigreeSheet.Mother -> state.animal.motherName
+                    PedigreeSheet.Father -> state.animal.fatherName
+                    is PedigreeSheet.Child -> child?.name
+                },
+                childrenCount = state.pedigreeSheetChildrenCount,
+                matingsCount = null,
+                onDismissRequest = { onIntent(AnimalCardIntent.OpenPedigreeSheet(null)) },
+                onOpenCard = {
+                    onIntent(AnimalCardIntent.OpenPedigreeSheet(null))
+                    onNavigateAnimalCard(it)
+                }
+            )
+        }
+        GroupDialogs(state = state, onIntent = onIntent)
     }
 }
 
 @Composable
 private fun DataCardOne(
     animal: DomainAnimalTable,
-    price: Double?
+    price: Double?,
+    /** Сборная группа, в которой состоит животное; null — не состоит. */
+    herdName: String?,
+    isLeaveVisible: Boolean,
+    isLeaveEnabled: Boolean,
+    onHerdClick: (() -> Unit)?,
+    onLeaveClick: () -> Unit
 ) {
     val context = LocalContext.current
     CardFieldNew() {
@@ -232,15 +324,15 @@ private fun DataCardOne(
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    // Имя, тип и порода — один плотный блок; различаются размером и цветом (как в списке)
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
                         text = animal.name,
-                        style = text_16,
+                        style = textBold_16,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = marengo
+                        overflow = TextOverflow.Ellipsis
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -252,11 +344,14 @@ private fun DataCardOne(
                             style = text_14,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
+                            color = marengo,
                             modifier = Modifier.weight(1f, fill = false)
                         )
                         if (!animal.group)
                             CountColorGradientCard(sex = animal.sex)
                     }
+                    // Порода необязательна — строку показываем, только если её указали
+                    animal.breed?.takeIf { it.isNotBlank() }?.let { AnimalBreedText(breed = it) }
                 }
             }
             Column(
@@ -285,6 +380,17 @@ private fun DataCardOne(
                     iconColor = Color(0xFFD08700),
                     iconColorSecond = orang_13
                 )
+                herdName?.let {
+                    HerdParameter(
+                        herdName = it,
+                        // У архивного члена группа может уже не иметь активных членов — её карточка
+                        // тут же закрылась бы, поэтому строка только для информации
+                        onClick = onHerdClick.takeIf { !animal.archive },
+                        isLeaveVisible = isLeaveVisible,
+                        isLeaveEnabled = isLeaveEnabled,
+                        onLeaveClick = onLeaveClick
+                    )
+                }
                 /* AnimalParameter(
                          titleParameter = R.string.search_section,
                          parameter = "$price",
@@ -304,6 +410,8 @@ private fun DataCardTwo(
     weight: DomainAnimalWeight?,
     vaccination: DomainAnimalVaccination?,
     count: DomainAnimalCount?,
+    isCountVisible: Boolean,
+    groupTotal: String?,
     onNavigateSize: () -> Unit,
     onNavigateCount: () -> Unit,
     onNavigateWeight: () -> Unit,
@@ -317,16 +425,19 @@ private fun DataCardTwo(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            AnimalParameter(
-                titleParameter = R.string.count_screen_title,
-                parameter = count?.let { "${it.count} ${stringResource(it.suffix.toResId())}" }
-                    ?: stringResource(R.string.animal_card_screen_animal_card_no_count),
-                icon = R.drawable.baseline_spoke_24,
-                iconColor = animal_1,
-                iconColorSecond = green_15,
-                isMore = true
-            ) { onNavigateCount() }
-            HorizontalDivider(thickness = 1.dp, color = gray_4)
+            if (isCountVisible) {
+                AnimalParameter(
+                    titleParameter = R.string.count_screen_title,
+                    parameter = groupTotal
+                        ?: count?.let { "${it.count} ${stringResource(it.suffix.toResId())}" }
+                        ?: stringResource(R.string.animal_card_screen_animal_card_no_count),
+                    icon = R.drawable.baseline_spoke_24,
+                    iconColor = animal_1,
+                    iconColorSecond = green_15,
+                    isMore = true
+                ) { onNavigateCount() }
+                HorizontalDivider(thickness = 1.dp, color = gray_4)
+            }
             AnimalParameter(
                 titleParameter = R.string.height_screen_title,
                 parameter = if (size == null) stringResource(R.string.animal_card_screen_animal_card_no_height)

@@ -98,8 +98,8 @@ interface ExpensesDao {
                 "                ELSE" +
                 "                    COALESCE(SUM(" +
                 "                        CASE" +
-                "                            WHEN version IN (1,4,5) THEN count" +
-                "                            WHEN version IN (0,2,3) THEN -count" +
+                "                            WHEN version IN ($ANIMAL_COUNT_PLUS) THEN count" +
+                "                            WHEN version IN ($ANIMAL_COUNT_MINUS) THEN -count" +
                 "                            ELSE 0" +
                 "                        END" +
                 "                    ), 0)" +

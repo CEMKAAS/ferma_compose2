@@ -21,6 +21,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.supportFun.YandexMetricRepository
 import com.zaroslikov.fermacompose2.utils.IncubatorChicksImporter
 import com.zaroslikov.fermacompose2.utils.IncubatorChicksManager
+import com.zaroslikov.fermacompose2.utils.PregnancyReminderScheduler
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -48,6 +49,7 @@ class FirstViewModel @Inject constructor(
     private val incubatorChicksImporter: IncubatorChicksImporter,
     private val resourceProvider: ResourceProvider,
     private val yandexMetricRepository: YandexMetricRepository,
+    private val pregnancyReminderScheduler: PregnancyReminderScheduler,
 ) : BaseViewModel2<FirstState, FirstIntent, FirstReducer>(
     FirstState(),
     FirstReducer()
@@ -110,6 +112,7 @@ class FirstViewModel @Inject constructor(
         viewModelScope.launch {
             launchNotificationForIncubator()
             launchNotificationForProject()
+            pregnancyReminderScheduler.rescheduleAll()
         }
     }
 
@@ -250,6 +253,7 @@ class FirstViewModel @Inject constructor(
         viewModelScope.launch {
             projectRepository.updateProject(domainProjectTable.copy(archive = false))
             if (domainProjectTable.mode) updateProjectNotifications() else updateIncubatorNotifications()
+            pregnancyReminderScheduler.rescheduleAll()
         }
     }
 
@@ -258,6 +262,7 @@ class FirstViewModel @Inject constructor(
             val domain = domainProjectTable ?: getState().currentProjectTable
             domain?.let {
                 projectRepository.updateProject(it.copy(archive = true))
+                pregnancyReminderScheduler.cancelForProject(it.id)
                 val bookmark = bookmarkRepository.getActivityBookmarkByIdPT(it.id).first()
                 bookmark?.let {
                     bookmarkRepository.update(
@@ -277,6 +282,7 @@ class FirstViewModel @Inject constructor(
     private fun deleteProject() {
         viewModelScope.launch {
             getState().currentProjectTable?.let {
+                pregnancyReminderScheduler.cancelForProject(it.id)
                 projectRepository.deleteProject(it)
                 if (it.mode) updateProjectNotifications() else updateIncubatorNotifications()
                 sendIntent(

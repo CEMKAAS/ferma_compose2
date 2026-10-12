@@ -21,7 +21,8 @@ import com.zaroslikov.fermacompose2.supportFun.formatterTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePicker(time: String, showDialog: (String) -> Unit) {
+/** [onDismiss] — отмена без выбора; если не задан, отмена возвращает исходное [time] в [showDialog]. */
+fun TimePicker(time: String, onDismiss: (() -> Unit)? = null, showDialog: (String) -> Unit) {
 
     val timeList = time.split(":")
     val timeState = rememberTimePickerState(
@@ -32,7 +33,7 @@ fun TimePicker(time: String, showDialog: (String) -> Unit) {
         titleRes = R.string.time_picker_title,
         iconRes = R.drawable.baseline_access_time_24,
         titleBackgroundColor = ghostly_white,
-        onDismissRequest = { showDialog(time) },
+        onDismissRequest = { onDismiss?.invoke() ?: showDialog(time) },
         onClick = { showDialog(formatterTime(timeState.hour, timeState.minute)) },
         colors = listOf(green_6, green_shamrock),
         textButtonRes = R.string.button_text_take

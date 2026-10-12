@@ -85,6 +85,8 @@ fun BaseOutlinedTextNew(
     @StringRes labelIntRes: Int? = null,
     @StringRes intResSup: Int,
     @StringRes intResError: Int = R.string.error_no_count_product,
+    /** Готовый текст ошибки (с подставленными значениями); если null — [intResError]. */
+    errorText: String? = null,
     isMore: Boolean? = null,
     singleLine: Boolean = true,
     minLines: Int = 1,
@@ -286,7 +288,7 @@ fun BaseOutlinedTextNew(
         ) {
             Column {
                 Spacer(Modifier.padding(4.dp))
-                Text(stringResource(intResError), style = text_12, color = error_base)
+                Text(errorText ?: stringResource(intResError), style = text_12, color = error_base)
             }
         }
     }

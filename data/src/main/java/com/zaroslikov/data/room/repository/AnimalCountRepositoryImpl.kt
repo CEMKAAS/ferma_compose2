@@ -23,15 +23,17 @@ class AnimalCountRepositoryImpl @Inject constructor(private val animalCountDao: 
     }
 
     override suspend fun insertAnimalCountTable(animalCountTable: DomainAnimalCount): Long {
-        return animalCountDao.insertAnimalCountTable(animalCountTable.toRoomMap())
+        return animalCountDao.insertCountWithSex(animalCountTable.toRoomMap())
     }
 
     override suspend fun updateAnimalCountTable(animalCountTable: DomainAnimalCount) {
-        return animalCountDao.updateAnimalCountTable(animalCountTable.toRoomMap())
+        // Метку сборной группы задаёт только вставка: правка записи её не меняет
+        val herdId = animalCountDao.getCountHerdId(animalCountTable.id)
+        return animalCountDao.updateCountWithSex(animalCountTable.toRoomMap().copy(herdId = herdId))
     }
 
     override suspend fun deleteAnimalCountTable(id: Long) {
-        return animalCountDao.deleteAnimalCountTable(id)
+        return animalCountDao.deleteCountWithSex(id)
     }
 
     override fun getCountAnimalLimit(id: Long): Flow<DomainAnimalCount?> {

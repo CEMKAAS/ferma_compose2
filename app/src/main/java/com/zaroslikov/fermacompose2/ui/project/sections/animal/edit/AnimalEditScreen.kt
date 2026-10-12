@@ -14,6 +14,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import com.zaroslikov.domain.models.animal.breed.DomainAnimalBreed
+import com.zaroslikov.domain.models.enums.AnimalSpecies
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -22,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.group.GroupSexCountFields
 import com.zaroslikov.fermacompose2.blue_1
 import com.zaroslikov.fermacompose2.blue_13
 import com.zaroslikov.fermacompose2.blue_14
@@ -29,6 +33,11 @@ import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_8
 import com.zaroslikov.fermacompose2.blue_9
 import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.orang_2
+import com.zaroslikov.fermacompose2.orang_4
+import com.zaroslikov.fermacompose2.orang_5
+import com.zaroslikov.fermacompose2.orang_6
+import com.zaroslikov.fermacompose2.red_14
 import com.zaroslikov.fermacompose2.price_green
 import com.zaroslikov.fermacompose2.price_green_2
 import com.zaroslikov.fermacompose2.ui.elements.empty_list.CircularProgress
@@ -36,6 +45,7 @@ import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.elements.DateFactoryCardNew
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.TextField.AnimalNameOutlinedTextNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalBreedNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalTypeNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
@@ -128,15 +138,47 @@ fun AnimalEntryContainer(
             onValueChange = {
                 onIntent(AnimalEditIntent.TypeChanged(it))
             },
-            intResSup = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_type_animals,
-            list = state.pickList.typeList,
+            intResSup = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_type_animal,
+            list = remember(state.pickList.typeList, state.isAnimalGroup, state.sex) {
+                AnimalSpecies.suggestions(state.isAnimalGroup, state.sex, state.pickList.typeList)
+            },
+            isError = state.error.isErrorPregnancyType,
+            intResError = R.string.pregnancy_error_type
         )
-        if (!state.isAnimalGroup)
+        OutlinedTextAnimalBreedNew(
+            value = state.breed,
+            onValueChange = {
+                onIntent(AnimalEditIntent.BreedChanged(it))
+            },
+            list = remember(state.pickList.breedList, state.type) {
+                DomainAnimalBreed.suggestions(state.pickList.breedList, state.type)
+            },
+            isAnimalGroup = state.isAnimalGroup
+        )
+        if (state.isAnimalGroup)
+            GroupSexCountFields(
+                females = state.femalesCount,
+                males = state.malesCount,
+                onFemalesChange = { onIntent(AnimalEditIntent.FemalesCountChanged(it)) },
+                onMalesChange = { onIntent(AnimalEditIntent.MalesCountChanged(it)) },
+                isError = state.error.isErrorSexCount
+            )
+        // Беременной самке пол не меняется — переключатель скрыт, вместо него подсказка
+        if (!state.isAnimalGroup && !state.isPregnancyLocked)
             OutlinedTextSexNew(
                 value = state.sex,
                 onValueChange = {
                     onIntent(AnimalEditIntent.SexClicked(it))
                 }
+            )
+        if (state.isPregnancyLocked)
+            WarningCard(
+                colorBackground = orang_4,
+                colorBorder = orang_5,
+                colorIcon = orang_2,
+                colorText = if (state.error.isErrorPregnancyType) red_14 else orang_6,
+                icon = R.drawable.outline_info_24,
+                text = R.string.pregnancy_finish_first
             )
         OutlinedTextDateNew(
             value = state.dateBorn,

@@ -1,13 +1,18 @@
 package com.zaroslikov.data.room.repository
 
+import com.zaroslikov.domain.models.animal.breed.DomainAnimalBreed
 import com.zaroslikov.data.room.dao.AnimalDao
 import com.zaroslikov.data.room.mapper.AnimaMapper.dto.toDomain
+import com.zaroslikov.data.room.mapper.dto.animal.toDomainAnimalBreed
 import com.zaroslikov.data.room.mapper.dto.animal.toAnimalForAddDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
+import com.zaroslikov.data.room.mapper.table.toInfoUpdate
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalWithCount
+import com.zaroslikov.domain.models.animal.group.normalizedForImport
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
+import com.zaroslikov.domain.models.table.DomainAnimalHerd
 import com.zaroslikov.domain.repository.AnimalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -20,12 +25,25 @@ class AnimalRepositoryImpl @Inject constructor(private val animalDao: AnimalDao)
             .map { it -> it.map { it.toDomainMap() } }
     }
 
-    override suspend fun clearAndInsertAnimalTableForImport(domainAnimal: List<DomainAnimalTable>) {
-        return animalDao.clearAndInsertAnimalTableForImport(domainAnimal.map { it.toRoomMap() })
+    override suspend fun clearAndInsertAnimalTableForImport(
+        domainAnimal: List<DomainAnimalTable>,
+        herds: List<DomainAnimalHerd>
+    ) {
+        return animalDao.clearAndInsertAnimalTableForImport(
+            domainAnimal.normalizedForImport(herds).map { it.toRoomMap() }
+        )
     }
 
-    override fun getAllAnimal(id: Long): Flow<List<DomainAnimalWithCount>> {
-        return animalDao.getAllAnimal(id).map { list -> list.map { it.toDomain() } }
+    override fun getAllAnimalWithGroups(id: Long): Flow<List<DomainAnimalWithCount>> {
+        return animalDao.getAllAnimalWithGroups(id).map { list -> list.map { it.toDomain() } }
+    }
+
+    override fun getAnimalWithGroup(id: Long): Flow<DomainAnimalWithCount?> {
+        return animalDao.getAnimalWithGroup(id).map { it?.toDomain() }
+    }
+
+    override fun getAnimalNames(idPT: Long): Flow<List<String>> {
+        return animalDao.getAnimalNames(idPT)
     }
 
     override fun getAnimal(id: Long): Flow<DomainAnimalTable> {
@@ -34,6 +52,10 @@ class AnimalRepositoryImpl @Inject constructor(private val animalDao: AnimalDao)
 
     override fun getTypeAnimal(id: Long): Flow<List<String>> {
         return animalDao.getTypeAnimal(id)
+    }
+
+    override fun getBreedAnimal(id: Long): Flow<List<DomainAnimalBreed>> {
+        return animalDao.getBreedAnimal(id).map { list -> list.map { it.toDomainAnimalBreed() } }
     }
 
     override fun getItemsAnimalAddList(id: Long): Flow<List<AnimalForAddDomain>> {
@@ -46,7 +68,7 @@ class AnimalRepositoryImpl @Inject constructor(private val animalDao: AnimalDao)
     }
 
     override suspend fun updateAnimalTable(animalTable: DomainAnimalTable) {
-        return animalDao.updateAnimalTable(animalTable.toRoomMap())
+        return animalDao.updateAnimalInfo(animalTable.toInfoUpdate())
     }
 
     override suspend fun deleteAnimalTable(id: Long) {

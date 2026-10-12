@@ -103,6 +103,10 @@ fun AnimalCountVersion.toResId(): Int {
         AnimalCountVersion.WRITE_OFF -> R.string.button_write_off
         AnimalCountVersion.ADD -> R.string.button_add
         AnimalCountVersion.INCUBATOR -> R.string.base_section_incubator_title
+        AnimalCountVersion.TRANSFER_IN -> R.string.button_transfer_in
+        AnimalCountVersion.TRANSFER_OUT -> R.string.button_transfer_out
+        AnimalCountVersion.HERD_JOIN -> R.string.button_herd_join
+        AnimalCountVersion.HERD_LEAVE -> R.string.button_herd_leave
     }
 }
 

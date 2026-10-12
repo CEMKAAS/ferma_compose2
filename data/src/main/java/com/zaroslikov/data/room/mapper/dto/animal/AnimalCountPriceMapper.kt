@@ -18,5 +18,7 @@ fun AnimalCountPriceDto.toDomainAnimalCountPrice(): DomainAnimalCountPrice {
         writeOffStatus = this.writeOffStatus,
         tableId = this.tableId,
         idPT = this.idPT,
+        femalesCount = this.femalesCount,
+        malesCount = this.malesCount,
     )
 }

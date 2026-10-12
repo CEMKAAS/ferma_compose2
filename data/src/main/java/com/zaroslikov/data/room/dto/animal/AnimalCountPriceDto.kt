@@ -22,5 +22,9 @@ data class AnimalCountPriceDto(
     val buyer: String?,
     @ColumnInfo(name = "table_id")
     val tableId: Long?,
-    val idPT: Long?
+    val idPT: Long?,
+    @ColumnInfo(name = "females_count")
+    val femalesCount: Int,
+    @ColumnInfo(name = "males_count")
+    val malesCount: Int
 )

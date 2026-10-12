@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.utils
 
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.AnimalSpecies
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.table.DomainAnimalCount
@@ -57,12 +58,13 @@ class IncubatorChicksImporter @Inject constructor(
             DomainAnimalTable(
                 name = chicks.name,
                 type = typeEgg?.let { resourceProvider.getString(it.toResId()) } ?: chicks.type,
+                species = typeEgg?.let(AnimalSpecies::fromTypeEgg) ?: AnimalSpecies.resolve(chicks.type),
                 date = chicks.date,
                 dateFactory = null,
                 group = true,
                 sex = false,
-                note = if (chicks.breed.isBlank()) ""
-                else resourceProvider.getString(R.string.incubator_chicks_breed_note).format(chicks.breed),
+                breed = chicks.breed.trim().ifEmpty { null },
+                note = "",
                 currentIcon = typeEgg?.toAnimalIcon(),
                 archive = false,
                 foodDay = 0.0,

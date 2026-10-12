@@ -199,17 +199,39 @@ fun TemplateFab(
 @Composable
 fun FabMenu2(
     isListEmpty: Boolean,
+    items: List<AnimalCountVersion> = listOf(
+        AnimalCountVersion.KILL,
+        AnimalCountVersion.EXPENSES,
+        AnimalCountVersion.WRITE_OFF,
+        AnimalCountVersion.SALE,
+        AnimalCountVersion.ADD
+    ),
     onClick: (AnimalCountVersion) -> Unit
 ) {
-    val items =
-        listOf(
-            AnimalCountVersion.KILL,
-            AnimalCountVersion.EXPENSES,
-            AnimalCountVersion.WRITE_OFF,
-            AnimalCountVersion.SALE,
-            AnimalCountVersion.ADD
-        )
+    FabMenuEntries(
+        items = items.map { item ->
+            FabMenuEntry(
+                title = stringResource(item.toResId()),
+                iconRes = item.toDrawRes(),
+                colors = item.toColorList(),
+                onClick = { onClick(item) }
+            )
+        }
+    )
+}
 
+/** Пункт меню FAB: название, иконка, градиент и действие. */
+data class FabMenuEntry(
+    val title: String,
+    @DrawableRes val iconRes: Int,
+    val colors: List<Color>,
+    val onClick: () -> Unit
+)
+
+/** Меню FAB с произвольными пунктами — анимация та же, что у [FabMenu2]. */
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun FabMenuEntries(items: List<FabMenuEntry>) {
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     FloatingActionButtonMenu(
@@ -237,11 +259,11 @@ fun FabMenu2(
                 ) {
                     NeonMenuItem(
                         modifier = Modifier,
-                        title = stringResource(item.toResId()),
-                        icon = painterResource(item.toDrawRes()),
-                        colors = item.toColorList(),
+                        title = item.title,
+                        icon = painterResource(item.iconRes),
+                        colors = item.colors,
                         onClick = {
-                            onClick(item)
+                            item.onClick()
                             fabMenuExpanded = false
                         }
                     )

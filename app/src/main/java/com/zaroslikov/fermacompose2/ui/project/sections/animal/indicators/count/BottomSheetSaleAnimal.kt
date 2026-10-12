@@ -22,6 +22,10 @@ import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EntryIndi
 
 @Composable
 fun BottomSheetSaleAnimal(
+    // Вместо поля количества (сборная группа: количество — по выбранным членам)
+    countContent: (@Composable () -> Unit)? = null,
+    // Под количеством: самки и самцы обезличенной группы
+    sexContent: (@Composable () -> Unit)? = null,
     state: CountItem,
     onIntent: (AnimalCountIntent) -> Unit,
     countAllAnimal: String?,
@@ -54,7 +58,7 @@ fun BottomSheetSaleAnimal(
         onInsertClick = { onIntent(AnimalCountIntent.InsertSalePressed) },
         onUpdateClick = { onIntent(AnimalCountIntent.UpdateSalePressed) }
     ) {
-        OutlinedTextCountAnimalNew(
+        if (countContent != null) countContent() else OutlinedTextCountAnimalNew(
             value = state.count,
             onValueChange = {
                 onIntent(AnimalCountIntent.CountChanged(it))
@@ -65,6 +69,7 @@ fun BottomSheetSaleAnimal(
             suffix = state.suffix,
             countAnimal = countAllAnimal,
         )
+        sexContent?.invoke()
         OutlinedPriceInputNew(
             price = state.price,
             onPriceChange = {

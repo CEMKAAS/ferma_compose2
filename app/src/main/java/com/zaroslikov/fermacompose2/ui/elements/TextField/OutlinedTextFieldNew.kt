@@ -56,7 +56,10 @@ import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.animal.AnimalForAddDomain
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixCategory
 import com.zaroslikov.domain.models.enums.ProductOrigin
+import com.zaroslikov.domain.models.enums.AnimalTypeSuggestion
 import com.zaroslikov.domain.models.enums.FilterDate
+import com.zaroslikov.fermacompose2.supportFun.toAnimalIcon
+import com.zaroslikov.fermacompose2.ui.elements.icon.drawableRes
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TypeEgg
 import com.zaroslikov.domain.models.list.suffixAllList
@@ -807,6 +810,7 @@ fun OutlinedTextCountNew(
     @StringRes intRes: Int = R.string.outlined_text_field_quantity,
     @StringRes intResSup: Int = R.string.support_text_product,
     @StringRes intResError: Int = R.string.error_no_count_product,
+    errorText: String? = null,
     keyboardOptions: KeyboardOptions = keyboardOptionsNextNumber(),
     isBorderCard: Boolean = true,
     colorTextField: Color = gray_9,
@@ -842,6 +846,7 @@ fun OutlinedTextCountNew(
                         labelIntRes = intRes,
                         intResSup = if (checkedForValue) R.string.is_empty_2 else R.string.outlined_text_count,
                         intResError = intResError,
+                        errorText = errorText,
                         keyboardOptions = keyboardOptions,
                         colorTextField = colorTextField,
                         isNecessarily = isNecessarily,
@@ -1522,7 +1527,8 @@ fun OutlinedTextSexNew(
     isBorderCard: Boolean = true
 ) {
     val focusManager = LocalFocusManager.current
-    var selectedItemIndex by remember { mutableIntStateOf(if (value) 0 else 1) }
+    // Пол может смениться извне (например, при вводе типа «Бык»), поэтому индекс производный от value
+    val selectedItemIndex = if (value) 0 else 1
     val statusList = listOf(
         Triple(R.drawable.baseline_male_24, R.string.animal_entry_screen_sex_man, true),
         Triple(R.drawable.baseline_female_24, R.string.animal_entry_screen_sex_woman, false)
@@ -1532,7 +1538,6 @@ fun OutlinedTextSexNew(
             status = value,
             setStatus = {
                 onValueChange(it.first)
-                selectedItemIndex = it.second
                 focusManager.moveFocus(FocusDirection.Down)
             },
             statusList = statusList
@@ -1601,11 +1606,16 @@ fun OutlinedTextAnimalTypeNew(
     @StringRes intResSup: Int,
     onValueChange: (String) -> Unit,
     onTrailingChance: () -> Unit = {},
-    list: List<String>,
+    list: List<AnimalTypeSuggestion>,
+    isError: Boolean = false,
+    @StringRes intResError: Int = R.string.error_no_count_product,
 ) {
     val focusManager = LocalFocusManager.current
+    // Выбран системный вид — показываем его иконку в поле рядом с названием
+    val systemIcon = list.firstOrNull { it.isSystem && it.name.equals(value.trim(), ignoreCase = true) }
+        ?.species?.toAnimalIcon()
     BorderCard {
-        ExposedDropdownMenuCategoryBuyer(
+        ExposedDropdownMenuAnimalType(
             title = value,
             setTitle = { onValueChange(it) },
             titleList = list
@@ -1620,6 +1630,10 @@ fun OutlinedTextAnimalTypeNew(
                 singleLine = false,
                 modifier = it.first,
                 leadingIconRes = R.drawable.baseline_pets_24,
+                leadingIconRes2 = systemIcon?.drawableRes,
+                leadingIconColor2 = Color(0xFF6A7282),
+                isError = isError,
+                intResError = intResError,
                 keyboardOptions = keyboardOptionsNext(),
                 isMore = value.isBlank()
             )
@@ -1646,6 +1660,39 @@ fun AnimalNameOutlinedTextNew(
             intResError = if (!isAnimalGroup) R.string.error_no_name_animal else R.string.error_no_name_animals,
             keyboardOptions = keyboardOptionsNext()
         )
+    }
+}
+
+/**
+ * Порода — необязательное поле карточки животного.
+ * [list] — уже встречающиеся в проекте породы этого вида; пустой — поле без выпадающего списка.
+ */
+@Composable
+fun OutlinedTextAnimalBreedNew(
+    value: String,
+    onValueChange: (String) -> Unit,
+    list: List<String>,
+    isAnimalGroup: Boolean
+) {
+    BorderCard {
+        ExposedDropdownMenuCategoryBuyer(
+            title = value,
+            setTitle = onValueChange,
+            titleList = list
+        ) {
+            BaseOutlinedTextNew(
+                modifier = it.first,
+                value = value,
+                onValueChange = onValueChange,
+                onClear = { onValueChange("") },
+                labelIntRes = R.string.outlined_text_breed_animal,
+                singleLine = false,
+                intResSup = if (!isAnimalGroup) R.string.support_text_breed_animal else R.string.support_text_breed_animals,
+                keyboardOptions = keyboardOptionsNext(),
+                // Стрелка — только когда есть что выбрать; крестик очистки — когда введён текст
+                isMore = if (value.isNotBlank()) false else if (list.isNotEmpty()) true else null
+            )
+        }
     }
 }
 

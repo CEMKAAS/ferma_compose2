@@ -12,7 +12,10 @@ sealed class AnimalEditIntent : BaseIntent {
 
     data class TitleChanged(val value: String) : AnimalEditIntent()
     data class TypeChanged(val value: String) : AnimalEditIntent()
+    data class BreedChanged(val value: String) : AnimalEditIntent()
     data class SexClicked(val value: Boolean) : AnimalEditIntent()
+    data class FemalesCountChanged(val value: String) : AnimalEditIntent()
+    data class MalesCountChanged(val value: String) : AnimalEditIntent()
 
     data class DateClicked(val value: String) : AnimalEditIntent()
     data class DateFactoryClicked(val value: Boolean) : AnimalEditIntent()

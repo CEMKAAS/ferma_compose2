@@ -75,6 +75,10 @@ import com.zaroslikov.fermacompose2.white
 
 @Composable
 fun BottomSheetKillAnimal(
+    // Вместо поля количества (сборная группа: количество — по выбранным членам)
+    countContent: (@Composable () -> Unit)? = null,
+    // Под количеством: самки и самцы обезличенной группы
+    sexContent: (@Composable () -> Unit)? = null,
     state: CountItem,
     onIntent: (AnimalCountIntent) -> Unit,
     countAnimalAll: String?,
@@ -117,7 +121,7 @@ fun BottomSheetKillAnimal(
             isShowWarningIcon = state.totalWeight?.let { state.finalWeight > it } ?: false,
             isAnimalMany = state.count.toConvertZeroDbInt() > 1
         )
-        OutlinedTextCountAnimalNew(
+        if (countContent != null) countContent() else OutlinedTextCountAnimalNew(
             value = state.count,
             onValueChange = {
                 onIntent(AnimalCountIntent.CountChanged(it))
@@ -127,6 +131,7 @@ fun BottomSheetKillAnimal(
             suffix = countSuffix,
             countAnimal = countAnimalAll,
         )
+        sexContent?.invoke()
         OutlinedTextDateNew(
             value = state.date,
             onValueChange = { onIntent(AnimalCountIntent.DateClicked(it)) },

@@ -48,6 +48,12 @@ class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
             is AnimalCountIntent.AutoPriceClicked ->
                 state.updateAutoPriceActionAnimal(intent.value).updatePriceAllActionAnimal()
 
+            is AnimalCountIntent.FemalesCountChanged ->
+                state.copy(currentProduct = state.currentProduct.copy(femalesCount = intent.value)).updateValid()
+
+            is AnimalCountIntent.MalesCountChanged ->
+                state.copy(currentProduct = state.currentProduct.copy(malesCount = intent.value)).updateValid()
+
             is AnimalCountIntent.DateClicked -> state.updateDateActionAnimal(intent.value)
             is AnimalCountIntent.NoteChanged -> state.updateNoteActionAnimal(intent.value)
 
@@ -97,13 +103,33 @@ class AnimalCountReduce : BaseReducer<AnimalCountState, AnimalCountIntent>() {
 
             AnimalCountVersion.KILL, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.ADD, AnimalCountVersion.INCUBATOR ->
                 count.isNotBlank() && !isAnimalCountZero(count)
+
+            AnimalCountVersion.TRANSFER_IN, AnimalCountVersion.TRANSFER_OUT,
+            AnimalCountVersion.HERD_JOIN, AnimalCountVersion.HERD_LEAVE -> false
         }
 
+        val isErrorSexCount = isSexCountError()
         return copy(
             currentProduct = currentProduct.copy(
-                hasAnyError = baseValid
+                hasAnyError = baseValid && !isErrorSexCount,
+                error = currentProduct.error.copy(isErrorSexCount = isErrorSexCount)
             )
         )
+    }
+
+    /**
+     * Обезличенная группа: самок и самцов вместе не больше количества записи; при убыли (продажа,
+     * списание, забой) — ещё и не больше, чем в группе (у правимой записи её пол уже вычтен — возвращаем).
+     */
+    private fun AnimalCountState.isSexCountError(): Boolean {
+        val item = currentProduct
+        if (!animal.group || item.version.sign == 0) return false
+        val females = item.femalesCount.toIntOrNull() ?: 0
+        val males = item.malesCount.toIntOrNull() ?: 0
+        val count = item.count.replace(',', '.').toDoubleOrNull() ?: 0.0
+        if (females + males > count) return true
+        return item.version.sign < 0 &&
+                (females > animal.femalesCount + item.oldFemalesCount || males > animal.malesCount + item.oldMalesCount)
     }
 
     private fun AnimalCountState.updateEntryBottomSheet(

@@ -17,4 +17,7 @@ data class DomainAnimalCountPrice(
     val buyer: String? = null,
     val tableId: Long? = null,
     val idPT: Long? = null,
+    /** Обезличенная группа: сколько из количества самок и самцов. */
+    val femalesCount: Int = 0,
+    val malesCount: Int = 0
 )

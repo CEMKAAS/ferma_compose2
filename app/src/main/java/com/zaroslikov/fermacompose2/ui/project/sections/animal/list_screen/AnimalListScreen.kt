@@ -1,6 +1,5 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen
 
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,26 +51,36 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
+import com.zaroslikov.domain.models.animal.breed.DomainAnimalBreed
+import com.zaroslikov.domain.models.enums.AnimalSpecies
 import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.ui.elements.icon.drawableRes
 import com.zaroslikov.domain.models.list.suffixPiecesList
 import com.zaroslikov.domain.models.list.suffixWeightDayList
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.group.GroupSexCountFields
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.card.GroupHeadsChips
 import com.zaroslikov.fermacompose2.animal_1
+import com.zaroslikov.fermacompose2.error_base
+import com.zaroslikov.fermacompose2.gray_4
+import com.zaroslikov.fermacompose2.orang_9
+import com.zaroslikov.domain.models.animal.pregnancy.PregnancyPhase
+import com.zaroslikov.domain.models.animal.pregnancy.PregnancyProgress
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.graphics.StrokeCap
 import com.zaroslikov.fermacompose2.animal_2
 import com.zaroslikov.fermacompose2.animal_3
 import com.zaroslikov.fermacompose2.dark
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.gray_8
-import com.zaroslikov.fermacompose2.green_15
 import com.zaroslikov.fermacompose2.green_g_3
 import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.grey
 import com.zaroslikov.fermacompose2.grey_2
 import com.zaroslikov.fermacompose2.marengo
-import com.zaroslikov.fermacompose2.orang_11
-import com.zaroslikov.fermacompose2.orang_13
+import com.zaroslikov.fermacompose2.gray_7
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.animalCard.ArchivePregnancyDialog
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
@@ -78,6 +90,7 @@ import com.zaroslikov.fermacompose2.ui.elements.CountColorGradientCard
 import com.zaroslikov.fermacompose2.ui.elements.DateFactoryCardNew
 import com.zaroslikov.fermacompose2.ui.elements.NeonGlowFab
 import com.zaroslikov.fermacompose2.ui.elements.TextField.AnimalNameOutlinedTextNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalBreedNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.DropdownMenuEdit
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedPriceInputNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextAnimalTypeNew
@@ -90,12 +103,17 @@ import com.zaroslikov.fermacompose2.ui.elements.modifierScreenLazy
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.text_16
+import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.ui.navigation.NavigationDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EmptyState
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.AnimalHerdListCard
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.group.MergeAnimalsBottomSheet
+import com.zaroslikov.fermacompose2.ui.elements.TemplateFab
+import com.zaroslikov.fermacompose2.red_14
 import java.io.File
 
 
@@ -110,6 +128,7 @@ object AnimalDestination : NavigationDestination {
 @Composable
 fun AnimalListScreen(
     navigateToItemCard: (Pair<Long, Long>) -> Unit = {},
+    navigateToHerdCard: (Pair<Long, Long>) -> Unit = {},
     viewModel: AnimalListViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -131,8 +150,16 @@ fun AnimalListScreen(
         },
         floatingActionButton = {
             if (!state.isArchiveProject)
-                NeonGlowFab(colors = colors,) {
-                    viewModel.onIntent(AnimalListIntent.OpenBottomSheetEntry(true))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TemplateFab(iconRes = R.drawable.ic_herd, color = colors.first()) {
+                        viewModel.onIntent(AnimalListIntent.OpenMergeSheet(true))
+                    }
+                    NeonGlowFab(colors = colors) {
+                        viewModel.onIntent(AnimalListIntent.OpenBottomSheetEntry(true))
+                    }
                 }
         }
     ) { innerPadding ->
@@ -152,10 +179,23 @@ fun AnimalListScreen(
                 searchBrieflyList = state.searchArchiveList,
                 isArchiveProject = state.isArchiveProject,
                 onClick = { navigateToItemCard(state.idPT to it) },
+                onHerdClick = { navigateToHerdCard(state.idPT to it) },
                 onArchiveClick = {
                     viewModel.onIntent(AnimalListIntent.Archive(it.first, it.second))
                 },
-                onDeleteClick = { viewModel.onIntent(AnimalListIntent.OpenBottomSheetDelete(it)) }
+                onDeleteClick = { viewModel.onIntent(AnimalListIntent.OpenBottomSheetDelete(it)) },
+                onGroupClick = { viewModel.onIntent(AnimalListIntent.OpenMergeSheet(true, it)) }
+            )
+        if (state.merge.isOpen)
+            MergeAnimalsBottomSheet(
+                state = state.merge,
+                colors = colors,
+                onDismissRequest = { viewModel.onIntent(AnimalListIntent.OpenMergeSheet(false)) },
+                onCandidateToggled = { viewModel.onIntent(AnimalListIntent.MergeCandidateToggled(it)) },
+                onModeChanged = { viewModel.onIntent(AnimalListIntent.MergeModeChanged(it)) },
+                onGroupChosen = { viewModel.onIntent(AnimalListIntent.MergeGroupChosen(it)) },
+                onNameChanged = { viewModel.onIntent(AnimalListIntent.MergeNameChanged(it)) },
+                onConfirm = { viewModel.onIntent(AnimalListIntent.MergeConfirmed) }
             )
         if (state.openBottomSheetEntry)
             AnimalEntryBottomSheet(
@@ -167,15 +207,23 @@ fun AnimalListScreen(
         if (state.isOpenBottomSheetDelete)
             WarningDeleteAnimalBottomSheet(
                 state = state.currentAnimal,
+                hasPregnancyHistory = state.deleteHasPregnancyHistory,
                 onDismissRequest = { viewModel.onIntent(AnimalListIntent.OpenBottomSheetDelete(null)) },
                 onDeleteClick = { viewModel.onIntent(AnimalListIntent.Delete) },
             )
+        state.archivePregnancyAnimalId?.let { animalId ->
+            ArchivePregnancyDialog(
+                onDismissRequest = { viewModel.onIntent(AnimalListIntent.OpenArchivePregnancyDialog(null)) },
+                onConfirm = { viewModel.onIntent(AnimalListIntent.ArchivePregnancyConfirmed(animalId, it)) }
+            )
+        }
     }
 }
 
 @Composable
 private fun WarningDeleteAnimalBottomSheet(
     state: AnimalListUi,
+    hasPregnancyHistory: Boolean,
     onDismissRequest: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -191,12 +239,18 @@ private fun WarningDeleteAnimalBottomSheet(
             animal = state,
             isArchive = true
         )
+        if (hasPregnancyHistory)
+            Text(
+                text = stringResource(R.string.pregnancy_delete_history_warning),
+                style = text_14,
+                color = red_14
+            )
     }
 }
 
 
 @Composable
-private fun AnimalEntryBottomSheet(
+internal fun AnimalEntryBottomSheet(
     colors: List<Color>,
     state: AnimalEntryState2,
     onIntent: (AnimalListIntent) -> Unit,
@@ -243,8 +297,20 @@ private fun AnimalEntryBottomSheet(
             onValueChange = {
                 onIntent(AnimalListIntent.TypeChanged(it))
             },
-            list = state.typeList,
-            intResSup = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_type_animals,
+            list = remember(state.typeList, state.isAnimalGroup, state.sex) {
+                AnimalSpecies.suggestions(state.isAnimalGroup, state.sex, state.typeList)
+            },
+            intResSup = if (state.isAnimalGroup) R.string.support_text_type_animals else R.string.support_text_type_animal,
+        )
+        OutlinedTextAnimalBreedNew(
+            value = state.breed,
+            onValueChange = {
+                onIntent(AnimalListIntent.BreedChanged(it))
+            },
+            list = remember(state.breedList, state.type) {
+                DomainAnimalBreed.suggestions(state.breedList, state.type)
+            },
+            isAnimalGroup = state.isAnimalGroup
         )
         if (state.isAnimalGroup)
             OutlinedTextCountNew(
@@ -258,6 +324,14 @@ private fun AnimalEntryBottomSheet(
                 isError = state.error.isErrorCount,
                 drawableRes = R.drawable.baseline_spoke_24,
                 intResSup = R.string.support_text_count_animals,
+            )
+        if (state.isAnimalGroup)
+            GroupSexCountFields(
+                females = state.femalesCount,
+                males = state.malesCount,
+                onFemalesChange = { onIntent(AnimalListIntent.FemalesCountChanged(it)) },
+                onMalesChange = { onIntent(AnimalListIntent.MalesCountChanged(it)) },
+                isError = state.error.isErrorSexCount
             )
         if (!state.isAnimalGroup)
             OutlinedTextSexNew(
@@ -336,13 +410,15 @@ private fun AnimalContainer(
     color: Color,
     details: Boolean,
     isArchiveProject: Boolean,
-    itemList: List<AnimalListUi>,
-    searchList: List<AnimalListUi>,
+    itemList: List<AnimalListItem>,
+    searchList: List<AnimalListItem>,
     brieflyList: List<AnimalListUi>,
     searchBrieflyList: List<AnimalListUi>,
     onClick: (Long) -> Unit,
+    onHerdClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
     onArchiveClick: (Pair<Long, Boolean>) -> Unit,
+    onGroupClick: (Long) -> Unit,
 ) {
     InventoryBody(
         modifier = modifier,
@@ -350,13 +426,24 @@ private fun AnimalContainer(
         itemList = itemList,
         searchList = searchList,
         brieflyList = brieflyList, searchBrieflyList = searchBrieflyList,
-        detailCard = { index, item ->
-            AnimalCard(
-                animal = item,
-                onClick = { onClick(item.id) },
-                onArchiveClick = { onArchiveClick(item.id to true) },
-                isArchive = isArchiveProject,
-                onDeleteClick = { onDeleteClick(item.id) })
+        detailCard = { _, row ->
+            when (row) {
+                is AnimalListItem.Herd -> AnimalHerdListCard(herd = row.herd) { onHerdClick(row.herd.id) }
+                is AnimalListItem.Animal -> {
+                    val item = row.animal
+                    AnimalCard(
+                        animal = item,
+                        onClick = { onClick(item.id) },
+                        onArchiveClick = { onArchiveClick(item.id to true) },
+                        isArchive = isArchiveProject,
+                        onDeleteClick = { onDeleteClick(item.id) },
+                        // В сборную группу — и животное, и обезличенную группу, если они ещё ни в какой не состоят
+                        onGroupClick = if (item.herdId == null && !item.isArchive) {
+                            { onGroupClick(item.id) }
+                        } else null
+                    )
+                }
+            }
         },
         brieflyCard = { item ->
             AnimalCard(
@@ -379,7 +466,8 @@ private fun AnimalContainer(
         ),
         iconColor = animal_1,
         backgroundColor = animal_3,
-        isArchive = isArchiveProject
+        isArchive = isArchiveProject,
+        bottomContentPadding = TWO_FAB_BOTTOM_PADDING
     )
 }
 
@@ -392,6 +480,7 @@ fun AnimalCard(
     onArchiveClick: (() -> Unit)? = null,
     onUnarchiveClick: (() -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null,
+    onGroupClick: (() -> Unit)? = null,
 ) {
     val cardField: @Composable () -> Unit = {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -399,12 +488,14 @@ fun AnimalCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconAnimal(
-                    sex = animal.sex,
-                    imagePath = animal.imagePath,
-                    currentIcon = animal.currentIcon,
-                    isArchive = animal.isArchive
-                )
+                PregnancyRingIcon(progress = animal.pregnancyProgress) {
+                    IconAnimal(
+                        sex = animal.sex,
+                        imagePath = animal.imagePath,
+                        currentIcon = animal.currentIcon,
+                        isArchive = animal.isArchive
+                    )
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Top,
@@ -414,69 +505,66 @@ fun AnimalCard(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Text(
-                            text = animal.name,
-                            style = text_16,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
+                        // Имя, тип и порода — один плотный блок; различаются размером и цветом
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(
-                                text = animal.type,
-                                style = text_14,
+                                text = animal.name,
+                                style = textBold_16,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                color = marengo,
-                                modifier = Modifier.weight(1f, fill = false)
+                                overflow = TextOverflow.Ellipsis
                             )
-                            Log.i("animal", "animal.sex :${animal.sex}")
-                            Log.i("animal", "animal.sex :${animal.count}")
-                            if (animal.sex != null)
-                                CountColorGradientCard(sex = animal.sex)
-                            else animal.count?.let {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
                                 Text(
-                                    "- $it ${stringResource(animal.suffix.toResId())}",
+                                    text = animal.type,
                                     style = text_14,
-                                    color = marengo
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = marengo,
+                                    modifier = Modifier.weight(1f, fill = false)
                                 )
+                                if (animal.sex != null) {
+                                    CountColorGradientCard(sex = animal.sex)
+                                    animal.pregnancyProgress?.let { PregnancyHeartCard(it) }
+                                }
+                                if (animal.isArchive)
+                                    CardClips(
+                                        colorBackground = gray_6,
+                                        colorBorder = gray_8,
+                                        colorText = marengo,
+                                        value = stringResource(R.string.alert_dialog_info_archive_animal),
+                                        icon = R.drawable.baseline_archive_24,
+                                        colorIcon = marengo
+                                    )
                             }
-                            if (animal.isArchive)
-                                CardClips(
-                                    colorBackground = gray_6,
-                                    colorBorder = gray_8,
-                                    colorText = marengo,
-                                    value = stringResource(R.string.alert_dialog_info_archive_animal),
-                                    icon = R.drawable.baseline_archive_24,
-                                    colorIcon = marengo
-                                )
+                            // Порода необязательна — строка только если указана
+                            animal.breed?.let { AnimalBreedText(breed = it) }
                         }
+                        // Обезличенная группа: поголовье отдельной строкой, за ним — разбивка по полу
+                        if (animal.sex == null) GroupHeadsChips(animal)
+                        // Видно в поиске и архиве: животное состоит в сборной группе
+                        if (animal.herdName != null)
+                            CardClips(
+                                colorBackground = green_g_3,
+                                colorBorder = green_g_4,
+                                colorText = dark,
+                                value = stringResource(R.string.animal_group_member_of, animal.herdName),
+                                icon = R.drawable.ic_herd,
+                                colorIcon = animal_1
+                            )
                     }
                     if (!isArchive)
                         DropdownMenuEdit(
                             onArchiveClick = onArchiveClick,
                             onUnarchiveClick = onUnarchiveClick,
-                            onDeleteClick = onDeleteClick
+                            onDeleteClick = onDeleteClick,
+                            onGroupClick = onGroupClick
                         )
                 }
             }
-            if (!animal.isArchive)
-                TableAnimalParameter(
-                    oneTitleParameter = R.string.animal_list_age,
-                    oneParameter = animal.date,
-                    oneIcon = R.drawable.baseline_calendar_month_24,
-                    oneIconColor = animal_1,
-                    oneIconColorSecond = green_15,
-                    twoTitleParameter = R.string.animal_list_food,
-                    twoParameter = animal.foodDay.formatNumber() +
-                            " ${stringResource(animal.foodDaySuffix.toResId())}",
-                    twoIcon = R.drawable.outline_restaurant_24,
-                    twoIconColor = orang_11,
-                    twoIconColorSecond = orang_13
-                )
         }
     }
     if (onClick != null)
@@ -486,45 +574,16 @@ fun AnimalCard(
     else BorderCard { cardField() }
 }
 
-
+/** Строка породы под типом: мельче и светлее типа — так её не спутать с типом. */
 @Composable
-fun TableAnimalParameter(
-    @StringRes oneTitleParameter: Int,
-    oneParameter: String?,
-    oneIcon: Int,
-    oneIconColor: Color,
-    oneIconColorSecond: Color,
-    @StringRes twoTitleParameter: Int,
-    twoParameter: String?,
-    twoIcon: Int,
-    twoIconColor: Color,
-    twoIconColorSecond: Color
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        oneParameter?.let {
-            AnimalParameter(
-                modifier = Modifier.weight(1f),
-                titleParameter = oneTitleParameter,
-                parameter = oneParameter,
-                icon = oneIcon,
-                iconColor = oneIconColor,
-                iconColorSecond = oneIconColorSecond
-            )
-        }
-        twoParameter?.let {
-            AnimalParameter(
-                modifier = Modifier.weight(1f),
-                titleParameter = twoTitleParameter,
-                parameter = twoParameter,
-                icon = twoIcon,
-                iconColor = twoIconColor,
-                iconColorSecond = twoIconColorSecond
-            )
-        }
-    }
+fun AnimalBreedText(breed: String) {
+    Text(
+        text = breed,
+        style = text_12,
+        color = gray_7,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
@@ -536,6 +595,9 @@ fun AnimalParameter(
     iconColor: Color,
     iconColorSecond: Color,
     isMore: Boolean = false,
+    /** Доп. элементы справа от значения (например, разбивка по полу в сборной группе). */
+    trailingValue: (@Composable RowScope.() -> Unit)? = null,
+    // onClick обязан оставаться последним: вызывающие передают его завершающей лямбдой
     onClick: (() -> Unit)? = null
 ) {
     Row(
@@ -573,10 +635,21 @@ fun AnimalParameter(
                     stringResource(titleParameter), color = grey, style = text_12,
                     overflow = TextOverflow.Ellipsis, maxLines = 1,
                 )
-                Text(
-                    text = parameter, color = dark, maxLines = 1, style = text_12,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (trailingValue == null)
+                    Text(
+                        text = parameter, color = dark, maxLines = 1, style = text_12,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                else Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = parameter, color = dark, maxLines = 1, style = text_12,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    trailingValue()
+                }
             }
         }
         if (isMore)
@@ -748,3 +821,65 @@ fun TypeAnimalCard(
     }
 }
 
+
+/** Две FAB (объединение + добавление) не должны перекрывать последнюю карточку. */
+private val TWO_FAB_BOTTOM_PADDING = 140.dp
+
+/**
+ * Иконка животного в кольце прогресса беременности; без [progress] — иконка как есть.
+ * [ringSize] — внешний диаметр кольца; чтобы кольцо плотно облегало иконку, передавайте
+ * размер иконки + 2 × [strokeWidth].
+ */
+@Composable
+fun PregnancyRingIcon(
+    progress: PregnancyProgress?,
+    ringSize: Dp = 76.dp,
+    strokeWidth: Dp = 4.dp,
+    icon: @Composable () -> Unit
+) {
+    if (progress == null) {
+        icon()
+        return
+    }
+    val accent = progress.accentColor()
+    Box(
+        modifier = Modifier.size(ringSize),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
+            progress = { progress.fraction },
+            modifier = Modifier.size(ringSize),
+            color = accent,
+            trackColor = gray_4,
+            strokeWidth = strokeWidth,
+            strokeCap = StrokeCap.Round,
+            gapSize = 0.dp
+        )
+        icon()
+    }
+}
+
+/** Цвет фазы срока — как на экране беременности. */
+private fun PregnancyProgress.accentColor(): Color = when (phase) {
+    PregnancyPhase.IN_PROGRESS -> animal_1
+    PregnancyPhase.BIRTH_WINDOW -> orang_9
+    PregnancyPhase.OVERDUE -> error_base
+}
+
+/** Значок сердца рядом со значком пола — у самки идёт беременность. */
+@Composable
+fun PregnancyHeartCard(progress: PregnancyProgress) {
+    Box(
+        modifier = Modifier
+            .background(color = progress.accentColor(), shape = RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painterResource(R.drawable.baseline_favorite_24),
+            contentDescription = stringResource(R.string.pregnancy_heart_description),
+            tint = Color.White,
+            modifier = Modifier.size(12.dp)
+        )
+    }
+}

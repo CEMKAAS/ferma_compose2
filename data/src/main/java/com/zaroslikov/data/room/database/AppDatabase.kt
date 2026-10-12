@@ -4,6 +4,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zaroslikov.data.room.converter.AnimalCountVersionConverter
+import com.zaroslikov.data.room.converter.AnimalSpeciesConverter
+import com.zaroslikov.data.room.converter.PregnancyInterruptReasonConverter
+import com.zaroslikov.data.room.converter.PregnancyStatusConverter
 import com.zaroslikov.data.room.converter.AppIconConverter
 import com.zaroslikov.data.room.converter.ProductOriginConverter
 import com.zaroslikov.data.room.converter.FinanceCategoryConverter
@@ -13,6 +16,8 @@ import com.zaroslikov.data.room.converter.TypeEggConvert
 import com.zaroslikov.data.room.dao.AddDao
 import com.zaroslikov.data.room.dao.AnimalCountDao
 import com.zaroslikov.data.room.dao.AnimalDao
+import com.zaroslikov.data.room.dao.AnimalHerdDao
+import com.zaroslikov.data.room.dao.AnimalPregnancyDao
 import com.zaroslikov.data.room.dao.AnimalSizeDao
 import com.zaroslikov.data.room.dao.AnimalVaccinationDao
 import com.zaroslikov.data.room.dao.AnimalWeightDao
@@ -34,6 +39,9 @@ import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
 import com.zaroslikov.data.room.dao.TemplateDao
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
+import com.zaroslikov.data.room.table.animal.AnimalHerdTable
+import com.zaroslikov.data.room.table.animal.AnimalPregnancyNoteTable
+import com.zaroslikov.data.room.table.animal.AnimalPregnancyTable
 import com.zaroslikov.data.room.table.animal.AnimalSizeTable
 import com.zaroslikov.data.room.table.animal.AnimalTable
 import com.zaroslikov.data.room.table.animal.AnimalVaccinationTable
@@ -64,11 +72,14 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         SaleTable::class,
         ExpensesTable::class,
         WriteOffTable::class,
+        AnimalHerdTable::class,
         AnimalTable::class,
         AnimalCountTable::class,
         AnimalSizeTable::class,
         AnimalVaccinationTable::class,
         AnimalWeightTable::class,
+        AnimalPregnancyTable::class,
+        AnimalPregnancyNoteTable::class,
         NoteTable::class,
         ExpensesAnimalTable::class,
         IncubatorTable::class,
@@ -79,7 +90,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         AppSettingsTable::class,
         ProfileTable::class,
     ],
-    version = 7,
+    version = 15,
     exportSchema = false,
 )
 @TypeConverters(
@@ -89,13 +100,18 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
     AnimalCountVersionConverter::class,
     TypeEggConvert::class,
     TemplateTypeConvert::class,
-    AppIconConverter::class
+    AppIconConverter::class,
+    AnimalSpeciesConverter::class,
+    PregnancyStatusConverter::class,
+    PregnancyInterruptReasonConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun addDao(): AddDao
     abstract fun addTemplateDao(): TemplateDao
     abstract fun animalCountDao(): AnimalCountDao
     abstract fun animalDao(): AnimalDao
+    abstract fun animalHerdDao(): AnimalHerdDao
+    abstract fun animalPregnancyDao(): AnimalPregnancyDao
     abstract fun animalSizeDao(): AnimalSizeDao
     abstract fun animalVaccinationDao(): AnimalVaccinationDao
     abstract fun animalWeightDao(): AnimalWeightDao

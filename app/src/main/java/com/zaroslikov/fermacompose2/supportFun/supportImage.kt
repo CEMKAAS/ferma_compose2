@@ -1,6 +1,7 @@
 package com.zaroslikov.fermacompose2.supportFun
 
 import com.zaroslikov.domain.models.enums.AnimalCountVersion
+import com.zaroslikov.domain.models.enums.AnimalSpecies
 import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.FinanceCategory
 import com.zaroslikov.fermacompose2.R
@@ -22,6 +23,27 @@ fun TypeEgg.toAnimalIcon(): AppIcon {
         TypeEgg.QUAILS -> AppIcon.QUAIL
         TypeEgg.TURKEYS -> AppIcon.TURKEY
         TypeEgg.DUCKS -> AppIcon.DUCK
+    }
+}
+
+/** Иконка системного вида в подсказках типа; у своего типа (UNKNOWN) иконки нет. */
+fun AnimalSpecies.toAnimalIcon(): AppIcon? {
+    return when (this) {
+        AnimalSpecies.UNKNOWN -> null
+        AnimalSpecies.RABBIT -> AppIcon.CRUELTY_FREE
+        AnimalSpecies.PIG -> AppIcon.PIG
+        AnimalSpecies.COW -> AppIcon.COW
+        AnimalSpecies.SHEEP -> AppIcon.SHEEP
+        AnimalSpecies.GOAT -> AppIcon.GOAT
+        AnimalSpecies.HORSE -> AppIcon.HORSE
+        AnimalSpecies.TURKEY -> AppIcon.TURKEY
+        AnimalSpecies.CHICKEN -> AppIcon.CHICKEN
+        AnimalSpecies.QUAIL -> AppIcon.QUAIL
+        AnimalSpecies.DUCK -> AppIcon.DUCK
+        AnimalSpecies.GOOSE -> AppIcon.GOOSE
+        // Своих иконок нет — ближайшие похожие птицы
+        AnimalSpecies.PHEASANT -> AppIcon.CHICKEN
+        AnimalSpecies.MUSCOVY_DUCK -> AppIcon.DUCK
     }
 }
 
@@ -50,6 +72,9 @@ fun AnimalCountVersion.toDrawRes(): Int {
         AnimalCountVersion.WRITE_OFF -> R.drawable.baseline_edit_note_24
         AnimalCountVersion.ADD -> R.drawable.baseline_add_circle_outline_24
         AnimalCountVersion.INCUBATOR -> R.drawable.outline_egg_24
+        AnimalCountVersion.TRANSFER_IN, AnimalCountVersion.TRANSFER_OUT -> R.drawable.icon_group
+        AnimalCountVersion.HERD_JOIN -> R.drawable.ic_herd
+        AnimalCountVersion.HERD_LEAVE -> R.drawable.ic_herd_leave
     }
 }
 

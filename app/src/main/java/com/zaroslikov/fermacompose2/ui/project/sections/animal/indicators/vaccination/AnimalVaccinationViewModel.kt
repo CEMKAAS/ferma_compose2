@@ -174,13 +174,20 @@ class AnimalVaccinationViewModel @Inject constructor(
 
             val newState = if (!getState().isSaveStateForBottomSheet || domain != null) {
                 val animalDeferred = async { animalRepository.getAnimal(itemId).first().group }
+                val groupTotalDeferred = async {
+                    animalRepository.getAnimalWithGroup(itemId).first()?.totalCount
+                }
                 val animalCountDeferred =
                     async { animalCountAnimalRepository.getCountAnimalLimit(itemId).first() }
                 val settingsDeferred = async { settingsRepository.getSettings(itemIdPT).first() }
 
+                val isGroup = animalDeferred.await()
+                val groupTotal = groupTotalDeferred.await()
                 val baseState = Vaccination(
-                    isAnimalGroup = animalDeferred.await(),
-                    countAnimalAll = animalCountDeferred.await()?.count,
+                    isAnimalGroup = isGroup,
+                    countAnimalAll = if (isGroup && groupTotal != null)
+                        groupTotal.formatNumber(isGroupingUsed = false)
+                    else animalCountDeferred.await()?.count,
                     animalSuffix = animalCountDeferred.await()?.suffix ?: Suffix.PIECES,
                     priceSuffix = settingsDeferred.await().currencySuffix,
                     idAnimal = itemId

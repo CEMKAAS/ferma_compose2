@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.DomainAddTable
+import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.dto.animal.DomainAnimalCountPrice
@@ -20,6 +21,7 @@ import com.zaroslikov.domain.repository.AnimalWeightRepository
 import com.zaroslikov.domain.repository.ExpensesRepository
 import com.zaroslikov.domain.repository.ProjectRepository
 import com.zaroslikov.domain.repository.SaleRepository
+import com.zaroslikov.domain.models.enums.AnimalSpecies
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class AnimalCountViewModel @Inject constructor(
@@ -241,6 +244,7 @@ class AnimalCountViewModel @Inject constructor(
     }
 
     private fun deleteAnimal(id: Long) {
+        if (getState().countList.find { it.id == id }?.version?.isTransfer == true) return
         viewModelScope.launch {
             val isError = validationCalculate(Transaction.DELETE, true, id)
             val confirmed = awaitConfirmationIfNeeded(isError)
@@ -256,7 +260,7 @@ class AnimalCountViewModel @Inject constructor(
     fun insertAddAnimal() {
         viewModelScope.launch {
             animalCountRepository.insertAnimalCountTable(domainAnimalCount())
-            animalRepository.updateAnimalTable(getState().animal.copy(group = true))
+            animalRepository.updateAnimalTable(getState().animal.asGroup())
             yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
             showSnackbar(Transaction.INSERT)
             loadDataForEntryOrEdit(false, null)
@@ -326,7 +330,7 @@ class AnimalCountViewModel @Inject constructor(
                 val countId = animalCountRepository.insertAnimalCountTable(domainAnimalCount())
                 expensesRepository.insertExpenses(domainExpenses(countId))
                 yandexMetricRepository.metricalAnimalCount(domainAnimalCount())
-                animalRepository.updateAnimalTable(getState().animal.copy(group = true))
+                animalRepository.updateAnimalTable(getState().animal.asGroup())
             }
         )
     }
@@ -442,7 +446,7 @@ class AnimalCountViewModel @Inject constructor(
         val currentProduct = getState().currentProduct
         val choiceAnimal = id?.let { getState().countList.find { it.id == id } }
 
-        val countAll = getState().countAnimal?.toInt() ?: 0
+        val countAll = getState().countAnimal?.toDoubleOrNull()?.roundToInt() ?: 0
         val count = choiceAnimal?.count?.toConvertZero() ?: currentProduct.count.toConvertZero()
         val countOld = currentProduct.oldCount.toConvertZero()
         val version = choiceAnimal?.version ?: currentProduct.version
@@ -517,10 +521,13 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun insert2(countAll: Int, count: Int, version: AnimalCountVersion): Boolean {
         return when (version) {
-            AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR ->
+            AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR, AnimalCountVersion.TRANSFER_IN ->
                 false
 
-            AnimalCountVersion.SALE, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.KILL ->
+            // Вход в группу и выход из неё поголовье животного не меняют
+            AnimalCountVersion.HERD_JOIN, AnimalCountVersion.HERD_LEAVE -> false
+
+            AnimalCountVersion.SALE, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.KILL, AnimalCountVersion.TRANSFER_OUT ->
                 0 > countAll - count
         }
     }
@@ -532,36 +539,42 @@ class AnimalCountViewModel @Inject constructor(
         version: AnimalCountVersion
     ): Boolean {
         return when (version) {
-            AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR ->
+            AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR, AnimalCountVersion.TRANSFER_IN ->
                 0 > (countAll - (countOld - count))
 
-            AnimalCountVersion.SALE, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.KILL ->
+            // Вход в группу и выход из неё поголовье животного не меняют
+            AnimalCountVersion.HERD_JOIN, AnimalCountVersion.HERD_LEAVE -> false
+
+            AnimalCountVersion.SALE, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.KILL, AnimalCountVersion.TRANSFER_OUT ->
                 0 > (countAll + (countOld - count))
         }
     }
 
     private fun delete2(countAll: Int, count: Int, version: AnimalCountVersion): Boolean {
         return when (version) {
-            AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR ->
+            AnimalCountVersion.ADD, AnimalCountVersion.EXPENSES, AnimalCountVersion.INCUBATOR, AnimalCountVersion.TRANSFER_IN ->
                 0 > countAll - count
 
-            AnimalCountVersion.SALE, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.KILL ->
+            // Вход в группу и выход из неё поголовье животного не меняют
+            AnimalCountVersion.HERD_JOIN, AnimalCountVersion.HERD_LEAVE -> false
+
+            AnimalCountVersion.SALE, AnimalCountVersion.WRITE_OFF, AnimalCountVersion.KILL, AnimalCountVersion.TRANSFER_OUT ->
                 0 > countAll + count
         }
     }
 
     private suspend fun transferToIndividual() {
+        val animal = getState().animal
         val countAnimalAll = animalCountRepository
             .getCountAnimalLimit(itemId)
-            .first()?.count?.toInt() ?: 0
+            .first()?.count?.toDoubleOrNull()?.roundToInt() ?: 0
 
-        val isAnimalGroup = getState().animal.group
         when {
-            countAnimalAll == 1 && isAnimalGroup ->
+            countAnimalAll == 1 && animal.group ->
                 sendIntent(AnimalCountIntent.OpenSoloDialogClicked(true))
 
-            countAnimalAll != 1 && !isAnimalGroup ->
-                animalRepository.updateAnimalTable(getState().animal.copy(group = true))
+            countAnimalAll > 1 && !animal.group ->
+                animalRepository.updateAnimalTable(animal.asGroup())
 
             else -> Unit
         }
@@ -569,10 +582,20 @@ class AnimalCountViewModel @Inject constructor(
 
     private fun saveSoloAnimal() {
         viewModelScope.launch {
-            animalRepository.updateAnimalTable(getState().animal.copy(group = false))
+            val animal = getState().animal
+            animalRepository.updateAnimalTable(
+                animal.copy(
+                    group = false,
+                    type = AnimalSpecies.adaptType(animal.type, isGroup = false, sex = animal.sex)
+                )
+            )
             showMessage(resourceProvider.getString(R.string.snackbar_animal_sex))
         }
     }
+
+    /** Особь стала группой: «Корова»/«Бык» → «Коровы»; свой тип не меняется. */
+    private fun DomainAnimalTable.asGroup(): DomainAnimalTable =
+        copy(group = true, type = AnimalSpecies.adaptType(type, isGroup = true, sex = sex))
 
     override fun insert() {}
     override fun update() {}
@@ -616,6 +639,10 @@ class AnimalCountViewModel @Inject constructor(
             writeOffStatus = domain.writeOffStatus ?: false,
             isEntry = false,
             productKillList = domain.productKill,
+            femalesCount = domain.femalesCount.takeIf { it > 0 }?.toString().orEmpty(),
+            malesCount = domain.malesCount.takeIf { it > 0 }?.toString().orEmpty(),
+            oldFemalesCount = domain.femalesCount,
+            oldMalesCount = domain.malesCount,
             buyerList = buyerList,
             titleList = titleList
         )
@@ -630,7 +657,12 @@ class AnimalCountViewModel @Inject constructor(
             date = state.date,
             idAnimal = itemId,
             note = state.note.trim(),
-            version = state.version
+            version = state.version,
+            // Член сборной группы: запись попадает и в историю поголовья группы
+            herdId = getState().animal.herdId,
+            // Обезличенная группа: пол уходящих или пришедших
+            femalesCount = state.sexCount { it.femalesCount },
+            malesCount = state.sexCount { it.malesCount }
         )
     }
 
@@ -746,7 +778,12 @@ class AnimalCountViewModel @Inject constructor(
             writeOffStatus = writeOffStatus,
             tableId = tableId,
             idPT = idPT,
-            productKill = productKill
+            productKill = productKill,
+            femalesCount = femalesCount,
+            malesCount = malesCount
         )
     }
 }
+/** Пол в записи: поля есть только у обезличенной группы, у остальных пусто — 0. */
+private fun CountItem.sexCount(value: (CountItem) -> String): Int =
+    if (version.sign != 0) value(this).toIntOrNull() ?: 0 else 0

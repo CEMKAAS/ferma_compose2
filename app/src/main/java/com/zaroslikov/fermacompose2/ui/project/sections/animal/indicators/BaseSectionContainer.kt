@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.zaroslikov.domain.models.enums.IndicationStatus
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.R
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.herd.card.SexCountChip
 import com.zaroslikov.fermacompose2.blue_3
 import com.zaroslikov.fermacompose2.blue_5
 import com.zaroslikov.fermacompose2.blue_6
@@ -225,6 +227,8 @@ fun AnimalIndicatorsCardBase(
     nextVaccinationDate: String? = null,
     isArchive: Boolean,
     noteContainer: @Composable (ColumnScope.() -> Unit)? = null,
+    /** Рядом со значением — например, самки и самцы записи обезличенной группы. */
+    valueTrailing: (@Composable RowScope.() -> Unit)? = null,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDetailClick: () -> Unit
@@ -257,6 +261,7 @@ fun AnimalIndicatorsCardBase(
                         style = textBold_16,
                         textAlign = TextAlign.Center
                     )
+                    valueTrailing?.invoke(this)
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -378,10 +383,19 @@ fun AnimalCountCardNew(
     indicationStatus: IndicationStatus,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    currencyPriceSuffix: Suffix
+    currencyPriceSuffix: Suffix,
+    /** Обезличенная группа: сколько из количества самок и самцов — плашки рядом со значением. */
+    femalesCount: Int = 0,
+    malesCount: Int = 0
 ) {
     var details by rememberSaveable { mutableStateOf(false) }
     AnimalIndicatorsCardBase(
+        valueTrailing = if (femalesCount > 0 || malesCount > 0) {
+            {
+                if (femalesCount > 0) SexCountChip(sex = false, count = femalesCount)
+                if (malesCount > 0) SexCountChip(sex = true, count = malesCount)
+            }
+        } else null,
         icon = icon,
         colors = colors,
         value = "$value ${stringResource(suffix.toResId())}",
@@ -567,13 +581,13 @@ fun CardIndicationChangeChoice(
     status: IndicationStatus
 ) {
     val colors = when (status) {
-        IndicationStatus.POSITIVE, IndicationStatus.PRICE, IndicationStatus.ADD, IndicationStatus.ALL_WEIGHT, IndicationStatus.INCUBATOR ->
+        IndicationStatus.POSITIVE, IndicationStatus.PRICE, IndicationStatus.ADD, IndicationStatus.ALL_WEIGHT, IndicationStatus.INCUBATOR, IndicationStatus.TRANSFER_IN, IndicationStatus.HERD_JOIN ->
             Triple(green_g_2, green_1, green_2)
 
         IndicationStatus.NEUTRAL -> Triple(grey_2, grey, grey_3)
         IndicationStatus.NEGATIVE, IndicationStatus.KILL -> Triple(red_3, red_2, red_1)
 
-        IndicationStatus.WRITE_OFF -> Triple(violet_3, violet_5, violet_1)
+        IndicationStatus.WRITE_OFF, IndicationStatus.TRANSFER_OUT, IndicationStatus.HERD_LEAVE -> Triple(violet_3, violet_5, violet_1)
         IndicationStatus.SALE -> Triple(blue_3, blue_9, blue_8)
         IndicationStatus.EXPENSES -> Triple(orang_4, orang_5, orang_6)
     }
@@ -601,6 +615,10 @@ fun CardIndicationChangeChoice(
             IndicationStatus.ALL_WEIGHT -> R.string.animal_card_screen_animal_card_info_weight_all
             IndicationStatus.EXPENSES -> R.string.animal_count_screen_expenses_animal
             IndicationStatus.INCUBATOR -> R.string.animal_count_screen_incubator_animal
+            IndicationStatus.TRANSFER_IN -> R.string.animal_count_screen_transfer_in_animal
+            IndicationStatus.TRANSFER_OUT -> R.string.animal_count_screen_transfer_out_animal
+            IndicationStatus.HERD_JOIN -> R.string.animal_count_screen_herd_join_animal
+            IndicationStatus.HERD_LEAVE -> R.string.animal_count_screen_herd_leave_animal
             else -> R.string.animal_indicators_changed
         }
     )

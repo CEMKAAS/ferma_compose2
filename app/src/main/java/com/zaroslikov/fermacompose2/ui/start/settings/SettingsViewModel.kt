@@ -9,7 +9,12 @@ import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.models.table.profile.DomainProfileTable
 import com.zaroslikov.domain.repository.AddRepository
+import com.zaroslikov.domain.models.animal.pregnancy.normalizedForImport
+import com.zaroslikov.domain.models.animal.pregnancy.normalizedNotesForImport
 import com.zaroslikov.domain.repository.AnimalCountRepository
+import com.zaroslikov.domain.repository.AnimalHerdRepository
+import com.zaroslikov.domain.models.animal.group.normalizedHerdsForImport
+import com.zaroslikov.domain.repository.AnimalPregnancyRepository
 import com.zaroslikov.domain.repository.AnimalRepository
 import com.zaroslikov.domain.repository.AnimalSizeRepository
 import com.zaroslikov.domain.repository.AnimalVaccinationRepository
@@ -34,6 +39,7 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.viewModel.BaseViewModel2
 import com.zaroslikov.fermacompose2.data.worker.WorkManagerRepository
 import com.zaroslikov.fermacompose2.ui.navigation.EventFile
+import com.zaroslikov.fermacompose2.utils.PregnancyReminderScheduler
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appmetrica.analytics.AppMetrica
@@ -66,10 +72,13 @@ class SettingsViewModel @Inject constructor(
     private val expensesAnimalRepository: ExpensesAnimalRepository,
 
     private val animalRepository: AnimalRepository,
+    private val animalHerdRepository: AnimalHerdRepository,
     private val animalCountRepository: AnimalCountRepository,
     private val animalWeightRepository: AnimalWeightRepository,
     private val animalSizeRepository: AnimalSizeRepository,
     private val animalVaccinationRepository: AnimalVaccinationRepository,
+    private val animalPregnancyRepository: AnimalPregnancyRepository,
+    private val pregnancyReminderScheduler: PregnancyReminderScheduler,
 
     private val incubatorTableRepository: IncubatorTableRepository,
     private val bookmarkRepository: BookmarkRepository,
@@ -161,6 +170,7 @@ class SettingsViewModel @Inject constructor(
             val expensesAnimalTable =
                 expensesAnimalRepository.getAllExpensesAnimalTableForExport().first()
 
+            val animalHerdTable = animalHerdRepository.getAllForExport().first()
             val animalTable = animalRepository.getAllAnimalTableForExport().first()
             val animalCountTable = animalCountRepository.getAllAnimalCountTableForExport().first()
             val animalWeightTable =
@@ -168,6 +178,8 @@ class SettingsViewModel @Inject constructor(
             val animalSizeTable = animalSizeRepository.getAllAnimalSizeTableForExport().first()
             val animalVaccinationTable =
                 animalVaccinationRepository.getAllAnimalVaccinationTableForExport().first()
+            val animalPregnancyTable = animalPregnancyRepository.getAllForExport().first()
+            val animalPregnancyNoteTable = animalPregnancyRepository.getAllNotesForExport().first()
 
             val incubatorTable = incubatorTableRepository.getAllIncubatorTableForExport().first()
             val bookmarkTable = bookmarkRepository.getAllBookmarkTableForExport().first()
@@ -201,6 +213,9 @@ class SettingsViewModel @Inject constructor(
                 expensesAnimal = expensesAnimalTable,
                 noteTable = noteTable,
                 templateTable = templateTable,
+                animalHerdTable = animalHerdTable.map { herd ->
+                    herd.copy(imagePath = herd.imagePath?.let(::encodeImage))
+                },
                 animalTable = animalTable.map { project ->
                     val base64 = project.imagePath?.let { path ->
                         val file = File(path)
@@ -217,6 +232,8 @@ class SettingsViewModel @Inject constructor(
                 animalWeightTable = animalWeightTable,
                 animalSizeTable = animalSizeTable,
                 animalVaccinationTable = animalVaccinationTable,
+                animalPregnancyTable = animalPregnancyTable,
+                animalPregnancyNoteTable = animalPregnancyNoteTable,
                 incubatorTable = incubatorTable,
                 bookmarkTable = bookmarkTable,
                 incubatorParameters = incubatorParameters,
@@ -260,6 +277,15 @@ class SettingsViewModel @Inject constructor(
                 timeNotificationProjectRepository.clearAndInsertTimeNotificationTableForImport(
                     backup.timeNotificationProjectTable
                 )
+                // Сборные группы — раньше животных: на них ссылается animal_table.herd_id
+                val herds = backup.animalHerdTable
+                    .normalizedHerdsForImport(projectIds = backup.projectTable.map { it.id }.toSet())
+                    .map { herd ->
+                    herd.copy(imagePath = herd.imagePath?.let { base64 ->
+                        decodeImage(base64 = base64, herd.id, context, prefix = "herd")
+                    })
+                }
+                animalHerdRepository.clearAndInsertForImport(herds)
                 animalRepository.clearAndInsertAnimalTableForImport(backup.animalTable.map { animalTable ->
                     val newPath = animalTable.imagePath?.let { base64 ->
                         decodeImage(base64 = base64, animalTable.id, context)
@@ -267,7 +293,7 @@ class SettingsViewModel @Inject constructor(
                     animalTable.copy(
                         imagePath = newPath
                     )
-                })
+                }, herds)
 
                 addRepository.clearAndInsertAddTableForImport(backup.addTable)
                 saleRepository.clearAndInsertSaleTableForImport(backup.saleTable)
@@ -277,10 +303,28 @@ class SettingsViewModel @Inject constructor(
 
                 templateRepository.clearAndInsertAddTemplateTableForImport(backup.templateTable)
 
-                animalCountRepository.clearAndInsertAnimalCountTableForImport(backup.animalCountTable)
+                // Метка несуществующей сборной группы нарушила бы FK — запись остаётся вне группы
+                val herdIds = herds.map { it.id }.toSet()
+                animalCountRepository.clearAndInsertAnimalCountTableForImport(
+                    backup.animalCountTable.map { count ->
+                        if (count.herdId != null && count.herdId !in herdIds) count.copy(herdId = null) else count
+                    }
+                )
                 animalWeightRepository.clearAndInsertAnimalWeightTableForImport(backup.animalWeightTable)
                 animalSizeRepository.clearAndInsertAnimalSizeTableForImport(backup.animalSizeTable)
                 animalVaccinationRepository.clearAndInsertAnimalVaccinationTableForImport(backup.animalVaccinationTable)
+                // Только после животных: их пересоздание каскадно удаляет беременности
+                val pregnancies = backup.animalPregnancyTable.normalizedForImport(
+                    animals = backup.animalTable,
+                    projectIds = backup.projectTable.map { it.id }.toSet()
+                )
+                animalPregnancyRepository.clearAndInsertForImport(pregnancies)
+                // Заметки — после беременностей (каскад) и только к уцелевшим
+                animalPregnancyRepository.clearAndInsertNotesForImport(
+                    backup.animalPregnancyNoteTable.normalizedNotesForImport(
+                        pregnancyIds = pregnancies.map { it.id }.toSet()
+                    )
+                )
 
                 expensesRepository.clearAndInsertExpensesTableForImport(backup.expensesTable)
 
@@ -298,6 +342,8 @@ class SettingsViewModel @Inject constructor(
                         deviceId = it.deviceId.ifBlank { UUID.randomUUID().toString() }
                     )
                 })
+                // Напоминания старых беременностей сняты, новые — по импортированным данным
+                pregnancyReminderScheduler.resetAfterImport()
                 launchNotification()
                 showMessage("Импорт прошел успешно")
                 AppMetrica.reportEvent("Импорт базы данных")
@@ -309,12 +355,19 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun decodeImage(base64: String, id: Long, context: Context): String? {
+    /** Фото для бэкапа: содержимое файла в base64; файла нет — null. */
+    private fun encodeImage(path: String): String? {
+        val file = File(path)
+        return if (file.exists()) Base64.encodeToString(file.readBytes(), Base64.DEFAULT) else null
+    }
+
+    /** [prefix] разводит файлы таблиц с пересекающимися id (животное и сборная группа). */
+    private fun decodeImage(base64: String, id: Long, context: Context, prefix: String = "project"): String? {
         return try {
             val bytes = Base64.decode(base64, Base64.DEFAULT)
             val file = File(
                 context.filesDir,
-                "project_${System.currentTimeMillis()}_${id}.jpg"
+                "${prefix}_${System.currentTimeMillis()}_${id}.jpg"
             )
             file.writeBytes(bytes)
             file.absolutePath

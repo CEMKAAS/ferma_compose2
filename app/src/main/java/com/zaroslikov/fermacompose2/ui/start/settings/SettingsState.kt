@@ -2,11 +2,14 @@ package com.zaroslikov.fermacompose2.ui.start.settings
 
 import com.zaroslikov.domain.models.DomainAddTable
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
+import com.zaroslikov.domain.models.table.DomainAnimalHerd
 import com.zaroslikov.domain.models.DomainExpensesAnimal
 import com.zaroslikov.domain.models.DomainExpensesTable
 import com.zaroslikov.domain.models.DomainNoteTable
 import com.zaroslikov.domain.models.DomainSaleTable
 import com.zaroslikov.domain.models.table.DomainAnimalCount
+import com.zaroslikov.domain.models.table.DomainAnimalPregnancy
+import com.zaroslikov.domain.models.table.DomainAnimalPregnancyNote
 import com.zaroslikov.domain.models.table.DomainAnimalSize
 import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import com.zaroslikov.domain.models.table.DomainAnimalWeight
@@ -52,11 +55,17 @@ data class BackupData(
 
     val expensesAnimal: List<DomainExpensesAnimal> = emptyList(),
 
+    /** Сборные группы (с версии схемы 8); в старых бэкапах поля нет. Фото — base64, как у животных. */
+    val animalHerdTable: List<DomainAnimalHerd> = emptyList(),
     val animalTable: List<DomainAnimalTable> = emptyList(),
     val animalCountTable: List<DomainAnimalCount> = emptyList(),
     val animalWeightTable: List<DomainAnimalWeight> = emptyList(),
     val animalSizeTable: List<DomainAnimalSize> = emptyList(),
     val animalVaccinationTable: List<DomainAnimalVaccination> = emptyList(),
+    /** Беременности (с версии схемы 10); в старых бэкапах поля нет. */
+    val animalPregnancyTable: List<DomainAnimalPregnancy> = emptyList(),
+    /** Заметки к беременностям по дням (с версии схемы 12); в старых бэкапах поля нет. */
+    val animalPregnancyNoteTable: List<DomainAnimalPregnancyNote> = emptyList(),
 
     val incubatorTable: List<DomainIncubatorTable> = emptyList(),
     val bookmarkTable: List<DomainBookmark> = emptyList(),

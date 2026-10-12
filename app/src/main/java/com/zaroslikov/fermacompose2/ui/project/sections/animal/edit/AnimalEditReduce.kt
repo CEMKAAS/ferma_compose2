@@ -1,8 +1,10 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.animal.edit
 
+import com.zaroslikov.domain.models.enums.AnimalSpecies
 import com.zaroslikov.domain.models.enums.AppIcon
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.base.reduce.BaseReducer
+import com.zaroslikov.fermacompose2.ui.project.sections.animal.group.isSexSplitExceeding
 import com.zaroslikov.fermacompose2.supportFun.formatDateToLong
 
 class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
@@ -13,12 +15,19 @@ class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
         return when (intent) {
             is AnimalEditIntent.TitleChanged -> state.updateName(intent.value).updateValid()
             is AnimalEditIntent.TypeChanged -> state.updateType(intent.value).updateValid()
+            is AnimalEditIntent.BreedChanged -> state.updateBreed(intent.value)
             is AnimalEditIntent.DateClicked -> state.updateDate(intent.value)
             is AnimalEditIntent.DateFactoryClicked -> state.updateIsDateFactory(intent.value)
             is AnimalEditIntent.DateFactoryChanged -> state.updateDateFactory(intent.value)
             is AnimalEditIntent.FoodDayChanged -> state.updateFoodDay(intent.value)
             is AnimalEditIntent.FoodDaySuffixClicked -> state.updateFoodSuffix(intent.value)
             is AnimalEditIntent.SexClicked -> state.updateSex(intent.value)
+            is AnimalEditIntent.FemalesCountChanged ->
+                state.copy(currentProduct = state.currentProduct.copy(femalesCount = intent.value)).updateValid()
+
+            is AnimalEditIntent.MalesCountChanged ->
+                state.copy(currentProduct = state.currentProduct.copy(malesCount = intent.value)).updateValid()
+
             is AnimalEditIntent.LoadDate -> state.updateLoadData(intent.value).updateValid()
             is AnimalEditIntent.LoadingChanged -> state.copy(isLoading = intent.value)
             is AnimalEditIntent.IconClicked -> state.updateIcon(intent.value)
@@ -52,10 +61,14 @@ class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
     private fun AnimalEditState.updateValid(): AnimalEditState {
         val isErrorTitle = currentProduct.name.isNotBlank()
         val isErrorType = currentProduct.type.isNotBlank()
-        val baseValid = isErrorTitle && isErrorType
+        // Самок и самцов не больше, чем голов в группе
+        val isErrorSexCount = currentProduct.isAnimalGroup &&
+                isSexSplitExceeding(currentProduct.headCount, currentProduct.femalesCount, currentProduct.malesCount)
+        val baseValid = isErrorTitle && isErrorType && !currentProduct.error.isErrorPregnancyType && !isErrorSexCount
         return copy(
             currentProduct = currentProduct.copy(
-                hasAnyError = baseValid
+                hasAnyError = baseValid,
+                error = currentProduct.error.copy(isErrorSexCount = isErrorSexCount)
             )
         )
     }
@@ -104,9 +117,20 @@ class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
     }
 
     private fun AnimalEditState.updateSex(sex: Boolean): AnimalEditState {
+        // Беременной самке пол не меняем — сначала нужно завершить беременность
+        if (currentProduct.isPregnancyLocked) return this
         return copy(
             currentProduct = currentProduct.copy(
-                sex = sex
+                sex = sex,
+                type = AnimalSpecies.adaptType(currentProduct.type, currentProduct.isAnimalGroup, sex)
+            )
+        )
+    }
+
+    private fun AnimalEditState.updateBreed(breed: String): AnimalEditState {
+        return copy(
+            currentProduct = currentProduct.copy(
+                breed = breed
             )
         )
     }
@@ -115,8 +139,15 @@ class AnimalEditReduce : BaseReducer<AnimalEditState, AnimalEditIntent>() {
         return copy(
             currentProduct = currentProduct.copy(
                 type = type,
+                // «Бык»/«Корова» однозначно задают пол особи; у беременной самки пол не меняется
+                sex = if (currentProduct.isAnimalGroup || currentProduct.isPregnancyLocked) currentProduct.sex
+                else AnimalSpecies.sexOf(type) ?: currentProduct.sex,
                 error = currentProduct.error.copy(
                     isErrorType = type.isBlank(),
+                    // Другой вид или мужское название («Бык») у беременной самки
+                    isErrorPregnancyType = currentProduct.pregnancyLockedSpecies
+                        ?.let { AnimalSpecies.resolve(type) != it || AnimalSpecies.sexOf(type) == true }
+                        ?: false
                 )
             )
         )
