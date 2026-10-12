@@ -12,6 +12,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.AddProdu
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 import com.zaroslikov.fermacompose2.ui.project.sections.sale.list_screen.SaleListIntent
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.WriteOffType
 
 sealed class WriteOffListIntent : BaseIntent {
     data class LoadDataForDetailNomenclatura(val value: String?) : WriteOffListIntent()
@@ -48,6 +49,34 @@ sealed class WriteOffListIntent : BaseIntent {
     data class DateClicked(val value: String) : WriteOffListIntent()
     data class NoteChanged(val value: String) : WriteOffListIntent()
     data class StatusClicked(val value: Boolean) : WriteOffListIntent()
+    data class TypeClicked(val value: WriteOffType) : WriteOffListIntent()
+
+    //Recycling
+    data object RecyclingAddIngredient : WriteOffListIntent()
+    data class RecyclingRemoveIngredient(val key: Long) : WriteOffListIntent()
+    data class RecyclingIngredientChoice(
+        val key: Long,
+        val title: String,
+        val suffix: Suffix,
+        val productOrigin: ProductOrigin
+    ) : WriteOffListIntent()
+
+    data class RecyclingIngredientCount(val key: Long, val value: String) : WriteOffListIntent()
+    data class RecyclingIngredientWarehouse(
+        val key: Long,
+        val value: List<DomainCountSuffix>
+    ) : WriteOffListIntent()
+
+    data class RecyclingTitleChanged(val value: String) : WriteOffListIntent()
+    data class RecyclingTitleAndSuffix(val title: String, val suffix: Suffix) : WriteOffListIntent()
+    data class RecyclingCountChanged(val value: String) : WriteOffListIntent()
+    data class RecyclingSuffixClicked(val value: Suffix) : WriteOffListIntent()
+    data class RecyclingDelayedClicked(val value: Boolean) : WriteOffListIntent()
+    data class RecyclingReadyDateClicked(val value: String) : WriteOffListIntent()
+    data class OpenRecyclingDetail(val id: Long?) : WriteOffListIntent()
+    data class OpenRecyclingDelete(val value: Boolean) : WriteOffListIntent()
+    data object CompleteRecycling : WriteOffListIntent()
+    data object DeleteRecycling : WriteOffListIntent()
     data object Insert : WriteOffListIntent()
     data object Update : WriteOffListIntent()
     data object Delete : WriteOffListIntent()

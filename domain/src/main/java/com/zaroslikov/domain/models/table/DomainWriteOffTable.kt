@@ -22,5 +22,7 @@ data class DomainWriteOffTable(
     val status: Boolean,
     val note: String,
     val idPT: Long,
-    val animalCountId: Long? = null
+    val animalCountId: Long? = null,
+    /** Списание сырья в переработку ([DomainRecycling.id]); null — обычное списание. */
+    val recyclingId: Long? = null
 ) : BaseProductSection

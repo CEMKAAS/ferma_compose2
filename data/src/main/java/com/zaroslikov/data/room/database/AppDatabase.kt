@@ -38,6 +38,7 @@ import com.zaroslikov.data.room.dao.TimeNotificationIncubatorDao
 import com.zaroslikov.data.room.dao.TimeNotificationProjectDao
 import com.zaroslikov.data.room.dao.WarehouseDao
 import com.zaroslikov.data.room.dao.WriteOffDao
+import com.zaroslikov.data.room.dao.RecyclingDao
 import com.zaroslikov.data.room.dao.TemplateDao
 import com.zaroslikov.data.room.table.animal.AnimalCountTable
 import com.zaroslikov.data.room.table.animal.AnimalHerdTable
@@ -57,6 +58,7 @@ import com.zaroslikov.data.room.table.project.ProjectTable
 import com.zaroslikov.data.room.table.ferma.SaleTable
 import com.zaroslikov.data.room.table.ferma.TemplateTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
+import com.zaroslikov.data.room.table.ferma.RecyclingTable
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
 import com.zaroslikov.data.room.table.incubator.TimeNotificationIncubatorTable
@@ -73,6 +75,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         SaleTable::class,
         ExpensesTable::class,
         WriteOffTable::class,
+        RecyclingTable::class,
         AnimalHerdTable::class,
         AnimalTable::class,
         AnimalCountTable::class,
@@ -91,7 +94,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         AppSettingsTable::class,
         ProfileTable::class,
     ],
-    version = 15,
+    version = 16,
     exportSchema = false,
 )
 @TypeConverters(
@@ -126,6 +129,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun crmSaleDao(): CrmSaleDao
     abstract fun warehouseDao(): WarehouseDao
     abstract fun writeOffDao(): WriteOffDao
+    abstract fun recyclingDao(): RecyclingDao
     abstract fun settingsDao(): SettingsDao
     abstract fun incubatorTableDao(): IncubatorTableDao
     abstract fun bookmarkTableDao(): BookmarkDao

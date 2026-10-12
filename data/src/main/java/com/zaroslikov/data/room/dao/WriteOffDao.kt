@@ -60,14 +60,14 @@ interface WriteOffDao {
 
     @Query(
         "SELECT * FROM write_off_table" +
-                " WHERE idPT=:id AND title =:name AND status = 1 AND price IS NOT NULL" +
+                " WHERE idPT=:id AND title =:name AND status = 1 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC"
     )
     fun getBrieflyDetailsItemWriteOffOwnNeed(id: Long, name: String): Flow<List<WriteOffTable>>
 
     @Query(
         "SELECT * FROM write_off_table" +
-                " WHERE idPT=:id AND title =:name AND status = 0 AND price IS NOT NULL" +
+                " WHERE idPT=:id AND title =:name AND status = 0 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC"
     )
     fun getBrieflyDetailsItemWriteOffScrap(id: Long, name: String): Flow<List<WriteOffTable>>
@@ -105,7 +105,7 @@ interface WriteOffDao {
         "SELECT" +
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id AND status= 1 AND price IS NOT NULL"
+                " WHERE idPT =:id AND status= 1 AND recycling_id IS NULL AND price IS NOT NULL"
     )
     fun getOwnNeed(id: Long): Flow<Double> //Write off Maybe
 
@@ -122,7 +122,7 @@ interface WriteOffDao {
     @Query(
         "SELECT COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id and status = 0 AND price IS NOT NULL"
+                " WHERE idPT =:id and status = 0 AND recycling_id IS NULL AND price IS NOT NULL"
     )
     fun getScrap(id: Long): Flow<Double> // WriteOff Maybe
 
@@ -141,7 +141,7 @@ interface WriteOffDao {
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
                 " 2 AS category" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id AND status = 1 AND price IS NOT NULL" +
+                " WHERE idPT =:id AND status = 1 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " GROUP BY title ORDER BY price DESC"
     )
     fun getOwnNeedAllList(id: Long): Flow<List<TitleSuffixPriceDto>> //maybe
@@ -152,7 +152,7 @@ interface WriteOffDao {
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
                 " 3 AS category" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id AND status = 0  AND price IS NOT NULL" +
+                " WHERE idPT =:id AND status = 0 AND recycling_id IS NULL  AND price IS NOT NULL" +
                 " GROUP BY title ORDER BY price DESC"
     )
     fun getScrapAllList(id: Long): Flow<List<TitleSuffixPriceDto>> //maybe
@@ -161,7 +161,7 @@ interface WriteOffDao {
         "SELECT category," +
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id AND status = 1 AND price IS NOT NULL" +
+                " WHERE idPT =:id AND status = 1 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " GROUP BY category ORDER BY price DESC"
     )
     fun getOwnNeedAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
@@ -170,7 +170,7 @@ interface WriteOffDao {
         "SELECT category," +
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id and status = 0 AND price IS NOT NULL" +
+                " WHERE idPT =:id and status = 0 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " GROUP BY category ORDER BY price DESC"
     )
     fun getScrapAllCategoryAllList(id: Long): Flow<List<CategoryPriceDto>>
@@ -180,7 +180,7 @@ interface WriteOffDao {
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS ResultCount" +
                 " FROM write_off_table" +
                 " WHERE idPT =:id AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) AND status=1 AND price IS NOT NULL"
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) AND status=1 AND recycling_id IS NULL AND price IS NOT NULL"
     )
     fun getOwnNeedMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double> //maybe
 
@@ -190,7 +190,7 @@ interface WriteOffDao {
                 " FROM write_off_table" +
                 " WHERE idPT =:id" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
-                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) AND status=0 AND price IS NOT NULL"
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd) AND status=0 AND recycling_id IS NULL AND price IS NOT NULL"
     )
     fun getScrapMonth(id: Long, dateBegin: String, dateEnd: String): Flow<Double> //maybe
 
@@ -200,7 +200,7 @@ interface WriteOffDao {
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
                 " 2 AS category" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id AND status = 1 AND price IS NOT NULL" +
+                " WHERE idPT =:id AND status = 1 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
                 " GROUP BY title ORDER BY price DESC"
@@ -217,7 +217,7 @@ interface WriteOffDao {
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price," +
                 " 3 AS category" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id AND status = 0  AND price IS NOT NULL" +
+                " WHERE idPT =:id AND status = 0 AND recycling_id IS NULL  AND price IS NOT NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
                 " GROUP BY title ORDER BY price DESC"
@@ -232,7 +232,7 @@ interface WriteOffDao {
         "SELECT category," +
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id AND status = 1 AND price IS NOT NULL" +
+                " WHERE idPT =:id AND status = 1 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
                 " GROUP BY category ORDER BY price DESC"
@@ -247,7 +247,7 @@ interface WriteOffDao {
         "SELECT category," +
                 " COALESCE(SUM(CASE WHEN price_all IS NULL THEN price ELSE price_all END), 0.0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT =:id and status = 0 AND price IS NOT NULL" +
+                " WHERE idPT =:id and status = 0 AND recycling_id IS NULL AND price IS NOT NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
                 " GROUP BY category ORDER BY price DESC"
@@ -270,7 +270,7 @@ interface WriteOffDao {
         "SELECT COALESCE(SUM(count), 0) AS count," +
                 " count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and title=:name and status=0"
+                " WHERE idPT=:id and title=:name and status=0 AND recycling_id IS NULL"
     )
     fun getAnalysisWriteOffOwnNeedsAllTime(id: Long, name: String): Flow<CountSuffixDto>
 
@@ -278,21 +278,21 @@ interface WriteOffDao {
         "SELECT  COALESCE(SUM(count), 0) AS count," +
                 " count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id AND title=:name AND status=1"
+                " WHERE idPT=:id AND title=:name AND status=1 AND recycling_id IS NULL"
     )
     fun getAnalysisWriteOffScrapAllTime(id: Long, name: String): Flow<CountSuffixDto>
 
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " Where idPT=:id AND title=:name AND status=0"
+                " Where idPT=:id AND title=:name AND status=0 AND recycling_id IS NULL"
     )
     fun getAnalysisWriteOffOwnNeedsMoneyAllTime(id: Long, name: String): Flow<Double>
 
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " Where idPT=:id and title=:name and status=1"
+                " Where idPT=:id and title=:name and status=1 AND recycling_id IS NULL"
     )
     fun getAnalysisWriteOffScrapMoneyAllTime(id: Long, name: String): Flow<Double>
 
@@ -317,7 +317,7 @@ interface WriteOffDao {
                 " COALESCE(price_all, price, 0.0) AS price," +
                 " printf('%04d-%02d-%02d', year, month, day) AS date" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and title=:name AND status=:status AND product_origin = 0" +
+                " WHERE idPT=:id and title=:name AND status=:status AND recycling_id IS NULL AND product_origin = 0" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
@@ -333,7 +333,7 @@ interface WriteOffDao {
         "SELECT COALESCE(SUM(count), 0) AS count," +
                 "  count_suffix AS suffix" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id AND title=:name AND status= 1  AND product_origin = 0" +
+                " WHERE idPT=:id AND title=:name AND status= 1 AND recycling_id IS NULL  AND product_origin = 0" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
@@ -347,7 +347,7 @@ interface WriteOffDao {
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id AND title=:name AND status=0" +
+                " WHERE idPT=:id AND title=:name AND status=0 AND recycling_id IS NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
@@ -361,7 +361,7 @@ interface WriteOffDao {
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id AND title=:name AND status=1" +
+                " WHERE idPT=:id AND title=:name AND status=1 AND recycling_id IS NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
@@ -375,7 +375,7 @@ interface WriteOffDao {
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id AND status=0" +
+                " WHERE idPT=:id AND status=0 AND recycling_id IS NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
@@ -388,7 +388,7 @@ interface WriteOffDao {
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and status=1" +
+                " WHERE idPT=:id and status=1 AND recycling_id IS NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
@@ -401,7 +401,7 @@ interface WriteOffDao {
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " WHERE status=0 AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " WHERE status=0 AND recycling_id IS NULL AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
     fun getAnalysisWriteOffOwnNeedsNewYear(
@@ -412,7 +412,7 @@ interface WriteOffDao {
     @Query(
         "SELECT COALESCE(SUM(price), 0) AS price" +
                 " FROM write_off_table" +
-                " Where status=1 AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " Where status=1 AND recycling_id IS NULL AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
     )
     fun getAnalysisWriteOffScrapNewYear(

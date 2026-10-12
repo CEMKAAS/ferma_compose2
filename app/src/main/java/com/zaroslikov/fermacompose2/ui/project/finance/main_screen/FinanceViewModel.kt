@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.finance
 
+import com.zaroslikov.domain.repository.RecyclingRepository
+import com.zaroslikov.fermacompose2.supportFun.todayIso
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
@@ -27,12 +29,15 @@ class FinanceViewModel @Inject constructor(
     private val saleRepository: SaleRepository,
     private val expensesRepository: ExpensesRepository,
     private val writeOffRepository: WriteOffRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val recyclingRepository: RecyclingRepository
 ) : ListViewModel<FinanceState, FinanceIntent>(FinanceState()) {
 
     private val itemId: Long = checkNotNull(savedStateHandle[FinanceDestination.itemIdArg])
 
     init {
+        // Продукция из переработки, чья дата готовности наступила, попадает в учёт
+        viewModelScope.launch { recyclingRepository.completeDueRecycling(todayIso()) }
         observeData()
     }
 

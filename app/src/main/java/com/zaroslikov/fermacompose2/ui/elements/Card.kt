@@ -477,6 +477,8 @@ fun DetailProductCardNew(
     priceSuffix: Suffix = Suffix.PIECES,
     category: String? = null,
     statusWriteOff: Boolean? = null,
+    /** Сырьё переработки: вместо причины списания — «Переработка → продукция». */
+    recyclingTitle: String? = null,
     note: String,
     animal: String? = null,
     productOrigin: ProductOrigin? = null,
@@ -533,7 +535,13 @@ fun DetailProductCardNew(
                         onDeleteClick = onDeleteProductClick
                     )
             }
-            statusWriteOff?.let { status ->
+            if (recyclingTitle != null)
+                IconAndTextNew(
+                    iconRes = R.drawable.baseline_autorenew_24,
+                    valueString = stringResource(R.string.recycling_label, recyclingTitle),
+                    iconColor = green_shamrock,
+                )
+            else statusWriteOff?.let { status ->
                 val (iconRes, valueString) = if (status)
                     R.drawable.baseline_cottage_24 to R.string.ration_button_own_needs
                 else

@@ -29,11 +29,17 @@ import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeDa
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeWarning
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingItem
 
 data class WriteOffListState(
     val idPT: Long = 0,
     val productDetail: DomainWriteOffTable? = null,
     val isNotProduction: Boolean = false,
+    /** Переработки проекта со своим сырьём; незавершённые — блок «В переработке». */
+    val recyclingItems: List<RecyclingItem> = emptyList(),
+    val recyclingDetailId: Long? = null,
+    val isOpenRecyclingDelete: Boolean = false,
 
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
@@ -51,6 +57,9 @@ data class WriteOffListState(
     override val qrCodeState: QrCodeData? = null,
     override val qrCodeWarning: QrCodeWarning = QrCodeWarning()
 ) : SectionState
+
+fun WriteOffListState.recyclingDetail(): RecyclingItem? =
+    recyclingDetailId?.let { id -> recyclingItems.find { it.recycling.id == id } }
 
 data class WriteOffUiState(
     override val colors: List<Color> = listOf(violet_1, violet_2),
@@ -101,7 +110,9 @@ data class WriteOffProduct(
     val status: Boolean = false,
     val animalCountId: Long? = null,
     val hasIndicators: Boolean = false,
-    val productOrigin: ProductOrigin? = null
+    val productOrigin: ProductOrigin? = null,
+    val isRecycling: Boolean = false,
+    val recycling: RecyclingForm = RecyclingForm()
 ) : Product
 
 data class WriteOffPickList(
@@ -109,6 +120,8 @@ data class WriteOffPickList(
     override val categories: List<String> = emptyList(),
     override val warehouseList: List<DomainCountSuffix> = emptyList(),
     val suffixList: List<Suffix> = suffixPiecesList,
+    /** Продукция, в которую можно переработать сырьё. */
+    val productTitles: List<TitleAndSuffixDomain> = emptyList(),
 ) : BasePickList
 
 data class WriteOffError(
@@ -116,6 +129,7 @@ data class WriteOffError(
     override val isErrorTitle: Boolean = false,
     override val isErrorSlash: Boolean = false,
     override val isErrorCount: Boolean = false,
+    val isErrorReadyDate: Boolean = false,
     override val hasAnyError: Boolean = false
 ) : ProductError
 

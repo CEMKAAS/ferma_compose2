@@ -52,12 +52,12 @@ interface FinanceDao {
                 " UNION All" +
                 " SELECT count, count_suffix, price, price_all, category, NULL AS buyer, NULL AS animal, day, month, year, 3 AS category_finance" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id  and title=:name  and status = 0 AND product_origin = 0" +
+                " WHERE idPT=:id  and title=:name  and status = 0 AND recycling_id IS NULL AND product_origin = 0" +
 
                 " UNION All" +
                 " SELECT count, count_suffix, price, price_all, category, NULL AS buyer, NULL AS animal, day, month, year, 2 AS category_finance" +
                 " FROM write_off_table" +
-                " WHERE idPT=:id and title=:name and status = 1 AND product_origin = 0" +
+                " WHERE idPT=:id and title=:name and status = 1 AND recycling_id IS NULL AND product_origin = 0" +
                 ") " +
                 " WHERE DATE(printf('%04d-%02d-%02d', year, month, day))" +
                 " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +

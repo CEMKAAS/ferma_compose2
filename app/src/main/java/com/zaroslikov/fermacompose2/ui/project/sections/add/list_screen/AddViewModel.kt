@@ -1,5 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
+import com.zaroslikov.domain.repository.RecyclingRepository
+import com.zaroslikov.fermacompose2.supportFun.todayIso
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -59,7 +61,8 @@ class AddViewModel @Inject constructor(
     private val projectRepository: ProjectRepository,
     private val templateRepository: TemplateRepository,
     private val yandexMetricRepository: YandexMetricRepository,
-    private val appSettingsRepository: AppSettingsRepository
+    private val appSettingsRepository: AppSettingsRepository,
+    private val recyclingRepository: RecyclingRepository
 ) : EntryNewViewModel3<AddListState, AddListIntent, AddListReduce>(
     initialState = AddListState(),
     reducer = AddListReduce(resourceProvider),
@@ -73,6 +76,8 @@ class AddViewModel @Inject constructor(
     private val _itemIdPT: Long = checkNotNull(savedStateHandle[HomeDestination.itemIdArg])
 
     init {
+        // Продукция из переработки, чья дата готовности наступила, поступает в список
+        viewModelScope.launch { recyclingRepository.completeDueRecycling(todayIso()) }
         loadData()
         loadTemplate(TemplateType.ADD)
     }

@@ -20,7 +20,8 @@ fun DomainWriteOffTable.toRoomMap(): WriteOffTable = WriteOffTable(
     status = status,
     note = note,
     idPT = idPT,
-    animalCountId = animalCountId
+    animalCountId = animalCountId,
+    recyclingId = recyclingId
 )
 
 fun WriteOffTable.toDomainMap(): DomainWriteOffTable = DomainWriteOffTable(
@@ -40,4 +41,5 @@ fun WriteOffTable.toDomainMap(): DomainWriteOffTable = DomainWriteOffTable(
     note = note,
     idPT = idPT,
     animalCountId = animalCountId,
+    recyclingId = recyclingId,
 )

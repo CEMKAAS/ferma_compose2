@@ -35,6 +35,7 @@ import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.TimeNotificationIncubatorRepository
 import com.zaroslikov.domain.repository.TimeNotificationProjectRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
+import com.zaroslikov.domain.repository.RecyclingRepository
 import com.zaroslikov.domain.repository.template.TemplateRepository
 import com.zaroslikov.fermacompose2.BuildConfig
 import com.zaroslikov.fermacompose2.R
@@ -67,6 +68,7 @@ class SettingsViewModel @Inject constructor(
     private val addRepository: AddRepository,
     private val saleRepository: SaleRepository,
     private val writeOffRepository: WriteOffRepository,
+    private val recyclingRepository: RecyclingRepository,
     private val expensesRepository: ExpensesRepository,
     private val noteRepository: NoteRepository,
 
@@ -168,6 +170,7 @@ class SettingsViewModel @Inject constructor(
             val addTable = addRepository.getAllAddTableForExport().first()
             val saleTable = saleRepository.getAllSaleTableForExport().first()
             val writeOffTable = writeOffRepository.getAllWriteOffTableForExport().first()
+            val recyclingTable = recyclingRepository.getAllRecyclingForExport().first()
             val expensesTable = expensesRepository.getAllExpensesTableForExport().first()
             val noteTable = noteRepository.getAllNoteTableForExport().first()
 
@@ -216,6 +219,7 @@ class SettingsViewModel @Inject constructor(
                 addTable = addTable,
                 saleTable = saleTable,
                 writeOff = writeOffTable,
+                recyclingTable = recyclingTable,
                 expensesTable = expensesTable,
                 expensesAnimal = expensesAnimalTable,
                 noteTable = noteTable,
@@ -306,6 +310,7 @@ class SettingsViewModel @Inject constructor(
                 addRepository.clearAndInsertAddTableForImport(backup.addTable)
                 saleRepository.clearAndInsertSaleTableForImport(backup.saleTable)
                 writeOffRepository.clearAndInsertWriteOffTableForImport(backup.writeOff)
+                recyclingRepository.clearAndInsertRecyclingForImport(backup.recyclingTable)
                 noteRepository.clearAndInsertNoteTableForImport(backup.noteTable)
                 expensesAnimalRepository.clearAndInsertExpensesAnimalTableForImport(backup.expensesAnimal)
 

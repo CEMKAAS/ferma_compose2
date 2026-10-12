@@ -17,6 +17,11 @@ import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeData
 import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.TemplateItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingIngredientForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.WriteOffType
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormLocalDate
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormString
 
 class WriteOffListReduce(
     private val resourceProvider: ResourceProvider
@@ -36,6 +41,59 @@ class WriteOffListReduce(
             is WriteOffListIntent.RefreshWarehouseCount -> state.updateWarehouseCount(intent.value)
 
             is WriteOffListIntent.StatusClicked -> state.updateStatus(intent.value)
+            is WriteOffListIntent.TypeClicked -> state.updateType(intent.value).updateValid()
+
+            //Recycling
+            is WriteOffListIntent.RecyclingAddIngredient -> state.updateRecycling {
+                it.copy(
+                    ingredients = it.ingredients + RecyclingIngredientForm(key = it.nextKey),
+                    nextKey = it.nextKey + 1
+                )
+            }.updateValid()
+
+            is WriteOffListIntent.RecyclingRemoveIngredient -> state.updateRecycling {
+                it.copy(ingredients = it.ingredients.filterNot { ingredient -> ingredient.key == intent.key })
+            }.updateValid()
+
+            is WriteOffListIntent.RecyclingIngredientChoice -> state.updateIngredient(intent.key) {
+                it.copy(
+                    title = intent.title,
+                    countSuffix = intent.suffix,
+                    productOrigin = intent.productOrigin,
+                    warehouseList = emptyList()
+                )
+            }.updateValid()
+
+            is WriteOffListIntent.RecyclingIngredientCount ->
+                state.updateIngredient(intent.key) { it.copy(count = intent.value) }.updateValid()
+
+            is WriteOffListIntent.RecyclingIngredientWarehouse ->
+                state.updateIngredient(intent.key) { it.copy(warehouseList = intent.value) }
+
+            is WriteOffListIntent.RecyclingTitleChanged ->
+                state.updateRecycling { it.copy(title = intent.value) }.updateValid()
+
+            is WriteOffListIntent.RecyclingTitleAndSuffix -> state.updateRecycling {
+                it.copy(title = intent.title, countSuffix = intent.suffix)
+            }.updateValid()
+
+            is WriteOffListIntent.RecyclingCountChanged ->
+                state.updateRecycling { it.copy(count = intent.value) }.updateValid()
+
+            is WriteOffListIntent.RecyclingSuffixClicked ->
+                state.updateRecycling { it.copy(countSuffix = intent.value) }
+
+            is WriteOffListIntent.RecyclingDelayedClicked ->
+                state.updateRecyclingDelayed(intent.value).updateValid()
+
+            is WriteOffListIntent.RecyclingReadyDateClicked ->
+                state.updateRecycling { it.copy(readyDate = intent.value) }.updateValid()
+
+            is WriteOffListIntent.OpenRecyclingDetail ->
+                state.copy(recyclingDetailId = intent.id, isOpenRecyclingDelete = false)
+
+            is WriteOffListIntent.OpenRecyclingDelete ->
+                state.copy(isOpenRecyclingDelete = intent.value)
             is WriteOffListIntent.TitleAndSuffix ->
                 state.updateTitleAndSuffix(
                     intent.title,
@@ -58,7 +116,7 @@ class WriteOffListReduce(
             is WriteOffListIntent.CategoryChanged ->
                 state.updateCategory(intent.value)
 
-            is WriteOffListIntent.DateClicked -> state.updateDate(intent.value)
+            is WriteOffListIntent.DateClicked -> state.updateDate(intent.value).updateValid()
             is WriteOffListIntent.NoteChanged -> state.updateNote(intent.value)
 
 
@@ -146,6 +204,8 @@ class WriteOffListReduce(
             )
         else {
             val domain = mainList.items.find { it.id == id }
+            // Сырьё переработки открывается всей переработкой
+            domain?.recyclingId?.let { return copy(recyclingDetailId = it) }
             copy(
                 bottomSheetState = bottomSheetState.copy(
                     isOpenDetail = domain?.let { true } ?: false),
@@ -164,6 +224,8 @@ class WriteOffListReduce(
             )
         else {
             val domain = mainList.items.find { it.id == id }
+            // Строку сырья нельзя удалить отдельно — только всю переработку
+            domain?.recyclingId?.let { return copy(recyclingDetailId = it) }
             copy(
                 bottomSheetState = bottomSheetState.copy(
                     isOpenProductDelete = domain?.let { true } ?: false),
@@ -182,6 +244,8 @@ class WriteOffListReduce(
                                 || !product.title.isSlash()) &&
                         (template.activeField.isCount || product.count.isNotBlank())
 
+                product.isRecycling -> product.isRecyclingValid()
+
                 else -> product.title.isNotBlank() &&
                         !product.title.isSlash() &&
                         product.count.isNotBlank()
@@ -190,10 +254,65 @@ class WriteOffListReduce(
         return copy(
             currentProduct = currentProduct.copy(
                 errors = currentProduct.errors.copy(
+                    isErrorReadyDate = product.isRecycling && product.isReadyDateBeforeStart(),
                     hasAnyError = baseValid
                 )
             )
         )
+    }
+
+    private fun WriteOffProduct.isReadyDateBeforeStart(): Boolean =
+        recycling.isDelayed && recycling.readyDate.toFormLocalDate().isBefore(date.toFormLocalDate())
+
+    private fun WriteOffProduct.isRecyclingValid(): Boolean =
+        recycling.ingredients.isNotEmpty() &&
+                recycling.ingredients.all { it.title.isNotBlank() && it.count.toConvertZeroDouble() > 0.0 } &&
+                recycling.title.isNotBlank() && !recycling.title.isSlash() &&
+                recycling.count.toConvertZeroDouble() > 0.0 &&
+                !isReadyDateBeforeStart()
+
+    private fun WriteOffListState.updateType(type: WriteOffType): WriteOffListState {
+        val product = currentProduct.product
+        return copy(
+            currentProduct = currentProduct.copy(
+                product = product.copy(
+                    isRecycling = type == WriteOffType.RECYCLING,
+                    status = when (type) {
+                        WriteOffType.OWN_NEEDS -> true
+                        WriteOffType.DISPOSAL -> false
+                        WriteOffType.RECYCLING -> product.status
+                    }
+                )
+            )
+        )
+    }
+
+    private fun WriteOffListState.updateRecycling(transform: (RecyclingForm) -> RecyclingForm): WriteOffListState {
+        val product = currentProduct.product
+        return copy(
+            currentProduct = currentProduct.copy(
+                product = product.copy(recycling = transform(product.recycling))
+            )
+        )
+    }
+
+    private fun WriteOffListState.updateIngredient(
+        key: Long,
+        transform: (RecyclingIngredientForm) -> RecyclingIngredientForm
+    ): WriteOffListState = updateRecycling { form ->
+        form.copy(ingredients = form.ingredients.map { if (it.key == key) transform(it) else it })
+    }
+
+    /** Включая «готово позже», сразу предлагаем следующий день, если дата готовности не позже начала. */
+    private fun WriteOffListState.updateRecyclingDelayed(isDelayed: Boolean): WriteOffListState {
+        val start = currentProduct.product.date.toFormLocalDate()
+        return updateRecycling { form ->
+            val readyDate =
+                if (isDelayed && !form.readyDate.toFormLocalDate().isAfter(start))
+                    start.plusDays(1).toFormString()
+                else form.readyDate
+            form.copy(isDelayed = isDelayed, readyDate = readyDate)
+        }
     }
 
     private fun WriteOffListState.updateEntryBottomSheet(

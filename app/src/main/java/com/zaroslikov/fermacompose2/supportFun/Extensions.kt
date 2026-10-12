@@ -112,6 +112,9 @@ fun dateToday(): String {
     return LocalDate.now().format(formatter)
 }
 
+/** Сегодня в формате `yyyy-MM-dd` — для сравнения дат в SQL. */
+fun todayIso(): String = LocalDate.now().toString()
+
 fun dateTodayNextYear(): String {
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())
     return LocalDate.now().plusYears(1).format(formatter)

@@ -121,7 +121,9 @@ fun <T, B> InventoryBody(
     // Запас снизу, чтобы FAB не перекрывал последнюю карточку.
     // Значение зависит от высоты FAB конкретного экрана, поэтому задаётся вызывающим;
     // дефолт сохраняет прежнее поведение.
-    bottomContentPadding: Dp = 8.dp
+    bottomContentPadding: Dp = 8.dp,
+    /** Первым элементом списка — например, блок «В переработке» раздела списания. */
+    header: (@Composable () -> Unit)? = null
 ) {
     val currentListIsNotEmpty = if (details) {
         itemList.isNotEmpty()
@@ -141,6 +143,7 @@ fun <T, B> InventoryBody(
                 detailCard = detailCard,
                 brieflyCard = brieflyCard,
                 bottomContentPadding = bottomContentPadding,
+                header = header,
             )
         else MessageNoData2(
             modifier = modifier.padding(bottom = 16.dp),
@@ -188,6 +191,7 @@ private fun <T, B> InventoryList(
     detailCard: @Composable (Int, T) -> Unit,
     brieflyCard: @Composable (B) -> Unit,
     bottomContentPadding: Dp = 8.dp,
+    header: (@Composable () -> Unit)? = null,
 ) {
     AnimatedContent(
         targetState = details,
@@ -224,6 +228,7 @@ private fun <T, B> InventoryList(
             contentPadding = PaddingValues(top = 8.dp, bottom = bottomContentPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            header?.let { item(key = "header") { it() } }
             if (targetDetails) {
                 itemsIndexed(itemList) { index, item ->
                     Column(

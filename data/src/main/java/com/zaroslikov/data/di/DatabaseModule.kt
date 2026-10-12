@@ -46,6 +46,8 @@ import com.zaroslikov.data.room.database.migration.MIGRATION_11_12
 import com.zaroslikov.data.room.database.migration.MIGRATION_12_13
 import com.zaroslikov.data.room.database.migration.MIGRATION_13_14
 import com.zaroslikov.data.room.database.migration.MIGRATION_14_15
+import com.zaroslikov.data.room.database.migration.MIGRATION_15_16
+import com.zaroslikov.data.room.dao.RecyclingDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -80,6 +82,7 @@ object DatabaseModule {
             .addMigrations(MIGRATION_12_13)
             .addMigrations(MIGRATION_13_14)
             .addMigrations(MIGRATION_14_15)
+            .addMigrations(MIGRATION_15_16)
             .addCallback(object : RoomDatabase.Callback() {
 
                 override fun onCreate(db: SupportSQLiteDatabase) {
@@ -210,6 +213,12 @@ object DatabaseModule {
     @Singleton
     fun provideWriteOffDao(database: AppDatabase): WriteOffDao {
         return database.writeOffDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRecyclingDao(database: AppDatabase): RecyclingDao {
+        return database.recyclingDao()
     }
 
     @Provides

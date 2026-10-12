@@ -1412,12 +1412,13 @@ fun OutlinedTextTitleSaleNew(
     onCheckedChange: (Boolean) -> Unit = {},
     @StringRes switchTextRes: Int = R.string.support_text_enter_when_applying,
     fontSize: TextUnit = 16.sp, focusRequester: FocusRequester? = null,
+    isBorderCard: Boolean = true,
 ) {
     val focusManager = LocalFocusManager.current
     var category by rememberSaveable { mutableStateOf(productOrigin) }
     var suffix by rememberSaveable { mutableStateOf(Suffix.PIECES) }
 
-    BorderCard {
+    val textField: @Composable () -> Unit = {
         ExposedDropdownMenuPair(
             title = value,
             setTitle = {
@@ -1465,6 +1466,7 @@ fun OutlinedTextTitleSaleNew(
                 intRes = switchTextRes
             )
     }
+    if (isBorderCard) BorderCard { textField() } else textField()
 }
 
 @Composable

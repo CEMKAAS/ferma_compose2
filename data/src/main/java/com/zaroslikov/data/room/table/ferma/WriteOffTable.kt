@@ -24,7 +24,7 @@ import com.zaroslikov.domain.models.enums.Suffix
             childColumns = arrayOf("animal_count_id"),
             onDelete = ForeignKey.CASCADE
         )],
-    indices = [Index("idPT"), Index("animal_count_id")]
+    indices = [Index("idPT"), Index("animal_count_id"), Index("recycling_id")]
 )
 data class WriteOffTable(
     @PrimaryKey(autoGenerate = true)
@@ -58,5 +58,8 @@ data class WriteOffTable(
     @ColumnInfo(name = "idPT")
     val idPT: Long,
     @ColumnInfo(name = "animal_count_id")
-    val animalCountId: Long? = null
+    val animalCountId: Long? = null,
+    /** Сырьё переработки (recycling_table._id). Без FK: строки удаляются вместе с переработкой в RecyclingDao. */
+    @ColumnInfo(name = "recycling_id")
+    val recyclingId: Long? = null
 )
