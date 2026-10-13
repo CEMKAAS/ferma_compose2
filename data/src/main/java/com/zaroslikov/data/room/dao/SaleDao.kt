@@ -61,6 +61,15 @@ interface SaleDao {
     @Query("SELECT * from sale_table Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC")
     fun getBrieflyDetailsItemSale(id: Long, name: String): Flow<List<SaleTable>>
 
+    /** Доска продукции: продажи именно продукта (не животных), как в складских остатках. */
+    @Query(
+        "SELECT * FROM sale_table" +
+                " WHERE idPT=:id AND title=:name" +
+                " AND animal_id IS NULL AND animal_count_id IS NULL AND product_origin = 0" +
+                " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) ASC, _id ASC"
+    )
+    fun getTraceSaleList(id: Long, name: String): Flow<List<SaleTable>>
+
 
     @Query(
         "SELECT DISTINCT a.title, a.count_suffix AS suffix, 0 AS product_origin FROM add_table a WHERE a.idPT=:id  " +

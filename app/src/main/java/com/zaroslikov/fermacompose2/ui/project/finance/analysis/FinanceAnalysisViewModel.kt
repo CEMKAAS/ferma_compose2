@@ -84,6 +84,7 @@ class FinanceAnalysisViewModel @Inject constructor(
             updateState {
                 it.copy(
                     isLoading = true,
+                    idPT = itemId,
                     titleProduct = titleProduct,
                     baseSuffix = baseSuffix
                 )
@@ -137,6 +138,7 @@ class FinanceAnalysisViewModel @Inject constructor(
                     updateState {
                         it.copy(
                             isLoading = false,
+                            idPT = itemId,
                             titleProduct = titleProduct,
                             buyers = newState.buyers,
                             animalProducer = newState.animalProducer,

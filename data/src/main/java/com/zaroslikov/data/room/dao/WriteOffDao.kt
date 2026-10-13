@@ -58,6 +58,15 @@ interface WriteOffDao {
     @Query("SELECT * from write_off_table Where idPT=:id and title =:name ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC")
     fun getBrieflyDetailsItemWriteOff(id: Long, name: String): Flow<List<WriteOffTable>>
 
+    /** Доска продукции: все списания продукта, включая сырьё переработки (`recycling_id`). */
+    @Query(
+        "SELECT * FROM write_off_table" +
+                " WHERE idPT=:id AND title=:name" +
+                " AND animal_count_id IS NULL AND product_origin = 0" +
+                " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) ASC, _id ASC"
+    )
+    fun getTraceWriteOffList(id: Long, name: String): Flow<List<WriteOffTable>>
+
     @Query(
         "SELECT * FROM write_off_table" +
                 " WHERE idPT=:id AND title =:name AND status = 1 AND recycling_id IS NULL AND price IS NOT NULL" +

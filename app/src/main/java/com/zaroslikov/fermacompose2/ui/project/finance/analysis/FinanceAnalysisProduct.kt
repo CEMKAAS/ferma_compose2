@@ -4,6 +4,11 @@ package com.zaroslikov.fermacompose2.ui.project.finance.analysis
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -112,6 +117,7 @@ object FinanceAnalysisDestination : NavigationDestination {
 @Composable
 fun FinanceAnalysisProduct(
     navigateBack: () -> Unit,
+    navigateToTraceBoard: (Triple<Long, String, Suffix>) -> Unit,
     viewModel: FinanceAnalysisViewModel = hiltViewModel()
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -144,6 +150,9 @@ fun FinanceAnalysisProduct(
                 modifier = Modifier
                     .modifierScreen(innerPadding),
                 state = state,
+                onTraceBoardClick = {
+                    navigateToTraceBoard(Triple(state.idPT, state.titleProduct, state.baseSuffix))
+                },
                 onCharSelectionClick = {
                     viewModel.onIntent(FinanceAnalysisIntent.CharSelectionClicked(it))
                 }
@@ -167,6 +176,7 @@ fun FinanceAnalysisContainer(
     modifier: Modifier,
     state: FinanceAnalysisState,
     priceSuffix: Suffix = state.settings.currencySuffix,
+    onTraceBoardClick: () -> Unit,
     onCharSelectionClick: (FinanceAnalysisEnum) -> Unit
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -175,7 +185,8 @@ fun FinanceAnalysisContainer(
             stock = state.stock,
             suffix = state.baseSuffix,
             averagePrice = state.averagePrice,
-            priceSuffix = priceSuffix
+            priceSuffix = priceSuffix,
+            onTraceBoardClick = onTraceBoardClick
         )
         FinanceAnalysisCard(
             financeCategory2 = state.financeAnalysis,
@@ -209,7 +220,8 @@ private fun AnalysisMainCard(
     stock: Double,
     suffix: Suffix,
     averagePrice: Double,
-    priceSuffix: Suffix
+    priceSuffix: Suffix,
+    onTraceBoardClick: () -> Unit
 ) {
     BigColorCard(
         glowColor = price_green,
@@ -251,6 +263,35 @@ private fun AnalysisMainCard(
                 titleRes = R.string.analysis_screen_average_price,
                 value = averagePrice,
                 suffix = priceSuffix
+            )
+        }
+        // Переход на доску продукции: откуда продукт пришёл и куда ушёл
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0x33FFFFFF))
+                .clickable { onTraceBoardClick() }
+                .padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.icon_group),
+                contentDescription = null,
+                tint = white,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = stringResource(R.string.trace_board_button),
+                style = text_14,
+                color = white
+            )
+            Icon(
+                painter = painterResource(R.drawable.baseline_arrow_outward_24),
+                contentDescription = null,
+                tint = white,
+                modifier = Modifier.size(16.dp)
             )
         }
     }

@@ -53,7 +53,7 @@ data class WriteOffTable(
     @ColumnInfo(name = "year")
     val year: Int, // время
     @ColumnInfo(name = "status")
-    val status: Boolean, //0-на собственные 1-утиль
+    val status: Boolean, // true (1) — на собственные нужды, false (0) — утилизация; сырьё переработки определяется по recycling_id
     val note: String,
     @ColumnInfo(name = "idPT")
     val idPT: Long,

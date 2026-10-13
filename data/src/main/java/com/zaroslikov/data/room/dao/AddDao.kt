@@ -16,6 +16,7 @@ import com.zaroslikov.data.room.dto.add.TitleAndSuffixDto
 import com.zaroslikov.data.room.dto.finance.AnimalWitchCountAndImageDto
 import com.zaroslikov.data.room.dto.sale.CountSuffixPriceDateDto
 import com.zaroslikov.data.room.dto.shared.CountSuffixDto
+import com.zaroslikov.data.room.dto.trace.TraceProductionDto
 import com.zaroslikov.data.room.table.ferma.AddTable
 import kotlinx.coroutines.flow.Flow
 
@@ -109,6 +110,34 @@ interface AddDao {
                 " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC"
     )
     fun getBrieflyDetailsItemAdd(id: Long, name: String): Flow<List<AddItemDto2>>
+
+    /** Доска продукции: все записи производства продукта с данными животного-производителя. */
+    @Query(
+        "SELECT" +
+                " a._id," +
+                " a.count," +
+                " a.count_suffix," +
+                " a.day," +
+                " a.month," +
+                " a.year," +
+                " a.price," +
+                " a.price_suffix," +
+                " a.animal_id," +
+                " at.name AS animal_name," +
+                " at.type AS animal_type," +
+                " at.breed AS animal_breed," +
+                " at.is_group AS animal_is_group," +
+                " at.sex AS animal_sex," +
+                " at.herd_id AS animal_herd_id," +
+                " at.icon AS animal_icon," +
+                " at.image_path AS animal_image_path," +
+                " a.note" +
+                " FROM add_table a" +
+                " LEFT JOIN animal_table at ON at.id = a.animal_id" +
+                " WHERE a.idPT=:id AND a.title=:name" +
+                " ORDER BY DATE(printf('%04d-%02d-%02d', a.year, a.month, a.day)) ASC, a._id ASC"
+    )
+    fun getTraceAddList(id: Long, name: String): Flow<List<TraceProductionDto>>
 
     @Query(
         "SELECT title," +

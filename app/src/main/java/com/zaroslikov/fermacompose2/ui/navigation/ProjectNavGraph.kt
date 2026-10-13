@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.navigation
 
+import android.net.Uri
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,11 +12,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zaroslikov.crm.ui.navigation.CrmDestination
 import com.zaroslikov.crm.ui.navigation.crmNavGraph
+import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
 import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisDestination
 import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisProduct
 import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceCategoryScreen2
+import com.zaroslikov.fermacompose2.ui.project.finance.traceBoard.TraceBoardDestination
+import com.zaroslikov.fermacompose2.ui.project.finance.traceBoard.TraceBoardScreen
 import com.zaroslikov.fermacompose2.ui.project.finance.category.FinanceIncomeExpensesDestination
 import com.zaroslikov.fermacompose2.ui.project.mainScreen.MainProjectsDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.workspace.HomeDestination
@@ -82,16 +86,7 @@ fun ProjectNavHost(
                 },
                 navigateToEdit = { rootNavController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
-                navigationToAnalysis = {
-                    navController.navigate(
-                        nav(
-                            FinanceAnalysisDestination.route,
-                            it.first.toString(),
-                            it.second,
-                            it.third.toString()
-                        )
-                    )
-                },
+                navigationToAnalysis = { navController.navigateToAnalysis(it) },
                 navigationToNewYear = {}
             )
         }
@@ -155,7 +150,27 @@ fun ProjectNavHost(
                     type = NavType.StringType
                 })
         ) {
-            FinanceAnalysisProduct(navigateBack = { navController.popBackStack() })
+            FinanceAnalysisProduct(
+                navigateBack = { navController.popBackStack() },
+                navigateToTraceBoard = { navController.navigateToTraceBoard(it) }
+            )
+        }
+        composable(
+            route = TraceBoardDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(TraceBoardDestination.itemIdArg) {
+                    type = NavType.LongType
+                }, navArgument(TraceBoardDestination.itemIdArgTwo) {
+                    type = NavType.StringType
+                },
+                navArgument(TraceBoardDestination.itemIdArgTree) {
+                    type = NavType.StringType
+                })
+        ) {
+            TraceBoardScreen(
+                navigateBack = { navController.popBackStack() },
+                navigateToTraceBoard = { navController.navigateToTraceBoard(it) }
+            )
         }
 
         // Section
@@ -186,16 +201,7 @@ fun ProjectNavHost(
                         )
                     )
                 },
-                navigationToAnalysis = {
-                    navController.navigate(
-                        nav(
-                            FinanceAnalysisDestination.route,
-                            it.first.toString(),
-                            it.second,
-                            it.third.toString()
-                        )
-                    )
-                },
+                navigationToAnalysis = { navController.navigateToAnalysis(it) },
                 navigateToItemProject = { navController.navigate("${MainProjectsDestination.route}/${it.first}?${MainProjectsDestination.templateArg}=${it.second}") },
             )
         }
@@ -470,3 +476,30 @@ fun ProjectNavHost(
     }
 }
 
+
+/** Анализ продукта: название кодируется — в нём могут быть «/», «?», «%» и т. п. */
+private fun NavController.navigateToAnalysis(product: Triple<Long, String, Suffix>) {
+    if (product.second.isBlank()) return
+    navigate(
+        nav(
+            FinanceAnalysisDestination.route,
+            product.first.toString(),
+            Uri.encode(product.second),
+            product.third.toString()
+        )
+    )
+}
+
+/** Доска продукции: название продукта кодируется — в нём могут быть «/», пробелы и т. п. */
+private fun NavController.navigateToTraceBoard(product: Triple<Long, String, Suffix>) {
+    // Пустое название дало бы маршрут «traceBoard/1//KG», который не совпадает ни с одним экраном
+    if (product.second.isBlank()) return
+    navigate(
+        nav(
+            TraceBoardDestination.route,
+            product.first.toString(),
+            Uri.encode(product.second),
+            product.third.toString()
+        )
+    )
+}

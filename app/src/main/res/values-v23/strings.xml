@@ -1893,4 +1893,76 @@
     <string name="snackbar_recycling_add_ready">Переработано: %1$s %2$s %3$s</string>
     <string name="snackbar_recycling_complete">Продукция готова: %1$s %2$s %3$s</string>
     <string name="snackbar_recycling_delete">Переработка удалена: %1$s</string>
+
+    <!-- Доска продукции -->
+    <string name="trace_board_button">Доска продукции</string>
+    <string name="trace_board_title_s">Доска: %s</string>
+    <string name="trace_board_produced_s">Произведено: %s</string>
+    <string name="trace_board_stock_s">Сейчас на складе: %s</string>
+    <string name="trace_board_hub_sale">Продажи</string>
+    <string name="trace_board_hub_own_needs">Собственные нужды</string>
+    <string name="trace_board_hub_disposal">Утилизация</string>
+    <string name="trace_board_hub_recycling">Переработка</string>
+    <string name="trace_board_source_no_animal">Животное не указано</string>
+    <string name="trace_board_source_animal_deleted">Животное удалено</string>
+    <string name="trace_board_source_group">группа</string>
+    <string name="trace_board_no_buyer">Без покупателя</string>
+    <plurals name="trace_board_operations">
+        <item quantity="one">%d операция</item>
+        <item quantity="few">%d операции</item>
+        <item quantity="many">%d операций</item>
+        <item quantity="other">%d операции</item>
+    </plurals>
+    <plurals name="trace_board_records">
+        <item quantity="one">%d запись</item>
+        <item quantity="few">%d записи</item>
+        <item quantity="many">%d записей</item>
+        <item quantity="other">%d записи</item>
+    </plurals>
+    <plurals name="trace_board_batches">
+        <item quantity="one">%d партия</item>
+        <item quantity="few">%d партии</item>
+        <item quantity="many">%d партий</item>
+        <item quantity="other">%d партии</item>
+    </plurals>
+    <string name="trace_board_batch_from_s">Партия от %s</string>
+    <string name="trace_board_batch_deleted">Партия удалена</string>
+    <string name="trace_board_ready">Готово</string>
+    <string name="trace_board_ready_until_s">Зреет до %s</string>
+    <string name="trace_board_ripening">Зреет</string>
+    <string name="trace_board_open_board">Открыть доску продукта</string>
+    <string name="trace_board_open_board_short">Открыть доску →</string>
+    <string name="trace_board_legend_production">Производство</string>
+    <string name="trace_board_summary_produced">Произведено</string>
+    <string name="trace_board_summary_sold">Продано</string>
+    <string name="trace_board_summary_disposal">Списано</string>
+    <string name="trace_board_summary_recycled">Переработано</string>
+    <string name="trace_board_summary_own_needs">Свои нужды</string>
+    <string name="trace_board_legend_title">Легенда</string>
+    <string name="trace_board_summary_stock">На складе</string>
+    <string name="trace_board_summary_title">Сводка</string>
+    <string name="trace_board_full_screen">На весь экран</string>
+    <string name="trace_board_full_screen_exit">Выйти из полноэкранного режима</string>
+    <string name="trace_board_operation_write_off">Списание</string>
+    <string name="trace_board_legend_operations">Операций</string>
+    <string name="trace_board_legend_sale">Продажи</string>
+    <string name="trace_board_legend_own_needs">Собств. нужды</string>
+    <string name="trace_board_legend_disposal">Утилизация</string>
+    <string name="trace_board_legend_recycling">Переработка</string>
+    <string name="trace_board_legend_result">Новый продукт</string>
+    <string name="trace_board_legend_ingredient">Сырьё</string>
+    <string name="trace_board_legend_product">Продукт</string>
+    <string name="trace_board_detail_date">Дата</string>
+    <string name="trace_board_detail_count">Количество</string>
+    <string name="trace_board_detail_price">Цена</string>
+    <string name="trace_board_detail_sum">Сумма</string>
+    <string name="trace_board_detail_buyer">Покупатель</string>
+    <string name="trace_board_detail_animal">Животное</string>
+    <string name="trace_board_detail_note">Заметка</string>
+    <string name="trace_board_detail_status">Статус</string>
+    <string name="trace_board_detail_category">Категория</string>
+    <string name="trace_board_zoom_in">Приблизить</string>
+    <string name="trace_board_zoom_out">Отдалить</string>
+    <string name="trace_board_center">По центру</string>
+    <string name="trace_board_empty">Операций по продукту пока нет — доска покажет их, как только появятся производство, продажи или списания.</string>
 </resources>

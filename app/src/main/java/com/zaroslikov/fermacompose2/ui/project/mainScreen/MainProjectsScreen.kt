@@ -1,6 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.project.mainScreen
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +16,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -51,10 +61,17 @@ fun MainProjectScreen(
 
     val startDestination = if (ioOpenTemplate) Destination.MAGAZINE else Destination.WAREHOUSE
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
+    // Экран внутри проекта (доска продукции) может спрятать нижний бар — режим «на весь экран»
+    val hideBottomBar = remember { mutableStateOf(false) }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         bottomBar = {
+            AnimatedVisibility(
+                visible = !hideBottomBar.value,
+                enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+                exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+            ) {
             Column {
                 HorizontalDivider(thickness = 1.dp, color = gray_6)
                 NavigationBar(
@@ -87,17 +104,26 @@ fun MainProjectScreen(
                     }
                 }
             }
+            }
         }
     ) { contentPadding ->
-        ProjectNavHost(
-            modifier = Modifier.padding(contentPadding),
-            isOpenTemplate = ioOpenTemplate,
-            rootNavController = rootNavController,
-            navController = projectNavController,
-            itemPT = itemPT
-        )
+        CompositionLocalProvider(LocalHideProjectBottomBar provides hideBottomBar) {
+            ProjectNavHost(
+                modifier = Modifier.padding(contentPadding),
+                isOpenTemplate = ioOpenTemplate,
+                rootNavController = rootNavController,
+                navController = projectNavController,
+                itemPT = itemPT
+            )
+        }
     }
 }
+
+/**
+ * Флаг «спрятать нижний бар проекта». Экран внутри [ProjectNavHost] (доска продукции в режиме
+ * «на весь экран») выставляет его в true и обязан сбросить при уходе с экрана.
+ */
+val LocalHideProjectBottomBar = compositionLocalOf<MutableState<Boolean>?> { null }
 
 
 enum class Destination {

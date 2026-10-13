@@ -27,6 +27,8 @@ import com.zaroslikov.data.room.repository.TimeNotificationProjectRepositoryImpl
 import com.zaroslikov.data.room.repository.WarehouseRepositoryImpl
 import com.zaroslikov.data.room.repository.WriteOffRepositoryImpl
 import com.zaroslikov.data.room.repository.RecyclingRepositoryImpl
+import com.zaroslikov.data.room.repository.ProductTraceRepositoryImpl
+import com.zaroslikov.domain.repository.ProductTraceRepository
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.AnimalCountRepository
 import com.zaroslikov.domain.repository.AnimalHerdRepository
@@ -145,6 +147,10 @@ abstract class RoomRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindRecyclingRepository(recyclingRepositoryImpl: RecyclingRepositoryImpl): RecyclingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProductTraceRepository(productTraceRepositoryImpl: ProductTraceRepositoryImpl): ProductTraceRepository
 
     @Binds
     @Singleton
