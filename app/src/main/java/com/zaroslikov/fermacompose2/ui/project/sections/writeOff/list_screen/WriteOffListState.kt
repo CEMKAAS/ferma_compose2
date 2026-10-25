@@ -30,13 +30,14 @@ import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.QrCodeWa
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_2
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingForm
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.findRecycling
 
 data class WriteOffListState(
     val idPT: Long = 0,
     val productDetail: DomainWriteOffTable? = null,
     val isNotProduction: Boolean = false,
-    /** Переработки проекта со своим сырьём; незавершённые — блок «В переработке». */
+    /** Партии переработки проекта с продукцией и сырьём; незавершённая продукция — блок «В переработке». */
     val recyclingItems: List<RecyclingItem> = emptyList(),
     val recyclingDetailId: Long? = null,
     val isOpenRecyclingDelete: Boolean = false,
@@ -58,8 +59,7 @@ data class WriteOffListState(
     override val qrCodeWarning: QrCodeWarning = QrCodeWarning()
 ) : SectionState
 
-fun WriteOffListState.recyclingDetail(): RecyclingItem? =
-    recyclingDetailId?.let { id -> recyclingItems.find { it.recycling.id == id } }
+fun WriteOffListState.recyclingDetail(): RecyclingItem? = recyclingItems.findRecycling(recyclingDetailId)
 
 data class WriteOffUiState(
     override val colors: List<Color> = listOf(violet_1, violet_2),
@@ -129,7 +129,6 @@ data class WriteOffError(
     override val isErrorTitle: Boolean = false,
     override val isErrorSlash: Boolean = false,
     override val isErrorCount: Boolean = false,
-    val isErrorReadyDate: Boolean = false,
     override val hasAnyError: Boolean = false
 ) : ProductError
 

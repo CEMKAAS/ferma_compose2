@@ -28,7 +28,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -122,7 +124,7 @@ fun <T, B> InventoryBody(
     // Значение зависит от высоты FAB конкретного экрана, поэтому задаётся вызывающим;
     // дефолт сохраняет прежнее поведение.
     bottomContentPadding: Dp = 8.dp,
-    /** Первым элементом списка — например, блок «В переработке» раздела списания. */
+    /** Первым элементом списка — например, блок «В переработке» списаний и «Продукции». */
     header: (@Composable () -> Unit)? = null
 ) {
     val currentListIsNotEmpty = if (details) {
@@ -160,17 +162,28 @@ fun <T, B> InventoryBody(
 
         val supportSecondTextArchive =
             if (isArchive) R.string.message_no_data_message_archive_project else support
-        MessageNoData2(
-            modifier = modifier.padding(bottom = 16.dp),
-            titleRes = titleRes,
-            messageRes = messageRes,
-            supportSecondText = supportSecondTextArchive,
-            iconRes = icon,
-            iconSize = iconSize,
-            iconColor = iconColor,
-            backgroundColor = backgroundColor,
-            isBorderCard = isBorderCard
-        )
+        val emptyState: @Composable (Modifier) -> Unit = {
+            MessageNoData2(
+                modifier = it.padding(bottom = 16.dp),
+                titleRes = titleRes,
+                messageRes = messageRes,
+                supportSecondText = supportSecondTextArchive,
+                iconRes = icon,
+                iconSize = iconSize,
+                iconColor = iconColor,
+                backgroundColor = backgroundColor,
+                isBorderCard = isBorderCard
+            )
+        }
+        // Шапка видна и в пустом списке: продукция «В переработке» есть ещё до первой записи
+        if (header == null) emptyState(modifier)
+        else Column(
+            modifier = modifier.verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            header()
+            emptyState(Modifier)
+        }
     }
 }
 

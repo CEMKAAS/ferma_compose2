@@ -8,6 +8,7 @@ import com.zaroslikov.domain.models.table.template.DomainTemplateTable
 import com.zaroslikov.fermacompose2.base.intent.BaseIntent
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
 
 sealed class AddListIntent : BaseIntent {
 
@@ -60,6 +61,13 @@ sealed class AddListIntent : BaseIntent {
     data class AnimalClear(val value: String) : AddListIntent()
     data class NoteChanged(val value: String) : AddListIntent()
     data class SearchChanged(val value: String) : AddListIntent()
+
+    //Recycling
+    data class RecyclingLoaded(val value: List<RecyclingItem>) : AddListIntent()
+    data class OpenRecyclingDetail(val id: Long?) : AddListIntent()
+    data class OpenRecyclingDelete(val value: Boolean) : AddListIntent()
+    data class CompleteRecyclingProduct(val productId: Long) : AddListIntent()
+    data object DeleteRecycling : AddListIntent()
 
     data object Insert : AddListIntent()
     data object Update : AddListIntent()

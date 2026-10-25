@@ -21,6 +21,7 @@ import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.models.table.DomainRecycling
+import com.zaroslikov.domain.models.table.DomainRecyclingProduct
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.models.table.incubator.DomainTimeNotificationIncubator
 import com.zaroslikov.domain.models.table.profile.DomainProfileTable
@@ -50,8 +51,10 @@ data class BackupData(
     val addTable: List<DomainAddTable> = emptyList(),
     val saleTable: List<DomainSaleTable> = emptyList(),
     val writeOff: List<DomainWriteOffTable> = emptyList(),
-    /** Переработки (с версии схемы 16); в старых бэкапах поля нет. */
+    /** Партии переработки (с версии схемы 16); в старых бэкапах поля нет. */
     val recyclingTable: List<DomainRecycling> = emptyList(),
+    /** Продукция партий переработки (с версии схемы 17); в старых бэкапах поля нет. */
+    val recyclingProductTable: List<DomainRecyclingProduct> = emptyList(),
     val expensesTable: List<DomainExpensesTable> = emptyList(),
     val noteTable: List<DomainNoteTable> = emptyList(),
 

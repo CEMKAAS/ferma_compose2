@@ -29,11 +29,17 @@ import com.zaroslikov.fermacompose2.supportFun.dateToday
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.findRecycling
 import kotlinx.serialization.Serializable
 
 data class AddListState(
     val idPT: Long = 0,
     val productDetail: DomainAddItemDto2? = null,
+    /** Партии переработки: незавершённая продукция — блок «В переработке» над списком. */
+    val recyclingItems: List<RecyclingItem> = emptyList(),
+    val recyclingDetailId: Long? = null,
+    val isOpenRecyclingDelete: Boolean = false,
 
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,
@@ -51,6 +57,8 @@ data class AddListState(
     override val qrCodeState: QrCodeData? = null,
     override val qrCodeWarning: QrCodeWarning = QrCodeWarning()
 ) : SectionState
+
+fun AddListState.recyclingDetail(): RecyclingItem? = recyclingItems.findRecycling(recyclingDetailId)
 
 data class AddUiState(
     override val colors: List<Color> = listOf(price_green, green_shamrock),

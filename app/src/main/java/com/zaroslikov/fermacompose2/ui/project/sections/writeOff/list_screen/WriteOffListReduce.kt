@@ -19,6 +19,9 @@ import com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen.Template
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingForm
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingIngredientForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingProductForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingReadyMode
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.isValid
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.WriteOffType
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormLocalDate
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormString
@@ -70,24 +73,39 @@ class WriteOffListReduce(
             is WriteOffListIntent.RecyclingIngredientWarehouse ->
                 state.updateIngredient(intent.key) { it.copy(warehouseList = intent.value) }
 
-            is WriteOffListIntent.RecyclingTitleChanged ->
-                state.updateRecycling { it.copy(title = intent.value) }.updateValid()
+            is WriteOffListIntent.RecyclingAddProduct -> state.updateRecycling {
+                it.copy(
+                    products = it.products + RecyclingProductForm(key = it.nextKey),
+                    nextKey = it.nextKey + 1
+                )
+            }.updateValid()
 
-            is WriteOffListIntent.RecyclingTitleAndSuffix -> state.updateRecycling {
+            is WriteOffListIntent.RecyclingRemoveProduct -> state.updateRecycling {
+                it.copy(products = it.products.filterNot { product -> product.key == intent.key })
+            }.updateValid()
+
+            is WriteOffListIntent.RecyclingProductTitle ->
+                state.updateProduct(intent.key) { it.copy(title = intent.value) }.updateValid()
+
+            is WriteOffListIntent.RecyclingProductTitleAndSuffix -> state.updateProduct(intent.key) {
                 it.copy(title = intent.title, countSuffix = intent.suffix)
             }.updateValid()
 
-            is WriteOffListIntent.RecyclingCountChanged ->
-                state.updateRecycling { it.copy(count = intent.value) }.updateValid()
+            is WriteOffListIntent.RecyclingProductCount ->
+                state.updateProduct(intent.key) { it.copy(count = intent.value) }.updateValid()
 
-            is WriteOffListIntent.RecyclingSuffixClicked ->
-                state.updateRecycling { it.copy(countSuffix = intent.value) }
+            is WriteOffListIntent.RecyclingProductSuffix ->
+                state.updateProduct(intent.key) { it.copy(countSuffix = intent.value) }
 
-            is WriteOffListIntent.RecyclingDelayedClicked ->
-                state.updateRecyclingDelayed(intent.value).updateValid()
+            is WriteOffListIntent.RecyclingProductReadyMode ->
+                state.updateProductReadyMode(intent.key, intent.value).updateValid()
 
-            is WriteOffListIntent.RecyclingReadyDateClicked ->
-                state.updateRecycling { it.copy(readyDate = intent.value) }.updateValid()
+            is WriteOffListIntent.RecyclingProductDays ->
+                state.updateProduct(intent.key) { it.copy(days = intent.value.filter(Char::isDigit)) }
+                    .updateValid()
+
+            is WriteOffListIntent.RecyclingProductReadyDate ->
+                state.updateProduct(intent.key) { it.copy(readyDate = intent.value) }.updateValid()
 
             is WriteOffListIntent.OpenRecyclingDetail ->
                 state.copy(recyclingDetailId = intent.id, isOpenRecyclingDelete = false)
@@ -253,23 +271,16 @@ class WriteOffListReduce(
             }
         return copy(
             currentProduct = currentProduct.copy(
-                errors = currentProduct.errors.copy(
-                    isErrorReadyDate = product.isRecycling && product.isReadyDateBeforeStart(),
-                    hasAnyError = baseValid
-                )
+                errors = currentProduct.errors.copy(hasAnyError = baseValid)
             )
         )
     }
 
-    private fun WriteOffProduct.isReadyDateBeforeStart(): Boolean =
-        recycling.isDelayed && recycling.readyDate.toFormLocalDate().isBefore(date.toFormLocalDate())
-
     private fun WriteOffProduct.isRecyclingValid(): Boolean =
         recycling.ingredients.isNotEmpty() &&
                 recycling.ingredients.all { it.title.isNotBlank() && it.count.toConvertZeroDouble() > 0.0 } &&
-                recycling.title.isNotBlank() && !recycling.title.isSlash() &&
-                recycling.count.toConvertZeroDouble() > 0.0 &&
-                !isReadyDateBeforeStart()
+                recycling.products.isNotEmpty() &&
+                recycling.products.all { it.isValid(date) }
 
     private fun WriteOffListState.updateType(type: WriteOffType): WriteOffListState {
         val product = currentProduct.product
@@ -303,15 +314,25 @@ class WriteOffListReduce(
         form.copy(ingredients = form.ingredients.map { if (it.key == key) transform(it) else it })
     }
 
-    /** Включая «готово позже», сразу предлагаем следующий день, если дата готовности не позже начала. */
-    private fun WriteOffListState.updateRecyclingDelayed(isDelayed: Boolean): WriteOffListState {
+    private fun WriteOffListState.updateProduct(
+        key: Long,
+        transform: (RecyclingProductForm) -> RecyclingProductForm
+    ): WriteOffListState = updateRecycling { form ->
+        form.copy(products = form.products.map { if (it.key == key) transform(it) else it })
+    }
+
+    /** Переходя к «К дате», сразу предлагаем следующий день, если дата готовности не позже начала. */
+    private fun WriteOffListState.updateProductReadyMode(
+        key: Long,
+        mode: RecyclingReadyMode
+    ): WriteOffListState {
         val start = currentProduct.product.date.toFormLocalDate()
-        return updateRecycling { form ->
+        return updateProduct(key) { product ->
             val readyDate =
-                if (isDelayed && !form.readyDate.toFormLocalDate().isAfter(start))
+                if (mode == RecyclingReadyMode.DATE && !product.readyDate.toFormLocalDate().isAfter(start))
                     start.plusDays(1).toFormString()
-                else form.readyDate
-            form.copy(isDelayed = isDelayed, readyDate = readyDate)
+                else product.readyDate
+            product.copy(readyMode = mode, readyDate = readyDate)
         }
     }
 

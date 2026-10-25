@@ -171,6 +171,7 @@ class SettingsViewModel @Inject constructor(
             val saleTable = saleRepository.getAllSaleTableForExport().first()
             val writeOffTable = writeOffRepository.getAllWriteOffTableForExport().first()
             val recyclingTable = recyclingRepository.getAllRecyclingForExport().first()
+            val recyclingProductTable = recyclingRepository.getAllRecyclingProductsForExport().first()
             val expensesTable = expensesRepository.getAllExpensesTableForExport().first()
             val noteTable = noteRepository.getAllNoteTableForExport().first()
 
@@ -220,6 +221,7 @@ class SettingsViewModel @Inject constructor(
                 saleTable = saleTable,
                 writeOff = writeOffTable,
                 recyclingTable = recyclingTable,
+                recyclingProductTable = recyclingProductTable,
                 expensesTable = expensesTable,
                 expensesAnimal = expensesAnimalTable,
                 noteTable = noteTable,
@@ -310,7 +312,10 @@ class SettingsViewModel @Inject constructor(
                 addRepository.clearAndInsertAddTableForImport(backup.addTable)
                 saleRepository.clearAndInsertSaleTableForImport(backup.saleTable)
                 writeOffRepository.clearAndInsertWriteOffTableForImport(backup.writeOff)
-                recyclingRepository.clearAndInsertRecyclingForImport(backup.recyclingTable)
+                recyclingRepository.clearAndInsertRecyclingForImport(
+                    backup.recyclingTable,
+                    backup.recyclingProductTable
+                )
                 noteRepository.clearAndInsertNoteTableForImport(backup.noteTable)
                 expensesAnimalRepository.clearAndInsertExpensesAnimalTableForImport(backup.expensesAnimal)
 

@@ -4,9 +4,12 @@ import com.zaroslikov.data.room.dao.RecyclingDao
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.table.DomainRecycling
+import com.zaroslikov.domain.models.table.DomainRecyclingProduct
+import com.zaroslikov.domain.models.table.DomainRecyclingWithProducts
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.RecyclingRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import javax.inject.Inject
@@ -18,30 +21,55 @@ class RecyclingRepositoryImpl @Inject constructor(
     override fun getAllRecyclingForExport(): Flow<List<DomainRecycling>> =
         recyclingDao.getAllRecyclingForExport().map { list -> list.map { it.toDomainMap() } }
 
-    override suspend fun clearAndInsertRecyclingForImport(list: List<DomainRecycling>) =
-        recyclingDao.clearAndInsertRecyclingForImport(list.map { it.toRoomMap() })
+    override fun getAllRecyclingProductsForExport(): Flow<List<DomainRecyclingProduct>> =
+        recyclingDao.getAllRecyclingProductsForExport().map { list -> list.map { it.toDomainMap() } }
 
-    override fun getRecyclingList(idPT: Long): Flow<List<DomainRecycling>> =
-        recyclingDao.getRecyclingList(idPT).map { list -> list.map { it.toDomainMap() } }
+    override suspend fun clearAndInsertRecyclingForImport(
+        list: List<DomainRecycling>,
+        products: List<DomainRecyclingProduct>
+    ) = recyclingDao.clearAndInsertRecyclingForImport(
+        list.map { it.toRoomMap() },
+        products.map { it.toRoomMap() }
+    )
+
+    override fun getRecyclingList(idPT: Long): Flow<List<DomainRecyclingWithProducts>> =
+        combine(
+            recyclingDao.getRecyclingList(idPT),
+            recyclingDao.getRecyclingProductList(idPT),
+            recyclingDao.getIngredientList(idPT)
+        ) { recyclingList, productList, ingredientList ->
+            val products = productList.groupBy { it.recyclingId }
+            val ingredients = ingredientList.groupBy { it.recyclingId }
+            recyclingList.map { recycling ->
+                DomainRecyclingWithProducts(
+                    recycling = recycling.toDomainMap(),
+                    products = products[recycling.id].orEmpty().map { it.toDomainMap() },
+                    ingredients = ingredients[recycling.id].orEmpty().map { it.toDomainMap() }
+                )
+            }
+        }
 
     override suspend fun insertRecycling(
         recycling: DomainRecycling,
+        products: List<DomainRecyclingProduct>,
         ingredients: List<DomainWriteOffTable>,
         todayIso: String
     ): Long {
-        val readyDate = recycling.readyYear?.let { year ->
-            LocalDate.of(year, recycling.readyMonth ?: 1, recycling.readyDay ?: 1)
-        }
-        val completeNow = readyDate == null || !readyDate.isAfter(LocalDate.parse(todayIso))
+        val today = LocalDate.parse(todayIso)
         return recyclingDao.insertRecycling(
-            recycling = recycling.copy(isCompleted = false, addId = null).toRoomMap(),
-            ingredients = ingredients.map { it.toRoomMap() },
-            completeNow = completeNow
+            recycling = recycling.toRoomMap(),
+            products = products.map { product ->
+                val readyDate = product.readyYear?.let { year ->
+                    LocalDate.of(year, product.readyMonth ?: 1, product.readyDay ?: 1)
+                }
+                product.toRoomMap() to (readyDate == null || !readyDate.isAfter(today))
+            },
+            ingredients = ingredients.map { it.toRoomMap() }
         )
     }
 
-    override suspend fun completeRecycling(id: Long, day: Int, month: Int, year: Int) =
-        recyclingDao.completeRecycling(id, day, month, year)
+    override suspend fun completeRecyclingProduct(productId: Long, day: Int, month: Int, year: Int) =
+        recyclingDao.completeRecyclingProduct(productId, day, month, year)
 
     override suspend fun completeDueRecycling(todayIso: String) =
         recyclingDao.completeDueRecycling(todayIso)

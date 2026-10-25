@@ -59,11 +59,12 @@ import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BaseSecti
 import com.zaroslikov.fermacompose2.violet_1
 import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.OutlinedWriteOffType
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingDeleteBottomSheet
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingDetailBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDeleteBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDetailBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingInProgressBlock
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.hasInProgress
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingEntryFields
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingInProgressBlock
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingItem
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.WriteOffType
 
 object WriteOffDestination : NavigationDestination {
@@ -158,7 +159,9 @@ fun WriteOffScreen(
                     RecyclingDetailBottomSheet(
                         item = recycling,
                         isArchive = state.isArchive,
-                        onCompleteClick = { viewModel.onIntent(WriteOffListIntent.CompleteRecycling) },
+                        onCompleteClick = {
+                            viewModel.onIntent(WriteOffListIntent.CompleteRecyclingProduct(it))
+                        },
                         onDeleteClick = {
                             viewModel.onIntent(WriteOffListIntent.OpenRecyclingDelete(true))
                         },
@@ -180,7 +183,7 @@ fun WriteOffScreen(
                     color = primeColor,
                     state = state.detailNomenclatura.detail,
                     list = state.detailNomenclatura.productItems,
-                    recyclingTitles = state.recyclingItems.associate { it.recycling.id to it.recycling.title },
+                    recyclingTitles = state.recyclingItems.associate { it.recycling.id to it.title },
                     priceSuffix = priceSuffix,
                     isArchive = state.isArchive,
                     onDismissRequest = {
@@ -324,8 +327,7 @@ private fun WriteOffContainer(
     recyclingItems: List<RecyclingItem>,
     onRecyclingClick: (Long) -> Unit
 ) {
-    val recyclingTitles = recyclingItems.associate { it.recycling.id to it.recycling.title }
-    val inProgress = recyclingItems.filter { !it.recycling.isCompleted }
+    val recyclingTitles = recyclingItems.associate { it.recycling.id to it.title }
     InventoryBody(
         modifier = modifier,
         details = details,
@@ -380,8 +382,8 @@ private fun WriteOffContainer(
         iconColor = violet_1,
         backgroundColor = violet_3,
         isArchive = isArchive,
-        header = if (inProgress.isEmpty()) null else {
-            { RecyclingInProgressBlock(items = inProgress, onClick = onRecyclingClick) }
+        header = if (!recyclingItems.hasInProgress()) null else {
+            { RecyclingInProgressBlock(items = recyclingItems, onClick = onRecyclingClick) }
         }
     )
 }
@@ -505,7 +507,6 @@ private fun WriteOffEntryBottomSheet(
                 date = product.date,
                 rawTitles = state.pickList.titles,
                 productTitles = state.pickList.productTitles,
-                isErrorReadyDate = errors.isErrorReadyDate,
                 onDateChange = { onIntent(WriteOffListIntent.DateClicked(it)) },
                 onAddIngredient = { onIntent(WriteOffListIntent.RecyclingAddIngredient) },
                 onRemoveIngredient = { onIntent(WriteOffListIntent.RecyclingRemoveIngredient(it)) },
@@ -519,14 +520,29 @@ private fun WriteOffEntryBottomSheet(
                 onIngredientCountChange = { key, value ->
                     onIntent(WriteOffListIntent.RecyclingIngredientCount(key, value))
                 },
-                onTitleChange = { onIntent(WriteOffListIntent.RecyclingTitleChanged(it)) },
-                onTitleChoice = {
-                    onIntent(WriteOffListIntent.RecyclingTitleAndSuffix(it.first, it.second))
+                onAddProduct = { onIntent(WriteOffListIntent.RecyclingAddProduct) },
+                onRemoveProduct = { onIntent(WriteOffListIntent.RecyclingRemoveProduct(it)) },
+                onProductTitleChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductTitle(key, value))
                 },
-                onCountChange = { onIntent(WriteOffListIntent.RecyclingCountChanged(it)) },
-                onSuffixChange = { onIntent(WriteOffListIntent.RecyclingSuffixClicked(it)) },
-                onDelayedChange = { onIntent(WriteOffListIntent.RecyclingDelayedClicked(it)) },
-                onReadyDateChange = { onIntent(WriteOffListIntent.RecyclingReadyDateClicked(it)) },
+                onProductTitleChoice = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductTitleAndSuffix(key, value.first, value.second))
+                },
+                onProductCountChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductCount(key, value))
+                },
+                onProductSuffixChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductSuffix(key, value))
+                },
+                onProductReadyModeChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductReadyMode(key, value))
+                },
+                onProductDaysChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductDays(key, value))
+                },
+                onProductReadyDateChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductReadyDate(key, value))
+                },
             )
             OutlinedTextNoteNew(
                 value = product.note,

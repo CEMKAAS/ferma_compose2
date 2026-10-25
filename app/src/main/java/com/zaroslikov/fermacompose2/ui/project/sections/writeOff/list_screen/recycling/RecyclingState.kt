@@ -6,16 +6,15 @@ import androidx.compose.ui.graphics.Color
 import com.zaroslikov.domain.models.dto.shared.DomainCountSuffix
 import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
-import com.zaroslikov.domain.models.table.DomainRecycling
-import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.green_shamrock
 import com.zaroslikov.fermacompose2.supportFun.dateToday
+import com.zaroslikov.fermacompose2.supportFun.isSlash
+import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.violet_1
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 /** «Тип списания» в форме: в БД первые два — `status`, переработка — отдельная запись recycling_table. */
 enum class WriteOffType(
@@ -38,24 +37,24 @@ data class RecyclingIngredientForm(
     val warehouseList: List<DomainCountSuffix> = emptyList()
 )
 
-data class RecyclingForm(
-    val ingredients: List<RecyclingIngredientForm> = listOf(RecyclingIngredientForm(key = 0)),
-    val nextKey: Long = 1,
+/** Когда товар будет готов: сразу, через N дней после переработки или к дате. */
+enum class RecyclingReadyMode { NONE, DAYS, DATE }
+
+/** Одна позиция готовой продукции; [key] — из того же счётчика, что и у сырья. */
+data class RecyclingProductForm(
+    val key: Long,
     val title: String = "",
     val count: String = "",
     val countSuffix: Suffix = Suffix.PIECES,
-    val isDelayed: Boolean = false,
+    val readyMode: RecyclingReadyMode = RecyclingReadyMode.NONE,
+    val days: String = "",
     val readyDate: String = dateToday()
 )
 
-/** Переработка со своим сырьём — для блока «В переработке» и шторки деталей. */
-data class RecyclingItem(
-    val recycling: DomainRecycling,
-    val ingredients: List<DomainWriteOffTable>,
-    /** Сколько дней осталось до готовности; null — без даты или уже завершена. */
-    val daysLeft: Long?,
-    /** Доля прошедшего срока переработки, 0..1. */
-    val progress: Float
+data class RecyclingForm(
+    val ingredients: List<RecyclingIngredientForm> = listOf(RecyclingIngredientForm(key = 0)),
+    val products: List<RecyclingProductForm> = listOf(RecyclingProductForm(key = 1)),
+    val nextKey: Long = 2
 )
 
 private val formFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -65,22 +64,25 @@ fun String.toFormLocalDate(): LocalDate = LocalDate.parse(this, formFormatter)
 
 fun LocalDate.toFormString(): String = format(formFormatter)
 
-fun DomainRecycling.toRecyclingItem(
-    ingredients: List<DomainWriteOffTable>,
-    today: LocalDate = LocalDate.now()
-): RecyclingItem {
-    val start = LocalDate.of(year, month, day)
-    val ready = readyYear?.let { LocalDate.of(it, readyMonth ?: 1, readyDay ?: 1) }
-    val total = ready?.let { ChronoUnit.DAYS.between(start, it) } ?: 0L
-    val progress = when {
-        isCompleted || ready == null || total <= 0L -> 1f
-        else -> (ChronoUnit.DAYS.between(start, today).toFloat() / total).coerceIn(0f, 1f)
-    }
-    return RecyclingItem(
-        recycling = this,
-        ingredients = ingredients,
-        daysLeft = if (isCompleted || ready == null) null
-        else ChronoUnit.DAYS.between(today, ready).coerceAtLeast(0L),
-        progress = progress
-    )
+/** Срок в днях не задан целым числом больше нуля. */
+fun RecyclingProductForm.isErrorDays(): Boolean =
+    readyMode == RecyclingReadyMode.DAYS && (days.toIntOrNull() ?: 0) <= 0
+
+/** Дата готовности раньше даты переработки [start] (`dd.MM.yyyy`). */
+fun RecyclingProductForm.isErrorReadyDate(start: String): Boolean =
+    readyMode == RecyclingReadyMode.DATE && readyDate.toFormLocalDate().isBefore(start.toFormLocalDate())
+
+/** Дата готовности товара; null — поступает на склад сразу. */
+fun RecyclingProductForm.readyLocalDate(start: String): LocalDate? = when (readyMode) {
+    RecyclingReadyMode.NONE -> null
+    RecyclingReadyMode.DAYS -> days.toIntOrNull()?.let { start.toFormLocalDate().plusDays(it.toLong()) }
+    RecyclingReadyMode.DATE -> readyDate.toFormLocalDate()
 }
+
+fun RecyclingProductForm.isValid(start: String): Boolean =
+    title.isNotBlank() && !title.isSlash() && count.toConvertZeroDouble() > 0.0 &&
+            !isErrorDays() && !isErrorReadyDate(start)
+
+/** Названия сырья (trim, без регистра) — их не предлагаем в готовой продукции. */
+fun RecyclingForm.rawTitleKeys(): Set<String> =
+    ingredients.map { it.title.trim().lowercase() }.filter { it.isNotEmpty() }.toSet()

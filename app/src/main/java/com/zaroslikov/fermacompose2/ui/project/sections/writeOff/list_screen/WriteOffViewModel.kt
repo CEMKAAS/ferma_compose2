@@ -19,8 +19,11 @@ import com.zaroslikov.domain.repository.WarehouseRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.domain.repository.RecyclingRepository
 import com.zaroslikov.domain.models.table.DomainRecycling
+import com.zaroslikov.domain.models.table.DomainRecyclingProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toCountText
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toRecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.readyLocalDate
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormLocalDate
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toRecyclingItem
 import com.zaroslikov.fermacompose2.supportFun.todayIso
 import java.time.LocalDate
 import com.zaroslikov.domain.repository.template.TemplateRepository
@@ -113,7 +116,7 @@ class WriteOffViewModel @Inject constructor(
             is WriteOffListIntent.RecyclingIngredientChoice ->
                 updateIngredientWarehouse(intent.key, intent.title, intent.productOrigin)
 
-            WriteOffListIntent.CompleteRecycling -> completeRecycling()
+            is WriteOffListIntent.CompleteRecyclingProduct -> completeRecyclingProduct(intent.productId)
             WriteOffListIntent.DeleteRecycling -> deleteRecycling()
 
             WriteOffListIntent.Insert -> insert()
@@ -146,10 +149,7 @@ class WriteOffViewModel @Inject constructor(
                 recyclingRepository.getRecyclingList(_itemIdPT)
             ) { addList, titleList, settings, recyclingList ->
                 val brieflyList = brieflyList(addList, settings)
-                val ingredients = addList.filter { it.recyclingId != null }.groupBy { it.recyclingId }
-                val recyclingItems = recyclingList.map { recycling ->
-                    recycling.toRecyclingItem(ingredients[recycling.id].orEmpty())
-                }
+                val recyclingItems = recyclingList.map { it.toRecyclingItem() }
                 LoadDataWriteOffList(addList, brieflyList, titleList, settings) to recyclingItems
             }.collectLatest { (data, recyclingItems) ->
                 val (writeOffItems, writeOffBrieflyItems, titleList, setting) = data
@@ -226,26 +226,31 @@ class WriteOffViewModel @Inject constructor(
         }
     }
 
-    /** Сырьё списывается сразу; продукция — в учёт сразу или в дату готовности. */
+    /** Сырьё списывается сразу; каждая позиция продукции — в учёт сразу или в свою дату готовности. */
     private fun insertRecycling() {
         viewModelScope.launch {
             val product = getState().currentProduct.product
             val form = product.recycling
             val start = product.date.toFormLocalDate()
-            val ready = if (form.isDelayed) form.readyDate.toFormLocalDate() else null
             val recycling = DomainRecycling(
-                title = form.title.trim(),
-                count = form.count.toConvertDbDouble(),
-                countSuffix = form.countSuffix,
                 day = start.dayOfMonth,
                 month = start.monthValue,
                 year = start.year,
-                readyDay = ready?.dayOfMonth,
-                readyMonth = ready?.monthValue,
-                readyYear = ready?.year,
                 note = product.note.trim(),
                 idPT = _itemIdPT
             )
+            val products = form.products.map { item ->
+                val ready = item.readyLocalDate(product.date)
+                DomainRecyclingProduct(
+                    title = item.title.trim(),
+                    count = item.count.toConvertDbDouble(),
+                    countSuffix = item.countSuffix,
+                    readyDay = ready?.dayOfMonth,
+                    readyMonth = ready?.monthValue,
+                    readyYear = ready?.year,
+                    idPT = _itemIdPT
+                )
+            }
             val ingredients = form.ingredients.map { ingredient ->
                 DomainWriteOffTable(
                     title = ingredient.title.trim(),
@@ -260,47 +265,52 @@ class WriteOffViewModel @Inject constructor(
                     idPT = _itemIdPT
                 )
             }
-            recyclingRepository.insertRecycling(recycling, ingredients, todayIso())
-            val isReady = ready == null || !ready.isAfter(LocalDate.now())
-            showRecyclingMessage(
-                if (isReady) R.string.snackbar_recycling_add_ready else R.string.snackbar_recycling_add,
-                recycling.title, recycling.count, recycling.countSuffix
+            recyclingRepository.insertRecycling(recycling, products, ingredients, todayIso())
+            val today = LocalDate.now()
+            val (ready, delayed) = products.partition { item ->
+                val year = item.readyYear ?: return@partition true
+                !LocalDate.of(year, item.readyMonth ?: 1, item.readyDay ?: 1).isAfter(today)
+            }
+            showMessage(
+                when {
+                    delayed.isEmpty() -> resourceProvider.getString(R.string.snackbar_recycling_add_ready)
+                        .format(ready.toCountText(resourceProvider))
+
+                    ready.isEmpty() -> resourceProvider.getString(R.string.snackbar_recycling_add)
+                        .format(delayed.toCountText(resourceProvider))
+
+                    else -> resourceProvider.getString(R.string.snackbar_recycling_add_mixed).format(
+                        ready.toCountText(resourceProvider),
+                        delayed.toCountText(resourceProvider)
+                    )
+                }
             )
             loadDataForEntryOrEdit(false, null)
         }
     }
 
-    private fun completeRecycling() {
+    private fun completeRecyclingProduct(productId: Long) {
         viewModelScope.launch {
-            val recycling = getState().recyclingDetail()?.recycling ?: return@launch
+            val product = getState().recyclingDetail()?.products
+                ?.find { it.product.id == productId }?.product ?: return@launch
             val today = LocalDate.now()
-            recyclingRepository.completeRecycling(
-                recycling.id, today.dayOfMonth, today.monthValue, today.year
+            recyclingRepository.completeRecyclingProduct(
+                productId, today.dayOfMonth, today.monthValue, today.year
             )
-            showRecyclingMessage(
-                R.string.snackbar_recycling_complete,
-                recycling.title, recycling.count, recycling.countSuffix
+            showMessage(
+                resourceProvider.getString(R.string.snackbar_recycling_complete)
+                    .format(listOf(product).toCountText(resourceProvider))
             )
-            sendIntent(WriteOffListIntent.OpenRecyclingDetail(null))
         }
     }
 
     private fun deleteRecycling() {
         viewModelScope.launch {
-            val recycling = getState().recyclingDetail()?.recycling ?: return@launch
-            recyclingRepository.deleteRecycling(recycling.id)
-            showMessage(
-                resourceProvider.getString(R.string.snackbar_recycling_delete).format(recycling.title)
-            )
+            val item = getState().recyclingDetail() ?: return@launch
+            recyclingRepository.deleteRecycling(item.recycling.id)
+            showMessage(resourceProvider.getString(R.string.snackbar_recycling_delete).format(item.title))
             sendIntent(WriteOffListIntent.OpenRecyclingDetail(null))
         }
-    }
-
-    private fun showRecyclingMessage(messageRes: Int, title: String, count: Double, suffix: Suffix) {
-        showMessage(
-            resourceProvider.getString(messageRes)
-                .format(title, count.formatNumber(), resourceProvider.getString(suffix.toResId()))
-        )
     }
 
     private fun updateIngredientWarehouse(key: Long, name: String, productOrigin: ProductOrigin) {

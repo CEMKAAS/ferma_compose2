@@ -51,6 +51,11 @@ import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.EmptyStat
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.InventoryBody
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BaseSectionScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDeleteBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDetailBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingInProgressBlock
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.hasInProgress
 import io.appmetrica.analytics.AppMetrica
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,7 +107,30 @@ fun AddScreen(
                     viewModel.onIntent(
                         AddListIntent.LoadDataForDetailNomenclatura(it)
                     )
-                })
+                },
+                recyclingItems = state.recyclingItems,
+                onRecyclingClick = { viewModel.onIntent(AddListIntent.OpenRecyclingDetail(it)) }
+            )
+            state.recyclingDetail()?.let { recycling ->
+                if (state.isOpenRecyclingDelete)
+                    RecyclingDeleteBottomSheet(
+                        item = recycling,
+                        onDismissRequest = {
+                            viewModel.onIntent(AddListIntent.OpenRecyclingDelete(false))
+                        },
+                        onDeleteClick = { viewModel.onIntent(AddListIntent.DeleteRecycling) }
+                    )
+                else
+                    RecyclingDetailBottomSheet(
+                        item = recycling,
+                        isArchive = state.isArchive,
+                        onCompleteClick = {
+                            viewModel.onIntent(AddListIntent.CompleteRecyclingProduct(it))
+                        },
+                        onDeleteClick = { viewModel.onIntent(AddListIntent.OpenRecyclingDelete(true)) },
+                        onDismissRequest = { viewModel.onIntent(AddListIntent.OpenRecyclingDetail(null)) }
+                    )
+            }
             if (state.bottomSheetState.isOpenEntry)
                 AddEntryBottomSheet(
                     state = state.currentProduct,
@@ -260,7 +288,9 @@ fun AddContainer2(
     onDetailsCardClick: (Long) -> Unit,
     onEditClick: (Long) -> Unit,
     onDeleteClick: (Long) -> Unit,
-    onDetailsClick: (String) -> Unit
+    onDetailsClick: (String) -> Unit,
+    recyclingItems: List<RecyclingItem>,
+    onRecyclingClick: (Long) -> Unit
 ) {
     InventoryBody(
         modifier = modifier,
@@ -310,7 +340,10 @@ fun AddContainer2(
         ),
         details = details,
         iconColor = green_shamrock,
-        backgroundColor = green_g_1, isArchive = isArchive
+        backgroundColor = green_g_1, isArchive = isArchive,
+        header = if (!recyclingItems.hasInProgress()) null else {
+            { RecyclingInProgressBlock(items = recyclingItems, onClick = onRecyclingClick) }
+        }
     )
 }
 

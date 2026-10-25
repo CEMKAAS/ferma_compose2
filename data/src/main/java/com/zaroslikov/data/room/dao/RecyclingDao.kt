@@ -7,6 +7,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.zaroslikov.data.room.table.ferma.AddTable
+import com.zaroslikov.data.room.table.ferma.RecyclingProductTable
 import com.zaroslikov.data.room.table.ferma.RecyclingTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.domain.models.enums.Suffix
@@ -18,35 +19,64 @@ interface RecyclingDao {
     @Query("SELECT * FROM recycling_table")
     fun getAllRecyclingForExport(): Flow<List<RecyclingTable>>
 
+    @Query("SELECT * FROM recycling_product_table")
+    fun getAllRecyclingProductsForExport(): Flow<List<RecyclingProductTable>>
+
     @Upsert
     suspend fun insertAllRecycling(data: List<RecyclingTable>)
+
+    @Upsert
+    suspend fun insertAllRecyclingProducts(data: List<RecyclingProductTable>)
 
     @Query("DELETE FROM recycling_table")
     suspend fun deleteAllRecycling()
 
+    @Query("DELETE FROM recycling_product_table")
+    suspend fun deleteAllRecyclingProducts()
+
     @Transaction
-    suspend fun clearAndInsertRecyclingForImport(data: List<RecyclingTable>) {
+    suspend fun clearAndInsertRecyclingForImport(
+        data: List<RecyclingTable>,
+        products: List<RecyclingProductTable>
+    ) {
+        deleteAllRecyclingProducts()
         deleteAllRecycling()
         insertAllRecycling(data)
+        insertAllRecyclingProducts(products)
     }
 
     @Query(
         "SELECT * FROM recycling_table WHERE idPT = :idPT" +
-                " ORDER BY is_completed ASC," +
-                " DATE(printf('%04d-%02d-%02d', COALESCE(ready_year, year), COALESCE(ready_month, month), COALESCE(ready_day, day))) ASC," +
-                " _id DESC"
+                " ORDER BY DATE(printf('%04d-%02d-%02d', year, month, day)) DESC, _id DESC"
     )
     fun getRecyclingList(idPT: Long): Flow<List<RecyclingTable>>
+
+    @Query(
+        "SELECT * FROM recycling_product_table WHERE idPT = :idPT" +
+                " ORDER BY is_completed ASC," +
+                " DATE(printf('%04d-%02d-%02d', ready_year, ready_month, ready_day)) ASC," +
+                " _id ASC"
+    )
+    fun getRecyclingProductList(idPT: Long): Flow<List<RecyclingProductTable>>
+
+    @Query("SELECT * FROM write_off_table WHERE idPT = :idPT AND recycling_id IS NOT NULL")
+    fun getIngredientList(idPT: Long): Flow<List<WriteOffTable>>
 
     @Query("SELECT * FROM recycling_table WHERE _id = :id")
     suspend fun getRecyclingOnce(id: Long): RecyclingTable?
 
+    @Query("SELECT * FROM recycling_product_table WHERE _id = :id")
+    suspend fun getRecyclingProductOnce(id: Long): RecyclingProductTable?
+
+    @Query("SELECT * FROM recycling_product_table WHERE recycling_id = :recyclingId")
+    suspend fun getRecyclingProducts(recyclingId: Long): List<RecyclingProductTable>
+
     @Query(
-        "SELECT _id FROM recycling_table" +
+        "SELECT _id FROM recycling_product_table" +
                 " WHERE is_completed = 0 AND ready_year IS NOT NULL" +
                 " AND DATE(printf('%04d-%02d-%02d', ready_year, ready_month, ready_day)) <= DATE(:todayIso)"
     )
-    suspend fun getDueRecyclingIds(todayIso: String): List<Long>
+    suspend fun getDueRecyclingProductIds(todayIso: String): List<Long>
 
     @Query("SELECT currency_suffix FROM settings_table WHERE idPT = :idPT LIMIT 1")
     suspend fun getCurrencySuffix(idPT: Long): Suffix?
@@ -54,8 +84,11 @@ interface RecyclingDao {
     @Insert
     suspend fun insertRecyclingRow(item: RecyclingTable): Long
 
+    @Insert
+    suspend fun insertRecyclingProductRow(item: RecyclingProductTable): Long
+
     @Update
-    suspend fun updateRecyclingRow(item: RecyclingTable)
+    suspend fun updateRecyclingProductRow(item: RecyclingProductTable)
 
     @Insert
     suspend fun insertIngredients(items: List<WriteOffTable>)
@@ -69,50 +102,66 @@ interface RecyclingDao {
     @Query("DELETE FROM write_off_table WHERE recycling_id = :recyclingId")
     suspend fun deleteIngredients(recyclingId: Long)
 
+    @Query("DELETE FROM recycling_product_table WHERE recycling_id = :recyclingId")
+    suspend fun deleteRecyclingProducts(recyclingId: Long)
+
     @Query("DELETE FROM recycling_table WHERE _id = :id")
     suspend fun deleteRecyclingRow(id: Long)
 
+    /** [products] — продукция и признак «поступает в учёт сразу». */
     @Transaction
     suspend fun insertRecycling(
         recycling: RecyclingTable,
-        ingredients: List<WriteOffTable>,
-        completeNow: Boolean
+        products: List<Pair<RecyclingProductTable, Boolean>>,
+        ingredients: List<WriteOffTable>
     ): Long {
         val id = insertRecyclingRow(recycling.copy(id = 0))
         insertIngredients(ingredients.map { it.copy(id = 0, recyclingId = id, idPT = recycling.idPT) })
-        if (completeNow)
-            completeRecycling(
-                id,
-                recycling.readyDay ?: recycling.day,
-                recycling.readyMonth ?: recycling.month,
-                recycling.readyYear ?: recycling.year
+        products.forEach { (product, completeNow) ->
+            val productId = insertRecyclingProductRow(
+                product.copy(
+                    id = 0,
+                    recyclingId = id,
+                    isCompleted = false,
+                    addId = null,
+                    idPT = recycling.idPT
+                )
             )
+            if (completeNow)
+                completeRecyclingProduct(
+                    productId,
+                    product.readyDay ?: recycling.day,
+                    product.readyMonth ?: recycling.month,
+                    product.readyYear ?: recycling.year
+                )
+        }
         return id
     }
 
     /** Продукция поступает в add_table датой готовности; повторный вызов ничего не делает. */
     @Transaction
-    suspend fun completeRecycling(id: Long, day: Int, month: Int, year: Int) {
-        val recycling = getRecyclingOnce(id) ?: return
-        if (recycling.isCompleted) return
+    suspend fun completeRecyclingProduct(productId: Long, day: Int, month: Int, year: Int) {
+        val product = getRecyclingProductOnce(productId) ?: return
+        if (product.isCompleted) return
+        val recycling = getRecyclingOnce(product.recyclingId) ?: return
         val addId = insertProduct(
             AddTable(
-                title = recycling.title,
-                count = recycling.count,
+                title = product.title,
+                count = product.count,
                 day = day,
                 month = month,
                 year = year,
                 price = 0.0,
-                countSuffix = recycling.countSuffix,
-                priceSuffix = getCurrencySuffix(recycling.idPT) ?: Suffix.RUBLE,
-                category = recycling.category,
+                countSuffix = product.countSuffix,
+                priceSuffix = getCurrencySuffix(product.idPT) ?: Suffix.RUBLE,
+                category = product.category,
                 animalId = null,
                 note = recycling.note,
-                idPT = recycling.idPT
+                idPT = product.idPT
             )
         )
-        updateRecyclingRow(
-            recycling.copy(
+        updateRecyclingProductRow(
+            product.copy(
                 isCompleted = true,
                 addId = addId,
                 readyDay = day,
@@ -124,13 +173,13 @@ interface RecyclingDao {
 
     @Transaction
     suspend fun completeDueRecycling(todayIso: String) {
-        getDueRecyclingIds(todayIso).forEach { id ->
-            val recycling = getRecyclingOnce(id) ?: return@forEach
-            completeRecycling(
+        getDueRecyclingProductIds(todayIso).forEach { id ->
+            val product = getRecyclingProductOnce(id) ?: return@forEach
+            completeRecyclingProduct(
                 id,
-                recycling.readyDay ?: recycling.day,
-                recycling.readyMonth ?: recycling.month,
-                recycling.readyYear ?: recycling.year
+                product.readyDay ?: return@forEach,
+                product.readyMonth ?: return@forEach,
+                product.readyYear ?: return@forEach
             )
         }
     }
@@ -138,8 +187,11 @@ interface RecyclingDao {
     @Transaction
     suspend fun deleteRecycling(id: Long) {
         val recycling = getRecyclingOnce(id) ?: return
-        recycling.addId?.let { deleteProduct(it, recycling.idPT) }
+        getRecyclingProducts(id).forEach { product ->
+            product.addId?.let { deleteProduct(it, recycling.idPT) }
+        }
         deleteIngredients(id)
+        deleteRecyclingProducts(id)
         deleteRecyclingRow(id)
     }
 }
