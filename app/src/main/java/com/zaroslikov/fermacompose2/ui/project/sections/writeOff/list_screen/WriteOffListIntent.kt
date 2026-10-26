@@ -84,12 +84,19 @@ sealed class WriteOffListIntent : BaseIntent {
         val value: RecyclingReadyMode
     ) : WriteOffListIntent()
 
-    data class RecyclingProductDays(val key: Long, val value: String) : WriteOffListIntent()
+    data class RecyclingProductHours(val key: Long, val value: String) : WriteOffListIntent()
+    data class RecyclingProductMinutes(val key: Long, val value: String) : WriteOffListIntent()
     data class RecyclingProductReadyDate(val key: Long, val value: String) : WriteOffListIntent()
+    data class RecyclingProductReadyTime(val key: Long, val value: String) : WriteOffListIntent()
+    data class RecyclingStartTime(val value: String) : WriteOffListIntent()
     data class OpenRecyclingDetail(val id: Long?) : WriteOffListIntent()
+    /** Правка всей партии переработки [id] в форме ввода. */
+    data class OpenRecyclingEdit(val id: Long) : WriteOffListIntent()
     data class OpenRecyclingDelete(val value: Boolean) : WriteOffListIntent()
+    data class OpenRecyclingDispose(val value: Boolean) : WriteOffListIntent()
     data class CompleteRecyclingProduct(val productId: Long) : WriteOffListIntent()
     data object DeleteRecycling : WriteOffListIntent()
+    data object DisposeRecycling : WriteOffListIntent()
     data object Insert : WriteOffListIntent()
     data object Update : WriteOffListIntent()
     data object Delete : WriteOffListIntent()

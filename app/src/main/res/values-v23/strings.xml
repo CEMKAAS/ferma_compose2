@@ -1851,7 +1851,6 @@
     <!-- Переработка (раздел списания) -->
     <string name="write_off_type_recycling">В переработку</string>
     <string name="support_text_write_off_type">Собственные нужды, утилизация или переработка в продукцию</string>
-    <string name="recycling_info">Сырьё спишется со склада, а готовая продукция поступит в раздел «Продукция».</string>
     <string name="recycling_raw_item">Сырьё %1$d</string>
     <string name="recycling_add_raw">Добавить сырьё</string>
     <string name="recycling_remove_raw">Убрать сырьё</string>
@@ -1860,16 +1859,23 @@
     <string name="support_text_recycling_count">Сколько товара получится</string>
     <string name="support_text_recycling_raw_count">Сколько сырья уходит в переработку</string>
     <string name="outlined_text_recycling_date">Дата переработки</string>
+    <string name="outlined_text_recycling_start_time">Время переработки</string>
+    <string name="support_text_recycling_start_time">Когда сырьё поставили на переработку — от него считаются часы</string>
     <string name="support_text_recycling_date">Когда сырьё ушло в переработку</string>
     <string name="recycling_delayed">Будет готово позже</string>
+    <string name="content_description_info">Пояснение</string>
     <string name="recycling_delayed_sup">Пока товар в переработке, его нет на складе и в общем учёте</string>
     <string name="outlined_text_recycling_ready_date">Дата готовности</string>
     <string name="support_text_recycling_ready_date">В этот день товар поступит на склад</string>
-    <string name="error_recycling_ready_date">Дата готовности не может быть раньше даты переработки</string>
+    <string name="outlined_text_recycling_ready_time">Время готовности</string>
+    <string name="support_text_recycling_ready_time">Во сколько товар поступит на склад</string>
+    <string name="error_recycling_ready_date_time">Дата и время готовности должны быть позже начала переработки</string>
     <string name="recycling_header">В переработке</string>
     <string name="recycling_ready_at">Готово %1$s</string>
-    <string name="recycling_ready_today">Готово сегодня</string>
+    <string name="recycling_date_time">%1$s, %2$s</string>
     <string name="recycling_days_left">через %1$d дн.</string>
+    <string name="recycling_hours_left">через %1$d ч</string>
+    <string name="recycling_less_hour">меньше часа</string>
     <string name="recycling_raw_summary">Сырьё: %1$s</string>
     <string name="recycling_label">Переработка → %1$s</string>
     <string name="recycling_detail_title">Переработка</string>
@@ -1878,9 +1884,7 @@
     <string name="recycling_detail_product">Продукция</string>
     <string name="recycling_detail_raw">Сырьё</string>
     <string name="recycling_detail_date">Дата переработки</string>
-    <string name="recycling_detail_done_date">Поступила на склад</string>
     <string name="recycling_complete_now">Готово сейчас</string>
-    <string name="recycling_frozen_hint">Продукция в переработке: её нет на складе и в общем учёте до даты готовности.</string>
     <string name="recycling_delete_title">Удалить переработку?</string>
     <string name="recycling_delete_support">Будут удалены списание всего сырья и вся полученная продукция</string>
     <string name="recycling_delete_button">Удалить переработку</string>
@@ -1888,13 +1892,26 @@
     <string name="snackbar_recycling_add_ready">Переработано: %1$s</string>
     <string name="snackbar_recycling_complete">Продукция готова: %1$s</string>
     <string name="snackbar_recycling_delete">Переработка удалена: %1$s</string>
+    <string name="snackbar_recycling_update">Переработка изменена: %1$s</string>
     <string name="recycling_product_item">Товар %1$d</string>
     <string name="recycling_add_product">Добавить товар</string>
+    <string name="recycling_error_raw_as_product">Сырьё не может быть готовой продукцией</string>
     <string name="recycling_remove_product">Убрать товар</string>
-    <string name="recycling_ready_mode_days">Через N дней</string>
-    <string name="recycling_ready_mode_date">К дате</string>
-    <string name="outlined_text_recycling_days">Срок переработки, дней</string>
-    <string name="support_text_recycling_days">Считается от даты переработки</string>
-    <string name="error_recycling_days">Укажите целое число дней больше нуля</string>
+    <string name="recycling_ready_mode_hours">Через время</string>
+    <string name="recycling_ready_mode_date_time">Дата и время</string>
+    <string name="outlined_text_recycling_hours">Часов</string>
+    <string name="support_text_recycling_hours">0</string>
+    <string name="outlined_text_recycling_minutes">Минут</string>
+    <string name="support_text_recycling_minutes">От 0 до 59</string>
+    <string name="error_recycling_hours">Укажите срок больше нуля, минут — от 0 до 59</string>
     <string name="snackbar_recycling_add_mixed">На склад: %1$s. В переработку: %2$s</string>
+    <string name="recycling_dispose_button">Списать в утиль</string>
+    <string name="recycling_dispose_title">Списать в утиль?</string>
+    <string name="recycling_dispose_support">Переработка завершится, всё сырьё спишется в утиль</string>
+    <string name="recycling_dispose_warning_text">• Сырьё станет обычным списанием в утиль
+• Неготовая продукция не поступит на склад
+• Готовая продукция останется на складе
+• Это действие нельзя отменить</string>
+    <string name="recycling_dispose_note">Испорчено при переработке</string>
+    <string name="snackbar_recycling_dispose">Списано в утиль: %1$s</string>
 </resources>

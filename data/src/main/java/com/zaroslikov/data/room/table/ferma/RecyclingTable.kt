@@ -31,6 +31,10 @@ data class RecyclingTable(
     val month: Int,
     @ColumnInfo(name = "year")
     val year: Int,
+    @ColumnInfo(name = "start_hour")
+    val startHour: Int? = null, // время начала переработки; null — начало дня (00:00)
+    @ColumnInfo(name = "start_minute")
+    val startMinute: Int? = null,
     @ColumnInfo(name = "note")
     val note: String,
     @ColumnInfo(name = "idPT")

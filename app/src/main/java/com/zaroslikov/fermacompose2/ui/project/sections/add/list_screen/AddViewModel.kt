@@ -1,10 +1,11 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.add.list_screen
 
 import com.zaroslikov.domain.repository.RecyclingRepository
-import com.zaroslikov.fermacompose2.supportFun.todayIso
+import com.zaroslikov.fermacompose2.supportFun.nowIso
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toCountText
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toIngredientCountText
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toRecyclingItem
-import java.time.LocalDate
+import java.time.LocalDateTime
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -80,7 +81,7 @@ class AddViewModel @Inject constructor(
 
     init {
         // Продукция из переработки, чья дата готовности наступила, поступает в список
-        viewModelScope.launch { recyclingRepository.completeDueRecycling(todayIso()) }
+        viewModelScope.launch { recyclingRepository.completeDueRecycling(nowIso()) }
         loadData()
         loadRecycling()
         loadTemplate(TemplateType.ADD)
@@ -100,6 +101,7 @@ class AddViewModel @Inject constructor(
 
             is AddListIntent.CompleteRecyclingProduct -> completeRecyclingProduct(intent.productId)
             AddListIntent.DeleteRecycling -> deleteRecycling()
+            AddListIntent.DisposeRecycling -> disposeRecycling()
 
             AddListIntent.Insert -> insert()
             AddListIntent.Update -> update()
@@ -155,11 +157,11 @@ class AddViewModel @Inject constructor(
         viewModelScope.launch {
             val product = getState().recyclingDetail()?.products
                 ?.find { it.product.id == productId }?.product ?: return@launch
-            val today = LocalDate.now()
-            recyclingRepository.completeRecyclingProduct(
-                productId, today.dayOfMonth, today.monthValue, today.year
+            val now = LocalDateTime.now()
+            val completed = recyclingRepository.completeRecyclingProduct(
+                productId, now.dayOfMonth, now.monthValue, now.year, now.hour, now.minute
             )
-            showMessage(
+            if (completed) showMessage(
                 resourceProvider.getString(R.string.snackbar_recycling_complete)
                     .format(listOf(product).toCountText(resourceProvider))
             )
@@ -171,6 +173,22 @@ class AddViewModel @Inject constructor(
             val item = getState().recyclingDetail() ?: return@launch
             recyclingRepository.deleteRecycling(item.recycling.id)
             showMessage(resourceProvider.getString(R.string.snackbar_recycling_delete).format(item.title))
+            sendIntent(AddListIntent.OpenRecyclingDetail(null))
+        }
+    }
+
+    /** Сырьё партии списывается в утиль, неготовая продукция отменяется. */
+    private fun disposeRecycling() {
+        viewModelScope.launch {
+            val item = getState().recyclingDetail() ?: return@launch
+            val disposed = recyclingRepository.disposeRecycling(
+                item.recycling.id,
+                resourceProvider.getString(R.string.recycling_dispose_note)
+            )
+            if (disposed.isNotEmpty()) showMessage(
+                resourceProvider.getString(R.string.snackbar_recycling_dispose)
+                    .format(disposed.toIngredientCountText(resourceProvider))
+            )
             sendIntent(AddListIntent.OpenRecyclingDetail(null))
         }
     }

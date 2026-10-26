@@ -1,7 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.finance
 
 import com.zaroslikov.domain.repository.RecyclingRepository
-import com.zaroslikov.fermacompose2.supportFun.todayIso
+import com.zaroslikov.fermacompose2.supportFun.nowIso
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.finance.DomainIncomeExpenses
@@ -37,7 +37,7 @@ class FinanceViewModel @Inject constructor(
 
     init {
         // Продукция из переработки, чья дата готовности наступила, попадает в учёт
-        viewModelScope.launch { recyclingRepository.completeDueRecycling(todayIso()) }
+        viewModelScope.launch { recyclingRepository.completeDueRecycling(nowIso()) }
         observeData()
     }
 

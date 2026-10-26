@@ -147,15 +147,29 @@ fun <T, B> InventoryBody(
                 bottomContentPadding = bottomContentPadding,
                 header = header,
             )
-        else MessageNoData2(
-            modifier = modifier.padding(bottom = 16.dp),
-            titleRes = R.string.search_section_search_nothing,
-            messageRes = R.string.search_section_search_nothing_sup,
-            supportSecondText = R.string.search_section_search_nothing_sup_2,
-            iconRes = R.drawable.icon_search_off,
-            iconColor = iconColor,
-            backgroundColor = backgroundColor,
-        )
+        else {
+            val nothingFound: @Composable (Modifier) -> Unit = {
+                MessageNoData2(
+                    modifier = it.padding(bottom = 16.dp),
+                    titleRes = R.string.search_section_search_nothing,
+                    messageRes = R.string.search_section_search_nothing_sup,
+                    supportSecondText = R.string.search_section_search_nothing_sup_2,
+                    iconRes = R.drawable.icon_search_off,
+                    iconColor = iconColor,
+                    backgroundColor = backgroundColor,
+                )
+            }
+            if (header == null) nothingFound(modifier)
+            else Column(
+                modifier = modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 8.dp, bottom = bottomContentPadding),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                header()
+                nothingFound(Modifier)
+            }
+        }
     } else {
         val (titleRes, messageRes, support, icon, iconSize) =
             if (details) detailEmptyState else brieflyEmptyState ?: detailEmptyState
@@ -178,7 +192,9 @@ fun <T, B> InventoryBody(
         // Шапка видна и в пустом списке: продукция «В переработке» есть ещё до первой записи
         if (header == null) emptyState(modifier)
         else Column(
-            modifier = modifier.verticalScroll(rememberScrollState()),
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .padding(top = 8.dp, bottom = bottomContentPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             header()
@@ -926,7 +942,7 @@ private fun ValueCard(
 }
 
 @Composable
-private fun ValueStandardCard(
+fun ValueStandardCard(
     @StringRes titleRes: Int,
     value: String,
     @DrawableRes iconRes: Int,

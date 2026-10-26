@@ -11,6 +11,7 @@ import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.toConvertZeroDouble
 import com.zaroslikov.fermacompose2.supportFun.toResId
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
+import com.zaroslikov.fermacompose2.supportFun.formatterTime
 import com.zaroslikov.fermacompose2.supportFun.monthToResString
 import com.zaroslikov.fermacompose2.supportFun.toSuffixList
 import com.zaroslikov.fermacompose2.ui.elements.bottomSheet.QrCodeWarningType
@@ -22,8 +23,10 @@ import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.rec
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingProductForm
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingReadyMode
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.isValid
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.rawTitleKeys
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.WriteOffType
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormLocalDate
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.isErrorReadyDateTime
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.start
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormString
 
 class WriteOffListReduce(
@@ -100,15 +103,39 @@ class WriteOffListReduce(
             is WriteOffListIntent.RecyclingProductReadyMode ->
                 state.updateProductReadyMode(intent.key, intent.value).updateValid()
 
-            is WriteOffListIntent.RecyclingProductDays ->
-                state.updateProduct(intent.key) { it.copy(days = intent.value.filter(Char::isDigit)) }
+            is WriteOffListIntent.RecyclingProductHours ->
+                state.updateProduct(intent.key) { it.copy(hours = intent.value.filter(Char::isDigit)) }
+                    .updateValid()
+
+            is WriteOffListIntent.RecyclingProductMinutes ->
+                state.updateProduct(intent.key) { it.copy(minutes = intent.value.filter(Char::isDigit)) }
                     .updateValid()
 
             is WriteOffListIntent.RecyclingProductReadyDate ->
                 state.updateProduct(intent.key) { it.copy(readyDate = intent.value) }.updateValid()
 
+            is WriteOffListIntent.RecyclingProductReadyTime ->
+                state.updateProduct(intent.key) { it.copy(readyTime = intent.value) }.updateValid()
+
+            is WriteOffListIntent.RecyclingStartTime ->
+                state.updateRecycling { it.copy(startTime = intent.value) }.updateValid()
+
             is WriteOffListIntent.OpenRecyclingDetail ->
-                state.copy(recyclingDetailId = intent.id, isOpenRecyclingDelete = false)
+                state.copy(
+                    recyclingDetailId = intent.id,
+                    isOpenRecyclingDelete = false,
+                    isOpenRecyclingDispose = false
+                )
+
+            is WriteOffListIntent.OpenRecyclingEdit ->
+                state.copy(
+                    recyclingDetailId = null,
+                    isOpenRecyclingDelete = false,
+                    isOpenRecyclingDispose = false
+                )
+
+            is WriteOffListIntent.OpenRecyclingDispose ->
+                state.copy(isOpenRecyclingDispose = intent.value)
 
             is WriteOffListIntent.OpenRecyclingDelete ->
                 state.copy(isOpenRecyclingDelete = intent.value)
@@ -276,11 +303,13 @@ class WriteOffListReduce(
         )
     }
 
-    private fun WriteOffProduct.isRecyclingValid(): Boolean =
-        recycling.ingredients.isNotEmpty() &&
+    private fun WriteOffProduct.isRecyclingValid(): Boolean {
+        val rawKeys = recycling.rawTitleKeys()
+        return recycling.ingredients.isNotEmpty() &&
                 recycling.ingredients.all { it.title.isNotBlank() && it.count.toConvertZeroDouble() > 0.0 } &&
                 recycling.products.isNotEmpty() &&
-                recycling.products.all { it.isValid(date) }
+                recycling.products.all { it.isValid(recycling.start(date), rawKeys) }
+    }
 
     private fun WriteOffListState.updateType(type: WriteOffType): WriteOffListState {
         val product = currentProduct.product
@@ -321,18 +350,29 @@ class WriteOffListReduce(
         form.copy(products = form.products.map { if (it.key == key) transform(it) else it })
     }
 
-    /** Переходя к «К дате», сразу предлагаем следующий день, если дата готовности не позже начала. */
+    /**
+     * Переходя к «Дата и время», сразу предлагаем момент через сутки от начала переработки,
+     * если выбранный не позже начала.
+     */
     private fun WriteOffListState.updateProductReadyMode(
         key: Long,
         mode: RecyclingReadyMode
     ): WriteOffListState {
-        val start = currentProduct.product.date.toFormLocalDate()
+        val product = currentProduct.product
+        // Начало считаем уже с новым режимом: включение «готово позже» показывает поле времени
+        val start = product.recycling.copy(
+            products = product.recycling.products.map { if (it.key == key) it.copy(readyMode = mode) else it }
+        ).start(product.date)
         return updateProduct(key) { product ->
-            val readyDate =
-                if (mode == RecyclingReadyMode.DATE && !product.readyDate.toFormLocalDate().isAfter(start))
-                    start.plusDays(1).toFormString()
-                else product.readyDate
-            product.copy(readyMode = mode, readyDate = readyDate)
+            val moved = product.copy(readyMode = mode)
+            if (mode != RecyclingReadyMode.DATE_TIME || !moved.isErrorReadyDateTime(start)) moved
+            else {
+                val ready = start.plusDays(1)
+                moved.copy(
+                    readyDate = ready.toLocalDate().toFormString(),
+                    readyTime = formatterTime(ready.hour, ready.minute)
+                )
+            }
         }
     }
 

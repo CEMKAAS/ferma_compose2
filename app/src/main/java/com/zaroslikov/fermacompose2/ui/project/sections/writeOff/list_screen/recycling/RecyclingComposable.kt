@@ -1,10 +1,14 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -12,7 +16,22 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.animation.animateContentSize
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +53,7 @@ import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.white
 import com.zaroslikov.fermacompose2.supportFun.dateBuilder
+import com.zaroslikov.fermacompose2.supportFun.formatterTime
 import com.zaroslikov.fermacompose2.supportFun.isSlash
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNext
 import com.zaroslikov.fermacompose2.supportFun.keyboardOptionsNextNumber
@@ -53,10 +73,11 @@ import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextCountNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextDateNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleAddNew
 import com.zaroslikov.fermacompose2.ui.elements.TextField.OutlinedTextTitleSaleNew
+import com.zaroslikov.fermacompose2.ui.elements.TextField.TimeOutlinedTextFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.text_12
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.GroupButton
-import com.zaroslikov.fermacompose2.ui.project.sections.recycling.InfoRecyclingCard
+import java.time.LocalDateTime
 
 /** «Тип списания» с переработкой; в шаблонах и при правке остаётся прежний двухпозиционный список. */
 @Composable
@@ -125,70 +146,153 @@ fun RecyclingEntryFields(
     onProductCountChange: (Long, String) -> Unit,
     onProductSuffixChange: (Long, Suffix) -> Unit,
     onProductReadyModeChange: (Long, RecyclingReadyMode) -> Unit,
-    onProductDaysChange: (Long, String) -> Unit,
+    onProductHoursChange: (Long, String) -> Unit,
+    onProductMinutesChange: (Long, String) -> Unit,
     onProductReadyDateChange: (Long, String) -> Unit,
+    onProductReadyTimeChange: (Long, String) -> Unit,
+    onStartTimeChange: (String) -> Unit,
 ) {
-    InfoRecyclingCard(stringResource(R.string.recycling_info))
+    val start = form.start(date)
 
-    OutlinedTextDateNew(
-        value = date,
-        onValueChange = onDateChange,
-        intRes = R.string.outlined_text_recycling_date,
-        intResSup = R.string.support_text_recycling_date
-    )
-
-    form.ingredients.forEachIndexed { index, ingredient ->
-        key(ingredient.key) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                PositionLabel(
-                    text = stringResource(R.string.recycling_raw_item, index + 1),
-                    removeDescriptionRes = R.string.recycling_remove_raw,
-                    canRemove = form.ingredients.size > 1,
-                    onRemove = { onRemoveIngredient(ingredient.key) }
-                )
-                IngredientCard(
-                    ingredient = ingredient,
-                    titles = rawTitles,
-                    onChoice = { onIngredientChoice(ingredient.key, it) },
-                    onCountChange = { onIngredientCountChange(ingredient.key, it) }
-                )
-            }
-        }
+    AnimatedPositions(
+        items = form.ingredients,
+        keyOf = { it.key },
+        addTextRes = R.string.recycling_add_raw,
+        onAdd = onAddIngredient,
+        onRemoved = onRemoveIngredient
+    ) { ingredient, number, canRemove, remove ->
+        IngredientCard(
+            label = stringResource(R.string.recycling_raw_item, number),
+            canRemove = canRemove,
+            ingredient = ingredient,
+            titles = rawTitles,
+            onRemove = remove,
+            onChoice = { onIngredientChoice(ingredient.key, it) },
+            onCountChange = { onIngredientCountChange(ingredient.key, it) }
+        )
     }
-    AddPositionButton(R.string.recycling_add_raw, onAddIngredient)
 
     Text(text = stringResource(R.string.recycling_section_product), style = textBold_16)
     // Сырьё не предлагаем в готовой продукции: из молока не получается «Молоко»
     val rawKeys = form.rawTitleKeys()
     val availableTitles = productTitles.filterNot { it.title.trim().lowercase() in rawKeys }
-    form.products.forEachIndexed { index, product ->
-        key(product.key) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                PositionLabel(
-                    text = stringResource(R.string.recycling_product_item, index + 1),
-                    removeDescriptionRes = R.string.recycling_remove_product,
-                    canRemove = form.products.size > 1,
-                    onRemove = { onRemoveProduct(product.key) }
-                )
-                ProductCard(
-                    product = product,
-                    date = date,
-                    titles = availableTitles,
-                    onTitleChange = { onProductTitleChange(product.key, it) },
-                    onTitleChoice = { onProductTitleChoice(product.key, it) },
-                    onCountChange = { onProductCountChange(product.key, it) },
-                    onSuffixChange = { onProductSuffixChange(product.key, it) },
-                    onReadyModeChange = { onProductReadyModeChange(product.key, it) },
-                    onDaysChange = { onProductDaysChange(product.key, it) },
-                    onReadyDateChange = { onProductReadyDateChange(product.key, it) }
+    AnimatedPositions(
+        items = form.products,
+        keyOf = { it.key },
+        addTextRes = R.string.recycling_add_product,
+        onAdd = onAddProduct,
+        onRemoved = onRemoveProduct
+    ) { product, number, canRemove, remove ->
+        ProductCard(
+            label = stringResource(R.string.recycling_product_item, number),
+            canRemove = canRemove,
+            onRemove = remove,
+            product = product,
+            date = date,
+            start = start,
+            isRawTitle = product.isRawTitle(rawKeys),
+            titles = availableTitles,
+            onTitleChange = { onProductTitleChange(product.key, it) },
+            onTitleChoice = { onProductTitleChoice(product.key, it) },
+            onCountChange = { onProductCountChange(product.key, it) },
+            onSuffixChange = { onProductSuffixChange(product.key, it) },
+            onReadyModeChange = { onProductReadyModeChange(product.key, it) },
+            onHoursChange = { onProductHoursChange(product.key, it) },
+            onMinutesChange = { onProductMinutesChange(product.key, it) },
+            onReadyDateChange = { onProductReadyDateChange(product.key, it) },
+            onReadyTimeChange = { onProductReadyTimeChange(product.key, it) }
+        )
+    }
+
+    // Дата и время — внизу, перед примечанием; своя колонка: отступ до поля времени
+    // сворачивается вместе с ним, без скачка в конце
+    Column {
+        OutlinedTextDateNew(
+            value = date,
+            onValueChange = onDateChange,
+            intRes = R.string.outlined_text_recycling_date,
+            intResSup = R.string.support_text_recycling_date
+        )
+        AnimatedVisibility(
+            visible = form.isDelayed(),
+            enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+            exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+        ) {
+            Box(modifier = Modifier.padding(top = 16.dp)) {
+                TimeOutlinedTextFieldNew(
+                    time = form.startTime,
+                    onValueChange = onStartTimeChange,
+                    intRes = R.string.outlined_text_recycling_start_time,
+                    intResSup = R.string.support_text_recycling_start_time
                 )
             }
         }
     }
-    AddPositionButton(R.string.recycling_add_product, onAddProduct)
 }
 
-/** Подпись позиции над карточкой («Сырьё 1», «Товар 2») и крестик удаления справа. */
+/** Отступ под позицией формы: он внутри анимируемого контента и сворачивается вместе с карточкой. */
+private val PositionSpacing = 16.dp
+
+/**
+ * Позиции формы и кнопка «Добавить» в собственной колонке без spacedBy: промежуток под позицией —
+ * её нижний отступ, поэтому при удалении и добавлении он меняется вместе с карточкой и в конце
+ * анимации высота не скачет. Сворачивающиеся позиции не входят в номера и в «можно убрать»,
+ * чтобы нельзя было удалить последнюю, пока предыдущая ещё уходит.
+ */
+@Composable
+private fun <T> AnimatedPositions(
+    items: List<T>,
+    keyOf: (T) -> Long,
+    addTextRes: Int,
+    onAdd: () -> Unit,
+    onRemoved: (Long) -> Unit,
+    content: @Composable (item: T, number: Int, canRemove: Boolean, remove: () -> Unit) -> Unit
+) {
+    val removing = remember { mutableStateListOf<Long>() }
+    val remaining = items.filterNot { keyOf(it) in removing }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        items.forEachIndexed { index, item ->
+            val itemKey = keyOf(item)
+            key(itemKey) {
+                DisposableEffect(Unit) { onDispose { removing.remove(itemKey) } }
+                val position = remaining.indexOfFirst { keyOf(it) == itemKey }.takeIf { it >= 0 } ?: index
+                AnimatedPosition(onRemoved = { onRemoved(itemKey) }) { remove ->
+                    content(item, position + 1, remaining.size > 1 && itemKey !in removing) {
+                        removing.add(itemKey)
+                        remove()
+                    }
+                }
+            }
+        }
+        AddPositionButton(addTextRes, onAdd)
+    }
+}
+
+/**
+ * Позиция формы с анимацией: появляется раскрытием, при удалении сначала сворачивается
+ * (вместе с отступом под ней) и только потом вызывает [onRemoved], чтобы строка исчезла из состояния.
+ */
+@Composable
+private fun AnimatedPosition(
+    onRemoved: () -> Unit,
+    content: @Composable (remove: () -> Unit) -> Unit
+) {
+    val visibleState = remember { MutableTransitionState(false).apply { targetState = true } }
+    val currentOnRemoved by rememberUpdatedState(onRemoved)
+    if (!visibleState.targetState && visibleState.isIdle && !visibleState.currentState)
+        LaunchedEffect(Unit) { currentOnRemoved() }
+    AnimatedVisibility(
+        visibleState = visibleState,
+        enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+    ) {
+        Column(modifier = Modifier.padding(bottom = PositionSpacing)) {
+            content { visibleState.targetState = false }
+        }
+    }
+}
+
+/** Заголовок позиции в карточке («Сырьё 1», «Товар 2») и крестик удаления справа. */
 @Composable
 private fun PositionLabel(
     text: String,
@@ -201,7 +305,7 @@ private fun PositionLabel(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = text, style = text_12, color = gray_7)
+        Text(text = text, style = textBold_16)
         if (canRemove)
             IconButton(onClick = onRemove, modifier = Modifier.size(24.dp)) {
                 Icon(
@@ -218,6 +322,8 @@ private fun PositionLabel(
 private fun AddPositionButton(textRes: Int, onClick: () -> Unit) {
     BorderCard(
         modifier = Modifier.fillMaxWidth(),
+        padding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+        shape = RoundedCornerShape(12.dp),
         borderColor = green_g_4,
         onClick = onClick
     ) {
@@ -231,7 +337,7 @@ private fun AddPositionButton(textRes: Int, onClick: () -> Unit) {
                 valueString = stringResource(textRes),
                 iconColor = green_shamrock,
                 textColor = green_shamrock,
-                iconSize = 20.dp
+                iconSize = 18.dp
             )
         }
     }
@@ -239,12 +345,16 @@ private fun AddPositionButton(textRes: Int, onClick: () -> Unit) {
 
 @Composable
 private fun IngredientCard(
+    label: String,
+    canRemove: Boolean,
     ingredient: RecyclingIngredientForm,
     titles: List<DomainTitleSuffixCategory>,
+    onRemove: () -> Unit,
     onChoice: (DomainTitleSuffixCategory) -> Unit,
     onCountChange: (String) -> Unit
 ) {
     BorderCard {
+        PositionLabel(label, R.string.recycling_remove_raw, canRemove, onRemove)
         OutlinedTextTitleSaleNew(
             value = ingredient.title,
             onValueChoice = onChoice,
@@ -284,29 +394,39 @@ private fun IngredientCard(
 }
 
 /**
- * Позиция готовой продукции. «Готово позже» открывает выбор срока: «Через N дней» (от даты
- * переработки [date]) или «К дате»; в БД в обоих случаях попадает только дата готовности.
+ * Позиция готовой продукции. «Готово позже» открывает выбор срока: «Через N часов» (от даты
+ * переработки [start]) или «Дата и время»; в БД в обоих случаях
+ * попадает только момент готовности.
  */
 @Composable
 private fun ProductCard(
+    label: String,
+    canRemove: Boolean,
+    onRemove: () -> Unit,
     product: RecyclingProductForm,
     date: String,
+    start: LocalDateTime,
+    isRawTitle: Boolean,
     titles: List<TitleAndSuffixDomain>,
     onTitleChange: (String) -> Unit,
     onTitleChoice: (Pair<String, Suffix>) -> Unit,
     onCountChange: (String) -> Unit,
     onSuffixChange: (Suffix) -> Unit,
     onReadyModeChange: (RecyclingReadyMode) -> Unit,
-    onDaysChange: (String) -> Unit,
-    onReadyDateChange: (String) -> Unit
+    onHoursChange: (String) -> Unit,
+    onMinutesChange: (String) -> Unit,
+    onReadyDateChange: (String) -> Unit,
+    onReadyTimeChange: (String) -> Unit
 ) {
     BorderCard {
+        PositionLabel(label, R.string.recycling_remove_product, canRemove, onRemove)
         OutlinedTextTitleAddNew(
             value = product.title,
             onValueChange = onTitleChange,
             onValueChangeSuffix = onTitleChoice,
             titleList = titles,
-            isErrorTitle = false,
+            isErrorTitle = isRawTitle,
+            intResError = R.string.recycling_error_raw_as_product,
             isErrorSlash = product.title.isSlash(),
             drawableRes = R.drawable.icon_add_product,
             intResSup = R.string.support_text_recycling_product,
@@ -324,53 +444,109 @@ private fun ProductCard(
         OutlinedSwitch(
             checked = product.readyMode != RecyclingReadyMode.NONE,
             onCheckedChange = {
-                onReadyModeChange(if (it) RecyclingReadyMode.DAYS else RecyclingReadyMode.NONE)
+                onReadyModeChange(if (it) RecyclingReadyMode.HOURS else RecyclingReadyMode.NONE)
             },
             isBorderCard = false,
             leadingIconRes = R.drawable.baseline_access_time_24,
             labelIntRes = R.string.recycling_delayed,
-            supportingText = R.string.recycling_delayed_sup
+            supportingText = null,
+            infoRes = R.string.recycling_delayed_sup
         )
-        if (product.readyMode == RecyclingReadyMode.NONE) return@BorderCard
-        ReadyModeChoice(mode = product.readyMode, onModeChange = onReadyModeChange)
-        if (product.readyMode == RecyclingReadyMode.DAYS) {
-            BaseOutlinedTextNew(
-                value = product.days,
-                onValueChange = onDaysChange,
-                leadingIconRes = R.drawable.baseline_access_time_24,
-                labelIntRes = R.string.outlined_text_recycling_days,
-                intResSup = R.string.support_text_recycling_days,
-                isError = product.days.isNotEmpty() && product.isErrorDays(),
-                intResError = R.string.error_recycling_days,
-                isNecessarily = true,
-                maxLength = 4,
-                keyboardOptions = keyboardOptionsNextNumber()
-            )
-            product.readyLocalDate(date)?.let { ready ->
-                IconAndTextNew(
-                    iconRes = R.drawable.baseline_calendar_month_24,
-                    valueString = stringResource(
-                        R.string.recycling_ready_at,
-                        dateBuilder(ready.dayOfMonth, stringResource(monthToResString(ready.monthValue)), ready.year)
-                    ),
-                    iconColor = orang_9
-                )
+        // Последний выбранный срок: при сворачивании блок не перескакивает на другой режим
+        var shownMode by remember { mutableStateOf(RecyclingReadyMode.HOURS) }
+        if (product.readyMode != RecyclingReadyMode.NONE) shownMode = product.readyMode
+        val mode = shownMode
+        // Во время сворачивания товар уже в NONE: показываем его со старым режимом,
+        // иначе ошибки и «Готово …» пропадают раньше анимации и высота дёргается
+        val shown = product.copy(readyMode = mode)
+        AnimatedVisibility(
+            visible = product.readyMode != RecyclingReadyMode.NONE,
+            enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+            exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .animateContentSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ReadyModeChoice(mode = mode, onModeChange = onReadyModeChange)
+                if (mode == RecyclingReadyMode.HOURS) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        BaseOutlinedTextNew(
+                            modifier = Modifier.weight(1f),
+                            value = shown.hours,
+                            onValueChange = onHoursChange,
+                            leadingIconRes = R.drawable.baseline_access_time_24,
+                            labelIntRes = R.string.outlined_text_recycling_hours,
+                            intResSup = R.string.support_text_recycling_hours,
+                            isError = shown.isDurationTouched() && shown.isErrorHours(),
+                            maxLength = 4,
+                            keyboardOptions = keyboardOptionsNextNumber()
+                        )
+                        BaseOutlinedTextNew(
+                            modifier = Modifier.weight(1f),
+                            value = shown.minutes,
+                            onValueChange = onMinutesChange,
+                            labelIntRes = R.string.outlined_text_recycling_minutes,
+                            intResSup = R.string.support_text_recycling_minutes,
+                            isError = shown.isDurationTouched() && shown.isErrorHours(),
+                            maxLength = 2,
+                            keyboardOptions = keyboardOptionsNextNumber()
+                        )
+                    }
+                    if (shown.isDurationTouched() && shown.isErrorHours())
+                        Text(
+                            text = stringResource(R.string.error_recycling_hours),
+                            style = text_12,
+                            color = error_base
+                        )
+                    if (!shown.isErrorHours())
+                        shown.readyDateTime(start)?.let { ready ->
+                            IconAndTextNew(
+                                iconRes = R.drawable.baseline_calendar_month_24,
+                                valueString = stringResource(
+                                    R.string.recycling_ready_at,
+                                    stringResource(
+                                        R.string.recycling_date_time,
+                                        dateBuilder(
+                                            ready.dayOfMonth,
+                                            stringResource(monthToResString(ready.monthValue)),
+                                            ready.year
+                                        ),
+                                        formatterTime(ready.hour, ready.minute)
+                                    )
+                                ),
+                                iconColor = orang_9
+                            )
+                        }
+                } else {
+                    OutlinedTextDateNew(
+                        value = shown.readyDate,
+                        onValueChange = onReadyDateChange,
+                        intRes = R.string.outlined_text_recycling_ready_date,
+                        intResSup = R.string.support_text_recycling_ready_date,
+                        minDate = date,
+                        isBorderCard = false
+                    )
+                    TimeOutlinedTextFieldNew(
+                        time = shown.readyTime,
+                        onValueChange = onReadyTimeChange,
+                        intRes = R.string.outlined_text_recycling_ready_time,
+                        intResSup = R.string.support_text_recycling_ready_time,
+                        isBorderCard = false
+                    )
+                    if (shown.isErrorReadyDateTime(start))
+                        Text(
+                            text = stringResource(R.string.error_recycling_ready_date_time),
+                            style = text_12,
+                            color = error_base
+                        )
+                }
             }
-        } else {
-            OutlinedTextDateNew(
-                value = product.readyDate,
-                onValueChange = onReadyDateChange,
-                intRes = R.string.outlined_text_recycling_ready_date,
-                intResSup = R.string.support_text_recycling_ready_date,
-                minDate = date,
-                isBorderCard = false
-            )
-            if (product.isErrorReadyDate(date))
-                Text(
-                    text = stringResource(R.string.error_recycling_ready_date),
-                    style = text_12,
-                    color = error_base
-                )
         }
     }
 }
@@ -386,8 +562,8 @@ private fun ReadyModeChoice(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             listOf(
-                RecyclingReadyMode.DAYS to R.string.recycling_ready_mode_days,
-                RecyclingReadyMode.DATE to R.string.recycling_ready_mode_date
+                RecyclingReadyMode.HOURS to R.string.recycling_ready_mode_hours,
+                RecyclingReadyMode.DATE_TIME to R.string.recycling_ready_mode_date_time
             ).forEach { (item, textRes) ->
                 val isSelected = item == mode
                 ButtonForGroupButtons(

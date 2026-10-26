@@ -40,6 +40,7 @@ data class AddListState(
     val recyclingItems: List<RecyclingItem> = emptyList(),
     val recyclingDetailId: Long? = null,
     val isOpenRecyclingDelete: Boolean = false,
+    val isOpenRecyclingDispose: Boolean = false,
 
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,

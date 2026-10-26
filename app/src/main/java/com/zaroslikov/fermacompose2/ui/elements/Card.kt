@@ -479,6 +479,8 @@ fun DetailProductCardNew(
     statusWriteOff: Boolean? = null,
     /** Сырьё переработки: вместо причины списания — «Переработка → продукция». */
     recyclingTitle: String? = null,
+    /** Кратко о продукции переработки после даты; тогда вместо «Переработка → …» — «В переработку». */
+    recyclingContent: (@Composable () -> Unit)? = null,
     note: String,
     animal: String? = null,
     productOrigin: ProductOrigin? = null,
@@ -538,7 +540,8 @@ fun DetailProductCardNew(
             if (recyclingTitle != null)
                 IconAndTextNew(
                     iconRes = R.drawable.baseline_autorenew_24,
-                    valueString = stringResource(R.string.recycling_label, recyclingTitle),
+                    valueString = if (recyclingContent != null) stringResource(R.string.write_off_type_recycling)
+                    else stringResource(R.string.recycling_label, recyclingTitle),
                     iconColor = green_shamrock,
                 )
             else statusWriteOff?.let { status ->
@@ -578,6 +581,7 @@ fun DetailProductCardNew(
                 valueString = date,
                 iconColor = color
             )
+            recyclingContent?.invoke()
             if (animal != null)
                 IconAndTextNew(
                     iconRes = R.drawable.baseline_pets_24,

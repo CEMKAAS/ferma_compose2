@@ -11,7 +11,7 @@ import com.zaroslikov.domain.repository.RecyclingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class RecyclingRepositoryImpl @Inject constructor(
@@ -53,26 +53,52 @@ class RecyclingRepositoryImpl @Inject constructor(
         recycling: DomainRecycling,
         products: List<DomainRecyclingProduct>,
         ingredients: List<DomainWriteOffTable>,
-        todayIso: String
-    ): Long {
-        val today = LocalDate.parse(todayIso)
-        return recyclingDao.insertRecycling(
-            recycling = recycling.toRoomMap(),
-            products = products.map { product ->
-                val readyDate = product.readyYear?.let { year ->
-                    LocalDate.of(year, product.readyMonth ?: 1, product.readyDay ?: 1)
+        nowIso: String
+    ): Long = recyclingDao.insertRecycling(
+        recycling = recycling.toRoomMap(),
+        products = products.withCompleteNow(nowIso),
+        ingredients = ingredients.map { it.toRoomMap() }
+    )
+
+    override suspend fun updateRecycling(
+        recycling: DomainRecycling,
+        products: List<DomainRecyclingProduct>,
+        ingredients: List<DomainWriteOffTable>,
+        nowIso: String
+    ) = recyclingDao.updateRecycling(
+        recycling = recycling.toRoomMap(),
+        products = products.withCompleteNow(nowIso),
+        ingredients = ingredients.map { it.toRoomMap() }
+    )
+
+    /** Продукция без даты готовности или с уже наступившим моментом поступает в учёт сразу. */
+    private fun List<DomainRecyclingProduct>.withCompleteNow(nowIso: String) =
+        LocalDateTime.parse(nowIso).let { now ->
+            map { product ->
+                val ready = product.readyYear?.let { year ->
+                    LocalDateTime.of(
+                        year, product.readyMonth ?: 1, product.readyDay ?: 1,
+                        product.readyHour ?: 0, product.readyMinute ?: 0
+                    )
                 }
-                product.toRoomMap() to (readyDate == null || !readyDate.isAfter(today))
-            },
-            ingredients = ingredients.map { it.toRoomMap() }
-        )
-    }
+                product.toRoomMap() to (ready == null || !ready.isAfter(now))
+            }
+        }
 
-    override suspend fun completeRecyclingProduct(productId: Long, day: Int, month: Int, year: Int) =
-        recyclingDao.completeRecyclingProduct(productId, day, month, year)
+    override suspend fun completeRecyclingProduct(
+        productId: Long,
+        day: Int,
+        month: Int,
+        year: Int,
+        hour: Int?,
+        minute: Int?
+    ): Boolean = recyclingDao.completeRecyclingProduct(productId, day, month, year, hour, minute)
 
-    override suspend fun completeDueRecycling(todayIso: String) =
-        recyclingDao.completeDueRecycling(todayIso)
+    override suspend fun completeDueRecycling(nowIso: String) =
+        recyclingDao.completeDueRecycling(nowIso)
+
+    override suspend fun disposeRecycling(id: Long, note: String): List<DomainWriteOffTable> =
+        recyclingDao.disposeRecycling(id, note).map { it.toDomainMap() }
 
     override suspend fun deleteRecycling(id: Long) = recyclingDao.deleteRecycling(id)
 }

@@ -1,7 +1,7 @@
 package com.zaroslikov.fermacompose2.ui.warehouse
 
 import com.zaroslikov.domain.repository.RecyclingRepository
-import com.zaroslikov.fermacompose2.supportFun.todayIso
+import com.zaroslikov.fermacompose2.supportFun.nowIso
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -70,7 +70,7 @@ class WarehouseViewModel @Inject constructor(
 
     init {
         // Продукция из переработки, чья дата готовности наступила, поступает на склад
-        viewModelScope.launch { recyclingRepository.completeDueRecycling(todayIso()) }
+        viewModelScope.launch { recyclingRepository.completeDueRecycling(nowIso()) }
         loadData()
     }
 

@@ -54,7 +54,8 @@ interface RecyclingDao {
     @Query(
         "SELECT * FROM recycling_product_table WHERE idPT = :idPT" +
                 " ORDER BY is_completed ASC," +
-                " DATE(printf('%04d-%02d-%02d', ready_year, ready_month, ready_day)) ASC," +
+                " printf('%04d-%02d-%02dT%02d:%02d', ready_year, ready_month, ready_day," +
+                " COALESCE(ready_hour, 0), COALESCE(ready_minute, 0)) ASC," +
                 " _id ASC"
     )
     fun getRecyclingProductList(idPT: Long): Flow<List<RecyclingProductTable>>
@@ -74,9 +75,10 @@ interface RecyclingDao {
     @Query(
         "SELECT _id FROM recycling_product_table" +
                 " WHERE is_completed = 0 AND ready_year IS NOT NULL" +
-                " AND DATE(printf('%04d-%02d-%02d', ready_year, ready_month, ready_day)) <= DATE(:todayIso)"
+                " AND printf('%04d-%02d-%02dT%02d:%02d', ready_year, ready_month, ready_day," +
+                " COALESCE(ready_hour, 0), COALESCE(ready_minute, 0)) <= :nowIso"
     )
-    suspend fun getDueRecyclingProductIds(todayIso: String): List<Long>
+    suspend fun getDueRecyclingProductIds(nowIso: String): List<Long>
 
     @Query("SELECT currency_suffix FROM settings_table WHERE idPT = :idPT LIMIT 1")
     suspend fun getCurrencySuffix(idPT: Long): Suffix?
@@ -93,8 +95,20 @@ interface RecyclingDao {
     @Insert
     suspend fun insertIngredients(items: List<WriteOffTable>)
 
+    @Update
+    suspend fun updateRecyclingRow(item: RecyclingTable)
+
+    @Query("DELETE FROM recycling_product_table WHERE _id = :id")
+    suspend fun deleteRecyclingProductRow(id: Long)
+
     @Insert
     suspend fun insertProduct(item: AddTable): Long
+
+    @Query("SELECT * FROM add_table WHERE _id = :addId AND idPT = :idPT")
+    suspend fun getProductOnce(addId: Long, idPT: Long): AddTable?
+
+    @Update
+    suspend fun updateProduct(item: AddTable)
 
     @Query("DELETE FROM add_table WHERE _id = :addId AND idPT = :idPT")
     suspend fun deleteProduct(addId: Long, idPT: Long)
@@ -132,18 +146,111 @@ interface RecyclingDao {
                     productId,
                     product.readyDay ?: recycling.day,
                     product.readyMonth ?: recycling.month,
-                    product.readyYear ?: recycling.year
+                    product.readyYear ?: recycling.year,
+                    product.readyHour,
+                    product.readyMinute
                 )
         }
         return id
     }
 
-    /** Продукция поступает в add_table датой готовности; повторный вызов ничего не делает. */
+    /**
+     * Правка партии: строка партии, сырьё заменяется целиком, продукция сверяется по id.
+     * [products] — продукция (id = 0 у новой) и признак «поступает в учёт сразу».
+     * Убранная продукция удаляется вместе со своей строкой add_table. Уже поступившая остаётся
+     * поступившей, если срок по-прежнему не задан или наступил, — её строка add_table получает новые
+     * название, количество, единицу и дату готовности; если же ей задали будущий срок, она уходит
+     * со склада обратно в переработку. Остальная (и новая) поступает сразу или ждёт по [products].
+     */
     @Transaction
-    suspend fun completeRecyclingProduct(productId: Long, day: Int, month: Int, year: Int) {
-        val product = getRecyclingProductOnce(productId) ?: return
-        if (product.isCompleted) return
-        val recycling = getRecyclingOnce(product.recyclingId) ?: return
+    suspend fun updateRecycling(
+        recycling: RecyclingTable,
+        products: List<Pair<RecyclingProductTable, Boolean>>,
+        ingredients: List<WriteOffTable>
+    ) {
+        val old = getRecyclingOnce(recycling.id) ?: return
+        val idPT = old.idPT
+        updateRecyclingRow(recycling.copy(idPT = idPT))
+        deleteIngredients(old.id)
+        insertIngredients(ingredients.map { it.copy(id = 0, recyclingId = old.id, idPT = idPT) })
+
+        val existing = getRecyclingProducts(old.id).associateBy { it.id }
+        val keptIds = products.map { it.first.id }.toSet()
+        existing.values.filter { it.id !in keptIds }.forEach { product ->
+            product.addId?.let { deleteProduct(it, idPT) }
+            deleteRecyclingProductRow(product.id)
+        }
+
+        products.forEach { (product, completeNow) ->
+            val current = existing[product.id]
+            val readyDay = product.readyDay ?: recycling.day
+            val readyMonth = product.readyMonth ?: recycling.month
+            val readyYear = product.readyYear ?: recycling.year
+            if (current != null && current.isCompleted && completeNow) {
+                updateRecyclingProductRow(
+                    product.copy(
+                        recyclingId = old.id,
+                        category = current.category,
+                        readyDay = readyDay,
+                        readyMonth = readyMonth,
+                        readyYear = readyYear,
+                        isCompleted = true,
+                        addId = current.addId,
+                        idPT = idPT
+                    )
+                )
+                current.addId?.let { getProductOnce(it, idPT) }?.let { add ->
+                    updateProduct(
+                        add.copy(
+                            title = product.title,
+                            count = product.count,
+                            countSuffix = product.countSuffix,
+                            day = readyDay,
+                            month = readyMonth,
+                            year = readyYear,
+                            note = recycling.note
+                        )
+                    )
+                }
+                return@forEach
+            }
+            // Поступившая продукция с новым будущим сроком снова ждёт: убираем её со склада
+            if (current?.isCompleted == true) current.addId?.let { deleteProduct(it, idPT) }
+            val pending = product.copy(
+                recyclingId = old.id,
+                category = current?.category ?: product.category,
+                isCompleted = false,
+                addId = null,
+                idPT = idPT
+            )
+            val productId = if (current != null) {
+                updateRecyclingProductRow(pending)
+                current.id
+            } else insertRecyclingProductRow(pending.copy(id = 0))
+            if (completeNow)
+                completeRecyclingProduct(
+                    productId, readyDay, readyMonth, readyYear, product.readyHour, product.readyMinute
+                )
+        }
+    }
+
+    /**
+     * Продукция поступает в add_table датой готовности; повторный вызов ничего не делает.
+     * [hour]/[minute] — время готовности (null — начало дня).
+     * Возвращает true, если продукция завершена именно этим вызовом.
+     */
+    @Transaction
+    suspend fun completeRecyclingProduct(
+        productId: Long,
+        day: Int,
+        month: Int,
+        year: Int,
+        hour: Int?,
+        minute: Int?
+    ): Boolean {
+        val product = getRecyclingProductOnce(productId) ?: return false
+        if (product.isCompleted) return false
+        val recycling = getRecyclingOnce(product.recyclingId) ?: return false
         val addId = insertProduct(
             AddTable(
                 title = product.title,
@@ -166,22 +273,56 @@ interface RecyclingDao {
                 addId = addId,
                 readyDay = day,
                 readyMonth = month,
-                readyYear = year
+                readyYear = year,
+                readyHour = hour,
+                readyMinute = minute
             )
         )
+        return true
     }
 
     @Transaction
-    suspend fun completeDueRecycling(todayIso: String) {
-        getDueRecyclingProductIds(todayIso).forEach { id ->
+    suspend fun completeDueRecycling(nowIso: String) {
+        getDueRecyclingProductIds(nowIso).forEach { id ->
             val product = getRecyclingProductOnce(id) ?: return@forEach
             completeRecyclingProduct(
                 id,
                 product.readyDay ?: return@forEach,
                 product.readyMonth ?: return@forEach,
-                product.readyYear ?: return@forEach
+                product.readyYear ?: return@forEach,
+                product.readyHour,
+                product.readyMinute
             )
         }
+    }
+
+    @Query("SELECT * FROM write_off_table WHERE recycling_id = :recyclingId")
+    suspend fun getIngredients(recyclingId: Long): List<WriteOffTable>
+
+    /** Сырьё партии становится обычным списанием в утиль; пустое примечание — [note]. */
+    @Query(
+        "UPDATE write_off_table SET recycling_id = NULL, status = 0," +
+                " note = CASE WHEN TRIM(note) = '' THEN :note ELSE note END" +
+                " WHERE recycling_id = :recyclingId"
+    )
+    suspend fun disposeIngredients(recyclingId: Long, note: String)
+
+    @Query("DELETE FROM recycling_product_table WHERE recycling_id = :recyclingId AND is_completed = 0")
+    suspend fun deleteIncompleteProducts(recyclingId: Long)
+
+    /**
+     * Переработка не удалась: сырьё партии списывается в утиль обычными записями (выходит из
+     * переработки), неготовая продукция отменяется — на склад она не поступит. Готовая продукция
+     * остаётся; если её нет, партия удаляется. Возвращает списанное сырьё (пусто — нечего списывать).
+     */
+    @Transaction
+    suspend fun disposeRecycling(id: Long, note: String): List<WriteOffTable> {
+        if (getRecyclingProducts(id).none { !it.isCompleted }) return emptyList()
+        val ingredients = getIngredients(id)
+        disposeIngredients(id, note)
+        deleteIncompleteProducts(id)
+        if (getRecyclingProducts(id).isEmpty()) deleteRecyclingRow(id)
+        return ingredients
     }
 
     @Transaction

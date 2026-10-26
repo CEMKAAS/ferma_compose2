@@ -5,6 +5,14 @@ package com.zaroslikov.fermacompose2.ui.elements.TextField
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.RichTooltip
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -1705,8 +1713,12 @@ fun OutlinedSwitch(
     isBorderCard: Boolean = true,
     @DrawableRes leadingIconRes: Int = R.drawable.outline_language_24,
     @StringRes labelIntRes: Int = R.string.outlined_text_multi_project_template,
-    @StringRes supportingText: Int = R.string.support_text_multi_project_template,
+    @StringRes supportingText: Int? = R.string.support_text_multi_project_template,
+    /** Пояснение по значку «i» рядом с подписью — вместо или вместе с [supportingText]. */
+    @StringRes infoRes: Int? = null,
 ) {
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
     val textField: @Composable () -> Unit = {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -1731,18 +1743,35 @@ fun OutlinedSwitch(
                         style = text_16,
                         color = dark
                     )
+                    if (infoRes != null)
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                            tooltip = { RichTooltip { Text(text = stringResource(infoRes), style = text_14) } },
+                            state = tooltipState
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.icon_info),
+                                contentDescription = stringResource(R.string.content_description_info),
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clip(CircleShape)
+                                    .clickable { scope.launch { tooltipState.show() } },
+                                tint = gray_7
+                            )
+                        }
                 }
                 Switch(
                     checked = checked,
                     onCheckedChange = onCheckedChange,
                 )
             }
-            Text(
-                text = stringResource(supportingText),
-                style = text_12,
-                color = gray_7,
-                lineHeight = 20.sp
-            )
+            if (supportingText != null)
+                Text(
+                    text = stringResource(supportingText),
+                    style = text_12,
+                    color = gray_7,
+                    lineHeight = 20.sp
+                )
         }
     }
 

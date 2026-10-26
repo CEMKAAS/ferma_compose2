@@ -61,9 +61,9 @@ import com.zaroslikov.fermacompose2.violet_3
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.OutlinedWriteOffType
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDetailBottomSheet
-import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingInProgressBlock
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDisposeBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingProductsBrief
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
-import com.zaroslikov.fermacompose2.ui.project.sections.recycling.hasInProgress
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingEntryFields
 import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.WriteOffType
 
@@ -155,6 +155,14 @@ fun WriteOffScreen(
                         },
                         onDeleteClick = { viewModel.onIntent(WriteOffListIntent.DeleteRecycling) }
                     )
+                else if (state.isOpenRecyclingDispose)
+                    RecyclingDisposeBottomSheet(
+                        item = recycling,
+                        onDismissRequest = {
+                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingDispose(false))
+                        },
+                        onDisposeClick = { viewModel.onIntent(WriteOffListIntent.DisposeRecycling) }
+                    )
                 else
                     RecyclingDetailBottomSheet(
                         item = recycling,
@@ -162,8 +170,14 @@ fun WriteOffScreen(
                         onCompleteClick = {
                             viewModel.onIntent(WriteOffListIntent.CompleteRecyclingProduct(it))
                         },
+                        onEditClick = {
+                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingEdit(recycling.recycling.id))
+                        },
                         onDeleteClick = {
                             viewModel.onIntent(WriteOffListIntent.OpenRecyclingDelete(true))
+                        },
+                        onDisposeClick = {
+                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingDispose(true))
                         },
                         onDismissRequest = {
                             viewModel.onIntent(WriteOffListIntent.OpenRecyclingDetail(null))
@@ -327,7 +341,7 @@ private fun WriteOffContainer(
     recyclingItems: List<RecyclingItem>,
     onRecyclingClick: (Long) -> Unit
 ) {
-    val recyclingTitles = recyclingItems.associate { it.recycling.id to it.title }
+    val recyclingById = recyclingItems.associateBy { it.recycling.id }
     InventoryBody(
         modifier = modifier,
         details = details,
@@ -335,6 +349,7 @@ private fun WriteOffContainer(
         searchList = searchList,
         brieflyList = brieflyList, searchBrieflyList = searchBrieflyList,
         detailCard = { index, item ->
+            val recycling = item.recyclingId?.let { recyclingById[it] }
             DetailProductCardNew(
                 title = item.title,
                 count = item.count,
@@ -343,7 +358,8 @@ private fun WriteOffContainer(
                 priceSuffix = priceSuffix,
                 productOrigin = item.productOrigin,
                 statusWriteOff = item.status,
-                recyclingTitle = item.recyclingId?.let { recyclingTitles[it] },
+                recyclingTitle = recycling?.title,
+                recyclingContent = recycling?.let { { RecyclingProductsBrief(it) } },
                 category = item.category,
                 note = item.note,
                 color = color,
@@ -353,7 +369,11 @@ private fun WriteOffContainer(
                 typeProduct = item.animalCountId?.let { TypeProduct.ANIMAL },
                 animalCountId = item.animalCountId,
                 isArchive = isArchive,
-                onClick = { onDetailsCardClick(item.id) },
+                // Сырьё переработки открывает детали всей партии: статус, «Готово сейчас», удаление
+                onClick = {
+                    if (recycling != null) onRecyclingClick(recycling.recycling.id)
+                    else onDetailsCardClick(item.id)
+                },
                 onEditClick = { onEditClick(item.id) },
                 onDeleteClick = { onDeleteClick(item.id) },
             )
@@ -381,10 +401,7 @@ private fun WriteOffContainer(
         ),
         iconColor = violet_1,
         backgroundColor = violet_3,
-        isArchive = isArchive,
-        header = if (!recyclingItems.hasInProgress()) null else {
-            { RecyclingInProgressBlock(items = recyclingItems, onClick = onRecyclingClick) }
-        }
+        isArchive = isArchive
     )
 }
 
@@ -483,17 +500,20 @@ private fun WriteOffEntryBottomSheet(
                 onValueChange = { onIntent(WriteOffListIntent.NameTemplateChanged(it)) },
                 isError = errors.isErrorNameTemplate,
             )
-        // Переработка — только для новой записи: шаблоны и правка хранят одну строку списания
-        if (isTemplate || !product.isEntry)
-            OutlinedWriteOffStatus(
+        // Выбор переработки — только для новой записи: шаблоны и правка строки хранят одну строку
+        // списания; при правке переработки тип не меняется, поле скрыто
+        when {
+            product.isRecycling && !product.isEntry -> Unit
+
+            isTemplate || !product.isEntry -> OutlinedWriteOffStatus(
                 value = product.status,
                 onValueChange = { onIntent(WriteOffListIntent.StatusClicked(it)) },
                 isShowSwitch = isTemplate,
                 checked = template.isWriteOffStatus,
                 onCheckedChange = { onIntent(WriteOffListIntent.WriteOffStatusClicked(it)) },
             )
-        else
-            OutlinedWriteOffType(
+
+            else -> OutlinedWriteOffType(
                 type = when {
                     product.isRecycling -> WriteOffType.RECYCLING
                     product.status -> WriteOffType.OWN_NEEDS
@@ -501,6 +521,7 @@ private fun WriteOffEntryBottomSheet(
                 },
                 onValueChange = { onIntent(WriteOffListIntent.TypeClicked(it)) }
             )
+        }
         if (product.isRecycling && !isTemplate) {
             RecyclingEntryFields(
                 form = product.recycling,
@@ -537,12 +558,19 @@ private fun WriteOffEntryBottomSheet(
                 onProductReadyModeChange = { key, value ->
                     onIntent(WriteOffListIntent.RecyclingProductReadyMode(key, value))
                 },
-                onProductDaysChange = { key, value ->
-                    onIntent(WriteOffListIntent.RecyclingProductDays(key, value))
+                onProductHoursChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductHours(key, value))
+                },
+                onProductMinutesChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductMinutes(key, value))
                 },
                 onProductReadyDateChange = { key, value ->
                     onIntent(WriteOffListIntent.RecyclingProductReadyDate(key, value))
                 },
+                onProductReadyTimeChange = { key, value ->
+                    onIntent(WriteOffListIntent.RecyclingProductReadyTime(key, value))
+                },
+                onStartTimeChange = { onIntent(WriteOffListIntent.RecyclingStartTime(it)) },
             )
             OutlinedTextNoteNew(
                 value = product.note,

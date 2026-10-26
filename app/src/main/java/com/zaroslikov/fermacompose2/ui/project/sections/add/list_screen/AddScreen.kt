@@ -53,6 +53,7 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryB
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BaseSectionScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDetailBottomSheet
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDisposeBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingInProgressBlock
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.hasInProgress
@@ -120,6 +121,14 @@ fun AddScreen(
                         },
                         onDeleteClick = { viewModel.onIntent(AddListIntent.DeleteRecycling) }
                     )
+                else if (state.isOpenRecyclingDispose)
+                    RecyclingDisposeBottomSheet(
+                        item = recycling,
+                        onDismissRequest = {
+                            viewModel.onIntent(AddListIntent.OpenRecyclingDispose(false))
+                        },
+                        onDisposeClick = { viewModel.onIntent(AddListIntent.DisposeRecycling) }
+                    )
                 else
                     RecyclingDetailBottomSheet(
                         item = recycling,
@@ -128,6 +137,7 @@ fun AddScreen(
                             viewModel.onIntent(AddListIntent.CompleteRecyclingProduct(it))
                         },
                         onDeleteClick = { viewModel.onIntent(AddListIntent.OpenRecyclingDelete(true)) },
+                        onDisposeClick = { viewModel.onIntent(AddListIntent.OpenRecyclingDispose(true)) },
                         onDismissRequest = { viewModel.onIntent(AddListIntent.OpenRecyclingDetail(null)) }
                     )
             }

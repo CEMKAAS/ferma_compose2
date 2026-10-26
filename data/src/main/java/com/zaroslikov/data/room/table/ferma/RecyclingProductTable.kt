@@ -41,6 +41,10 @@ data class RecyclingProductTable(
     val readyMonth: Int?,
     @ColumnInfo(name = "ready_year")
     val readyYear: Int?,
+    @ColumnInfo(name = "ready_hour")
+    val readyHour: Int? = null, // время готовности; null — начало дня (00:00)
+    @ColumnInfo(name = "ready_minute")
+    val readyMinute: Int? = null,
     @ColumnInfo(name = "is_completed")
     val isCompleted: Boolean,
     @ColumnInfo(name = "add_id")

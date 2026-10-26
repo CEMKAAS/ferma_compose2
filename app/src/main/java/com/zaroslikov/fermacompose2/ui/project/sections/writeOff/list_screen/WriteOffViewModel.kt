@@ -20,12 +20,25 @@ import com.zaroslikov.domain.repository.WriteOffRepository
 import com.zaroslikov.domain.repository.RecyclingRepository
 import com.zaroslikov.domain.models.table.DomainRecycling
 import com.zaroslikov.domain.models.table.DomainRecyclingProduct
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.readyDateTime
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toCountText
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toIngredientCountText
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.toRecyclingItem
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.readyLocalDate
-import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormLocalDate
-import com.zaroslikov.fermacompose2.supportFun.todayIso
-import java.time.LocalDate
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.readyDateTime
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.start
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.findRecycling
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingIngredientForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingProductForm
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.RecyclingReadyMode
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.recyclingStart
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.recycling.toFormString
+import com.zaroslikov.fermacompose2.supportFun.formatterTime
+import java.time.LocalTime
+import com.zaroslikov.fermacompose2.supportFun.nowIso
+import com.zaroslikov.fermacompose2.supportFun.toIso
+import java.time.LocalDateTime
 import com.zaroslikov.domain.repository.template.TemplateRepository
 import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.base.intent.QrCodeIntent
@@ -116,8 +129,12 @@ class WriteOffViewModel @Inject constructor(
             is WriteOffListIntent.RecyclingIngredientChoice ->
                 updateIngredientWarehouse(intent.key, intent.title, intent.productOrigin)
 
+            is WriteOffListIntent.OpenRecyclingEdit ->
+                viewModelScope.launch { openRecyclingEdit(intent.id) }
+
             is WriteOffListIntent.CompleteRecyclingProduct -> completeRecyclingProduct(intent.productId)
             WriteOffListIntent.DeleteRecycling -> deleteRecycling()
+            WriteOffListIntent.DisposeRecycling -> disposeRecycling()
 
             WriteOffListIntent.Insert -> insert()
             WriteOffListIntent.Update -> update()
@@ -141,7 +158,7 @@ class WriteOffViewModel @Inject constructor(
         viewModelScope.launch {
             val isArchive = projectRepository.getIsArchiveProject(_itemIdPT).first()
             // Продукция, чья дата готовности наступила, поступает на склад
-            recyclingRepository.completeDueRecycling(todayIso())
+            recyclingRepository.completeDueRecycling(nowIso())
             combine(
                 writeOffRepository.getAllWriteOffItems(_itemIdPT),
                 addRepository.getItemsTitleAddList(_itemIdPT, false),
@@ -207,6 +224,7 @@ class WriteOffViewModel @Inject constructor(
     }
 
     override fun update() {
+        if (getState().currentProduct.product.isRecycling) return updateRecycling()
         viewModelScope.launch {
             writeOffRepository.updateWriteOff(getState().currentProduct.product.updateForSave())
             if (getState().productDetail != null)
@@ -231,45 +249,12 @@ class WriteOffViewModel @Inject constructor(
         viewModelScope.launch {
             val product = getState().currentProduct.product
             val form = product.recycling
-            val start = product.date.toFormLocalDate()
-            val recycling = DomainRecycling(
-                day = start.dayOfMonth,
-                month = start.monthValue,
-                year = start.year,
-                note = product.note.trim(),
-                idPT = _itemIdPT
-            )
-            val products = form.products.map { item ->
-                val ready = item.readyLocalDate(product.date)
-                DomainRecyclingProduct(
-                    title = item.title.trim(),
-                    count = item.count.toConvertDbDouble(),
-                    countSuffix = item.countSuffix,
-                    readyDay = ready?.dayOfMonth,
-                    readyMonth = ready?.monthValue,
-                    readyYear = ready?.year,
-                    idPT = _itemIdPT
-                )
-            }
-            val ingredients = form.ingredients.map { ingredient ->
-                DomainWriteOffTable(
-                    title = ingredient.title.trim(),
-                    count = ingredient.count.toConvertDbDouble(),
-                    countSuffix = ingredient.countSuffix,
-                    productOrigin = ingredient.productOrigin,
-                    day = start.dayOfMonth,
-                    month = start.monthValue,
-                    year = start.year,
-                    status = true,
-                    note = "",
-                    idPT = _itemIdPT
-                )
-            }
-            recyclingRepository.insertRecycling(recycling, products, ingredients, todayIso())
-            val today = LocalDate.now()
+            // «Через N часов» отсчитываются от даты и времени постановки на переработку
+            val (recycling, products, ingredients) = product.toRecyclingDomain(form.start(product.date))
+            val now = LocalDateTime.now()
+            recyclingRepository.insertRecycling(recycling, products, ingredients, now.toIso())
             val (ready, delayed) = products.partition { item ->
-                val year = item.readyYear ?: return@partition true
-                !LocalDate.of(year, item.readyMonth ?: 1, item.readyDay ?: 1).isAfter(today)
+                item.readyDateTime()?.isAfter(now) != true
             }
             showMessage(
                 when {
@@ -289,15 +274,144 @@ class WriteOffViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Правка партии: время начала сохраняется из формы и тогда, когда ни один товар не «зреет»,
+     * чтобы правка не сдвигала его на момент сохранения.
+     */
+    private fun updateRecycling() {
+        viewModelScope.launch {
+            val product = getState().currentProduct.product
+            val form = product.recycling
+            val start = recyclingStart(product.date, LocalTime.parse(form.startTime))
+            val (recycling, products, ingredients) = product.toRecyclingDomain(start)
+            recyclingRepository.updateRecycling(recycling, products, ingredients, nowIso())
+            showMessage(
+                resourceProvider.getString(R.string.snackbar_recycling_update)
+                    .format(products.toCountText(resourceProvider))
+            )
+            loadDataForEntryOrEdit(false, null)
+        }
+    }
+
+    /** Партия, её продукция (id из формы, у новой 0) и сырьё; [WriteOffProduct.itemId] — id партии. */
+    private fun WriteOffProduct.toRecyclingDomain(
+        start: LocalDateTime
+    ): Triple<DomainRecycling, List<DomainRecyclingProduct>, List<DomainWriteOffTable>> {
+        val recycling = DomainRecycling(
+            id = itemId,
+            day = start.dayOfMonth,
+            month = start.monthValue,
+            year = start.year,
+            startHour = start.hour,
+            startMinute = start.minute,
+            note = note.trim(),
+            idPT = _itemIdPT
+        )
+        val products = this.recycling.products.map { item ->
+            val ready = item.readyDateTime(start)
+            DomainRecyclingProduct(
+                id = item.id ?: 0,
+                recyclingId = itemId,
+                title = item.title.trim(),
+                count = item.count.toConvertDbDouble(),
+                countSuffix = item.countSuffix,
+                readyDay = ready?.dayOfMonth,
+                readyMonth = ready?.monthValue,
+                readyYear = ready?.year,
+                readyHour = ready?.hour,
+                readyMinute = ready?.minute,
+                idPT = _itemIdPT
+            )
+        }
+        val ingredients = this.recycling.ingredients.map { ingredient ->
+            DomainWriteOffTable(
+                title = ingredient.title.trim(),
+                count = ingredient.count.toConvertDbDouble(),
+                countSuffix = ingredient.countSuffix,
+                productOrigin = ingredient.productOrigin,
+                day = start.dayOfMonth,
+                month = start.monthValue,
+                year = start.year,
+                status = true,
+                note = "",
+                idPT = _itemIdPT
+            )
+        }
+        return Triple(recycling, products, ingredients)
+    }
+
+    /** Открывает форму ввода в режиме переработки, заполненную партией [recyclingId]. */
+    private suspend fun openRecyclingEdit(recyclingId: Long) {
+        val item = getState().recyclingItems.findRecycling(recyclingId) ?: return
+        val state = loadDataForPickList().toRecyclingUi(item)
+        sendIntent(WriteOffListIntent.RefreshEntryBottomSheetState(true, state))
+        state.product.recycling.ingredients.forEach { ingredient ->
+            ingredient.productOrigin?.let { updateIngredientWarehouse(ingredient.key, ingredient.title, it) }
+        }
+    }
+
+    /**
+     * Форма правки партии: у товара, чей момент готовности позже начала переработки, —
+     * «Дата и время» с этим моментом; поступивший сразу (готовность не позже начала) — без срока.
+     */
+    private fun WriteOffProductState.toRecyclingUi(item: RecyclingItem): WriteOffProductState {
+        val recycling = item.recycling
+        val start = LocalDateTime.of(
+            recycling.year, recycling.month, recycling.day,
+            recycling.startHour ?: 0, recycling.startMinute ?: 0
+        )
+        val ingredients = item.ingredients.mapIndexed { index, ingredient ->
+            RecyclingIngredientForm(
+                key = index.toLong(),
+                title = ingredient.title,
+                countSuffix = ingredient.countSuffix,
+                productOrigin = ingredient.productOrigin,
+                count = ingredient.count.formatNumber(false)
+            )
+        }
+        val products = item.products.mapIndexed { index, productItem ->
+            val domain = productItem.product
+            val ready = domain.readyDateTime()?.takeIf { it.isAfter(start) }
+            val form = RecyclingProductForm(
+                key = (ingredients.size + index).toLong(),
+                id = domain.id,
+                title = domain.title,
+                count = domain.count.formatNumber(false),
+                countSuffix = domain.countSuffix
+            )
+            if (ready == null) form
+            else form.copy(
+                readyMode = RecyclingReadyMode.DATE_TIME,
+                readyDate = ready.toLocalDate().toFormString(),
+                readyTime = formatterTime(ready.hour, ready.minute)
+            )
+        }
+        return copy(
+            product = product.copy(
+                itemId = recycling.id,
+                date = formatDateToString(recycling.day, recycling.month, recycling.year),
+                note = recycling.note,
+                isEntry = false,
+                isRecycling = true,
+                recycling = RecyclingForm(
+                    ingredients = ingredients,
+                    products = products,
+                    nextKey = (ingredients.size + products.size).toLong(),
+                    startTime = formatterTime(start.hour, start.minute)
+                )
+            )
+        )
+    }
+
     private fun completeRecyclingProduct(productId: Long) {
         viewModelScope.launch {
             val product = getState().recyclingDetail()?.products
                 ?.find { it.product.id == productId }?.product ?: return@launch
-            val today = LocalDate.now()
-            recyclingRepository.completeRecyclingProduct(
-                productId, today.dayOfMonth, today.monthValue, today.year
+            val now = LocalDateTime.now()
+            val completed = recyclingRepository.completeRecyclingProduct(
+                productId, now.dayOfMonth, now.monthValue, now.year, now.hour, now.minute
             )
-            showMessage(
+            if (completed) showMessage(
                 resourceProvider.getString(R.string.snackbar_recycling_complete)
                     .format(listOf(product).toCountText(resourceProvider))
             )
@@ -309,6 +423,22 @@ class WriteOffViewModel @Inject constructor(
             val item = getState().recyclingDetail() ?: return@launch
             recyclingRepository.deleteRecycling(item.recycling.id)
             showMessage(resourceProvider.getString(R.string.snackbar_recycling_delete).format(item.title))
+            sendIntent(WriteOffListIntent.OpenRecyclingDetail(null))
+        }
+    }
+
+    /** Сырьё партии списывается в утиль, неготовая продукция отменяется. */
+    private fun disposeRecycling() {
+        viewModelScope.launch {
+            val item = getState().recyclingDetail() ?: return@launch
+            val disposed = recyclingRepository.disposeRecycling(
+                item.recycling.id,
+                resourceProvider.getString(R.string.recycling_dispose_note)
+            )
+            if (disposed.isNotEmpty()) showMessage(
+                resourceProvider.getString(R.string.snackbar_recycling_dispose)
+                    .format(disposed.toIngredientCountText(resourceProvider))
+            )
             sendIntent(WriteOffListIntent.OpenRecyclingDetail(null))
         }
     }
@@ -417,9 +547,9 @@ class WriteOffViewModel @Inject constructor(
 
                         else -> {
                             val addItem = writeOffRepository.getItemWriteOff(id).first()
-                            // Сырьё не правится по строке — открываем всю переработку
+                            // Сырьё не правится по строке — правим всю переработку
                             addItem.recyclingId?.let {
-                                sendIntent(WriteOffListIntent.OpenRecyclingDetail(it))
+                                openRecyclingEdit(it)
                                 return@launch
                             }
                             baseState.toUi(addItem)

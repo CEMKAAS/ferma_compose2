@@ -13,6 +13,9 @@ data class DomainRecycling(
     val day: Int,
     val month: Int,
     val year: Int,
+    /** Время начала переработки; null — начало дня (00:00, так у старых записей и бэкапов). */
+    val startHour: Int? = null,
+    val startMinute: Int? = null,
     val note: String = "",
     val idPT: Long
 )
@@ -20,7 +23,8 @@ data class DomainRecycling(
 /**
  * Продукция партии переработки [recyclingId]. Пока она не завершена ([isCompleted] = false),
  * её нет ни на складе, ни в учёте — строка add_table появляется только при готовности, её id — [addId].
- * Дата готовности ([readyDay]/[readyMonth]/[readyYear]) задана, только если продукция «зреет».
+ * Дата готовности ([readyDay]/[readyMonth]/[readyYear]) задана, только если продукция «зреет»;
+ * время ([readyHour]/[readyMinute]) — к этой дате, null — начало дня (00:00, так у старых бэкапов).
  */
 @Serializable
 data class DomainRecyclingProduct(
@@ -33,6 +37,8 @@ data class DomainRecyclingProduct(
     val readyDay: Int? = null,
     val readyMonth: Int? = null,
     val readyYear: Int? = null,
+    val readyHour: Int? = null,
+    val readyMinute: Int? = null,
     val isCompleted: Boolean = false,
     val addId: Long? = null,
     val idPT: Long

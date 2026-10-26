@@ -6,6 +6,7 @@ import com.zaroslikov.fermacompose2.R
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.Period
 import java.time.ZoneId
@@ -112,8 +113,12 @@ fun dateToday(): String {
     return LocalDate.now().format(formatter)
 }
 
-/** Сегодня в формате `yyyy-MM-dd` — для сравнения дат в SQL. */
-fun todayIso(): String = LocalDate.now().toString()
+/** Текущий момент в формате `yyyy-MM-dd'T'HH:mm` — для сравнения даты-времени в SQL. */
+fun nowIso(): String = LocalDateTime.now().toIso()
+
+/** Момент в формате `yyyy-MM-dd'T'HH:mm` — как его собирают SQL-запросы переработки. */
+fun LocalDateTime.toIso(): String =
+    format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm", Locale.ROOT))
 
 fun dateTodayNextYear(): String {
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault())

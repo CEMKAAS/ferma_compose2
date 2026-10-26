@@ -41,6 +41,7 @@ data class WriteOffListState(
     val recyclingItems: List<RecyclingItem> = emptyList(),
     val recyclingDetailId: Long? = null,
     val isOpenRecyclingDelete: Boolean = false,
+    val isOpenRecyclingDispose: Boolean = false,
 
     override val isLoading: Boolean = false,
     override val navigate: UiEvent? = null,
