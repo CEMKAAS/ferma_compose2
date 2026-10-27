@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Экран -->
+    <string name="assistant_title">Помощник</string>
+    <string name="assistant_subtitle_offline">Работает без интернета</string>
+    <string name="assistant_back">Назад</string>
+    <string name="assistant_menu">Меню</string>
+    <string name="assistant_menu_auto_confirm">Записывать без подтверждения</string>
+    <string name="assistant_menu_auto_confirm_sup">Карточка покажется уже записанной, её можно отменить</string>
+    <string name="assistant_menu_clear">Очистить чат</string>
+    <string name="assistant_menu_help">Что умеет помощник</string>
+    <string name="assistant_clear_title">Очистить чат?</string>
+    <string name="assistant_clear_text">История разговора будет удалена. Записи в хозяйстве останутся.</string>
+    <string name="assistant_clear_confirm">Очистить</string>
+    <string name="assistant_cancel">Отмена</string>
+    <string name="assistant_ok">ОК</string>
+    <string name="assistant_save">Сохранить</string>
+
+    <!-- Ввод -->
+    <string name="assistant_input_hint">Напишите или скажите…</string>
+    <string name="assistant_send">Отправить</string>
+    <string name="assistant_mic">Голосовой ввод</string>
+    <string name="assistant_mic_stop">Остановить запись</string>
+    <string name="assistant_listening">Слушаю…</string>
+    <string name="assistant_thinking">Помощник думает…</string>
+    <string name="assistant_speech_unavailable">Голосовой ввод недоступен на этом устройстве</string>
+
+    <!-- Карточка действия -->
+    <string name="assistant_card_confirm">Записать</string>
+    <string name="assistant_card_edit">Изменить</string>
+    <string name="assistant_card_cancel">Отмена</string>
+    <string name="assistant_card_undo">Отменить запись</string>
+    <string name="assistant_card_saved">Записано</string>
+    <string name="assistant_card_saving">Записываю…</string>
+    <string name="assistant_card_undoing">Удаляю запись…</string>
+    <string name="assistant_card_cancelled">Отменено</string>
+    <string name="assistant_card_undone">Запись удалена</string>
+    <string name="assistant_card_hint">Проверьте данные и нажмите «Записать» или скажите «да»</string>
+
+    <!-- Шторка правки -->
+    <string name="assistant_edit_title">Изменить запись</string>
+    <string name="assistant_edit_name">Название</string>
+    <string name="assistant_edit_count">Количество</string>
+    <string name="assistant_edit_unit">Единица</string>
+    <string name="assistant_edit_price">Цена</string>
+    <string name="assistant_edit_price_per_unit">За единицу</string>
+    <string name="assistant_edit_price_total">Сумма</string>
+    <string name="assistant_edit_buyer">Покупатель</string>
+    <string name="assistant_edit_category">Категория</string>
+    <string name="assistant_edit_animal_name">Кличка</string>
+    <string name="assistant_edit_animal_type">Вид</string>
+    <string name="assistant_edit_date">Дата</string>
+    <string name="assistant_edit_note">Примечание</string>
+    <string name="assistant_edit_error_number">Введите число</string>
+    <string name="assistant_edit_error_empty">Заполните поле</string>
+    <string name="assistant_edit_date_hint">дд.мм.гггг</string>
+    <string name="assistant_edit_animal_price">Цена покупки (необязательно)</string>
+    <string name="assistant_help_query">что ты умеешь</string>
+
+    <!-- Сообщения -->
+    <string name="assistant_msg_error">Не удалось выполнить: ошибка базы данных</string>
+</resources>

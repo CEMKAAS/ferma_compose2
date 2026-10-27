@@ -9,8 +9,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.zaroslikov.assistant.ui.navigation.AssistantDestination
+import com.zaroslikov.assistant.ui.navigation.assistantNavGraph
 import com.zaroslikov.crm.ui.navigation.CrmDestination
 import com.zaroslikov.crm.ui.navigation.crmNavGraph
+import io.appmetrica.analytics.AppMetrica
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
 import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisDestination
@@ -82,6 +85,10 @@ fun ProjectNavHost(
                 },
                 navigateToEdit = { rootNavController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
+                navigateToAssistant = {
+                    navController.navigate(AssistantDestination.routeFor(it))
+                    AppMetrica.reportEvent("Переход в помощник")
+                },
                 navigationToAnalysis = {
                     navController.navigate(
                         nav(
@@ -132,6 +139,9 @@ fun ProjectNavHost(
 
         // Раздел CRM живёт в модуле :crm, граф экранов подключается целиком
         crmNavGraph(navController)
+
+        // Чат помощника — модуль :assistant
+        assistantNavGraph(navController)
 
         composable(
             route = FinanceIncomeExpensesDestination.routeWithArgs,

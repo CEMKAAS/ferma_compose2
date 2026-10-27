@@ -122,6 +122,7 @@ fun WarehouseScreen(
     navigateToStart: () -> Unit,
     navigateToEdit: (Long) -> Unit,
     navigateToNote: (Long) -> Unit,
+    navigateToAssistant: (Long) -> Unit,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
     viewModel: WarehouseViewModel = hiltViewModel()
@@ -139,7 +140,11 @@ fun WarehouseScreen(
                 onSettingsClick = if (state.isArchive) null else {
                     { navigateToEdit(state.idPT) }
                 },
-                onNoteClick = { navigateToNote(state.idPT) }
+                onNoteClick = { navigateToNote(state.idPT) },
+                // В архивном проекте записи не ведутся — помощник скрыт вместе с настройками
+                onAssistantClick = if (state.isArchive) null else {
+                    { navigateToAssistant(state.idPT) }
+                }
             )
         }
     ) { innerPadding ->

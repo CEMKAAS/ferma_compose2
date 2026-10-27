@@ -75,6 +75,8 @@ fun TopAppBarBack(
     onNavigateBackClick: ((() -> Unit)?) = null,
     onNoteClick: (() -> Unit)? = null,
     onSettingsClick: (() -> Unit)? = null,
+    /** Открыть чат помощника (модуль :assistant). */
+    onAssistantClick: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     isHorizontalDriver: Boolean = false
 ) {
@@ -99,6 +101,14 @@ fun TopAppBarBack(
             windowInsets = WindowInsets(0),
             scrollBehavior = scrollBehavior,
             actions = {
+                onAssistantClick?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            painterResource(R.drawable.outline_chat_bubble_24),
+                            contentDescription = stringResource(R.string.warehouse_assistant_button)
+                        )
+                    }
+                }
                 onNoteClick?.let {
                     IconButton(onClick = it) {
                         Icon(
