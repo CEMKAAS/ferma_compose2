@@ -386,8 +386,25 @@ class AddViewModel @Inject constructor(
     override fun delete() {
         viewModelScope.launch {
             getState().productDetail?.let { product ->
-                addRepository.deleteAddById(product.id)
-                showSnackbar(ProductOperation.DELETE)
+                // Продукция переработки: удаляется и из партии, единственный товар — сырьё в утиль
+                val disposed = if (recyclingRepository.isRecycledProduct(product.id))
+                    recyclingRepository.deleteRecycledProduct(
+                        product.id,
+                        resourceProvider.getString(R.string.recycling_dispose_note)
+                    )
+                else {
+                    addRepository.deleteAddById(product.id)
+                    emptyList()
+                }
+                if (disposed.isEmpty()) showSnackbar(ProductOperation.DELETE)
+                else showMessage(
+                    resourceProvider.getString(R.string.snackbar_recycled_product_delete_dispose).format(
+                        product.title,
+                        product.count.formatNumber(),
+                        resourceProvider.getString(product.countSuffix.toResId()),
+                        disposed.toIngredientCountText(resourceProvider)
+                    )
+                )
                 sendIntent(AddListIntent.OpenBottomSheetDelete(null))
             }
         }
@@ -465,6 +482,9 @@ class AddViewModel @Inject constructor(
                 isEntry = false,
                 animalCountId = domain.animalCountId,
                 hasIndicators = isIndicatorsValue,
+                isRecycled = getState().recyclingItems.any { item ->
+                    item.products.any { it.product.addId == domain.id }
+                },
             ),
             errors = AddErrors()
         )

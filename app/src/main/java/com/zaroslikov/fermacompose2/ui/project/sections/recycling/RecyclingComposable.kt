@@ -3,6 +3,8 @@ package com.zaroslikov.fermacompose2.ui.project.sections.recycling
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +27,8 @@ import com.zaroslikov.fermacompose2.R
 import com.zaroslikov.fermacompose2.error_base
 import com.zaroslikov.fermacompose2.gray_6
 import com.zaroslikov.fermacompose2.green_15
-import com.zaroslikov.fermacompose2.green_g_4
 import com.zaroslikov.fermacompose2.green_shamrock
+import com.zaroslikov.fermacompose2.marengo
 import com.zaroslikov.fermacompose2.orang_6
 import com.zaroslikov.fermacompose2.orang_9
 import com.zaroslikov.fermacompose2.price_green
@@ -44,13 +46,16 @@ import com.zaroslikov.fermacompose2.ui.elements.BaseBottomSheet
 import com.zaroslikov.fermacompose2.ui.elements.BorderButton
 import com.zaroslikov.fermacompose2.ui.elements.BorderCard
 import com.zaroslikov.fermacompose2.ui.elements.CardClips
+import com.zaroslikov.fermacompose2.ui.elements.CardFieldNew
 import com.zaroslikov.fermacompose2.ui.elements.CountColorCard
+import com.zaroslikov.fermacompose2.ui.elements.DetailProductCardNew
 import com.zaroslikov.fermacompose2.ui.elements.GradientButton
 import com.zaroslikov.fermacompose2.ui.elements.IconAndTextNew
-import com.zaroslikov.fermacompose2.ui.elements.IconIndicatorsAnimal
+import com.zaroslikov.fermacompose2.ui.elements.NoteColorCard
 import com.zaroslikov.fermacompose2.ui.elements.text_14
 import com.zaroslikov.fermacompose2.ui.elements.textBold_16
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.BaseSlider
+import com.zaroslikov.fermacompose2.ui.elements.сompositions.SliderGradient
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.ButtonPanelDetailNew
 import com.zaroslikov.fermacompose2.ui.elements.сompositions.WarningDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.ValueStandardCard
@@ -61,41 +66,33 @@ private const val MINUTES_IN_HOUR = 60L
 private const val MINUTES_IN_DAY = 24 * MINUTES_IN_HOUR
 
 /**
- * Блок «В переработке» над списком (списания, «Продукция»): карточка на каждую позицию продукции,
- * которая ещё не поступила на склад. Клик открывает всю партию — [onClick] получает id переработки.
+ * Продукция «В переработке» над списком «Продукции»: каждая позиция, которая ещё не поступила
+ * на склад, — обычной карточкой товара с пометкой переработки, сырьём и полоской оставшегося срока.
+ * Клик открывает всю партию — [onClick] получает id переработки.
  */
 @Composable
 fun RecyclingInProgressBlock(
     items: List<RecyclingItem>,
+    /** Какую продукцию показать: например, только с названием группы товара. */
+    filter: (DomainRecyclingProduct) -> Boolean = { true },
+    /** В шторке группы товара: рамочные карточки без названия, как записи группы. */
+    inGroup: Boolean = false,
     onClick: (Long) -> Unit
 ) {
     val inProgress = items
-        .flatMap { item -> item.products.filter { !it.product.isCompleted }.map { item to it } }
+        .flatMap { item ->
+            item.products
+                .filter { !it.product.isCompleted && filter(it.product) }
+                .map { item to it }
+        }
         .sortedBy { (_, product) -> product.minutesLeft ?: 0L }
     if (inProgress.isEmpty()) return
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            IconAndTextNew(
-                iconRes = R.drawable.baseline_autorenew_24,
-                valueString = stringResource(R.string.recycling_header),
-                iconColor = green_shamrock,
-                textStyle = textBold_16,
-                iconSize = 20.dp
-            )
-            CardClips(
-                colorBackground = green_15,
-                colorBorder = green_g_4,
-                colorText = green_shamrock,
-                value = inProgress.size.toString()
-            )
-        }
+    Column(verticalArrangement = Arrangement.spacedBy(if (inGroup) 12.dp else 16.dp)) {
         inProgress.forEach { (item, product) ->
             RecyclingProgressCard(
                 item = item,
                 productItem = product,
+                inGroup = inGroup,
                 onClick = { onClick(item.recycling.id) }
             )
         }
@@ -103,50 +100,133 @@ fun RecyclingInProgressBlock(
 }
 
 /** Есть ли в партиях продукция, которая ещё в переработке, — показывать ли блок. */
-fun List<RecyclingItem>.hasInProgress(): Boolean =
-    any { item -> item.products.any { !it.product.isCompleted } }
+fun List<RecyclingItem>.hasInProgress(
+    filter: (DomainRecyclingProduct) -> Boolean = { true }
+): Boolean = any { item -> item.products.any { !it.product.isCompleted && filter(it.product) } }
 
+/**
+ * Карточка в стиле обычной карточки товара «Продукции» (полоса слева — признак переработки);
+ * [inGroup] — как записи в шторке группы: рамка, без полосы и названия (оно в заголовке).
+ */
 @Composable
 private fun RecyclingProgressCard(
     item: RecyclingItem,
     productItem: RecyclingProductItem,
+    inGroup: Boolean,
     onClick: () -> Unit
 ) {
     val product = productItem.product
-    BorderCard(
-        modifier = Modifier.fillMaxWidth(),
-        borderColor = green_g_4,
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+    val recycling = item.recycling
+    val content: @Composable () -> Unit = {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconIndicatorsAnimal(icon = R.drawable.baseline_autorenew_24, colors = listOf(violet_1, violet_2))
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(text = product.title, style = textBold_16, maxLines = 2)
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (!inGroup)
+                        Text(
+                            text = product.title,
+                            style = textBold_16,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
                     CountColorCard(product.count, product.countSuffix, product.countSuffix.toColorList())
                 }
             }
-            productItem.minutesLeft?.let { TimeLeftClip(it) }
+            product.category?.takeIf { it.isNotBlank() }?.let {
+                IconAndTextNew(
+                    iconRes = R.drawable.baseline_format_list_bulleted_24,
+                    valueString = it,
+                    iconColor = green_shamrock
+                )
+            }
+            // Когда будет готово — пока скрыто
+            // ReadyAtText(product)
+            // Как в списании: сырьё и остаток до готовности над полоской во всю ширину
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                RecyclingRawLine(item, Modifier.weight(1f))
+                productItem.minutesLeft?.let { TimeLeftClip(it) }
+            }
+            SliderGradient(percentFloat = productItem.progress, colors = recyclingGradient)
+            if (recycling.note.isNotBlank()) NoteColorCard(recycling.note, green_shamrock)
         }
-        ReadyDateText(product)
-        if (item.ingredients.isNotEmpty()) {
-            val raw = item.ingredients.map { it.ingredientText() }.joinToString()
-            IconAndTextNew(
-                iconRes = R.drawable.baseline_shopping_basket_24,
-                valueString = stringResource(R.string.recycling_raw_summary, raw),
-                iconColor = green_shamrock
-            )
-        }
-        BaseSlider(percentFloat = productItem.progress, color = green_shamrock)
     }
+    if (inGroup)
+        BorderCard(modifier = Modifier.fillMaxWidth(), onClick = onClick) { content() }
+    else CardFieldNew(
+        modifier = Modifier.fillMaxWidth(),
+        colors = recyclingGradient,
+        onClick = onClick
+    ) { content() }
+}
+
+/** Сырьё партии одной строкой: «Молоко 2 шт., Соль 1 кг»; null — сырья уже нет (списано в утиль). */
+@Composable
+fun RecyclingItem.rawText(): String? =
+    ingredients.takeIf { it.isNotEmpty() }?.map { it.ingredientText() }?.joinToString()
+
+/**
+ * Строка карточки товара, полученного переработкой: значок переработки и сырьё — название
+ * с цветной плашкой количества; без сырья (списано в утиль) — просто «Переработка».
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun RecyclingRawLine(item: RecyclingItem, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(
+            painterResource(R.drawable.baseline_autorenew_24),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = green_shamrock
+        )
+        if (item.ingredients.isEmpty())
+            Text(text = stringResource(R.string.recycling_detail_title), style = text_14, color = marengo)
+        else FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            item.ingredients.forEach { raw ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(text = raw.title, style = text_14, color = marengo)
+                    CountColorCard(raw.count, raw.countSuffix, raw.countSuffix.toColorList())
+                }
+            }
+        }
+    }
+}
+
+/** «Готово 28 окт. 2026, 14:00» — когда товар поступит на склад. */
+@Composable
+private fun ReadyAtText(product: DomainRecyclingProduct) {
+    val readyYear = product.readyYear ?: return
+    val dateTime = stringResource(
+        R.string.recycling_date_time,
+        formatDate(product.readyDay ?: 1, product.readyMonth ?: 1, readyYear),
+        formatterTime(product.readyHour ?: 0, product.readyMinute ?: 0)
+    )
+    IconAndTextNew(
+        iconRes = R.drawable.baseline_access_time_24,
+        valueString = stringResource(R.string.recycling_ready_at, dateTime),
+        iconColor = green_shamrock
+    )
 }
 
 /**
@@ -426,7 +506,9 @@ private fun RecyclingProductCard(
 fun RecyclingDeleteBottomSheet(
     item: RecyclingItem,
     onDismissRequest: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    /** Карточки партии как в разделе (в списаниях — строки сырья); null — карточки продукции. */
+    itemCard: (@Composable () -> Unit)? = null
 ) {
     WarningDeleteBottomSheet(
         titleRes = R.string.recycling_delete_title,
@@ -435,8 +517,42 @@ fun RecyclingDeleteBottomSheet(
         onDismissRequest = onDismissRequest,
         onDeleteClick = onDeleteClick
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (itemCard != null) itemCard()
+        else Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item.products.forEach { RecyclingProductCard(productItem = it, onCompleteClick = null) }
+        }
+    }
+}
+
+/**
+ * Сырьё, которое уйдёт в утиль при удалении единственного товара переработки: заголовок
+ * и карточки списаний уже со статусом «На утилизацию».
+ */
+@Composable
+fun RecyclingDisposeRawCards(item: RecyclingItem) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        IconAndTextNew(
+            iconRes = R.drawable.baseline_delete_24,
+            valueString = stringResource(R.string.recycling_delete_product_raw_title),
+            iconColor = error_base,
+            textStyle = textBold_16
+        )
+        item.ingredients.forEach { raw ->
+            DetailProductCardNew(
+                title = raw.title,
+                count = raw.count,
+                suffix = raw.countSuffix,
+                statusWriteOff = false,
+                productOrigin = raw.productOrigin,
+                category = raw.category,
+                note = raw.note,
+                color = violet_1,
+                day = raw.day,
+                month = raw.month,
+                year = raw.year,
+                isArchive = true,
+                isCardField = false,
+            )
         }
     }
 }

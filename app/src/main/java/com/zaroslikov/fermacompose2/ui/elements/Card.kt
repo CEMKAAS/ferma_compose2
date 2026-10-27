@@ -481,6 +481,8 @@ fun DetailProductCardNew(
     recyclingTitle: String? = null,
     /** Кратко о продукции переработки после даты; тогда вместо «Переработка → …» — «В переработку». */
     recyclingContent: (@Composable () -> Unit)? = null,
+    /** Товар получен переработкой: строка со значком переработки и сырьём. */
+    recyclingSource: (@Composable () -> Unit)? = null,
     note: String,
     animal: String? = null,
     productOrigin: ProductOrigin? = null,
@@ -537,6 +539,7 @@ fun DetailProductCardNew(
                         onDeleteClick = onDeleteProductClick
                     )
             }
+            recyclingSource?.invoke()
             if (recyclingTitle != null)
                 IconAndTextNew(
                     iconRes = R.drawable.baseline_autorenew_24,

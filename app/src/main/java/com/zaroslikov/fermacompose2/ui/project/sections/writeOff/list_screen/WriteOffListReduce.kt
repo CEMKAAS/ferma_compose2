@@ -124,6 +124,7 @@ class WriteOffListReduce(
                 state.copy(
                     recyclingDetailId = intent.id,
                     isOpenRecyclingDelete = false,
+                    isRecyclingDeleteDirect = false,
                     isOpenRecyclingDispose = false
                 )
 
@@ -131,6 +132,7 @@ class WriteOffListReduce(
                 state.copy(
                     recyclingDetailId = null,
                     isOpenRecyclingDelete = false,
+                    isRecyclingDeleteDirect = false,
                     isOpenRecyclingDispose = false
                 )
 
@@ -138,7 +140,13 @@ class WriteOffListReduce(
                 state.copy(isOpenRecyclingDispose = intent.value)
 
             is WriteOffListIntent.OpenRecyclingDelete ->
-                state.copy(isOpenRecyclingDelete = intent.value)
+                if (!intent.value && state.isRecyclingDeleteDirect)
+                    state.copy(
+                        recyclingDetailId = null,
+                        isOpenRecyclingDelete = false,
+                        isRecyclingDeleteDirect = false
+                    )
+                else state.copy(isOpenRecyclingDelete = intent.value)
             is WriteOffListIntent.TitleAndSuffix ->
                 state.updateTitleAndSuffix(
                     intent.title,
@@ -269,8 +277,14 @@ class WriteOffListReduce(
             )
         else {
             val domain = mainList.items.find { it.id == id }
-            // Строку сырья нельзя удалить отдельно — только всю переработку
-            domain?.recyclingId?.let { return copy(recyclingDetailId = it) }
+            // Строку сырья нельзя удалить отдельно — сразу подтверждение удаления всей переработки
+            domain?.recyclingId?.let {
+                return copy(
+                    recyclingDetailId = it,
+                    isOpenRecyclingDelete = true,
+                    isRecyclingDeleteDirect = true
+                )
+            }
             copy(
                 bottomSheetState = bottomSheetState.copy(
                     isOpenProductDelete = domain?.let { true } ?: false),

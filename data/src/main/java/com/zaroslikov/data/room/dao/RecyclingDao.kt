@@ -335,4 +335,23 @@ interface RecyclingDao {
         deleteRecyclingProducts(id)
         deleteRecyclingRow(id)
     }
+
+    @Query("SELECT * FROM recycling_product_table WHERE add_id = :addId LIMIT 1")
+    suspend fun getRecyclingProductByAddId(addId: Long): RecyclingProductTable?
+
+    /**
+     * Удаление готовой продукции из «Продукции». Единственный товар партии — сырьё уходит
+     * в утиль обычными списаниями, партия удаляется; товаров несколько — удаляется только этот.
+     */
+    @Transaction
+    suspend fun deleteRecycledProduct(addId: Long, note: String): List<WriteOffTable> {
+        val product = getRecyclingProductByAddId(addId) ?: return emptyList()
+        deleteProduct(addId, product.idPT)
+        deleteRecyclingProductRow(product.id)
+        if (getRecyclingProducts(product.recyclingId).isNotEmpty()) return emptyList()
+        val ingredients = getIngredients(product.recyclingId)
+        disposeIngredients(product.recyclingId, note)
+        deleteRecyclingRow(product.recyclingId)
+        return ingredients
+    }
 }

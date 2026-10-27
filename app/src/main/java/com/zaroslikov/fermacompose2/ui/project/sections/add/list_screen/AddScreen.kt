@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -56,6 +57,11 @@ import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDetai
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDisposeBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingInProgressBlock
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.associateByAddId
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.inProgressOnlyGroups
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.rawText
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingRawLine
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDisposeRawCards
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.hasInProgress
 import io.appmetrica.analytics.AppMetrica
 
@@ -96,6 +102,7 @@ fun AddScreen(
                 brieflyList = state.mainList.brieflyItems,
                 details = state.mainList.isGroupMode,
                 searchBrieflyList = state.searchState.searchBrieflyResults,
+                searchQuery = state.searchState.searchQuery,
                 isArchive = state.isArchive,
                 onDetailsCardClick = { viewModel.onIntent(AddListIntent.OpenBottomSheetDetail(it)) },
                 onEditClick = {
@@ -152,6 +159,11 @@ fun AddScreen(
                 BrieflyBottomSheetAdd(
                     iconRes = state.ui.iconRes,
                     list = state.detailNomenclatura.productItems,
+                    recyclingItems = state.recyclingItems,
+                    onRecyclingClick = {
+                        viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false))
+                        viewModel.onIntent(AddListIntent.OpenRecyclingDetail(it))
+                    },
                     state = state.detailNomenclatura.detail,
                     onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
                     onEditClick = {
@@ -169,6 +181,11 @@ fun AddScreen(
             if (state.bottomSheetState.isOpenDetail)
                 AddDetailBottomSheet(
                     state = state.productDetail,
+                    recycling = state.productDetail?.let { product ->
+                        state.recyclingItems.firstOrNull { item ->
+                            item.products.any { it.product.addId == product.id }
+                        }
+                    },
                     colors = state.ui.colors,
                     onIntent = viewModel::onIntent,
                     isArchive = state.isArchive
@@ -178,6 +195,9 @@ fun AddScreen(
                     onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetDelete(null)) },
                     onDeleteClick = { viewModel.onIntent(AddListIntent.Delete) },
                     state = state.productDetail,
+                    recycling = state.productDetail?.let { product ->
+                        state.recyclingItems.associateByAddId()[product.id]
+                    },
                 )
             if (state.bottomSheetState.isOpenEntryInTemplate)
                 EnterInPatternBottomSheet(
@@ -202,6 +222,7 @@ fun AddScreen(
 @Composable
 private fun AddDetailBottomSheet(
     state: DomainAddItemDto2?,
+    recycling: RecyclingItem?,
     colors: List<Color>,
     onIntent: (AddListIntent) -> Unit,
     isArchive: Boolean
@@ -217,6 +238,9 @@ private fun AddDetailBottomSheet(
             date = date,
             animal = state.nameAnimal,
             note = state.note,
+            recyclingRaw = recycling?.let {
+                it.rawText() ?: stringResource(R.string.recycling_raw_disposed)
+            },
             animalId = state.animalCountId,
             iconColor = green_shamrock,
             boxColor = alabaster,
@@ -234,8 +258,21 @@ private fun WarningDeleteAddBottomSheet(
     onDismissRequest: () -> Unit,
     onDeleteClick: () -> Unit,
     state: DomainAddItemDto2?,
+    recycling: RecyclingItem? = null,
 ) {
+    // Товар переработки: единственный — сырьё уйдёт в утиль, иначе удаляется только он
+    val isSingleRecycled = recycling != null && recycling.products.size == 1
     WarningDeleteBottomSheet(
+        supportRes = when {
+            recycling == null -> R.string.base_section_delete_support_add
+            isSingleRecycled -> R.string.recycling_delete_product_single_support
+            else -> R.string.recycling_delete_product_support
+        },
+        textRes = when {
+            recycling == null -> R.string.base_section_warning_text
+            isSingleRecycled -> R.string.recycling_delete_product_single_warning_text
+            else -> R.string.recycling_delete_product_warning_text
+        },
         onDismissRequest = onDismissRequest,
         onDeleteClick = onDeleteClick
     ) {
@@ -252,9 +289,12 @@ private fun WarningDeleteAddBottomSheet(
                 day = product.day,
                 month = product.month,
                 year = product.year,
+                recyclingSource = recycling?.let { { RecyclingRawLine(it) } },
                 isArchive = true
             )
         }
+        if (isSingleRecycled && recycling.ingredients.isNotEmpty())
+            RecyclingDisposeRawCards(recycling)
     }
 }
 
@@ -300,14 +340,23 @@ fun AddContainer2(
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (String) -> Unit,
     recyclingItems: List<RecyclingItem>,
-    onRecyclingClick: (Long) -> Unit
+    onRecyclingClick: (Long) -> Unit,
+    searchQuery: String = ""
 ) {
+    val recyclingByAddId = remember(recyclingItems) { recyclingItems.associateByAddId() }
+    // В группировке товар в переработке показывается внутри своей группы; если на складе
+    // такого товара ещё нет — для него заводится своя группа (первой, как и в общем списке)
+    val recyclingGroups = remember(recyclingItems, brieflyList) {
+        recyclingItems.inProgressOnlyGroups(brieflyList)
+    }
+    val query = searchQuery.trim().lowercase()
     InventoryBody(
         modifier = modifier,
         itemList = itemList,
         searchList = searchList,
-        brieflyList = brieflyList,
-        searchBrieflyList = searchBrieflyList,
+        brieflyList = recyclingGroups + brieflyList,
+        searchBrieflyList = recyclingGroups.filter { it.title.lowercase().contains(query) } +
+                searchBrieflyList,
         detailCard = { index, item ->
             DetailProductCardNew(
                 title = item.title,
@@ -321,6 +370,7 @@ fun AddContainer2(
                 month = item.month,
                 year = item.year,
                 typeProduct = item.animalCountId?.let { TypeProduct.KILL },
+                recyclingSource = recyclingByAddId[item.id]?.let { { RecyclingRawLine(it) } },
                 isArchive = isArchive,
                 onClick = { onDetailsCardClick(item.id) },
                 onEditClick = { onEditClick(item.id) },
@@ -351,7 +401,7 @@ fun AddContainer2(
         details = details,
         iconColor = green_shamrock,
         backgroundColor = green_g_1, isArchive = isArchive,
-        header = if (!recyclingItems.hasInProgress()) null else {
+        header = if (!details || !recyclingItems.hasInProgress()) null else {
             { RecyclingInProgressBlock(items = recyclingItems, onClick = onRecyclingClick) }
         }
     )
@@ -361,6 +411,8 @@ fun AddContainer2(
 fun BrieflyBottomSheetAdd(
     @DrawableRes iconRes: Int,
     list: List<DomainAddItemDto2>,
+    recyclingItems: List<RecyclingItem> = emptyList(),
+    onRecyclingClick: (Long) -> Unit = {},
     isArchive: Boolean,
     state: BrieflyItem?,
     onEditClick: (Long) -> Unit,
@@ -368,6 +420,7 @@ fun BrieflyBottomSheetAdd(
     onDismissRequest: () -> Unit,
     onAnalysisClick: (Pair<String, Suffix>) -> Unit = {},
 ) {
+    val recyclingByAddId = remember(recyclingItems) { recyclingItems.associateByAddId() }
     state?.let { currentBriefly ->
         BrieflyBottomSheetUniversal(
             list = list,
@@ -380,6 +433,17 @@ fun BrieflyBottomSheetAdd(
             pieces = currentBriefly.pieces,
             onDismissRequest = onDismissRequest,
             onAnalysisClick = { onAnalysisClick(currentBriefly.title to it) }, //TODO
+            // Этот же товар, ещё не готовый в переработке, — сверху, как в общем списке
+            header = if (!recyclingItems.hasInProgress { it.title == currentBriefly.title }) null else {
+                {
+                    RecyclingInProgressBlock(
+                        items = recyclingItems,
+                        filter = { it.title == currentBriefly.title },
+                        inGroup = true,
+                        onClick = onRecyclingClick
+                    )
+                }
+            },
             itemCard = { product ->
                 DetailProductCardNew(
                     modifier = Modifier,
@@ -393,6 +457,7 @@ fun BrieflyBottomSheetAdd(
                     day = product.day,
                     month = product.month,
                     year = product.year,
+                    recyclingSource = recyclingByAddId[product.id]?.let { { RecyclingRawLine(it) } },
                     isArchive = isArchive,
                     onDeleteClick = { onDeleteClick(product.id) },
                     onEditClick = { onEditClick(product.id) },
@@ -508,7 +573,8 @@ fun AddEntryBottomSheet(
                 labelIntRes = R.string.outlined_text_current_date,
                 supportingText = R.string.support_text_current_date,
             )
-        if (!product.hasIndicators && state.pickList.animals.isNotEmpty())
+        // Товару из переработки животное не указывается — он получен из сырья
+        if (!product.hasIndicators && !product.isRecycled && state.pickList.animals.isNotEmpty())
             OutlinedTextAnimalNew(
                 value = product.animalName,
                 onValueChange = { onIntent(AddListIntent.Animal(it)) },

@@ -312,6 +312,8 @@ fun <T> BrieflyBottomSheetUniversal(
     @DrawableRes iconRes: Int,
     onDismissRequest: () -> Unit,
     onAnalysisClick: ((Suffix) -> Unit)? = null,
+    /** Перед карточками списка — например, тот же товар «В переработке» в «Продукции». */
+    header: (@Composable () -> Unit)? = null,
     itemCard: @Composable ((T) -> Unit),
 ) {
     BaseBottomSheet(
@@ -363,6 +365,7 @@ fun <T> BrieflyBottomSheetUniversal(
 
             }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                header?.let { item(key = "header") { it() } }
                 items(list) { item ->
                     itemCard(item)
                 }
@@ -506,6 +509,8 @@ fun DetailSectionBottomSheet(
     animal: String? = null,
     note: String,
     statusWriteOff: Boolean? = null,
+    /** Сырьё, из которого товар получен переработкой. */
+    recyclingRaw: String? = null,
     iconColor: Color,
     boxColor: Color,
     colors: List<Color>,
@@ -543,6 +548,15 @@ fun DetailSectionBottomSheet(
                 titleRes = R.string.detail_card_status_write_off,
                 value = stringResource(valueString),
                 iconRes = iconRes,
+                iconColor = iconColor,
+                boxColor = boxColor
+            )
+        }
+        recyclingRaw?.let {
+            ValueStandardCard(
+                titleRes = R.string.detail_card_recycling,
+                value = it,
+                iconRes = R.drawable.baseline_autorenew_24,
                 iconColor = iconColor,
                 boxColor = boxColor
             )

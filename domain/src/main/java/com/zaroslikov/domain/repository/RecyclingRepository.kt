@@ -70,4 +70,15 @@ interface RecyclingRepository {
 
     /** Удаляет партию вместе со списанием сырья и всей полученной продукцией. */
     suspend fun deleteRecycling(id: Long)
+
+    /**
+     * Удаляет готовую продукцию переработки по строке склада [addId]. Если это был единственный
+     * товар партии, её сырьё становится обычным списанием в утиль (пустое примечание — [note]),
+     * а партия удаляется; иначе удаляется только этот товар. Возвращает списанное в утиль сырьё
+     * (пусто — сырьё не трогалось или товар не из переработки).
+     */
+    suspend fun deleteRecycledProduct(addId: Long, note: String): List<DomainWriteOffTable>
+
+    /** Получен ли товар склада [addId] переработкой. */
+    suspend fun isRecycledProduct(addId: Long): Boolean
 }

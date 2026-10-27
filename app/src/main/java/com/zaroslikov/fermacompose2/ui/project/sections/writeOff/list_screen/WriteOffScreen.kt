@@ -13,6 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -153,7 +156,14 @@ fun WriteOffScreen(
                         onDismissRequest = {
                             viewModel.onIntent(WriteOffListIntent.OpenRecyclingDelete(false))
                         },
-                        onDeleteClick = { viewModel.onIntent(WriteOffListIntent.DeleteRecycling) }
+                        onDeleteClick = { viewModel.onIntent(WriteOffListIntent.DeleteRecycling) },
+                        itemCard = {
+                            RecyclingRawCards(
+                                recycling = recycling,
+                                color = primeColor,
+                                priceSuffix = priceSuffix
+                            )
+                        }
                     )
                 else if (state.isOpenRecyclingDispose)
                     RecyclingDisposeBottomSheet(
@@ -314,6 +324,38 @@ private fun WarningDeleteWriteOffBottomSheet(
                 year = product.year,
                 priceSuffix = priceSuffix,
                 animalCountId = product.animalCountId,
+                isArchive = true,
+                isCardField = false,
+            )
+        }
+    }
+}
+
+/** Строки сырья партии — такими же карточками, как в списке списаний. */
+@Composable
+private fun RecyclingRawCards(
+    recycling: RecyclingItem,
+    color: Color,
+    priceSuffix: Suffix
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        recycling.ingredients.forEach { raw ->
+            DetailProductCardNew(
+                title = raw.title,
+                count = raw.count,
+                suffix = raw.countSuffix,
+                price = raw.priceAll ?: raw.price,
+                priceSuffix = priceSuffix,
+                productOrigin = raw.productOrigin,
+                statusWriteOff = raw.status,
+                recyclingTitle = recycling.title,
+                recyclingContent = { RecyclingProductsBrief(recycling) },
+                category = raw.category,
+                note = raw.note,
+                color = color,
+                day = raw.day,
+                month = raw.month,
+                year = raw.year,
                 isArchive = true,
                 isCardField = false,
             )

@@ -6,6 +6,7 @@ import com.zaroslikov.domain.models.table.DomainRecyclingWithProducts
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.fermacompose2.supportFun.formatNumber
 import com.zaroslikov.fermacompose2.supportFun.toResId
+import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BrieflyItem
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -56,6 +57,35 @@ fun DomainRecyclingWithProducts.toRecyclingItem(now: LocalDateTime = LocalDateTi
         },
         ingredients = ingredients
     )
+}
+
+/** Партии по id строки склада (add_table) их готовой продукции — чтобы отметить товар из переработки. */
+fun List<RecyclingItem>.associateByAddId(): Map<Long, RecyclingItem> = buildMap {
+    this@associateByAddId.forEach { item ->
+        item.products.forEach { productItem -> productItem.product.addId?.let { put(it, item) } }
+    }
+}
+
+/**
+ * Группы «плиткой» для продукции, которая пока только в переработке и на складе её нет:
+ * без количества на складе, записей — сколько позиций в переработке.
+ */
+fun List<RecyclingItem>.inProgressOnlyGroups(existing: List<BrieflyItem>): List<BrieflyItem> {
+    val titles = existing.map { it.title }.toSet()
+    return flatMap { item -> item.products.filter { !it.product.isCompleted } }
+        .groupBy { it.product.title }
+        .filterKeys { it !in titles }
+        .map { (title, products) ->
+            BrieflyItem(
+                title = title,
+                weight = null,
+                linear = null,
+                volume = null,
+                pieces = null,
+                price = null,
+                rowCount = products.size
+            )
+        }
 }
 
 fun List<RecyclingItem>.findRecycling(id: Long?): RecyclingItem? =

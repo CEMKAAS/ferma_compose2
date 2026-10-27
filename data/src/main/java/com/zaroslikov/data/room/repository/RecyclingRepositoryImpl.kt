@@ -101,4 +101,10 @@ class RecyclingRepositoryImpl @Inject constructor(
         recyclingDao.disposeRecycling(id, note).map { it.toDomainMap() }
 
     override suspend fun deleteRecycling(id: Long) = recyclingDao.deleteRecycling(id)
+
+    override suspend fun deleteRecycledProduct(addId: Long, note: String): List<DomainWriteOffTable> =
+        recyclingDao.deleteRecycledProduct(addId, note).map { it.toDomainMap() }
+
+    override suspend fun isRecycledProduct(addId: Long): Boolean =
+        recyclingDao.getRecyclingProductByAddId(addId) != null
 }

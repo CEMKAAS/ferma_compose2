@@ -41,6 +41,8 @@ data class WriteOffListState(
     val recyclingItems: List<RecyclingItem> = emptyList(),
     val recyclingDetailId: Long? = null,
     val isOpenRecyclingDelete: Boolean = false,
+    /** Удаление открыто из меню карточки сырья, без шторки деталей: отмена закрывает всё. */
+    val isRecyclingDeleteDirect: Boolean = false,
     val isOpenRecyclingDispose: Boolean = false,
 
     override val isLoading: Boolean = false,

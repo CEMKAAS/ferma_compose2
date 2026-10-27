@@ -1877,6 +1877,8 @@
     <string name="recycling_hours_left">через %1$d ч</string>
     <string name="recycling_less_hour">меньше часа</string>
     <string name="recycling_raw_summary">Сырьё: %1$s</string>
+    <string name="recycling_raw_disposed">Сырьё списано в утиль</string>
+    <string name="detail_card_recycling">Получено переработкой из</string>
     <string name="recycling_label">Переработка → %1$s</string>
     <string name="recycling_detail_title">Переработка</string>
     <string name="recycling_status_in_progress">В переработке</string>
@@ -1908,10 +1910,13 @@
     <string name="recycling_dispose_button">Списать в утиль</string>
     <string name="recycling_dispose_title">Списать в утиль?</string>
     <string name="recycling_dispose_support">Переработка завершится, всё сырьё спишется в утиль</string>
-    <string name="recycling_dispose_warning_text">• Сырьё станет обычным списанием в утиль
-• Неготовая продукция не поступит на склад
-• Готовая продукция останется на складе
-• Это действие нельзя отменить</string>
+    <string name="recycling_dispose_warning_text">• Сырьё станет обычным списанием в утиль\n• Неготовая продукция не поступит на склад\n• Готовая продукция останется на складе\n• Это действие нельзя отменить</string>
     <string name="recycling_dispose_note">Испорчено при переработке</string>
+    <string name="snackbar_recycled_product_delete_dispose">Продукция %1$s %2$s %3$s удалена, сырьё списано в утиль: %4$s</string>
+    <string name="recycling_delete_product_single_support">Это единственный товар переработки — без него сырьё будет списано в утиль</string>
+    <string name="recycling_delete_product_support">Товар удалится и из переработки в списаниях</string>
+    <string name="recycling_delete_product_single_warning_text">• Товар будет удалён со склада\n• Переработка будет отменена\n• Сырьё выше станет обычным списанием в утиль\n• Это действие нельзя отменить</string>
+    <string name="recycling_delete_product_warning_text">• Товар будет удалён со склада\n• Он пропадёт из переработки в списаниях\n• Сырьё и остальная продукция переработки останутся\n• Это действие нельзя отменить</string>
+    <string name="recycling_delete_product_raw_title">Это сырьё уйдёт в утиль</string>
     <string name="snackbar_recycling_dispose">Списано в утиль: %1$s</string>
 </resources>

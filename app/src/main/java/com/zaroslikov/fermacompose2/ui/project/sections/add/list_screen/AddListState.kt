@@ -127,6 +127,8 @@ data class AddProduct(
     val animalName: String = "",
     val hasIndicators: Boolean = false,
     val animalCountId: Long? = null,
+    /** Товар получен переработкой — поле «Животное» не показывается. */
+    val isRecycled: Boolean = false,
     override val price: String = "", // Заглушка на будующе
     override val priceAll: String = "",// Заглушка на будующе
     override val isAutoPrice: Boolean = false,// Заглушка на будующе
