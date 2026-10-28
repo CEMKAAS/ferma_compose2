@@ -54,8 +54,8 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.indicators.EntryB
 import com.zaroslikov.fermacompose2.ui.project.sections.baseComposable.BaseSectionScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDetailBottomSheet
-import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingDisposeBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingInProgressBlock
+import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingProductDeleteBottomSheet
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.RecyclingItem
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.associateByAddId
 import com.zaroslikov.fermacompose2.ui.project.sections.recycling.inProgressOnlyGroups
@@ -117,10 +117,22 @@ fun AddScreen(
                     )
                 },
                 recyclingItems = state.recyclingItems,
-                onRecyclingClick = { viewModel.onIntent(AddListIntent.OpenRecyclingDetail(it)) }
+                onRecyclingClick = { id, productId ->
+                    viewModel.onIntent(AddListIntent.OpenRecyclingDetail(id, productId))
+                }
             )
             state.recyclingDetail()?.let { recycling ->
-                if (state.isOpenRecyclingDelete)
+                val productId = state.recyclingDetailProductId
+                if (state.isOpenRecyclingDelete && productId != null)
+                    RecyclingProductDeleteBottomSheet(
+                        item = recycling,
+                        productId = productId,
+                        onDismissRequest = {
+                            viewModel.onIntent(AddListIntent.OpenRecyclingDelete(false))
+                        },
+                        onDeleteClick = { viewModel.onIntent(AddListIntent.DeleteRecycling) }
+                    )
+                else if (state.isOpenRecyclingDelete)
                     RecyclingDeleteBottomSheet(
                         item = recycling,
                         onDismissRequest = {
@@ -128,23 +140,16 @@ fun AddScreen(
                         },
                         onDeleteClick = { viewModel.onIntent(AddListIntent.DeleteRecycling) }
                     )
-                else if (state.isOpenRecyclingDispose)
-                    RecyclingDisposeBottomSheet(
-                        item = recycling,
-                        onDismissRequest = {
-                            viewModel.onIntent(AddListIntent.OpenRecyclingDispose(false))
-                        },
-                        onDisposeClick = { viewModel.onIntent(AddListIntent.DisposeRecycling) }
-                    )
                 else
                     RecyclingDetailBottomSheet(
                         item = recycling,
                         isArchive = state.isArchive,
+                        productId = state.recyclingDetailProductId,
                         onCompleteClick = {
                             viewModel.onIntent(AddListIntent.CompleteRecyclingProduct(it))
                         },
                         onDeleteClick = { viewModel.onIntent(AddListIntent.OpenRecyclingDelete(true)) },
-                        onDisposeClick = { viewModel.onIntent(AddListIntent.OpenRecyclingDispose(true)) },
+                        onDisposeClick = null,
                         onDismissRequest = { viewModel.onIntent(AddListIntent.OpenRecyclingDetail(null)) }
                     )
             }
@@ -160,9 +165,9 @@ fun AddScreen(
                     iconRes = state.ui.iconRes,
                     list = state.detailNomenclatura.productItems,
                     recyclingItems = state.recyclingItems,
-                    onRecyclingClick = {
+                    onRecyclingClick = { id, productId ->
                         viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false))
-                        viewModel.onIntent(AddListIntent.OpenRecyclingDetail(it))
+                        viewModel.onIntent(AddListIntent.OpenRecyclingDetail(id, productId))
                     },
                     state = state.detailNomenclatura.detail,
                     onDismissRequest = { viewModel.onIntent(AddListIntent.OpenBottomSheetGroup(false)) },
@@ -340,7 +345,7 @@ fun AddContainer2(
     onDeleteClick: (Long) -> Unit,
     onDetailsClick: (String) -> Unit,
     recyclingItems: List<RecyclingItem>,
-    onRecyclingClick: (Long) -> Unit,
+    onRecyclingClick: (recyclingId: Long, productId: Long) -> Unit,
     searchQuery: String = ""
 ) {
     val recyclingByAddId = remember(recyclingItems) { recyclingItems.associateByAddId() }
@@ -412,7 +417,7 @@ fun BrieflyBottomSheetAdd(
     @DrawableRes iconRes: Int,
     list: List<DomainAddItemDto2>,
     recyclingItems: List<RecyclingItem> = emptyList(),
-    onRecyclingClick: (Long) -> Unit = {},
+    onRecyclingClick: (recyclingId: Long, productId: Long) -> Unit = { _, _ -> },
     isArchive: Boolean,
     state: BrieflyItem?,
     onEditClick: (Long) -> Unit,

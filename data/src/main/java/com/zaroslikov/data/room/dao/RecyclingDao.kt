@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import com.zaroslikov.data.room.dto.shared.TitleCountSuffixDto
 import com.zaroslikov.data.room.table.ferma.AddTable
 import com.zaroslikov.data.room.table.ferma.RecyclingProductTable
 import com.zaroslikov.data.room.table.ferma.RecyclingTable
@@ -336,6 +337,29 @@ interface RecyclingDao {
         deleteRecyclingRow(id)
     }
 
+    /**
+     * Готовая продукция, полученная переработкой сырья [name], за период по дате переработки:
+     * сумма по названию и единице. Партия с несколькими видами сырья учитывается у каждого.
+     */
+    @Query(
+        "SELECT p.title AS title, SUM(p.count) AS count, p.count_suffix AS suffix" +
+                " FROM recycling_product_table p" +
+                " JOIN recycling_table r ON r._id = p.recycling_id" +
+                " WHERE p.idPT = :idPT AND p.is_completed = 1" +
+                " AND EXISTS (SELECT 1 FROM write_off_table w" +
+                " WHERE w.recycling_id = r._id AND w.title = :name)" +
+                " AND DATE(printf('%04d-%02d-%02d', r.year, r.month, r.day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)" +
+                " GROUP BY p.title, p.count_suffix" +
+                " ORDER BY count DESC"
+    )
+    fun getAnalysisRecyclingProducts(
+        idPT: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<TitleCountSuffixDto>>
+
     @Query("SELECT * FROM recycling_product_table WHERE add_id = :addId LIMIT 1")
     suspend fun getRecyclingProductByAddId(addId: Long): RecyclingProductTable?
 
@@ -346,7 +370,17 @@ interface RecyclingDao {
     @Transaction
     suspend fun deleteRecycledProduct(addId: Long, note: String): List<WriteOffTable> {
         val product = getRecyclingProductByAddId(addId) ?: return emptyList()
-        deleteProduct(addId, product.idPT)
+        return deleteRecyclingProduct(product.id, note)
+    }
+
+    /**
+     * Удаляет товар партии [productId] (готовый — вместе со строкой в учёте). Единственный товар
+     * партии — сырьё уходит в утиль обычными списаниями, партия удаляется.
+     */
+    @Transaction
+    suspend fun deleteRecyclingProduct(productId: Long, note: String): List<WriteOffTable> {
+        val product = getRecyclingProductOnce(productId) ?: return emptyList()
+        product.addId?.let { deleteProduct(it, product.idPT) }
         deleteRecyclingProductRow(product.id)
         if (getRecyclingProducts(product.recyclingId).isNotEmpty()) return emptyList()
         val ingredients = getIngredients(product.recyclingId)

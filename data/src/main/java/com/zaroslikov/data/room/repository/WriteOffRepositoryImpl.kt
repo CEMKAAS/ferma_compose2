@@ -241,6 +241,16 @@ class WriteOffRepositoryImpl @Inject constructor(private val writeOffDao: WriteO
             .map { it -> it.map { it.toDomainCountSuffixPriceDate() } }
     }
 
+    override fun getAnalysisRecyclingRangeList(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainCountSuffixPriceDate>> {
+        return writeOffDao.getAnalysisRecyclingRangeList(id, name, dateBegin, dateEnd)
+            .map { it -> it.map { it.toDomainCountSuffixPriceDate() } }
+    }
+
     override fun getAnalysisWriteOffScrapAllTimeRange(
         id: Long,
         name: String,

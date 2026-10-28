@@ -68,7 +68,7 @@ private const val MINUTES_IN_DAY = 24 * MINUTES_IN_HOUR
 /**
  * Продукция «В переработке» над списком «Продукции»: каждая позиция, которая ещё не поступила
  * на склад, — обычной карточкой товара с пометкой переработки, сырьём и полоской оставшегося срока.
- * Клик открывает всю партию — [onClick] получает id переработки.
+ * Клик открывает детали — [onClick] получает id переработки и id нажатого товара.
  */
 @Composable
 fun RecyclingInProgressBlock(
@@ -77,7 +77,7 @@ fun RecyclingInProgressBlock(
     filter: (DomainRecyclingProduct) -> Boolean = { true },
     /** В шторке группы товара: рамочные карточки без названия, как записи группы. */
     inGroup: Boolean = false,
-    onClick: (Long) -> Unit
+    onClick: (recyclingId: Long, productId: Long) -> Unit
 ) {
     val inProgress = items
         .flatMap { item ->
@@ -93,7 +93,7 @@ fun RecyclingInProgressBlock(
                 item = item,
                 productItem = product,
                 inGroup = inGroup,
-                onClick = { onClick(item.recycling.id) }
+                onClick = { onClick(item.recycling.id, product.product.id) }
             )
         }
     }
@@ -328,7 +328,8 @@ private fun DomainWriteOffTable.ingredientText(): String =
  * Детали партии — по образцу деталей обычного списания: сырьё с количествами, дата и время начала,
  * примечание; ниже — продукция со статусами («Готово сейчас» — по позиции, [onCompleteClick] получает
  * её id). Внизу — удаление, правка ([onEditClick] = null — без кнопки «Изменить») и «Списать в утиль»,
- * пока в партии есть неготовая продукция.
+ * пока в партии есть неготовая продукция ([onDisposeClick] = null — без неё).
+ * [productId] — показать только эту позицию продукции (клик по товару в «Продукции»).
  */
 @Composable
 fun RecyclingDetailBottomSheet(
@@ -336,12 +337,14 @@ fun RecyclingDetailBottomSheet(
     isArchive: Boolean,
     onCompleteClick: (Long) -> Unit,
     onDeleteClick: () -> Unit,
-    onDisposeClick: () -> Unit,
+    onDisposeClick: (() -> Unit)?,
     onDismissRequest: () -> Unit,
-    onEditClick: (() -> Unit)? = null
+    onEditClick: (() -> Unit)? = null,
+    productId: Long? = null
 ) {
     val recycling = item.recycling
-    val canDispose = !isArchive && item.products.any { !it.product.isCompleted }
+    val products = item.products.filter { productId == null || it.product.id == productId }
+    val canDispose = onDisposeClick != null && !isArchive && item.products.any { !it.product.isCompleted }
     BaseBottomSheet(
         title = stringResource(R.string.recycling_detail_title),
         onDismissRequest = onDismissRequest,
@@ -351,7 +354,7 @@ fun RecyclingDetailBottomSheet(
                     canDispose = canDispose,
                     onEditClick = onEditClick,
                     onDeleteClick = onDeleteClick,
-                    onDisposeClick = onDisposeClick
+                    onDisposeClick = onDisposeClick ?: {}
                 )
             }
         }
@@ -387,7 +390,7 @@ fun RecyclingDetailBottomSheet(
                     boxColor = violet_3
                 )
             Text(text = stringResource(R.string.recycling_detail_product), style = textBold_16)
-            item.products.forEach { productItem ->
+            products.forEach { productItem ->
                 RecyclingProductCard(
                     productItem = productItem,
                     onCompleteClick = if (isArchive || productItem.product.isCompleted) null
@@ -521,6 +524,33 @@ fun RecyclingDeleteBottomSheet(
         else Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item.products.forEach { RecyclingProductCard(productItem = it, onCompleteClick = null) }
         }
+    }
+}
+
+/**
+ * Удаление одного товара партии [productId], ещё не поступившего на склад: единственный
+ * товар — сырьё уйдёт в утиль, иначе удаляется только он.
+ */
+@Composable
+fun RecyclingProductDeleteBottomSheet(
+    item: RecyclingItem,
+    productId: Long,
+    onDismissRequest: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    val isSingle = item.products.size == 1
+    WarningDeleteBottomSheet(
+        supportRes = if (isSingle) R.string.recycling_delete_product_single_support
+        else R.string.recycling_delete_product_support,
+        textRes = if (isSingle) R.string.recycling_delete_progress_single_warning_text
+        else R.string.recycling_delete_progress_warning_text,
+        onDismissRequest = onDismissRequest,
+        onDeleteClick = onDeleteClick
+    ) {
+        item.products.find { it.product.id == productId }?.let {
+            RecyclingProductCard(productItem = it, onCompleteClick = null)
+        }
+        if (isSingle && item.ingredients.isNotEmpty()) RecyclingDisposeRawCards(item)
     }
 }
 

@@ -5,11 +5,15 @@ import com.zaroslikov.domain.models.enums.FinanceCategory
 
 class FinanceCategoryConverter {
     @TypeConverter
-    fun fromFinanceCategory(category: FinanceCategory): Int = category.ordinal
+    fun fromFinanceCategory(category: FinanceCategory): Int =
+        if (category == FinanceCategory.RECYCLING) RECYCLING_ID else category.ordinal
 
     @TypeConverter
     fun toFinanceCategory(id: Int): FinanceCategory = financeCategoryFromId(id)
 }
+
+/** 5 в запросах уже занят под поступления (читается как PROFIT), переработка — 6. */
+const val RECYCLING_ID = 6
 
 fun financeCategoryFromId(id: Int): FinanceCategory {
     return when (id) {
@@ -17,6 +21,7 @@ fun financeCategoryFromId(id: Int): FinanceCategory {
         1 -> FinanceCategory.EXPENSES
         2 -> FinanceCategory.OWN_NEED
         3 -> FinanceCategory.SCRAP
+        RECYCLING_ID -> FinanceCategory.RECYCLING
         else -> FinanceCategory.PROFIT
     }
 }

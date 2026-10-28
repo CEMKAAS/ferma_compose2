@@ -1,8 +1,10 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.RecyclingDao
+import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleCountSuffix
 import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
+import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
 import com.zaroslikov.domain.models.table.DomainRecycling
 import com.zaroslikov.domain.models.table.DomainRecyclingProduct
 import com.zaroslikov.domain.models.table.DomainRecyclingWithProducts
@@ -94,6 +96,15 @@ class RecyclingRepositoryImpl @Inject constructor(
         minute: Int?
     ): Boolean = recyclingDao.completeRecyclingProduct(productId, day, month, year, hour, minute)
 
+    override fun getAnalysisRecyclingProducts(
+        idPT: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainTitleCountSuffix>> =
+        recyclingDao.getAnalysisRecyclingProducts(idPT, name, dateBegin, dateEnd)
+            .map { list -> list.map { it.toDomainTitleCountSuffix() } }
+
     override suspend fun completeDueRecycling(nowIso: String) =
         recyclingDao.completeDueRecycling(nowIso)
 
@@ -104,6 +115,9 @@ class RecyclingRepositoryImpl @Inject constructor(
 
     override suspend fun deleteRecycledProduct(addId: Long, note: String): List<DomainWriteOffTable> =
         recyclingDao.deleteRecycledProduct(addId, note).map { it.toDomainMap() }
+
+    override suspend fun deleteRecyclingProduct(productId: Long, note: String): List<DomainWriteOffTable> =
+        recyclingDao.deleteRecyclingProduct(productId, note).map { it.toDomainMap() }
 
     override suspend fun isRecycledProduct(addId: Long): Boolean =
         recyclingDao.getRecyclingProductByAddId(addId) != null

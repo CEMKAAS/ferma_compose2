@@ -1,5 +1,6 @@
 package com.zaroslikov.domain.repository
 
+import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
 import com.zaroslikov.domain.models.table.DomainRecycling
 import com.zaroslikov.domain.models.table.DomainRecyclingProduct
 import com.zaroslikov.domain.models.table.DomainRecyclingWithProducts
@@ -58,6 +59,17 @@ interface RecyclingRepository {
         minute: Int?
     ): Boolean
 
+    /**
+     * Готовая продукция, полученная переработкой сырья [name] за период (`yyyy-MM-dd`, по дате
+     * переработки), — сумма по названию и единице, для анализа продукции.
+     */
+    fun getAnalysisRecyclingProducts(
+        idPT: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainTitleCountSuffix>>
+
     /** Завершает всю продукцию, чей момент готовности наступил к [nowIso] (`yyyy-MM-dd'T'HH:mm`). */
     suspend fun completeDueRecycling(nowIso: String)
 
@@ -78,6 +90,12 @@ interface RecyclingRepository {
      * (пусто — сырьё не трогалось или товар не из переработки).
      */
     suspend fun deleteRecycledProduct(addId: Long, note: String): List<DomainWriteOffTable>
+
+    /**
+     * Удаляет товар переработки [productId] (в том числе ещё не готовый) — правило то же, что
+     * у [deleteRecycledProduct]: последний товар партии уводит её сырьё в утиль.
+     */
+    suspend fun deleteRecyclingProduct(productId: Long, note: String): List<DomainWriteOffTable>
 
     /** Получен ли товар склада [addId] переработкой. */
     suspend fun isRecycledProduct(addId: Long): Boolean

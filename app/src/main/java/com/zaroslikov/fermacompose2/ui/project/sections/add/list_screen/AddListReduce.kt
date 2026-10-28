@@ -34,12 +34,11 @@ class AddListReduce(private val resourceProvider: ResourceProvider) :
             is AddListIntent.OpenRecyclingDetail ->
                 state.copy(
                     recyclingDetailId = intent.id,
-                    isOpenRecyclingDelete = false,
-                    isOpenRecyclingDispose = false
+                    recyclingDetailProductId = intent.productId,
+                    isOpenRecyclingDelete = false
                 )
 
             is AddListIntent.OpenRecyclingDelete -> state.copy(isOpenRecyclingDelete = intent.value)
-            is AddListIntent.OpenRecyclingDispose -> state.copy(isOpenRecyclingDispose = intent.value)
 
             is AddListIntent.GroupClicked -> state.updateGroup(intent.value)
             is AddListIntent.SearchChanged -> state.updateSearch(intent.value)

@@ -96,6 +96,9 @@ class FinanceCategoryViewModel @Inject constructor(
                         )
                     }
                 }
+
+                // Переработка — только в анализе продукции, здесь не открывается
+                FinanceCategory.RECYCLING -> flowOf(BalanceStructure())
             }
 
             val financeCategoryFlow = when (financeCategory) {
@@ -123,7 +126,7 @@ class FinanceCategoryViewModel @Inject constructor(
                     end
                 )
 
-                FinanceCategory.PROFIT -> flowOf(emptyList())
+                FinanceCategory.PROFIT, FinanceCategory.RECYCLING -> flowOf(emptyList())
             }
 
             val financeProductFlow = when (financeCategory) {
@@ -151,7 +154,7 @@ class FinanceCategoryViewModel @Inject constructor(
                     end
                 )
 
-                FinanceCategory.PROFIT -> flowOf(emptyList())
+                FinanceCategory.PROFIT, FinanceCategory.RECYCLING -> flowOf(emptyList())
             }
 
             combine(
@@ -200,7 +203,8 @@ class FinanceCategoryViewModel @Inject constructor(
         return list.map { item ->
             val positive = when (item.category) {
                 FinanceCategory.SALE, FinanceCategory.OWN_NEED -> true
-                FinanceCategory.EXPENSES, FinanceCategory.SCRAP, FinanceCategory.PROFIT -> false
+                FinanceCategory.EXPENSES, FinanceCategory.SCRAP, FinanceCategory.PROFIT,
+                FinanceCategory.RECYCLING -> false
             }
             ProductUi(
                 category = item.category,
@@ -267,7 +271,7 @@ class FinanceCategoryViewModel @Inject constructor(
             FinanceCategory.EXPENSES -> getDetailsFinanceByName(titleProduct)
             FinanceCategory.OWN_NEED -> getDetailsWriteOffOwnNeedByName(titleProduct)
             FinanceCategory.SCRAP -> getDetailsScrapByName(titleProduct)
-            FinanceCategory.PROFIT -> emptyList()
+            FinanceCategory.PROFIT, FinanceCategory.RECYCLING -> emptyList()
         }
     }
 

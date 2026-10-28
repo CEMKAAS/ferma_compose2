@@ -64,12 +64,10 @@ sealed class AddListIntent : BaseIntent {
 
     //Recycling
     data class RecyclingLoaded(val value: List<RecyclingItem>) : AddListIntent()
-    data class OpenRecyclingDetail(val id: Long?) : AddListIntent()
+    data class OpenRecyclingDetail(val id: Long?, val productId: Long? = null) : AddListIntent()
     data class OpenRecyclingDelete(val value: Boolean) : AddListIntent()
-    data class OpenRecyclingDispose(val value: Boolean) : AddListIntent()
     data class CompleteRecyclingProduct(val productId: Long) : AddListIntent()
     data object DeleteRecycling : AddListIntent()
-    data object DisposeRecycling : AddListIntent()
 
     data object Insert : AddListIntent()
     data object Update : AddListIntent()

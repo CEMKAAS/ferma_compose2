@@ -1269,6 +1269,9 @@
     <string name="analysis_screen_char_sale">График проданной продуции</string>
     <string name="analysis_screen_char_own_need">График сэкономленной продуции</string>
     <string name="analysis_screen_char_scrap">График потеряной продуции</string>
+    <string name="analysis_screen_recycled">Переработано</string>
+    <string name="analysis_screen_char_recycling">График переработанной продукции</string>
+    <string name="analysis_screen_recycling_products">Продукция из переработки</string>
     <string name="analysis_screen_history_transaction">История операций</string>
     <string name="analysis_screen_entries">запись</string>
 
@@ -1918,5 +1921,8 @@
     <string name="recycling_delete_product_single_warning_text">• Товар будет удалён со склада\n• Переработка будет отменена\n• Сырьё выше станет обычным списанием в утиль\n• Это действие нельзя отменить</string>
     <string name="recycling_delete_product_warning_text">• Товар будет удалён со склада\n• Он пропадёт из переработки в списаниях\n• Сырьё и остальная продукция переработки останутся\n• Это действие нельзя отменить</string>
     <string name="recycling_delete_product_raw_title">Это сырьё уйдёт в утиль</string>
+    <string name="recycling_delete_progress_single_warning_text">• Товар не поступит на склад\n• Переработка будет отменена\n• Сырьё выше станет обычным списанием в утиль\n• Это действие нельзя отменить</string>
+    <string name="recycling_delete_progress_warning_text">• Товар не поступит на склад\n• Он пропадёт из переработки в списаниях\n• Сырьё и остальная продукция переработки останутся\n• Это действие нельзя отменить</string>
+    <string name="snackbar_recycling_product_delete">Продукция %1$s %2$s %3$s удалена из переработки</string>
     <string name="snackbar_recycling_dispose">Списано в утиль: %1$s</string>
 </resources>

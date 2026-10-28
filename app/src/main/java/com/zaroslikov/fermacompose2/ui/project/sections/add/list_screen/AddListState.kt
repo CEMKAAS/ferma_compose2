@@ -39,8 +39,9 @@ data class AddListState(
     /** Партии переработки: незавершённая продукция — блок «В переработке» над списком. */
     val recyclingItems: List<RecyclingItem> = emptyList(),
     val recyclingDetailId: Long? = null,
+    /** Товар партии, по которому нажали, — в деталях показывается только он. */
+    val recyclingDetailProductId: Long? = null,
     val isOpenRecyclingDelete: Boolean = false,
-    val isOpenRecyclingDispose: Boolean = false,
 
     override val isLoading: Boolean = true,
     override val navigate: UiEvent? = null,

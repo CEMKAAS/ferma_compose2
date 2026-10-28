@@ -111,6 +111,7 @@ fun FinanceCategory.toDrawRes(): Int {
         FinanceCategory.OWN_NEED -> R.drawable.outline_savings_24
         FinanceCategory.SCRAP -> R.drawable.baseline_delete_24
         FinanceCategory.PROFIT -> R.drawable.baseline_currency_ruble_24
+        FinanceCategory.RECYCLING -> R.drawable.baseline_autorenew_24
     }
 }
 
@@ -121,5 +122,6 @@ fun FinanceCategory.toTransactionDrawRes(): Int {
         FinanceCategory.OWN_NEED -> R.drawable.outline_savings_24
         FinanceCategory.SCRAP -> R.drawable.baseline_delete_24
         FinanceCategory.PROFIT -> R.drawable.icon_add_product
+        FinanceCategory.RECYCLING -> R.drawable.baseline_autorenew_24
     }
 }

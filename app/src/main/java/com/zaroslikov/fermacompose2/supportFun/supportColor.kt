@@ -155,6 +155,7 @@ fun FinanceCategory.toColorList(): List<Color> {
         FinanceCategory.OWN_NEED -> listOf(Color(0xFFFE9A00), Color(0xFFFF6900))
         FinanceCategory.SCRAP -> listOf(Color(0xFF4A5565), Color(0xFF364153))
         FinanceCategory.PROFIT -> /*listOf(blue_1, animal_2)*/ listOf(blue_10, blue_11, blue_12)
+        FinanceCategory.RECYCLING -> listOf(violet_1, violet_2)
     }
 }
 
@@ -205,6 +206,7 @@ fun FinanceCategory.toColorIconSecond(): Color {
         FinanceCategory.OWN_NEED -> orang_2
         FinanceCategory.SCRAP -> marengo
         FinanceCategory.PROFIT -> blue_1
+        FinanceCategory.RECYCLING -> violet_1
     }
 }
 
@@ -215,6 +217,7 @@ fun FinanceCategory.toColorIconBorderSecond(): Color {
         FinanceCategory.OWN_NEED -> orang_4
         FinanceCategory.SCRAP -> gray_6
         FinanceCategory.PROFIT -> blue_3
+        FinanceCategory.RECYCLING -> violet_3
     }
 }
 
@@ -225,6 +228,7 @@ fun FinanceCategory.toBorderCard(): Color {
         FinanceCategory.OWN_NEED -> orang_8
         FinanceCategory.SCRAP -> grey_2
         FinanceCategory.PROFIT -> blue_13
+        FinanceCategory.RECYCLING -> violet_5
     }
 }
 

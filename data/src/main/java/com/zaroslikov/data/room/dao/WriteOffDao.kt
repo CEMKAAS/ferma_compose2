@@ -329,6 +329,24 @@ interface WriteOffDao {
         dateEnd: String
     ): Flow<List<CountSuffixPriceDateDto>>
 
+    /** Сырьё [name], ушедшее в переработку за период, — для анализа продукции. */
+    @Query(
+        "SELECT count," +
+                " count_suffix AS suffix," +
+                " COALESCE(price_all, price, 0.0) AS price," +
+                " printf('%04d-%02d-%02d', year, month, day) AS date" +
+                " FROM write_off_table" +
+                " WHERE idPT=:id and title=:name AND recycling_id IS NOT NULL AND product_origin = 0" +
+                " AND DATE(printf('%04d-%02d-%02d', year, month, day))" +
+                " BETWEEN DATE(:dateBegin) AND DATE(:dateEnd)"
+    )
+    fun getAnalysisRecyclingRangeList(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<CountSuffixPriceDateDto>>
+
     @Query(
         "SELECT COALESCE(SUM(count), 0) AS count," +
                 "  count_suffix AS suffix" +

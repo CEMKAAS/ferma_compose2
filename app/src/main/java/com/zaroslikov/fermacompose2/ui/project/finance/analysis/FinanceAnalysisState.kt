@@ -34,6 +34,9 @@ import com.zaroslikov.fermacompose2.supportFun.DomainChartPoint
 import com.zaroslikov.fermacompose2.supportFun.firstDayOfMonth
 import com.zaroslikov.fermacompose2.supportFun.todayOfMonth
 import com.zaroslikov.fermacompose2.ui.navigation.UiEvent
+import com.zaroslikov.fermacompose2.violet_1
+import com.zaroslikov.fermacompose2.violet_3
+import com.zaroslikov.fermacompose2.violet_6
 import okhttp3.internal.http2.Settings
 
 data class FinanceAnalysisState(
@@ -53,6 +56,7 @@ data class FinanceAnalysisState(
     val charFilter: List<Pair<List<DomainChartPoint>, FinanceAnalysisEnum>> = emptyList(),
     val buyers: List<Buyer> = emptyList(),
     val animalProducer: List<AnimalProducer> = emptyList(),
+    val recyclingProducts: List<RecyclingProduct> = emptyList(),
     val financeAnalysis: List<FinanceAnalysis> = emptyList(),
     val dateFilter: DateFilterAnalysis = DateFilterAnalysis(),
     // true по умолчанию: экран открывается сразу и с первого кадра показывает
@@ -90,6 +94,15 @@ data class AnimalProducer(
     val currentIcon: AppIcon,
 )
 
+/** Продукция, полученная переработкой этого продукта; процент — внутри своей единицы. */
+data class RecyclingProduct(
+    val title: String,
+    val count: Double,
+    val suffix: Suffix,
+    val percentDouble: Double,
+    val percentFloat: Float
+)
+
 data class FinanceAnalysis(
     val totalCount: Double,
     val suffixCount: Suffix,
@@ -104,6 +117,7 @@ data class FinanceAnalysis(
 data class AnalysisUiCalculatedState(
     val buyers: List<Buyer>,
     val animalProducer: List<AnimalProducer>,
+    val recyclingProducts: List<RecyclingProduct> = emptyList(),
     val financeAnalysis: List<FinanceAnalysis> = emptyList(),
     val totalPrice: Double = 0.0,
     val countProduct: Double = 0.0,
@@ -172,5 +186,16 @@ enum class FinanceAnalysisEnum(
         titleChar = R.string.analysis_screen_char_scrap,
         sign = "-",
         colorTextPercent = red_14
+    ),
+    RECYCLING(
+        colorBackground = violet_3,
+        iconBackground = violet_1,
+        textColor = violet_6,
+        icon = R.drawable.baseline_autorenew_24,
+        title = R.string.analysis_screen_recycled,
+        titleButton = R.string.analysis_screen_recycled,
+        titleChar = R.string.analysis_screen_char_recycling,
+        sign = "~",
+        colorTextPercent = violet_6
     )
 }

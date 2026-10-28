@@ -9,11 +9,13 @@ import com.zaroslikov.domain.models.dto.finance.DomainAnimalWitchCountAndImage
 import com.zaroslikov.domain.models.dto.finance.DomainTransaction
 import com.zaroslikov.domain.models.dto.sale.DomainBuyerPrice
 import com.zaroslikov.domain.models.dto.sale.DomainCountSuffixPriceDate
+import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
 import com.zaroslikov.domain.models.enums.FilterDate
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.AddRepository
 import com.zaroslikov.domain.repository.FinanceRepository
+import com.zaroslikov.domain.repository.RecyclingRepository
 import com.zaroslikov.domain.repository.SaleRepository
 import com.zaroslikov.domain.repository.SettingsRepository
 import com.zaroslikov.domain.repository.WriteOffRepository
@@ -50,6 +52,7 @@ class FinanceAnalysisViewModel @Inject constructor(
     private val writeOffRepository: WriteOffRepository,
     private val financeRepository: FinanceRepository,
     private val settingsRepository: SettingsRepository,
+    private val recyclingRepository: RecyclingRepository,
     private val resourceProvider: ResourceProvider
 ) : ListViewModel<FinanceAnalysisState, FinanceAnalysisIntent>(FinanceAnalysisState()) {
 
@@ -114,7 +117,9 @@ class FinanceAnalysisViewModel @Inject constructor(
                     end
                 ),
                 saleRepository.getAnalysisSaleRangeList(itemId, titleProduct, start, end),
-                settingsRepository.getSettings(itemId)
+                settingsRepository.getSettings(itemId),
+                writeOffRepository.getAnalysisRecyclingRangeList(itemId, titleProduct, start, end),
+                recyclingRepository.getAnalysisRecyclingProducts(itemId, titleProduct, start, end)
             ) { values: Array<Any?> ->
                 buildUiState(
                     transactionList = values[0] as List<DomainTransaction>,
@@ -125,6 +130,8 @@ class FinanceAnalysisViewModel @Inject constructor(
                     totalScrap = values[5] as List<DomainCountSuffixPriceDate>,
                     saleProduct = values[6] as List<DomainCountSuffixPriceDate>,
                     settings = values[7] as DomainSettings,
+                    totalRecycling = values[8] as List<DomainCountSuffixPriceDate>,
+                    recyclingProducts = values[9] as List<DomainTitleCountSuffix>,
                     start = start,
                     end = end,
                 )
@@ -140,6 +147,7 @@ class FinanceAnalysisViewModel @Inject constructor(
                             titleProduct = titleProduct,
                             buyers = newState.buyers,
                             animalProducer = newState.animalProducer,
+                            recyclingProducts = newState.recyclingProducts,
                             totalPrice = newState.totalPrice,
                             countProduct = newState.countProduct,
                             financeAnalysis = newState.financeAnalysis,
@@ -168,12 +176,14 @@ class FinanceAnalysisViewModel @Inject constructor(
         totalScrap: List<DomainCountSuffixPriceDate>,
         saleProduct: List<DomainCountSuffixPriceDate>,
         settings: DomainSettings,
+        totalRecycling: List<DomainCountSuffixPriceDate>,
+        recyclingProducts: List<DomainTitleCountSuffix>,
         start: String,
         end: String,
     ): AnalysisUiCalculatedState {
         val topBuyer = topBuyersList(buyersList, settings)
         val animalProducerList = animalProducerList(animalProducerList, settings)
-        val char = char(productList, saleProduct, totalOwnNeed, totalScrap, settings, start, end)
+        val char = char(productList, saleProduct, totalOwnNeed, totalScrap, totalRecycling, settings, start, end)
 
         val transactionList2 =
             transactionList.filter { it.suffix.conversation4(settings) == baseSuffix }
@@ -207,8 +217,17 @@ class FinanceAnalysisViewModel @Inject constructor(
                 settings
             )
 
+        val financeRecyclingCount =
+            financeAnalysis(
+                totalRecycling,
+                settings.currencySuffix,
+                FinanceAnalysisEnum.RECYCLING,
+                settings
+            )
+
         val totalStock = // TODO
-            totalCountProduct - financeSale.totalCount - financeOwnNeed.totalCount - financeScrap.totalCount
+            totalCountProduct - financeSale.totalCount - financeOwnNeed.totalCount -
+                    financeScrap.totalCount - financeRecyclingCount.totalCount
         val realizedPrice = financeSale.totalPrice + financeOwnNeed.totalPrice
 
 
@@ -230,8 +249,15 @@ class FinanceAnalysisViewModel @Inject constructor(
             percentFloat = 0f
         )
 
+        // Сырьё в переработке обычно без цены — оценивается, как и остаток, по средней цене
+        val financeRecycling = if (financeRecyclingCount.totalPrice > 0) financeRecyclingCount
+        else financeRecyclingCount.copy(
+            totalPrice = financeRecyclingCount.totalCount * averagePurchasePrice,
+            averagePrice = averagePurchasePrice
+        )
+
         val financeAnalysisList =
-            listOf(financeSale, financeOwnNeed, financeScrap, financeStock)
+            listOf(financeSale, financeOwnNeed, financeScrap, financeRecycling, financeStock)
 
         val totalAllAnimals2 = financeAnalysisList.sumOf { it.totalCount }
         val resultAnimalProducer2 = financeAnalysisList.map { animal -> //TODO
@@ -250,6 +276,7 @@ class FinanceAnalysisViewModel @Inject constructor(
         return AnalysisUiCalculatedState(
             buyers = topBuyer,
             animalProducer = animalProducerList,
+            recyclingProducts = recyclingProductList(recyclingProducts),
             charFilter = char,
             financeAnalysis = resultAnimalProducer2,
             totalPrice = totalPrice,
@@ -302,6 +329,22 @@ class FinanceAnalysisViewModel @Inject constructor(
         }
     }
 
+    /** Единицы у полученных товаров разные — процент считается среди товаров с той же единицей. */
+    private fun recyclingProductList(list: List<DomainTitleCountSuffix>): List<RecyclingProduct> {
+        val totalBySuffix = list.groupBy { it.suffix }.mapValues { (_, items) -> items.sumOf { it.count } }
+        return list.map { item ->
+            val total = totalBySuffix[item.suffix] ?: 0.0
+            val percent = if (total == 0.0) 0.0 else item.count / total
+            RecyclingProduct(
+                title = item.title,
+                count = item.count,
+                suffix = item.suffix,
+                percentDouble = percent * 100.0,
+                percentFloat = percent.toFloat()
+            )
+        }
+    }
+
     private fun topBuyersList(
         buyersList: List<DomainBuyerPrice>,
         domainSettings: DomainSettings
@@ -333,6 +376,7 @@ class FinanceAnalysisViewModel @Inject constructor(
         saleProduct: List<DomainCountSuffixPriceDate>,
         totalOwnNeed: List<DomainCountSuffixPriceDate>,
         totalScrap: List<DomainCountSuffixPriceDate>,
+        totalRecycling: List<DomainCountSuffixPriceDate>,
         domainSettings: DomainSettings,
         start: String,
         end: String
@@ -355,11 +399,17 @@ class FinanceAnalysisViewModel @Inject constructor(
             end, baseSuffix, domainSettings
         )
 
+        val chartFilterRecycling = chartFilter(
+            totalRecycling, getState().dateFilter.filterDate, start,
+            end, baseSuffix, domainSettings
+        )
+
         return listOf(
             chartFilterStock to FinanceAnalysisEnum.STOCK,
             chartFilterSale to FinanceAnalysisEnum.SALE,
             chartFilterOwnNeed to FinanceAnalysisEnum.OWN_NEED,
-            chartFilterScrap to FinanceAnalysisEnum.SCRAP
+            chartFilterScrap to FinanceAnalysisEnum.SCRAP,
+            chartFilterRecycling to FinanceAnalysisEnum.RECYCLING
         )
     }
 

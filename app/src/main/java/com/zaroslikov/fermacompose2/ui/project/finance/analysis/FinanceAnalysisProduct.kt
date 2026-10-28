@@ -4,6 +4,8 @@ package com.zaroslikov.fermacompose2.ui.project.finance.analysis
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -94,6 +96,8 @@ import com.zaroslikov.fermacompose2.supportFun.monthToResString2
 import com.zaroslikov.fermacompose2.ui.elements.AdsCard
 import com.zaroslikov.fermacompose2.ui.elements.BorderShowAllButton
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.IconAnimal
+import com.zaroslikov.fermacompose2.violet_1
+import com.zaroslikov.fermacompose2.violet_4
 import com.zaroslikov.fermacompose2.violet_5
 import com.zaroslikov.fermacompose2.violet_6
 import com.zaroslikov.fermacompose2.white
@@ -187,6 +191,7 @@ fun FinanceAnalysisContainer(
         )
         ProductDistribution(state.financeAnalysis)
         AnimalProducers(state.animalProducer)
+        RecyclingProducts(state.recyclingProducts)
         TopBuyers(state.buyers)
         Chart(
             state.charFilter,
@@ -586,6 +591,78 @@ private fun AnimalProducerSlider(
     }
 }
 
+/** Что получили, переработав этот продукт, — по образцу «Продукции от животных». */
+@Composable
+private fun RecyclingProducts(
+    products: List<RecyclingProduct>
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val visibleList = if (expanded) products else products.take(3)
+
+    if (visibleList.isNotEmpty())
+        CardNewWithTitle(
+            titleRes = R.string.analysis_screen_recycling_products
+        ) {
+            visibleList.forEachIndexed { index, product ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    RecyclingProductSlider(product)
+                    if (index == visibleList.lastIndex && products.size > 3)
+                        BorderShowAllButton(
+                            listSize = products.size,
+                            textColor = violet_6,
+                            borderColor = violet_5,
+                            isShowMore = expanded
+                        ) { expanded = !expanded }
+                }
+            }
+        }
+}
+
+@Composable
+private fun RecyclingProductSlider(product: RecyclingProduct) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                IconCircle(
+                    icon = R.drawable.icon_add_product,
+                    colorBackground = FinanceAnalysisEnum.RECYCLING.iconBackground
+                )
+                Text(product.title, style = text_14, color = black_2)
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    "${product.count.formatNumber()} ${stringResource(product.suffix.toResId())}",
+                    style = text_14,
+                    color = black_2
+                )
+                TextMiniCard(
+                    "${product.percentDouble.formatNumber()}%",
+                    textColor = FinanceAnalysisEnum.RECYCLING.colorTextPercent,
+                    backgroundColor = FinanceAnalysisEnum.RECYCLING.colorBackground
+                )
+            }
+        }
+        SliderGradient(
+            percentFloat = product.percentFloat,
+            colors = listOf(violet_4, violet_1)
+        )
+    }
+}
+
 @Composable
 private fun TopBuyers(
     buyersList: List<Buyer>
@@ -711,14 +788,16 @@ private fun Chart(
                 .background(Color.White)
                 .padding(bottom = 20.dp)
         )
+        // Пять графиков в ширину не помещаются — кнопки по ширине подписи, ряд прокручивается
         GroupButton(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
         ) {
             FinanceAnalysisEnum.entries.forEach {
                 val triple = if (it == charSelection) Triple(it.iconBackground, white, 1.dp)
                 else Triple(Color.Transparent, marengo, 0.dp)
                 ButtonForGroupButtons(
-                    modifier = Modifier.weight(1f),
                     text = it.titleButton,
                     backgroundColor = triple.first,
                     textColor = triple.second,
@@ -795,6 +874,7 @@ private fun TransitionCard(
     val (colorPrice, positive) = when (categoryFinance) {
         FinanceCategory.SALE -> price_green to "+"
         FinanceCategory.OWN_NEED -> orang_2 to ""
+        FinanceCategory.RECYCLING -> violet_6 to ""
         else -> error_base to "-"
     }
     val dateList = date.split("-")

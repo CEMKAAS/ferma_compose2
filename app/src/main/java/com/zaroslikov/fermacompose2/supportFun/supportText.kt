@@ -143,6 +143,7 @@ fun FinanceCategory.toResId(): Int {
         FinanceCategory.OWN_NEED -> R.string.finance_category_onw_need_total
         FinanceCategory.SCRAP -> R.string.finance_category_scrap_total
         FinanceCategory.PROFIT -> /*R.string.finance_category_total_profit*/ R.string.support_text_current_balance
+        FinanceCategory.RECYCLING -> R.string.analysis_screen_recycled
     }
 }
 
@@ -153,6 +154,7 @@ fun FinanceCategory.toTitleResId(): Int {
         FinanceCategory.OWN_NEED -> R.string.card_own_need
         FinanceCategory.SCRAP -> R.string.card_scrap
         FinanceCategory.PROFIT -> R.string.card_profit
+        FinanceCategory.RECYCLING -> R.string.analysis_screen_recycled
     }
 }
 
@@ -163,6 +165,7 @@ fun FinanceCategory.toTitleSecondResId(): Int {
         FinanceCategory.OWN_NEED -> R.string.card_own_need
         FinanceCategory.SCRAP -> R.string.card_scrap
         FinanceCategory.PROFIT -> R.string.finance_total
+        FinanceCategory.RECYCLING -> R.string.analysis_screen_recycled
     }
 }
 

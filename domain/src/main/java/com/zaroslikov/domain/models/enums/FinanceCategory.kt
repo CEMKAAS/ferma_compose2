@@ -5,5 +5,7 @@ enum class FinanceCategory {
     EXPENSES,
     OWN_NEED,
     SCRAP,
-    PROFIT
+    PROFIT,
+    /** Сырьё, ушедшее в переработку (только в анализе продукции). */
+    RECYCLING
 }

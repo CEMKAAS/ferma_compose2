@@ -793,7 +793,7 @@ private fun FinanceCategoryCard(
 ) {
     val positive = when (category) {
         FinanceCategory.SALE, FinanceCategory.OWN_NEED -> "+"
-        FinanceCategory.EXPENSES, FinanceCategory.SCRAP -> "-"
+        FinanceCategory.EXPENSES, FinanceCategory.SCRAP, FinanceCategory.RECYCLING -> "-"
         FinanceCategory.PROFIT -> if (price > 0) "" else "-"
     }
     Card(
@@ -908,5 +908,8 @@ private fun WarningCardByFinanceCategory(
             title = R.string.finance_category_expenses_title,
             text = R.string.finance_category_expenses_text
         )
+
+        // Переработка — только в анализе продукции, здесь не открывается
+        FinanceCategory.RECYCLING -> Unit
     }
 }

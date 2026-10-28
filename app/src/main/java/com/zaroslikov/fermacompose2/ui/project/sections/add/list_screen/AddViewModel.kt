@@ -101,7 +101,6 @@ class AddViewModel @Inject constructor(
 
             is AddListIntent.CompleteRecyclingProduct -> completeRecyclingProduct(intent.productId)
             AddListIntent.DeleteRecycling -> deleteRecycling()
-            AddListIntent.DisposeRecycling -> disposeRecycling()
 
             AddListIntent.Insert -> insert()
             AddListIntent.Update -> update()
@@ -165,30 +164,35 @@ class AddViewModel @Inject constructor(
                 resourceProvider.getString(R.string.snackbar_recycling_complete)
                     .format(listOf(product).toCountText(resourceProvider))
             )
+            // В деталях был только этот товар — он ушёл на склад, шторке больше нечего показывать
+            sendIntent(AddListIntent.OpenRecyclingDetail(null))
         }
     }
 
     private fun deleteRecycling() {
         viewModelScope.launch {
             val item = getState().recyclingDetail() ?: return@launch
-            recyclingRepository.deleteRecycling(item.recycling.id)
-            showMessage(resourceProvider.getString(R.string.snackbar_recycling_delete).format(item.title))
-            sendIntent(AddListIntent.OpenRecyclingDetail(null))
-        }
-    }
-
-    /** Сырьё партии списывается в утиль, неготовая продукция отменяется. */
-    private fun disposeRecycling() {
-        viewModelScope.launch {
-            val item = getState().recyclingDetail() ?: return@launch
-            val disposed = recyclingRepository.disposeRecycling(
-                item.recycling.id,
-                resourceProvider.getString(R.string.recycling_dispose_note)
-            )
-            if (disposed.isNotEmpty()) showMessage(
-                resourceProvider.getString(R.string.snackbar_recycling_dispose)
-                    .format(disposed.toIngredientCountText(resourceProvider))
-            )
+            // Открыт конкретный товар — удаляется только он, последний товар уводит сырьё в утиль
+            val product = item.products
+                .find { it.product.id == getState().recyclingDetailProductId }?.product
+            if (product == null) {
+                recyclingRepository.deleteRecycling(item.recycling.id)
+                showMessage(resourceProvider.getString(R.string.snackbar_recycling_delete).format(item.title))
+            } else {
+                val disposed = recyclingRepository.deleteRecyclingProduct(
+                    product.id,
+                    resourceProvider.getString(R.string.recycling_dispose_note)
+                )
+                val count = product.count.formatNumber()
+                val suffix = resourceProvider.getString(product.countSuffix.toResId())
+                showMessage(
+                    if (disposed.isEmpty())
+                        resourceProvider.getString(R.string.snackbar_recycling_product_delete)
+                            .format(product.title, count, suffix)
+                    else resourceProvider.getString(R.string.snackbar_recycled_product_delete_dispose)
+                        .format(product.title, count, suffix, disposed.toIngredientCountText(resourceProvider))
+                )
+            }
             sendIntent(AddListIntent.OpenRecyclingDetail(null))
         }
     }

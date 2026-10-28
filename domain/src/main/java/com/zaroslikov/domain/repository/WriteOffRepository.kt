@@ -89,6 +89,14 @@ interface WriteOffRepository {
         dateEnd: String
     ): Flow<List<DomainCountSuffixPriceDate>>
 
+    /** Сырьё [name], ушедшее в переработку за период, — для анализа продукции. */
+    fun getAnalysisRecyclingRangeList(
+        id: Long,
+        name: String,
+        dateBegin: String,
+        dateEnd: String
+    ): Flow<List<DomainCountSuffixPriceDate>>
+
     fun getAnalysisWriteOffScrapAllTimeRange(
         id: Long,
         name: String,
