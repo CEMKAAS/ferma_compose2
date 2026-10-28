@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"cd \\\"D:/Work/_Project/ferma_compose2/data/src/main/java/com/zaroslikov/data\\\" && cat > room/table/ferma/RecyclingTable.kt <<'EOF'\\npackage com.zaroslikov.data.room.table.ferma\\n\\nimport an...",
-  "error": "Exit code 2\n/usr/bin/bash: -c: line 156: unexpected EOF while looking for matching `''",
-  "timestamp": "2026-10-12T17:51:39.295Z",
-  "retry_count": 1
-}
