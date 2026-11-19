@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="todo_assignees">Исполнители</string>
+    <string name="todo_assignees_show_all">Показать все</string>
+    <string name="todo_assignees_collapse">Свернуть</string>
+    <string name="todo_assignee_name">Имя исполнителя</string>
+    <string name="todo_assignee_add">Добавить исполнителя</string>
+    <string name="todo_assignee_choose">Выбрать исполнителя</string>
+    <string name="todo_assignee_select_name">Назначить исполнителя %1$s</string>
+    <string name="todo_assignee_no_matches">Нет подходящих исполнителей</string>
+    <string name="todo_assignee_remove">Убрать исполнителя %1$s</string>
+    <string name="todo_assignees_empty">Пока нет исполнителей</string>
+    <string name="todo_assignees_empty_text">Добавьте исполнителя, чтобы назначать его на задачи.</string>
+    <string name="todo_assignee_edit">Изменить исполнителя</string>
+    <string name="todo_assignee_edit_name">Редактировать исполнителя %1$s</string>
+    <string name="todo_assignee_edit_action">Редактировать</string>
+    <string name="todo_assignee_default_name">Исполнитель</string>
+    <string name="todo_assignee_profile_empty">Сведения об исполнителе пока не заполнены</string>
+    <string name="todo_assignee_first_name">Имя</string>
+    <string name="todo_assignee_last_name">Фамилия</string>
+    <string name="todo_assignee_middle_name">Отчество</string>
+    <string name="todo_assignee_birthday">День рождения</string>
+    <string name="todo_assignee_birthday_choose">Выбрать дату рождения</string>
+    <string name="todo_assignee_birthday_clear">Очистить дату рождения</string>
+    <string name="todo_assignee_phone">Номер телефона</string>
+    <string name="todo_assignee_phone_example">+7 (900) 123-45-67</string>
+    <string name="todo_assignee_phone_invalid">Введите номер телефона полностью</string>
+    <string name="todo_assignee_email">E-mail</string>
+    <string name="todo_assignee_email_example">name@example.com</string>
+    <string name="todo_assignee_email_invalid">Введите E-mail в формате name@example.com</string>
+    <string name="todo_assignee_address">Домашний адрес</string>
+    <string name="todo_assignee_description">Описание</string>
+    <string name="todo_assignee_delete_name">Удалить исполнителя %1$s</string>
+    <string name="todo_assignee_delete_title">Удалить исполнителя?</string>
+    <string name="todo_assignee_delete_text">«%1$s» будет удалён из списка исполнителей и снят со всех задач проекта.</string>
+    <string name="todo_assignee_exists">Исполнитель с таким именем уже есть</string>
+</resources>

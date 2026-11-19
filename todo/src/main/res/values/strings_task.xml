@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="todo_msg_task_blocked">Сначала завершите все задачи, которые блокируют эту задачу</string>
+    <!-- Шторка «Подробно» задачи -->
+    <string name="todo_details_title">Подробно</string>
+    <string name="todo_details_parameters">Параметры задачи</string>
+    <string name="todo_details_delete">Удалить задачу</string>
+    <string name="todo_details_new_tag_hint">Название тега</string>
+    <string name="todo_details_subtask_delete">Удалить подзадачу</string>
+    <string name="todo_edit_new_tag">Новый тег</string>
+    <string name="todo_tags_reset">Сброс</string>
+    <string name="todo_tags_not_specified">Не указаны</string>
+    <string name="todo_tags_close">Сохранить</string>
+    <string name="todo_tags_close_all">Закрыть все меню</string>
+
+    <string name="todo_card_delete_title">Удалить задачу?</string>
+    <string name="todo_card_delete_text">Вместе с задачей будут удалены её подзадачи, комментарии и связи.</string>
+
+    <string name="todo_card_subtasks">Подзадачи</string>
+    <string name="todo_card_subtasks_progress">Подзадачи · %1$d из %2$d</string>
+    <string name="todo_card_subtasks_percent">%1$d%%</string>
+    <string name="todo_card_subtask_quick">Новая подзадача</string>
+    <string name="todo_card_subtasks_show_all">Показать все</string>
+    <string name="todo_card_subtasks_collapse">Свернуть</string>
+
+    <string name="todo_card_links">Связи</string>
+    <string name="todo_card_link_add">Связать</string>
+    <string name="todo_card_link_delete">Удалить связь</string>
+    <string name="todo_card_link_sheet_title">Связать с задачей</string>
+    <string name="todo_card_link_type">Тип связи</string>
+    <string name="todo_card_link_direction_hint">Выберите связь для открытой задачи, затем найдите вторую задачу.</string>
+    <string name="todo_card_link_search_hint">Название задачи</string>
+    <string name="todo_card_link_not_found">Подходящих задач не найдено</string>
+    <string name="todo_card_msg_link_added">Связь добавлена</string>
+    <string name="todo_card_msg_link_deleted">Связь удалена</string>
+
+    <string name="todo_card_comments">Комментарии</string>
+    <string name="todo_card_comments_show_all">Показать все</string>
+    <string name="todo_card_comments_collapse">Свернуть</string>
+    <string name="todo_card_comment_hint">Комментарий</string>
+    <string name="todo_card_comment_send">Отправить</string>
+    <string name="todo_card_comment_date_edited">%1$s · изменено</string>
+    <string name="todo_card_comment_edit_title">Изменить комментарий</string>
+    <string name="todo_card_comment_delete_title">Удалить комментарий?</string>
+    <string name="todo_card_comment_delete_text">Комментарий будет удалён без возможности восстановления.</string>
+    <string name="todo_card_error_comment_empty">Введите текст комментария</string>
+    <string name="todo_card_msg_comment_deleted">Комментарий удалён</string>
+</resources>

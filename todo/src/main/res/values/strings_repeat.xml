@@ -1,0 +1,12 @@
+<resources>
+    <string name="todo_repeat">Повтор</string>
+    <string name="todo_repeat_none">Не повторять</string>
+    <string name="todo_repeat_day">Каждый день</string>
+    <string name="todo_repeat_week">Каждую неделю</string>
+    <string name="todo_repeat_month">Каждый месяц</string>
+    <string name="todo_repeat_year">Каждый год</string>
+    <string name="todo_repeat_end">Дата окончания повтора</string>
+    <string name="todo_repeat_forever">Без окончания</string>
+    <string name="todo_repeat_until">До %1$s</string>
+    <string name="todo_repeat_error_end">Дата окончания не может быть раньше срока задачи</string>
+</resources>

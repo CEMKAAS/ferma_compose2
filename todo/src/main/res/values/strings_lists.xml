@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Шторка «название + цвет» -->
+    <string name="todo_form_title_locked">Название статуса по умолчанию не меняется — только цвет</string>
+
+    <!-- Главный экран: умные списки, «Мои списки», поиск -->
+    <string name="todo_lists_new">Новый список</string>
+    <string name="todo_lists_edit">Изменить список</string>
+    <string name="todo_lists_my_lists">Мои списки</string>
+    <string name="todo_lists_no_lists">Нет списков</string>
+    <string name="todo_msg_task_added">Задача добавлена</string>
+    <string name="todo_lists_delete_title">Удалить список?</string>
+    <string name="todo_lists_delete_text">Список «%1$s» будет удалён вместе со всеми его задачами, подзадачами и комментариями.</string>
+    <string name="todo_msg_list_deleted">Список удалён</string>
+    <string name="todo_lists_pin">Закрепить</string>
+    <string name="todo_lists_unpin">Открепить</string>
+
+    <!-- Значки списков (подписи для выбора и чтения с экрана) -->
+    <string name="todo_list_icon">Значок</string>
+    <string name="todo_list_icon_list">Список</string>
+    <string name="todo_list_icon_animals">Животные</string>
+    <string name="todo_list_icon_plants">Растения</string>
+    <string name="todo_list_icon_flowers">Цветы</string>
+    <string name="todo_list_icon_machinery">Техника</string>
+    <string name="todo_list_icon_eggs">Яйца</string>
+    <string name="todo_list_icon_shopping">Покупки</string>
+    <string name="todo_list_icon_repair">Ремонт</string>
+    <string name="todo_list_icon_home">Дом</string>
+    <string name="todo_list_icon_water">Вода</string>
+    <string name="todo_list_icon_money">Деньги</string>
+    <string name="todo_list_icon_calendar">Календарь</string>
+
+    <!-- Экран списка задач -->
+    <string name="todo_list_menu">Действия со списком</string>
+    <string name="todo_list_menu_show_completed">Показать завершённые</string>
+    <string name="todo_list_menu_hide_completed">Скрыть завершённые</string>
+    <string name="todo_list_menu_filter">Фильтр</string>
+    <string name="todo_list_menu_delete">Удалить список</string>
+    <string name="todo_list_search_hint">Поиск задач</string>
+    <string name="todo_list_empty">Нет задач</string>
+    <string name="todo_list_not_found">Ничего не найдено</string>
+    <string name="todo_list_menu_clear_completed">Удалить завершённые</string>
+    <string name="todo_list_done_editing">Готово</string>
+    <string name="todo_list_task_details">Подробнее о задаче</string>
+    <string name="todo_list_subtasks_expand">Показать подзадачи</string>
+    <string name="todo_list_subtasks_collapse">Скрыть подзадачи</string>
+    <string name="todo_list_subtasks">Подзадачи %1$d/%2$d</string>
+    <string name="todo_list_comments">Комментарии: %1$d</string>
+    <string name="todo_list_links">Связи: %1$d</string>
+    <string name="todo_list_done_checkbox">Отметить выполненной</string>
+    <string name="todo_list_undone_checkbox">Снять отметку</string>
+    <string name="todo_list_today">Сегодня</string>
+    <string name="todo_list_tomorrow">Завтра</string>
+    <string name="todo_list_yesterday">Вчера</string>
+    <string name="todo_list_filter_reset">Сбросить</string>
+    <string name="todo_list_filter_remove">Снять фильтр «%1$s»</string>
+    <string name="todo_list_clear_title">Удалить завершённые?</string>
+    <string name="todo_list_clear_text">Завершённые задачи этого списка будут удалены вместе с их подзадачами, комментариями и связями.</string>
+    <string name="todo_list_msg_task_deleted">Задача удалена</string>
+
+    <!-- Экран статусов -->
+    <string name="todo_statuses_new">Новый статус</string>
+    <string name="todo_statuses_edit">Изменить статус</string>
+    <string name="todo_statuses_delete_title">Удалить статус?</string>
+    <string name="todo_statuses_delete_text">Статус «%1$s» будет удалён, его задачи перейдут в «В планах».</string>
+    <string name="todo_msg_status_deleted">Статус удалён</string>
+
+    <!-- Экран тегов -->
+    <string name="todo_tags_new">Новый тег</string>
+    <string name="todo_tags_edit">Изменить тег</string>
+    <string name="todo_tags_empty_title">Тегов пока нет</string>
+    <string name="todo_tags_empty_text">Теги помогают отбирать задачи, например «Срочно» или «Закупка»</string>
+    <string name="todo_tags_delete_title">Удалить тег?</string>
+    <string name="todo_tags_delete_text">Тег «%1$s» будет снят со всех задач.</string>
+    <string name="todo_msg_tag_deleted">Тег удалён</string>
+    <string name="todo_undo_delete">Отменить</string>
+    <string name="todo_snackbar_seconds">%1$d с</string>
+    <string name="todo_snackbar_unlimited">∞</string>
+</resources>

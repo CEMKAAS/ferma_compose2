@@ -11,6 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zaroslikov.crm.ui.navigation.CrmDestination
 import com.zaroslikov.crm.ui.navigation.crmNavGraph
+import com.zaroslikov.todo.ui.navigation.TodoDestination
+import com.zaroslikov.todo.ui.navigation.todoNavGraph
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
 import com.zaroslikov.fermacompose2.ui.finance.FinanceScreen
 import com.zaroslikov.fermacompose2.ui.project.finance.analysis.FinanceAnalysisDestination
@@ -82,6 +84,7 @@ fun ProjectNavHost(
                 },
                 navigateToEdit = { rootNavController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
+                navigateToTasks = { navController.navigate("${TodoDestination.route}/$it") },
                 navigationToAnalysis = {
                     navController.navigate(
                         nav(
@@ -132,6 +135,8 @@ fun ProjectNavHost(
 
         // Раздел CRM живёт в модуле :crm, граф экранов подключается целиком
         crmNavGraph(navController)
+        // Задачи проекта — модуль :todo, вход со склада
+        todoNavGraph(navController)
 
         composable(
             route = FinanceIncomeExpensesDestination.routeWithArgs,

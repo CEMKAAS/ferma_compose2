@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Меню настроек -->
+    <string name="todo_settings">Настройки</string>
+
+    <!-- Подсписки -->
+    <string name="todo_section_new">Новый подсписок</string>
+    <string name="todo_section_rename">Переименовать</string>
+    <string name="todo_section_delete">Удалить</string>
+    <string name="todo_section_delete_title">Удалить подсписок?</string>
+    <string name="todo_section_delete_text">Подсписок «%1$s» будет удалён, его задачи останутся в списке без подсписка.</string>
+    <string name="todo_section_msg_deleted">Подсписок удалён</string>
+    <string name="todo_section_none">Без подсписка</string>
+    <string name="todo_section_expand">Развернуть подсписок</string>
+    <string name="todo_section_collapse">Свернуть подсписок</string>
+    <string name="todo_section_actions">Действия с подсписком «%1$s»</string>
+    <string name="todo_section_field">Подсписок</string>
+
+    <!-- Вид списка -->
+    <string name="todo_list_menu_show_columns">Показать столбцами</string>
+    <string name="todo_list_menu_show_list">Показать списком</string>
+    <string name="todo_columns_new_column">Новый столбик</string>
+    <string name="todo_columns_move_to">Переместить в…</string>
+</resources>

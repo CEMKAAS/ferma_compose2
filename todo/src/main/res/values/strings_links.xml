@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="todo_links_blocked_by_count">Блокирующих задач: %1$d</string>
+    <string name="todo_links_blocking_count">Блокирует задач: %1$d</string>
+    <string name="todo_link_type_help">О типе связи «%1$s»</string>
+    <string name="todo_link_task_tooltip">%1$s\nСтатус: %2$s</string>
+    <string name="todo_link_status_unknown">Неизвестен</string>
+    <string name="todo_link_filter_unfinished">Незавершённые</string>
+    <string name="todo_link_filter_all">Все задачи</string>
+    <string name="todo_link_relates_help">Связывает задачи без направления. При завершении любой задачи автоматически завершается вся цепочка связанных задач.</string>
+    <string name="todo_link_blocks_help">Текущая задача обозначается как блокирующая выбранную. При завершении любой из них автоматически завершается вся цепочка связанных задач.</string>
+    <string name="todo_link_blocked_by_help">Выбранная задача обозначается как блокирующая текущую. При завершении любой из них автоматически завершается вся цепочка связанных задач.</string>
+</resources>

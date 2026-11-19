@@ -3,6 +3,7 @@ package com.zaroslikov.fermacompose2.ui.start.first
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.crm.domain.repository.CrmBackupRepository
+import com.zaroslikov.todo.domain.repository.TodoBackupRepository
 import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.repository.AppSettingsRepository
@@ -53,6 +54,7 @@ class FirstViewModel @Inject constructor(
     private val yandexMetricRepository: YandexMetricRepository,
     private val pregnancyReminderScheduler: PregnancyReminderScheduler,
     private val crmBackupRepository: CrmBackupRepository,
+    private val todoBackupRepository: TodoBackupRepository,
 ) : BaseViewModel2<FirstState, FirstIntent, FirstReducer>(
     FirstState(),
     FirstReducer()
@@ -295,6 +297,14 @@ class FirstViewModel @Inject constructor(
                     throw e
                 } catch (e: Exception) {
                     Log.i("error", "deleteProject: CRM $e")
+                }
+                // Задачи — тоже отдельная база без FK на проект
+                try {
+                    todoBackupRepository.deleteForProject(it.id)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.i("error", "deleteProject: todo $e")
                 }
                 if (it.mode) updateProjectNotifications() else updateIncubatorNotifications()
                 sendIntent(

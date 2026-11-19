@@ -76,7 +76,8 @@ fun TopAppBarBack(
     onNoteClick: (() -> Unit)? = null,
     onSettingsClick: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    isHorizontalDriver: Boolean = false
+    isHorizontalDriver: Boolean = false,
+    onTasksClick: (() -> Unit)? = null
 ) {
     Column {
         CenterAlignedTopAppBar(
@@ -99,6 +100,14 @@ fun TopAppBarBack(
             windowInsets = WindowInsets(0),
             scrollBehavior = scrollBehavior,
             actions = {
+                onTasksClick?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            painterResource(R.drawable.outline_check_circle_24),
+                            contentDescription = "Задачи"
+                        )
+                    }
+                }
                 onNoteClick?.let {
                     IconButton(onClick = it) {
                         Icon(

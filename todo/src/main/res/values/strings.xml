@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Общие -->
+    <string name="todo_title">Задачи</string>
+    <string name="todo_back">Назад</string>
+    <string name="todo_all">Все</string>
+    <string name="todo_save">Сохранить</string>
+    <string name="todo_cancel">Отмена</string>
+    <string name="todo_ok">ОК</string>
+    <string name="todo_add">Добавить</string>
+    <string name="todo_create">Создать</string>
+    <string name="todo_edit_short">Изменить</string>
+    <string name="todo_rename">Переименовать</string>
+    <string name="todo_delete">Удалить</string>
+    <string name="todo_more">Ещё</string>
+    <string name="todo_search">Поиск</string>
+    <string name="todo_clear">Очистить</string>
+    <string name="todo_dash">—</string>
+    <string name="todo_field_title">Название</string>
+    <string name="todo_field_note">Примечание</string>
+    <string name="todo_add_note">Добавить заметку</string>
+    <string name="todo_color">Цвет</string>
+    <string name="todo_color_option">Цвет %1$d</string>
+    <string name="todo_selected">Выбрано</string>
+
+    <!-- Заголовки экранов -->
+    <string name="todo_lists_title">Задачи</string>
+    <string name="todo_list_title">Список</string>
+    <string name="todo_task_new_title">Новая задача</string>
+    <string name="todo_statuses_title">Статусы</string>
+    <string name="todo_tags_title">Теги</string>
+
+    <!-- Статусы по умолчанию -->
+    <string name="todo_status">Статус</string>
+    <string name="todo_status_planned">В планах</string>
+    <string name="todo_status_in_progress">В работе</string>
+    <string name="todo_status_done">Завершённые</string>
+    <string name="todo_status_default">По умолчанию</string>
+
+    <!-- Приоритеты -->
+    <string name="todo_priority">Приоритет</string>
+    <string name="todo_priority_none">Нет</string>
+    <string name="todo_priority_low">Низкий</string>
+    <string name="todo_priority_medium">Средний</string>
+    <string name="todo_priority_high">Высокий</string>
+
+    <!-- Типы связей -->
+    <string name="todo_link_relates">Связана с</string>
+    <string name="todo_link_blocks">Блокирует</string>
+    <string name="todo_link_blocked_by">Заблокирована задачей</string>
+
+    <!-- Срок -->
+    <string name="todo_due">Срок</string>
+    <string name="todo_due_date">Дата</string>
+    <string name="todo_due_time">Время</string>
+    <string name="todo_overdue">Просрочено</string>
+
+    <!-- Сообщения и ошибки -->
+    <string name="todo_msg_error">Не удалось сохранить</string>
+    <string name="todo_msg_load_error">Не удалось загрузить данные</string>
+    <string name="todo_error_title_empty">Введите название</string>
+    <string name="todo_msg_tag_exists">Тег с таким названием уже есть</string>
+    <string name="todo_msg_link_exists">Задачи уже связаны</string>
+    <string name="todo_msg_default_status">Статус по умолчанию нельзя удалить или переименовать</string>
+    <string name="todo_details_close">Закрыть подробности</string>
+</resources>

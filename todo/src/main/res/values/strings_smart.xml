@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Умные списки: плитки главного экрана и их экраны -->
+    <string name="todo_smart_today">Сегодня</string>
+    <string name="todo_smart_scheduled">Запланировано</string>
+    <string name="todo_smart_all">Все</string>
+    <string name="todo_smart_completed">Завершено</string>
+    <string name="todo_smart_overdue">Просрочено</string>
+    <string name="todo_smart_empty">Нет задач</string>
+    <string name="todo_smart_in_parent">в: %1$s</string>
+</resources>

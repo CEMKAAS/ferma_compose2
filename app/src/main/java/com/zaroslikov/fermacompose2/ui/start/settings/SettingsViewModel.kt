@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.zaroslikov.crm.domain.model.DomainCrmBackup
 import com.zaroslikov.crm.domain.repository.CrmBackupRepository
+import com.zaroslikov.todo.domain.model.DomainTodoBackup
+import com.zaroslikov.todo.domain.repository.TodoBackupRepository
 import com.zaroslikov.data.room.database.AppDatabase
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.models.table.profile.DomainProfileTable
@@ -93,7 +95,8 @@ class SettingsViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val appSettingsRepository: AppSettingsRepository,
     private val workManagerRepository: WorkManagerRepository,
-    private val crmBackupRepository: CrmBackupRepository
+    private val crmBackupRepository: CrmBackupRepository,
+    private val todoBackupRepository: TodoBackupRepository
 
 ) :
     BaseViewModel2<SettingsState, SettingsIntent, SettingsReduce>(
@@ -134,8 +137,9 @@ class SettingsViewModel @Inject constructor(
                         )
                     )
                 }
-                // CRM хранится в отдельной базе — чистим её тоже
+                // CRM и задачи хранятся в отдельных базах — чистим их тоже
                 crmBackupRepository.clearAll()
+                todoBackupRepository.clearAll()
 
                 withContext(Dispatchers.Main) {
                     sendIntent(SettingsIntent.OpenDeleteBottomSheetClick(false))
@@ -200,6 +204,7 @@ class SettingsViewModel @Inject constructor(
             val profileTable = profileRepository.getAllProfileTableForExport().first()
             val appSettingsTable = appSettingsRepository.getAllAppSettingsTableForExport().first()
             val crm = crmBackupRepository.export()
+            val todo = todoBackupRepository.export()
 
             val backupData = BackupData(
                 version = 1,
@@ -253,7 +258,8 @@ class SettingsViewModel @Inject constructor(
                 timeNotificationIncubatorTable = timeNotificationIncubatorTable,
                 profileTable = profileTable,
                 appSettingsTable = appSettingsTable,
-                crm = crm
+                crm = crm,
+                todo = todo
             )
             val json = Json.encodeToString(backupData)
             updateState { state -> state.copy(backupDataText = json) }
@@ -366,6 +372,11 @@ class SettingsViewModel @Inject constructor(
                     backup.crm ?: DomainCrmBackup(),
                     projectIds = backup.projectTable.map { it.id }.toSet()
                 )
+                // Задачи — так же: всегда перезаписываются, только проекты этого бэкапа
+                todoBackupRepository.import(
+                    backup.todo ?: DomainTodoBackup(),
+                    projectIds = backup.projectTable.map { it.id }.toSet()
+                )
                 // Напоминания старых беременностей сняты, новые — по импортированным данным
                 pregnancyReminderScheduler.resetAfterImport()
                 launchNotification()
@@ -380,6 +391,13 @@ class SettingsViewModel @Inject constructor(
                     throw clearError
                 } catch (clearError: Exception) {
                     Log.i("error", "setAllData: clear CRM $clearError")
+                }
+                try {
+                    todoBackupRepository.clearAll()
+                } catch (clearError: CancellationException) {
+                    throw clearError
+                } catch (clearError: Exception) {
+                    Log.i("error", "setAllData: clear todo $clearError")
                 }
                 showMessage("Ошибка при импорте базы данных!\nОбратитесь в службу поддержки.")
                 Log.i("error", "setAllData: $e")
