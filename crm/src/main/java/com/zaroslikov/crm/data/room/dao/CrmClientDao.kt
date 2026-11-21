@@ -35,9 +35,19 @@ interface CrmClientDao {
     /** Обновляет только редактируемые поля: `sales_key`, `source` и `created_date` неизменяемы. */
     @Query(
         "UPDATE crm_client_table SET name = :name, is_vip = :isVip, note = :note, " +
-                "is_favorite = :isFavorite WHERE id = :id"
+                "is_favorite = :isFavorite, birth_date = :birthDate WHERE id = :id"
     )
-    suspend fun updateClient(id: Long, name: String, isVip: Boolean, note: String, isFavorite: Boolean)
+    suspend fun updateClient(
+        id: Long,
+        name: String,
+        isVip: Boolean,
+        note: String,
+        isFavorite: Boolean,
+        birthDate: String?
+    )
+
+    @Query("UPDATE crm_client_table SET is_favorite = :isFavorite WHERE id = :id")
+    suspend fun setFavorite(id: Long, isFavorite: Boolean)
 
     /** Синхронизация с продажами: существующие `(idPT, sales_key)` пропускаются. */
     @Insert(onConflict = OnConflictStrategy.IGNORE)

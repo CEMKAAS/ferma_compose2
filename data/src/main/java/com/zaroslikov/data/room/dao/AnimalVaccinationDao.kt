@@ -13,6 +13,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnimalVaccinationDao {
+    @Query(
+        "SELECT v.* FROM animal_vaccination_table v " +
+                "JOIN animal_table a ON a.id = v.animal_id WHERE a.idPT = :idPT"
+    )
+    fun getProjectVaccinations(idPT: Long): Flow<List<AnimalVaccinationTable>>
+
     @Query("SELECT * from animal_vaccination_table")
     fun getAllAnimalVaccinationTableForExport(): Flow<List<AnimalVaccinationTable>>
 

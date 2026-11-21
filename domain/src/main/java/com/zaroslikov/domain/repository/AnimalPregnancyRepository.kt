@@ -17,6 +17,9 @@ interface AnimalPregnancyRepository {
     /** Активные беременности проекта — бейдж в списке животных. */
     fun getActivePregnanciesByProject(idPT: Long): Flow<List<DomainAnimalPregnancy>>
 
+    /** Активные беременности и состоявшиеся роды проекта. */
+    fun getProjectBirths(idPT: Long): Flow<List<DomainAnimalPregnancy>>
+
     suspend fun getPregnancy(id: Long): DomainAnimalPregnancy?
 
     /** Активные беременности у неархивных самок в неархивных проектах — для перепланирования. */

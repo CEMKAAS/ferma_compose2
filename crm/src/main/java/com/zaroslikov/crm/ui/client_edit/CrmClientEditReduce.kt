@@ -37,6 +37,7 @@ object CrmClientEditReducer {
                 isVip = intent.client.isVip,
                 isFavorite = intent.client.isFavorite,
                 note = intent.client.note,
+                birthDate = intent.client.birthDate,
                 contacts = intent.contacts.mapIndexed { index, contact ->
                     CrmContactDraft(
                         key = index + 1L,
@@ -51,6 +52,7 @@ object CrmClientEditReducer {
             is CrmClientEditIntent.VipChange -> state.copy(isVip = intent.isVip)
             is CrmClientEditIntent.FavoriteChange -> state.copy(isFavorite = intent.isFavorite)
             is CrmClientEditIntent.NoteChange -> state.copy(note = intent.note)
+            is CrmClientEditIntent.BirthDateChange -> state.copy(birthDate = intent.birthDate)
 
             CrmClientEditIntent.AddContact -> {
                 val key = (state.contacts.maxOfOrNull { it.key } ?: 0L) + 1L

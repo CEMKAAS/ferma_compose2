@@ -14,6 +14,11 @@ import javax.inject.Inject
 
 class AnimalVaccinationRepositoryImpl @Inject constructor(private val animalVaccinationDao: AnimalVaccinationDao) :
     AnimalVaccinationRepository {
+    override fun getProjectVaccinations(idPT: Long): Flow<List<DomainAnimalVaccination>> =
+        animalVaccinationDao.getProjectVaccinations(idPT).map { rows ->
+            rows.map { it.toDomainAnimalVaccination() }
+        }
+
     override fun getAllAnimalVaccinationTableForExport(): Flow<List<DomainAnimalVaccination>> {
         return animalVaccinationDao.getAllAnimalVaccinationTableForExport()
             .map { it -> it.map { it.toDomainAnimalVaccination() } }

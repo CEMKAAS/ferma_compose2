@@ -7,6 +7,7 @@ import com.zaroslikov.crm.data.room.dao.CrmContactDao
 import com.zaroslikov.crm.data.room.dao.CrmInteractionDao
 import com.zaroslikov.crm.data.room.dao.CrmTaskDao
 import com.zaroslikov.crm.data.room.database.CrmDatabase
+import com.zaroslikov.crm.data.room.database.migration.MIGRATION_1_2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +23,9 @@ object CrmDatabaseModule {
     @Provides
     @Singleton
     fun provideCrmDatabase(@ApplicationContext context: Context): CrmDatabase {
-        return Room.databaseBuilder(context, CrmDatabase::class.java, "crm_database").build()
+        return Room.databaseBuilder(context, CrmDatabase::class.java, "crm_database")
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides

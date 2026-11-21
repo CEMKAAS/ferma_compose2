@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
  *
  * [salesKey] — неизменяемый ключ связи с `sale_table.buyer` (TRIM имени на момент создания),
  * вся статистика матчится по нему. [name] — только отображение, его можно свободно править.
+ * [birthDate] хранится в формате `yyyy-MM-dd`, если дата указана.
  */
 @Serializable
 data class DomainCrmClient(
@@ -19,5 +20,6 @@ data class DomainCrmClient(
     val note: String = "",
     val isFavorite: Boolean = false,
     val createdDate: String,
-    val isArchived: Boolean = false
+    val isArchived: Boolean = false,
+    val birthDate: String? = null
 )

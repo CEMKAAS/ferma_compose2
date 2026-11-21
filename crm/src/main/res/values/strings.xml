@@ -107,6 +107,10 @@
     <string name="crm_new_client">Новый клиент</string>
     <string name="crm_edit_client">Редактирование клиента</string>
     <string name="crm_field_name">Имя клиента</string>
+    <string name="crm_field_birth_date">Дата рождения</string>
+    <string name="crm_client_birth_date">Дата рождения: %1$s</string>
+    <string name="crm_birth_date_missing">не указана</string>
+    <string name="crm_clear_birth_date">Очистить дату рождения</string>
     <string name="crm_field_note">Заметка</string>
     <string name="crm_field_status">Статус</string>
     <string name="crm_status_regular">Обычный</string>

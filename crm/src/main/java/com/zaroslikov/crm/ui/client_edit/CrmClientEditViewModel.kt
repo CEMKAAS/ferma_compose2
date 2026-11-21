@@ -84,7 +84,8 @@ class CrmClientEditViewModel @Inject constructor(
                             isVip = state.isVip,
                             note = state.note.trim(),
                             isFavorite = state.isFavorite,
-                            createdDate = crmToday()
+                            createdDate = crmToday(),
+                            birthDate = state.birthDate
                         ),
                         // clientId проставит репозиторий после вставки клиента
                         state.contacts.toDomainContacts(0)
@@ -95,7 +96,8 @@ class CrmClientEditViewModel @Inject constructor(
                             name = name,
                             isVip = state.isVip,
                             note = state.note.trim(),
-                            isFavorite = state.isFavorite
+                            isFavorite = state.isFavorite,
+                            birthDate = state.birthDate
                         ),
                         state.contacts.toDomainContacts(original.id)
                     )

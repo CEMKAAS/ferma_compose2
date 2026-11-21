@@ -17,6 +17,9 @@ class CrmTaskRepositoryImpl @Inject constructor(
         return crmTaskDao.getTasks(idPT, isDone).map { list -> list.map { it.toDomain() } }
     }
 
+    override fun getCalendarTasks(idPT: Long): Flow<List<DomainCrmTask>> =
+        crmTaskDao.getCalendarTasks(idPT).map { list -> list.map { it.toDomain() } }
+
     override fun getUpcoming(idPT: Long, limit: Int): Flow<List<DomainCrmTask>> {
         return crmTaskDao.getUpcoming(idPT, limit).map { list -> list.map { it.toDomain() } }
     }
@@ -31,6 +34,10 @@ class CrmTaskRepositoryImpl @Inject constructor(
 
     override suspend fun setDone(id: Long, isDone: Boolean) {
         crmTaskDao.setDone(id, isDone)
+    }
+
+    override suspend fun setTaskCompleted(idPT: Long, taskId: Long, completed: Boolean) {
+        crmTaskDao.setDone(taskId, isDone = completed, idPT = idPT)
     }
 
     override suspend fun deleteTask(task: DomainCrmTask) {

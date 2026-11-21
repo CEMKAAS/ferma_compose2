@@ -38,6 +38,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,6 +60,7 @@ import com.zaroslikov.crm.domain.model.crmSalesKey
 import com.zaroslikov.crm.ui.base.CrmUiEvent
 import com.zaroslikov.crm.ui.client_card.icon
 import com.zaroslikov.crm.ui.components.CrmCard
+import com.zaroslikov.crm.ui.components.CrmDatePickerField
 import com.zaroslikov.crm.ui.components.CrmSegmentedButtons
 import com.zaroslikov.crm.ui.components.CrmTextField
 import com.zaroslikov.crm.ui.components.CrmTopBar
@@ -164,6 +166,17 @@ private fun CrmClientEditBody(
                     selectedIndex = if (state.isVip) 1 else 0,
                     onSelect = { onIntent(CrmClientEditIntent.VipChange(it == 1)) }
                 )
+
+                CrmDatePickerField(
+                    value = state.birthDate.orEmpty(),
+                    onValueChange = { onIntent(CrmClientEditIntent.BirthDateChange(it)) },
+                    label = stringResource(R.string.crm_field_birth_date)
+                )
+                if (state.birthDate != null) {
+                    TextButton(onClick = { onIntent(CrmClientEditIntent.BirthDateChange(null)) }) {
+                        Text(text = stringResource(R.string.crm_clear_birth_date), color = green_shamrock)
+                    }
+                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),

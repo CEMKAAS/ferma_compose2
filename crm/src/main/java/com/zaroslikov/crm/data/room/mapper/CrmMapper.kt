@@ -19,7 +19,8 @@ fun CrmClientTable.toDomain() = DomainCrmClient(
     note = note,
     isFavorite = isFavorite,
     createdDate = createdDate,
-    isArchived = isArchived
+    isArchived = isArchived,
+    birthDate = birthDate
 )
 
 fun DomainCrmClient.toTable() = CrmClientTable(
@@ -32,7 +33,8 @@ fun DomainCrmClient.toTable() = CrmClientTable(
     note = note,
     isFavorite = isFavorite,
     createdDate = createdDate,
-    isArchived = isArchived
+    isArchived = isArchived,
+    birthDate = birthDate
 )
 
 fun CrmContactTable.toDomain() = DomainCrmContact(

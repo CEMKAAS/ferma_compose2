@@ -54,6 +54,7 @@ interface ExpensesRepository {
     ): Flow<List<DomainTitleSuffixPrice>> //maybe
 
     fun getCurrentFoodWarehouse(id: Long): Flow<List<DomainExpensesTable>>
+    fun getProjectFeedWithEndDate(idPT: Long): Flow<List<DomainExpensesTable>>
     suspend fun updateFoodOnWriteOffWarehouse(id: Long)
     fun getAnalysisExpensesNewYearProject(
         id: Long,

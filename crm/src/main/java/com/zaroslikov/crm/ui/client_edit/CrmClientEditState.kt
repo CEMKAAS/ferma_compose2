@@ -26,6 +26,7 @@ data class CrmClientEditState(
     val isVip: Boolean = false,
     val isFavorite: Boolean = false,
     val note: String = "",
+    val birthDate: String? = null,
     val contacts: List<CrmContactDraft> = emptyList()
 ) {
     val isNew: Boolean get() = clientId == NEW_CLIENT_ID

@@ -135,7 +135,7 @@ class CrmClientCardViewModel @Inject constructor(
         when (intent) {
             CrmClientCardIntent.ToggleFavorite -> getState().data?.client?.let { client ->
                 // Состояние уже переключено reducer'ом — сохраняем его
-                launchSafe { clientRepository.updateClient(client) }
+                launchSafe { clientRepository.setFavorite(client.id, client.isFavorite) }
             }
 
             CrmClientCardIntent.ConfirmArchive -> launchSafe {

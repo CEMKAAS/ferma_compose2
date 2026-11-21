@@ -24,7 +24,7 @@ import com.zaroslikov.crm.data.room.table.CrmTaskTable
         CrmInteractionTable::class,
         CrmTaskTable::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(CrmConverters::class)

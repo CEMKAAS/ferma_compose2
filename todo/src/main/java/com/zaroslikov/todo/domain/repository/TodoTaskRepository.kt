@@ -121,6 +121,9 @@ interface TodoTaskRepository {
     /** Явная отметка из UI: повторное завершение уже завершённой задачи ничего не меняет. */
     suspend fun setDone(taskId: Long, done: Boolean)
 
+    /** Меняет выполнение задачи проекта [idPT]. Снятие выполнения возвращает её в «В планах». */
+    suspend fun setTaskCompleted(idPT: Long, taskId: Long, completed: Boolean)
+
     /** Подзадачи, теги, связи и комментарии удаляются каскадом. */
     suspend fun delete(id: Long)
 

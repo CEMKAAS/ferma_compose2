@@ -2,6 +2,7 @@ package com.zaroslikov.fermacompose2.ui.start.first
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.zaroslikov.calendar.domain.CalendarBackupRepository
 import com.zaroslikov.crm.domain.repository.CrmBackupRepository
 import com.zaroslikov.todo.domain.repository.TodoBackupRepository
 import com.zaroslikov.domain.models.table.DomainProjectTable
@@ -27,12 +28,14 @@ import com.zaroslikov.fermacompose2.utils.PregnancyReminderScheduler
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import androidx.core.net.toUri
 import com.zaroslikov.domain.models.enums.TemplateType
@@ -55,6 +58,7 @@ class FirstViewModel @Inject constructor(
     private val pregnancyReminderScheduler: PregnancyReminderScheduler,
     private val crmBackupRepository: CrmBackupRepository,
     private val todoBackupRepository: TodoBackupRepository,
+    private val calendarBackupRepository: CalendarBackupRepository,
 ) : BaseViewModel2<FirstState, FirstIntent, FirstReducer>(
     FirstState(),
     FirstReducer()
@@ -288,7 +292,15 @@ class FirstViewModel @Inject constructor(
         viewModelScope.launch {
             getState().currentProjectTable?.let {
                 pregnancyReminderScheduler.cancelForProject(it.id)
-                projectRepository.deleteProject(it)
+                withContext(NonCancellable) {
+                    projectRepository.deleteProject(it)
+                    try {
+                        calendarBackupRepository.deleteForProject(it.id)
+                    } catch (e: Exception) {
+                        Log.i("error", "deleteProject: calendar $e")
+                        showMessage(resourceProvider.getString(R.string.calendar_project_cleanup_error))
+                    }
+                }
                 // CRM в отдельной базе без FK на проект — клиенты и задачи удаляются явно.
                 // Сбой CRM не должен мешать удалению проекта
                 try {

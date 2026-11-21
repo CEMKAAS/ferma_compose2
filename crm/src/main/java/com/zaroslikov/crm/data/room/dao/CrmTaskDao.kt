@@ -14,6 +14,9 @@ interface CrmTaskDao {
     @Query("SELECT * FROM crm_task_table WHERE idPT = :idPT AND is_done = :isDone ORDER BY due_date, id")
     fun getTasks(idPT: Long, isDone: Boolean): Flow<List<CrmTaskTable>>
 
+    @Query("SELECT * FROM crm_task_table WHERE idPT = :idPT ORDER BY due_date, id")
+    fun getCalendarTasks(idPT: Long): Flow<List<CrmTaskTable>>
+
     @Query("SELECT * FROM crm_task_table WHERE idPT = :idPT AND is_done = 0 ORDER BY due_date, id LIMIT :limit")
     fun getUpcoming(idPT: Long, limit: Int): Flow<List<CrmTaskTable>>
 
@@ -23,8 +26,11 @@ interface CrmTaskDao {
     @Upsert
     suspend fun upsertTask(task: CrmTaskTable): Long
 
-    @Query("UPDATE crm_task_table SET is_done = :isDone WHERE id = :id")
-    suspend fun setDone(id: Long, isDone: Boolean)
+    @Query(
+        "UPDATE crm_task_table SET is_done = :isDone " +
+            "WHERE id = :id AND (:idPT IS NULL OR idPT = :idPT) AND is_done != :isDone"
+    )
+    suspend fun setDone(id: Long, isDone: Boolean, idPT: Long? = null)
 
     @Delete
     suspend fun deleteTask(task: CrmTaskTable)

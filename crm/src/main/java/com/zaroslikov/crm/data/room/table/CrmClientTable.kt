@@ -39,5 +39,7 @@ data class CrmClientTable(
     @ColumnInfo(name = "created_date")
     val createdDate: String,
     @ColumnInfo(name = "is_archived", defaultValue = "0")
-    val isArchived: Boolean = false
+    val isArchived: Boolean = false,
+    @ColumnInfo(name = "birth_date")
+    val birthDate: String? = null
 )

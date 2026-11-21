@@ -27,6 +27,9 @@ class AnimalPregnancyRepositoryImpl @Inject constructor(
     override fun getActivePregnanciesByProject(idPT: Long): Flow<List<DomainAnimalPregnancy>> =
         pregnancyDao.getActivePregnanciesByProject(idPT).map { list -> list.map { it.toDomainMap() } }
 
+    override fun getProjectBirths(idPT: Long): Flow<List<DomainAnimalPregnancy>> =
+        pregnancyDao.getProjectBirths(idPT).map { rows -> rows.map { it.toDomainMap() } }
+
     override suspend fun getPregnancy(id: Long): DomainAnimalPregnancy? =
         pregnancyDao.getPregnancy(id)?.toDomainMap()
 

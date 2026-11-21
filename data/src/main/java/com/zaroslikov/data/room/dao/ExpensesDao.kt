@@ -216,6 +216,9 @@ interface ExpensesDao {
     @Query("SELECT * FROM expenses_table WHERE idPT =:id AND is_show_food = 1 AND is_food = 1")
     fun getCurrentFoodWarehouse(id: Long): Flow<List<ExpensesTable>>
 
+    @Query("SELECT * FROM expenses_table WHERE idPT = :idPT AND is_food = 1 AND last_day_food IS NOT NULL")
+    fun getProjectFeedWithEndDate(idPT: Long): Flow<List<ExpensesTable>>
+
     @Query("UPDATE expenses_table SET is_show_food = 0 WHERE _id = :id")
     suspend fun updateFoodOnWriteOffWarehouse(id: Long)
 

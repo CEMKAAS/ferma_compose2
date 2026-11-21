@@ -123,6 +123,7 @@ fun WarehouseScreen(
     navigateToEdit: (Long) -> Unit,
     navigateToNote: (Long) -> Unit,
     navigateToTasks: (Long) -> Unit,
+    navigateToCalendar: () -> Unit,
     navigationToNewYear: (Pair<Boolean, Int>) -> Unit,
     navigationToAnalysis: (Triple<Long, String, Suffix>) -> Unit,
     viewModel: WarehouseViewModel = hiltViewModel()
@@ -141,7 +142,8 @@ fun WarehouseScreen(
                     { navigateToEdit(state.idPT) }
                 },
                 onNoteClick = { navigateToNote(state.idPT) },
-                onTasksClick = { navigateToTasks(state.idPT) }
+                onTasksClick = { navigateToTasks(state.idPT) },
+                onCalendarClick = navigateToCalendar,
             )
         }
     ) { innerPadding ->

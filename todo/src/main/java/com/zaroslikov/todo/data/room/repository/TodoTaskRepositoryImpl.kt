@@ -349,11 +349,20 @@ class TodoTaskRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setDone(taskId: Long, done: Boolean) {
+        updateDone(taskId, done, projectId = null)
+    }
+
+    override suspend fun setTaskCompleted(idPT: Long, taskId: Long, completed: Boolean) {
+        updateDone(taskId, done = completed, projectId = idPT)
+    }
+
+    private suspend fun updateDone(taskId: Long, done: Boolean, projectId: Long?) {
         database.withTransaction {
             val task = todoTaskDao.getTask(taskId) ?: return@withTransaction
             val isDone = todoStatusDao.getStatus(task.statusId)?.isDone == true
             if (isDone == done) return@withTransaction
             val idPT = todoTaskDao.getProjectId(taskId) ?: return@withTransaction
+            if (projectId != null && idPT != projectId) return@withTransaction
             todoStatusDao.insertMissingDefaults(idPT)
             val target = if (done) TodoDefaultStatus.DONE else TodoDefaultStatus.PLANNED
             val status = todoStatusDao.getDefault(idPT, target) ?: error("Нет статуса $target")

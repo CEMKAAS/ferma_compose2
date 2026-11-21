@@ -111,6 +111,46 @@ class TodoTaskRecurrenceTest {
         assertEquals(1, database.todoLinkDao().getAllForExport().size)
     }
 
+    @Test fun calendarCompletionAndReopeningStayInProjectAndKeepExistingRepeats() = runBlocking {
+        dao.insertTask(source().copy(id = 11, dueDate = "2026-02-01", repeatPeriod = TodoRepeatPeriod.DAY))
+        database.todoLinkDao().insertLink(TodoTaskLinkTable(taskId = 11, linkedTaskId = 10))
+
+        repository.setTaskCompleted(8, 10, completed = true)
+        assertEquals(2, dao.getAllForExport().size)
+        assertEquals(1L, dao.getTask(10)?.statusId)
+
+        repository.setTaskCompleted(7, 10, completed = true)
+        val completed = requireNotNull(dao.getTask(10))
+        val linked = requireNotNull(dao.getTask(11))
+        val originalIds = setOf(10L, 11L)
+        val successors = dao.getAllForExport().filterNot { it.id in originalIds }.toSet()
+        assertEquals(2L, completed.statusId)
+        assertNotNull(completed.completedAt)
+        assertEquals(2L, linked.statusId)
+        assertNotNull(linked.completedAt)
+        assertEquals(2, successors.size)
+        assertEquals(setOf("2026-02-28", "2026-02-02"), successors.map { it.dueDate }.toSet())
+        assertTrue(successors.all { it.statusId == 1L && it.completedAt == null })
+
+        repository.setTaskCompleted(8, 10, completed = false)
+        assertEquals(completed, dao.getTask(10))
+
+        repository.setTaskCompleted(7, 10, completed = false)
+        val reopened = requireNotNull(dao.getTask(10))
+        assertEquals(1L, reopened.statusId)
+        assertNull(reopened.completedAt)
+        assertTrue(reopened.recurrenceGenerated)
+        assertEquals(linked, dao.getTask(11))
+        assertEquals(successors, dao.getAllForExport().filterNot { it.id in originalIds }.toSet())
+
+        repository.setTaskCompleted(7, 10, completed = true)
+        repository.setTaskCompleted(7, 10, completed = true)
+        assertEquals(2L, dao.getTask(10)?.statusId)
+        assertNotNull(dao.getTask(10)?.completedAt)
+        assertEquals(linked, dao.getTask(11))
+        assertEquals(successors, dao.getAllForExport().filterNot { it.id in originalIds }.toSet())
+    }
+
     @Test fun endDateIncludesFinalOccurrenceAndStopsAfterIt() = runBlocking {
         dao.updateTask(source().copy(repeatEndDate = "2026-02-28"))
         repository.setDone(10, true)

@@ -51,8 +51,13 @@ class CrmClientRepositoryImpl @Inject constructor(
             name = client.name,
             isVip = client.isVip,
             note = client.note,
-            isFavorite = client.isFavorite
+            isFavorite = client.isFavorite,
+            birthDate = client.birthDate
         )
+    }
+
+    override suspend fun setFavorite(id: Long, isFavorite: Boolean) {
+        crmClientDao.setFavorite(id, isFavorite)
     }
 
     override suspend fun createClientWithContacts(

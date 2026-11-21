@@ -152,6 +152,9 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: Expens
         return expensesDao.getCurrentFoodWarehouse(id).map { it -> it.map { it.toDomainMap() } }
     }
 
+    override fun getProjectFeedWithEndDate(idPT: Long): Flow<List<DomainExpensesTable>> =
+        expensesDao.getProjectFeedWithEndDate(idPT).map { rows -> rows.map { it.toDomainMap() } }
+
     override suspend fun updateFoodOnWriteOffWarehouse(id: Long) {
         return expensesDao.updateFoodOnWriteOffWarehouse(id)
     }

@@ -322,6 +322,15 @@ private fun CrmClientHeader(
             color = gray_7
         )
 
+        Text(
+            text = stringResource(
+                R.string.crm_client_birth_date,
+                client.birthDate?.let(::isoToDisplay) ?: stringResource(R.string.crm_birth_date_missing)
+            ),
+            style = text_14,
+            color = marengo
+        )
+
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             // Узкие кнопки: уменьшенные отступы, иначе подписи не помещаются на половине ширины
             val buttonPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp)

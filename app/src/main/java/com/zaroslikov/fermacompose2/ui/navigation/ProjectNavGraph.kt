@@ -9,6 +9,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.zaroslikov.calendar.ui.calendarNavGraph
+import com.zaroslikov.calendar.ui.calendarRoute
 import com.zaroslikov.crm.ui.navigation.CrmDestination
 import com.zaroslikov.crm.ui.navigation.crmNavGraph
 import com.zaroslikov.todo.ui.navigation.TodoDestination
@@ -72,7 +74,8 @@ fun ProjectNavHost(
             arguments = listOf(navArgument(WarehouseDestination.itemIdArg) {
                 type = NavType.LongType
             })
-        ) {
+        ) { entry ->
+            val warehouseProjectId = entry.arguments?.getLong(WarehouseDestination.itemIdArg) ?: itemPT
             WarehouseScreen(
                 navigateToStart = {
                     rootNavController.navigate(FirstDestination.route) {
@@ -85,6 +88,9 @@ fun ProjectNavHost(
                 navigateToEdit = { rootNavController.navigate("${WarehouseEditDestination.route}/${it}") },
                 navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
                 navigateToTasks = { navController.navigate("${TodoDestination.route}/$it") },
+                navigateToCalendar = {
+                    navController.navigate(calendarRoute(warehouseProjectId)) { launchSingleTop = true }
+                },
                 navigationToAnalysis = {
                     navController.navigate(
                         nav(
@@ -137,6 +143,7 @@ fun ProjectNavHost(
         crmNavGraph(navController)
         // Задачи проекта — модуль :todo, вход со склада
         todoNavGraph(navController)
+        calendarNavGraph(navController)
 
         composable(
             route = FinanceIncomeExpensesDestination.routeWithArgs,

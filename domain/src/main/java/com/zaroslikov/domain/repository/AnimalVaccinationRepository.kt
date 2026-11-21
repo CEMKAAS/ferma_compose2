@@ -5,6 +5,8 @@ import com.zaroslikov.domain.models.table.DomainAnimalVaccination
 import kotlinx.coroutines.flow.Flow
 
 interface AnimalVaccinationRepository {
+    fun getProjectVaccinations(idPT: Long): Flow<List<DomainAnimalVaccination>>
+
     fun getAllAnimalVaccinationTableForExport(): Flow<List<DomainAnimalVaccination>>
     suspend fun clearAndInsertAnimalVaccinationTableForImport(domainAnimalVaccination: List<DomainAnimalVaccination>)
     suspend fun insertAnimalVaccinationTable(animalVaccinationTable: DomainAnimalVaccination): Long

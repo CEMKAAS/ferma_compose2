@@ -50,6 +50,9 @@ interface AnimalPregnancyDao {
     @Query("SELECT * FROM animal_pregnancy_table WHERE idPT = :idPT AND status = 0 ORDER BY id DESC")
     fun getActivePregnanciesByProject(idPT: Long): Flow<List<AnimalPregnancyTable>>
 
+    @Query("SELECT * FROM animal_pregnancy_table WHERE idPT = :idPT AND status IN (0, 1)")
+    fun getProjectBirths(idPT: Long): Flow<List<AnimalPregnancyTable>>
+
     @Query("SELECT * FROM animal_pregnancy_table WHERE id = :id")
     suspend fun getPregnancy(id: Long): AnimalPregnancyTable?
 

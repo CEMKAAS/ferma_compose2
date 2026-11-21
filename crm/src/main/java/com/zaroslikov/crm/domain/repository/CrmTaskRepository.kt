@@ -7,6 +7,8 @@ interface CrmTaskRepository {
 
     fun getTasks(idPT: Long, isDone: Boolean): Flow<List<DomainCrmTask>>
 
+    fun getCalendarTasks(idPT: Long): Flow<List<DomainCrmTask>>
+
     /** Ближайшие невыполненные задачи проекта по сроку. */
     fun getUpcoming(idPT: Long, limit: Int): Flow<List<DomainCrmTask>>
 
@@ -15,6 +17,9 @@ interface CrmTaskRepository {
     suspend fun upsertTask(task: DomainCrmTask): Long
 
     suspend fun setDone(id: Long, isDone: Boolean)
+
+    /** Меняет выполнение задачи, если она принадлежит проекту [idPT]. */
+    suspend fun setTaskCompleted(idPT: Long, taskId: Long, completed: Boolean)
 
     suspend fun deleteTask(task: DomainCrmTask)
 }

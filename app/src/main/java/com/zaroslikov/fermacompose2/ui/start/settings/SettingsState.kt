@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.start.settings
 
+import com.zaroslikov.calendar.domain.CalendarBackup
 import com.zaroslikov.crm.domain.model.DomainCrmBackup
 import com.zaroslikov.todo.domain.model.DomainTodoBackup
 import com.zaroslikov.domain.models.DomainAddTable
@@ -85,4 +86,6 @@ data class BackupData(
     val crm: DomainCrmBackup? = null,
     /** Задачи (отдельная база `todo_database`); в старых бэкапах поля нет. */
     val todo: DomainTodoBackup? = null,
+    /** Свои события и фильтры календаря. Внешние события читаются из своих разделов. */
+    val calendar: CalendarBackup = CalendarBackup(),
 )

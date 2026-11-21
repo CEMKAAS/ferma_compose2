@@ -77,7 +77,8 @@ fun TopAppBarBack(
     onSettingsClick: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     isHorizontalDriver: Boolean = false,
-    onTasksClick: (() -> Unit)? = null
+    onTasksClick: (() -> Unit)? = null,
+    onCalendarClick: (() -> Unit)? = null,
 ) {
     Column {
         CenterAlignedTopAppBar(
@@ -100,6 +101,14 @@ fun TopAppBarBack(
             windowInsets = WindowInsets(0),
             scrollBehavior = scrollBehavior,
             actions = {
+                onCalendarClick?.let {
+                    IconButton(onClick = it) {
+                        Icon(
+                            painterResource(R.drawable.baseline_calendar_month_24),
+                            contentDescription = stringResource(R.string.warehouse_screen_calendar),
+                        )
+                    }
+                }
                 onTasksClick?.let {
                     IconButton(onClick = it) {
                         Icon(

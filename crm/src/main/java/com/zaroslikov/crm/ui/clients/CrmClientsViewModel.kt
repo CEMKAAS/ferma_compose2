@@ -73,7 +73,7 @@ class CrmClientsViewModel @Inject constructor(
         sendIntent(intent)
         when (intent) {
             is CrmClientsIntent.ToggleFavorite -> launchSafe {
-                clientRepository.updateClient(intent.client.copy(isFavorite = !intent.client.isFavorite))
+                clientRepository.setFavorite(intent.client.id, !intent.client.isFavorite)
             }
 
             is CrmClientsIntent.Restore -> launchSafe {

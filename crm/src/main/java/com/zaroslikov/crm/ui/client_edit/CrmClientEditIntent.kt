@@ -12,6 +12,7 @@ sealed interface CrmClientEditIntent {
     data class VipChange(val isVip: Boolean) : CrmClientEditIntent
     data class FavoriteChange(val isFavorite: Boolean) : CrmClientEditIntent
     data class NoteChange(val note: String) : CrmClientEditIntent
+    data class BirthDateChange(val birthDate: String?) : CrmClientEditIntent
 
     data object AddContact : CrmClientEditIntent
     data class RemoveContact(val key: Long) : CrmClientEditIntent

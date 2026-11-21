@@ -1,5 +1,9 @@
 package com.zaroslikov.fermacompose2.ui.start.settings
 
+import com.zaroslikov.calendar.domain.CalendarBackup
+import com.zaroslikov.calendar.domain.CalendarDisabledCategoryBackup
+import com.zaroslikov.calendar.domain.CalendarExceptionBackup
+import com.zaroslikov.calendar.domain.CalendarSeriesBackup
 import com.zaroslikov.domain.models.DomainAnimalTable.DomainAnimalTable
 import com.zaroslikov.domain.models.animal.group.normalizedForImport
 import com.zaroslikov.domain.models.animal.pregnancy.normalizedForImport
@@ -255,6 +259,33 @@ class BackupImportCompatibilityTest {
             val again = Json.decodeFromString<BackupData>(Json.encodeToString(backup))
             assertEquals("$version: данные изменились после пересохранения", backup, again)
         }
+    }
+
+    @Test
+    fun `старый бэкап читается без данных календаря`() {
+        listOf("3.0.0", "3.1.0", "3.1.1").forEach { version ->
+            assertEquals(CalendarBackup(), import(version).calendar)
+        }
+    }
+
+    @Test
+    fun `бэкап сохраняет серии переносы отмены и фильтры календаря`() {
+        val backup = BackupData(
+            version = 1,
+            projectTable = listOf(DomainProjectTable(id = 1)),
+            calendar = CalendarBackup(
+                series = listOf(
+                    CalendarSeriesBackup(1, 1, "Серия", "2026-01-31", "09:00", "Заметка", "monthly", "2026-06-30"),
+                    CalendarSeriesBackup(2, 1, "Событие", "2026-03-01"),
+                ),
+                exceptions = listOf(
+                    CalendarExceptionBackup(1, "2026-02-28", "Перенос", "2026-03-02", "10:30", "Примечание"),
+                    CalendarExceptionBackup(1, "2026-03-31"),
+                ),
+                disabledCategories = listOf(CalendarDisabledCategoryBackup(1, "birthdays")),
+            ),
+        )
+        assertEquals(backup, BackupParser.parse(Json.encodeToString(backup)))
     }
 
     /** Всё, что есть во всех трёх версиях, должно приехать без потерь. */

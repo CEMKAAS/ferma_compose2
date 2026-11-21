@@ -5,6 +5,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
+import com.zaroslikov.calendar.domain.CalendarBackupRepository
 import com.zaroslikov.crm.domain.model.DomainCrmBackup
 import com.zaroslikov.crm.domain.repository.CrmBackupRepository
 import com.zaroslikov.todo.domain.model.DomainTodoBackup
@@ -50,6 +51,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.appmetrica.analytics.AppMetrica
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,7 +98,8 @@ class SettingsViewModel @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
     private val workManagerRepository: WorkManagerRepository,
     private val crmBackupRepository: CrmBackupRepository,
-    private val todoBackupRepository: TodoBackupRepository
+    private val todoBackupRepository: TodoBackupRepository,
+    private val calendarBackupRepository: CalendarBackupRepository,
 
 ) :
     BaseViewModel2<SettingsState, SettingsIntent, SettingsReduce>(
@@ -119,27 +122,33 @@ class SettingsViewModel @Inject constructor(
     private fun deleteDatabase() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                database.withTransaction {
-                    workManagerRepository.cancelAllNotifications()
-                    database.clearAllTables()
+                workManagerRepository.cancelAllNotifications()
+                withContext(NonCancellable) {
+                    database.withTransaction {
+                        database.clearAllTables()
 
-                    appSettingsRepository.createAppSettings(
-                        domainAppSettings = DomainAppSettings(
-                            lastVersionApp = BuildConfig.VERSION_NAME,
-                            currentVersionApp = BuildConfig.VERSION_NAME,
-                            isFirstLaunch = false,
-                            deviceId = UUID.randomUUID().toString()
+                        appSettingsRepository.createAppSettings(
+                            domainAppSettings = DomainAppSettings(
+                                lastVersionApp = BuildConfig.VERSION_NAME,
+                                currentVersionApp = BuildConfig.VERSION_NAME,
+                                isFirstLaunch = false,
+                                deviceId = UUID.randomUUID().toString()
+                            )
                         )
-                    )
-                    profileRepository.createProfile(
-                        DomainProfileTable(
-                            name = resourceProvider.getString(R.string.profile_screen_base)
+                        profileRepository.createProfile(
+                            DomainProfileTable(
+                                name = resourceProvider.getString(R.string.profile_screen_base)
+                            )
                         )
-                    )
+                    }
+                    // После очистки проектов сбрасываем и базы с отдельным хранением.
+                    try {
+                        calendarBackupRepository.clearAll()
+                    } finally {
+                        crmBackupRepository.clearAll()
+                        todoBackupRepository.clearAll()
+                    }
                 }
-                // CRM и задачи хранятся в отдельных базах — чистим их тоже
-                crmBackupRepository.clearAll()
-                todoBackupRepository.clearAll()
 
                 withContext(Dispatchers.Main) {
                     sendIntent(SettingsIntent.OpenDeleteBottomSheetClick(false))
@@ -205,6 +214,7 @@ class SettingsViewModel @Inject constructor(
             val appSettingsTable = appSettingsRepository.getAllAppSettingsTableForExport().first()
             val crm = crmBackupRepository.export()
             val todo = todoBackupRepository.export()
+            val calendar = calendarBackupRepository.export()
 
             val backupData = BackupData(
                 version = 1,
@@ -259,7 +269,8 @@ class SettingsViewModel @Inject constructor(
                 profileTable = profileTable,
                 appSettingsTable = appSettingsTable,
                 crm = crm,
-                todo = todo
+                todo = todo,
+                calendar = calendar,
             )
             val json = Json.encodeToString(backupData)
             updateState { state -> state.copy(backupDataText = json) }
@@ -285,14 +296,30 @@ class SettingsViewModel @Inject constructor(
             try {
                 workManagerRepository.cancelAllNotifications()
 
-                projectRepository.clearAndInsertProjectTableForImport(backup.projectTable.map { project ->
+                val projects = backup.projectTable.map { project ->
                     val newPath = project.imagePath?.let { base64 ->
                         decodeImage(base64, project.id, context)
                     }
                     project.copy(
                         imagePath = newPath
                     )
-                })
+                }
+                val projectIds = projects.map { it.id }.toSet()
+                // Календарь хранит идентификаторы проектов в отдельной базе. После замены
+                // проектов доводим до конца замену календаря даже при закрытии экрана.
+                withContext(NonCancellable) {
+                    projectRepository.clearAndInsertProjectTableForImport(projects)
+                    try {
+                        calendarBackupRepository.import(backup.calendar, projectIds)
+                    } catch (error: Exception) {
+                        try {
+                            calendarBackupRepository.clearAll()
+                        } catch (clearError: Exception) {
+                            error.addSuppressed(clearError)
+                        }
+                        throw error
+                    }
+                }
                 settingsRepository.clearAndInsertSettingsTableForImport(backup.settingsTable)
                 timeNotificationProjectRepository.clearAndInsertTimeNotificationTableForImport(
                     backup.timeNotificationProjectTable
@@ -370,12 +397,12 @@ class SettingsViewModel @Inject constructor(
                 // Берутся только строки проектов этого же бэкапа
                 crmBackupRepository.import(
                     backup.crm ?: DomainCrmBackup(),
-                    projectIds = backup.projectTable.map { it.id }.toSet()
+                    projectIds = projectIds
                 )
                 // Задачи — так же: всегда перезаписываются, только проекты этого бэкапа
                 todoBackupRepository.import(
                     backup.todo ?: DomainTodoBackup(),
-                    projectIds = backup.projectTable.map { it.id }.toSet()
+                    projectIds = projectIds
                 )
                 // Напоминания старых беременностей сняты, новые — по импортированным данным
                 pregnancyReminderScheduler.resetAfterImport()

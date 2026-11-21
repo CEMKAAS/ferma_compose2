@@ -25,6 +25,8 @@ interface CrmClientRepository {
 
     suspend fun updateClient(client: DomainCrmClient)
 
+    suspend fun setFavorite(id: Long, isFavorite: Boolean)
+
     /**
      * Создаёт клиента и его контакты в одной транзакции; возвращает id клиента.
      * Падает на дубликате `(idPT, sales_key)`, как [insertClient].
