@@ -1,5 +1,6 @@
 package com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.zaroslikov.domain.models.dto.add.DomainAddItemDto
@@ -62,11 +63,14 @@ import com.zaroslikov.fermacompose2.utils.QrGenerator
 import com.zaroslikov.fermacompose2.utils.QrNavigationManager
 import com.zaroslikov.fermacompose2.utils.ResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.component1
@@ -103,6 +107,8 @@ class WriteOffViewModel @Inject constructor(
 ) {
 
     private val _itemIdPT: Long = checkNotNull(savedStateHandle[WriteOffDestination.itemIdArg])
+    private val recyclingRefreshes = MutableStateFlow(0)
+    internal val recyclingSummary = recyclingRepository.observeSummary(_itemIdPT)
 
     init {
         loadData()
@@ -158,15 +164,17 @@ class WriteOffViewModel @Inject constructor(
         viewModelScope.launch {
             val isArchive = projectRepository.getIsArchiveProject(_itemIdPT).first()
             // Продукция, чья дата готовности наступила, поступает на склад
-            recyclingRepository.completeDueRecycling(nowIso())
+            refreshRecycling()
             combine(
                 writeOffRepository.getAllWriteOffItems(_itemIdPT),
                 addRepository.getItemsTitleAddList(_itemIdPT, false),
                 settingsRepository.getSettings(_itemIdPT),
-                recyclingRepository.getRecyclingList(_itemIdPT)
-            ) { addList, titleList, settings, recyclingList ->
+                recyclingRepository.getRecyclingList(_itemIdPT),
+                recyclingRefreshes
+            ) { addList, titleList, settings, recyclingList, _ ->
                 val brieflyList = brieflyList(addList, settings)
-                val recyclingItems = recyclingList.map { it.toRecyclingItem() }
+                val now = LocalDateTime.now()
+                val recyclingItems = recyclingList.map { it.toRecyclingItem(now) }
                 LoadDataWriteOffList(addList, brieflyList, titleList, settings) to recyclingItems
             }.collectLatest { (data, recyclingItems) ->
                 val (writeOffItems, writeOffBrieflyItems, titleList, setting) = data
@@ -190,6 +198,18 @@ class WriteOffViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    internal suspend fun refreshRecycling() {
+        try {
+            recyclingRepository.completeDueRecycling(nowIso())
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            Log.e("WriteOffViewModel", "Не удалось обновить партии переработки", error)
+        }
+        // Таймер обновляет прогресс, даже если состав партий не изменился.
+        recyclingRefreshes.update { it + 1 }
     }
 
     private fun brieflyList(

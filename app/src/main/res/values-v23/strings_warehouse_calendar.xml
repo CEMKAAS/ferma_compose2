@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="warehouse_calendar_tomorrow">Завтра</string>
+    <string name="warehouse_calendar_loading">Загрузка…</string>
+    <string name="warehouse_calendar_load_failed">Не удалось загрузить записи</string>
+    <string name="warehouse_calendar_no_entries_today">Нет записей</string>
+    <string name="warehouse_calendar_no_upcoming">Дальше записей нет</string>
+    <string name="warehouse_calendar_more_entries">Ещё %1$d</string>
+</resources>

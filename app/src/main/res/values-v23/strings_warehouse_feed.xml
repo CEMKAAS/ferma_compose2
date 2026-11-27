@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="warehouse_feed_stock">Остаток</string>
+    <string name="warehouse_feed_forecast">Запас в днях</string>
+    <string name="warehouse_feed_daily_consumption">Расход в день</string>
+    <string name="warehouse_feed_partial_forecast">Прогноз по кормам с заданным расходом</string>
+    <string name="warehouse_feed_less_than_a_day">Меньше суток</string>
+    <string name="warehouse_feed_consumption_not_set">Не задан</string>
+    <string name="warehouse_feed_forecast_unavailable">Прогноз недоступен</string>
+    <string name="warehouse_feed_exhausted">Корм %1$s закончился</string>
+    <string name="warehouse_feed_write_off_error">Не удалось списать корм</string>
+    <plurals name="warehouse_feed_days">
+        <item quantity="one">%1$s день</item>
+        <item quantity="few">%1$s дня</item>
+        <item quantity="many">%1$s дней</item>
+        <item quantity="other">%1$s дня</item>
+    </plurals>
+</resources>

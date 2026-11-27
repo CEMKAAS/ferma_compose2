@@ -84,7 +84,7 @@ class YandexMetricRepositoryImpl @Inject constructor(
     override fun metricalWriteOffFood(state: FoodListUi) {
         val eventParameters: MutableMap<String, Any> = HashMap()
         eventParameters["Имя"] = state.title
-        eventParameters["Дней до конца"] = state.daysEnd
+        state.daysEnd?.let { eventParameters["Дней до конца"] = it }
         AppMetrica.reportEvent("Списание корма", eventParameters)
     }
 

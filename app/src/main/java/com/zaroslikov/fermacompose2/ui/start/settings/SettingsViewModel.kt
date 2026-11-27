@@ -175,17 +175,24 @@ class SettingsViewModel @Inject constructor(
                 updateState { state -> state.copy(backupDataText = null) }
                 return@launch
             }
-            val projectTable = projectRepository.getAllProjectTableForExport().first()
+            // Готовность и списание меняют сразу несколько таблиц. Читаем их одним снимком.
+            val warehouseBackup = database.withTransaction {
+                BackupData(
+                    version = 1,
+                    projectTable = projectRepository.getAllProjectTableForExport().first(),
+                    addTable = addRepository.getAllAddTableForExport().first(),
+                    writeOff = writeOffRepository.getAllWriteOffTableForExport().first(),
+                    expensesTable = expensesRepository.getAllExpensesTableForExport().first(),
+                    recyclingTable = recyclingRepository.getAllRecyclingForExport().first(),
+                    recyclingProductTable = recyclingRepository.getAllRecyclingProductsForExport().first(),
+                    recyclingInterruptionTable = recyclingRepository.getAllRecyclingInterruptionsForExport().first(),
+                )
+            }
             val settingsTable = settingsRepository.getAllSettingsTableForExport().first()
             val timeNotificationProjectTable =
                 timeNotificationProjectRepository.getAllTimeNotificationTableForExport().first()
 
-            val addTable = addRepository.getAllAddTableForExport().first()
             val saleTable = saleRepository.getAllSaleTableForExport().first()
-            val writeOffTable = writeOffRepository.getAllWriteOffTableForExport().first()
-            val recyclingTable = recyclingRepository.getAllRecyclingForExport().first()
-            val recyclingProductTable = recyclingRepository.getAllRecyclingProductsForExport().first()
-            val expensesTable = expensesRepository.getAllExpensesTableForExport().first()
             val noteTable = noteRepository.getAllNoteTableForExport().first()
 
             val templateTable = templateRepository.getAllAddTemplateTableForExport().first()
@@ -216,9 +223,8 @@ class SettingsViewModel @Inject constructor(
             val todo = todoBackupRepository.export()
             val calendar = calendarBackupRepository.export()
 
-            val backupData = BackupData(
-                version = 1,
-                projectTable = projectTable.map { project ->
+            val backupData = warehouseBackup.copy(
+                projectTable = warehouseBackup.projectTable.map { project ->
                     val base64 = project.imagePath?.let { path ->
                         val file = File(path)
                         if (file.exists()) {
@@ -232,12 +238,7 @@ class SettingsViewModel @Inject constructor(
                 },
                 settingsTable = settingsTable,
                 timeNotificationProjectTable = timeNotificationProjectTable,
-                addTable = addTable,
                 saleTable = saleTable,
-                writeOff = writeOffTable,
-                recyclingTable = recyclingTable,
-                recyclingProductTable = recyclingProductTable,
-                expensesTable = expensesTable,
                 expensesAnimal = expensesAnimalTable,
                 noteTable = noteTable,
                 templateTable = templateTable,
@@ -342,13 +343,16 @@ class SettingsViewModel @Inject constructor(
                     )
                 }, herds)
 
-                addRepository.clearAndInsertAddTableForImport(backup.addTable)
-                saleRepository.clearAndInsertSaleTableForImport(backup.saleTable)
-                writeOffRepository.clearAndInsertWriteOffTableForImport(backup.writeOff)
-                recyclingRepository.clearAndInsertRecyclingForImport(
-                    backup.recyclingTable,
-                    backup.recyclingProductTable
-                )
+                database.withTransaction {
+                    addRepository.clearAndInsertAddTableForImport(backup.addTable)
+                    saleRepository.clearAndInsertSaleTableForImport(backup.saleTable)
+                    writeOffRepository.clearAndInsertWriteOffTableForImport(backup.writeOff)
+                    recyclingRepository.clearAndInsertRecyclingForImport(
+                        backup.recyclingTable,
+                        backup.recyclingProductTable,
+                        backup.recyclingInterruptionTable
+                    )
+                }
                 noteRepository.clearAndInsertNoteTableForImport(backup.noteTable)
                 expensesAnimalRepository.clearAndInsertExpensesAnimalTableForImport(backup.expensesAnimal)
 

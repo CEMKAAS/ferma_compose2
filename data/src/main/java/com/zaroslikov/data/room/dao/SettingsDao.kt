@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import androidx.room.Upsert
 import com.zaroslikov.data.room.table.project.SettingsTable
 import com.zaroslikov.domain.models.enums.Suffix
@@ -38,8 +37,23 @@ interface SettingsDao {
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
     suspend fun insertSettingsLong(settingsTable: SettingsTable): Long
 
-    @Update
-    suspend fun updateSettings(settingsTable: SettingsTable)
+    @Query("""
+        UPDATE settings_table
+        SET currency_suffix = :currencySuffix, weight_suffix = :weightSuffix,
+            volume_suffix = :volumeSuffix, linear_suffix = :linearSuffix, idPT = :idPT
+        WHERE id = :id
+    """)
+    suspend fun updateSettings(
+        id: Long,
+        currencySuffix: Suffix,
+        weightSuffix: Suffix,
+        volumeSuffix: Suffix,
+        linearSuffix: Suffix,
+        idPT: Long,
+    )
+
+    @Query("UPDATE settings_table SET warehouse_card_codes = :codesJson WHERE idPT = :idPT")
+    suspend fun updateWarehouseCards(idPT: Long, codesJson: String): Int
 
     @Delete
     suspend fun deleteSettings(settingsTable: SettingsTable)

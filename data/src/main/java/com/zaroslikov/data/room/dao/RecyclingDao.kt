@@ -6,8 +6,10 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import com.zaroslikov.data.room.dto.RecyclingSummaryDto
 import com.zaroslikov.data.room.dto.shared.TitleCountSuffixDto
 import com.zaroslikov.data.room.table.ferma.AddTable
+import com.zaroslikov.data.room.table.ferma.RecyclingInterruptionTable
 import com.zaroslikov.data.room.table.ferma.RecyclingProductTable
 import com.zaroslikov.data.room.table.ferma.RecyclingTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
@@ -23,11 +25,17 @@ interface RecyclingDao {
     @Query("SELECT * FROM recycling_product_table")
     fun getAllRecyclingProductsForExport(): Flow<List<RecyclingProductTable>>
 
+    @Query("SELECT * FROM recycling_interruption_table ORDER BY _id")
+    fun getAllRecyclingInterruptionsForExport(): Flow<List<RecyclingInterruptionTable>>
+
     @Upsert
     suspend fun insertAllRecycling(data: List<RecyclingTable>)
 
     @Upsert
     suspend fun insertAllRecyclingProducts(data: List<RecyclingProductTable>)
+
+    @Insert
+    suspend fun insertAllRecyclingInterruptions(data: List<RecyclingInterruptionTable>)
 
     @Query("DELETE FROM recycling_table")
     suspend fun deleteAllRecycling()
@@ -35,16 +43,45 @@ interface RecyclingDao {
     @Query("DELETE FROM recycling_product_table")
     suspend fun deleteAllRecyclingProducts()
 
+    @Query("DELETE FROM recycling_interruption_table")
+    suspend fun deleteAllRecyclingInterruptions()
+
     @Transaction
     suspend fun clearAndInsertRecyclingForImport(
         data: List<RecyclingTable>,
-        products: List<RecyclingProductTable>
+        products: List<RecyclingProductTable>,
+        interruptions: List<RecyclingInterruptionTable>
     ) {
+        deleteAllRecyclingInterruptions()
         deleteAllRecyclingProducts()
         deleteAllRecycling()
         insertAllRecycling(data)
         insertAllRecyclingProducts(products)
+        insertAllRecyclingInterruptions(interruptions)
     }
+
+    @Query(
+        """
+        WITH batches AS (
+            SELECT r._id,
+                   COUNT(p._id) AS totalPositions,
+                   COUNT(CASE WHEN p.is_completed = 0 THEN 1 END) AS pendingPositions
+            FROM recycling_table r
+            LEFT JOIN recycling_product_table p ON p.recycling_id = r._id AND p.idPT = :idPT
+            WHERE r.idPT = :idPT
+            GROUP BY r._id
+        )
+        SELECT COUNT(CASE WHEN pendingPositions > 0 THEN 1 END) AS activeBatches,
+               COALESCE(SUM(pendingPositions), 0) AS activePositions,
+               COUNT(CASE WHEN totalPositions > 0 AND pendingPositions = 0 AND NOT EXISTS (
+                   SELECT 1 FROM recycling_interruption_table i
+                   WHERE i.recycling_id = batches._id AND i.idPT = :idPT AND i.ended_current_cycle = 1
+               ) THEN 1 END) AS completedBatches,
+               (SELECT COUNT(*) FROM recycling_interruption_table WHERE idPT = :idPT) AS interruptedBatches
+        FROM batches
+        """
+    )
+    fun observeSummary(idPT: Long): Flow<RecyclingSummaryDto>
 
     @Query(
         "SELECT * FROM recycling_table WHERE idPT = :idPT" +
@@ -89,6 +126,15 @@ interface RecyclingDao {
 
     @Insert
     suspend fun insertRecyclingProductRow(item: RecyclingProductTable): Long
+
+    @Insert
+    suspend fun insertRecyclingInterruption(item: RecyclingInterruptionTable)
+
+    @Query(
+        "UPDATE recycling_interruption_table SET ended_current_cycle = 0" +
+                " WHERE recycling_id = :recyclingId AND ended_current_cycle = 1"
+    )
+    suspend fun reopenRecycling(recyclingId: Long)
 
     @Update
     suspend fun updateRecyclingProductRow(item: RecyclingProductTable)
@@ -171,6 +217,7 @@ interface RecyclingDao {
     ) {
         val old = getRecyclingOnce(recycling.id) ?: return
         val idPT = old.idPT
+        if (products.any { !it.second }) reopenRecycling(old.id)
         updateRecyclingRow(recycling.copy(idPT = idPT))
         deleteIngredients(old.id)
         insertIngredients(ingredients.map { it.copy(id = 0, recyclingId = old.id, idPT = idPT) })
@@ -318,11 +365,22 @@ interface RecyclingDao {
      */
     @Transaction
     suspend fun disposeRecycling(id: Long, note: String): List<WriteOffTable> {
-        if (getRecyclingProducts(id).none { !it.isCompleted }) return emptyList()
+        val recycling = getRecyclingOnce(id) ?: return emptyList()
+        val products = getRecyclingProducts(id)
+        if (products.none { !it.isCompleted }) return emptyList()
+
+        val keepsBatch = products.any { it.isCompleted }
         val ingredients = getIngredients(id)
         disposeIngredients(id, note)
         deleteIncompleteProducts(id)
-        if (getRecyclingProducts(id).isEmpty()) deleteRecyclingRow(id)
+        if (!keepsBatch) deleteRecyclingRow(id)
+        insertRecyclingInterruption(
+            RecyclingInterruptionTable(
+                idPT = recycling.idPT,
+                recyclingId = id.takeIf { keepsBatch },
+                endedCurrentCycle = keepsBatch
+            )
+        )
         return ingredients
     }
 

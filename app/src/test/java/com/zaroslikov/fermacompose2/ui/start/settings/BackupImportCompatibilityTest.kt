@@ -16,10 +16,13 @@ import com.zaroslikov.domain.models.enums.ProductOrigin
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.enums.TemplateType
 import com.zaroslikov.domain.models.enums.TypeEgg
+import com.zaroslikov.domain.models.enums.WarehouseCard
 import com.zaroslikov.domain.models.table.DomainAnimalCount
 import com.zaroslikov.domain.models.table.DomainAnimalHerd
 import com.zaroslikov.domain.models.table.DomainAnimalPregnancy
 import com.zaroslikov.domain.models.table.DomainProjectTable
+import com.zaroslikov.domain.models.table.DomainRecyclingInterruption
+import com.zaroslikov.domain.models.table.DomainSettings
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -51,6 +54,18 @@ class BackupImportCompatibilityTest {
 
     @Test
     fun `бэкап 3_1_1 читается`() = assertCommonData(import("3.1.1"))
+
+    @Test
+    fun recyclingInterruptionHistoryIsOptionalAndRoundTrips() {
+        assertTrue(import("3.1.1").recyclingInterruptionTable.isEmpty())
+        val events = listOf(
+            DomainRecyclingInterruption(id = 1, idPT = 1),
+            DomainRecyclingInterruption(id = 2, idPT = 1, recyclingId = 8, endedCurrentCycle = true),
+            DomainRecyclingInterruption(id = 3, idPT = 1, recyclingId = 8)
+        )
+        val backup = BackupData(version = 1, recyclingInterruptionTable = events)
+        assertEquals(events, BackupParser.parse(Json.encodeToString(backup)).recyclingInterruptionTable)
+    }
 
     @Test
     fun `иконки старых версий восстанавливаются`() {
@@ -266,6 +281,36 @@ class BackupImportCompatibilityTest {
         listOf("3.0.0", "3.1.0", "3.1.1").forEach { version ->
             assertEquals(CalendarBackup(), import(version).calendar)
         }
+    }
+
+    @Test
+    fun `старый бэкап оставляет стандартную раскладку склада`() {
+        listOf("3.0.0", "3.1.0", "3.1.1").forEach { version ->
+            val settings = import(version).settingsTable.single()
+            assertNull(settings.warehouseCardCodes)
+            assertEquals(WarehouseCard.defaultOrder, WarehouseCard.fromCodes(settings.warehouseCardCodes))
+        }
+    }
+
+    @Test
+    fun `бэкап восстанавливает разные раскладки двух проектов`() {
+        val customOrder = listOf(WarehouseCard.NOTES, WarehouseCard.CALENDAR)
+        val backup = BackupData(
+            version = 1,
+            projectTable = listOf(DomainProjectTable(id = 1), DomainProjectTable(id = 2)),
+            settingsTable = listOf(
+                DomainSettings(id = 1, idPT = 1, warehouseCardCodes = customOrder.map { it.code }),
+                DomainSettings(id = 2, idPT = 2, warehouseCardCodes = emptyList()),
+            ),
+        )
+
+        val json = Json.encodeToString(backup)
+        val restored = BackupParser.parse(json)
+        val cardsByProject = restored.settingsTable.associate { it.idPT to WarehouseCard.fromCodes(it.warehouseCardCodes) }
+
+        assertTrue(json.contains("\"warehouseCardCodes\":[\"notes\",\"calendar\"]"))
+        assertTrue(json.contains("\"warehouseCardCodes\":[]"))
+        assertEquals(mapOf(1L to customOrder, 2L to emptyList()), cardsByProject)
     }
 
     @Test

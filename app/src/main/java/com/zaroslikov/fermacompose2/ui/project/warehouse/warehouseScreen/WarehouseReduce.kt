@@ -17,17 +17,8 @@ class WarehouseReduce : BaseReducer<WarehouseState, WarehouseIntent>() {
             is WarehouseIntent.ShowAllExpensesClicked ->
                 state.updateShowAllExpenses(intent.value)
 
-            is WarehouseIntent.ShowFastAddClicked ->
-                state.updateShowFastAdd(intent.value)
-
             else -> state
         }
-    }
-
-    private fun WarehouseState.updateShowFastAdd(isShowFastAddProduct: Boolean): WarehouseState {
-        return copy(
-            isShowFastAddProduct = isShowFastAddProduct
-        )
     }
 
     private fun WarehouseState.updateOpenWarningWriteOffAlterDialog(

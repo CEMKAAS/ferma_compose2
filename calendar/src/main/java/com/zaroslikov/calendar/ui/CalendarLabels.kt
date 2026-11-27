@@ -79,7 +79,7 @@ internal val CalendarRepeat.label: Int
         CalendarRepeat.YEARLY -> R.string.calendar_repeat_yearly
     }
 
-internal val CalendarCategory.color: Color
+val CalendarCategory.color: Color
     get() = when (this) {
         CalendarCategory.TASKS -> Color(0xFF155DFC)
         CalendarCategory.VACCINATIONS -> Color(0xFFFF2056)

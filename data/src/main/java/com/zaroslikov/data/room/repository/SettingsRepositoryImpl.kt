@@ -1,9 +1,9 @@
 package com.zaroslikov.data.room.repository
 
 import com.zaroslikov.data.room.dao.SettingsDao
-import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toDomainSettings
 import com.zaroslikov.data.room.mapper.table.toSettingsTable
+import com.zaroslikov.data.room.mapper.table.toWarehouseCardCodesJson
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.repository.SettingsRepository
@@ -35,7 +35,19 @@ class SettingsRepositoryImpl @Inject constructor(private val settingsDao: Settin
     }
 
     override suspend fun updateSettings(domainSettings: DomainSettings) {
-        return settingsDao.updateSettings(domainSettings.toSettingsTable())
+        settingsDao.updateSettings(
+            id = domainSettings.id,
+            currencySuffix = domainSettings.currencySuffix,
+            weightSuffix = domainSettings.weightSuffix,
+            volumeSuffix = domainSettings.volumeSuffix,
+            linearSuffix = domainSettings.linearSuffix,
+            idPT = domainSettings.idPT,
+        )
+    }
+
+    override suspend fun updateWarehouseCardCodes(idPT: Long, codes: List<String>) {
+        val codesJson = codes.toWarehouseCardCodesJson()
+        check(settingsDao.updateWarehouseCards(idPT, codesJson) > 0)
     }
 
     override suspend fun deleteSettings(domainSettings: DomainSettings) {

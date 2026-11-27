@@ -5,6 +5,7 @@ package com.zaroslikov.fermacompose2.ui.elements
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
@@ -13,6 +14,7 @@ import androidx.compose.material3.FloatingToolbarHorizontalFabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
@@ -24,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zaroslikov.fermacompose2.R
@@ -73,19 +76,20 @@ fun TopAppBarBack(
     @StringRes intRes: Int? = null,
     title: String = "",
     onNavigateBackClick: ((() -> Unit)?) = null,
-    onNoteClick: (() -> Unit)? = null,
     onSettingsClick: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     isHorizontalDriver: Boolean = false,
-    onTasksClick: (() -> Unit)? = null,
-    onCalendarClick: (() -> Unit)? = null,
+    additionalActions: @Composable RowScope.() -> Unit = {},
+    @StringRes settingsDescription: Int? = null,
+    titleStyle: TextStyle = TextStyle.Default,
 ) {
     Column {
         CenterAlignedTopAppBar(
             title = {
                 Text(
                     text = if (intRes != null) stringResource(intRes) else title, maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    style = LocalTextStyle.current.merge(titleStyle),
                 )
             },
             navigationIcon = {
@@ -101,35 +105,12 @@ fun TopAppBarBack(
             windowInsets = WindowInsets(0),
             scrollBehavior = scrollBehavior,
             actions = {
-                onCalendarClick?.let {
-                    IconButton(onClick = it) {
-                        Icon(
-                            painterResource(R.drawable.baseline_calendar_month_24),
-                            contentDescription = stringResource(R.string.warehouse_screen_calendar),
-                        )
-                    }
-                }
-                onTasksClick?.let {
-                    IconButton(onClick = it) {
-                        Icon(
-                            painterResource(R.drawable.outline_check_circle_24),
-                            contentDescription = "Задачи"
-                        )
-                    }
-                }
-                onNoteClick?.let {
-                    IconButton(onClick = it) {
-                        Icon(
-                            painterResource(R.drawable.baseline_sticky_note_2_24),
-                            contentDescription = "Date Range"
-                        )
-                    }
-                }
+                additionalActions()
                 onSettingsClick?.let {
                     IconButton(onClick = it) {
                         Icon(
                             painterResource(R.drawable.icon_setting),
-                            contentDescription = null
+                            contentDescription = settingsDescription?.let { stringResource(it) }
                         )
                     }
                 }

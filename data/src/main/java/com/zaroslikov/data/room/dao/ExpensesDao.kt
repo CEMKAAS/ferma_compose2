@@ -14,6 +14,7 @@ import com.zaroslikov.data.room.dto.expenses.BrieflyExpensesDto
 import com.zaroslikov.data.room.dto.shared.CategoryPriceDto
 import com.zaroslikov.data.room.dto.shared.TitleSuffixPriceDto
 import com.zaroslikov.data.room.table.ferma.ExpensesTable
+import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.domain.models.enums.Suffix
 import kotlinx.coroutines.flow.Flow
 
@@ -219,8 +220,21 @@ interface ExpensesDao {
     @Query("SELECT * FROM expenses_table WHERE idPT = :idPT AND is_food = 1 AND last_day_food IS NOT NULL")
     fun getProjectFeedWithEndDate(idPT: Long): Flow<List<ExpensesTable>>
 
-    @Query("UPDATE expenses_table SET is_show_food = 0 WHERE _id = :id")
-    suspend fun updateFoodOnWriteOffWarehouse(id: Long)
+    @Query("""
+        UPDATE expenses_table SET is_show_food = 0
+        WHERE _id = :id AND idPT = :projectId AND is_food = 1 AND is_show_food = 1
+    """)
+    suspend fun hideActiveFeed(id: Long, projectId: Long): Int
+
+    @Insert
+    suspend fun insertFeedWriteOff(item: WriteOffTable)
+
+    @Transaction
+    suspend fun writeOffFood(id: Long, item: WriteOffTable): Boolean {
+        if (hideActiveFeed(id, item.idPT) == 0) return false
+        insertFeedWriteOff(item)
+        return true
+    }
 
     @Query(
         "SELECT COALESCE(SUM(price),0) AS price" +

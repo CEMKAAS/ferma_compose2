@@ -2,6 +2,7 @@ package com.zaroslikov.data.room.mapper.table
 
 import com.zaroslikov.data.room.table.project.SettingsTable
 import com.zaroslikov.domain.models.table.DomainSettings
+import org.json.JSONArray
 
 fun SettingsTable.toDomainSettings(): DomainSettings {
     return DomainSettings(
@@ -11,6 +12,10 @@ fun SettingsTable.toDomainSettings(): DomainSettings {
         volumeSuffix = this.volumeSuffix,
         linearSuffix = this.linearSuffix,
         idPT = this.idPT,
+        warehouseCardCodes = warehouseCardCodesJson?.let { json ->
+            val codes = JSONArray(json)
+            List(codes.length(), codes::getString)
+        },
     )
 }
 
@@ -22,5 +27,8 @@ fun DomainSettings.toSettingsTable(): SettingsTable {
         weightSuffix = this.weightSuffix,
         idPT = this.idPT,
         volumeSuffix = this.volumeSuffix,
+        warehouseCardCodesJson = warehouseCardCodes?.toWarehouseCardCodesJson(),
     )
 }
+
+internal fun List<String>.toWarehouseCardCodesJson(): String = JSONArray(this).toString()

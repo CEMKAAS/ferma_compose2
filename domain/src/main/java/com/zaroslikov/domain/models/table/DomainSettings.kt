@@ -11,4 +11,5 @@ data class DomainSettings(
     val volumeSuffix: Suffix = Suffix.LITERS,
     val linearSuffix: Suffix = Suffix.CENTIMETERS,
     val idPT: Long = 0,
+    val warehouseCardCodes: List<String>? = null,
 )

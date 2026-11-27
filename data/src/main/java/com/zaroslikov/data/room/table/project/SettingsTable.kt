@@ -31,4 +31,6 @@ data class SettingsTable(
     val linearSuffix: Suffix,
     @ColumnInfo(name = "idPT")
     val idPT: Long,
+    @ColumnInfo(name = "warehouse_card_codes")
+    val warehouseCardCodesJson: String? = null,
 )

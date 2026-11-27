@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="warehouse_recycling_active_batches">Партий в работе</string>
+    <string name="warehouse_recycling_active_positions">Позиций в работе</string>
+    <string name="warehouse_recycling_completed_batches">Партий завершено</string>
+    <string name="warehouse_recycling_interrupted_batches">Партий прервано</string>
+    <string name="warehouse_recycling_interrupted_note">Учёт прерываний с обновления</string>
+</resources>

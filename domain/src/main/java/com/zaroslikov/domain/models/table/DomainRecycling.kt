@@ -50,3 +50,19 @@ data class DomainRecyclingWithProducts(
     val products: List<DomainRecyclingProduct>,
     val ingredients: List<DomainWriteOffTable>
 )
+
+/** Прерывание переработки с исторической ссылкой на партию, пока она существует. */
+@Serializable
+data class DomainRecyclingInterruption(
+    val id: Long = 0,
+    val idPT: Long,
+    val recyclingId: Long? = null,
+    val endedCurrentCycle: Boolean = false
+)
+
+data class DomainRecyclingSummary(
+    val activeBatches: Int = 0,
+    val activePositions: Int = 0,
+    val completedBatches: Int = 0,
+    val interruptedBatches: Int = 0
+)

@@ -9,6 +9,7 @@ import com.zaroslikov.data.room.mapper.dto.shared.toDomainCategoryPrice
 import com.zaroslikov.data.room.mapper.dto.shared.toDomainTitleSuffixPrice
 import com.zaroslikov.data.room.mapper.dto.toTitleAndSuffixDomain
 import com.zaroslikov.data.room.mapper.table.toDomainMap
+import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.data.room.mapper.toDomainMap
 import com.zaroslikov.data.room.mapper.toExpensesRoomMap
 import com.zaroslikov.domain.models.DomainExpensesTable
@@ -16,6 +17,7 @@ import com.zaroslikov.domain.models.dto.add.TitleAndSuffixDomain
 import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.models.enums.Suffix
+import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.ExpensesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -155,9 +157,11 @@ class ExpensesRepositoryImpl @Inject constructor(private val expensesDao: Expens
     override fun getProjectFeedWithEndDate(idPT: Long): Flow<List<DomainExpensesTable>> =
         expensesDao.getProjectFeedWithEndDate(idPT).map { rows -> rows.map { it.toDomainMap() } }
 
-    override suspend fun updateFoodOnWriteOffWarehouse(id: Long) {
-        return expensesDao.updateFoodOnWriteOffWarehouse(id)
-    }
+    override suspend fun hideExhaustedFeed(id: Long, projectId: Long): Boolean =
+        expensesDao.hideActiveFeed(id, projectId) > 0
+
+    override suspend fun writeOffFood(id: Long, writeOff: DomainWriteOffTable): Boolean =
+        expensesDao.writeOffFood(id, writeOff.toRoomMap())
 
     override fun getAnalysisExpensesNewYearProject(
         id: Long,

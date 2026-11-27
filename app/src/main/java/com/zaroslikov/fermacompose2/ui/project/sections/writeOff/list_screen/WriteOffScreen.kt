@@ -149,58 +149,7 @@ fun WriteOffScreen(
                     viewModel.onIntent(WriteOffListIntent.OpenRecyclingDetail(it))
                 }
             )
-            state.recyclingDetail()?.let { recycling ->
-                if (state.isOpenRecyclingDelete)
-                    RecyclingDeleteBottomSheet(
-                        item = recycling,
-                        onDismissRequest = {
-                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingDelete(false))
-                        },
-                        onDeleteClick = { viewModel.onIntent(WriteOffListIntent.DeleteRecycling) },
-                        itemCard = {
-                            RecyclingRawCards(
-                                recycling = recycling,
-                                color = primeColor,
-                                priceSuffix = priceSuffix
-                            )
-                        }
-                    )
-                else if (state.isOpenRecyclingDispose)
-                    RecyclingDisposeBottomSheet(
-                        item = recycling,
-                        onDismissRequest = {
-                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingDispose(false))
-                        },
-                        onDisposeClick = { viewModel.onIntent(WriteOffListIntent.DisposeRecycling) }
-                    )
-                else
-                    RecyclingDetailBottomSheet(
-                        item = recycling,
-                        isArchive = state.isArchive,
-                        onCompleteClick = {
-                            viewModel.onIntent(WriteOffListIntent.CompleteRecyclingProduct(it))
-                        },
-                        onEditClick = {
-                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingEdit(recycling.recycling.id))
-                        },
-                        onDeleteClick = {
-                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingDelete(true))
-                        },
-                        onDisposeClick = {
-                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingDispose(true))
-                        },
-                        onDismissRequest = {
-                            viewModel.onIntent(WriteOffListIntent.OpenRecyclingDetail(null))
-                        }
-                    )
-            }
-            if (state.bottomSheetState.isOpenEntry)
-                WriteOffEntryBottomSheet(
-                    colors = colors,
-                    state = state.currentProduct,
-                    onIntent = viewModel::onIntent,
-                    onTemplateIntent = viewModel::onTemplateIntent
-                )
+            WriteOffEntrySheets(state, viewModel::onIntent, viewModel::onTemplateIntent)
             if (state.bottomSheetState.isOpenGroup)
                 BrieflyBottomSheetWriteOff(
                     iconRes = iconRes,
@@ -256,6 +205,66 @@ fun WriteOffScreen(
                     }
                 )
         })
+}
+
+@Composable
+internal fun WriteOffEntrySheets(
+    state: WriteOffListState,
+    onIntent: (WriteOffListIntent) -> Unit,
+    onTemplateIntent: (TemplateIntent) -> Unit
+) {
+    state.recyclingDetail()?.let { recycling ->
+        if (state.isOpenRecyclingDelete)
+            RecyclingDeleteBottomSheet(
+                item = recycling,
+                onDismissRequest = {
+                    onIntent(WriteOffListIntent.OpenRecyclingDelete(false))
+                },
+                onDeleteClick = { onIntent(WriteOffListIntent.DeleteRecycling) },
+                itemCard = {
+                    RecyclingRawCards(
+                        recycling = recycling,
+                        color = violet_1,
+                        priceSuffix = state.settings.currencySuffix
+                    )
+                }
+            )
+        else if (state.isOpenRecyclingDispose)
+            RecyclingDisposeBottomSheet(
+                item = recycling,
+                onDismissRequest = {
+                    onIntent(WriteOffListIntent.OpenRecyclingDispose(false))
+                },
+                onDisposeClick = { onIntent(WriteOffListIntent.DisposeRecycling) }
+            )
+        else
+            RecyclingDetailBottomSheet(
+                item = recycling,
+                isArchive = state.isArchive,
+                onCompleteClick = {
+                    onIntent(WriteOffListIntent.CompleteRecyclingProduct(it))
+                },
+                onEditClick = {
+                    onIntent(WriteOffListIntent.OpenRecyclingEdit(recycling.recycling.id))
+                },
+                onDeleteClick = {
+                    onIntent(WriteOffListIntent.OpenRecyclingDelete(true))
+                },
+                onDisposeClick = {
+                    onIntent(WriteOffListIntent.OpenRecyclingDispose(true))
+                },
+                onDismissRequest = {
+                    onIntent(WriteOffListIntent.OpenRecyclingDetail(null))
+                }
+            )
+    }
+    if (state.bottomSheetState.isOpenEntry)
+        WriteOffEntryBottomSheet(
+            colors = state.ui.colors,
+            state = state.currentProduct,
+            onIntent = onIntent,
+            onTemplateIntent = onTemplateIntent
+        )
 }
 
 @Composable

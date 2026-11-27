@@ -60,6 +60,7 @@ import com.zaroslikov.data.room.table.ferma.TemplateTable
 import com.zaroslikov.data.room.table.ferma.WriteOffTable
 import com.zaroslikov.data.room.table.ferma.RecyclingTable
 import com.zaroslikov.data.room.table.ferma.RecyclingProductTable
+import com.zaroslikov.data.room.table.ferma.RecyclingInterruptionTable
 import com.zaroslikov.data.room.table.incubator.BookmarkTable
 import com.zaroslikov.data.room.table.incubator.IncubatorTable
 import com.zaroslikov.data.room.table.incubator.TimeNotificationIncubatorTable
@@ -78,6 +79,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         WriteOffTable::class,
         RecyclingTable::class,
         RecyclingProductTable::class,
+        RecyclingInterruptionTable::class,
         AnimalHerdTable::class,
         AnimalTable::class,
         AnimalCountTable::class,
@@ -96,7 +98,7 @@ import com.zaroslikov.data.room.table.project.TimeNotificationProjectTable
         AppSettingsTable::class,
         ProfileTable::class,
     ],
-    version = 18,
+    version = 20,
     exportSchema = false,
 )
 @TypeConverters(

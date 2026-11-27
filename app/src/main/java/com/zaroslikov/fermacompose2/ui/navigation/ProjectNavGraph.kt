@@ -2,7 +2,9 @@ package com.zaroslikov.fermacompose2.ui.navigation
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -13,6 +15,7 @@ import com.zaroslikov.calendar.ui.calendarNavGraph
 import com.zaroslikov.calendar.ui.calendarRoute
 import com.zaroslikov.crm.ui.navigation.CrmDestination
 import com.zaroslikov.crm.ui.navigation.crmNavGraph
+import com.zaroslikov.domain.models.enums.WarehouseCard
 import com.zaroslikov.todo.ui.navigation.TodoDestination
 import com.zaroslikov.todo.ui.navigation.todoNavGraph
 import com.zaroslikov.fermacompose2.ui.finance.FinanceDestination
@@ -48,9 +51,13 @@ import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.Anima
 import com.zaroslikov.fermacompose2.ui.project.sections.animal.list_screen.AnimalListScreen
 import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteDestination
 import com.zaroslikov.fermacompose2.ui.project.sections.note.list_screen.NoteScreen
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.RecyclingListDestination
+import com.zaroslikov.fermacompose2.ui.project.sections.writeOff.list_screen.RecyclingListScreen
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditDestination
 import com.zaroslikov.fermacompose2.ui.warehouse.WarehouseEditScreen
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseDestination
+import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseBalanceDestination
+import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseBalanceScreen
 import com.zaroslikov.fermacompose2.ui.project.warehouse.warehouseScreen.WarehouseScreen
 import com.zaroslikov.fermacompose2.ui.start.first.FirstDestination
 
@@ -85,13 +92,38 @@ fun ProjectNavHost(
                         launchSingleTop = true
                     }
                 },
-                navigateToEdit = { rootNavController.navigate("${WarehouseEditDestination.route}/${it}") },
-                navigateToNote = { navController.navigate("${NoteDestination.route}/${it}") },
-                navigateToTasks = { navController.navigate("${TodoDestination.route}/$it") },
-                navigateToCalendar = {
-                    navController.navigate(calendarRoute(warehouseProjectId)) { launchSingleTop = true }
-                },
-                navigationToAnalysis = {
+                navigateToEdit = { rootNavController.navigate(nav(WarehouseEditDestination.route, it.toString())) },
+                navigateToCard = { card ->
+                    val id = warehouseProjectId.toString()
+                    val route = when (card) {
+                        WarehouseCard.CALENDAR -> calendarRoute(warehouseProjectId)
+                        WarehouseCard.TASKS -> nav(TodoDestination.route, id)
+                        WarehouseCard.NOTES -> nav(NoteDestination.route, id)
+                        WarehouseCard.RECYCLING -> nav(RecyclingListDestination.route, id)
+                        WarehouseCard.PRODUCTION, WarehouseCard.FEED, WarehouseCard.GOODS ->
+                            nav(WarehouseBalanceDestination.route, id, card.code)
+                    }
+                    navController.navigate(route) { launchSingleTop = true }
+                }
+            )
+        }
+        composable(
+            route = WarehouseBalanceDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(WarehouseDestination.itemIdArg) { type = NavType.LongType },
+                navArgument(WarehouseBalanceDestination.cardArg) { type = NavType.StringType }
+            )
+        ) { entry ->
+            val balanceCard = WarehouseCard.entries.first {
+                it.code == entry.arguments?.getString(WarehouseBalanceDestination.cardArg)
+            }
+            val warehouseEntry = remember(entry) {
+                navController.getBackStackEntry(WarehouseDestination.routeWithArgs)
+            }
+            WarehouseBalanceScreen(
+                card = balanceCard,
+                navigateBack = { navController.popBackStack() },
+                navigateToAnalysis = {
                     navController.navigate(
                         nav(
                             FinanceAnalysisDestination.route,
@@ -101,8 +133,14 @@ fun ProjectNavHost(
                         )
                     )
                 },
-                navigationToNewYear = {}
+                viewModel = hiltViewModel(warehouseEntry)
             )
+        }
+        composable(
+            route = RecyclingListDestination.routeWithArgs,
+            arguments = listOf(navArgument(WarehouseDestination.itemIdArg) { type = NavType.LongType })
+        ) {
+            RecyclingListScreen(navigateBack = { navController.popBackStack() })
         }
         composable(
             route = WarehouseEditDestination.routeWithArgs,

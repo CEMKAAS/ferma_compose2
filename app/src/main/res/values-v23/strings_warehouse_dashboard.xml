@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="warehouse_cards_configure">Настроить карточки</string>
+    <string name="warehouse_cards_done">Готово</string>
+    <string name="warehouse_cards_save_error">Не удалось сохранить расположение карточек</string>
+    <string name="warehouse_project_settings">Настройки проекта</string>
+    <string name="warehouse_balance_visible_count">Позиций: %1$s</string>
+    <string name="warehouse_balance_show_nonpositive">Показать нулевые и отрицательные остатки</string>
+    <string name="warehouse_balance_hide_nonpositive">Скрыть нулевые и отрицательные остатки</string>
+    <string name="warehouse_balance_no_positive">Нет позиций с положительным остатком</string>
+    <string name="warehouse_recycling_empty">Партий переработки пока нет</string>
+    <string name="warehouse_recycling_empty_support">Добавьте переработку в разделе списаний</string>
+</resources>

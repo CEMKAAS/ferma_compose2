@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="warehouse_cards_calendar">Календарь</string>
+    <string name="warehouse_cards_feed">Корм</string>
+    <string name="warehouse_cards_recycling">Переработка</string>
+    <string name="warehouse_cards_tasks">Задачи</string>
+    <string name="warehouse_cards_notes">Заметки</string>
+    <string name="warehouse_count_positions">позиций</string>
+    <string name="warehouse_count_in_stock">на складе</string>
+    <string name="warehouse_count_feed_entries">позиций корма</string>
+    <string name="warehouse_count_in_progress">в работе</string>
+    <string name="warehouse_count_notes">записей</string>
+    <string name="warehouse_count_tasks_today">%1$s на сегодня</string>
+    <string name="warehouse_cards_open_calendar">Открыть календарь</string>
+    <string name="warehouse_cards_empty">Все карточки скрыты</string>
+    <string name="warehouse_cards_edit">Изменить</string>
+    <string name="warehouse_cards_edit_title">ИЗМЕНЕНИЕ</string>
+    <string name="warehouse_cards_show_hidden">Скрытые</string>
+    <string name="warehouse_cards_no_hidden">Нет скрытых карточек</string>
+    <string name="warehouse_cards_drag_help">Удерживайте карточку, чтобы переместить</string>
+    <string name="warehouse_cards_hidden">Скрытые карточки</string>
+    <string name="warehouse_cards_actions">Действия с карточкой «%1$s»</string>
+    <string name="warehouse_cards_move_up">Переместить выше</string>
+    <string name="warehouse_cards_move_down">Переместить ниже</string>
+    <string name="warehouse_cards_hide">Скрыть</string>
+    <string name="warehouse_cards_hide_named">Скрыть карточку «%1$s»</string>
+    <string name="warehouse_cards_restore">Вернуть «%1$s»</string>
+</resources>

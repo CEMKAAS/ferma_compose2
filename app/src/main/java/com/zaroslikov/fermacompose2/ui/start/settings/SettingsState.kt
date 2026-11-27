@@ -23,6 +23,7 @@ import com.zaroslikov.domain.models.table.DomainProjectTable
 import com.zaroslikov.domain.models.table.DomainSettings
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.models.table.DomainRecycling
+import com.zaroslikov.domain.models.table.DomainRecyclingInterruption
 import com.zaroslikov.domain.models.table.DomainRecyclingProduct
 import com.zaroslikov.domain.models.table.app.DomainAppSettings
 import com.zaroslikov.domain.models.table.incubator.DomainTimeNotificationIncubator
@@ -57,6 +58,8 @@ data class BackupData(
     val recyclingTable: List<DomainRecycling> = emptyList(),
     /** Продукция партий переработки (с версии схемы 17); в старых бэкапах поля нет. */
     val recyclingProductTable: List<DomainRecyclingProduct> = emptyList(),
+    /** История прерываний переработки (с версии схемы 20). */
+    val recyclingInterruptionTable: List<DomainRecyclingInterruption> = emptyList(),
     val expensesTable: List<DomainExpensesTable> = emptyList(),
     val noteTable: List<DomainNoteTable> = emptyList(),
 

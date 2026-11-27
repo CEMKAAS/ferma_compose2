@@ -8,6 +8,7 @@ import com.zaroslikov.domain.models.dto.shared.DomainCategoryPrice
 import com.zaroslikov.domain.models.dto.shared.DomainTitleSuffixPrice
 import com.zaroslikov.domain.models.enums.Suffix
 import com.zaroslikov.domain.models.table.DomainIncubatorParameters
+import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import kotlinx.coroutines.flow.Flow
 import java.util.Currency
 
@@ -55,7 +56,8 @@ interface ExpensesRepository {
 
     fun getCurrentFoodWarehouse(id: Long): Flow<List<DomainExpensesTable>>
     fun getProjectFeedWithEndDate(idPT: Long): Flow<List<DomainExpensesTable>>
-    suspend fun updateFoodOnWriteOffWarehouse(id: Long)
+    suspend fun hideExhaustedFeed(id: Long, projectId: Long): Boolean
+    suspend fun writeOffFood(id: Long, writeOff: DomainWriteOffTable): Boolean
     fun getAnalysisExpensesNewYearProject(
         id: Long,
         dateBegin: String,

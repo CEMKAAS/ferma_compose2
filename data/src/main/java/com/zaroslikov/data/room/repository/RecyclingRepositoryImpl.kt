@@ -6,7 +6,9 @@ import com.zaroslikov.data.room.mapper.table.toDomainMap
 import com.zaroslikov.data.room.mapper.table.toRoomMap
 import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
 import com.zaroslikov.domain.models.table.DomainRecycling
+import com.zaroslikov.domain.models.table.DomainRecyclingInterruption
 import com.zaroslikov.domain.models.table.DomainRecyclingProduct
+import com.zaroslikov.domain.models.table.DomainRecyclingSummary
 import com.zaroslikov.domain.models.table.DomainRecyclingWithProducts
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import com.zaroslikov.domain.repository.RecyclingRepository
@@ -26,13 +28,23 @@ class RecyclingRepositoryImpl @Inject constructor(
     override fun getAllRecyclingProductsForExport(): Flow<List<DomainRecyclingProduct>> =
         recyclingDao.getAllRecyclingProductsForExport().map { list -> list.map { it.toDomainMap() } }
 
+    override fun getAllRecyclingInterruptionsForExport(): Flow<List<DomainRecyclingInterruption>> =
+        recyclingDao.getAllRecyclingInterruptionsForExport().map { list -> list.map { it.toDomainMap() } }
+
     override suspend fun clearAndInsertRecyclingForImport(
         list: List<DomainRecycling>,
-        products: List<DomainRecyclingProduct>
+        products: List<DomainRecyclingProduct>,
+        interruptions: List<DomainRecyclingInterruption>
     ) = recyclingDao.clearAndInsertRecyclingForImport(
         list.map { it.toRoomMap() },
-        products.map { it.toRoomMap() }
+        products.map { it.toRoomMap() },
+        interruptions.map { it.toRoomMap() }
     )
+
+    override fun observeSummary(idPT: Long): Flow<DomainRecyclingSummary> =
+        recyclingDao.observeSummary(idPT).map {
+            DomainRecyclingSummary(it.activeBatches, it.activePositions, it.completedBatches, it.interruptedBatches)
+        }
 
     override fun getRecyclingList(idPT: Long): Flow<List<DomainRecyclingWithProducts>> =
         combine(

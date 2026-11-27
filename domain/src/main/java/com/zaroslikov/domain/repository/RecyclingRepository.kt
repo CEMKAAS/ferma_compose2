@@ -2,7 +2,9 @@ package com.zaroslikov.domain.repository
 
 import com.zaroslikov.domain.models.dto.shared.DomainTitleCountSuffix
 import com.zaroslikov.domain.models.table.DomainRecycling
+import com.zaroslikov.domain.models.table.DomainRecyclingInterruption
 import com.zaroslikov.domain.models.table.DomainRecyclingProduct
+import com.zaroslikov.domain.models.table.DomainRecyclingSummary
 import com.zaroslikov.domain.models.table.DomainRecyclingWithProducts
 import com.zaroslikov.domain.models.table.DomainWriteOffTable
 import kotlinx.coroutines.flow.Flow
@@ -13,10 +15,15 @@ interface RecyclingRepository {
 
     fun getAllRecyclingProductsForExport(): Flow<List<DomainRecyclingProduct>>
 
+    fun getAllRecyclingInterruptionsForExport(): Flow<List<DomainRecyclingInterruption>>
+
     suspend fun clearAndInsertRecyclingForImport(
         list: List<DomainRecycling>,
-        products: List<DomainRecyclingProduct>
+        products: List<DomainRecyclingProduct>,
+        interruptions: List<DomainRecyclingInterruption> = emptyList()
     )
+
+    fun observeSummary(idPT: Long): Flow<DomainRecyclingSummary>
 
     /** Партии переработки проекта с продукцией (незавершённая — первой, по дате готовности) и сырьём. */
     fun getRecyclingList(idPT: Long): Flow<List<DomainRecyclingWithProducts>>

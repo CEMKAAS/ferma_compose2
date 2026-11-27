@@ -1,8 +1,10 @@
 package com.zaroslikov.data.room.mapper.table
 
+import com.zaroslikov.data.room.table.ferma.RecyclingInterruptionTable
 import com.zaroslikov.data.room.table.ferma.RecyclingProductTable
 import com.zaroslikov.data.room.table.ferma.RecyclingTable
 import com.zaroslikov.domain.models.table.DomainRecycling
+import com.zaroslikov.domain.models.table.DomainRecyclingInterruption
 import com.zaroslikov.domain.models.table.DomainRecyclingProduct
 
 fun DomainRecycling.toRoomMap(): RecyclingTable = RecyclingTable(
@@ -59,4 +61,18 @@ fun RecyclingProductTable.toDomainMap(): DomainRecyclingProduct = DomainRecyclin
     isCompleted = isCompleted,
     addId = addId,
     idPT = idPT
+)
+
+fun DomainRecyclingInterruption.toRoomMap() = RecyclingInterruptionTable(
+    id = id,
+    idPT = idPT,
+    recyclingId = recyclingId,
+    endedCurrentCycle = endedCurrentCycle
+)
+
+fun RecyclingInterruptionTable.toDomainMap() = DomainRecyclingInterruption(
+    id = id,
+    idPT = idPT,
+    recyclingId = recyclingId,
+    endedCurrentCycle = endedCurrentCycle
 )
